@@ -88,6 +88,7 @@ PROJ_LIBS = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_ROOT)/include
 BOARD     = ST_NUCLEO32_F042K6
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
