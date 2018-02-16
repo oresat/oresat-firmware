@@ -82,6 +82,7 @@ PROJECT = app_candev
 
 # Imported source files and paths
 PROJ_ROOT = ../..
+APP_ROOT  = .
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 CONFDIR   = conf
 PROJ_LIBS = $(PROJ_ROOT)/common
@@ -102,7 +103,8 @@ include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
-# Auto-build files in ./source recursively.
+# Auto-build files recursively.
+include $(APP_ROOT)/app.mk
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
 #include $(CHIBIOS)/test/lib/test.mk
