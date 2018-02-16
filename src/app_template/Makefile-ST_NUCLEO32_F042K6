@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_blinky
+PROJECT   = app_template
 
 # Define board here
 BOARD     = ST_NUCLEO32_F042K6
@@ -100,8 +100,8 @@ AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 #Board specific directories
 CONFDIR   = conf
-BUILDDIR  = $(PROJ_ROOT)/build
-DEPDIR    = $(PROJ_ROOT)/.dep
+BUILDDIR  = $(APP_ROOT)/build
+DEPDIR    = $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Licensing files.

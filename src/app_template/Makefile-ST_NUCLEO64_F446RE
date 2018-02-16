@@ -100,8 +100,8 @@ AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 #Board specific directories
 CONFDIR   = conf
-BUILDDIR  = $(PROJ_ROOT)/build
-DEPDIR    = $(PROJ_ROOT)/.dep
+BUILDDIR  = $(APP_ROOT)/build
+DEPDIR    = $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Licensing files.
