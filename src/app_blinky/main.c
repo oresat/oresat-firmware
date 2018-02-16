@@ -25,8 +25,15 @@
  * @{
  */
 
+/*
+ * ChibiOS header files
+ */
 #include "ch.h"
 #include "hal.h"
+
+/*
+ * Project header files
+ */
 
 /*
  * Serial configuration
@@ -38,7 +45,6 @@ static SerialConfig ser_cfg =
     0,          //
     0,          //
 };
-
 
 /*
  * Green LED blinker thread, times are in milliseconds.

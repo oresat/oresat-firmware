@@ -25,8 +25,16 @@
  * @{
  */
 
+/*
+ * ChibiOS header files
+ */
 #include "ch.h"
 #include "hal.h"
+
+/*
+ * Project header files
+ */
+#include "can.h"
 
 /*
  * Serial configuration
@@ -38,7 +46,6 @@ static SerialConfig ser_cfg =
     0,          //
     0,          //
 };
-
 
 /*
  * CAN Register configuration
@@ -130,7 +137,7 @@ static THD_FUNCTION(can_tx, p)
 
 static void app_init(void)
 {
-    // Start up debug output, chprintf(DEBUG_CHP,...)
+    // Start up debug output
     sdStart(&SD2, &ser_cfg);
 
 

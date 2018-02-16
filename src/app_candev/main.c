@@ -4,7 +4,7 @@
  */
 
 /*
-   ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,8 +25,16 @@
  * @{
  */
 
+/*
+ * ChibiOS header files
+ */
 #include "ch.h"
 #include "hal.h"
+
+/*
+ * Project header files
+ */
+#include "can.h"
 
 /*
  * Serial configuration
@@ -38,7 +46,6 @@ static SerialConfig ser_cfg =
     0,          //
     0,          //
 };
-
 
 /*
  * CAN Register configuration
