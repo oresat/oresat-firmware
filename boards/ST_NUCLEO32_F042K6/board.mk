@@ -1,8 +1,8 @@
 # List of all the board related files.
-BOARDSRC = ./board.c
+BOARDSRC = $(BOARDDIR)/board.c
 
 # Required include directories
-BOARDINC = .
+BOARDINC = $(BOARDDIR)
 
 # Shared variables
 ALLCSRC += $(BOARDSRC)
