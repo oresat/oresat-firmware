@@ -82,6 +82,7 @@ PROJECT = app_blinky
 
 # Imported source files and paths
 PROJ_ROOT = ../..
+APP_ROOT  = .
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 CONFDIR   = conf
 PROJ_LIBS = $(PROJ_ROOT)/common
