@@ -35,6 +35,7 @@
  * Project header files
  */
 #include "can.h"
+#include "example.h"
 
 /*
  * Serial configuration
