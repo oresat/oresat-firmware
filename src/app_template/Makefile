@@ -66,7 +66,12 @@ endif
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x400
+endif
+
+# Enables the use of FPU (no, softfp, hard).
+ifeq ($(USE_FPU),)
+  USE_FPU = no
 endif
 
 #
@@ -78,18 +83,26 @@ endif
 #
 
 # Define project name here
-PROJECT = app_candev
+PROJECT = app_template
 
-# Imported source files and paths
+# Define board here
+BOARD     = ST_NUCLEO32_F042K6
+
+#Project sources
 PROJ_ROOT = ../..
 APP_ROOT  = .
+
+# Imported source files and paths
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
-CONFDIR   = conf
 PROJ_LIBS = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_ROOT)/include
-BOARD     = ST_NUCLEO32_F042K6
-BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 AUTOBUILD_ROOT = $(PROJ_LIBS)
+
+#Board specific directories
+CONFDIR   = conf
+BUILDDIR  = $(PROJ_ROOT)/build
+DEPDIR    = $(PROJ_ROOT)/.dep
+BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
