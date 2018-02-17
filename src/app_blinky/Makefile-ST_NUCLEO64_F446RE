@@ -96,6 +96,7 @@ APP_ROOT  = .
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 PROJ_LIBS = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_ROOT)/include
+TOOLCHAIN = $(PROJ_ROOT)/toolchain
 AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 #Board specific directories
@@ -116,7 +117,7 @@ include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
-# Auto-build files in ./source recursively.
+# Auto-build files recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(APP_ROOT)/app.mk
 # Other files (optional).
