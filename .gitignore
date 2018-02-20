@@ -71,4 +71,4 @@ dkms.conf
 
 ## Custom definitions
 # build dirs
-build/
+build*/

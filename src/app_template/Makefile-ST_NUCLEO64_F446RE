@@ -94,16 +94,18 @@ APP_ROOT  = .
 
 # Imported source files and paths
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
-PROJ_LIBS = $(PROJ_ROOT)/common
+PROJ_SRC = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_ROOT)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
-AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 #Board specific directories
 CONFDIR   = conf
 BUILDDIR  = $(APP_ROOT)/build
 DEPDIR    = $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+# Project specific files
+include $(PROJ_SRC)/common.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -119,7 +121,6 @@ include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Auto-build files recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
-include $(APP_ROOT)/app.mk
 # Other files (optional).
 #include $(CHIBIOS)/test/lib/test.mk
 #include $(CHIBIOS)/test/rt/rt_test.mk
@@ -182,7 +183,7 @@ UADEFS =
 UINCDIR = $(PROJ_INC)
 
 # List the user directory to look for the libraries here
-ULIBDIR = $(PROJ_LIBS)
+ULIBDIR = $(PROJ_SRC)
 
 # List all user libraries here
 ULIBS =
