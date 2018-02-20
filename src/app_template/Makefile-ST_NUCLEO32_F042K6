@@ -96,7 +96,7 @@ APP_ROOT  = .
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 PROJ_LIBS = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_ROOT)/include
-TOOLS_DIR = $(PROJ_ROOT)/tools
+TOOLCHAIN = $(PROJ_ROOT)/toolchain
 AUTOBUILD_ROOT = $(PROJ_LIBS)
 
 #Board specific directories
