@@ -105,10 +105,6 @@ int main(void)
      */
     halInit();
     chSysInit();
-    // Initialize CAN Subsystem
-    can_init();
-    // Start CAN threads
-    can_start();
 
     // Initialize and start app
     app_init();
