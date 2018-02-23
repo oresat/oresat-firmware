@@ -48,6 +48,21 @@ static SerialConfig ser_cfg =
     0,          //
 };
 
+/*
+ * App thread definitions
+ */
+static THD_WORKING_AREA(waThread1, 128);
+static THD_FUNCTION(Thread1, arg) {
+
+  (void)arg;
+  chRegSetThreadName("thread1");
+
+  while (!chThdShouldTerminateX()) {
+    chThdSleepMilliseconds(500);
+  }
+}
+
+
 static void app_init(void)
 {
     /*
@@ -64,6 +79,7 @@ static void main_app(void)
     /*
      * Start app threads
      */
+    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     /*
      * Begin main loop
