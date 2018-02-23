@@ -30,6 +30,7 @@
  */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /*
  * Project header files
@@ -66,6 +67,10 @@ static THD_FUNCTION(Thread1, arg) {
 
 static void app_init(void)
 {
+    /*
+     * App initializations
+     */
+
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
 
@@ -74,8 +79,10 @@ static void app_init(void)
 static void main_app(void)
 {
     /*
-     * Starting the blinker thread
+     * Start app threads
      */
+
+    //Blinker thread
     chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     /*
@@ -98,12 +105,16 @@ int main(void)
      */
     halInit();
     chSysInit();
-    app_init();
+    // Initialize CAN Subsystem
+    can_init();
+    // Start CAN threads
+    can_start();
 
+    // Initialize and start app
+    app_init();
     main_app();
 
     return 0;
 }
 
 //! @}
-

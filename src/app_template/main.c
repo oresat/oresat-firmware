@@ -30,6 +30,7 @@
  */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /*
  * Project header files
@@ -49,17 +50,20 @@ static SerialConfig ser_cfg =
 
 static void app_init(void)
 {
+    /*
+     * App initializations
+     */
+
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
 
-    // Initialize CAN Subsystem
-    can_init();
 }
 
 static void main_app(void)
 {
-    // Start CAN threads
-    can_start();
+    /*
+     * Start app threads
+     */
 
     /*
      * Begin main loop
@@ -81,8 +85,13 @@ int main(void)
      */
     halInit();
     chSysInit();
-    app_init();
+    // Initialize CAN Subsystem
+    can_init();
+    // Start CAN threads
+    can_start();
 
+    // Initialize and start app
+    app_init();
     main_app();
 
     return 0;
