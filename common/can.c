@@ -2,17 +2,13 @@
  * CAN Subsystem implementation
  */
 
-#include "ch.h"
-#include "hal.h"
-
 #include "can.h"
 
 /*
  * Receiver thread.
  */
 static THD_WORKING_AREA(can_rx_wa, 256);
-static THD_FUNCTION(can_rx, p)
-{
+static THD_FUNCTION(can_rx, p) {
     event_listener_t        el;
     CANRxFrame              rxmsg;
 
@@ -27,14 +23,11 @@ static THD_FUNCTION(can_rx, p)
     palClearLine(LINE_LED_GREEN);
 
     // Start RX Loop
-    while (!chThdShouldTerminateX())
-    {
-        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0)
-        {
+    while (!chThdShouldTerminateX()) {
+        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0) {
             continue;
         }
-        while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK)
-        {
+        while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
             palToggleLine(LINE_LED_GREEN);
         }
@@ -48,8 +41,7 @@ static THD_FUNCTION(can_rx, p)
  * Transmitter thread.
  */
 static THD_WORKING_AREA(can_tx_wa, 256);
-static THD_FUNCTION(can_tx, p)
-{
+static THD_FUNCTION(can_tx, p) {
     CANTxFrame txmsg;
 
     (void)p;
@@ -68,27 +60,26 @@ static THD_FUNCTION(can_tx, p)
     txmsg.data8[7] = 0x07;
 
     // Start TX Loop
-    while (!chThdShouldTerminateX())
-    {
+    while (!chThdShouldTerminateX()) {
         canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
         chThdSleepMilliseconds(500);
     }
 }
 
 
-void can_init(void)
-{
+void can_init(void) {
     /*
      * Activates CAN driver 1.
      */
     canStart(&CAND1, &cancfg);
+    return;
 }
 
-void can_start(void)
-{
+void can_start(void) {
     /*
      * Starting the transmitter and receiver threads.
      */
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
     chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
+    return;
 }

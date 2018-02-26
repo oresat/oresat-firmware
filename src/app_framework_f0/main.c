@@ -1,8 +1,3 @@
-/*! \file main.c
- *  app_framework_f0
- *
- */
-
 /*
     ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
 
@@ -19,27 +14,15 @@
     limitations under the License.
 */
 
-/*!
- * \defgroup main app_framework_f0 main
- *
- * @{
- */
-
-/*
- * ChibiOS header files
- */
+//=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
 
-/*
- * Project header files
- */
+//=== Project header files
 #include "can.h"
 
-/*
- * Serial configuration
- */
+//=== Serial configuration
 static SerialConfig ser_cfg =
 {
     115200,     //Baud rate
@@ -48,9 +31,8 @@ static SerialConfig ser_cfg =
     0,          //
 };
 
-/*
- * App thread definitions
- */
+//=== Thread definitions
+
 static THD_WORKING_AREA(waThread1, 128);
 static THD_FUNCTION(Thread1, arg) {
 
@@ -63,22 +45,18 @@ static THD_FUNCTION(Thread1, arg) {
 }
 
 
-static void app_init(void)
-{
-    /*
-     * App initializations
-     */
+static void app_init(void) {
+    //=== App initialization
 
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
 
 }
 
-static void main_app(void)
-{
-    /*
-     * Start app threads
-     */
+static void main_app(void) {
+    //=== Start application threads
+
+    //Example thread creation
     chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     /*
@@ -90,8 +68,7 @@ static void main_app(void)
     }
 }
 
-int main(void)
-{
+int main(void) {
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers

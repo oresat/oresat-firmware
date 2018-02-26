@@ -4,6 +4,9 @@
 #ifndef _CAN_H_
 #define _CAN_H_
 
+#include "ch.h"
+#include "hal.h"
+
 /*
  * CAN Register configuration
  * See section 22.7.7 on the STM32 reference manual.

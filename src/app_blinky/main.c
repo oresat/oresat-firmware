@@ -1,12 +1,7 @@
-/*! \file main.c
- *  app_blinky
- *
- */
-
 /*
     ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
-    Licensed under the Apache License, Version 2.0 (the "License");
 
+    Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
@@ -19,26 +14,14 @@
     limitations under the License.
 */
 
-/*!
- * \defgroup main app_blinky main
- *
- * @{
- */
-
-/*
- * ChibiOS header files
- */
+//=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
 
-/*
- * Project header files
- */
+//=== Project header files
 
-/*
- * Serial configuration
- */
+//=== Serial configuration
 static SerialConfig ser_cfg =
 {
     115200,     //Baud rate
@@ -47,9 +30,9 @@ static SerialConfig ser_cfg =
     0,          //
 };
 
-/*
- * Green LED blinker thread, times are in milliseconds.
- */
+//=== Thread definitions
+
+// Green LED blinker thread, times are in milliseconds.
 static THD_WORKING_AREA(waThread1, 128);
 static THD_FUNCTION(Thread1, arg) {
 
@@ -65,22 +48,16 @@ static THD_FUNCTION(Thread1, arg) {
 }
 
 
-static void app_init(void)
-{
-    /*
-     * App initializations
-     */
+static void app_init(void) {
+    //=== App initialization
 
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
 
 }
 
-static void main_app(void)
-{
-    /*
-     * Start app threads
-     */
+static void main_app(void) {
+    //=== Start application threads
 
     //Blinker thread
     chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
@@ -94,8 +71,7 @@ static void main_app(void)
     }
 }
 
-int main(void)
-{
+int main(void) {
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers
