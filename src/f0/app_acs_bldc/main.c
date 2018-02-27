@@ -36,7 +36,7 @@ static THD_WORKING_AREA(wa_bldcThread,128);
 static THD_FUNCTION(bldcThread,arg){
   (void)arg;
   chRegSetThreadName("bldc");
-	bldcInit();
+//	bldcInit();
 	bldcSinStart();
 	
   while(!chThdShouldTerminateX()){
@@ -46,23 +46,25 @@ static THD_FUNCTION(bldcThread,arg){
 
 static void app_init(void){
 	// Start up debug output
+	bldcInit();
+//	bldcSinStart();
 	sdStart(&SD2, &ser_cfg);
 }
 
 static void app_main(void){
 	chThdCreateStatic(
-			wa_bldcThread,
-			sizeof(wa_bldcThread), 
-			NORMALPRIO, 
-			bldcThread, 
-			NULL
+		wa_bldcThread,
+		sizeof(wa_bldcThread), 
+		NORMALPRIO, 
+		bldcThread, 
+		NULL
 	);
 
 	/*
 	 * Begin main loop
 	 */
 	while (true){
-			chThdSleepMilliseconds(1000);
+		chThdSleepMilliseconds(1000);
 	}
 }
 
