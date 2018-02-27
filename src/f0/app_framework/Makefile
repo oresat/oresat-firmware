@@ -60,7 +60,7 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x400
+  USE_PROCESS_STACKSIZE = 0x200
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
@@ -83,13 +83,13 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template
+PROJECT   = app_framework
 
 # Define board here
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ST_NUCLEO32_F042K6
 
 #Project sources
-PROJ_ROOT = ../..
+PROJ_ROOT = ../../..
 APP_ROOT  = .
 
 # Imported source files and paths
@@ -110,15 +110,15 @@ include $(PROJ_SRC)/common.mk
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
-include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
+include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32F0xx/platform.mk
 include $(BOARDDIR)/board.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
+include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
 # Auto-build files recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
@@ -128,7 +128,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
+LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -197,7 +197,7 @@ ULIBS =
 # Compiler settings
 #
 
-MCU  = cortex-m4
+MCU  = cortex-m0
 
 #TRGT = arm-elf-
 TRGT = arm-none-eabi-

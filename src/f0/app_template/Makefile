@@ -89,7 +89,7 @@ PROJECT   = app_template
 BOARD     = ST_NUCLEO32_F042K6
 
 #Project sources
-PROJ_ROOT = ../..
+PROJ_ROOT = ../../..
 APP_ROOT  = .
 
 # Imported source files and paths
