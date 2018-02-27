@@ -4,8 +4,34 @@
 #ifndef _CAN_H_
 #define _CAN_H_
 
+//ChibiOS headers
 #include "ch.h"
 #include "hal.h"
+
+//Project headers
+
+//Definitions
+
+typedef enum {
+    CAN_ID_NMT_SERVICE       = 0x000,   //Network management
+    CAN_ID_SYNC              = 0x080,   //Synchronous message
+    CAN_ID_EMERGENCY         = 0x080,   //Emergency messages (+nodeID)
+    CAN_ID_TIME_STAMP        = 0x100,   //Time stamp message
+    CAN_ID_TPDO_1            = 0x180,   //TPDO1 (+nodeID)
+    CAN_ID_RPDO_1            = 0x200,   //RPDO1 (+nodeID)
+    CAN_ID_TPDO_2            = 0x280,   //TPDO2 (+nodeID)
+    CAN_ID_RPDO_2            = 0x300,   //RPDO2 (+nodeID)
+    CAN_ID_TPDO_3            = 0x380,   //TPDO3 (+nodeID)
+    CAN_ID_RPDO_3            = 0x400,   //RPDO3 (+nodeID)
+    CAN_ID_TPDO_4            = 0x480,   //TPDO4 (+nodeID)
+    CAN_ID_RPDO_4            = 0x500,   //RPDO5 (+nodeID)
+    CAN_ID_TSDO              = 0x580,   //SDO response (+nodeID)
+    CAN_ID_RSDO              = 0x600,   //SDO request (+nodeID)
+    CAN_ID_HEARTBEAT         = 0x700    //Heartbeat message
+} CAN_ID_t;
+
+
+
 
 /*
  * CAN Register configuration
@@ -27,8 +53,8 @@ static const CANConfig cancfg = {
     CAN_BTR_BRP(5)          //Bit Rate Prescaler
 };
 
+//CAN subsystem initialization and invocation functions
 void can_init(void);
-
 void can_start(void);
 
 #endif

@@ -18,10 +18,6 @@ static THD_FUNCTION(can_rx, p) {
     // Register RX event
     chEvtRegister(&CAND1.rxfull_event, &el, 0);
 
-    // Configure Status LED (Green)
-    palSetLineMode(LINE_LED_GREEN, PAL_MODE_OUTPUT_PUSHPULL);
-    palClearLine(LINE_LED_GREEN);
-
     // Start RX Loop
     while (!chThdShouldTerminateX()) {
         if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0) {
@@ -29,7 +25,7 @@ static THD_FUNCTION(can_rx, p) {
         }
         while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
-            palToggleLine(LINE_LED_GREEN);
+
         }
     }
 
@@ -46,18 +42,20 @@ static THD_FUNCTION(can_tx, p) {
 
     (void)p;
     chRegSetThreadName("transmitter");
+
+    //Initialize txmsg struct
     txmsg.IDE = CAN_IDE_STD;
     txmsg.SID = 0x000;
     txmsg.RTR = CAN_RTR_DATA;
     txmsg.DLC = 8;
     txmsg.data8[0] = 0x00;
-    txmsg.data8[1] = 0x01;
-    txmsg.data8[2] = 0x02;
-    txmsg.data8[3] = 0x03;
-    txmsg.data8[4] = 0x04;
-    txmsg.data8[5] = 0x05;
-    txmsg.data8[6] = 0x06;
-    txmsg.data8[7] = 0x07;
+    txmsg.data8[1] = 0x00;
+    txmsg.data8[2] = 0x00;
+    txmsg.data8[3] = 0x00;
+    txmsg.data8[4] = 0x00;
+    txmsg.data8[5] = 0x00;
+    txmsg.data8[6] = 0x00;
+    txmsg.data8[7] = 0x00;
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
