@@ -1,6 +1,9 @@
 ## Based on github/gitignore templates
 ##
 
+# bear
+compile_commands.json
+
 ## Vim-specific files
 # swap
 [._]*.s[a-v][a-z]
