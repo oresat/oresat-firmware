@@ -79,7 +79,7 @@ static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
 }
 
 static PWMConfig pwmcfg = {
-  PWM_CLOCK_FREQ,	
+  PWM_TIMER_FREQ,	
   PWM_PERIOD,	
   pwmpcb,
   {

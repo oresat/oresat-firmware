@@ -12,9 +12,9 @@ typedef struct{
 	int phase_shift;
 } BldcConfig;
 
-#define PWM_CLOCK_FREQ	40000U
-#define PWM_FREQ				1U
-#define PWM_PERIOD			PWM_CLOCK_FREQ/PWM_FREQ
+#define PWM_TIMER_FREQ	40000U
+#define PWM_FREQ				360U // periods per sec
+#define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ
 
 #define PWM_CH1					0U
 #define PWM_CH2					1U
