@@ -1,13 +1,28 @@
 #ifndef ACS_BLDC_H
 #define ACS_BLDC_H
 
+//*
+#define SINUSOIDAL 
+//*/
+/*
+#define SIXSTEP
+//*/
+
+#ifdef SINUSOIDAL
+#undef SIXSTEP
+#endif
+
+#ifdef SIXSTEP
+#undef SINUSOIDAL
+#endif
+
 #include "ch.h"
 #include "hal.h"
 
 typedef struct{
-	int stepU;
-	int stepV;
-	int stepW;
+	int step_u;
+	int step_v;
+	int step_w;
 	int sinctrl_size;
 	int phase_shift;
 } BldcConfig;
