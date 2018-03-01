@@ -32,7 +32,7 @@ BldcConfig bldc;
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
-  //palClearLine(LINE_LED_GREEN);
+  palClearLine(LINE_LED_GREEN);
 	
 	++bldc.step_u;
   ++bldc.step_v;
@@ -51,7 +51,7 @@ static void pwmpcb(PWMDriver *pwmp) {
 
 static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-  //palSetLine(LINE_LED_GREEN);
+  palSetLine(LINE_LED_GREEN);
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH1,
@@ -61,7 +61,7 @@ static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
 
 static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
- 	//palSetLine(LINE_LED_GREEN);
+ 	palSetLine(LINE_LED_GREEN);
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH2,
@@ -71,7 +71,7 @@ static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
 
 static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-  //palSetLine(LINE_LED_GREEN);
+  palSetLine(LINE_LED_GREEN);
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH3,
@@ -100,7 +100,7 @@ static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
 
 static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
- 	//palSetLine(LINE_LED_GREEN);
+ 	palSetLine(LINE_LED_GREEN);
 /*
 	pwmEnableChannelI(
 		&PWMD1,
@@ -139,18 +139,29 @@ static PWMConfig pwmcfg = {
 };
 
 extern void bldcInit(){
+
+#ifdef SINUSOIDAL
 	bldc.sinctrl_size = sizeof(sinctrl)/sizeof(int);
   bldc.phase_shift = bldc.sinctrl_size/3;
   bldc.step_u = 0;
   bldc.step_v = bldc.step_u + bldc.phase_shift;
   bldc.step_w = bldc.step_v + bldc.phase_shift;
+#endif
 
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
+#ifdef SINUSOIDAL
 	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH1));
   pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH2));
   pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH3));
+#endif
+
+#ifdef SIXSTEP
+	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
+  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
+  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
+#endif
 
 	pwmEnableChannelNotification(&PWMD1,PWM_CH1);
   pwmEnableChannelNotification(&PWMD1,PWM_CH2);

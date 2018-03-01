@@ -1,10 +1,10 @@
 #ifndef ACS_BLDC_H
 #define ACS_BLDC_H
 
-//*
+/*
 #define SINUSOIDAL 
 //*/
-/*
+//*
 #define SIXSTEP
 //*/
 
@@ -27,9 +27,15 @@ typedef struct{
 	int phase_shift;
 } BldcConfig;
 
+/*
 #define PWM_TIMER_FREQ	40000U
 #define PWM_FREQ				360U // periods per sec
-#define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ
+//*/
+//*
+#define PWM_TIMER_FREQ	1e6  // Hz
+#define PWM_FREQ				1000 // periods per sec
+//*/
+#define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 
 #define PWM_CH1					0U
 #define PWM_CH2					1U
