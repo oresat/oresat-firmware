@@ -1,5 +1,5 @@
 /*
- * CAN Subsystem header file
+ * CAN Subsystem Header file
  */
 #ifndef _CAN_H_
 #define _CAN_H_
@@ -9,9 +9,9 @@
 #include "hal.h"
 
 //Project headers
+#include "can_hw.h"
 
 //Definitions
-
 typedef enum {
     CAN_ID_NMT_SERVICE       = 0x000,   //Network management
     CAN_ID_SYNC              = 0x080,   //Synchronous message
@@ -30,31 +30,50 @@ typedef enum {
     CAN_ID_HEARTBEAT         = 0x700    //Heartbeat message
 } CAN_ID_t;
 
+typedef struct {
+    uint8_t     node_id;
+    uint8_t     err_code;
+    uint32_t    bitrate;
+    uint32_t    heartbeat_time;
+    uint32_t    heartbeat_timestamp;
+    CANTxFrame  heartbeat_msg;
+    uint8_t     error_reg;
+} node_cfg;
 
+typedef struct {
+#ifdef USE_EVENT_TIME
+    uint32_t    event_time;
+    uint32_t    event_timestamp;
+#endif
+#ifdef USE_INHIBIT_TIME
+    uint32_t    inhibit_time;
+    uint32_t    inhibit_timestamp;
+    uint8_t     inhibit_status;
+#endif
+    uint8_t     offset;
+    CANTxFrame  msg;
+} tpdo_cfg;
 
+typedef struct {
+    uint32_t    canid;
+    uint8_t     len;
+    uint8_t     offset;
+} rpdo_cfg;
 
-/*
- * CAN Register configuration
- * See section 22.7.7 on the STM32 reference manual.
- * Timing calculator:
- * http://www.bittiming.can-wiki.info/
- */
-static const CANConfig cancfg = {
-    // MCR (Master Control Register)
-    CAN_MCR_ABOM      |     //Automatic Bus-Off Management
-    CAN_MCR_AWUM      |     //Automatic Wakeup Mode
-    CAN_MCR_TXFP      ,     //Transmit FIFO Priority
-    // BTR (Bit Timing Register)
-    // Note: Convert to zero based values here when using the calculator
-    // CAN_BTR_LBKM     |     //Loopback Mode (Debug)
-    CAN_BTR_SJW(0)    |     //Synchronization Jump Width
-    CAN_BTR_TS1(12)   |     //Time Segment 1
-    CAN_BTR_TS2(1)    |     //Time Segment 2
-    CAN_BTR_BRP(5)          //Bit Rate Prescaler
-};
+//Function prototypes
 
 //CAN subsystem initialization and invocation functions
 void can_init(void);
 void can_start(void);
+
+void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t offset);
+void can_initRPDO(uint8_t pdo_num, uint32_t can_id, uint8_t len, uint8_t offset);
+
+uint8_t can_processStack(void);
+
+void can_reset_app(void);
+void can_reset_comms(void);
+
+void can_fatal_error(uint32_t err_code);
 
 #endif
