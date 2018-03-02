@@ -33,20 +33,24 @@ static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
   palClearLine(LINE_LED_GREEN);
-	
-	++bldc.step_u;
-  ++bldc.step_v;
-  ++bldc.step_w;
 
-  if(bldc.step_u >= 360){
-    bldc.step_u = 0;
-  }
-  if(bldc.step_v >= 360){
-    bldc.step_v = 0;
-  }
-  if(bldc.step_w >= 360){
-    bldc.step_w = 0;
-  }
+//	if(bldc.count==0){
+		++bldc.step_u;
+		++bldc.step_v;
+		++bldc.step_w;
+
+		if(bldc.step_u >= 360){
+			bldc.step_u = 0;
+		}
+		if(bldc.step_v >= 360){
+			bldc.step_v = 0;
+		}
+		if(bldc.step_w >= 360){
+			bldc.step_w = 0;
+		}
+		bldc.count=0;
+//	}
+//	++bldc.count;
 }
 
 static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
@@ -84,12 +88,25 @@ static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   palClearLine(LINE_LED_GREEN);
+	bldc.step_u+=3333;
+  bldc.step_v+=3333;
+  bldc.step_w+=3333;
+
+  if(bldc.step_u >= 9999){
+    bldc.step_u = 0;
+  }
+  if(bldc.step_v >= 9999){
+    bldc.step_v = 0;
+  }
+  if(bldc.step_w >= 9999){
+    bldc.step_w = 0;
+  }
 }
 
 static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-//  palSetLine(LINE_LED_GREEN);
-/*
+  palSetLine(LINE_LED_GREEN);
+//*
 	pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH1,
@@ -101,7 +118,7 @@ static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
 static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
  	palSetLine(LINE_LED_GREEN);
-/*
+//*
 	pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH2,
@@ -112,8 +129,8 @@ static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
 
 static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-//  palSetLine(LINE_LED_GREEN);
-/*
+  palSetLine(LINE_LED_GREEN);
+//*
 	pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH3,
@@ -146,6 +163,12 @@ extern void bldcInit(){
   bldc.step_u = 0;
   bldc.step_v = bldc.step_u + bldc.phase_shift;
   bldc.step_w = bldc.step_v + bldc.phase_shift;
+	bldc.count=0;
+#endif
+#ifdef SIXSTEP
+	bldc.step_u = 0;
+  bldc.step_v = 3333;
+  bldc.step_w = 6666;
 #endif
 
 	pwmStart(&PWMD1, &pwmcfg);
@@ -158,9 +181,9 @@ extern void bldcInit(){
 #endif
 
 #ifdef SIXSTEP
-	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
-  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
-  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000));
+	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_u));
+  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_v));
+  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_w));
 #endif
 
 	pwmEnableChannelNotification(&PWMD1,PWM_CH1);
