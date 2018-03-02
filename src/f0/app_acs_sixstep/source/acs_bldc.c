@@ -27,6 +27,7 @@ int sinctrl[] = {
 
 BldcConfig bldc;
 
+#ifdef SINUSOIDAL
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
@@ -81,6 +82,63 @@ static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,sinctrl[bldc.step_w])
 	);
 }
+#endif
+
+#ifdef SIXSTEP
+static void pwmpcb(PWMDriver *pwmp) {
+  (void)pwmp;
+  palClearLine(LINE_LED_GREEN);
+	bldc.step_u+=3333;
+  bldc.step_v+=3333;
+  bldc.step_w+=3333;
+
+  if(bldc.step_u >= 9999){
+    bldc.step_u = 0;
+  }
+  if(bldc.step_v >= 9999){
+    bldc.step_v = 0;
+  }
+  if(bldc.step_w >= 9999){
+    bldc.step_w = 0;
+  }
+}
+
+static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
+  (void)pwmp;
+  palSetLine(LINE_LED_GREEN);
+//*
+	pwmEnableChannelI(
+		&PWMD1,
+		PWM_CH1,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_u)
+	);
+//*/
+}
+
+static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
+  (void)pwmp;
+ 	palSetLine(LINE_LED_GREEN);
+//*
+	pwmEnableChannelI(
+		&PWMD1,
+		PWM_CH2,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_v)
+	);
+//*/
+}
+
+static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
+  (void)pwmp;
+  palSetLine(LINE_LED_GREEN);
+//*
+	pwmEnableChannelI(
+		&PWMD1,
+		PWM_CH3,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_w)
+	);
+//*/
+}
+#endif
 
 static PWMConfig pwmcfg = {
   PWM_TIMER_FREQ,	
@@ -98,19 +156,35 @@ static PWMConfig pwmcfg = {
 };
 
 extern void bldcInit(){
+
+#ifdef SINUSOIDAL
 	bldc.sinctrl_size = sizeof(sinctrl)/sizeof(int);
   bldc.phase_shift = bldc.sinctrl_size/3;
   bldc.step_u = 0;
   bldc.step_v = bldc.step_u + bldc.phase_shift;
   bldc.step_w = bldc.step_v + bldc.phase_shift;
 	bldc.count=0;
+#endif
+#ifdef SIXSTEP
+	bldc.step_u = 0;
+  bldc.step_v = 3333;
+  bldc.step_w = 6666;
+#endif
 
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
+#ifdef SINUSOIDAL
 	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH1));
   pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH2));
   pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH3));
+#endif
+
+#ifdef SIXSTEP
+	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_u));
+  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_v));
+  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_w));
+#endif
 
 	pwmEnableChannelNotification(&PWMD1,PWM_CH1);
   pwmEnableChannelNotification(&PWMD1,PWM_CH2);

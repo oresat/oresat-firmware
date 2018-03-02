@@ -1,6 +1,21 @@
 #ifndef ACS_BLDC_H
 #define ACS_BLDC_H
 
+//*
+#define SINUSOIDAL 
+//*/
+/*
+#define SIXSTEP
+//*/
+
+#ifdef SINUSOIDAL
+#undef SIXSTEP
+#endif
+
+#ifdef SIXSTEP
+#undef SINUSOIDAL
+#endif
+
 #include "ch.h"
 #include "hal.h"
 
