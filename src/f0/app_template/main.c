@@ -22,6 +22,8 @@
 //=== Project header files
 #include "can.h"
 
+#include "thread1.h"
+
 //=== Serial configuration
 static SerialConfig ser_cfg =
 {
@@ -30,23 +32,6 @@ static SerialConfig ser_cfg =
     0,          //
     0,          //
 };
-
-//=== Thread definitions
-
-// Example blinker thread
-static THD_WORKING_AREA(waThread1, 128);
-static THD_FUNCTION(Thread1, arg) {
-
-  (void)arg;
-  chRegSetThreadName("thread1");
-
-  while (!chThdShouldTerminateX()) {
-    palClearLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
-    palSetLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
-  }
-}
 
 
 static void app_init(void) {

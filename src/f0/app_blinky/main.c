@@ -20,6 +20,7 @@
 #include "chprintf.h"
 
 //=== Project header files
+#include "blinky.h"
 
 //=== Serial configuration
 static SerialConfig ser_cfg =
@@ -29,23 +30,6 @@ static SerialConfig ser_cfg =
     0,          //
     0,          //
 };
-
-//=== Thread definitions
-
-// Green LED blinker thread, times are in milliseconds.
-static THD_WORKING_AREA(waThread1, 128);
-static THD_FUNCTION(Thread1, arg) {
-
-  (void)arg;
-  chRegSetThreadName("blinker");
-
-  while (!chThdShouldTerminateX()) {
-    palClearLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
-    palSetLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
-  }
-}
 
 
 static void app_init(void) {
