@@ -45,7 +45,7 @@ THD_FUNCTION(can_tx, p) {
 
     //Initialize txmsg struct
     txmsg.IDE = CAN_IDE_STD;
-    txmsg.SID = 0x000;
+    txmsg.SID = 0x7FF;
     txmsg.RTR = CAN_RTR_DATA;
     txmsg.DLC = 8;
     txmsg.data8[0] = 0x00;

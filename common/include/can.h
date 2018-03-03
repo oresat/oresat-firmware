@@ -63,7 +63,7 @@ typedef struct {
 //Function prototypes
 
 //CAN subsystem initialization and invocation functions
-void can_init(void);
+void can_init(uint8_t node_id);
 void can_start(void);
 
 void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t offset);
