@@ -95,7 +95,7 @@ APP_ROOT  = .
 # Imported source files and paths
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 PROJ_SRC = $(PROJ_ROOT)/common
-PROJ_INC  = $(PROJ_ROOT)/include
+PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 #Board specific directories
