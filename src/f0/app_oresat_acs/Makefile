@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template
+PROJECT   = app_oresat_acs
 
 # Define board here
 BOARD     = ST_NUCLEO32_F042K6
