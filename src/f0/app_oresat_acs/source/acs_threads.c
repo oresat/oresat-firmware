@@ -1,11 +1,11 @@
-#include "thread1.h"
+#include "acs_threads.h"
 
 // Example blinker thread
-THD_WORKING_AREA(waThread1, 128);
-THD_FUNCTION(Thread1, arg) {
+THD_WORKING_AREA(waACSThread, 128);
+THD_FUNCTION(ACSThread, arg) {
 
   (void)arg;
-  chRegSetThreadName("thread1");
+  chRegSetThreadName("acsthread");
 
   while (!chThdShouldTerminateX()) {
     palClearLine(LINE_LED_GREEN);

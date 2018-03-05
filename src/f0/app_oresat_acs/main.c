@@ -14,6 +14,23 @@
     limitations under the License.
 */
 
+/*
+ *	OreSat: Attitude Control System
+ *	Portland State Aerospace Society (PSAS)
+ *	
+ *  // be wery wery quiet i'm hunting wabbits...
+ *
+ *	// add your name if you break things
+ *	// and you are paying attention
+ *	// and you want your broken things in
+ *	// space 
+ *	
+ *	// o_0
+ *
+ *	Chad Coates	
+ *
+ */
+
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
@@ -22,61 +39,57 @@
 //=== Project header files
 #include "can.h"
 
-#include "thread1.h"
+#include "acs_threads.h"
 
 //=== Serial configuration
-static SerialConfig ser_cfg =
-{
-    115200,     //Baud rate
-    0,          //
-    0,          //
-    0,          //
+static SerialConfig ser_cfg = {
+	115200,     //Baud rate
+	0,          //
+	0,          //
+	0,          //
 };
 
+static void app_init(void){
+	//=== App initialization
 
-static void app_init(void) {
-    //=== App initialization
-
-    // Start up debug output
-    sdStart(&SD2, &ser_cfg);
-
+	// Start up debug output
+	sdStart(&SD2, &ser_cfg);
 }
 
-static void main_app(void) {
-    //=== Start application threads
+static void app_main(void){
+	//=== Start application threads
 
-    //Example thread creation
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+	//Example thread creation
+	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
 
-    /*
-     * Begin main loop
-     */
-    while (true)
-    {
-        chThdSleepMilliseconds(1000);
-    }
+	/*
+	 * Begin main loop
+	 */
+	while(true){
+		chThdSleepMilliseconds(1000);
+	}
 }
 
-int main(void) {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-    // Initialize CAN Subsystem
-    can_init();
-    // Start CAN threads
-    can_start();
+int main(void){
+	/*
+	 * System initializations.
+	 * - HAL initialization, this also initializes the configured device drivers
+	 *   and performs the board-specific initializations.
+	 * - Kernel initialization, the main() function becomes a thread and the
+	 *   RTOS is active.
+	 */
+	halInit();
+	chSysInit();
+	// Initialize CAN Subsystem
+	can_init();
+	// Start CAN threads
+	can_start();
 
-    // Initialize and start app
-    app_init();
-    main_app();
+	// Initialize and start app
+	app_init();
+	app_main();
 
-    return 0;
+	return 0;
 }
 
 //! @}
