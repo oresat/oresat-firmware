@@ -1,34 +1,106 @@
 /*
- * CAN Subsystem Hardware Implementation
+ * CAN Subsystem Implementation
  */
 
 #include "can.h"
 
-void can_init(void) {
+node_cfg node;
+tpdo_cfg tpdo_objects[4];
+rpdo_cfg rpdo_objects[4];
 
-    /*
-     * Activates CAN driver 1.
-     */
-    canStart(&CAND1, &cancfg);
+void can_init(uint8_t node_id, uint32_t heartbeat) {
+    // If node_id is greater than maximum node ID (127), set to maximum node ID
+    // TODO: Exception
+    if (node_id > 0x7F) {
+        node_id = 0x7F;
+    }
+
+    // Initialize node configuration data
+    node.node_id = node_id;
+    node.err_code = 0x00;
+    node.bitrate = 500U;
+    node.heartbeat_time = heartbeat;
+    node.heartbeat_timestamp = 0x00;
+    node.error_reg = 0x00;
+
+    // Initialize the node HB message. COB ID for HB is 0x700 + Node ID
+    node.heartbeat_msg.IDE = CAN_IDE_STD;
+    node.heartbeat_msg.SID = 0x700 + node_id;
+    node.heartbeat_msg.RTR = CAN_RTR_DATA;
+    node.heartbeat_msg.DLC = 1;
+    node.heartbeat_msg.data8[0] = 0x05;
+
+    // Initialize all TPDO and RPDO objects to defaults
+    for (uint8_t i = 0; i < 3; ++i) {
+        can_initTPDO(i, 0, 0, 0, 0, NULL);
+        can_initRPDO(i, 0, 0, NULL);
+    }
+    // Initialize the hardware
+    can_hw_init();
+
     return;
 }
 
 void can_start(void) {
-    /*
-     * Starting the transmitter and receiver threads.
-     */
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
-    return;
-}
-
-
-void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t offset) {
+    // Start the CAN subsystem threads
+    can_start_threads();
 
     return;
 }
 
-void can_initRPDO(uint8_t pdo_num, uint32_t can_id, uint8_t len, uint8_t offset) {
+// TPDO Initialization
+// pdo_num is a zero-based index of TPDO 1-4
+// can_id is the CAN Message ID the TPDO is sent with. Set to zero (0) to use default
+void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
+    // If the pdo_num is greater than 3 (TPDO 4), set to maximum value 3.
+    // TODO: Exception
+    if (pdo_num > 3) {
+        pdo_num = 3;
+    }
+
+    // Initialize TPDO configuration data
+    tpdo_objects[pdo_num].event_time = event_tim;
+    tpdo_objects[pdo_num].event_timestamp = 0x00;
+    tpdo_objects[pdo_num].inhibit_time = inhibit_tim;
+    tpdo_objects[pdo_num].inhibit_timestamp = 0x00;
+    tpdo_objects[pdo_num].inhibit_status = 0x00;
+    tpdo_objects[pdo_num].pdata = pdata;
+
+    // Initialize TPDO TX Frame
+    tpdo_objects[pdo_num].msg.IDE = CAN_IDE_STD;
+    tpdo_objects[pdo_num].msg.RTR = CAN_RTR_DATA;
+    tpdo_objects[pdo_num].msg.DLC = len;
+
+    // If the can_id is zero, set the default value (TPDO# base ID + Node ID)
+    if (!can_id) {
+        tpdo_objects[pdo_num].msg.SID = (((pdo_num + 1) << 8) | 0x80) + node.node_id;
+    } else {
+        tpdo_objects[pdo_num].msg.SID = can_id;
+    }
+
+    return;
+}
+
+// RPDO Initialization
+// pdo_num is a zero-based index of RRDO 1-4
+// can_id is the CAN Message ID the RPDO is watching for. Set to zero (0) to use default
+void can_initRPDO(uint8_t pdo_num, uint32_t can_id, uint8_t len, uint8_t *pdata) {
+    // If the pdo_num is greater than 3 (RPDO 4), set to maximum value 3.
+    // TODO: Exception
+    if (pdo_num > 3) {
+        pdo_num = 3;
+    }
+
+    // Initialize RPDO configuration data
+    rpdo_objects[pdo_num].len = len;
+    rpdo_objects[pdo_num].pdata = pdata;
+
+    // If the can_id is zero, set the default value (RPDO# base ID + Node ID)
+    if (!can_id) {
+        rpdo_objects[pdo_num].can_id = ((pdo_num + 2) << 8) + node.node_id;
+    } else {
+        rpdo_objects[pdo_num].can_id = can_id;
+    }
 
     return;
 }
@@ -44,11 +116,6 @@ void can_reset_app(void) {
     return;
 }
 void can_reset_comms(void) {
-
-    return;
-}
-
-void can_fatal_error(uint32_t err_code) {
 
     return;
 }

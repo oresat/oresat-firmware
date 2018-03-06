@@ -9,32 +9,19 @@
 #include "hal.h"
 
 //Project headers
+#include "can.h"
 
 //Definitions
+#define INIT 0x01
+#define CERR 0x02
+#define ERPA 0x04
+#define RXOR 0x08
+#define TXOR 0x10
+#define BOFF 0x80
 
-/*
- * CAN Register configuration
- * See section 22.7.7 on the STM32 reference manual.
- * Timing calculator:
- * http://www.bittiming.can-wiki.info/
- */
-static const CANConfig cancfg = {
-    // MCR (Master Control Register)
-    CAN_MCR_ABOM      |     //Automatic Bus-Off Management
-    CAN_MCR_AWUM      |     //Automatic Wakeup Mode
-    CAN_MCR_TXFP      ,     //Transmit FIFO Priority
-    // BTR (Bit Timing Register)
-    // Note: Convert to zero based values here when using the calculator
-    // CAN_BTR_LBKM     |     //Loopback Mode (Debug)
-    CAN_BTR_SJW(0)    |     //Synchronization Jump Width
-    CAN_BTR_TS1(12)   |     //Time Segment 1
-    CAN_BTR_TS2(1)    |     //Time Segment 2
-    CAN_BTR_BRP(5)          //Bit Rate Prescaler
-};
+extern const CANConfig cancfg;
 
-extern THD_WORKING_AREA(can_rx_wa, 256);
-extern THD_FUNCTION(can_rx, p);
-extern THD_WORKING_AREA(can_tx_wa, 256);
-extern THD_FUNCTION(can_tx, p);
+//Function prototypes
+uint8_t can_hw_init(void);
 
 #endif

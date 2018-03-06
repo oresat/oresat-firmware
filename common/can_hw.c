@@ -5,61 +5,31 @@
 #include "can_hw.h"
 
 /*
- * Receiver thread.
+ * CAN Register configuration
+ * See section 22.7.7 on the STM32 reference manual.
+ * Timing calculator:
+ * http://www.bittiming.can-wiki.info/
+ * Default: 500Kbps based on 48MHz clock
  */
-THD_WORKING_AREA(can_rx_wa, 256);
-THD_FUNCTION(can_rx, p) {
-    event_listener_t        el;
-    CANRxFrame              rxmsg;
+const CANConfig cancfg = {
+    // MCR (Master Control Register)
+    CAN_MCR_ABOM      |     //Automatic Bus-Off Management
+    CAN_MCR_AWUM      |     //Automatic Wakeup Mode
+    CAN_MCR_TXFP      ,     //Transmit FIFO Priority
+    // BTR (Bit Timing Register)
+    // Note: Convert to zero based values here when using the calculator
+    // CAN_BTR_LBKM     |     //Loopback Mode (Debug)
+    CAN_BTR_SJW(0)    |     //Synchronization Jump Width
+    CAN_BTR_TS1(12)   |     //Time Segment 1
+    CAN_BTR_TS2(1)    |     //Time Segment 2
+    CAN_BTR_BRP(5)          //Bit Rate Prescaler
+};
 
-    (void)p;
-    // Set thread name
-    chRegSetThreadName("receiver");
-    // Register RX event
-    chEvtRegister(&CAND1.rxfull_event, &el, 0);
+uint8_t can_hw_init(void) {
+    /*
+     * Activates CAN driver 1.
+     */
+    canStart(&CAND1, &cancfg);
 
-    // Start RX Loop
-    while (!chThdShouldTerminateX()) {
-        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0) {
-            continue;
-        }
-        while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
-            /* Process message.*/
-
-        }
-    }
-
-    //Unregister RX event before terminating thread
-    chEvtUnregister(&CAND1.rxfull_event, &el);
-}
-
-/*
- * Transmitter thread.
- */
-THD_WORKING_AREA(can_tx_wa, 256);
-THD_FUNCTION(can_tx, p) {
-    CANTxFrame txmsg;
-
-    (void)p;
-    chRegSetThreadName("transmitter");
-
-    //Initialize txmsg struct
-    txmsg.IDE = CAN_IDE_STD;
-    txmsg.SID = 0x7FF;
-    txmsg.RTR = CAN_RTR_DATA;
-    txmsg.DLC = 8;
-    txmsg.data8[0] = 0x00;
-    txmsg.data8[1] = 0x00;
-    txmsg.data8[2] = 0x00;
-    txmsg.data8[3] = 0x00;
-    txmsg.data8[4] = 0x00;
-    txmsg.data8[5] = 0x00;
-    txmsg.data8[6] = 0x00;
-    txmsg.data8[7] = 0x00;
-
-    // Start TX Loop
-    while (!chThdShouldTerminateX()) {
-        canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
-        chThdSleepMilliseconds(500);
-    }
+    return true;
 }
