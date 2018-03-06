@@ -31,7 +31,7 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     node.heartbeat_msg.data8[0] = 0x05;
 
     // Initialize all TPDO and RPDO objects to defaults
-    for (uint8_t i = 0; i < 3; ++i) {
+    for (uint8_t i = 0; i < 4; ++i) {
         can_initTPDO(i, 0, 0, 0, 0, NULL);
         can_initRPDO(i, 0, 0, NULL);
     }

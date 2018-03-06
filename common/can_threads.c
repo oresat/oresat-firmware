@@ -26,7 +26,7 @@ THD_FUNCTION(can_rx, p) {
 
         while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
-            for (uint8_t i = 0; i < 3; ++i) {
+            for (uint8_t i = 0; i < 4; ++i) {
                 if (!rpdo_objects[i].pdata) {
                     continue;
                 }
@@ -57,7 +57,7 @@ THD_FUNCTION(can_tx, p) {
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
-        for (uint8_t i = 0; i < 3; ++i)
+        for (uint8_t i = 0; i < 4; ++i)
         {
             if (!tpdo_objects[i].pdata) {
                 continue;
