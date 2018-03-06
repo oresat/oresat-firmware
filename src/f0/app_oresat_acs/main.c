@@ -14,59 +14,63 @@
     limitations under the License.
 */
 
+/*
+ *	OreSat: Attitude Control System
+ *	Portland State Aerospace Society (PSAS)
+ *	
+ *  // be wery wery quiet i'm hunting wabbits...
+ *
+ *	// add your name if you break things
+ *	// and you are paying attention
+ *	// and you want your broken things in
+ *	// space 
+ *	
+ *	// o_0
+ *
+ *	Chad Coates	
+ *
+ */
+
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
 
 //=== Project header files
-//#include "can.h"
-#include "acs_bldc.h"
+#include "can.h"
+
+#include "acs_threads.h"
 
 //=== Serial configuration
 static SerialConfig ser_cfg = {
-    115200,     //Baud rate
-    0,          //
-    0,          //
-    0,          //
+	115200,     //Baud rate
+	0,          //
+	0,          //
+	0,          //
 };
 
-// bldc control thread
-static THD_WORKING_AREA(wa_bldcThread,128);
-static THD_FUNCTION(bldcThread,arg){
-  (void)arg;
-  chRegSetThreadName("bldc");
-//	bldcSinStart();
-	
-  while(!chThdShouldTerminateX()){
-    chThdSleepMilliseconds(500);
-  }
-}
-
 static void app_init(void){
+	//=== App initialization
+
 	// Start up debug output
-	bldcInit();
 	sdStart(&SD2, &ser_cfg);
 }
 
 static void app_main(void){
-	chThdCreateStatic(
-		wa_bldcThread,
-		sizeof(wa_bldcThread), 
-		NORMALPRIO, 
-		bldcThread, 
-		NULL
-	);
+	//=== Start application threads
+
+	//Example thread creation
+	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
 
 	/*
 	 * Begin main loop
 	 */
-	while (true){
+	while(true){
 		chThdSleepMilliseconds(1000);
 	}
 }
 
-int main(void) {
+int main(void){
 	/*
 	 * System initializations.
 	 * - HAL initialization, this also initializes the configured device drivers
@@ -77,9 +81,9 @@ int main(void) {
 	halInit();
 	chSysInit();
 	// Initialize CAN Subsystem
-	//can_init();
+	can_init();
 	// Start CAN threads
-	//can_start();
+	can_start();
 
 	// Initialize and start app
 	app_init();
