@@ -35,7 +35,7 @@ THD_FUNCTION(can_rx, p) {
                         // TODO: Exception
                         continue;
                     }
-                    for (uint8_t j = 0; j < (rxmsg.DLC - 1); ++j) {
+                    for (uint8_t j = 0; j < rxmsg.DLC; ++j) {
                         rpdo_objects[i].pdata[j] = rxmsg.data8[j];
                     }
                 }
@@ -62,7 +62,7 @@ THD_FUNCTION(can_tx, p) {
             if (!tpdo_objects[i].pdata) {
                 continue;
             }
-            for (uint8_t j = 0; j < (tpdo_objects[i].msg.DLC - 1); ++j)
+            for (uint8_t j = 0; j < tpdo_objects[i].msg.DLC; ++j)
             {
                 tpdo_objects[i].msg.data8[j] = tpdo_objects[i].pdata[j];
             }

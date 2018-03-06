@@ -37,7 +37,7 @@ static SerialConfig ser_cfg =
 
 static void app_init(void) {
     //=== App initialization
-    for (uint8_t i = 0; i < (ARRAYSIZE - 1); ++i)
+    for (uint8_t i = 0; i < ARRAYSIZE; ++i)
     {
         data_array[i] = i;
     }
