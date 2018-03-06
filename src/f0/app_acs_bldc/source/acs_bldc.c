@@ -108,9 +108,19 @@ extern void bldcInit(){
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
+/*
 	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH1));
   pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH2));
   pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH3));
+//*/
+//*
+	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_u));
+  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_v));
+  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_w));
+//*/
+
+	// enable pwm center aligned mode
+	PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
 
 	pwmEnableChannelNotification(&PWMD1,PWM_CH1);
   pwmEnableChannelNotification(&PWMD1,PWM_CH2);
