@@ -7,7 +7,7 @@
 /*
  * Receiver thread.
  */
-THD_WORKING_AREA(can_rx_wa, 256);
+THD_WORKING_AREA(can_rx_wa, 64);
 THD_FUNCTION(can_rx, p) {
     event_listener_t        el;
     CANRxFrame              rxmsg;
@@ -50,7 +50,7 @@ THD_FUNCTION(can_rx, p) {
 /*
  * Transmitter thread.
  */
-THD_WORKING_AREA(can_tx_wa, 256);
+THD_WORKING_AREA(can_tx_wa, 64);
 THD_FUNCTION(can_tx, p) {
     (void)p;
     chRegSetThreadName("transmitter");
@@ -72,7 +72,7 @@ THD_FUNCTION(can_tx, p) {
     }
 }
 
-THD_WORKING_AREA(can_hb_wa, 256);
+THD_WORKING_AREA(can_hb_wa, 64);
 THD_FUNCTION(can_hb, p) {
     (void)p;
     chRegSetThreadName("heartbeat");
