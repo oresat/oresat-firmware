@@ -22,6 +22,10 @@
 //=== Project header files
 #include "can.h"
 
+#define ARRAYSIZE 8
+
+static uint8_t data_array[ARRAYSIZE];
+
 //=== Serial configuration
 static SerialConfig ser_cfg =
 {
@@ -31,9 +35,13 @@ static SerialConfig ser_cfg =
     0,          //
 };
 
-
 static void app_init(void) {
     //=== App initialization
+    for (uint8_t i = 0; i < ARRAYSIZE; ++i)
+    {
+        data_array[i] = i;
+    }
+    can_initTPDO(0, 0, 0, 0, ARRAYSIZE, data_array);
 
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
@@ -64,7 +72,7 @@ int main(void) {
     halInit();
     chSysInit();
     // Initialize CAN Subsystem
-    can_init();
+    can_init(0x01, 200);
     // Start CAN threads
     can_start();
 

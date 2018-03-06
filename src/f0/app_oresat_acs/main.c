@@ -70,24 +70,24 @@ static void app_main(void){
 	}
 }
 
-int main(void){
-	/*
-	 * System initializations.
-	 * - HAL initialization, this also initializes the configured device drivers
-	 *   and performs the board-specific initializations.
-	 * - Kernel initialization, the main() function becomes a thread and the
-	 *   RTOS is active.
-	 */
-	halInit();
-	chSysInit();
-	// Initialize CAN Subsystem
-	can_init();
-	// Start CAN threads
-	can_start();
+int main(void) {
+    /*
+     * System initializations.
+     * - HAL initialization, this also initializes the configured device drivers
+     *   and performs the board-specific initializations.
+     * - Kernel initialization, the main() function becomes a thread and the
+     *   RTOS is active.
+     */
+    halInit();
+    chSysInit();
+    // Initialize CAN Subsystem
+    can_init(0x01, 200);
+    // Start CAN threads
+    can_start();
 
-	// Initialize and start app
-	app_init();
-	app_main();
+    // Initialize and start app
+    app_init();
+    main_app();
 
 	return 0;
 }
