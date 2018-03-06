@@ -68,7 +68,7 @@ THD_FUNCTION(can_tx, p) {
             }
             canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo_objects[i].msg, TIME_MS2I(100));
         }
-        chThdSleepMilliseconds(500);
+        chThdSleepMilliseconds(20);
     }
 }
 
