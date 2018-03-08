@@ -68,7 +68,7 @@ int main(void) {
     halInit();
     chSysInit();
     // Initialize CAN Subsystem
-    can_init();
+    can_init(0x01, 200);
     // Start CAN threads
     can_start();
 
@@ -78,5 +78,3 @@ int main(void) {
 
     return 0;
 }
-
-//! @}
