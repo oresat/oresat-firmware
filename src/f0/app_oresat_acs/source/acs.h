@@ -1,10 +1,17 @@
-#ifndef _ACS_THREADS_H_
-#define _ACS_THREADS_H_
+#ifndef _ACS_H_
+#define _ACS_H_
 
 #include "ch.h"
 #include "hal.h"
 
-// Example blinker thread prototypes
+#define CAN_NODE 0x01
+
+typedef struct{
+	// o_0
+}ACSConfig;
+
+extern void acs_init(void);
+
 extern THD_WORKING_AREA(waACSThread, 128);
 extern THD_FUNCTION(ACSThread, arg);
 

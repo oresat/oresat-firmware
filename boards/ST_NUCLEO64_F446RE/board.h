@@ -329,7 +329,7 @@
  * PA1  - ARD_A1 ADC123_IN1         (input pullup).
  * PA2  - ARD_D1 USART2_TX          (alternate 7).
  * PA3  - ARD_D0 USART2_RX          (alternate 7).
- * PA4  - SPI1_NSS                  (alternate 5).
+ * PA4  - SPI1_NSS                  (output pushpull high).
  * PA5  - SPI1_SCK                  (alternate 5).
  * PA6  - SPI1_MISO                 (alternate 5).
  * PA7  - SPI1_MOSI                 (alternate 5).
@@ -346,7 +346,7 @@
                                      PIN_MODE_INPUT(GPIOA_ARD_A1) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |     \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |     \
-                                     PIN_MODE_ALTERNATE(GPIOA_SPI1_NSS) |         \
+                                     PIN_MODE_OUTPUT(GPIOA_SPI1_NSS) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |      \
@@ -426,7 +426,7 @@
                                      PIN_AFIO_AF(GPIOA_ARD_A1, 0U) |        \
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 7U) |        \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 7U) |        \
-                                     PIN_AFIO_AF(GPIOA_SPI1_NSS, 5U) |        \
+                                     PIN_AFIO_AF(GPIOA_SPI1_NSS, 0U) |        \
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
                                      PIN_AFIO_AF(GPIOA_SPI1_MOSI, 5U))

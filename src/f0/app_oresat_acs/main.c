@@ -20,9 +20,9 @@
  *	
  *  // be wery wery quiet i'm hunting wabbits...
  *
- *	// add your name if you break things
+ *	// add your name if you code things
  *	// and you are paying attention
- *	// and you want your broken things in
+ *	// and you want your code things in
  *	// space 
  *	
  *	// o_0
@@ -38,10 +38,8 @@
 
 //=== Project header files
 #include "can.h"
+#include "acs.h"
 
-#include "acs_threads.h"
-
-//=== Serial configuration
 static SerialConfig ser_cfg = {
 	115200,     //Baud rate
 	0,          //
@@ -50,45 +48,28 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	//=== App initialization
-
-	// Start up debug output
-	sdStart(&SD2, &ser_cfg);
+	acs_init();	 
+	can_init(CAN_NODE,200);
+	sdStart(&SD2,&ser_cfg); // Start up debug output
 }
 
 static void app_main(void){
-	//=== Start application threads
-
-	//Example thread creation
+  can_start();
+	
 	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
 
-	/*
-	 * Begin main loop
-	 */
 	while(true){
 		chThdSleepMilliseconds(1000);
 	}
 }
 
 int main(void) {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-    // Initialize CAN Subsystem
-    can_init(0x01, 200);
-    // Start CAN threads
-    can_start();
-
-    // Initialize and start app
-    app_init();
-    main_app();
-
+	halInit();
+	chSysInit();
+	
+	app_init();
+	app_main();
+	
 	return 0;
 }
 
