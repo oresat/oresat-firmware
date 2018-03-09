@@ -53,6 +53,7 @@ static void main_app(void) {
      */
     while (true)
     {
+        chprintf((BaseSequentialStream*)&SD2, "Hello!\r\n");
         chThdSleepMilliseconds(1000);
     }
 }
