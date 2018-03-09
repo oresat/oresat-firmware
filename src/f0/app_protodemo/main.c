@@ -53,7 +53,7 @@ static void main_app(void) {
      */
     while (true)
     {
-        chprintf((BaseSequentialStream*)&SD2, "Hello!\r\n");
+        chprintf((BaseSequentialStream*)&SD2, "OreSat Protocard V1.1!\r\n");
         chThdSleepMilliseconds(1000);
     }
 }
