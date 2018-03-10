@@ -7,8 +7,8 @@
 /*
  * Receiver thread.
  */
-THD_WORKING_AREA(can_rx_wa, 128);
-THD_FUNCTION(can_rx, p) {
+THD_WORKING_AREA(can_rpdo_wa, 128);
+THD_FUNCTION(can_rpdo, p) {
     event_listener_t        el;
     CANRxFrame              rxmsg;
 
@@ -27,16 +27,19 @@ THD_FUNCTION(can_rx, p) {
         while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
             for (uint8_t i = 0; i < 4; ++i) {
-                if (!rpdo_objects[i].pdata) {
+                if (rpdo[i].pdata == NULL) {
+                    // RPDO is undefined. Continue to next
                     continue;
                 }
-                if (rxmsg.SID == rpdo_objects[i].can_id){
-                    if (rxmsg.DLC != rpdo_objects[i].len) {
+
+                // If the data received matches this RPDO, copy the data
+                if (rxmsg.SID == rpdo[i].can_id){
+                    if (rxmsg.DLC != rpdo[i].len) {
                         // TODO: Exception
                         continue;
                     }
                     for (uint8_t j = 0; j < rxmsg.DLC; ++j) {
-                        rpdo_objects[i].pdata[j] = rxmsg.data8[j];
+                        rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
                 }
             }
@@ -50,8 +53,8 @@ THD_FUNCTION(can_rx, p) {
 /*
  * Transmitter thread.
  */
-THD_WORKING_AREA(can_tx_wa, 128);
-THD_FUNCTION(can_tx, p) {
+THD_WORKING_AREA(can_tpdo_wa, 128);
+THD_FUNCTION(can_tpdo, p) {
     (void)p;
     chRegSetThreadName("transmitter");
 
@@ -59,16 +62,18 @@ THD_FUNCTION(can_tx, p) {
     while (!chThdShouldTerminateX()) {
         for (uint8_t i = 0; i < 4; ++i)
         {
-            if (!tpdo_objects[i].pdata) {
+            if (tpdo[i].pdata == NULL) {
+                // TPDO is undefined. Continue to next
                 continue;
             }
-            for (uint8_t j = 0; j < tpdo_objects[i].msg.DLC; ++j)
+
+            for (uint8_t j = 0; j < tpdo[i].msg.DLC; ++j)
             {
-                tpdo_objects[i].msg.data8[j] = tpdo_objects[i].pdata[j];
+                tpdo[i].msg.data8[j] = tpdo[i].pdata[j];
             }
-            canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo_objects[i].msg, TIME_MS2I(100));
+            canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
         }
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(200);
     }
 }
 
@@ -89,7 +94,7 @@ void can_start_threads(void) {
     /*
      * Starting the transmitter and receiver threads.
      */
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
+    chThdCreateStatic(can_rpdo_wa, sizeof(can_rpdo_wa), NORMALPRIO + 7, can_rpdo, NULL);
+    chThdCreateStatic(can_tpdo_wa, sizeof(can_tpdo_wa), NORMALPRIO + 7, can_tpdo, NULL);
     chThdCreateStatic(can_hb_wa, sizeof(can_hb_wa), NORMALPRIO + 7, can_hb, NULL);
 }
