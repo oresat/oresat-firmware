@@ -10,10 +10,6 @@ extern void acs_init(void){
 
 }
 
-struct{
-	uint8_t acs[8];
-} ACSdata;
-
 ACSdata data;
 // ACS thread
 THD_WORKING_AREA(waACSThread,128);

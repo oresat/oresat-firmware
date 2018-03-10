@@ -14,52 +14,42 @@
     limitations under the License.
 */
 
-/*
- *	OreSat: Attitude Control System
- *	Portland State Aerospace Society (PSAS)
- *	
- *  // be wery wery quiet i'm hunting wabbits...
- *
- *	// add your name if you code things
- *	// and you are paying attention
- *	// and you want your code things in
- *	// space 
- *	
- *	// o_0
- *
- *	Chad Coates	
- *
- */
-
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
 
 //=== Project header files
-#include "can.h"
-#include "acs.h"
+//#include "can.h"
 #include "acs_bldc.h"
 
+//=== Serial configuration
 static SerialConfig ser_cfg = {
-	115200,     //Baud rate
-	0,          //
-	0,          //
-	0,          //
+    115200,     //Baud rate
+    0,          //
+    0,          //
+    0,          //
 };
 
-static void app_init(void){
-	acs_init();	 
-	bldcInit();
-	initRPDO(0,0,8,&data);
-//	initTPDO();
+// bldc control thread
+static THD_WORKING_AREA(wa_bldcThread,128);
+static THD_FUNCTION(bldcThread,arg){
+  (void)arg;
+  chRegSetThreadName("bldc");
+//	bldcSinStart();
+	
+  while(!chThdShouldTerminateX()){
+    chThdSleepMilliseconds(500);
+  }
+}
 
-	sdStart(&SD2,&ser_cfg); // Start up debug output
+static void app_init(void){
+	// Start up debug output
+	bldcInit();
+	sdStart(&SD2, &ser_cfg);
 }
 
 static void app_main(void){
-	
-//	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
 	chThdCreateStatic(
 		wa_bldcThread,
 		sizeof(wa_bldcThread), 
@@ -68,21 +58,33 @@ static void app_main(void){
 		NULL
 	);
 
-	while(true){
+	/*
+	 * Begin main loop
+	 */
+	while (true){
 		chThdSleepMilliseconds(1000);
 	}
 }
 
 int main(void) {
+	/*
+	 * System initializations.
+	 * - HAL initialization, this also initializes the configured device drivers
+	 *   and performs the board-specific initializations.
+	 * - Kernel initialization, the main() function becomes a thread and the
+	 *   RTOS is active.
+	 */
 	halInit();
 	chSysInit();
-	
-	can_init(CAN_NODE,200);
-  can_start();
-	
+	// Initialize CAN Subsystem
+	//can_init();
+	// Start CAN threads
+	//can_start();
+
+	// Initialize and start app
 	app_init();
 	app_main();
-	
+
 	return 0;
 }
 

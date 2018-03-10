@@ -10,6 +10,10 @@ typedef struct{
 	// o_0
 }ACSConfig;
 
+typedef struct{
+	uint8_t acs[8];
+} ACSdata;
+
 extern void acs_init(void);
 
 extern THD_WORKING_AREA(waACSThread, 128);
