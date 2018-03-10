@@ -83,10 +83,10 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_framework
+PROJECT   = app_protodemo
 
 # Define board here
-BOARD     = ST_NUCLEO32_F042K6
+BOARD     = PROTOCARD_V1_1
 
 #Project sources
 PROJ_ROOT = ../../..
