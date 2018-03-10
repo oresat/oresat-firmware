@@ -20,7 +20,7 @@
 #include "chprintf.h"
 
 //=== Project header files
-#include "can.h"
+#include "oresat.h"
 
 #include "demo.h"
 
@@ -43,6 +43,7 @@ static const I2CConfig i2cfg1 =
     0,
 };
 
+uint8_t data[8];
 
 static void app_init(void) {
     //=== App initialization
@@ -52,6 +53,12 @@ static void app_init(void) {
 
     i2cInit();
     i2cStart(&I2CD1, &i2cfg1);
+
+    for (uint8_t i = 0; i < 8; ++i) {
+        data[i] = 0;
+    }
+
+    can_initTPDO(CAN_PDO_1, CAN_ID_DEFAULT, 0, 0, 8, data);
 }
 
 static void main_app(void) {
@@ -79,10 +86,7 @@ int main(void) {
      */
     halInit();
     chSysInit();
-    // Initialize CAN Subsystem
-    can_init(0x01, 200);
-    // Start CAN threads
-    can_start();
+    oresat_init();
 
     // Initialize and start app
     app_init();
@@ -90,5 +94,3 @@ int main(void) {
 
     return 0;
 }
-
-//! @}

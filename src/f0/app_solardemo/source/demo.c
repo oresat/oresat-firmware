@@ -3,6 +3,7 @@
 const  uint8_t           LTC2990_I2C_ADDR   =    0b1001100;
 static ltc2990_data      monitor_data;
 static solar_v1_p        params;
+extern uint8_t           data[];
 
 // Example blinker thread
 THD_WORKING_AREA(demo_measure_wa, 128);
@@ -38,6 +39,14 @@ THD_FUNCTION(demo_measure, arg) {
         {
             /* READ ALL */
             ltc2990_read_all(&monitor_data, &i2c_errors);
+            data[0] = monitor_data.T_INT_MSB;
+            data[1] = monitor_data.T_INT_LSB;
+            data[2] = monitor_data.VCC_MSB;
+            data[3] = monitor_data.VCC_LSB;
+            data[4] = monitor_data.V1_MSB;
+            data[5] = monitor_data.V1_LSB;
+            data[6] = monitor_data.V3_MSB;
+            data[7] = monitor_data.V3_LSB;
 
             /* TINT */
             ltc2990_error derror;
