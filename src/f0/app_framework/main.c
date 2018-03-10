@@ -20,7 +20,7 @@
 #include "chprintf.h"
 
 //=== Project header files
-#include "can.h"
+#include "oresat.h"
 
 #define ARRAYSIZE 8
 
@@ -71,10 +71,7 @@ int main(void) {
      */
     halInit();
     chSysInit();
-    // Initialize CAN Subsystem
-    can_init(0x01, 200);
-    // Start CAN threads
-    can_start();
+    oresat_init();
 
     // Initialize and start app
     app_init();
@@ -82,5 +79,3 @@ int main(void) {
 
     return 0;
 }
-
-//! @}
