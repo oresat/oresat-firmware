@@ -34,8 +34,8 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
 
     // Initialize all TPDO and RPDO objects
     for (uint8_t i = 0; i < 4; ++i) {
-        can_initTPDO(i, 0, 0, 0, 0, NULL);
-        can_initRPDO(i, 0, 0, NULL);
+        can_initTPDO(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
+        can_initRPDO(i, CAN_ID_DEFAULT, 0, NULL);
     }
 
     // Initialize the hardware

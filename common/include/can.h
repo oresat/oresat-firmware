@@ -32,6 +32,7 @@ typedef enum {
 } CAN_PDO_t;
 
 typedef enum {
+    CAN_ID_DEFAULT          = 0x000,   //Use default CAN ID (non-NMT functions)
     CAN_ID_NMT_SERVICE      = 0x000,   //Network management
     CAN_ID_SYNC             = 0x080,   //Synchronous message
     CAN_ID_EMERGENCY        = 0x080,   //Emergency messages (+nodeID)
