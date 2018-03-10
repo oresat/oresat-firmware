@@ -5,8 +5,8 @@
 #include "can.h"
 
 node_cfg node;
-tpdo_cfg tpdo_objects[4];
-rpdo_cfg rpdo_objects[4];
+tpdo_cfg tpdo[4];
+rpdo_cfg rpdo[4];
 
 void can_init(uint8_t node_id, uint32_t heartbeat) {
     // If node_id is greater than maximum node ID (127), set to maximum node ID
@@ -59,23 +59,23 @@ void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t
     }
 
     // Initialize TPDO configuration data
-    tpdo_objects[pdo_num].event_time = event_tim;
-    tpdo_objects[pdo_num].event_timestamp = 0x00;
-    tpdo_objects[pdo_num].inhibit_time = inhibit_tim;
-    tpdo_objects[pdo_num].inhibit_timestamp = 0x00;
-    tpdo_objects[pdo_num].inhibit_status = 0x00;
-    tpdo_objects[pdo_num].pdata = pdata;
+    tpdo[pdo_num].event_time = event_tim;
+    tpdo[pdo_num].event_timestamp = 0x00;
+    tpdo[pdo_num].inhibit_time = inhibit_tim;
+    tpdo[pdo_num].inhibit_timestamp = 0x00;
+    tpdo[pdo_num].inhibit_status = 0x00;
+    tpdo[pdo_num].pdata = pdata;
 
     // Initialize TPDO TX Frame
-    tpdo_objects[pdo_num].msg.IDE = CAN_IDE_STD;
-    tpdo_objects[pdo_num].msg.RTR = CAN_RTR_DATA;
-    tpdo_objects[pdo_num].msg.DLC = len;
+    tpdo[pdo_num].msg.IDE = CAN_IDE_STD;
+    tpdo[pdo_num].msg.RTR = CAN_RTR_DATA;
+    tpdo[pdo_num].msg.DLC = len;
 
     // If the can_id is zero, set the default value (TPDO# base ID + Node ID)
     if (!can_id) {
-        tpdo_objects[pdo_num].msg.SID = (((pdo_num + 1) << 8) | 0x80) + node.node_id;
+        tpdo[pdo_num].msg.SID = (((pdo_num + 1) << 8) | 0x80) + node.node_id;
     } else {
-        tpdo_objects[pdo_num].msg.SID = can_id;
+        tpdo[pdo_num].msg.SID = can_id;
     }
 
     return;
@@ -92,14 +92,14 @@ void can_initRPDO(uint8_t pdo_num, uint32_t can_id, uint8_t len, uint8_t *pdata)
     }
 
     // Initialize RPDO configuration data
-    rpdo_objects[pdo_num].len = len;
-    rpdo_objects[pdo_num].pdata = pdata;
+    rpdo[pdo_num].len = len;
+    rpdo[pdo_num].pdata = pdata;
 
     // If the can_id is zero, set the default value (RPDO# base ID + Node ID)
     if (!can_id) {
-        rpdo_objects[pdo_num].can_id = ((pdo_num + 2) << 8) + node.node_id;
+        rpdo[pdo_num].can_id = ((pdo_num + 2) << 8) + node.node_id;
     } else {
-        rpdo_objects[pdo_num].can_id = can_id;
+        rpdo[pdo_num].can_id = can_id;
     }
 
     return;

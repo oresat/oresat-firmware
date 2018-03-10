@@ -27,16 +27,19 @@ THD_FUNCTION(can_rx, p) {
         while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
             for (uint8_t i = 0; i < 4; ++i) {
-                if (!rpdo_objects[i].pdata) {
+                if (rpdo[i].pdata == NULL) {
+                    // RPDO is undefined. Continue to next
                     continue;
                 }
-                if (rxmsg.SID == rpdo_objects[i].can_id){
-                    if (rxmsg.DLC != rpdo_objects[i].len) {
+
+                // If the data received matches this RPDO, copy the data
+                if (rxmsg.SID == rpdo[i].can_id){
+                    if (rxmsg.DLC != rpdo[i].len) {
                         // TODO: Exception
                         continue;
                     }
                     for (uint8_t j = 0; j < rxmsg.DLC; ++j) {
-                        rpdo_objects[i].pdata[j] = rxmsg.data8[j];
+                        rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
                 }
             }
@@ -59,16 +62,18 @@ THD_FUNCTION(can_tx, p) {
     while (!chThdShouldTerminateX()) {
         for (uint8_t i = 0; i < 4; ++i)
         {
-            if (!tpdo_objects[i].pdata) {
+            // TPDO is undefined. Continue to next
+            if (tpdo[i].pdata == NULL) {
                 continue;
             }
-            for (uint8_t j = 0; j < tpdo_objects[i].msg.DLC; ++j)
+
+            for (uint8_t j = 0; j < tpdo[i].msg.DLC; ++j)
             {
-                tpdo_objects[i].msg.data8[j] = tpdo_objects[i].pdata[j];
+                tpdo[i].msg.data8[j] = tpdo[i].pdata[j];
             }
-            canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo_objects[i].msg, TIME_MS2I(100));
+            canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
         }
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(200);
     }
 }
 

@@ -16,6 +16,13 @@
 #define CAN_ID_TPDO(n)  ((n << 8) | 0x80)
 #define CAN_ID_RPDO(n)  ((n + 1) << 8)
 
+#undef HAL_USE_CAN
+#undef STM32_CAN_USE_CAN1
+#undef STM32_CAN_CAN1_IRQ_PRIORITY
+
+#define HAL_USE_CAN                 TRUE
+#define STM32_CAN_USE_CAN1          TRUE
+#define STM32_CAN_CAN1_IRQ_PRIORITY 3
 
 //typedef enum {
     //CAN_ID_NMT_SERVICE       = 0x000,   //Network management
@@ -62,8 +69,8 @@ typedef struct {
 } rpdo_cfg;
 
 extern node_cfg node;
-extern tpdo_cfg tpdo_objects[];
-extern rpdo_cfg rpdo_objects[];
+extern tpdo_cfg tpdo[];
+extern rpdo_cfg rpdo[];
 
 /*
  * Function prototypes
