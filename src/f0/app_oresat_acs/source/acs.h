@@ -4,7 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#define CAN_NODE 0x01
+#define CAN_NODE 0x3F // max 0x7f
 
 typedef struct{
 	// o_0

@@ -49,12 +49,13 @@ static SerialConfig ser_cfg = {
 
 static void app_init(void){
 	acs_init();	 
-	can_init(CAN_NODE,200);
+	initRPDO(0,0,8,&data);
+//	initTPDO();
+
 	sdStart(&SD2,&ser_cfg); // Start up debug output
 }
 
 static void app_main(void){
-  can_start();
 	
 	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
 
@@ -66,6 +67,9 @@ static void app_main(void){
 int main(void) {
 	halInit();
 	chSysInit();
+	
+	can_init(CAN_NODE,200);
+  can_start();
 	
 	app_init();
 	app_main();
