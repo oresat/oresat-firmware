@@ -22,8 +22,6 @@
 //=== Project header files
 #include "oresat.h"
 
-#include "thread1.h"
-
 //=== Serial configuration
 static SerialConfig ser_cfg =
 {
@@ -45,8 +43,6 @@ static void app_init(void) {
 static void main_app(void) {
     //=== Start application threads
 
-    //Example thread creation
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     /*
      * Begin main loop
@@ -54,7 +50,10 @@ static void main_app(void) {
     while (true)
     {
         chprintf((BaseSequentialStream*)&SD2, "OreSat Protocard V1.1!\r\n");
-        chThdSleepMilliseconds(1000);
+        palClearLine(LINE_LED_GREEN);
+        chThdSleepMilliseconds(500);
+        palSetLine(LINE_LED_GREEN);
+        chThdSleepMilliseconds(500);
     }
 }
 

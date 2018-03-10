@@ -18,23 +18,26 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     // Initialize node configuration data
     node.node_id = node_id;
     node.err_code = 0x00;
+    //TODO: Implement actual bitrate handling
     node.bitrate = 500U;
     node.heartbeat_time = heartbeat;
     node.heartbeat_timestamp = 0x00;
     node.error_reg = 0x00;
 
-    // Initialize the node HB message. COB ID for HB is 0x700 + Node ID
+    // Initialize the node heartbeat message
+    // CAN ID for heartbeat is 0x700 + Node ID
     node.heartbeat_msg.IDE = CAN_IDE_STD;
-    node.heartbeat_msg.SID = 0x700 + node_id;
+    node.heartbeat_msg.SID = CAN_ID_HEARTBEAT + node_id;
     node.heartbeat_msg.RTR = CAN_RTR_DATA;
     node.heartbeat_msg.DLC = 1;
     node.heartbeat_msg.data8[0] = 0x05;
 
-    // Initialize all TPDO and RPDO objects to defaults
+    // Initialize all TPDO and RPDO objects
     for (uint8_t i = 0; i < 4; ++i) {
         can_initTPDO(i, 0, 0, 0, 0, NULL);
         can_initRPDO(i, 0, 0, NULL);
     }
+
     // Initialize the hardware
     can_hw_init();
 
@@ -51,7 +54,7 @@ void can_start(void) {
 // TPDO Initialization
 // pdo_num is a zero-based index of TPDO 1-4
 // can_id is the CAN Message ID the TPDO is sent with. Set to zero (0) to use default
-void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
+void can_initTPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
     // If the pdo_num is greater than 3 (TPDO 4), set to maximum value 3.
     // TODO: Exception
     if (pdo_num > 3) {
@@ -84,7 +87,7 @@ void can_initTPDO(uint8_t pdo_num, uint32_t can_id, uint32_t event_tim, uint32_t
 // RPDO Initialization
 // pdo_num is a zero-based index of RRDO 1-4
 // can_id is the CAN Message ID the RPDO is watching for. Set to zero (0) to use default
-void can_initRPDO(uint8_t pdo_num, uint32_t can_id, uint8_t len, uint8_t *pdata) {
+void can_initRPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint8_t len, uint8_t *pdata) {
     // If the pdo_num is greater than 3 (RPDO 4), set to maximum value 3.
     // TODO: Exception
     if (pdo_num > 3) {

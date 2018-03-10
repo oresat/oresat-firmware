@@ -7,8 +7,8 @@
 /*
  * Receiver thread.
  */
-THD_WORKING_AREA(can_rx_wa, 128);
-THD_FUNCTION(can_rx, p) {
+THD_WORKING_AREA(can_rpdo_wa, 128);
+THD_FUNCTION(can_rpdo, p) {
     event_listener_t        el;
     CANRxFrame              rxmsg;
 
@@ -53,8 +53,8 @@ THD_FUNCTION(can_rx, p) {
 /*
  * Transmitter thread.
  */
-THD_WORKING_AREA(can_tx_wa, 128);
-THD_FUNCTION(can_tx, p) {
+THD_WORKING_AREA(can_tpdo_wa, 128);
+THD_FUNCTION(can_tpdo, p) {
     (void)p;
     chRegSetThreadName("transmitter");
 
@@ -62,8 +62,8 @@ THD_FUNCTION(can_tx, p) {
     while (!chThdShouldTerminateX()) {
         for (uint8_t i = 0; i < 4; ++i)
         {
-            // TPDO is undefined. Continue to next
             if (tpdo[i].pdata == NULL) {
+                // TPDO is undefined. Continue to next
                 continue;
             }
 
@@ -94,7 +94,7 @@ void can_start_threads(void) {
     /*
      * Starting the transmitter and receiver threads.
      */
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
+    chThdCreateStatic(can_rpdo_wa, sizeof(can_rpdo_wa), NORMALPRIO + 7, can_rpdo, NULL);
+    chThdCreateStatic(can_tpdo_wa, sizeof(can_tpdo_wa), NORMALPRIO + 7, can_tpdo, NULL);
     chThdCreateStatic(can_hb_wa, sizeof(can_hb_wa), NORMALPRIO + 7, can_hb, NULL);
 }
