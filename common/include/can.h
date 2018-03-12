@@ -29,7 +29,7 @@ typedef enum {
     CAN_PDO_2              = 1U,
     CAN_PDO_3              = 2U,
     CAN_PDO_4              = 3U
-} CAN_PDO_t;
+} can_pdo_t;
 
 typedef enum {
     CAN_ID_DEFAULT          = 0x000,   //Use default CAN ID (non-NMT functions)
@@ -48,7 +48,7 @@ typedef enum {
     CAN_ID_TSDO             = 0x580,   //SDO response (+nodeID)
     CAN_ID_RSDO             = 0x600,   //SDO request (+nodeID)
     CAN_ID_HEARTBEAT        = 0x700    //Heartbeat message
-} CAN_ID_t;
+} can_id_t;
 
 typedef struct {
     uint8_t     node_id;
@@ -58,7 +58,7 @@ typedef struct {
     uint32_t    heartbeat_timestamp;
     CANTxFrame  heartbeat_msg;
     uint8_t     error_reg;
-} node_cfg;
+} can_node_t;
 
 typedef struct {
     uint32_t    event_time;
@@ -68,17 +68,17 @@ typedef struct {
     uint8_t     inhibit_status;
     uint8_t     *pdata;
     CANTxFrame  msg;
-} tpdo_cfg;
+} can_tpdo_t;
 
 typedef struct {
     uint32_t    can_id;
     uint8_t     len;
     uint8_t     *pdata;
-} rpdo_cfg;
+} can_rpdo_t;
 
-extern node_cfg node;
-extern tpdo_cfg tpdo[];
-extern rpdo_cfg rpdo[];
+extern can_node_t node;
+extern can_tpdo_t tpdo[];
+extern can_rpdo_t rpdo[];
 
 /*
  * Function prototypes
@@ -89,8 +89,8 @@ void can_init(uint8_t node_id, uint32_t heartbeat);
 void can_start(void);
 
 //TPDO/RPDO initializations
-void can_initTPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata);
-void can_initRPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint8_t len, uint8_t *pdata);
+void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata);
+void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t *pdata);
 
 //CAN Process
 uint8_t can_processStack(void);

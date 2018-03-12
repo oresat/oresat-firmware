@@ -4,9 +4,9 @@
 
 #include "can.h"
 
-node_cfg node;
-tpdo_cfg tpdo[4];
-rpdo_cfg rpdo[4];
+can_node_t node;
+can_tpdo_t tpdo[4];
+can_rpdo_t rpdo[4];
 
 void can_init(uint8_t node_id, uint32_t heartbeat) {
     // If node_id is greater than maximum node ID (127), set to maximum node ID
@@ -34,8 +34,8 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
 
     // Initialize all TPDO and RPDO objects
     for (uint8_t i = 0; i < 4; ++i) {
-        can_initTPDO(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
-        can_initRPDO(i, CAN_ID_DEFAULT, 0, NULL);
+        canTPDOObjectInit(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
+        canRPDOObjectInit(i, CAN_ID_DEFAULT, 0, NULL);
     }
 
     // Initialize the hardware
@@ -54,7 +54,7 @@ void can_start(void) {
 // TPDO Initialization
 // pdo_num is a zero-based index of TPDO 1-4
 // can_id is the CAN Message ID the TPDO is sent with. Set to zero (0) to use default
-void can_initTPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
+void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
     // If the pdo_num is greater than 3 (TPDO 4), set to maximum value 3.
     // TODO: Exception
     if (pdo_num > 3) {
@@ -87,7 +87,7 @@ void can_initTPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint32_t event_tim, uint32
 // RPDO Initialization
 // pdo_num is a zero-based index of RRDO 1-4
 // can_id is the CAN Message ID the RPDO is watching for. Set to zero (0) to use default
-void can_initRPDO(CAN_PDO_t pdo_num, CAN_ID_t can_id, uint8_t len, uint8_t *pdata) {
+void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t *pdata) {
     // If the pdo_num is greater than 3 (RPDO 4), set to maximum value 3.
     // TODO: Exception
     if (pdo_num > 3) {
