@@ -58,7 +58,7 @@ static void app_init(void) {
         data[i] = 0;
     }
 
-    can_initTPDO(CAN_PDO_1, CAN_ID_DEFAULT, 0, 0, 8, data);
+    canTPDOObjectInit(CAN_PDO_1, CAN_ID_DEFAULT, 0, 0, 8, data);
 }
 
 static void main_app(void) {
