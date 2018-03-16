@@ -3,6 +3,6 @@
 
 #include "can.h"
 
-void oresat_init(void);
+void oresat_init(uint8_t node_id);
 
 #endif
