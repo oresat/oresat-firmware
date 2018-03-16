@@ -86,7 +86,7 @@ int main(void) {
      */
     halInit();
     chSysInit();
-    oresat_init();
+    oresat_init(31);
 
     // Initialize and start app
     app_init();
