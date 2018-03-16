@@ -38,9 +38,12 @@ THD_FUNCTION(can_rpdo, p) {
                         // TODO: Exception
                         continue;
                     }
+
+                    chSysLock();
                     for (uint8_t j = 0; j < rxmsg.DLC; ++j) {
                         rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
+                    chSysUnlock();
                 }
             }
         }
@@ -48,6 +51,7 @@ THD_FUNCTION(can_rpdo, p) {
 
     //Unregister RX event before terminating thread
     chEvtUnregister(&CAND1.rxfull_event, &el);
+    chThdExit(MSG_OK);
 }
 
 /*
@@ -67,14 +71,19 @@ THD_FUNCTION(can_tpdo, p) {
                 continue;
             }
 
+            chSysLock();
             for (uint8_t j = 0; j < tpdo[i].msg.DLC; ++j)
             {
                 tpdo[i].msg.data8[j] = tpdo[i].pdata[j];
             }
+            chSysUnlock();
+
+            // Transmit the PDO
             canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
         }
         chThdSleepMilliseconds(200);
     }
+    chThdExit(MSG_OK);
 }
 
 THD_WORKING_AREA(can_hb_wa, 64);
@@ -88,6 +97,7 @@ THD_FUNCTION(can_hb, p) {
         chThdSleepMilliseconds(node.heartbeat_time);
     }
 
+    chThdExit(MSG_OK);
 }
 
 void can_start_threads(void) {
