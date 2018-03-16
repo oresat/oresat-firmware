@@ -39,6 +39,7 @@ THD_FUNCTION(demo_measure, arg) {
         {
             /* READ ALL */
             ltc2990_read_all(&monitor_data, &i2c_errors);
+            chSysLock();
             data[0] = monitor_data.T_INT_MSB;
             data[1] = monitor_data.T_INT_LSB;
             data[2] = monitor_data.VCC_MSB;
@@ -47,6 +48,7 @@ THD_FUNCTION(demo_measure, arg) {
             data[5] = monitor_data.V1_LSB;
             data[6] = monitor_data.V3_MSB;
             data[7] = monitor_data.V3_LSB;
+            chSysUnlock();
 
             /* TINT */
             ltc2990_error derror;
