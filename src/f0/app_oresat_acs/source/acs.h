@@ -16,7 +16,7 @@ typedef struct{
 
 extern void acs_init(void);
 
-extern THD_WORKING_AREA(waACSThread, 128);
-extern THD_FUNCTION(ACSThread, arg);
+extern THD_WORKING_AREA(wa_acsThread, 128);
+extern THD_FUNCTION(acsThread, arg);
 
 #endif

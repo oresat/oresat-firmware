@@ -10,18 +10,17 @@ extern void acs_init(void){
 
 }
 
-ACSdata data;
 // ACS thread
-THD_WORKING_AREA(waACSThread,128);
-THD_FUNCTION(ACSThread,arg) {
+THD_WORKING_AREA(wa_acsThread,128);
+THD_FUNCTION(acsThread,arg) {
 
   (void)arg;
-  chRegSetThreadName("acsthread");
+  chRegSetThreadName("acsThread");
 
   while (!chThdShouldTerminateX()) {
-    palClearLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
-    palSetLine(LINE_LED_GREEN);
-    chThdSleepMilliseconds(500);
+//  palClearLine(LINE_LED_GREEN);
+//  chThdSleepMilliseconds(500);
+//  palSetLine(LINE_LED_GREEN);
+//  chThdSleepMilliseconds(500);
   }
 }

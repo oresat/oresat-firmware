@@ -1,13 +1,13 @@
-#ifndef ACS_BLDC_H
-#define ACS_BLDC_H
+#ifndef _ACS_BLDC_H_
+#define _ACS_BLDC_H_
 
 #include "ch.h"
 #include "hal.h"
 
 typedef struct{
-	int step_u;
-	int step_v;
-	int step_w;
+	int u;
+	int v;
+	int w;
 	int count;
 	int sinctrl_size;
 	int phase_shift;

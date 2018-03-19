@@ -41,6 +41,9 @@
 #include "acs.h"
 #include "acs_bldc.h"
 
+ACSdata data;
+//uint8_t data[8];
+
 static SerialConfig ser_cfg = {
 	115200,     //Baud rate
 	0,          //
@@ -49,17 +52,25 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	acs_init();	 
+//	acs_init();	 
 	bldcInit();
-	initRPDO(0,0,8,&data);
+	can_initRPDO(0,0,8,data.acs);
 //	initTPDO();
 
 	sdStart(&SD2,&ser_cfg); // Start up debug output
 }
 
 static void app_main(void){
-	
-//	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
+/*		
+	chThdCreateStatic(
+		waACSThread,
+		sizeof(waACSThread),
+		NORMALPRIO,
+		ACSThread,
+		NULL
+	);
+//*/
+//*
 	chThdCreateStatic(
 		wa_bldcThread,
 		sizeof(wa_bldcThread), 
@@ -67,7 +78,17 @@ static void app_main(void){
 		bldcThread, 
 		NULL
 	);
+//*/
 
+/*
+	chThdCreateStatic(
+		wa_acsThread,
+		sizeof(wa_acsThread), 
+		NORMALPRIO, 
+		acsThread, 
+		NULL
+	);
+//*/
 	while(true){
 		chThdSleepMilliseconds(1000);
 	}
