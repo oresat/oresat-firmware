@@ -5,9 +5,9 @@
 #include "hal.h"
 
 typedef struct{
-	int step_u;
-	int step_v;
-	int step_w;
+	int u;
+	int v;
+	int w;
 	int count;
 	int sinctrl_size;
 	int phase_shift;
@@ -18,8 +18,9 @@ typedef struct{
 #define PWM_FREQ				360U // periods per sec
 //*/
 //*
+//#define PWM_TIMER_FREQ	40000 // Hz
 #define PWM_TIMER_FREQ	1e6  // Hz
-#define PWM_FREQ				10000 // periods per sec
+#define PWM_FREQ				50000// periods per sec
 //*/
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 

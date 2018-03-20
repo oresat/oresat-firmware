@@ -34,22 +34,26 @@ static void pwmpcb(PWMDriver *pwmp) {
   palClearLine(LINE_LED_GREEN);
 
 //	if(bldc.count==0){
-		++bldc.step_u;
-		++bldc.step_v;
-		++bldc.step_w;
+		++bldc.u;
+		++bldc.v;
+		++bldc.w;
 
-		if(bldc.step_u >= 360){
-			bldc.step_u = 0;
+		if(bldc.u >= 360){
+			bldc.u = 0;
 		}
-		if(bldc.step_v >= 360){
-			bldc.step_v = 0;
+		if(bldc.v >= 360){
+			bldc.v = 0;
 		}
-		if(bldc.step_w >= 360){
-			bldc.step_w = 0;
+		if(bldc.w >= 360){
+			bldc.w = 0;
 		}
 		bldc.count=0;
 //	}
 //	++bldc.count;
+}
+
+int scale(int duty_cycle){
+	return duty_cycle*6/10+2000;	
 }
 
 static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
@@ -58,7 +62,7 @@ static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH1,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,sinctrl[bldc.step_u])
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.u]))
 	);
 }
 
@@ -68,7 +72,7 @@ static void pwmc2cb(PWMDriver *pwmp){ // channel 2 callback
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH2,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,sinctrl[bldc.step_v])
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.v]))
 	);
 }
 
@@ -78,7 +82,7 @@ static void pwmc3cb(PWMDriver *pwmp){ // channel 3 callback
   pwmEnableChannelI(
 		&PWMD1,
 		PWM_CH3,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,sinctrl[bldc.step_w])
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.w]))
 	);
 }
 
@@ -100,9 +104,9 @@ static PWMConfig pwmcfg = {
 extern void bldcInit(){
 	bldc.sinctrl_size = sizeof(sinctrl)/sizeof(int);
   bldc.phase_shift = bldc.sinctrl_size/3;
-  bldc.step_u = 0;
-  bldc.step_v = bldc.step_u + bldc.phase_shift;
-  bldc.step_w = bldc.step_v + bldc.phase_shift;
+  bldc.u = 0;
+  bldc.v = bldc.u + bldc.phase_shift;
+  bldc.w = bldc.v + bldc.phase_shift;
 	bldc.count=0;
 
 	pwmStart(&PWMD1, &pwmcfg);
@@ -114,13 +118,13 @@ extern void bldcInit(){
   pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,PWM_DC_CH3));
 //*/
 //*
-	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_u));
-  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_v));
-  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.step_w));
+	pwmEnableChannel(&PWMD1,PWM_CH1,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.u));
+  pwmEnableChannel(&PWMD1,PWM_CH2,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.v));
+  pwmEnableChannel(&PWMD1,PWM_CH3,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.w));
 //*/
 
 	// enable pwm center aligned mode
-	PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
+//	PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
 
 	pwmEnableChannelNotification(&PWMD1,PWM_CH1);
   pwmEnableChannelNotification(&PWMD1,PWM_CH2);
