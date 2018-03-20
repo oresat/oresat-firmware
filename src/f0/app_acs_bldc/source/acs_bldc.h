@@ -20,7 +20,7 @@ typedef struct{
 //*
 //#define PWM_TIMER_FREQ	40000 // Hz
 #define PWM_TIMER_FREQ	1e6  // Hz
-#define PWM_FREQ				50000// periods per sec
+#define PWM_FREQ				20000// periods per sec
 //*/
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 

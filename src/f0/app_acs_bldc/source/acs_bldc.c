@@ -53,7 +53,7 @@ static void pwmpcb(PWMDriver *pwmp) {
 }
 
 int scale(int duty_cycle){
-	return duty_cycle*6/10+2000;	
+	return duty_cycle;//*5/10+2000;	
 }
 
 static void pwmc1cb(PWMDriver *pwmp){ // channel 1 callback
