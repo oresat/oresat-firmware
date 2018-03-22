@@ -4,13 +4,20 @@
 #include "ch.h"
 #include "hal.h"
 
+#define SADDLE
+
+#define PERIOD 360
+
+#ifdef SADDLE
+#undef PERIOD
+#define PERIOD 384
+#endif
+
+
 typedef struct{
-	int u;
-	int v;
-	int w;
-	int count;
-	int sinctrl_size;
-	int phase_shift;
+	int u,v,w, // motor phases
+			sinctrl_size,
+			phase_shift;
 } BldcConfig;
 
 /*
@@ -24,13 +31,9 @@ typedef struct{
 //*/
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 
-#define PWM_CH1					0U
-#define PWM_CH2					1U
-#define PWM_CH3					2U
-
-#define PWM_DC_CH1			2000U
-#define PWM_DC_CH2			4000U
-#define PWM_DC_CH3			8000U
+#define PWM_U					0U
+#define PWM_V					1U
+#define PWM_W					2U
 
 extern void bldcInit(void);
 extern void bldcStart(void);
