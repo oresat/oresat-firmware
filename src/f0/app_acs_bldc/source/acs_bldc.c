@@ -76,14 +76,14 @@ static void pwmpcb(PWMDriver *pwmp) {
 	}
 }
 
-int scale(int duty_cycle){
+static int scale(int duty_cycle){
 #ifdef SADDLE
 	duty_cycle*=10;
 #endif
 	return duty_cycle*6/10+2000;	
 }
 
-void pwmCallback(uint8_t channel,int step){
+static void pwmCallback(uint8_t channel,int step){
   palSetLine(LINE_LED_GREEN);
   pwmEnableChannelI(
 		&PWMD1,
@@ -166,7 +166,7 @@ extern void bldcInit(){
 //	PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
 
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
-  pwmEnableChannelNotification(&PWMD1,PWM_W);
+  pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
