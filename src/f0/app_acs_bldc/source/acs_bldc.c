@@ -1,7 +1,11 @@
 #include "acs_bldc.h"
 
+BldcConfig bldc;
+
 #ifdef SADDLE
-int sinctrl[384]={
+#define STEPS 384 // for ease of calculations
+
+sinctrl_t sinctrl[STEPS]={
  127,131,135,138,142,145,149,152,155,159,162,165,168,171,174,177,180,183,186,
  189,192,194,197,200,202,205,207,210,212,214,217,219,221,223,225,227,229,231,
  232,234,236,237,239,240,242,243,244,245,247,248,249,250,250,251,252,253,253,
@@ -22,12 +26,15 @@ int sinctrl[384]={
 	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  
 	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  6, 10, 15, 19, 23, 27, 31, 35, 
 	39, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 99,103,107,111,
- 115,118,121,124
+ 115,118,121,124 
 };
+
 #endif
 
 #ifndef SADDLE
-int sinctrl[360] = {
+#define STEPS 360
+	// TODO: This has too many steps in it. we should redo this manually maybe
+sinctrl_t sinctrl[STEPS] = {
 	4980,5068,5155,5242,5329,5416,5503,5590,5676,5763,5849,5934,6020,6105,6190,6274,
 	6359,6442,6525,6608,6690,6772,6853,6934,7014,7093,7172,7250,7328,7404,7480,7556,
 	7630,7704,7776,7848,7919,7989,8059,8127,8194,8261,8326,8390,8454,8516,8577,8637,
@@ -49,11 +56,10 @@ int sinctrl[360] = {
 	1095,1150,1207,1265,1324,1384,1445,1507,1570,1635,1700,1766,1834,1902,1971,2041,
 	2113,2184,2257,2331,2405,2480,2556,2633,2710,2789,2867,2947,3027,3107,3189,3270,
 	3353,3435,3519,3602,3686,3771,3856,3941,4026,4112,4198,4285,4371,4458,4545,4632,
-	4719,4806,4893,4980
+	4719,4806,4893
 };
-#endif
 
-BldcConfig bldc;
+#endif
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
@@ -76,14 +82,14 @@ static void pwmpcb(PWMDriver *pwmp) {
 	}
 }
 
-static int scale(int duty_cycle){
+static sinctrl_t scale(sinctrl_t duty_cycle){
 #ifdef SADDLE
 	duty_cycle*=10;
 #endif
-	return duty_cycle*6/10+2000;	
+	return duty_cycle*SCALE;	
 }
 
-static void pwmCallback(uint8_t channel,int step){
+static void pwmCallback(uint8_t channel,sinctrl_t step){
   palSetLine(LINE_LED_GREEN);
   pwmEnableChannelI(
 		&PWMD1,
@@ -94,40 +100,16 @@ static void pwmCallback(uint8_t channel,int step){
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-/*
-	palSetLine(LINE_LED_GREEN);
-  pwmEnableChannelI(
-		&PWMD1,
-		PWM_CH1,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.u]))
-	);
-//*/
 	pwmCallback(PWM_U,bldc.u);
 }
 
 static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-/*
- 	palSetLine(LINE_LED_GREEN);
-  pwmEnableChannelI(
-		&PWMD1,
-		PWM_CH2,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.v]))
-	);
-//*/
 	pwmCallback(PWM_V,bldc.v);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-/*
-  palSetLine(LINE_LED_GREEN);
-  pwmEnableChannelI(
-		&PWMD1,
-		PWM_CH3,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl[bldc.w]))
-	);
-//*/
 	pwmCallback(PWM_W,bldc.w);
 }
 
@@ -147,7 +129,7 @@ static PWMConfig pwmcfg = {
 };
 
 extern void bldcInit(){
-	bldc.sinctrl_size = sizeof(sinctrl)/sizeof(int);
+	bldc.sinctrl_size = sizeof(sinctrl)/sizeof(sinctrl_t);
   bldc.phase_shift = bldc.sinctrl_size/3;
   bldc.u = 0;
   bldc.v = bldc.u + bldc.phase_shift;
@@ -163,8 +145,10 @@ extern void bldcInit(){
 //*/
 
 	// enable pwm center aligned mode
-//	PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
-
+	// TODO: This is not working. needs more research
+	//
+	//PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
+	
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);

@@ -5,27 +5,23 @@
 #include "hal.h"
 
 #define SADDLE
-
-#define PERIOD 360
+#define SCALE		6/10+2000;
+#define PERIOD 	360
 
 #ifdef SADDLE
 #undef PERIOD
-#define PERIOD 384
+#define PERIOD 	384
 #endif
 
+#define sinctrl_t int
+//#define sinctrl_t uint32_t // in testing
 
 typedef struct{
-	int u,v,w, // motor phases
-			sinctrl_size,
-			phase_shift;
+	sinctrl_t u,v,w,phase_shift;
+	int	sinctrl_size;
 } BldcConfig;
 
-/*
-#define PWM_TIMER_FREQ	40000U
-#define PWM_FREQ				360U // periods per sec
-//*/
 //*
-//#define PWM_TIMER_FREQ	40000 // Hz
 #define PWM_TIMER_FREQ	1e6  // Hz
 #define PWM_FREQ				50000// periods per sec
 //*/
