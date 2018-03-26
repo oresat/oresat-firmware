@@ -25,10 +25,10 @@
 
 //=== Serial configuration
 static SerialConfig ser_cfg = {
-    115200,     //Baud rate
-    0,          //
-    0,          //
-    0,          //
+	115200,     //Baud rate
+	0,          //
+	0,          //
+	0,          //
 };
 
 // bldc control thread

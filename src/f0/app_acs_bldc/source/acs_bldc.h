@@ -4,33 +4,37 @@
 #include "ch.h"
 #include "hal.h"
 
+//#define SADDLE
+#define SCALE		10/10
+#define PERIOD 	360
+#define STRETCH 1
+
+#ifdef SADDLE
+#undef PERIOD
+#undef SCALE		
+#define PERIOD 	384
+#define SCALE		2/10
+#endif
+
+#define sinctrl_t int
+//#define sinctrl_t uint32_t // in testing
+
 typedef struct{
-	int u;
-	int v;
-	int w;
+	sinctrl_t u,v,w,phase_shift;
+	int	sinctrl_size;
 	int count;
-	int sinctrl_size;
-	int phase_shift;
 } BldcConfig;
 
-/*
-#define PWM_TIMER_FREQ	40000U
-#define PWM_FREQ				360U // periods per sec
-//*/
 //*
-//#define PWM_TIMER_FREQ	40000 // Hz
-#define PWM_TIMER_FREQ	1e6  // Hz
-#define PWM_FREQ				20000// periods per sec
+#define PWM_TIMER_FREQ	100000 // Hz
+#define PWM_FREQ				10000// periods per sec
 //*/
+//#define PWM_PERIOD			100 
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 
-#define PWM_CH1					0U
-#define PWM_CH2					1U
-#define PWM_CH3					2U
-
-#define PWM_DC_CH1			2000U
-#define PWM_DC_CH2			4000U
-#define PWM_DC_CH3			8000U
+#define PWM_U					0U
+#define PWM_V					1U
+#define PWM_W					2U
 
 extern void bldcInit(void);
 extern void bldcStart(void);
