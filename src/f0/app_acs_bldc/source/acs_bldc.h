@@ -3,18 +3,11 @@
 
 #include "ch.h"
 #include "hal.h"
+//#include "acs_sinlut.h"
 
-//#define SADDLE // 'VERY' Experimental
 #define SCALE		3/10
 #define PERIOD 	360
 #define STRETCH 1
-
-#ifdef SADDLE
-#undef PERIOD
-#undef SCALE		
-#define PERIOD 	384
-#define SCALE		2/10
-#endif
 
 #define sinctrl_t int
 //#define sinctrl_t uint32_t // in testing
@@ -23,18 +16,22 @@ typedef struct{
 	sinctrl_t u,v,w,phase_shift;
 	int	sinctrl_size;
 	int count;
+	int scale;
+	int period;
+	sinctrl_t *sinctrl;
 } BldcConfig;
 
 //*
-#define PWM_TIMER_FREQ	1e5 // Hz
-#define PWM_FREQ				1e4 // periods per sec
+#define PWM_TIMER_FREQ	48e6 // Hz
+#define PWM_FREQ				30000// periods per sec
 //*/
-//#define PWM_PERIOD			100 
+
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 
 #define PWM_U					0U
 #define PWM_V					1U
 #define PWM_W					2U
+#define PWM_D 				3U
 
 extern void bldcInit(void);
 extern void bldcStart(void);
