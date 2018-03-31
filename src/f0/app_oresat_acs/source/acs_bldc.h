@@ -5,7 +5,7 @@
 #include "hal.h"
 #include "acs.h"
 
-#define SCALE		9
+#define SCALE		9/10
 #define PERIOD 	360
 #define STRETCH 1
 

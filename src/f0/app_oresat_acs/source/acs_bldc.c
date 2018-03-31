@@ -2,7 +2,7 @@
 
 BldcConfig bldc;
 
-sinctrl_t sinctrl360[] = {
+sinctrl_t sinctrl360[360] = {
 	5000,5087,5174,5262,5349,5436,5523,5609,
 	5696,5782,5868,5954,6040,6125,6210,6294,
 	6378,6462,6545,6628,6710,6792,6873,6954,
@@ -77,7 +77,8 @@ static void pwmpcb(PWMDriver *pwmp) {
 }
 
 static sinctrl_t scale(sinctrl_t duty_cycle){
-	return (duty_cycle*bldc.scale)/10;	
+	return duty_cycle*SCALE;	
+	//return (duty_cycle*bldc.scale)/10;	
 }
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
