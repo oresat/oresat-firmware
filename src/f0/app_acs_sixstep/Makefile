@@ -5,8 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  //USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
-  USE_OPT = -Og -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -84,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_oresat_acs
+PROJECT   = app_acs_sixstep
 
 # Define board here
 BOARD     = ST_NUCLEO32_F042K6
@@ -96,7 +95,7 @@ APP_ROOT  = .
 # Imported source files and paths
 CHIBIOS   = $(PROJ_ROOT)/ChibiOS
 PROJ_SRC = $(PROJ_ROOT)/common
-PROJ_INC  = $(PROJ_SRC)/include
+PROJ_INC  = $(PROJ_ROOT)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 #Board specific directories

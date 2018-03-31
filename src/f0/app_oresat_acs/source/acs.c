@@ -11,7 +11,7 @@ extern void acs_init(void){
 }
 
 // ACS thread
-THD_WORKING_AREA(wa_acsThread,128);
+THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 THD_FUNCTION(acsThread,arg) {
 
   (void)arg;

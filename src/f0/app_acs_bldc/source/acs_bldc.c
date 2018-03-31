@@ -2,6 +2,7 @@
 
 BldcConfig bldc;
 
+//*
 sinctrl_t sinctrl360[] = {
 	5000,5087,5174,5262,5349,5436,5523,5609,
 	5696,5782,5868,5954,6040,6125,6210,6294,
@@ -49,12 +50,68 @@ sinctrl_t sinctrl360[] = {
 	3622,3706,3790,3875,3960,4046,4132,4218,
 	4304,4391,4477,4564,4651,4738,4826,4913
 };
+//*/
+
+/*
+static sinctrl_t sinctrlSaddle[384] = {
+ 127,131,135,138,142,145,149,152,
+ 155,159,162,165,168,171,174,177,
+ 180,183,186,189,192,194,197,200,
+ 202,205,207,210,212,214,217,219,
+ 221,223,225,227,229,231,232,234,
+ 236,237,239,240,242,243,244,245,
+ 247,248,249,250,250,251,252,253,
+ 253,254,254,255,255,255,255,255,
+ 255,255,255,255,255,255,254,254,
+ 253,253,252,252,251,250,249,248,
+ 247,246,245,244,242,241,240,238,
+ 237,235,233,232,230,228,226,224,
+ 222,222,225,226,228,230,232,234,
+ 235,237,238,240,241,243,244,245,
+ 246,247,248,249,250,251,252,252,
+ 253,254,254,254,255,255,255,255,
+ 255,255,255,255,255,255,254,254,
+ 254,253,252,252,251,250,249,248,
+ 247,246,245,244,243,241,240,238,
+ 237,235,234,232,230,228,227,225,
+ 223,220,218,216,214,212,209,207,
+ 204,202,199,197,194,191,188,185,
+ 183,180,177,174,171,167,164,161,
+ 158,154,151,148,144,141,137,134,
+ 130,127,123,119,116,112,108,104,
+ 101, 97, 93, 89, 85, 81, 77, 73, 
+  69, 65, 61, 57, 53, 49, 45, 41,
+	36, 32, 28, 24, 20, 16, 12,  7, 
+	 0,  0,  0,  0,  0,  0,  0,  0, 
+	 0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0,
+   0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0, 
+	 0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0, 
+	 0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0, 
+	 0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  
+	 0,  0,  0,  0,  0,  0,  0,  0, 
+	 2,  6, 10, 15, 19, 23, 27, 31,
+	35, 39, 44, 48, 52, 56, 60, 64, 
+	68, 72, 76, 80, 84, 88, 92, 96, 
+	99,103,107,111,115,118,121,124
+};
+//*/
+
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
   palClearLine(LINE_LED_GREEN);
+	
 	++bldc.count;
 	
 	if(bldc.count==bldc.stretch){
@@ -112,19 +169,21 @@ static PWMConfig pwmcfg = {
    {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmUcb},
    {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmVcb},
    {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmWcb},
-   {PWM_OUTPUT_DISABLED, NULL}
+   {PWM_OUTPUT_ACTIVE_HIGH,NULL}
   },
   0,
 	0,
   0
 };
 
+
 extern void bldcInit(){
 	bldc.period = PERIOD;
 	bldc.stretch = STRETCH;
 	bldc.scale = SCALE;
-	bldc.count = 0;
+	//bldc.sinctrl_size = sizeof(sinctrl)/sizeof(sinctrl_t);
   bldc.phase_shift = bldc.period/3;
+	bldc.count=0;
   bldc.u = 0;
   bldc.v = bldc.u + bldc.phase_shift;
   bldc.w = bldc.v + bldc.phase_shift;
@@ -132,10 +191,17 @@ extern void bldcInit(){
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
+//	palSetPadMode(GPIOA, 11, PAL_MODE_ALTERNATE(0));
+
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.u));
   pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.v));
   pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.w));
 
+	// enable pwm center aligned mode
+	// TODO: This is not working. needs more research
+	//
+	//PWMD1.tim->CR1 |= STM32_TIM_CR1_CMS(0x01);
+	
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);
@@ -153,13 +219,3 @@ extern void bldcSinStart(){
 
 }
 
-THD_WORKING_AREA(wa_bldcThread,THREAD_SIZE);
-THD_FUNCTION(bldcThread,arg){
-  (void)arg;
-  chRegSetThreadName("bldcThread");
-//	bldcSinStart();
-	
-  while(!chThdShouldTerminateX()){
-    chThdSleepMilliseconds(500);
-  }
-}

@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 
+#define THREAD_SIZE	(1<<5) 
 #define CAN_NODE 0x3F // max 0x7f
 
 typedef struct{
@@ -16,7 +17,7 @@ typedef struct{
 
 extern void acs_init(void);
 
-extern THD_WORKING_AREA(wa_acsThread, 128);
+extern THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 extern THD_FUNCTION(acsThread, arg);
 
 #endif
