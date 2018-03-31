@@ -4,8 +4,8 @@
 #include "ch.h"
 #include "hal.h"
 
-//#define SADDLE
-#define SCALE		10/10
+//#define SADDLE // 'VERY' Experimental
+#define SCALE		3/10
 #define PERIOD 	360
 #define STRETCH 1
 
@@ -26,8 +26,8 @@ typedef struct{
 } BldcConfig;
 
 //*
-#define PWM_TIMER_FREQ	100000 // Hz
-#define PWM_FREQ				10000// periods per sec
+#define PWM_TIMER_FREQ	1e5 // Hz
+#define PWM_FREQ				1e4 // periods per sec
 //*/
 //#define PWM_PERIOD			100 
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
