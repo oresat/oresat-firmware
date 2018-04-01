@@ -5,8 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  //USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
-  USE_OPT = -Og -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -84,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_oresat_acs
+PROJECT   = app_acs_bldc
 
 # Define board here
 BOARD     = ST_NUCLEO32_F042K6
