@@ -72,13 +72,15 @@ static void pwmpcb(PWMDriver *pwmp) {
 			bldc.w = 0;
 		}
 
+	//	chprintf(DEBUG_CHP,"(%d,%d,%d)\n",bldc.u,bldc.v,bldc.w);
+
 		bldc.count=0;
 	}
 }
 
 static sinctrl_t scale(sinctrl_t duty_cycle){
-	return duty_cycle*SCALE;	
-	//return (duty_cycle*bldc.scale)/10;	
+	//return duty_cycle*SCALE;	
+	return (duty_cycle*bldc.scale)/10;	
 }
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
@@ -124,6 +126,7 @@ extern void bldcInit(){
 	bldc.period = PERIOD;
 	bldc.stretch = STRETCH;
 	bldc.scale = SCALE;
+//	bldc.sinctrl=sinctrl360;
 	bldc.count = 0;
   bldc.phase_shift = bldc.period/3;
   bldc.u = 0;
