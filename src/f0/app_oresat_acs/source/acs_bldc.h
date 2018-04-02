@@ -17,8 +17,8 @@
 #define PWM_V					1U
 #define PWM_W					2U
 
-#define sinctrl_t int
-//#define sinctrl_t uint32_t // in testing
+//#define sinctrl_t int
+#define sinctrl_t uint16_t // in testing
 
 typedef struct{
 	int count,		// period counter
