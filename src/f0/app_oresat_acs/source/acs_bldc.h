@@ -26,8 +26,9 @@ typedef struct{
 			period,		// steps in lut TODO: rname this
 			stretch;  
 	sinctrl_t u,v,w,
-						phase_shift,
-						*sinctrl;
+						phase_shift;
+	
+	sinctrl_t const	*sinctrl;
 } BldcConfig;
 
 extern void bldcInit(void);

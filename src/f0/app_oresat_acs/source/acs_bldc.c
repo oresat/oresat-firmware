@@ -126,7 +126,7 @@ extern void bldcInit(){
 	bldc.period = PERIOD;
 	bldc.stretch = STRETCH;
 	bldc.scale = SCALE;
-//	bldc.sinctrl=sinctrl360;
+	bldc.sinctrl=sinctrl360;
 	bldc.count = 0;
   bldc.phase_shift = bldc.period/3;
   bldc.u = 0;
