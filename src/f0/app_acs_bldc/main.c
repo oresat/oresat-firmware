@@ -20,7 +20,7 @@
 #include "chprintf.h"
 
 //=== Project header files
-//#include "can.h"
+//#include "oresat.h"
 #include "acs_bldc.h"
 
 //=== Serial configuration
@@ -76,10 +76,7 @@ int main(void) {
 	 */
 	halInit();
 	chSysInit();
-	// Initialize CAN Subsystem
-	//can_init();
-	// Start CAN threads
-	//can_start();
+	//oresat_init(0);
 
 	// Initialize and start app
 	app_init();

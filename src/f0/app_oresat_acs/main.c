@@ -37,7 +37,7 @@
 #include "chprintf.h"
 
 //=== Project header files
-#include "can.h"
+#include "oresat.h"
 #include "acs.h"
 #include "acs_bldc.h"
 
@@ -54,7 +54,7 @@ static SerialConfig ser_cfg = {
 static void app_init(void){
 //	acs_init();	 
 	bldcInit();
-	can_initRPDO(0,0,8,data.acs);
+	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
 //	initTPDO();
 
 	sdStart(&SD2,&ser_cfg); // Start up debug output
@@ -88,8 +88,7 @@ int main(void) {
 	halInit();
 	chSysInit();
 	
-	can_init(CAN_NODE,200);
-  can_start();
+	oresat_init(CAN_NODE);
 	
 	app_init();
 	app_main();
