@@ -5,9 +5,9 @@
 #include "hal.h"
 #include "acs.h"
 
-#define SCALE		9/10
-#define PERIOD 	360
-#define STRETCH 1
+#define SCALE			9
+#define STEPS			360 
+#define STRETCH		1
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 #define PWM_FREQ				30e3 // periods per sec
@@ -26,8 +26,8 @@ typedef struct{
 			period,		// steps in lut TODO: rname this
 			stretch;  
 	sinctrl_t u,v,w,
-						phase_shift,
-						*sinctrl;
+						phase_shift;
+	sinctrl_t const *sinctrl;
 } BldcConfig;
 
 extern void bldcInit(void);

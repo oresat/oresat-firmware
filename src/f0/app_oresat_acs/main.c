@@ -16,7 +16,7 @@
 
 /*
  *	OreSat: Attitude Control System
- *	Portland State Aerospace (PSAS)
+ *	Portland State Aerospace Society (PSAS)
  *	
  *  // be wery wery quiet i'm hunting wabbits...
  *
