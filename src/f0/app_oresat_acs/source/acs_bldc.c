@@ -55,6 +55,7 @@ static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
   palClearLine(LINE_LED_GREEN);
+	
 	++bldc.count;
 	
 	if(bldc.count==bldc.stretch){
@@ -79,7 +80,6 @@ static void pwmpcb(PWMDriver *pwmp) {
 }
 
 static sinctrl_t scale(sinctrl_t duty_cycle){
-	//return duty_cycle*SCALE;	
 	return (duty_cycle*bldc.scale)/10;	
 }
 
@@ -123,7 +123,7 @@ static PWMConfig pwmcfg = {
 };
 
 extern void bldcInit(){
-	bldc.period = PERIOD;
+	bldc.period = STEPS;
 	bldc.stretch = STRETCH;
 	bldc.scale = SCALE;
 	bldc.sinctrl=sinctrl360;
@@ -133,6 +133,10 @@ extern void bldcInit(){
   bldc.v = bldc.u + bldc.phase_shift;
   bldc.w = bldc.v + bldc.phase_shift;
 
+	bldcStart();
+}
+
+extern void bldcStart(){
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
@@ -145,23 +149,25 @@ extern void bldcInit(){
   pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
-extern void bldcStart(){
-
-}
-
 extern void bldcStop(){
+	pwmStop(&PWMD1);
+/*
+  pwmEnablePeriodicNotification(&PWMD1);
 
-}
+	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.w));
 
-extern void bldcSinStart(){
-
+	pwmEnableChannelNotification(&PWMD1,PWM_U);
+  pwmEnableChannelNotification(&PWMD1,PWM_V);
+  pwmEnableChannelNotification(&PWMD1,PWM_W);
+*/
 }
 
 THD_WORKING_AREA(wa_bldcThread,THREAD_SIZE);
 THD_FUNCTION(bldcThread,arg){
   (void)arg;
   chRegSetThreadName("bldcThread");
-//	bldcSinStart();
 	
   while(!chThdShouldTerminateX()){
     chThdSleepMilliseconds(500);
