@@ -5,9 +5,9 @@
 #include "hal.h"
 #include "acs.h"
 
-#define SCALE		9/10
+#define SCALE		9
 #define PERIOD 	360
-#define STRETCH 1
+#define STRETCH 100
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 #define PWM_FREQ				30e3 // periods per sec
@@ -19,6 +19,8 @@
 
 //#define sinctrl_t int
 #define sinctrl_t uint16_t // in testing
+
+//extern const sinctrl_t sinctrl360[360];
 
 typedef struct{
 	int count,		// period counter

@@ -88,7 +88,7 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
   pwmEnableChannelI(
 		&PWMD1,
 		channel,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl360[step]))
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[step]))
 	);
 }
 
