@@ -2,7 +2,7 @@
 
 BldcConfig bldc;
 
-sinctrl_t sinctrl360[360] = {
+const sinctrl_t sinctrl360[360] = {
 	5000,5087,5174,5262,5349,5436,5523,5609,
 	5696,5782,5868,5954,6040,6125,6210,6294,
 	6378,6462,6545,6628,6710,6792,6873,6954,
@@ -55,6 +55,7 @@ static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
   palClearLine(LINE_LED_GREEN);
+	
 	++bldc.count;
 	
 	if(bldc.count==bldc.stretch){
@@ -79,7 +80,6 @@ static void pwmpcb(PWMDriver *pwmp) {
 }
 
 static sinctrl_t scale(sinctrl_t duty_cycle){
-	//return duty_cycle*SCALE;	
 	return (duty_cycle*bldc.scale)/10;	
 }
 
@@ -88,7 +88,7 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
   pwmEnableChannelI(
 		&PWMD1,
 		channel,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(sinctrl360[step]))
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[step]))
 	);
 }
 
@@ -123,16 +123,20 @@ static PWMConfig pwmcfg = {
 };
 
 extern void bldcInit(){
-	bldc.period = PERIOD;
+	bldc.period = STEPS;
 	bldc.stretch = STRETCH;
 	bldc.scale = SCALE;
-//	bldc.sinctrl=sinctrl360;
+	bldc.sinctrl=sinctrl360;
 	bldc.count = 0;
   bldc.phase_shift = bldc.period/3;
   bldc.u = 0;
   bldc.v = bldc.u + bldc.phase_shift;
   bldc.w = bldc.v + bldc.phase_shift;
 
+	bldcStart();
+}
+
+extern void bldcStart(){
 	pwmStart(&PWMD1, &pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
@@ -145,23 +149,25 @@ extern void bldcInit(){
   pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
-extern void bldcStart(){
-
-}
-
 extern void bldcStop(){
+	pwmStop(&PWMD1);
+/*
+  pwmEnablePeriodicNotification(&PWMD1);
 
-}
+	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.w));
 
-extern void bldcSinStart(){
-
+	pwmEnableChannelNotification(&PWMD1,PWM_U);
+  pwmEnableChannelNotification(&PWMD1,PWM_V);
+  pwmEnableChannelNotification(&PWMD1,PWM_W);
+*/
 }
 
 THD_WORKING_AREA(wa_bldcThread,THREAD_SIZE);
 THD_FUNCTION(bldcThread,arg){
   (void)arg;
   chRegSetThreadName("bldcThread");
-//	bldcSinStart();
 	
   while(!chThdShouldTerminateX()){
     chThdSleepMilliseconds(500);

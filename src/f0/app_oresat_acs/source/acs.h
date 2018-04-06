@@ -4,7 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#define THREAD_SIZE	(1<<5) 
+#define THREAD_SIZE	(1<<7) 
 #define CAN_NODE 0x3F // max 0x7f
 
 typedef struct{
