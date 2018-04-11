@@ -2,7 +2,7 @@
 #include "acs_lut.h"
 
 BldcConfig bldc;
-uint16_t rxbuf[2] = {0};
+uint16_t rxbuf[2] = {0}; // receive buffer
 
 THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 THD_FUNCTION(acsThread,arg) {
@@ -12,10 +12,12 @@ THD_FUNCTION(acsThread,arg) {
 	bldcStart();
 
   while (!chThdShouldTerminateX()) {
-//  palClearLine(LINE_LED_GREEN);
-//  chThdSleepMilliseconds(500);
-//  palSetLine(LINE_LED_GREEN);
-//  chThdSleepMilliseconds(500);
+	//*
+		palClearLine(LINE_LED_GREEN);
+		chThdSleepMilliseconds(500);
+		palSetLine(LINE_LED_GREEN);
+		chThdSleepMilliseconds(500);
+	//*/
   }
 }
 
@@ -24,23 +26,20 @@ THD_FUNCTION(spiThread,arg){
   (void)arg;
   chRegSetThreadName("spiThread");
 	int step;
-//  uint16_t encoder_val = 0;
 
-  spiStart(&SPID1, &spicfg);             // Start driver.
-  spiAcquireBus(&SPID1);                 // Gain ownership of bus.
+  spiStart(&SPID1, &spicfg);            // Start driver.
+  spiAcquireBus(&SPID1);                // Gain ownership of bus.
 
   while (!chThdShouldTerminateX()) {
 		rxbuf[0] = 0;
-		spiSelect(&SPID1);                   // Select slave.
+		spiSelect(&SPID1);                  // Select slave.
 
 		while(SPID1.state != SPI_READY) {}   
-		spiReceive(&SPID1,1,rxbuf);     // Receive 1 frame (16 bits).
-		spiUnselect(&SPID1);                 // Unselect slave.
+		spiReceive(&SPID1,1,rxbuf);     		// Receive 1 frame (16 bits).
+		spiUnselect(&SPID1);                // Unselect slave.
 
 		bldc.position = 0x3FFF & rxbuf[0];
 	 
-		// Display results
-		
 		step = bldc.position*360/(1<<14);
 		chprintf(DEBUG_CHP,"enc pos: %u \n", bldc.position);        
 		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
@@ -66,7 +65,7 @@ static void pwmpcb(PWMDriver *pwmp) {
 	++bldc.count;
 	
 	if(bldc.count==bldc.stretch){
-/*
+#ifdef BRUTEFORCE
 		++bldc.u;
 		++bldc.v;
 		++bldc.w;
@@ -80,8 +79,8 @@ static void pwmpcb(PWMDriver *pwmp) {
 		if(bldc.w >= bldc.steps){
 			bldc.w = 0;
 		}
-//*/
-
+#endif
+#ifndef BRUTEFORCE
 //*
 //		int step = 360/(1<<14)*bldc.position;
 		step = bldc.position*360/(1<<14);
@@ -89,7 +88,7 @@ static void pwmpcb(PWMDriver *pwmp) {
 		bldc.v = (bldc.u + bldc.phase_shift)%360;
 		bldc.w = (bldc.v + bldc.phase_shift)%360;
 //*/
-
+#endif
 		bldc.count=0;
 	}
 }
@@ -138,9 +137,7 @@ static PWMConfig pwmcfg = {
 };
 
 extern void acsInit(void){
-//	for(int i = 0;i < 2;++i){  // Initializing receive buffer to zero. 
-//		rxbuf[i] = 0;
-//	}
+	bldcInit();
 }
 
 extern void bldcInit(){
