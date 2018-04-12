@@ -4,6 +4,27 @@
 BldcConfig bldc;
 uint16_t rxbuf[2] = {0}; // receive buffer
 
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+    (void)adcp;
+    (void)err;
+}
+
+/*
+ * ADC conversion group.
+ * Mode:        Continuous, 16 samples of 1 channel, SW triggered.
+ * Channels:    IN10, IN11, Sensor, VRef.
+ */
+static const ADCConversionGroup adcgrpcfg = {
+    TRUE,
+    ADC_GRP_NUM_CHANNELS,
+    NULL,
+    adcerrorcallback,
+    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGRR1 */
+    ADC_TR(0, 0),                                     /* TR */
+    ADC_SMPR_SMP_239P5,                                /* SMPR */
+    ADC_CHSELR_CHSEL0                                /* CHSELR */
+};
+
 THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 THD_FUNCTION(acsThread,arg) {
   (void)arg;
@@ -48,6 +69,9 @@ THD_FUNCTION(spiThread,arg){
 		step = (step + bldc.phase_shift)%360;
 		chprintf(DEBUG_CHP,"phase 3: %u \n\n", step);     
 		//chprintf(DEBUG_CHP,"Decimal: %u \n", encoder_val);        
+
+    chprintf(DEBUG_CHP, "ADC: %d \n\r", (int)bldc.samples[0]);
+
 
 		chThdSleepMilliseconds(100);
   }
@@ -138,6 +162,12 @@ static PWMConfig pwmcfg = {
 
 extern void acsInit(void){
 	bldcInit();
+  adcStart(&ADCD1, NULL);
+
+  /*
+  * Starts an ADC continuous conversion.
+  */
+  adcStartConversion(&ADCD1, &adcgrpcfg, bldc.samples, ADC_GRP_BUF_DEPTH);
 }
 
 extern void bldcInit(){
@@ -154,6 +184,8 @@ extern void bldcInit(){
 
 //	bldcStart();
 }
+
+
 
 extern void bldcStart(){
 	pwmStart(&PWMD1, &pwmcfg);

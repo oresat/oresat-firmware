@@ -36,6 +36,9 @@
 
 #define sinctrl_t uint16_t 
 
+#define ADC_GRP_NUM_CHANNELS   1
+#define ADC_GRP_BUF_DEPTH      8
+
 typedef struct{
 	int count,		// period counter
 			scale,		// scales the duty cycle
@@ -45,6 +48,8 @@ typedef struct{
 						phase_shift;		// 
   uint16_t position;				// motor position from encoder
 	sinctrl_t const *sinctrl; // pointer to the sin lut
+   adcsample_t samples[ADC_GRP_NUM_CHANNELS * ADC_GRP_BUF_DEPTH]; // ADC conversion storage array
+
 } BldcConfig;
 
 static const SPIConfig spicfg = {
