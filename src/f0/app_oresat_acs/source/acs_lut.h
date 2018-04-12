@@ -1,11 +1,9 @@
 #ifndef _ACS_LUT_H_
 #define _ACS_LUT_H_
 
-#define sinctrl_t int
-//#define sinctrl_t uint32_t // in testing
+#include "acs.h"
 
-/*
-sinctrl_t sinctrl360[] = {
+const sinctrl_t sinctrl360[360] = {
 	5000,5087,5174,5262,5349,5436,5523,5609,
 	5696,5782,5868,5954,6040,6125,6210,6294,
 	6378,6462,6545,6628,6710,6792,6873,6954,
@@ -52,6 +50,5 @@ sinctrl_t sinctrl360[] = {
 	3622,3706,3790,3875,3960,4046,4132,4218,
 	4304,4391,4477,4564,4651,4738,4826,4913
 };
-//*/
 
 #endif
