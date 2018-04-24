@@ -37,6 +37,10 @@
 #define sinctrl_t uint16_t 
 
 typedef struct{
+	uint8_t acs[8];
+} ACSdata;
+
+typedef struct{
 	int count,		// period counter
 			scale,		// scales the duty cycle
 			steps,		// number of steps in lut 
@@ -45,6 +49,7 @@ typedef struct{
 						phase_shift;		// 
   uint16_t position;				// motor position from encoder
 	sinctrl_t const *sinctrl; // pointer to the sin lut
+	ACSdata *data;
 } BldcConfig;
 
 static const SPIConfig spicfg = {
@@ -60,17 +65,13 @@ typedef struct{
 	// o_0
 }ACSConfig;
 
-typedef struct{
-	uint8_t acs[8];
-} ACSdata;
-
 extern THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 extern THD_FUNCTION(acsThread,arg);
 
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 extern THD_FUNCTION(spiThread,arg);
 
-extern void acsInit(void);
+extern void acsInit(ACSdata *data);
 extern void bldcInit(void);
 extern void bldcStart(void);
 extern void bldcStop(void);

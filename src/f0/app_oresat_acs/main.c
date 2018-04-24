@@ -39,8 +39,7 @@
 #include "oresat.h"
 #include "acs.h"
 
-ACSdata data;
-//uint8_t data[8];
+ACSdata data = {};
 
 static SerialConfig ser_cfg = {
 	115200,     //Baud rate
@@ -50,7 +49,7 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	acsInit();	 
+	acsInit(&data);	 
 	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
 //	initTPDO();
 
