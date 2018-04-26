@@ -9,8 +9,6 @@ THD_FUNCTION(acsThread,arg) {
   (void)arg;
   chRegSetThreadName("acsThread");
 
-//	bldc.data->acs[0]=1;
-
   while (!chThdShouldTerminateX()) {
 		switch(bldc.data->acs[0]){
 			case 0:
@@ -24,7 +22,7 @@ THD_FUNCTION(acsThread,arg) {
 			default:
 				break;
 		}
-		chThdSleepMilliseconds(500);
+		chThdSleepMilliseconds(100);
   }
 }
 
@@ -71,7 +69,7 @@ static void pwmpcb(PWMDriver *pwmp) {
 	++bldc.count;
 	
 	if(bldc.count==bldc.stretch){
-#ifdef BRUTEFORCE
+#ifdef OPENLOOP
 		++bldc.u;
 		++bldc.v;
 		++bldc.w;
@@ -86,9 +84,8 @@ static void pwmpcb(PWMDriver *pwmp) {
 			bldc.w = 0;
 		}
 #endif
-#ifndef BRUTEFORCE
+#ifndef OPENLOOP 
 //*
-//		int step = 360/(1<<14)*bldc.position;
 		step = bldc.position*360/(1<<14);
 		bldc.u = (step + 1 + bldc.phase_shift)%360;
 		bldc.v = (bldc.u + bldc.phase_shift)%360;

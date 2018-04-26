@@ -5,7 +5,7 @@
 #include "hal.h"
 #include "chprintf.h"
 
-//#define BRUTEFORCE
+//#define OPENLOOP
 
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 
@@ -25,8 +25,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				10e3 // periods per sec
-//#define PWM_FREQ				30e3 // periods per sec
+#define PWM_FREQ				15e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 

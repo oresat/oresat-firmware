@@ -49,7 +49,8 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	acsInit(&data);	 
+	acsInit(&data);	
+	//data.acs[0] = 1;
 	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
 //	initTPDO();
 
