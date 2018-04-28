@@ -51,8 +51,9 @@ static SerialConfig ser_cfg = {
 static void app_init(void){
 	acsInit(&data);	
 	//data.acs[0] = 1;
-	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
+	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,CAN_BUF,data.recv);
 //	initTPDO();
+	canTPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,0,0,CAN_BUF,data.send);
 
 	sdStart(&SD2,&ser_cfg); // Start up debug output
 }

@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
+#include "string.h"
 
 //#define OPENLOOP
 
@@ -11,6 +12,7 @@
 
 #define THREAD_SIZE	(1<<7) 
 #define CAN_NODE 0x3F // max 0x7f
+#define CAN_BUF 8
 
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
@@ -36,7 +38,8 @@
 #define sinctrl_t uint16_t 
 
 typedef struct{
-	uint8_t acs[8];
+	uint8_t send[CAN_BUF];
+	uint8_t recv[CAN_BUF];
 } ACSdata;
 
 typedef struct{

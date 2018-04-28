@@ -10,7 +10,7 @@ THD_FUNCTION(acsThread,arg) {
   chRegSetThreadName("acsThread");
 
   while (!chThdShouldTerminateX()) {
-		switch(bldc.data->acs[0]){
+		switch(bldc.data->recv[0]){
 			case 0:
 				break;
 			case 1:
@@ -22,6 +22,7 @@ THD_FUNCTION(acsThread,arg) {
 			default:
 				break;
 		}
+		memcpy(bldc.data->send,bldc.data->recv,8);	
 		chThdSleepMilliseconds(100);
   }
 }
