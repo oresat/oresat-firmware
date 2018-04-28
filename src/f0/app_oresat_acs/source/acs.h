@@ -5,7 +5,8 @@
 #include "hal.h"
 #include "chprintf.h"
 
-//#define BRUTEFORCE
+#define BRUTEFORCE
+#define CONFIGURE true
 
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 
@@ -18,6 +19,13 @@
 #define SCALE			9
 #define STEPS			360 
 #define STRETCH		1
+#define STEP_SIZE 1
+
+#define COIL_NUM 6
+
+#define ENCODER_MAX 2^14
+#define ENCODER_MIN 0
+#define ENCODER_CHUNK_SIZE 2730
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 
@@ -25,7 +33,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				10e3 // periods per sec
+#define PWM_FREQ				15e3 // periods per sec
 //#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
@@ -57,7 +65,7 @@ static const SPIConfig spicfg = {
 	NULL,               // Operation complete call back.
 	GPIOA,              // Chip select line
 	GPIOA_SPI1_NSS,     // Chip select port
-	SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,//reg 1 mask
+	SPI_CR1_BR_0|SPI_CR1_CPHA,//reg 1 mask
 	SPI_CR2_DS_0|SPI_CR2_DS_1|SPI_CR2_DS_2|SPI_CR2_DS_3,//reg 2 mask
 };
 
@@ -74,6 +82,11 @@ extern THD_FUNCTION(acsThread,arg);
 
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 extern THD_FUNCTION(spiThread,arg);
+
+extern THD_WORKING_AREA(wa_debugThread,THREAD_SIZE);
+extern THD_FUNCTION(debugThread,arg);
+
+
 
 extern void acsInit(void);
 extern void bldcInit(void);
