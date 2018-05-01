@@ -34,12 +34,10 @@
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
 //=== Project header files
 #include "oresat.h"
 #include "acs.h"
-#include "acs_bldc.h"
 
 ACSdata data;
 //uint8_t data[8];
@@ -52,8 +50,7 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-//	acs_init();	 
-	bldcInit();
+	acsInit();	 
 	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
 //	initTPDO();
 
@@ -63,19 +60,19 @@ static void app_init(void){
 static void app_main(void){
 //*
 	chThdCreateStatic(
-		wa_bldcThread,
-		sizeof(wa_bldcThread), 
+		wa_acsThread,
+		sizeof(wa_acsThread), 
 		NORMALPRIO, 
-		bldcThread, 
+		acsThread, 
 		NULL
 	);
 //*/
 //*
 	chThdCreateStatic(
-		wa_acsThread,
-		sizeof(wa_acsThread), 
-		NORMALPRIO, 
-		acsThread, 
+		wa_spiThread,
+		sizeof(wa_spiThread),
+		NORMALPRIO + 1,
+		spiThread,
 		NULL
 	);
 //*/
