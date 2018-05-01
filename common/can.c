@@ -9,11 +9,8 @@ can_tpdo_t tpdo[4];
 can_rpdo_t rpdo[4];
 
 void can_init(uint8_t node_id, uint32_t heartbeat) {
-    // If node_id is greater than maximum node ID (127), set to maximum node ID
-    // TODO: Exception
-    if (node_id > 0x7F) {
-        node_id = 0x7F;
-    }
+    // If node_id is greater than maximum node ID (127), halt
+    chDbgAssert(node_id <= 0x7F, "Error: Node ID out of range");
 
     // Initialize node configuration data
     node.node_id = node_id;

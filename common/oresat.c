@@ -1,9 +1,15 @@
 #include "oresat.h"
 
 void oresat_init(uint8_t node_id) {
+    uint8_t *obr_node_id = (FLASH->OBR & FLASH_OBR_DATA0) >> FLASH_OBR_DATA0_Pos;
+
+    //If node ID is not overridden, set node ID
     if (node_id == 0) {
-        //TODO: Check if the user data bytes are set and set Node ID from that if so
-        node_id = 0x7F;
+        //TODO: If node ID is not set or is invalid, get new node ID
+        if (obr_node_id  == 0xFF) {
+            obr_node_id = 0x7F;
+        }
+        node_id = obr_node_id;
     }
     //Initialize CAN Subsystem
     can_init(node_id, 500);
