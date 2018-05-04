@@ -5,8 +5,8 @@
 #include "hal.h"
 #include "chprintf.h"
 
-#define BRUTEFORCE
-#define CONFIGURE true
+//#define BRUTEFORCE
+//#define CONFIGURE
 
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 
@@ -16,9 +16,9 @@
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-#define SCALE			9
+#define SCALE			7
 #define STEPS			360 
-#define STRETCH		1
+#define STRETCH	  1
 #define STEP_SIZE 1
 
 #define COIL_NUM 6
@@ -33,7 +33,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				15e3 // periods per sec
+#define PWM_FREQ				2000 // periods per sec
 //#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************

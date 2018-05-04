@@ -7,7 +7,7 @@
 static virtual_timer_t speed_vt;
 static int step_size = 1;
 
-static bool configure = CONFIGURE;
+//static bool configure = true;
 
 
 static sysinterval_t interval = 0;
@@ -266,33 +266,44 @@ static uint16_t encoderToLUT(uint16_t position)
 
 static uint32_t LUTrevCount = 0;
 
+static sinctrl_t scale(sinctrl_t duty_cycle){
+	return (duty_cycle*bldc.scale)/10;	
+}
+
+
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
  	uint16_t step; 
   palClearLine(LINE_LED_GREEN);
-	configure = true;
+	//configure = true;
+#ifdef CONFIGURE
 
-  if (configure)
-  {
+      //bldc.u = 0;
+      //bldc.v = 120;
+      //bldc.w = 240;
+ 
     if (LUTrevCount < 6 * 360)
     {
-      bldc.u++;
-      bldc.v++;
-      bldc.w++;
+      if (bldc.count == bldc.stretch){
+      bldc.u += STEP_SIZE;
+      bldc.v += STEP_SIZE;
+      bldc.w += STEP_SIZE;
 
       LUTrevCount++;
 
       if(bldc.u >= bldc.steps){
-			  bldc.u = 0 + bldc.u;
+			  bldc.u = 0 + bldc.u - bldc.steps;
 		  }
 		  if(bldc.v >= bldc.steps){
-			  bldc.v = 0 + bldc.v;
+			  bldc.v = 0 + bldc.v - bldc.steps;
 		  }
 		  if(bldc.w >= bldc.steps){
-			  bldc.w = 0 + bldc.w;
+			  bldc.w = 0 + bldc.w - bldc.steps;
 		  }
-
+      bldc.count = 0;
+     }
+     ++bldc.count;
     }
     else
     {
@@ -301,11 +312,12 @@ static void pwmpcb(PWMDriver *pwmp) {
       bldc.w = 240;
     }
     
-  }
-  else
-  {
+  
+#endif
+
+#ifndef CONFIGURE    
 	  ++bldc.count;
-	
+
 	  if(bldc.count==bldc.stretch){
 #ifdef BRUTEFORCE
 		  bldc.u += step_size;
@@ -348,14 +360,35 @@ static void pwmpcb(PWMDriver *pwmp) {
 #endif
 		  bldc.count=0;
 	  }
-  }
+#endif
+
+/*
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_U,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.u]))
+	);
+
+
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_V,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.v]))
+	);
+
+
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_U,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.w]))
+	);
+*/
+		//chThdSleepSeconds(1);
 }
 
 
 
-static sinctrl_t scale(sinctrl_t duty_cycle){
-	return (duty_cycle*bldc.scale)/10;	
-}
+
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
   palSetLine(LINE_LED_GREEN);
@@ -364,6 +397,7 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 		channel,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[step]))
 	);
+  
 }
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
