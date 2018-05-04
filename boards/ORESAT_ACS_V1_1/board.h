@@ -211,8 +211,8 @@
 /*
  * GPIOA setup:
  *
- * PA0  - CURR_FDB_MAG              (input pullup).
- * PA1  - CURR_FDB_BLDC             (input pullup).
+ * PA0  - CURR_FDB_MAG              (analog).
+ * PA1  - CURR_FDB_BLDC             (analog).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - FAULT_BLDC                (input pullup).
@@ -228,8 +228,8 @@
  * PA14 - SWCLK                     (alternate 0).
  * PA15 - SPI1_NSS                  (output pushpull maximum).
  */
-#define VAL_GPIOA_MODER             (PIN_MODE_INPUT(GPIOA_CURR_FDB_MAG) |   \
-                                     PIN_MODE_INPUT(GPIOA_CURR_FDB_BLDC) |  \
+#define VAL_GPIOA_MODER             (PIN_MODE_ANALOG(GPIOA_CURR_FDB_MAG) |  \
+                                     PIN_MODE_ANALOG(GPIOA_CURR_FDB_BLDC) | \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_INPUT(GPIOA_FAULT_BLDC) |     \
@@ -276,8 +276,8 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWDIO) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_NSS))
-#define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLUP(GPIOA_CURR_FDB_MAG) | \
-                                     PIN_PUPDR_PULLUP(GPIOA_CURR_FDB_BLDC) |\
+#define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_CURR_FDB_MAG) | \
+                                     PIN_PUPDR_FLOATING(GPIOA_CURR_FDB_BLDC) |\
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_FAULT_BLDC) |   \
@@ -291,7 +291,7 @@
                                      PIN_PUPDR_PULLUP(GPIOA_CAN_TX) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_SWDIO) |        \
                                      PIN_PUPDR_PULLUP(GPIOA_SWCLK) |        \
-                                     PIN_PUPDR_FLOATING(GPIOA_SPI1_NSS))
+                                     PIN_PUPDR_PULLUP(GPIOA_SPI1_NSS))
 #define VAL_GPIOA_ODR               (PIN_ODR_HIGH(GPIOA_CURR_FDB_MAG) |     \
                                      PIN_ODR_HIGH(GPIOA_CURR_FDB_BLDC) |    \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
@@ -331,10 +331,10 @@
  * PB0  - TIM1_CH2N                 (alternate 2).
  * PB1  - TIM1_CH3N                 (alternate 2).
  * PB2  - NC                        (input pullup).
- * PB3  - EN_MAG                    (input pullup).
+ * PB3  - EN_MAG                    (output pushpull maximum).
  * PB4  - SPI1_MISO                 (alternate 0).
  * PB5  - PIN5                      (input pullup).
- * PB6  - EN_BLDC                   (input pullup)
+ * PB6  - EN_BLDC                   (output pushpull maximum)
  * PB7  - FAULT_MAG                 (input pullup).
  * PB8  - PIN8_BOOT0                (input pullup).
  * PB9  - PIN9                      (input pullup).
@@ -348,10 +348,10 @@
 #define VAL_GPIOB_MODER             (PIN_MODE_ALTERNATE(GPIOB_TIM1_CH2N) |  \
                                      PIN_MODE_ALTERNATE(GPIOB_TIM1_CH3N) |  \
                                      PIN_MODE_INPUT(GPIOB_PIN2) |           \
-                                     PIN_MODE_INPUT(GPIOB_EN_MAG) |         \
+                                     PIN_MODE_OUTPUT(GPIOB_EN_MAG) |        \
                                      PIN_MODE_ALTERNATE(GPIOB_SPI1_MISO) |  \
                                      PIN_MODE_INPUT(GPIOB_PIN5) |           \
-                                     PIN_MODE_INPUT(GPIOB_EN_BLDC) |        \
+                                     PIN_MODE_OUTPUT(GPIOB_EN_BLDC) |       \
                                      PIN_MODE_INPUT(GPIOB_FAULT_MAG) |      \
                                      PIN_MODE_INPUT(GPIOB_PIN8) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN9) |           \
