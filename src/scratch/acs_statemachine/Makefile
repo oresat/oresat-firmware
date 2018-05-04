@@ -1,31 +1,34 @@
-CC=gcc
+# Makefile for the design and test of
+# the OreSat ACS state machine
 
-PROG_BIN=acs_sm
-TEST_BIN=test
+CC = gcc
+
+# binaries
+PROG_BIN = acs_sm
+TEST_BIN = test
+
+SRC = ./src
+INC = ./inc
 
 PROG_CFLAGS=
 TEST_CFLAGS=
-FLAGS=-I ./include -g -Wall -Wextra \
-			-std=c++11 -Wno-unused-parameter
+FLAGS=-I $(INC) -g -Wall -Wextra 
 
-SRC=./src
-INC=./inc
+# sources
+PROG_SRCS=$(SRC)/statemachine_main.c \
+					$(SRC)/statemachine.c 
 
-PROG_SRCS=$(SRC)/statemachine.c \
+TEST_SRCS=$(SRC)/test_main.c \
+					$(SRC)/test.c 
 
-TEST_SRCS=
-#TEST_SRCS=$(SRC)/test_main.cpp \
-#					$(SRC)/test.cpp \
-PROG_INC=
+# headers
+PROG_INC=$(INC)
+TEST_INC=$(INC) 
 
-TEST_INC=
-#TEST_INC=$(INC)/test.h \
+PROG_OBJS = $(PROG_SRCS:.c=.o)
+TEST_OBJS = $(TEST_SRCS:.c=.o)
 
-PROG_OBJS = $(PROG_SRCS:.cpp=.o)
-TEST_OBJS = $(TEST_SRCS:.cpp=.o)
-
-#default: $(PROG_BIN) $(TEST_BIN)
-default: $(PROG_BIN) 
+default: $(PROG_BIN) $(TEST_BIN)
 	@echo build successful!
  
 $(PROG_BIN): $(PROG_OBJS)
@@ -36,13 +39,13 @@ $(TEST_BIN): $(TEST_OBJS)
 	$(CC) $(TEST_CFLAGS) -o $(TEST_BIN) $(TEST_OBJS)
 	@echo $(TEST_BIN) compiled!
 
-.cpp.o: 
+.c.o: 
 	$(CC) $(FLAGS) -c $^ -o $@
 
 run_$(PROG_BIN):
 	./$(PROG_BIN)
 
-run_test:
+run_$(TEST_BIN):
 	./$(TEST_BIN)
 
 clean: 

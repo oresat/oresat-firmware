@@ -1,58 +1,47 @@
+#include "statemachine.h"
 
+int off_state(void){
 
-int entry_state(void);
-int foo_state(void);
-int bar_state(void);
-int exit_state(void);
+	return 0;
+}
 
-/* array and enum below must be in sync! */
-int (* state)(void)[] = { entry_state, foo_state, bar_state, exit_state};
-enum state_codes { entry = 0, foo, bar, end};
+int ready_state(void){
+	
+	return 0;
+}
 
-enum ret_codes { ok, fail, repeat};
-struct transition {
-    enum state_codes src_state;
-    enum ret_codes   ret_code;
-    enum state_codes dst_state;
+int rw_state(void){
+
+	return 0;
+}
+
+int mtqr_state(void){
+
+	return 0;
+}
+
+int (* state[])() = {off_state,ready_state,rw_state,mtqr_state};
+
+transition state_transitions[] = {
+	{RDY,		repeat,		RDY},
+	{RDY, 	rw,				RW},
+	{RDY, 	mtqr,			MTQR},
+	{RDY, 	off,			OFF},
+	{RW, 		repeat,		RW},
+	{RW, 		rdy,			RDY},
+	{MTQR, 	repeat,		MTQR},
+	{MTQR, 	rdy,			RDY}
 };
 
-/* transitions from end state aren't needed */
-struct transition state_transitions[] = {
-	{entry, ok,     foo},
-	{entry, fail,   end},
-	{foo,   ok,     bar},
-	{foo,   fail,   end},
-	{foo,   repeat, foo},
-	{bar,   ok,     end},
-	{bar,   fail,   end},
-	{bar,   repeat, foo}
-};
-
-#define EXIT_STATE end
-#define ENTRY_STATE entry
-
-int lookup_transitions(enum state_codes sc){
+int lookup_transitions(state_codes sc,ret_codes rc){
+	UNUSED(sc);
+	UNUSED(rc);
 
 	return EXIT_SUCCESS;
 }
 
-int main(int argc, char *argv[]) {
-	enum state_codes cur_state = ENTRY_STATE;
-	enum ret_codes rc;
-	int (* state_fun)(void);
 
-	for(;;){
-		state_fun = state[cur_state];
-		rc = state_fun();
-		if (EXIT_STATE == cur_state)
-				break;
-		cur_state = lookup_transitions(cur_state, rc);
-	}
 
-return EXIT_SUCCESS;
-}
 
-/*
-I don't put lookup_transition() function as it is trivial.
-That's the way I do state machines for years.
-*/
+
+
