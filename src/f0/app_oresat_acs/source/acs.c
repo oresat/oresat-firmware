@@ -9,7 +9,7 @@ THD_FUNCTION(acsThread,arg) {
   (void)arg;
   chRegSetThreadName("acsThread");
 
-  while (!chThdShouldTerminateX()) {
+  while(!chThdShouldTerminateX()){
 		switch(bldc.data->recv[0]){
 			case 0:
 				break;
@@ -22,7 +22,7 @@ THD_FUNCTION(acsThread,arg) {
 			default:
 				break;
 		}
-		memcpy(bldc.data->send,bldc.data->recv,8);	
+		memcpy(bldc.data->send,bldc.data->recv,CAN_BUF);	
 		chThdSleepMilliseconds(100);
   }
 }
@@ -47,12 +47,12 @@ THD_FUNCTION(spiThread,arg){
 		bldc.position = 0x3FFF & rxbuf[0];
 	 
 		step = bldc.position*360/(1<<14);
-		chprintf(DEBUG_CHP,"enc pos: %u \n", bldc.position);        
+		chprintf(DEBUG_CHP,"enc pos: %u \n",bldc.position);        
 		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
 		step = (step + bldc.phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 2: %u \n", step);     
+		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
 		step = (step + bldc.phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 3: %u \n\n", step);     
+		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
 
 		chThdSleepMilliseconds(100);
   }
@@ -162,7 +162,7 @@ extern void bldcInit(){
 
 extern void bldcStart(){
 	palSetLine(LINE_LED_GREEN);
-	pwmStart(&PWMD1, &pwmcfg);
+	pwmStart(&PWMD1,&pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,bldc.u));

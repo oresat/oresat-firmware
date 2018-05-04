@@ -6,7 +6,7 @@
 #include "chprintf.h"
 #include "string.h"
 
-//#define OPENLOOP
+#define OPENLOOP
 
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 
@@ -23,17 +23,13 @@
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 
-//**************************************************************
-//
-// TODO: we need to do math ASAP
-//
 #define PWM_FREQ				15e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
-//**************************************************************
 
 #define PWM_U					0U
 #define PWM_V					1U
 #define PWM_W					2U
+#define PWM_MTQR			3u
 
 #define sinctrl_t uint16_t 
 
