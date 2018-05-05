@@ -1,26 +1,28 @@
 #include "statemachine.h"
 
-int off_state(void){
+ACS acs;
+
+int state_off(void){
 	printf("off\n");	
 	return OFF;
 }
 
-int ready_state(void){
+int state_ready(void){
 	printf("ready\n");	
 	return RDY;
 }
 
-int rw_state(void){
+int state_rw(void){
 	printf("rw\n");	
 	return RW;
 }
 
-int mtqr_state(void){
+int state_mtqr(void){
 	printf("mtqr\n");	
 	return MTQR;
 }
 
-int (* state[])() = {off_state,ready_state,rw_state,mtqr_state};
+int (* state[])() = {state_off,state_ready,state_rw,state_mtqr};
 char *state_name[] = {"OFF","RDY","RW","MTQR"};
 
 transition state_transitions[] = {
@@ -34,26 +36,28 @@ transition state_transitions[] = {
 	{MTQR, 	rdy,			RDY}
 };
 
-int lookup_transitions(state_codes sc,ret_codes rc){
-	(void)sc;
+int lookup_transitions(acs_state acss,acs_event rc){
+	(void)acss;
 	(void)rc;
 
 	return EXIT_SUCCESS;
 }
 
 int acs_statemachine(){
-	state_codes cur_state = ENTRY_STATE;
-	ret_codes rc;
-	int (* state_fun)(void);
+	acs.cur_state = ENTRY_STATE;
+	acs_event event;
 	int i=0;
-	char input[10];
+	char input;
 
 	for(i=0;i<100;++i){
-		printf("current state: %s\n",state_name[cur_state]);
+		printf("current state: %s\n",state_name[acs.cur_state]);
 		printf("desired state? ");
-		fgets(input,1,stdin);		
-		state_fun = state[input]; 
-		if(EXIT_STATE == cur_state)
+		scanf(" %c", &input);
+		event = atoi(&input);
+		printf("%d\n",event);
+		acs.active_state = state[event];
+		acs.ac
+		if(EXIT_STATE == acs.cur_state)
 				break;
 	}
 
@@ -67,7 +71,7 @@ int acs_statemachine(){
 	}
 //*/
 
-	printf("interations: %d\n",i);
+	printf("iterations: %d\n",i);
 
 	return EXIT_SUCCESS;
 }
