@@ -15,11 +15,9 @@ int state_ready(void);
 int state_rw(void);
 int state_mtqr(void);
 
-extern int (* state[])(); 
 extern char *state_name[];
 
-typedef enum {OFF,RDY,RW,MTQR} acs_state;
-typedef enum {off,repeat,rdy,rw,mtqr} acs_event;
+typedef enum {OFF,INIT,RDY,RW,MTQR} acs_state;
 
 typedef struct{
 	acs_state src_state;
