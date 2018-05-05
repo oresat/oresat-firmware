@@ -2,105 +2,134 @@
 
 ACS acs;
 
+char *state_name[] = {
+	"ST_ANY",
+	"ST_OFF",
+	"ST_INIT",
+	"ST_RDY",
+	"ST_RW",
+	"ST_MTQR"
+};
+
+char *event_name[] = {
+	"EV_ANY",
+	"EV_OFF",
+	"EV_INIT",
+	"EV_RDY",
+	"EV_RW",
+	"EV_MTQR"
+};
+
+static void print_state(int state){
+	printf("%s",state_name[state+1]);	
+}
+
 static int state_off(void){
-	printf("off\n");	
-	return OFF;
+	printf("***call to state_off: ");	
+	print_state(ST_OFF);
+	printf("\n");
+	return ST_OFF;
 }
 
 static int state_init(void){
-	printf("init\n");	
-	return OFF;
+	printf("***call to state_init: ");	
+	print_state(ST_INIT);
+	printf("\n");
+	return ST_INIT;
 }
 
-static int state_ready(void){
-	printf("ready\n");	
-	return RDY;
+static int state_rdy(void){
+	printf("***call to state_rdy: ");	
+	print_state(ST_RDY);
+	printf("\n");
+	return ST_RDY;
 }
 
 static int state_rw(void){
-	printf("rw\n");	
-	return RW;
+	printf("***call to state_rw: ");	
+	print_state(ST_RW);
+	printf("\n");
+	return ST_RW;
 }
 
 static int state_mtqr(void){
-	printf("mtqr\n");	
-	return MTQR;
+	printf("***call to state_mtqr: ");	
+	print_state(ST_MTQR);
+	printf("\n");
+	return ST_MTQR;
 }
 
-char *state_name[] = {"OFF","INIT","RDY","RW","MTQR"};
+static int fsm_error(void){
+	printf("***call to fsm_error, keeping state\n");	
+	return acs.cur_state;
+}
 
-transition state_transitions[] = {
-	{RDY, 	RW,			&state_reactionwheel},
-	{RDY, 	MTQR,		&state_magnetorquer},
-	{RDY, 	OFF,		&state_off},
-	{RW, 		RDY,		&state_ready},
-	{MTQR, 	RDY,		&state_ready}
+transition trans[] = {
+	{ST_INIT, 	ST_RDY,		&state_rdy},
+	{ST_INIT, 	ST_OFF,		&state_off},
+	{ST_RDY, 		ST_RW,		&state_rw},
+	{ST_RDY, 		ST_MTQR,	&state_mtqr},
+	{ST_RDY, 		ST_OFF,		&state_off},
+	{ST_RW, 		ST_RDY,		&state_rdy},
+	{ST_MTQR, 	ST_RDY,		&state_rdy},
+	{ST_ANY, 		EV_ANY,		&fsm_error}
 };
 
-#define TRANS_COUNT (sizeof(state_transitions)/sizeof(*trans))
+#define TRANS_COUNT (int)(sizeof(trans)/sizeof(transition))
 
-int lookup_transitions(acs_state acss,acs_event rc){
-	(void)acss;
-	(void)rc;
+acs_state getNextEvent(){
+	acs_event event;
+	char input[2];;
 
-	return EXIT_SUCCESS;
-}
-
-acs_event getNextEvent(){
-	
-	return 
+	printf("current state: %d ",acs.cur_state);
+	print_state(acs.cur_state);
+	printf("\n");
+	printf("desired state? ");
+	scanf(" %s", input);
+	event = atoi(input);
+	input[0]=input[1]=0;
+//	if(evet < EV_ANY || event > EV){
+//		printf("error, state out of range\n");
+//		return 
+//	}
+	printf("attemping transitioning to state: "); print_state(event);
+	printf("\n");
+	return event;
 }
 
 int acs_statemachine(){
-	acs.cur_state = ENTRY_STATE;
 	acs_event event;
+	int i;
 
-	while (acs.cur_state != OFF) {
+	acs.cur_state = state_init();
+	printf("entry state: %s\n",state_name[acs.cur_state+1]);
+	
+	printf("state enum: "); 
+	printf("%d, %d, %d, %d, %d, %d\n",
+			ST_ANY,ST_OFF,ST_INIT,ST_RDY,ST_RW,ST_MTQR);
+	
+	printf("state names: "); 
+	print_state(ST_ANY); printf(", ");
+	print_state(ST_OFF); printf(", ");
+	print_state(ST_INIT); printf(", ");
+	print_state(ST_RDY); printf(", ");
+	print_state(ST_RW); printf(", ");
+	print_state(ST_MTQR); printf("\n");
+	printf("TRANS_CNT: %d\n",TRANS_COUNT);
+	
+	while (acs.cur_state != ST_OFF) {
 		event = getNextEvent();
-			for (i = 0; i < TRANS_COUNT; i++) {
-				if ((acs.cur_state == trans[i].st) || (ST_ANY == trans[i].st)) {
-				if ((event == trans[i].ev) || (EV_ANY == trans[i].ev)) {
-					state = (trans[i].fn)();
-					break;
-			}
+		for (i = 0;i < TRANS_COUNT;++i) {
+		//	if((int)acs.cur_state != (int)event){
+				if((acs.cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
+					if((event == trans[i].event)||(EV_ANY == trans[i].event)){
+						acs.cur_state = (trans[i].trans_fn)();
+						break;
+					}
+				}
+		//	}
 		}
 	}
-}
 	return EXIT_SUCCESS;
 }
-
-/*
-int acs_statemachine(){
-	acs.cur_state = ENTRY_STATE;
-	acs_event event;
-	int i=0;
-	char input;
-
-	for(i=0;i<100;++i){
-		printf("current state: %s\n",state_name[acs.cur_state]);
-		printf("desired state? ");
-		scanf(" %c", &input);
-		event = atoi(&input);
-		printf("%d\n",event);
-		acs.active_state = state[event];
-		acs.ac
-		if(EXIT_STATE == acs.cur_state)
-				break;
-	}
-//*/
-/*
-	for(i=0;i<100;++i){
-		state_fun = state[cur_state];
-		rc = state_fun();
-		if(EXIT_STATE == cur_state)
-				break;
-		cur_state = lookup_transitions(cur_state, rc);
-	}
-//*/
-
-	printf("iterations: %d\n",i);
-
-	return EXIT_SUCCESS;
-}
-
 
