@@ -16,9 +16,9 @@
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-#define SCALE			7
+#define SCALE			10
 #define STEPS			360 
-#define STRETCH	  1
+#define STRETCH	  80
 #define STEP_SIZE 1
 
 #define COIL_NUM 6
@@ -33,7 +33,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				2000 // periods per sec
+#define PWM_FREQ				12000 // periods per sec
 //#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************

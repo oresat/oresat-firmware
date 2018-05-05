@@ -5,12 +5,13 @@
 //                  CH_CFG_ST_FREQUENCY)
 
 static virtual_timer_t speed_vt;
-static int step_size = 1;
+//static int step_size = 1;
 
 //static bool configure = true;
 
 
 static sysinterval_t interval = 0;
+static uint32_t anglePrev, angleCurr;
 static uint32_t angleDelta = 0;
 static uint32_t rps = 0;
 static uint32_t time = 0;
@@ -18,15 +19,43 @@ static uint32_t time = 0;
 static  systime_t now;
 static  systime_t prv;
 
-static void speed_cb(void * arg)
-{
-  chVTSetI(&speed_vt, TIME_MS2I(100), speed_cb, NULL);
-  rps = angleDelta * 10;
-}
+
 
 
 BldcConfig bldc;
 uint16_t rxbuf[2] = {0}; // receive buffer
+
+
+static void gpt4cb(GPTDriver *gptp) {
+  (void)gptp;
+  // Perform your action here
+
+  anglePrev = angleCurr;
+  angleCurr = bldc.position;
+  angleDelta = 5;//angleCurr - anglePrev;
+
+  rps = angleDelta * 10;
+
+ 
+  gptStartOneShotI(&GPTD14, 100000); // ~100 ns delay, then stop timer
+}
+
+static const GPTConfig gpt4cfg = {
+  100000, // 1 MHz timer clock.
+  gpt4cb, // No callback
+  0, 0
+};
+
+static void speed_cb(void * arg)
+{
+  //chVTSetI(&speed_vt, TIME_MS2I(100), speed_cb, NULL);
+
+  anglePrev = angleCurr;
+  angleCurr = bldc.position;
+  angleDelta = angleCurr - anglePrev;
+
+  rps = angleDelta * 10;
+}
 
 static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
     (void)adcp;
@@ -65,8 +94,6 @@ THD_FUNCTION(acsThread,arg) {
 
 	bldcStart();
 
-  chVTObjectInit(&speed_vt);
-  //chVTSet(&speed_vt, TIME_MS2I(100), speed_cb, NULL);
 
     bool up = true;
     bool down = false;
@@ -80,6 +107,7 @@ THD_FUNCTION(acsThread,arg) {
     
     ///*
 		chprintf(DEBUG_CHP,"enc pos: %u \n\r", bldc.position);
+		//chprintf(DEBUG_CHP,"angleDelta: %u \n\r", angleDelta);
  	  chprintf(DEBUG_CHP,"phase 1: %u \n\r", bldc.u);     
 		chprintf(DEBUG_CHP,"phase 2: %u \n\r", bldc.v);     
 		chprintf(DEBUG_CHP,"phase 3: %u \n\n\r", bldc.w);     
@@ -171,10 +199,10 @@ THD_FUNCTION(spiThread,arg){
 
 		bldc.position = 0x3FFF & rxbuf[0];
 	 
-    prv = chVTGetSystemTime();
-    interval = chTimeDiffX(now, prv);
+    //prv = chVTGetSystemTime();
+    //interval = chTimeDiffX(now, prv);
     
-    time = TIME_I2US(interval);
+    //time = TIME_I2US(interval);
     
 
 		chThdSleepMicroseconds(1);
@@ -189,19 +217,6 @@ THD_WORKING_AREA(wa_debugThread,THREAD_SIZE);
 THD_FUNCTION(debugThread,arg) {
   (void)arg;
   chRegSetThreadName("debugThread");
-
-		chprintf(DEBUG_CHP,"enc pos: %u \n\r", bldc.position);
- 	  chprintf(DEBUG_CHP,"phase 1: %u \n\r", bldc.u);     
-		chprintf(DEBUG_CHP,"phase 2: %u \n\r", bldc.v);     
-		chprintf(DEBUG_CHP,"phase 3: %u \n\r", bldc.w);     
- 
-    chprintf(DEBUG_CHP, "ADC: %u \n\r", (int)bldc.samples[0]);
-    
-    chprintf(DEBUG_CHP, "TimeDelta : %u \n\r", interval);
-    chprintf(DEBUG_CHP, "AngleDelta : %u \n\r", angleDelta); 
-    chprintf(DEBUG_CHP, "rp? : %u \n\n\r", rps); 
-
-
  //chThdSleepMilliseconds(100);
 }
 
@@ -270,11 +285,20 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 	return (duty_cycle*bldc.scale)/10;	
 }
 
+uint32_t step_size = STRETCH;
+
+uint32_t current_sin_u, next_sin_u;
+uint32_t current_sin_v, next_sin_v;
+uint32_t current_sin_w, next_sin_w;
+uint16_t sin_diff;
+uint16_t sin_size;
+uint16_t sin_step = STRETCH;
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
  	uint16_t step; 
+  uint16_t next_step;
   palClearLine(LINE_LED_GREEN);
 	//configure = true;
 #ifdef CONFIGURE
@@ -316,9 +340,9 @@ static void pwmpcb(PWMDriver *pwmp) {
 #endif
 
 #ifndef CONFIGURE    
-	  ++bldc.count;
+	  //++bldc.count;
 
-	  if(bldc.count==bldc.stretch){
+	  //if(bldc.count==bldc.stretch){
 #ifdef BRUTEFORCE
 		  bldc.u += step_size;
 		  bldc.v += step_size;
@@ -337,8 +361,12 @@ static void pwmpcb(PWMDriver *pwmp) {
 #ifndef BRUTEFORCE
 
 //		int step = 360/(1<<14)*bldc.position;
-		  step = encoderToLUT(bldc.position);
-		  bldc.u = (step + STEP_SIZE)%360;
+      step = encoderToLUT(bldc.position);
+		  next_step = step + 1;
+
+
+
+      bldc.u = (next_step)%360;
 		  bldc.v = (bldc.u + bldc.phase_shift)%360;
 		  bldc.w = (bldc.v + bldc.phase_shift)%360;
 
@@ -358,31 +386,72 @@ static void pwmpcb(PWMDriver *pwmp) {
 */
 
 #endif
-		  bldc.count=0;
-	  }
+		//  bldc.count=0;
+	  //}
 #endif
+if (sin_step == step_size)
+{
+  current_sin_u = bldc.sinctrl[bldc.u];
+  current_sin_v = bldc.sinctrl[bldc.v];
+  current_sin_w = bldc.sinctrl[bldc.w];
+  next_sin_u = bldc.sinctrl[bldc.u + 1];
+  next_sin_v = bldc.sinctrl[bldc.v + 1];
+  next_sin_w = bldc.sinctrl[bldc.w + 1];
+  
+  if (current_sin_u < next_sin_u)
+  {
+    sin_diff = next_sin_u - current_sin_u;
+    //sin_diff_v = next_sin_v - current_sin_v;
+    //sin_diff_w = next_sin_w - current_sin_w;
 
-/*
+    sin_size = sin_diff / step_size;
+  }
+  else if (current_sin_v < next_sin_v)
+  {
+    sin_diff = next_sin_v - current_sin_v;
+    sin_size = sin_diff / step_size;
+  }  
+  else
+  {
+    sin_diff = next_sin_w - current_sin_w;
+    sin_size = sin_diff / step_size;
+  }
+}
+
+current_sin_u = current_sin_u + sin_size;
+current_sin_v = current_sin_v + sin_size;
+current_sin_w = current_sin_w + sin_size;
+
+sin_step = sin_step - 1;
+
+if (sin_step == 0)
+{
+  current_sin_u = next_sin_u;
+  current_sin_v = next_sin_v;
+  current_sin_w = next_sin_w;
+  sin_step = step_size;
+}
+
+
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.u]))
-	);
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_u));
 
 
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_V,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.v]))
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_v)
 	);
 
 
 pwmEnableChannelI(
 		&PWMD1,
-		PWM_U,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(bldc.sinctrl[bldc.w]))
+		PWM_W,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_w)
 	);
-*/
+
 		//chThdSleepSeconds(1);
 }
 
@@ -402,17 +471,17 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-	pwmCallback(PWM_U,bldc.u);
+	//pwmCallback(PWM_U,bldc.u);
 }
 
 static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-	pwmCallback(PWM_V,bldc.v);
+	//pwmCallback(PWM_V,bldc.v);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-	pwmCallback(PWM_W,bldc.w);
+	//pwmCallback(PWM_W,bldc.w);
 }
 
 static PWMConfig pwmcfg = {
@@ -433,12 +502,21 @@ static PWMConfig pwmcfg = {
 extern void acsInit(void){
 	bldcInit();
   // TODO MAX wrap up into adcInit
-  adcStart(&ADCD1, NULL);
+  //adcStart(&ADCD1, NULL);
 
   /*
   * Starts an ADC continuous conversion.
   */
-  adcStartConversion(&ADCD1, &adcgrpcfg, bldc.samples, ADC_GRP_BUF_DEPTH);
+  //adcStartConversion(&ADCD1, &adcgrpcfg, bldc.samples, ADC_GRP_BUF_DEPTH);
+
+  
+  //gptStart(&GPTD14, &gpt4cfg);
+  //gptStartOneShot(&GPTD14, 100000); // ~100 ns delay, then stop timer
+
+
+
+  //chVTObjectInit(&speed_vt);
+  //chVTSet(&speed_vt, TIME_MS2I(100), speed_cb, NULL);
 }
 
 extern void bldcInit(){
