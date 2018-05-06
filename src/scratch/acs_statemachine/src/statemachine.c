@@ -128,10 +128,10 @@ acs_event getNextEvent(ACS *acs){
 
 void print_welcome(){
 	printf("state enum: "); 
-	printf("%d, %d, %d, %d, %d, %d\n",
+	printf("\t%d, \t%d, \t%d, \t %d, \t %d, \t %d\n",
 			ST_ANY,ST_OFF,ST_INIT,ST_RDY,ST_RW,ST_MTQR);
 	
-	printf("state names: "); 
+	printf("state names: \t"); 
 	print_state(ST_ANY); printf(", ");
 	print_state(ST_OFF); printf(", ");
 	print_state(ST_INIT); printf(", ");
@@ -140,10 +140,10 @@ void print_welcome(){
 	print_state(ST_MTQR); printf("\n");
 	
 	printf("event enum: "); 
-	printf("%d, %d, %d, %d, %d, %d, %d\n",
+	printf("\t%d, \t%d, \t%d, \t %d, \t %d, \t %d, \t %d\n",
 			EV_ANY,EV_OFF,EV_INIT,EV_RDY,EV_RW,EV_MTQR,EV_REP);
 
-	printf("event names: "); 
+	printf("event names: \t"); 
 	print_event(EV_ANY); printf(", ");
 	print_event(EV_OFF); printf(", ");
 	print_event(EV_INIT); printf(", ");
