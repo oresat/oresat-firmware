@@ -27,8 +27,10 @@ typedef enum {
 	EV_RDY,
 	EV_RW,
 	EV_MTQR,
-	EV_REP
+	EV_REP,
+	EV_END // this must be the last event
 }acs_event;
+
 
 typedef struct{
 	acs_state cur_state;
@@ -38,10 +40,17 @@ typedef struct{
 typedef struct{
 	acs_state state;
 	acs_event event;
+	int (* fn)(ACS *acs);
+}acs_transition,acs_trap;
+/*
+typedef struct{
+	acs_state state;
+	acs_event event;
 	int (* trans_fn)(ACS *acs);
 }transition;
-
-extern transition trans[];
+*/
+extern acs_transition trans[];
+extern acs_trap trap[];
 
 int acs_statemachine();
 

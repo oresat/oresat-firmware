@@ -18,7 +18,8 @@ char *event_name[] = {
 	"EV_RDY",
 	"EV_RW",
 	"EV_MTQR",
-	"EV_REP"
+	"EV_REP",
+	"EV_END"
 };
 
 static void print_state(int state){
@@ -69,24 +70,32 @@ static int state_mtqr(ACS *acs){
 	return ST_MTQR;
 }
 
-static int fsm_report(ACS *acs){
+static int trap_report(ACS *acs){
 	printf("***call to fsm_report, keeping state\n");	
 	return acs->cur_state;
 }
 
+acs_trap trap[] = {
+	{ST_ANY, 	EV_REP,		&trap_report}
+};
+
+#define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
+
 static int fsm_trap(ACS *acs){
 	printf("***call to fsm_trap, keeping state\n");	
-	switch(acs->event){
-		case EV_REP:
-			fsm_report(acs);
+	int i;
+	
+	for(i = 0;i < EVENT_COUNT;++i){
+		if((acs->event == trap[i].event)){
+			acs->cur_state = (trap[i].fn)(acs);
 			break;
-		default:
-			break;
-	};
+		}
+	}
+
 	return acs->cur_state;
 }
 
-transition trans[] = {
+acs_transition trans[] = {
 	{ST_INIT, 	EV_RDY,		&state_rdy},
 	{ST_INIT, 	EV_OFF,		&state_off},
 	{ST_RDY, 		EV_RW,		&state_rw},
@@ -94,11 +103,10 @@ transition trans[] = {
 	{ST_RDY, 		EV_OFF,		&state_off},
 	{ST_RW, 		EV_RDY,		&state_rdy},
 	{ST_MTQR, 	EV_RDY,		&state_rdy},
-	{ST_ANY, 		EV_ANY,		&fsm_trap},
-	{ST_ANY, 		EV_REP,		NULL}
+	{ST_ANY, 		EV_ANY,		&fsm_trap}
 };
 
-#define TRANS_COUNT (int)(sizeof(trans)/sizeof(transition))
+#define TRANS_COUNT (int)(sizeof(trans)/sizeof(acs_transition))
 
 acs_event getNextEvent(ACS *acs){
 	acs_event event;
@@ -110,7 +118,7 @@ acs_event getNextEvent(ACS *acs){
 	printf("request event? ");
 	scanf(" %s", input);
 	event = atoi(input);
-	if(event < EV_ANY || event > EV_REP){
+	if(event < EV_ANY || event >= EV_END){
 		printf("error, event out of range\n");
 		return acs->cur_state; 
 	}
@@ -142,7 +150,8 @@ void print_welcome(){
 	print_event(EV_RDY); printf(", ");
 	print_event(EV_RW); printf(", ");
 	print_event(EV_MTQR); printf(", ");
-	print_event(EV_REP); printf("\n\n");
+	print_event(EV_REP); printf(", ");
+	print_event(EV_END); printf("\n\n");
 }
 
 int acs_statemachine(ACS *acs){
@@ -159,7 +168,7 @@ int acs_statemachine(ACS *acs){
 		for (i = 0;i < TRANS_COUNT;++i) {
 			if((acs->cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
 				if((acs->event == trans[i].event)||(EV_ANY == trans[i].event)){
-					acs->cur_state = (trans[i].trans_fn)(acs);
+					acs->cur_state = (trans[i].fn)(acs);
 					break;
 				}
 			}
