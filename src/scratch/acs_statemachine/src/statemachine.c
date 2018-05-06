@@ -19,6 +19,7 @@ char *event_name[] = {
 	"EV_RW",
 	"EV_MTQR",
 	"EV_REP",
+	"EV_STATUS",
 	"EV_END"
 };
 
@@ -30,9 +31,12 @@ static void print_event(int event){
 	printf("%s",event_name[event+1]);	
 }
 
+#define STATE_STRING "*Calling transition -> " 
+#define TRAP_STRING "*Calling trap -> " 
+
 static int state_off(ACS *acs){
 	(void)acs;
-	printf("***call to state_off: ");	
+	printf("%sstate_off: ",STATE_STRING);	
 	print_state(ST_OFF);
 	printf("\n");
 	return ST_OFF;
@@ -40,7 +44,7 @@ static int state_off(ACS *acs){
 
 static int state_init(ACS *acs){
 	(void)acs;
-	printf("***call to state_init: ");	
+	printf("%sstate_init: ",STATE_STRING);	
 	print_state(ST_INIT);
 	printf("\n");
 	return ST_INIT;
@@ -48,7 +52,7 @@ static int state_init(ACS *acs){
 
 static int state_rdy(ACS *acs){
 	(void)acs;
-	printf("***call to state_rdy: ");	
+	printf("%sstate_rdy: ",STATE_STRING);	
 	print_state(ST_RDY);
 	printf("\n");
 	return ST_RDY;
@@ -56,7 +60,7 @@ static int state_rdy(ACS *acs){
 
 static int state_rw(ACS *acs){
 	(void)acs;
-	printf("***call to state_rw: ");	
+	printf("%sstate_rw: ",STATE_STRING);	
 	print_state(ST_RW);
 	printf("\n");
 	return ST_RW;
@@ -64,31 +68,51 @@ static int state_rw(ACS *acs){
 
 static int state_mtqr(ACS *acs){
 	(void)acs;
-	printf("***call to state_mtqr: ");	
+	printf("%sstate_mtqr: ",STATE_STRING);	
 	print_state(ST_MTQR);
 	printf("\n");
 	return ST_MTQR;
 }
 
-static int trap_report(ACS *acs){
-	printf("***call to fsm_report, keeping state\n");	
-	return acs->cur_state;
+static int trap_fsm_report(ACS *acs){
+	(void)acs;
+	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
+	return EXIT_SUCCESS;
+}
+
+static int trap_rw_status(ACS *acs){
+	(void)acs;
+	printf("%strap_rw_status, keeping state!\n",TRAP_STRING);	
+	return EXIT_SUCCESS;
+}
+
+static int trap_mtqr_status(ACS *acs){
+	(void)acs;
+	printf("%strap_mtqr_status, keeping state!\n",TRAP_STRING);	
+	return EXIT_SUCCESS;
 }
 
 acs_trap trap[] = {
-	{ST_ANY, 	EV_REP,		&trap_report}
+	{ST_ANY, 	EV_REP,			&trap_fsm_report},
+	{ST_RW, 	EV_STATUS,	&trap_rw_status},
+	{ST_MTQR, EV_STATUS,	&trap_mtqr_status}
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
 
 static int fsm_trap(ACS *acs){
-	printf("***call to fsm_trap, keeping state\n");	
-	int i;
-	
+	printf("%sfsm_trap, keeping state!\n",TRAP_STRING);	
+	int i,trap_status;
+
 	for(i = 0;i < EVENT_COUNT;++i){
-		if((acs->event == trap[i].event)){
-			acs->cur_state = (trap[i].fn)(acs);
-			break;
+		if(acs->cur_state == trap[i].state){
+			if((acs->event == trap[i].event)){
+				trap_status = (trap[i].fn)(acs);
+				if(trap_status){
+					printf("trap error!\n");
+				}
+				break;
+			}
 		}
 	}
 
@@ -159,9 +183,9 @@ int acs_statemachine(ACS *acs){
 
 	print_welcome();
 
-	printf("starting state machine!\n\n");
+	printf("Starting state machine!\n\n");
 	acs->cur_state = state_init(acs);
-	printf("\nentry state: %s\n",state_name[acs->cur_state+1]);
+	printf("\nIntitializing ACS to state: %s\n\n",state_name[acs->cur_state+1]);
 	
 	while (acs->cur_state != ST_OFF) {
 		acs->event = getNextEvent(acs);
