@@ -150,8 +150,8 @@ void print_welcome(){
 	print_event(EV_RDY); printf(", ");
 	print_event(EV_RW); printf(", ");
 	print_event(EV_MTQR); printf(", ");
-	print_event(EV_REP); printf(", ");
-	print_event(EV_END); printf("\n\n");
+	print_event(EV_REP); printf("\n");
+	printf("TRANS_CNT: %d\n\n",TRANS_COUNT);
 }
 
 int acs_statemachine(ACS *acs){
@@ -159,9 +159,9 @@ int acs_statemachine(ACS *acs){
 
 	print_welcome();
 
+	printf("starting state machine!\n\n");
 	acs->cur_state = state_init(acs);
-	printf("entry state: %s\n",state_name[acs->cur_state+1]);
-	printf("TRANS_CNT: %d\n",TRANS_COUNT);
+	printf("\nentry state: %s\n",state_name[acs->cur_state+1]);
 	
 	while (acs->cur_state != ST_OFF) {
 		acs->event = getNextEvent(acs);
