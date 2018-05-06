@@ -42,10 +42,10 @@ $(TEST_BIN): $(TEST_OBJS)
 .c.o: 
 	$(CC) $(FLAGS) -c $^ -o $@
 
-run_$(PROG_BIN):
+run:
 	./$(PROG_BIN)
 
-run_$(TEST_BIN):
+test:
 	./$(TEST_BIN)
 
 clean: 
