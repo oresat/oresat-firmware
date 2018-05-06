@@ -4,8 +4,8 @@
 CC = gcc
 
 # binaries
-PROG_BIN = acs_sm
-TEST_BIN = test
+PROG_BIN = acs_statemachine
+TEST_BIN = acs_test
 
 SRC = ./src
 INC = ./inc

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -25,18 +26,20 @@ typedef enum {
 	EV_INIT,
 	EV_RDY,
 	EV_RW,
-	EV_MTQR
+	EV_MTQR,
+	EV_REP
 }acs_event;
+
+typedef struct{
+	acs_state cur_state;
+	acs_event event;
+}ACS;
 
 typedef struct{
 	acs_state state;
 	acs_event event;
-	int (* trans_fn)(void);
+	int (* trans_fn)(ACS *acs);
 }transition;
-
-typedef struct{
-	acs_state cur_state;
-}ACS;
 
 extern transition trans[];
 
