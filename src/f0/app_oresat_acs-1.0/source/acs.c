@@ -37,56 +37,49 @@ static void print_event(int event){
 
 static int state_off(ACS *acs){
 	(void)acs;
-//	printf("%sstate_off: ",STATE_STRING);	
-	print_state(ST_OFF);
-//	printf("\n");
+	// change state to OFF	
 	return ST_OFF;
 }
 
 static int state_init(ACS *acs){
 	(void)acs;
-//	printf("%sstate_init: ",STATE_STRING);	
-	print_state(ST_INIT);
-//	printf("\n");
+	// change state to INIT
 	return ST_INIT;
 }
 
 static int state_rdy(ACS *acs){
 	(void)acs;
-//	printf("%sstate_rdy: ",STATE_STRING);	
-	print_state(ST_RDY);
-//	printf("\n");
+	// change state to RDY
 	return ST_RDY;
 }
 
 static int state_rw(ACS *acs){
 	(void)acs;
-//	printf("%sstate_rw: ",STATE_STRING);	
-	print_state(ST_RW);
-//	printf("\n");
+	// change state to RW
 	return ST_RW;
 }
 
 static int state_mtqr(ACS *acs){
 	(void)acs;
-//	printf("%sstate_mtqr: ",STATE_STRING);	
-	print_state(ST_MTQR);
-//	printf("\n");
+	// change state to MTQR
 	return ST_MTQR;
 }
 
 static int trap_fsm_report(ACS *acs){
 	(void)acs;
-//	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
 	chMtxLock(&mtx);
 	acs->can_buf.send[REP_STATE]=acs->cur_state;
 	acs->can_buf.send[SEND_ARG_BYTE]=acs->cur_state;
+	chMtxUnlock(&mtx);
+ 
+	chThdSleepMilliseconds(100);
+	
+	chMtxLock(&mtx);
 	for(int i=0;i<CAN_BUF_SIZE;++i){
-//		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.send[i]=0;
 	}
 	chMtxUnlock(&mtx);
-
+	
 	return EXIT_SUCCESS;
 }
 
