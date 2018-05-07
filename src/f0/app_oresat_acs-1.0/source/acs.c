@@ -1,5 +1,7 @@
 #include "acs.h"
 
+static mutex_t mtx;
+
 char *state_name[] = {
 	"ST_ANY",
 	"ST_OFF",
@@ -31,10 +33,7 @@ static void print_event(int event){
 	(void)event;
 //	printf("%s",event_name[event+1]);	
 }
-//*/
-
-//#define STATE_STRING "*Calling transition -> " 
-//#define TRAP_STRING "*Calling trap -> " 
+/*/
 
 static int state_off(ACS *acs){
 	(void)acs;
@@ -79,6 +78,15 @@ static int state_mtqr(ACS *acs){
 static int trap_fsm_report(ACS *acs){
 	(void)acs;
 //	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
+	chMtxLock(&mtx);
+	acs->can_buf.send[REP_STATE]=acs->cur_state;
+	acs->can_buf.send[SEND_ARG_BYTE]=acs->cur_state;
+	for(int i=0;i<CAN_BUF_SIZE;++i){
+//		recv[i]=acs->can_buf.recv[i];
+		acs->can_buf.send[i]=0;
+	}
+	chMtxUnlock(&mtx);
+
 	return EXIT_SUCCESS;
 }
 
@@ -108,7 +116,7 @@ static int fsm_trap(ACS *acs){
 
 	for(i = 0;i < EVENT_COUNT;++i){
 		if(acs->cur_state == trap[i].state){
-			if((acs->event == trap[i].event)){
+			if(acs->event == trap[i].event){
 				trap_status = (trap[i].fn)(acs);
 				if(trap_status){
 //					printf("trap error!\n");
@@ -136,14 +144,35 @@ const acs_transition trans[] = {
 
 static acs_event getNextEvent(ACS *acs){
 	acs_event event = EV_ANY;
-	//char input[3]="-1\n";
+	uint8_t recv[CAN_BUF_SIZE]={0};
 
-	// TODO: get event from the bus
+	chMtxLock(&mtx);
+	for(int i=0;i<CAN_BUF_SIZE;++i){
+		recv[i]=acs->can_buf.recv[i];
+		acs->can_buf.recv[i]=0;
+	}
+	chMtxUnlock(&mtx);
+	
+	switch(recv[RECV_TYPE]){
+		case NOT_RECV:
+			break;
+		case CHG_ST:
+			event = recv[RECV_ARG_BYTE];			
+			break;
+		case REP_ST:
+			event = EV_REP;			
+			break;
+		case BLINK:
+			break;
+		default:
+			break;
+	}
 
 	if(event < EV_ANY || event >= EV_END){
 	//	printf("error, event out of range\n");
-		return acs->cur_state; 
+		return (acs_event)acs->cur_state; 
 	}
+
 //	printf("event %s received\n", event_name[event+1]);
 	return event;
 }
@@ -153,7 +182,7 @@ int acs_statemachine(ACS *acs){
 
 	acs->cur_state = state_init(acs);
 	
-	while (acs->cur_state != ST_OFF) {
+	while (!chThdShouldTerminateX() && acs->cur_state != ST_OFF) {
 		acs->event = getNextEvent(acs);
 		for (i = 0;i < TRANS_COUNT;++i) {
 			if((acs->cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
@@ -163,6 +192,7 @@ int acs_statemachine(ACS *acs){
 				}
 			}
 		}
+    chThdSleepMilliseconds(500);
 	}
 	
 	return EXIT_SUCCESS;
@@ -170,18 +200,22 @@ int acs_statemachine(ACS *acs){
 
 extern int acsInit(ACS *acs){
 	(void)acs;
-	
+//	acs->cur_state = ST_OFF;
+//	acs->event = EV_OFF;
+//	acs->can_buf.send=empty_can_buf;
+//	acs->can_buf.recv=empty_can_buf;
+
 	return EXIT_SUCCESS;
 }
 
-THD_WORKING_AREA(wa_acsThread,WA_ACSTHD_SIZE);
-THD_FUNCTION(acsThread,acs) {
+THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
+THD_FUNCTION(acsThread,acs){
 //  (void)arg;
   chRegSetThreadName("acsThread");
 
 	acs_statemachine(acs);
   
-	while (!chThdShouldTerminateX()) {
-    chThdSleepMilliseconds(500);
-  }
+//	while (!chThdShouldTerminateX()) {
+//    chThdSleepMilliseconds(500);
+//  }
 }

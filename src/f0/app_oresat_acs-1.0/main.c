@@ -24,7 +24,7 @@
 
 #include "acs.h"
 
-ACS acs;
+ACS acs = {};
 
 //=== Serial configuration
 static SerialConfig ser_cfg ={

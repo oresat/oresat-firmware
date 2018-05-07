@@ -3,16 +3,60 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "chmtx.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
-#define WA_ACSTHD_SIZE 128
+#define WA_ACS_THD_SIZE (1<<7)
+#define CAN_NODE 				0x3F // max 0x7f
+#define CAN_BUF_SIZE 		8
+
+/*
+ *	can_message
+ *
+ * 	Byte		Name		Use
+ * 	0				CMD			Issuing a command to the ACS
+ *	1
+ *	2
+ *	3
+ *	4
+ *	5
+ *
+ *	CMD
+ *
+ *
+ *
+ *
+ *
+ */
+
+typedef enum{
+	RECV_TYPE=0,
+	RECV_ARG_BYTE
+}can_recv_msg;
+
+typedef enum{
+	NOT_RECV=0,
+	CHG_ST,
+	REP_ST,
+	BLINK
+}acs_recv_msg_type;
+
+typedef enum{
+	SEND_TYPE=0,
+	SEND_ARG_BYTE
+}can_send_msg;
+
+typedef enum{
+	NOT_SEND=0,
+	REP_STATE
+}acs_send_msg_type;
 
 extern char *state_name[];
 extern char *event_name[];
 
-typedef enum {
+typedef enum{
 	ST_ANY=-1,
 	ST_OFF,
 	ST_INIT,
@@ -33,10 +77,15 @@ typedef enum {
 	EV_END // this must be the last event
 }acs_event;
 
+typedef struct{
+	uint8_t send[CAN_BUF_SIZE];
+	uint8_t recv[CAN_BUF_SIZE];	
+}can_buffer;
 
 typedef struct{
 	acs_state cur_state;
-	acs_event event;
+	acs_event event; // the most recent event
+	can_buffer can_buf;
 }ACS;
 
 typedef struct{
@@ -49,7 +98,7 @@ extern int acs_statemachine(ACS *acs);
 
 extern int acsInit(ACS *acs);
 
-extern THD_WORKING_AREA(wa_acsThread,WA_ACSTHD_SIZE);
+extern THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
 extern THD_FUNCTION(acsThread,acs);
 
 #endif
