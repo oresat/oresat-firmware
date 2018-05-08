@@ -84,7 +84,7 @@ typedef struct{
 	int (*fn)(ACS *acs);
 }acs_transition,acs_trap;
 
-extern int acs_statemachine(ACS *acs);
+//extern int acs_statemachine(ACS *acs);
 
 extern int acsInit(ACS *acs);
 

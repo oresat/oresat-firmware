@@ -177,7 +177,7 @@ static acs_event getNextEvent(ACS *acs){
 	return event;
 }
 
-int acs_statemachine(ACS *acs){
+static int acs_statemachine(ACS *acs){
 	int i;
 
 	acs->cur_state = state_init(acs);
@@ -200,10 +200,6 @@ int acs_statemachine(ACS *acs){
 
 extern int acsInit(ACS *acs){
 	(void)acs;
-//	acs->cur_state = ST_OFF;
-//	acs->event = EV_OFF;
-//	acs->can_buf.send=empty_can_buf;
-//	acs->can_buf.recv=empty_can_buf;
 
 	return EXIT_SUCCESS;
 }
