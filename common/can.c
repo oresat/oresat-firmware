@@ -8,6 +8,8 @@ can_node_t node;
 can_tpdo_t tpdo[4];
 can_rpdo_t rpdo[4];
 
+event_source_t rpdo_event;
+
 void can_init(uint8_t node_id, uint32_t heartbeat) {
     // If node_id is greater than maximum node ID (127), halt
     chDbgAssert(node_id <= 0x7F, "Error: Node ID out of range");
@@ -32,8 +34,9 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     for (uint8_t i = 0; i < 4; ++i) {
         canTPDOObjectInit(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
         canRPDOObjectInit(i, CAN_ID_DEFAULT, 0, NULL);
-        chEvtObjectInit(&rpdo[i].event);
     }
+
+    chEvtObjectInit(&rpdo_event);
 
     // Initialize the hardware
     can_hw_init();

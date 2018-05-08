@@ -65,7 +65,6 @@ typedef struct {
     uint32_t    inhibit_timestamp;
     uint8_t     inhibit_status;
     uint8_t     *pdata;
-    virtual_timer_t timer;
     CANTxFrame  msg;
 } can_tpdo_t;
 
@@ -73,12 +72,13 @@ typedef struct {
     uint32_t    can_id;
     uint8_t     len;
     uint8_t     *pdata;
-    event_source_t event;
 } can_rpdo_t;
 
 extern can_node_t node;
 extern can_tpdo_t tpdo[];
 extern can_rpdo_t rpdo[];
+
+extern event_source_t rpdo_event;
 
 /*
  * Function prototypes

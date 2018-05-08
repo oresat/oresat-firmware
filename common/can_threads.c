@@ -44,7 +44,7 @@ THD_FUNCTION(can_rpdo, p) {
                         rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
                     chSysUnlock();
-                    chEvtBroadcast(&rpdo[i].event);
+                    chEvtBroadcast(&rpdo_event);
                 }
             }
         }
