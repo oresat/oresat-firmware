@@ -1,6 +1,6 @@
 #include "acs.h"
 
-static mutex_t mtx;
+//static mutex_t mtx;
 
 char *state_name[] = {
 	"ST_ANY",
@@ -37,56 +37,53 @@ static void print_event(int event){
 
 static int state_off(ACS *acs){
 	(void)acs;
-//	printf("%sstate_off: ",STATE_STRING);	
 	print_state(ST_OFF);
-//	printf("\n");
 	return ST_OFF;
 }
 
 static int state_init(ACS *acs){
 	(void)acs;
-//	printf("%sstate_init: ",STATE_STRING);	
 	print_state(ST_INIT);
-//	printf("\n");
 	return ST_INIT;
 }
 
 static int state_rdy(ACS *acs){
 	(void)acs;
-//	printf("%sstate_rdy: ",STATE_STRING);	
 	print_state(ST_RDY);
-//	printf("\n");
 	return ST_RDY;
 }
 
 static int state_rw(ACS *acs){
 	(void)acs;
-//	printf("%sstate_rw: ",STATE_STRING);	
 	print_state(ST_RW);
-//	printf("\n");
 	return ST_RW;
 }
 
 static int state_mtqr(ACS *acs){
 	(void)acs;
-//	printf("%sstate_mtqr: ",STATE_STRING);	
 	print_state(ST_MTQR);
-//	printf("\n");
 	return ST_MTQR;
 }
 
 static int trap_fsm_report(ACS *acs){
 	(void)acs;
 //	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
-	chMtxLock(&mtx);
-	acs->can_buf.send[REP_STATE]=acs->cur_state;
-	acs->can_buf.send[SEND_ARG_BYTE]=acs->cur_state;
+// **********critical section************
+// TODO: needs to synchronize with the CAN thred
+//	chMtxLock(&mtx);
+	acs->can_buf.send[MSG_TYPE]=REP_STATE;
+	acs->can_buf.send[ARG_BYTE]=acs->cur_state;
+// TODO: The buffer should not be overwritten with zeros
+// 			 until the message is placed on the bus.
+    chThdSleepMilliseconds(500); // *************
+//  ^^^^^ this should not be implemented with sleep
+
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 //		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.send[i]=0;
 	}
-	chMtxUnlock(&mtx);
-
+//	chMtxUnlock(&mtx);
+// *********end critical section*********
 	return EXIT_SUCCESS;
 }
 
@@ -146,23 +143,27 @@ static acs_event getNextEvent(ACS *acs){
 	acs_event event = EV_ANY;
 	uint8_t recv[CAN_BUF_SIZE]={0};
 
-	chMtxLock(&mtx);
+// *******critical section**********
+// TODO: This needs to be synchronized with the CAN thread
+//	chMtxLock(&mtx);
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.recv[i]=0;
 	}
-	chMtxUnlock(&mtx);
-	
-	switch(recv[RECV_TYPE]){
-		case NOT_RECV:
+//	chMtxUnlock(&mtx);
+// ******end critical section*******
+
+	switch(recv[MSG_TYPE]){
+		case NOP:
 			break;
-		case CHG_ST:
-			event = recv[RECV_ARG_BYTE];			
+		case CHG_STATE:
+			event = recv[ARG_BYTE];			
 			break;
-		case REP_ST:
+		case REP_STATE:
 			event = EV_REP;			
 			break;
 		case BLINK:
+			// TODO: implement
 			break;
 		default:
 			break;

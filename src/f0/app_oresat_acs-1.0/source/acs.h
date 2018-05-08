@@ -16,7 +16,7 @@
  *	can_message
  *
  * 	Byte		Name		Use
- * 	0				CMD			Issuing a command to the ACS
+ * 	0				
  *	1
  *	2
  *	3
@@ -32,26 +32,16 @@
  */
 
 typedef enum{
-	RECV_TYPE=0,
-	RECV_ARG_BYTE
-}can_recv_msg;
+	MSG_TYPE=0,
+	ARG_BYTE
+}can_msg;
 
 typedef enum{
-	NOT_RECV=0,
-	CHG_ST,
-	REP_ST,
+	NOP=0,
+	CHG_STATE,
+	REP_STATE,
 	BLINK
-}acs_recv_msg_type;
-
-typedef enum{
-	SEND_TYPE=0,
-	SEND_ARG_BYTE
-}can_send_msg;
-
-typedef enum{
-	NOT_SEND=0,
-	REP_STATE
-}acs_send_msg_type;
+}can_msg_type;
 
 extern char *state_name[];
 extern char *event_name[];
