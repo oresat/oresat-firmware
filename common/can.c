@@ -18,7 +18,6 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     //TODO: Implement actual bitrate calculations
     node.bitrate = 500U;
     node.heartbeat_time = heartbeat;
-    node.heartbeat_timestamp = 0x00;
     node.error_reg = 0x00;
 
     // Initialize the node heartbeat message
@@ -33,7 +32,8 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     for (uint8_t i = 0; i < 4; ++i) {
         canTPDOObjectInit(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
         canRPDOObjectInit(i, CAN_ID_DEFAULT, 0, NULL);
-        chVTObjectInit(&tpdo[i].timer);
+        chEvtObjectInit(&rpdo[i].event);
+        /*chVTObjectInit(&tpdo[i].timer);*/
     }
 
     // Initialize the hardware
@@ -57,8 +57,11 @@ void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, u
     chDbgAssert(pdo_num <= 3, "Error: Invalid PDO number");
 
     // Initialize TPDO configuration data
+    // TODO: Handle zero timeout
+    if (event_tim == 0) {
+        event_tim = 200;
+    }
     tpdo[pdo_num].event_time = event_tim;
-    tpdo[pdo_num].event_timestamp = 0x00;
     tpdo[pdo_num].inhibit_time = inhibit_tim;
     tpdo[pdo_num].inhibit_timestamp = 0x00;
     tpdo[pdo_num].inhibit_status = 0x00;
@@ -106,22 +109,17 @@ void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t 
     return;
 }
 
-void tpdo_cb(void *arg) {
+void tpdo_callback(void *arg) {
+    can_tpdo_t *ptpdo = (can_tpdo_t*)arg;
 
     chSysLockFromISR();
-    for (uint8_t i = 0; i < ((can_tpdo_t*)arg)->msg.DLC; ++i) {
-        ((can_tpdo_t*)arg)->msg.data8[i] = ((can_tpdo_t*)arg)->pdata[i];
+    for (uint8_t i = 0; i < ptpdo->msg.DLC; ++i) {
+        ptpdo->msg.data8[i] = ptpdo->pdata[i];
     }
-    chVTSetI(&((can_tpdo_t*)arg)->timer, TIME_MS2I(((can_tpdo_t*)arg)->event_time), tpdo_cb, arg);
+    chVTSetI(&ptpdo->timer, TIME_MS2I(ptpdo->event_time), tpdo_callback, arg);
     chSysUnlockFromISR();
 
     return;
-}
-
-uint8_t can_processStack(void) {
-    uint8_t status = 0;
-
-    return status;
 }
 
 void can_reset_app(void) {

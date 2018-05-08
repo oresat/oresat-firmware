@@ -55,14 +55,12 @@ typedef struct {
     uint8_t     err_code;
     uint32_t    bitrate;
     uint32_t    heartbeat_time;
-    uint32_t    heartbeat_timestamp;
     CANTxFrame  heartbeat_msg;
     uint8_t     error_reg;
 } can_node_t;
 
 typedef struct {
     uint32_t    event_time;
-    uint32_t    event_timestamp;
     uint32_t    inhibit_time;
     uint32_t    inhibit_timestamp;
     uint8_t     inhibit_status;
@@ -75,6 +73,7 @@ typedef struct {
     uint32_t    can_id;
     uint8_t     len;
     uint8_t     *pdata;
+    event_source_t event;
 } can_rpdo_t;
 
 extern can_node_t node;
@@ -94,10 +93,7 @@ void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, u
 void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t *pdata);
 
 //TPDO/RPDO support functions
-void tpdo_cb(void *arg);
-
-//CAN Process
-uint8_t can_processStack(void);
+void tpdo_callback(void *arg);
 
 //Reset functions
 void can_reset_app(void);
