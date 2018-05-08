@@ -79,7 +79,6 @@ static int trap_fsm_report(ACS *acs){
 //  ^^^^^ this should not be implemented with sleep
 
 	for(int i=0;i<CAN_BUF_SIZE;++i){
-//		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.send[i]=0;
 	}
 //	chMtxUnlock(&mtx);
