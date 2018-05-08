@@ -33,7 +33,6 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
         canTPDOObjectInit(i, CAN_ID_DEFAULT, 0, 0, 0, NULL);
         canRPDOObjectInit(i, CAN_ID_DEFAULT, 0, NULL);
         chEvtObjectInit(&rpdo[i].event);
-        /*chVTObjectInit(&tpdo[i].timer);*/
     }
 
     // Initialize the hardware
@@ -79,12 +78,6 @@ void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, u
         tpdo[pdo_num].msg.SID = can_id;
     }
 
-    if (pdata != NULL) {
-        /*chVTSet(&tpdo[pdo_num].timer, TIME_MS2I(tpdo[pdo_num].event_time), tpdo_cb, &(tpdo[pdo_num]));*/
-    } else {
-        /*chVTReset(&tpdo[pdo_num].timer);*/
-    }
-
     return;
 }
 
@@ -105,19 +98,6 @@ void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t 
     } else {
         rpdo[pdo_num].can_id = can_id;
     }
-
-    return;
-}
-
-void tpdo_callback(void *arg) {
-    can_tpdo_t *ptpdo = (can_tpdo_t*)arg;
-
-    chSysLockFromISR();
-    for (uint8_t i = 0; i < ptpdo->msg.DLC; ++i) {
-        ptpdo->msg.data8[i] = ptpdo->pdata[i];
-    }
-    chVTSetI(&ptpdo->timer, TIME_MS2I(ptpdo->event_time), tpdo_callback, arg);
-    chSysUnlockFromISR();
 
     return;
 }

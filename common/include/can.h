@@ -92,9 +92,6 @@ void can_start(void);
 void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata);
 void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t *pdata);
 
-//TPDO/RPDO support functions
-void tpdo_callback(void *arg);
-
 //Reset functions
 void can_reset_app(void);
 void can_reset_comms(void);
