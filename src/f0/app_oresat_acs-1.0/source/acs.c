@@ -27,16 +27,25 @@ char *event_name[] = {
 #define TRAP_STRING "*Calling trap -> " 
 
 static void print_state(int state){
-//	(void)state;
-	chprintf(DEBUG_CHP,"%s%s\n\r",STATE_STRING,state_name[state+1]); 
+	(void)state;
+//	chprintf(DEBUG_CHP,"%s%s\n\r",STATE_STRING,state_name[state+1]); 
 }
 
-/*
-static void print_event(int event){
-	(void)event;
-//	printf("%s",event_name[event+1]);	
+static void update_recv(ACS *acs,int recv_byte){
+	switch(recv_byte){
+		case ERROR_CODE:
+			break;
+		case ACS_STATE:
+// *******critical section**********
+			chSysLock();
+			acs->can_buf.send[recv_byte]=acs->cur_state;
+			chSysUnlock();
+// *******end critical section**********
+			break;
+		default:
+			break;
+	}
 }
-/*/
 
 static int state_off(ACS *acs){
 	(void)acs;
@@ -70,44 +79,8 @@ static int state_mtqr(ACS *acs){
 
 static int trap_fsm_status(ACS *acs){
 	(void)acs;
-	//palClearLine(LINE_LED_GREEN);
-//	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
-// **********critical section************
-// TODO: needs to synchronize with the CAN thred
-//	chMtxLock(&mtx);
-
-	chSysLock();
-	acs->can_buf.send[MSG_TYPE]=REPORT_STATUS;
-	acs->can_buf.send[ARG_BYTE]=acs->cur_state;
-	chSysUnlock();
-// TODO: The buffer should not be overwritten with zeros
-// 			 until the message is placed on the bus.
-    chThdSleepMilliseconds(1000); // *************
-//  ^^^^^ this should not be implemented with sleep
-
-	chSysLock();
-	for(int i=0;i<CAN_BUF_SIZE;++i){
-		acs->can_buf.send[i]=0;
-	}
-	chSysUnlock();
-//	chMtxUnlock(&mtx);
-// *********end critical section*********
 	return EXIT_SUCCESS;
 }
-
-/*
-static int trap_rw_status(ACS *acs){
-	(void)acs;
-//	printf("%strap_rw_status, keeping state!\n",TRAP_STRING);	
-	return EXIT_SUCCESS;
-}
-
-static int trap_mtqr_status(ACS *acs){
-	(void)acs;
-//	printf("%strap_mtqr_status, keeping state!\n",TRAP_STRING);	
-	return EXIT_SUCCESS;
-}
-//*/
 
 const acs_trap trap[] = {
 //	{ST_RW, 	EV_STATUS,	&trap_rw_status},
@@ -118,11 +91,9 @@ const acs_trap trap[] = {
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
 
 static int fsm_trap(ACS *acs){
-//	printf("%sfsm_trap, keeping state!\n",TRAP_STRING);	
 	int i,trap_status;
 
 	for(i = 0;i < EVENT_COUNT;++i){
-		//palClearLine(LINE_LED_GREEN);
 		if(acs->event == trap[i].event){
 			if(trap[i].state == ST_ANY || acs->cur_state == trap[i].state){
 				trap_status = (trap[i].fn)(acs);
@@ -153,16 +124,14 @@ static acs_event getNextEvent(ACS *acs){
 	acs_event event = EV_ANY;
 	uint8_t recv[CAN_BUF_SIZE]={0};
 
-// *******critical section**********
-// TODO: This needs to be synchronized with the CAN thread
-//	chMtxLock(&mtx);
+// synchronized with the CAN thread
+//	chEvtWaitAny(ALL_EVENTS);	
 	chSysLock();
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.recv[i]=0;
 	}
 	chSysUnlock();
-//	chMtxUnlock(&mtx);
 // ******end critical section*******
 
 	switch(recv[MSG_TYPE]){
@@ -172,15 +141,12 @@ static acs_event getNextEvent(ACS *acs){
 			event = recv[ARG_BYTE];			
 			break;
 		case REPORT_STATUS:
-	//		palClearLine(LINE_LED_GREEN);
 			event = EV_STATUS;			
 			break;
 		case BLINK:
 			// TODO: implement
 			break;
 		default:
-	//		palClearLine(LINE_LED_GREEN);
-			//event = EV_REP;			
 			break;
 	}
 
@@ -189,7 +155,6 @@ static acs_event getNextEvent(ACS *acs){
 		return (acs_event)acs->cur_state; 
 	}
 
-//	printf("event %s received\n", event_name[event+1]);
 	return event;
 }
 
@@ -199,13 +164,12 @@ static int acs_statemachine(ACS *acs){
 	acs->cur_state = state_init(acs);
 	
 	while (!chThdShouldTerminateX() && acs->cur_state != ST_OFF) {
-		chEvtWaitAny(All_EVENTS);	
 		acs->event = getNextEvent(acs);
 		for (i = 0;i < TRANS_COUNT;++i) {
 			if((acs->cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
 				if((acs->event == trans[i].event)||(EV_ANY == trans[i].event)){
 					acs->cur_state = (trans[i].fn)(acs);
-					break;
+					update_recv(acs,ACS_STATE);
 				}
 			}
 		}
@@ -223,7 +187,6 @@ extern int acsInit(ACS *acs){
 
 THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
 THD_FUNCTION(acsThread,acs){
-//  (void)arg;
   chRegSetThreadName("acsThread");
 
 	acs_statemachine(acs);

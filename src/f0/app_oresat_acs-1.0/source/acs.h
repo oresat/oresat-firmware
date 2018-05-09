@@ -41,6 +41,11 @@ typedef enum{
 }can_msg;
 
 typedef enum{
+	ERROR_CODE = 0,
+	ACS_STATE
+}can_recv;
+
+typedef enum{
 	NOP=0,
 	CHG_STATE,
 	REPORT_STATUS,
