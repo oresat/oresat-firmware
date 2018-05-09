@@ -3,14 +3,18 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "chmtx.h"
-
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
+//#include "chmtx.h"
+#include "chprintf.h"
 
 #define WA_ACS_THD_SIZE (1<<7)
 #define CAN_NODE 				0x3F // max 0x7f
 #define CAN_BUF_SIZE 		8
+
+#define DEBUG_SERIAL SD2
+#define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
+
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
 
 /*
  *	can_message
@@ -39,7 +43,7 @@ typedef enum{
 typedef enum{
 	NOP=0,
 	CHG_STATE,
-	REP_STATE,
+	REPORT_STATUS,
 	BLINK
 }can_msg_type;
 
@@ -62,7 +66,6 @@ typedef enum {
 	EV_RDY,
 	EV_RW,
 	EV_MTQR,
-	EV_REP,
 	EV_STATUS,
 	EV_END // this must be the last event
 }acs_event;

@@ -23,9 +23,12 @@ char *event_name[] = {
 	"EV_END"
 };
 
+#define STATE_STRING "*Calling transition -> " 
+#define TRAP_STRING "*Calling trap -> " 
+
 static void print_state(int state){
-	(void)state;
-//	printf("%s",state_name[state+1]);	
+//	(void)state;
+	chprintf(DEBUG_CHP,"%s%s\n\r",STATE_STRING,state_name[state+1]); 
 }
 
 /*
@@ -65,27 +68,33 @@ static int state_mtqr(ACS *acs){
 	return ST_MTQR;
 }
 
-static int trap_fsm_report(ACS *acs){
+static int trap_fsm_status(ACS *acs){
 	(void)acs;
+	//palClearLine(LINE_LED_GREEN);
 //	printf("%strap_fsm_report, keeping state!\n",TRAP_STRING);	
 // **********critical section************
 // TODO: needs to synchronize with the CAN thred
 //	chMtxLock(&mtx);
-	acs->can_buf.send[MSG_TYPE]=REP_STATE;
+	chSysLock();
+	acs->can_buf.send[MSG_TYPE]=REPORT_STATUS;
 	acs->can_buf.send[ARG_BYTE]=acs->cur_state;
+	chSysUnlock();
 // TODO: The buffer should not be overwritten with zeros
 // 			 until the message is placed on the bus.
-    chThdSleepMilliseconds(500); // *************
+    chThdSleepMilliseconds(1000); // *************
 //  ^^^^^ this should not be implemented with sleep
 
+	chSysLock();
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 		acs->can_buf.send[i]=0;
 	}
+	chSysUnlock();
 //	chMtxUnlock(&mtx);
 // *********end critical section*********
 	return EXIT_SUCCESS;
 }
 
+/*
 static int trap_rw_status(ACS *acs){
 	(void)acs;
 //	printf("%strap_rw_status, keeping state!\n",TRAP_STRING);	
@@ -97,11 +106,12 @@ static int trap_mtqr_status(ACS *acs){
 //	printf("%strap_mtqr_status, keeping state!\n",TRAP_STRING);	
 	return EXIT_SUCCESS;
 }
+//*/
 
 const acs_trap trap[] = {
-	{ST_ANY, 	EV_REP,			&trap_fsm_report},
-	{ST_RW, 	EV_STATUS,	&trap_rw_status},
-	{ST_MTQR, EV_STATUS,	&trap_mtqr_status}
+//	{ST_RW, 	EV_STATUS,	&trap_rw_status},
+//	{ST_MTQR, EV_STATUS,	&trap_mtqr_status},
+	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
@@ -111,13 +121,13 @@ static int fsm_trap(ACS *acs){
 	int i,trap_status;
 
 	for(i = 0;i < EVENT_COUNT;++i){
-		if(acs->cur_state == trap[i].state){
-			if(acs->event == trap[i].event){
+		//palClearLine(LINE_LED_GREEN);
+		if(acs->event == trap[i].event){
+			if(trap[i].state == ST_ANY || acs->cur_state == trap[i].state){
 				trap_status = (trap[i].fn)(acs);
 				if(trap_status){
-//					printf("trap error!\n");
+					// something bad happened
 				}
-				break;
 			}
 		}
 	}
@@ -145,10 +155,12 @@ static acs_event getNextEvent(ACS *acs){
 // *******critical section**********
 // TODO: This needs to be synchronized with the CAN thread
 //	chMtxLock(&mtx);
+	chSysLock();
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 		recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.recv[i]=0;
 	}
+	chSysUnlock();
 //	chMtxUnlock(&mtx);
 // ******end critical section*******
 
@@ -158,13 +170,16 @@ static acs_event getNextEvent(ACS *acs){
 		case CHG_STATE:
 			event = recv[ARG_BYTE];			
 			break;
-		case REP_STATE:
-			event = EV_REP;			
+		case REPORT_STATUS:
+	//		palClearLine(LINE_LED_GREEN);
+			event = EV_STATUS;			
 			break;
 		case BLINK:
 			// TODO: implement
 			break;
 		default:
+	//		palClearLine(LINE_LED_GREEN);
+			//event = EV_REP;			
 			break;
 	}
 
@@ -179,7 +194,7 @@ static acs_event getNextEvent(ACS *acs){
 
 static int acs_statemachine(ACS *acs){
 	int i;
-
+	palSetLine(LINE_LED_GREEN);
 	acs->cur_state = state_init(acs);
 	
 	while (!chThdShouldTerminateX() && acs->cur_state != ST_OFF) {
