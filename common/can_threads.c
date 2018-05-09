@@ -44,6 +44,7 @@ THD_FUNCTION(can_rpdo, p) {
                         rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
                     chSysUnlock();
+                    chEvtBroadcast(&rpdo_event);
                 }
             }
         }
@@ -86,6 +87,9 @@ THD_FUNCTION(can_tpdo, p) {
     chThdExit(MSG_OK);
 }
 
+/*
+ * Heartbeat thread.
+ */
 THD_WORKING_AREA(can_hb_wa, 64);
 THD_FUNCTION(can_hb, p) {
     (void)p;

@@ -37,6 +37,8 @@ static SerialConfig ser_cfg ={
 static void app_init(void) {
 	//=== App initialization
 	acsInit(&acs);
+//	event_listener_t el;
+//	chEvtRegister(&rpdo_event, &el, 0);
 	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,CAN_BUF_SIZE,acs.can_buf.recv);
 	canTPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,0,0,CAN_BUF_SIZE,acs.can_buf.send);
 	// Start up debug output
@@ -61,13 +63,6 @@ static void app_main(void) {
 }
 
 int main(void){
-	/*
-	 * System initializations.
-	 * - HAL initialization, this also initializes the configured device drivers
-	 *   and performs the board-specific initializations.
-	 * - Kernel initialization, the main() function becomes a thread and the
-	 *   RTOS is active.
-	 */
 	halInit();
 	chSysInit();
 	oresat_init(CAN_NODE);
