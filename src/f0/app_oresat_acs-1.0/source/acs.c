@@ -75,6 +75,7 @@ static int trap_fsm_status(ACS *acs){
 // **********critical section************
 // TODO: needs to synchronize with the CAN thred
 //	chMtxLock(&mtx);
+
 	chSysLock();
 	acs->can_buf.send[MSG_TYPE]=REPORT_STATUS;
 	acs->can_buf.send[ARG_BYTE]=acs->cur_state;
@@ -198,6 +199,7 @@ static int acs_statemachine(ACS *acs){
 	acs->cur_state = state_init(acs);
 	
 	while (!chThdShouldTerminateX() && acs->cur_state != ST_OFF) {
+		chEvtWaitAny(All_EVENTS);	
 		acs->event = getNextEvent(acs);
 		for (i = 0;i < TRANS_COUNT;++i) {
 			if((acs->cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
