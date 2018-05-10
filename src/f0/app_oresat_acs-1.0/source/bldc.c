@@ -1,28 +1,27 @@
-#include "reactionwheel.h"
-#include "plut.h"
+#include "bldc.h"
+#include "sin_lut.h"
 
 //bldc pbldc;
 
-THD_WORKING_AREA(wa_spiEncoderThread,THREAD_SIZE);
-THD_FUNCTION(spispiEncoderThread,pbldc){
-  (void)arg;
-  chRegSetThreadName("spiEncoderThread");
+THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
+THD_FUNCTION(spiThread,_bldc){
+  chRegSetThreadName("spiThread");
 	int step;
 
-  spiStart(&SPID1, &spicfg);            // Start driver.
+  spiStart(&SPID1,&spicfg);            // Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
 
   while (!chThdShouldTerminateX()) {
-		pbldc.rxbuf[0] = 0;
+		pbldc.spi_rxbuf[0] = 0;
 		spiSelect(&SPID1);                  // Select slave.
 
 		while(SPID1.state != SPI_READY) {}   
-		spiReceive(&SPID1,1,bldc.rxbuf);     		// Receive 1 frame (16 bits).
+		spiReceive(&SPID1,1,pbldc.spi_rxbuf);     		// Receive 1 frame (16 bits).
 		spiUnselect(&SPID1);                // Unselect slave.
 
 		pbldc.position = 0x3FFF & pbldc.rxbuf[0];
 	 
-		step = pbldc.position*360/(1<<14);
+		step = pbldc->position*360/(1<<14);
 		chprintf(DEBUG_CHP,"enc pos: %u \n",pbldc.position);        
 		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
 		step = (step + pbldc.phase_shift)%360;

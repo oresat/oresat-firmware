@@ -3,6 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "bldc.h"
 //#include "chmtx.h"
 #include "chprintf.h"
 
@@ -84,6 +85,7 @@ typedef struct{
 	acs_state cur_state;
 	acs_event event; // the most recent event
 	can_buffer can_buf;
+	bldc acs_bldc;
 }ACS;
 
 typedef struct{

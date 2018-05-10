@@ -1,5 +1,11 @@
-#ifndef _REACTIONWHEEL_H_
-#define _REACTIONWHEEL_H_
+#ifndef _BLDC_H_
+#define _BLDC_H_
+
+#include "ch.h"
+#include "hal.h"
+#include "bldc.h"
+
+#include <unistd.h>
 
 #define THREAD_SIZE	(1<<7)
 
@@ -35,7 +41,7 @@ typedef struct{
 			phase_shift;		// 
 	uint16_t position;				// motor position from encoder
 					 sinctrl_t const *sinctrl; // pointer to the sin lut
-	uint16_t spi_rxbuf[2] = {0}; // receive buffer
+	uint16_t spi_rxbuf[2]; // receive buffer
 } bldc;
 
 static const SPIConfig spicfg = {
@@ -48,9 +54,9 @@ static const SPIConfig spicfg = {
 };
 
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
-extern THD_FUNCTION(spiThread,arg);
+extern THD_FUNCTION(spiThread,pbldc);
 
-extern void acsInit(bldc *pbldc);
+//extern void acsInit(bldc *pbldc);
 extern void bldcInit(bldc *pbldc);
 extern void bldcStart(bldc *pbldc);
 extern void bldcStop(bldc *pbldc);
