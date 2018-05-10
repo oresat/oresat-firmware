@@ -54,11 +54,11 @@ static const SPIConfig spicfg = {
 };
 
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
-extern THD_FUNCTION(spiThread,pbldc);
+extern THD_FUNCTION(spiThread,arg);
 
 //extern void acsInit(bldc *pbldc);
-extern void bldcInit(bldc *pbldc);
-extern void bldcStart(bldc *pbldc);
-extern void bldcStop(bldc *pbldc);
+extern void bldcInit(bldc *_bldc);
+extern void bldcStart(bldc *_bldc);
+extern void bldcStop(bldc *_bldc);
 
 #endif

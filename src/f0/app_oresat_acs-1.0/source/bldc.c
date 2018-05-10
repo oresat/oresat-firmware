@@ -1,32 +1,33 @@
 #include "bldc.h"
 #include "sin_lut.h"
 
-//bldc pbldc;
+bldc *_bldc;
 
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
-THD_FUNCTION(spiThread,_bldc){
-  chRegSetThreadName("spiThread");
+THD_FUNCTION(spiThread,arg){
+  (void)arg;
+	chRegSetThreadName("spiThread");
 	int step;
 
   spiStart(&SPID1,&spicfg);            // Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
 
   while (!chThdShouldTerminateX()) {
-		pbldc.spi_rxbuf[0] = 0;
+		_bldc->spi_rxbuf[0] = 0;
 		spiSelect(&SPID1);                  // Select slave.
 
 		while(SPID1.state != SPI_READY) {}   
-		spiReceive(&SPID1,1,pbldc.spi_rxbuf);     		// Receive 1 frame (16 bits).
+		spiReceive(&SPID1,1,_bldc->spi_rxbuf);     		// Receive 1 frame (16 bits).
 		spiUnselect(&SPID1);                // Unselect slave.
 
-		pbldc.position = 0x3FFF & pbldc.rxbuf[0];
+		_bldc->position = 0x3FFF & _bldc->spi_rxbuf[0];
 	 
-		step = pbldc->position*360/(1<<14);
-		chprintf(DEBUG_CHP,"enc pos: %u \n",pbldc.position);        
+		step = _bldc->position*360/(1<<14);
+		chprintf(DEBUG_CHP,"enc pos: %u \n",_bldc->position);        
 		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
-		step = (step + pbldc.phase_shift)%360;
+		step = (step + _bldc->phase_shift)%360;
 		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
-		step = (step + pbldc.phase_shift)%360;
+		step = (step + _bldc->phase_shift)%360;
 		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
 
 		chThdSleepMilliseconds(100);
@@ -36,68 +37,71 @@ THD_FUNCTION(spiThread,_bldc){
 	spiStop(&SPID1);          // Stop driver.
 }
 
+static sinctrl_t scale(sinctrl_t duty_cycle){
+	return (duty_cycle*_bldc->scale)/10;	
+}
+
+static void pwmCallback(uint8_t channel,sinctrl_t step){
+ // palSetLine(LINE_LED_GREEN);
+  pwmEnableChannel(
+		&PWMD1,
+		channel,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(_bldc->sinctrl[step]))
+	);
+}
+
 // pwm period callback
-static void pwmpcb(PWMDriver *pwmp,bldc *pbldc) {
+static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
  	int step; 
 //  palClearLine(LINE_LED_GREEN);
 	
-	++pbldc.count;
+	++_bldc->count;
 	
-	if(pbldc.count==pbldc.stretch){
+	if(_bldc->count==_bldc->stretch){
 #ifdef OPENLOOP
-		++pbldc.u;
-		++pbldc.v;
-		++pbldc.w;
+		++_bldc->u;
+		++_bldc->v;
+		++_bldc->w;
 
-		if(pbldc.u >= pbldc.steps){
-			pbldc.u = 0;
+		if(_bldc->u >= _bldc->steps){
+			_bldc->u = 0;
 		}
-		if(pbldc.v >= pbldc.steps){
-			pbldc.v = 0;
+		if(_bldc->v >= _bldc->steps){
+			_bldc->v = 0;
 		}
-		if(pbldc.w >= pbldc.steps){
-			pbldc.w = 0;
+		if(_bldc->w >= _bldc->steps){
+			_bldc->w = 0;
 		}
 #endif
 #ifndef OPENLOOP 
 //*
-		step = pbldc.position*360/(1<<14);
-		pbldc.u = (step + 1 + pbldc.phase_shift)%360;
-		pbldc.v = (pbldc.u + pbldc.phase_shift)%360;
-		pbldc.w = (pbldc.v + pbldc.phase_shift)%360;
+		step = _bldc->position*360/(1<<14);
+		_bldc->u = (step + 1 + _bldc->phase_shift)%360;
+		_bldc->v = (_bldc->u + _bldc->phase_shift)%360;
+		_bldc->w = (_bldc->v + _bldc->phase_shift)%360;
 //*/
 #endif
-		pbldc.count=0;
+		_bldc->count=0;
 	}
+	pwmCallback(PWM_U,_bldc->u);
+	pwmCallback(PWM_V,_bldc->v);
+	pwmCallback(PWM_W,_bldc->w);
 }
 
-static sinctrl_t scale(sinctrl_t duty_cycle,bldc *pbldc){
-	return (duty_cycle*pbldc.scale)/10;	
-}
-
-static void pwmCallback(uint8_t channel,sinctrl_t step,bldc *pbldc){
- // palSetLine(LINE_LED_GREEN);
-  pwmEnableChannelI(
-		&PWMD1,
-		channel,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(pbldc.sinctrl[step]))
-	);
-}
-
-static void pwmUcb(PWMDriver *pwmp,bldc *pbldc){ // channel 1 callback
+static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-	pwmCallback(PWM_U,pbldc.u);
+//	pwmCallback(PWM_U,_bldc->u,_bldc);
 }
 
-static void pwmVcb(PWMDriver *pwmp,bldc *pbldc){ // channel 2 callback
+static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-	pwmCallback(PWM_V,pbldc.v);
+//	pwmCallback(PWM_V,_bldc->v,_bldc);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-	pwmCallback(PWM_W,pbldc.w);
+//	pwmCallback(PWM_W,_bldc->w,_bldc);
 }
 
 static PWMConfig pwmcfg = {
@@ -115,44 +119,46 @@ static PWMConfig pwmcfg = {
   0
 };
 
-extern void pbldcInit(bldc *pbldc){
-	pbldc.steps = STEPS;
-	pbldc.stretch = STRETCH;
-	pbldc.scale = SCALE;
-	pbldc.sinctrl = sinctrl360;
-	pbldc.count = 0;
-	pbldc.position = 0;
-	pbldc.phase_shift = pbldc.steps/3;
-	pbldc.u = 0;
-	pbldc.v = pbldc.u + pbldc.phase_shift;
-	pbldc.w = pbldc.v + pbldc.phase_shift;
+extern void _bldcInit(bldc *pbldc){
+	_bldc=pbldc;
+	_bldc->steps = STEPS;
+	_bldc->stretch = STRETCH;
+	_bldc->scale = SCALE;
+	_bldc->sinctrl = sinctrl360;
+	_bldc->count = 0;
+	_bldc->position = 0;
+	_bldc->phase_shift = _bldc->steps/3;
+	_bldc->u = 0;
+	_bldc->v = _bldc->u + _bldc->phase_shift;
+	_bldc->w = _bldc->v + _bldc->phase_shift;
 
-//	pbldcStart();
+//	_bldcStart();
 }
 
-extern void pbldcStart(bldc *pbldc){
+extern void _bldcStart(bldc *_bldc){
 	palSetLine(LINE_LED_GREEN);
 	pwmStart(&PWMD1,&pwmcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
-	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.u));
-  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.v));
-  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.w));
+	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->w));
 
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
-extern void pbldcStop(bldc *pbldc){
+extern void _bldcStop(bldc *_bldc){
+	(void) _bldc;
   palClearLine(LINE_LED_GREEN);
 	pwmStop(&PWMD1);
 /*
   pwmEnablePeriodicNotification(&PWMD1);
 
-	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.u));
-  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.v));
-  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,pbldc.w));
+	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->w));
 
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);

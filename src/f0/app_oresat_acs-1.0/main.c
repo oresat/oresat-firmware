@@ -62,7 +62,7 @@ static void app_main(void) {
 		sizeof(wa_spiThread),
 		NORMALPRIO + 1,
 		spiThread,
-		&acs->acs_bldc;
+		NULL
 	);
 
 	while (true){
