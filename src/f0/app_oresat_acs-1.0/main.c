@@ -56,7 +56,7 @@ static void app_main(void) {
 		acsThread, 
 		&acs	
 	);
-
+/*
 	chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
@@ -64,7 +64,7 @@ static void app_main(void) {
 		spiThread,
 		NULL
 	);
-
+//*/
 	while (true){
 		chThdSleepMilliseconds(1000);
 	}

@@ -19,6 +19,8 @@ char *event_name[] = {
 	"EV_RW",
 	"EV_MTQR",
 	"EV_REP",
+	"EV_RW_START",
+	"EV_RW_STOP",
 	"EV_STATUS",
 	"EV_END"
 };
@@ -29,6 +31,30 @@ char *event_name[] = {
 static void print_state(int state){
 	(void)state;
 //	chprintf(DEBUG_CHP,"%s%s\n\r",STATE_STRING,state_name[state+1]); 
+}
+
+static void trans_cleanup(ACS *acs){
+	switch(acs->cur_state){
+		case ST_OFF:
+			
+			break;
+		case ST_INIT:
+
+			break;
+		case ST_RDY:
+
+			break;
+
+		case ST_RW:
+			bldcExit();
+			break;
+
+		case ST_MTQR:
+
+		default:
+
+			break;
+	}
 }
 
 static void update_recv(ACS *acs,int recv_byte){
@@ -61,13 +87,16 @@ static int state_init(ACS *acs){
 
 static int state_rdy(ACS *acs){
 	(void)acs;
+	trans_cleanup(acs);
 	print_state(ST_RDY);
 	return ST_RDY;
 }
 
 static int state_rw(ACS *acs){
 	(void)acs;
+	trans_cleanup(acs);
 	print_state(ST_RW);
+	bldcInit(&acs->acs_bldc);
 	return ST_RW;
 }
 
@@ -77,13 +106,26 @@ static int state_mtqr(ACS *acs){
 	return ST_MTQR;
 }
 
+static int trap_rw_start(ACS *acs){
+	(void)acs;
+	bldcStart();
+	return EXIT_SUCCESS;
+}
+
+static int trap_rw_stop(ACS *acs){
+	(void)acs;
+	bldcStop();
+	return EXIT_SUCCESS;
+}
+
 static int trap_fsm_status(ACS *acs){
 	(void)acs;
 	return EXIT_SUCCESS;
 }
 
 const acs_trap trap[] = {
-//	{ST_RW, 	EV_STATUS,	&trap_rw_status},
+	{ST_RW, 	EV_RW_START,	&trap_rw_start},
+	{ST_RW, 	EV_RW_STOP,		&trap_rw_stop},
 //	{ST_MTQR, EV_STATUS,	&trap_mtqr_status},
 	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
 };

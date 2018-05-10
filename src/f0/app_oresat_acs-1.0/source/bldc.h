@@ -42,6 +42,7 @@ typedef struct{
 	uint16_t position;				// motor position from encoder
 					 sinctrl_t const *sinctrl; // pointer to the sin lut
 	uint16_t spi_rxbuf[2]; // receive buffer
+	thread_t *p_spi_thread;
 } bldc;
 
 static const SPIConfig spicfg = {
@@ -56,9 +57,9 @@ static const SPIConfig spicfg = {
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 extern THD_FUNCTION(spiThread,arg);
 
-//extern void acsInit(bldc *pbldc);
-extern void bldcInit(bldc *_bldc);
-extern void bldcStart(bldc *_bldc);
-extern void bldcStop(bldc *_bldc);
+extern void bldcInit(bldc *pbldc);
+extern void bldcStart(void);
+extern void bldcStop(void);
+extern void bldcExit(void);
 
 #endif

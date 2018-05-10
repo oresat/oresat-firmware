@@ -43,7 +43,7 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
  // palSetLine(LINE_LED_GREEN);
-  pwmEnableChannel(
+  pwmEnableChannelI(
 		&PWMD1,
 		channel,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(_bldc->sinctrl[step]))
@@ -91,20 +91,20 @@ static void pwmpcb(PWMDriver *pwmp) {
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-//	pwmCallback(PWM_U,_bldc->u,_bldc);
+	pwmCallback(PWM_U,_bldc->u);
 }
 
 static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-//	pwmCallback(PWM_V,_bldc->v,_bldc);
+	pwmCallback(PWM_V,_bldc->v);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-//	pwmCallback(PWM_W,_bldc->w,_bldc);
+	pwmCallback(PWM_W,_bldc->w);
 }
 
-static PWMConfig pwmcfg = {
+static PWMConfig pwmRWcfg = {
   PWM_TIMER_FREQ,	
   PWM_PERIOD,	
   pwmpcb,
@@ -119,8 +119,8 @@ static PWMConfig pwmcfg = {
   0
 };
 
-extern void _bldcInit(bldc *pbldc){
-	_bldc=pbldc;
+extern void bldcInit(bldc *pbldc){
+	_bldc = pbldc;
 	_bldc->steps = STEPS;
 	_bldc->stretch = STRETCH;
 	_bldc->scale = SCALE;
@@ -132,12 +132,19 @@ extern void _bldcInit(bldc *pbldc){
 	_bldc->v = _bldc->u + _bldc->phase_shift;
 	_bldc->w = _bldc->v + _bldc->phase_shift;
 
+	_bldc->p_spi_thread=chThdCreateStatic(
+		wa_spiThread,
+		sizeof(wa_spiThread),
+		NORMALPRIO + 1,
+		spiThread,
+		NULL
+	);
 //	_bldcStart();
 }
 
-extern void _bldcStart(bldc *_bldc){
+extern void bldcStart(){
 	palSetLine(LINE_LED_GREEN);
-	pwmStart(&PWMD1,&pwmcfg);
+	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->u));
@@ -149,19 +156,11 @@ extern void _bldcStart(bldc *_bldc){
   pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
-extern void _bldcStop(bldc *_bldc){
-	(void) _bldc;
-  palClearLine(LINE_LED_GREEN);
+extern void bldcStop(){
+//  palClearLine(LINE_LED_GREEN);
 	pwmStop(&PWMD1);
-/*
-  pwmEnablePeriodicNotification(&PWMD1);
+}
 
-	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->u));
-  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->v));
-  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->w));
-
-	pwmEnableChannelNotification(&PWMD1,PWM_U);
-  pwmEnableChannelNotification(&PWMD1,PWM_V);
-  pwmEnableChannelNotification(&PWMD1,PWM_W);
-*/
+extern void bldcExit(){
+	chThdTerminate(_bldc->p_spi_thread);
 }
