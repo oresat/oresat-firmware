@@ -25,7 +25,7 @@ static  systime_t prv;
 BldcConfig bldc;
 uint16_t rxbuf[2] = {0}; // receive buffer
 
-
+/*
 static void gpt4cb(GPTDriver *gptp) {
   (void)gptp;
   // Perform your action here
@@ -44,8 +44,9 @@ static const GPTConfig gpt4cfg = {
   100000, // 1 MHz timer clock.
   gpt4cb, // No callback
   0, 0
-};
+};*/
 
+/*
 static void speed_cb(void * arg)
 {
   //chVTSetI(&speed_vt, TIME_MS2I(100), speed_cb, NULL);
@@ -55,7 +56,7 @@ static void speed_cb(void * arg)
   angleDelta = angleCurr - anglePrev;
 
   rps = angleDelta * 10;
-}
+}*/
 
 static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
     (void)adcp;
@@ -79,6 +80,14 @@ static const ADCConversionGroup adcgrpcfg = {
 };
 
 
+uint32_t step_size = STRETCH;
+
+uint32_t current_sin_u, next_sin_u;
+uint32_t current_sin_v, next_sin_v;
+uint32_t current_sin_w, next_sin_w;
+uint16_t sin_diff;
+uint16_t sin_size;
+uint16_t sin_step = STRETCH;
 //static sysinterval_t interval = 0;
 //static uint32_t angleDelta = 0;
 //static uint32_t rp_ = 0;
@@ -95,8 +104,8 @@ THD_FUNCTION(acsThread,arg) {
 	bldcStart();
 
 
-    bool up = true;
-    bool down = false;
+    //bool up = true;
+    //bool down = false;
   while (!chThdShouldTerminateX()) {
 	/*
 		palClearLine(LINE_LED_GREEN);
@@ -110,11 +119,12 @@ THD_FUNCTION(acsThread,arg) {
 		//chprintf(DEBUG_CHP,"angleDelta: %u \n\r", angleDelta);
  	  chprintf(DEBUG_CHP,"phase 1: %u \n\r", bldc.u);     
 		chprintf(DEBUG_CHP,"phase 2: %u \n\r", bldc.v);     
-		chprintf(DEBUG_CHP,"phase 3: %u \n\n\r", bldc.w);     
+		chprintf(DEBUG_CHP,"phase 3: %u \n\r", bldc.w);     
+    chprintf(DEBUG_CHP,"step_size: %u \n\n\r", step_size);
     chThdSleepMilliseconds(500); 
     //*/
 
-    //chprintf(DEBUG_CHP, "ADC: %u \n\r", (int)bldc.samples[0]);
+    chprintf(DEBUG_CHP, "ADC: %u \n\r", (int)bldc.samples[0]);
     
     //chprintf(DEBUG_CHP, "now: %u \n\r", now);
     //chprintf(DEBUG_CHP, "prv: %u \n\r", prv);
@@ -157,8 +167,8 @@ THD_FUNCTION(spiThread,arg){
   //systime_t now;
   //systime_t prv;
 
-  uint32_t angleNow = 0;
-  uint32_t anglePrv = 0;
+  //uint32_t angleNow = 0;
+  //uint32_t anglePrv = 0;
 
   spiStart(&SPID1, &spicfg);            // Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
@@ -285,14 +295,10 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 	return (duty_cycle*bldc.scale)/10;	
 }
 
-uint32_t step_size = STRETCH;
 
-uint32_t current_sin_u, next_sin_u;
-uint32_t current_sin_v, next_sin_v;
-uint32_t current_sin_w, next_sin_w;
-uint16_t sin_diff;
-uint16_t sin_size;
-uint16_t sin_step = STRETCH;
+uint16_t count = 0;
+
+bool down = false;
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
@@ -301,6 +307,34 @@ static void pwmpcb(PWMDriver *pwmp) {
   uint16_t next_step;
   palClearLine(LINE_LED_GREEN);
 	//configure = true;
+  
+  if (count > 2000)
+  {
+    if (!down)
+    {
+      step_size++;
+      //sin_step++;
+    }
+    else
+    {
+      step_size = step_size - 1;
+      //sin_step = sin_step - 1;
+    }
+    count = 0;
+  }
+
+  if (step_size >= 100)
+  {
+    down = true;
+    //step_size = 1;
+    //sin_step = 1;
+    //count = 5001;
+  }
+  else if (step_size < 2)
+  {
+    down = false;
+    //count = 5001;
+  }
 #ifdef CONFIGURE
 
       //bldc.u = 0;
@@ -361,8 +395,10 @@ static void pwmpcb(PWMDriver *pwmp) {
 #ifndef BRUTEFORCE
 
 //		int step = 360/(1<<14)*bldc.position;
+if (sin_step == step_size)
+{
       step = encoderToLUT(bldc.position);
-		  next_step = step + 1;
+		  next_step = step + SKIP;
 
 
 
@@ -384,11 +420,13 @@ static void pwmpcb(PWMDriver *pwmp) {
       bldc.w = 0 + (bldc.w - 360);
     }
 */
-
+}
 #endif
-		//  bldc.count=0;
-	  //}
+	//	  bldc.count=0;
+	 // }
 #endif
+if (SKIP)
+{
 if (sin_step == step_size)
 {
   current_sin_u = bldc.sinctrl[bldc.u];
@@ -431,28 +469,34 @@ if (sin_step == 0)
   current_sin_w = next_sin_w;
   sin_step = step_size;
 }
-
-
+}
+else
+{
+  current_sin_u = bldc.sinctrl[bldc.u];
+  current_sin_v = bldc.sinctrl[bldc.v];
+  current_sin_w = bldc.sinctrl[bldc.w];
+}
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_u));
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_u)));
 
 
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_V,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_v)
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_v))
 	);
 
 
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_W,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,current_sin_w)
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_w))
 	);
 
 		//chThdSleepSeconds(1);
+  count++;
 }
 
 
@@ -502,12 +546,12 @@ static PWMConfig pwmcfg = {
 extern void acsInit(void){
 	bldcInit();
   // TODO MAX wrap up into adcInit
-  //adcStart(&ADCD1, NULL);
+  adcStart(&ADCD1, NULL);
 
   /*
   * Starts an ADC continuous conversion.
   */
-  //adcStartConversion(&ADCD1, &adcgrpcfg, bldc.samples, ADC_GRP_BUF_DEPTH);
+  adcStartConversion(&ADCD1, &adcgrpcfg, bldc.samples, ADC_GRP_BUF_DEPTH);
 
   
   //gptStart(&GPTD14, &gpt4cfg);

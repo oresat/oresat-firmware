@@ -10,16 +10,17 @@
 
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 
-#define THREAD_SIZE	(1<<7) 
+#define THREAD_SIZE	(120) 
 #define CAN_NODE 0x3F // max 0x7f
 
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-#define SCALE			10
+#define SCALE			2
 #define STEPS			360 
-#define STRETCH	  80
+#define STRETCH	  1
 #define STEP_SIZE 1
+#define SKIP      1
 
 #define COIL_NUM 6
 
@@ -33,7 +34,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				12000 // periods per sec
+#define PWM_FREQ				12e3 // periods per sec
 //#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
