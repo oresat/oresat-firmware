@@ -23,12 +23,12 @@ THD_FUNCTION(spiThread,arg){
 		motor->position = 0x3FFF & motor->spi_rxbuf[0];
 	 
 		step = motor->position*360/(1<<14);
-	//	chprintf(DEBUG_CHP,"enc pos: %u \n",motor->position);        
-	//	chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
+		chprintf(DEBUG_CHP,"enc pos: %u \n",motor->position);        
+		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
 		step = (step + motor->phase_shift)%360;
-	//	chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
+		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
 		step = (step + motor->phase_shift)%360;
-	//	chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
+		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
 
 		chThdSleepMilliseconds(100);
   }
@@ -130,7 +130,7 @@ extern void bldcInit(bldc *pbldc){
 	motor->v = motor->u + motor->phase_shift;
 	motor->w = motor->v + motor->phase_shift;
 
-/*
+//*
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),

@@ -238,7 +238,7 @@ static int acs_statemachine(ACS *acs){
 
 extern int acsInit(ACS *acs){
 //	(void)acs;
-//*
+/*
 	bldcInit(&acs->motor);
 	bldcStart();
 //*/	
@@ -249,11 +249,6 @@ THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
 THD_FUNCTION(acsThread,acs){
   chRegSetThreadName("acsThread");
 	chEvtRegister(&rpdo_event,&el,0);
-
-/*
-	bldcInit(acs);
-	bldcStart();
-//*/	
 
 	acs_statemachine(acs);
   
