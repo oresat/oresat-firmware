@@ -34,7 +34,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				12e3 // periods per sec
+#define PWM_FREQ				20e3 // periods per sec
 //#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************

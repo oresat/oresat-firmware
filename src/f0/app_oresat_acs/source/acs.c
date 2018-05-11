@@ -1,26 +1,17 @@
 #include "acs.h"
 #include "acs_lut.h"
 
-//#define ST2US(n) (((n) * 1000000UL + CH_CFG_ST_FREQUENCY - 1UL) /    \
-//                  CH_CFG_ST_FREQUENCY)
 
-static virtual_timer_t speed_vt;
-//static int step_size = 1;
+// static virtual_timer_t speed_vt;
 
-//static bool configure = true;
+// static sysinterval_t interval = 0;
+//static uint32_t anglePrev, angleCurr;
+//static uint32_t angleDelta = 0;
+//static uint32_t rps = 0;
+//static uint32_t time = 0;
 
-
-static sysinterval_t interval = 0;
-static uint32_t anglePrev, angleCurr;
-static uint32_t angleDelta = 0;
-static uint32_t rps = 0;
-static uint32_t time = 0;
-
-static  systime_t now;
-static  systime_t prv;
-
-
-
+//static  systime_t now;
+//static  systime_t prv;
 
 BldcConfig bldc;
 uint16_t rxbuf[2] = {0}; // receive buffer
@@ -88,13 +79,6 @@ uint32_t current_sin_w, next_sin_w;
 uint16_t sin_diff;
 uint16_t sin_size;
 uint16_t sin_step = STRETCH;
-//static sysinterval_t interval = 0;
-//static uint32_t angleDelta = 0;
-//static uint32_t rp_ = 0;
-//static uint32_t time = 0;
-
-//static  systime_t now;
-//static  systime_t prv;
 
 THD_WORKING_AREA(wa_acsThread,THREAD_SIZE);
 THD_FUNCTION(acsThread,arg) {
@@ -103,57 +87,17 @@ THD_FUNCTION(acsThread,arg) {
 
 	bldcStart();
 
-
-    //bool up = true;
-    //bool down = false;
   while (!chThdShouldTerminateX()) {
-	/*
-		palClearLine(LINE_LED_GREEN);
-		chThdSleepMilliseconds(500);
-		palSetLine(LINE_LED_GREEN);
-		chThdSleepMilliseconds(500);
-	*/
     
-    ///*
 		chprintf(DEBUG_CHP,"enc pos: %u \n\r", bldc.position);
-		//chprintf(DEBUG_CHP,"angleDelta: %u \n\r", angleDelta);
  	  chprintf(DEBUG_CHP,"phase 1: %u \n\r", bldc.u);     
 		chprintf(DEBUG_CHP,"phase 2: %u \n\r", bldc.v);     
 		chprintf(DEBUG_CHP,"phase 3: %u \n\r", bldc.w);     
     chprintf(DEBUG_CHP,"step_size: %u \n\n\r", step_size);
     chThdSleepMilliseconds(500); 
-    //*/
 
     chprintf(DEBUG_CHP, "ADC: %u \n\r", (int)bldc.samples[0]);
-    
-    //chprintf(DEBUG_CHP, "now: %u \n\r", now);
-    //chprintf(DEBUG_CHP, "prv: %u \n\r", prv);
-    //chprintf(DEBUG_CHP, "TimeDelta : %u \n\n\r", time);
-    //chprintf(DEBUG_CHP, "AngleDelta : %u \n\r", angleDelta); 
-    //chprintf(DEBUG_CHP, "rp? : %u \n\n\r", rp_); 
-    
-    /*
-		chThdSleepMilliseconds(1000);
-    if (step_size >= 7)
-    {
-      up = false;
-      down = true;
-    }
-
-    if (step_size == 1)
-    {
-      up = true;
-      down = false;
-    }
-
-    if (up)
-      step_size++;
-    else
-      step_size--;
-
- 		chprintf(DEBUG_CHP,"Step size: %u \n\n\r", step_size);
-    */
-    
+   
   }
 }
 
@@ -161,60 +105,19 @@ THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
   chRegSetThreadName("spiThread");
-	int step;
-
-		//chprintf(DEBUG_CHP,"enc pos: %u \n\r", bldc.position);
-  //systime_t now;
-  //systime_t prv;
-
-  //uint32_t angleNow = 0;
-  //uint32_t anglePrv = 0;
 
   spiStart(&SPID1, &spicfg);            // Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
 
-  // TODO MAX add time grabbing here for speed
-  // systime_t now = chVTGetSystemTime();
-  // Use this twice, compute the difference. Need to configure
-  // CH_CFG_ST_* stuff
-
   while (!chThdShouldTerminateX()) {
 		rxbuf[0] = 0; 
-    now = chVTGetSystemTime(); 
 		spiSelect(&SPID1);                  // Select slave.
 
-		//while(SPID1.state != SPI_READY) {}   
 		spiReceive(&SPID1,1,rxbuf);     		// Receive 1 frame (16 bits).
-    /*chprintf(DEBUG_CHP, "IntervalNow : %u \n\r", (int) now);
-    chprintf(DEBUG_CHP, "IntervalPrv : %u \n\r", (int) prv);
-    chprintf(DEBUG_CHP, "IntervalNowUs : %u \n\r", ST2US(now));
-    chprintf(DEBUG_CHP, "IntervalPrvUs : %u \n\r", ST2US(prv));*/
-    // In microseconds
-    //interval = chTimeDiffX(prv, now);
-    //prv = now;
-    //time = TIME_I2US(interval);
-		spiUnselect(&SPID1);                // Unselect slave.
-       
-    //angleNow = (0x3FFF & rxbuf[0]) * 360/(1<<14);
-    
-    //angleDelta = angleNow - anglePrv;
-    //chprintf(DEBUG_CHP, "AngleNow: %u \n\r", angleNow);
-    //chprintf(DEBUG_CHP, "AnglePrv: %u \n\r", anglePrv);
-    
-    // TODO MAX interval changes, I may need to find
-    // a way to have a defined time interval to measure across
-    // maybe a health thread or info thread?
-    //rp_ = (angleDelta / 360) / interval;
-    //anglePrv = angleNow;
-
-		bldc.position = 0x3FFF & rxbuf[0];
+		
+    spiUnselect(&SPID1);                // Unselect slave.
+    bldc.position = 0x3FFF & rxbuf[0];
 	 
-    //prv = chVTGetSystemTime();
-    //interval = chTimeDiffX(now, prv);
-    
-    //time = TIME_I2US(interval);
-    
-
 		chThdSleepMicroseconds(1);
   }
 
@@ -229,6 +132,12 @@ THD_FUNCTION(debugThread,arg) {
   chRegSetThreadName("debugThread");
  //chThdSleepMilliseconds(100);
 }
+
+/*
+  Sections off value from encoder (0 - 2^14)
+  into chunks of 0-360 for the LUT.
+  TODO MAX: clean this up.
+*/
 
 static uint16_t chunk0L = 0 * ENCODER_CHUNK_SIZE;
 static uint16_t chunk0H = 1 * ENCODER_CHUNK_SIZE;
@@ -249,6 +158,8 @@ static uint16_t chunk5L = 5 * ENCODER_CHUNK_SIZE;
 static uint16_t chunk5H = 6 * ENCODER_CHUNK_SIZE;
 
 
+// Uses above defines to translate encoder feedback
+// into the proper LUT index.
 static uint16_t encoderToLUT(uint16_t position)
 {
   uint16_t step = 0;
@@ -289,16 +200,21 @@ static uint16_t encoderToLUT(uint16_t position)
   return step;
 }
 
-static uint32_t LUTrevCount = 0;
+//static uint32_t LUTrevCount = 0;
 
+// TODO Max, instead of increments of 10%, get finer control.
 static sinctrl_t scale(sinctrl_t duty_cycle){
 	return (duty_cycle*bldc.scale)/10;	
 }
 
-
+// Temporary for ramping function, hopefully can simulate this with CAN
 uint16_t count = 0;
 
 bool down = false;
+
+
+// TODO Max, find a way to separate the types of control
+// easily with CAN. Probably a simple case statement
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
@@ -306,41 +222,32 @@ static void pwmpcb(PWMDriver *pwmp) {
  	uint16_t step; 
   uint16_t next_step;
   palClearLine(LINE_LED_GREEN);
-	//configure = true;
   
   if (count > 2000)
   {
     if (!down)
     {
       step_size++;
-      //sin_step++;
     }
     else
     {
       step_size = step_size - 1;
-      //sin_step = sin_step - 1;
     }
     count = 0;
   }
 
-  if (step_size >= 100)
+  if (step_size >= 80)
   {
     down = true;
-    //step_size = 1;
-    //sin_step = 1;
-    //count = 5001;
   }
   else if (step_size < 2)
   {
     down = false;
-    //count = 5001;
   }
+
+// TODO Max, do we want the configure stuff for any reason?
 #ifdef CONFIGURE
 
-      //bldc.u = 0;
-      //bldc.v = 120;
-      //bldc.w = 240;
- 
     if (LUTrevCount < 6 * 360)
     {
       if (bldc.count == bldc.stretch){
@@ -374,9 +281,6 @@ static void pwmpcb(PWMDriver *pwmp) {
 #endif
 
 #ifndef CONFIGURE    
-	  //++bldc.count;
-
-	  //if(bldc.count==bldc.stretch){
 #ifdef BRUTEFORCE
 		  bldc.u += step_size;
 		  bldc.v += step_size;
@@ -393,8 +297,8 @@ static void pwmpcb(PWMDriver *pwmp) {
 		  }
 #endif
 #ifndef BRUTEFORCE
-
-//		int step = 360/(1<<14)*bldc.position;
+// This is the encoder feedback.
+// TODO Max, this really needs to be cleaned up.
 if (sin_step == step_size)
 {
       step = encoderToLUT(bldc.position);
@@ -406,24 +310,8 @@ if (sin_step == step_size)
 		  bldc.v = (bldc.u + bldc.phase_shift)%360;
 		  bldc.w = (bldc.v + bldc.phase_shift)%360;
 
-/*
-    if (bldc.u > 360)
-    {
-      bldc.u = 0 + (bldc.u - 360);
-    }
-    if (bldc.v > 360)
-    {
-      bldc.v = 0 + (bldc.v - 360);
-    }
-    if (bldc.w > 360)
-    {
-      bldc.w = 0 + (bldc.w - 360);
-    }
-*/
 }
 #endif
-	//	  bldc.count=0;
-	 // }
 #endif
 if (SKIP)
 {
@@ -439,8 +327,6 @@ if (sin_step == step_size)
   if (current_sin_u < next_sin_u)
   {
     sin_diff = next_sin_u - current_sin_u;
-    //sin_diff_v = next_sin_v - current_sin_v;
-    //sin_diff_w = next_sin_w - current_sin_w;
 
     sin_size = sin_diff / step_size;
   }
@@ -476,11 +362,11 @@ else
   current_sin_v = bldc.sinctrl[bldc.v];
   current_sin_w = bldc.sinctrl[bldc.w];
 }
+
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_u)));
-
 
 pwmEnableChannelI(
 		&PWMD1,
@@ -488,14 +374,12 @@ pwmEnableChannelI(
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_v))
 	);
 
-
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_W,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_w))
 	);
 
-		//chThdSleepSeconds(1);
   count++;
 }
 
@@ -574,8 +458,6 @@ extern void bldcInit(){
   bldc.u = 0;
   bldc.v = bldc.u + bldc.phase_shift;
   bldc.w = bldc.v + bldc.phase_shift;
-
-//	bldcStart();
 }
 
 
