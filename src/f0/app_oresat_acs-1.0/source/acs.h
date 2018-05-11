@@ -67,14 +67,14 @@ typedef enum{
 
 typedef enum {
 	EV_ANY=-1,
-	EV_OFF,
-	EV_INIT,
-	EV_RDY,
-	EV_RW,
-	EV_MTQR,
-	EV_STATUS,
-	EV_RW_START,
-	EV_RW_STOP,
+	EV_OFF,					// 1
+	EV_INIT,				// 2
+	EV_RDY,					// 3
+	EV_RW,					// 4
+	EV_MTQR,				// 5
+	EV_STATUS,			// 6
+	EV_RW_START,		// 7
+	EV_RW_STOP,			// 8
 	EV_END // this must be the last event
 }acs_event;
 

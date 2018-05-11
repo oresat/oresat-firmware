@@ -15,3 +15,10 @@ Then, open the Makefile and edit the line `PROJECT =` to whatever name you chose
 ```
 PROJECT   = app_<name>
 ```
+
+Commands for interacting with the can bus
+
+sudo slcand -o -c -f -s6 /dev/serial/by-id/*CANtact*-if00
+sudo ip link set slcan0 up
+candump slcan0
+```
