@@ -1,6 +1,6 @@
 #include "acs.h"
 
-//static mutex_t mtx;
+event_listener_t el;
 
 char *state_name[] = {
 	"ST_ANY",
@@ -96,7 +96,7 @@ static int state_rw(ACS *acs){
 	(void)acs;
 	trans_cleanup(acs);
 	print_state(ST_RW);
-	bldcInit(&acs->acs_bldc);
+	bldcInit(&acs->motor);
 	return ST_RW;
 }
 
@@ -108,6 +108,12 @@ static int state_mtqr(ACS *acs){
 
 static int trap_rw_start(ACS *acs){
 	(void)acs;
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_RW_START;
+	chSysUnlock();
+  chThdSleepMilliseconds(500);
+	// *******end critical section**********
 	bldcStart();
 	return EXIT_SUCCESS;
 }
@@ -167,7 +173,7 @@ static acs_event getNextEvent(ACS *acs){
 	uint8_t recv[CAN_BUF_SIZE]={0};
 
 // synchronized with the CAN thread
-//	chEvtWaitAny(ALL_EVENTS);	
+	chEvtWaitAny(ALL_EVENTS);	
 	chSysLock();
 	for(int i=0;i<CAN_BUF_SIZE;++i){
 		recv[i]=acs->can_buf.recv[i];
@@ -203,10 +209,19 @@ static acs_event getNextEvent(ACS *acs){
 static int acs_statemachine(ACS *acs){
 	int i;
 	palSetLine(LINE_LED_GREEN);
+	
 	acs->cur_state = state_init(acs);
+	update_recv(acs,ACS_STATE);
 	
 	while (!chThdShouldTerminateX() && acs->cur_state != ST_OFF) {
 		acs->event = getNextEvent(acs);
+	
+		// *******critical section**********
+		chSysLock();
+		acs->can_buf.send[LAST_EVENT]=acs->event;
+		chSysUnlock();
+		// *******end critical section**********
+		
 		for (i = 0;i < TRANS_COUNT;++i) {
 			if((acs->cur_state == trans[i].state)||(ST_ANY == trans[i].state)){
 				if((acs->event == trans[i].event)||(EV_ANY == trans[i].event)){
@@ -222,14 +237,23 @@ static int acs_statemachine(ACS *acs){
 }
 
 extern int acsInit(ACS *acs){
-	(void)acs;
-
+//	(void)acs;
+//*
+	bldcInit(&acs->motor);
+	bldcStart();
+//*/	
 	return EXIT_SUCCESS;
 }
 
 THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
 THD_FUNCTION(acsThread,acs){
   chRegSetThreadName("acsThread");
+	chEvtRegister(&rpdo_event,&el,0);
+
+/*
+	bldcInit(acs);
+	bldcStart();
+//*/	
 
 	acs_statemachine(acs);
   

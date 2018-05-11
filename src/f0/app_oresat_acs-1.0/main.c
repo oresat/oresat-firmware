@@ -17,11 +17,9 @@
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
+//#include "chprintf.h"
 
 //=== Project header files
-#include "oresat.h"
-
 #include "acs.h"
 
 ACS acs = {};
@@ -37,8 +35,6 @@ static SerialConfig ser_cfg ={
 static void app_init(void) {
 	//=== App initialization
 	acsInit(&acs);
-//	event_listener_t el;
-//	chEvtRegister(&rpdo_event, &el, 0);
 	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,CAN_BUF_SIZE,acs.can_buf.recv);
 	canTPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,0,0,CAN_BUF_SIZE,acs.can_buf.send);
 	// Start up debug output

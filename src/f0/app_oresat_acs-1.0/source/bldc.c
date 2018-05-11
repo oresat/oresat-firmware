@@ -1,7 +1,7 @@
 #include "bldc.h"
 #include "sin_lut.h"
 
-bldc *_bldc;
+bldc *motor;
 
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
@@ -9,26 +9,26 @@ THD_FUNCTION(spiThread,arg){
 	chRegSetThreadName("spiThread");
 	int step;
 
-  spiStart(&SPID1,&spicfg);            // Start driver.
+  spiStart(&SPID1,&spicfg);            	// Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
 
   while (!chThdShouldTerminateX()) {
-		_bldc->spi_rxbuf[0] = 0;
+		motor->spi_rxbuf[0] = 0;
 		spiSelect(&SPID1);                  // Select slave.
 
 		while(SPID1.state != SPI_READY) {}   
-		spiReceive(&SPID1,1,_bldc->spi_rxbuf);     		// Receive 1 frame (16 bits).
+		spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
 		spiUnselect(&SPID1);                // Unselect slave.
 
-		_bldc->position = 0x3FFF & _bldc->spi_rxbuf[0];
+		motor->position = 0x3FFF & motor->spi_rxbuf[0];
 	 
-		step = _bldc->position*360/(1<<14);
-		chprintf(DEBUG_CHP,"enc pos: %u \n",_bldc->position);        
-		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
-		step = (step + _bldc->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
-		step = (step + _bldc->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
+		step = motor->position*360/(1<<14);
+	//	chprintf(DEBUG_CHP,"enc pos: %u \n",motor->position);        
+	//	chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
+		step = (step + motor->phase_shift)%360;
+	//	chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
+		step = (step + motor->phase_shift)%360;
+	//	chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
 
 		chThdSleepMilliseconds(100);
   }
@@ -38,70 +38,68 @@ THD_FUNCTION(spiThread,arg){
 }
 
 static sinctrl_t scale(sinctrl_t duty_cycle){
-	return (duty_cycle*_bldc->scale)/10;	
+	return (duty_cycle*motor->scale)/10;	
 }
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
  // palSetLine(LINE_LED_GREEN);
-  pwmEnableChannelI(
+//*
+	pwmEnableChannelI(
 		&PWMD1,
 		channel,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(_bldc->sinctrl[step]))
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
 	);
+//*/
 }
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
- 	int step; 
 //  palClearLine(LINE_LED_GREEN);
+	++motor->count;
 	
-	++_bldc->count;
-	
-	if(_bldc->count==_bldc->stretch){
+	if(motor->count==motor->stretch){
 #ifdef OPENLOOP
-		++_bldc->u;
-		++_bldc->v;
-		++_bldc->w;
+		++motor->u;
+		++motor->v;
+		++motor->w;
 
-		if(_bldc->u >= _bldc->steps){
-			_bldc->u = 0;
+		if(motor->u >= motor->steps){
+			motor->u = 0;
 		}
-		if(_bldc->v >= _bldc->steps){
-			_bldc->v = 0;
+		if(motor->v >= motor->steps){
+			motor->v = 0;
 		}
-		if(_bldc->w >= _bldc->steps){
-			_bldc->w = 0;
+		if(motor->w >= motor->steps){
+			motor->w = 0;
 		}
 #endif
 #ifndef OPENLOOP 
 //*
-		step = _bldc->position*360/(1<<14);
-		_bldc->u = (step + 1 + _bldc->phase_shift)%360;
-		_bldc->v = (_bldc->u + _bldc->phase_shift)%360;
-		_bldc->w = (_bldc->v + _bldc->phase_shift)%360;
+ 		int step; 
+		step = motor->position*360/(1<<14);
+		motor->u = (step + 1 + motor->phase_shift)%360;
+		motor->v = (motor->u + motor->phase_shift)%360;
+		motor->w = (motor->v + motor->phase_shift)%360;
 //*/
 #endif
-		_bldc->count=0;
+		motor->count=0;
 	}
-	pwmCallback(PWM_U,_bldc->u);
-	pwmCallback(PWM_V,_bldc->v);
-	pwmCallback(PWM_W,_bldc->w);
 }
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-	pwmCallback(PWM_U,_bldc->u);
+	pwmCallback(PWM_U,motor->u);
 }
 
 static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-	pwmCallback(PWM_V,_bldc->v);
+	pwmCallback(PWM_V,motor->v);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-	pwmCallback(PWM_W,_bldc->w);
+	pwmCallback(PWM_W,motor->w);
 }
 
 static PWMConfig pwmRWcfg = {
@@ -120,40 +118,43 @@ static PWMConfig pwmRWcfg = {
 };
 
 extern void bldcInit(bldc *pbldc){
-	_bldc = pbldc;
-	_bldc->steps = STEPS;
-	_bldc->stretch = STRETCH;
-	_bldc->scale = SCALE;
-	_bldc->sinctrl = sinctrl360;
-	_bldc->count = 0;
-	_bldc->position = 0;
-	_bldc->phase_shift = _bldc->steps/3;
-	_bldc->u = 0;
-	_bldc->v = _bldc->u + _bldc->phase_shift;
-	_bldc->w = _bldc->v + _bldc->phase_shift;
+	motor = pbldc;
+	motor->steps = STEPS;
+	motor->stretch = STRETCH;
+	motor->scale = SCALE;
+	motor->sinctrl = sinctrl360;
+	motor->count = 0;
+	motor->position = 0;
+	motor->phase_shift = motor->steps/3;
+	motor->u = 0;
+	motor->v = motor->u + motor->phase_shift;
+	motor->w = motor->v + motor->phase_shift;
 
-	_bldc->p_spi_thread=chThdCreateStatic(
+/*
+	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
 		NORMALPRIO + 1,
 		spiThread,
 		NULL
 	);
-//	_bldcStart();
+//*/
 }
 
 extern void bldcStart(){
 	palSetLine(LINE_LED_GREEN);
 	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
-
-	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->u));
-  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->v));
-  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,_bldc->w));
-
+//*
+	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
+//*/
+//*
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);
+//*/
 }
 
 extern void bldcStop(){
@@ -162,5 +163,5 @@ extern void bldcStop(){
 }
 
 extern void bldcExit(){
-	chThdTerminate(_bldc->p_spi_thread);
+	chThdTerminate(motor->p_spi_thread);
 }

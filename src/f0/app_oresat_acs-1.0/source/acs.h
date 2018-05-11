@@ -6,6 +6,7 @@
 #include "bldc.h"
 //#include "chmtx.h"
 #include "chprintf.h"
+#include "oresat.h"
 
 #define WA_ACS_THD_SIZE (1<<7)
 #define CAN_NODE 				0x3F // max 0x7f
@@ -43,7 +44,9 @@ typedef enum{
 
 typedef enum{
 	ERROR_CODE = 0,
-	ACS_STATE
+	ACS_STATE,
+	LAST_EVENT,
+	LAST_TRAP,
 }can_recv;
 
 typedef enum{
@@ -67,14 +70,14 @@ typedef enum{
 
 typedef enum {
 	EV_ANY=-1,
-	EV_OFF,					// 1
-	EV_INIT,				// 2
-	EV_RDY,					// 3
-	EV_RW,					// 4
-	EV_MTQR,				// 5
-	EV_STATUS,			// 6
-	EV_RW_START,		// 7
-	EV_RW_STOP,			// 8
+	EV_OFF,					// 0
+	EV_INIT,				// 1
+	EV_RDY,					// 2
+	EV_RW,					// 3
+	EV_MTQR,				// 4
+	EV_STATUS,			// 5
+	EV_RW_START,		// 6
+	EV_RW_STOP,			// 7
 	EV_END // this must be the last event
 }acs_event;
 
@@ -87,7 +90,7 @@ typedef struct{
 	acs_state cur_state;
 	acs_event event; // the most recent event
 	can_buffer can_buf;
-	bldc acs_bldc;
+	bldc motor;
 }ACS;
 
 typedef struct{

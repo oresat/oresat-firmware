@@ -7,6 +7,8 @@
 
 #include <unistd.h>
 
+#define OPENLOOP
+
 #define THREAD_SIZE	(1<<7)
 
 #define DEBUG_SERIAL SD2
@@ -22,7 +24,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				10e3 // periods per sec
+#define PWM_FREQ				30e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 
