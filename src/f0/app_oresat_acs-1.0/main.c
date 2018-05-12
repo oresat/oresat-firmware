@@ -44,7 +44,6 @@ static void app_init(void) {
 static void app_main(void) {
   //=== Start application threads
 
-  //Example thread creation
 	chThdCreateStatic(
 		wa_acsThread,
 		sizeof(wa_acsThread), 
@@ -52,15 +51,7 @@ static void app_main(void) {
 		acsThread, 
 		&acs	
 	);
-/*
-	chThdCreateStatic(
-		wa_spiThread,
-		sizeof(wa_spiThread),
-		NORMALPRIO + 1,
-		spiThread,
-		NULL
-	);
-//*/
+
 	while (true){
 		chThdSleepMilliseconds(1000);
 	}

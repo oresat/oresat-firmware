@@ -1,5 +1,4 @@
-#include "acs.h"
-
+#include "acs.h" 
 event_listener_t el;
 
 char *state_name[] = {
@@ -21,6 +20,8 @@ char *event_name[] = {
 	"EV_REP",
 	"EV_RW_START",
 	"EV_RW_STOP",
+	"EV_MTQR_START",
+	"EV_MTQR_STOP",
 	"EV_STATUS",
 	"EV_END"
 };
@@ -50,6 +51,7 @@ static void trans_cleanup(ACS *acs){
 			break;
 
 		case ST_MTQR:
+			mtqrExit();
 
 		default:
 
@@ -102,25 +104,50 @@ static int state_rw(ACS *acs){
 
 static int state_mtqr(ACS *acs){
 	(void)acs;
+	trans_cleanup(acs);
 	print_state(ST_MTQR);
+	mtqrInit(&acs->mtqr);
 	return ST_MTQR;
 }
 
 static int trap_rw_start(ACS *acs){
-	(void)acs;
 	// *******critical section**********
 	chSysLock();
 	acs->can_buf.send[LAST_TRAP]=EV_RW_START;
 	chSysUnlock();
-  chThdSleepMilliseconds(500);
 	// *******end critical section**********
 	bldcStart();
 	return EXIT_SUCCESS;
 }
 
 static int trap_rw_stop(ACS *acs){
-	(void)acs;
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_RW_STOP;
+	chSysUnlock();
+	// *******end critical section**********
 	bldcStop();
+	return EXIT_SUCCESS;
+}
+
+static int trap_mtqr_start(ACS *acs){
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_MTQR_START;
+	chSysUnlock();
+	// *******end critical section**********
+	mtqrStart();
+	return EXIT_SUCCESS;
+}
+
+static int trap_mtqr_stop(ACS *acs){
+	(void)acs;
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_MTQR_STOP;
+	chSysUnlock();
+	// *******end critical section**********
+	mtqrStop();
 	return EXIT_SUCCESS;
 }
 
@@ -130,10 +157,11 @@ static int trap_fsm_status(ACS *acs){
 }
 
 const acs_trap trap[] = {
-	{ST_RW, 	EV_RW_START,	&trap_rw_start},
-	{ST_RW, 	EV_RW_STOP,		&trap_rw_stop},
-//	{ST_MTQR, EV_STATUS,	&trap_mtqr_status},
-	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
+	{ST_RW,			EV_RW_START,		&trap_rw_start},
+	{ST_RW,			EV_RW_STOP,			&trap_rw_stop},
+	{ST_MTQR,		EV_MTQR_START,	&trap_mtqr_start},
+	{ST_MTQR,		EV_MTQR_STOP,		&trap_mtqr_stop},
+	{ST_ANY,		EV_STATUS,			&trap_fsm_status}
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
@@ -146,7 +174,12 @@ static int fsm_trap(ACS *acs){
 			if(trap[i].state == ST_ANY || acs->cur_state == trap[i].state){
 				trap_status = (trap[i].fn)(acs);
 				if(trap_status){
-					// something bad happened
+					// *******critical section**********
+					chSysLock();
+					acs->can_buf.send[ERROR_CODE]=77;
+					chSysUnlock();
+					chThdSleepMilliseconds(500);
+					// *******end critical section**********
 				}
 			}
 		}
@@ -188,8 +221,8 @@ static acs_event getNextEvent(ACS *acs){
 		case CHG_STATE:
 			event = recv[ARG_BYTE];			
 			break;
-		case REPORT_STATUS:
-			event = EV_STATUS;			
+		case CALL_TRAP:
+//			event = EV_STATUS;			
 			break;
 		case BLINK:
 			// TODO: implement
@@ -237,11 +270,8 @@ static int acs_statemachine(ACS *acs){
 }
 
 extern int acsInit(ACS *acs){
-//	(void)acs;
-/*
-	bldcInit(&acs->motor);
-	bldcStart();
-//*/	
+	(void)acs;
+	mtqrInit(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 
@@ -251,9 +281,5 @@ THD_FUNCTION(acsThread,acs){
 	chEvtRegister(&rpdo_event,&el,0);
 
 	acs_statemachine(acs);
-  
-//	while (!chThdShouldTerminateX()) {
-//    chThdSleepMilliseconds(500);
-//  }
 }
 

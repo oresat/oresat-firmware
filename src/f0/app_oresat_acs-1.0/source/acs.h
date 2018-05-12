@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "bldc.h"
+#include "magnetorquer.h"
 //#include "chmtx.h"
 #include "chprintf.h"
 #include "oresat.h"
@@ -52,7 +53,7 @@ typedef enum{
 typedef enum{
 	NOP=0,
 	CHG_STATE,
-	REPORT_STATUS,
+	CALL_TRAP,
 	BLINK
 }can_msg_type;
 
@@ -78,6 +79,8 @@ typedef enum {
 	EV_STATUS,			// 5
 	EV_RW_START,		// 6
 	EV_RW_STOP,			// 7
+	EV_MTQR_START,  // 8
+	EV_MTQR_STOP,   // 9
 	EV_END // this must be the last event
 }acs_event;
 
@@ -91,6 +94,7 @@ typedef struct{
 	acs_event event; // the most recent event
 	can_buffer can_buf;
 	bldc motor;
+	MTQR mtqr;
 }ACS;
 
 typedef struct{
