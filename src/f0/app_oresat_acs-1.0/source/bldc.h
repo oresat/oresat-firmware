@@ -17,6 +17,11 @@
 #define SCALE			10
 #define STEPS			360 
 #define STRETCH		1
+#define SKIP      1
+
+#define ENCODER_MAX 1<<14
+#define CHUNK_AMOUNT 6
+#define CHUNK_SIZE ENCODER_MAX / CHUNK_AMOUNT
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 
@@ -35,10 +40,11 @@
 #define sinctrl_t uint16_t 
 
 typedef struct{
-	int count,		// period counter
+	uint16_t count,		// period counter
 			scale,		// scales the duty cycle
 			steps,		// number of steps in lut 
-			stretch;  
+			stretch,
+      skip;  
 			sinctrl_t u,v,w,// signals
 			phase_shift;		// 
 	uint16_t position;				// motor position from encoder
