@@ -86,19 +86,6 @@ static void pwmpcb(PWMDriver *pwmp) {
   //TODO Figure out what to do with this stretch
 	//if(motor->count==motor->stretch){
 #ifdef OPENLOOP
-		++motor->u;
-		++motor->v;
-		++motor->w;
-
-		if(motor->u >= motor->steps){
-			motor->u = 0;
-		}
-		if(motor->v >= motor->steps){
-			motor->v = 0;
-    }
-		if(motor->w >= motor->steps){
-			motor->w = 0;
-		}
 #endif
 #ifndef OPENLOOP 
 if (sin_step == step_size)
@@ -112,10 +99,28 @@ if (sin_step == step_size)
 }
 
 #endif
+if (sin_step == step_size)
+{
+    
+		++motor->u;
+		++motor->v;
+		++motor->w;
+
+		if(motor->u >= motor->steps){
+			motor->u = 0;
+		}
+		if(motor->v >= motor->steps){
+			motor->v = 0;
+    }
+		if(motor->w >= motor->steps){
+			motor->w = 0;
+		}
+}
+
 
 	//	motor->count=0;
 	//}
-if (motor->skip > 1)
+if (motor->stretch > 1)
 {
   if (sin_step == step_size)
   {
