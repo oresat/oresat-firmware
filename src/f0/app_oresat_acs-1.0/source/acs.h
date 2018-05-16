@@ -78,7 +78,7 @@ typedef enum {
 	EV_STATUS,			// 5
 	EV_RW_START,		// 6
 	EV_RW_STOP,			// 7
-  EV_RW_STRETCH,  // 8
+//  EV_RW_STRETCH,  // 8
 	EV_END // this must be the last event
 }acs_event;
 

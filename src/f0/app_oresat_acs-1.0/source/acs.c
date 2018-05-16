@@ -21,7 +21,7 @@ char *event_name[] = {
 	"EV_REP",
 	"EV_RW_START",
 	"EV_RW_STOP",
-  "EV_RW_STRETCH",
+//  "EV_RW_STRETCH",
 	"EV_STATUS",
 	"EV_END"
 };
@@ -142,7 +142,7 @@ static int trap_fsm_status(ACS *acs){
 const acs_trap trap[] = {
 	{ST_RW, 	EV_RW_START,	&trap_rw_start},
 	{ST_RW, 	EV_RW_STOP,		&trap_rw_stop},
-  {ST_RW,   EV_RW_STRETCH,&trap_rw_stretch},
+//  {ST_RW,   EV_RW_STRETCH,&trap_rw_stretch},
 //	{ST_MTQR, EV_STATUS,	&trap_mtqr_status},
 	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
 };

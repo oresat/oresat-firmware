@@ -185,30 +185,30 @@ pwmEnableChannelI(
 
 
 }
-/*
+
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;
-	pwmCallback(PWM_U,motor->u);
+//	pwmCallback(PWM_U,motor->u);
 }
 
 static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
   (void)pwmp;
-	pwmCallback(PWM_V,motor->v);
+//	pwmCallback(PWM_V,motor->v);
 }
 
 static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
   (void)pwmp;
-	pwmCallback(PWM_W,motor->w);
+//	pwmCallback(PWM_W,motor->w);
 }
-*/
+
 static PWMConfig pwmRWcfg = {
   PWM_TIMER_FREQ,	
   PWM_PERIOD,	
   pwmpcb,
   {
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmUcb},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmVcb},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmWcb},
    {PWM_OUTPUT_DISABLED, NULL}
   },
   0,
@@ -242,7 +242,7 @@ extern void bldcInit(bldc *pbldc){
 }
 
 extern void bldcStart(){
-	palSetLine(LINE_LED_GREEN);
+	//palSetLine(LINE_LED_GREEN);
 	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 //*
