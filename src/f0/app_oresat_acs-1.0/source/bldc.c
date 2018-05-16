@@ -64,7 +64,7 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 static uint8_t encoderToLUT(uint16_t position)
 {
   uint8_t chunk = (position * CHUNK_AMOUNT) / ENCODER_MAX;
-  return ((position - chunk_low[chunk]) * (STEPS + 1)) / CHUNK_SIZE;
+  return ((position - chunk_low[chunk]) * (STEPS)) / CHUNK_SIZE;
 }
 
 //TODO probably a better way to handle these
@@ -86,19 +86,7 @@ static void pwmpcb(PWMDriver *pwmp) {
   //TODO Figure out what to do with this stretch
 	//if(motor->count==motor->stretch){
 #ifdef OPENLOOP
-#endif
-#ifndef OPENLOOP 
-if (sin_step == step_size)
-{
-      next_step = encoderToLUT(motor->position) + motor->skip;
 
-      motor->u = (next_step)%360;
-		  motor->v = (motor->u + motor->phase_shift)%360;
-		  motor->w = (motor->v + motor->phase_shift)%360;
-
-}
-
-#endif
 if (sin_step == step_size)
 {
     
@@ -117,6 +105,19 @@ if (sin_step == step_size)
 		}
 }
 
+
+#endif
+#ifndef OPENLOOP 
+if (sin_step == step_size)
+{
+      next_step = encoderToLUT(motor->position) + motor->skip;
+
+      motor->u = (next_step)%360;
+		  motor->v = (motor->u + motor->phase_shift)%360;
+		  motor->w = (motor->v + motor->phase_shift)%360;
+
+}
+#endif
 
 	//	motor->count=0;
 	//}

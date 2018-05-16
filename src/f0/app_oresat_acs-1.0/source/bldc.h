@@ -7,7 +7,7 @@
 
 #include <unistd.h>
 
-#define OPENLOOP
+//#define OPENLOOP
 
 #define THREAD_SIZE	(1<<7)
 
@@ -16,7 +16,7 @@
 
 #define SCALE			2
 #define STEPS			360 
-#define STRETCH		1
+#define STRETCH		2
 #define SKIP      1
 
 #define ENCODER_MAX 1<<14
