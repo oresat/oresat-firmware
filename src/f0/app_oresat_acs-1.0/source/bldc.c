@@ -3,6 +3,81 @@
 
 bldc *motor;
 
+//TODO temp test
+uint32_t step_size = STRETCH;
+
+uint32_t current_sin_u, next_sin_u;
+uint32_t current_sin_v, next_sin_v;
+uint32_t current_sin_w, next_sin_w;
+uint16_t sin_diff;
+uint16_t sin_size;
+uint16_t sin_step = STRETCH;
+
+
+static uint16_t chunk0L = 0 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk0H = 1 * ENCODER_CHUNK_SIZE;
+
+static uint16_t chunk1L = 1 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk1H = 2 * ENCODER_CHUNK_SIZE;
+
+static uint16_t chunk2L = 2 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk2H = 3 * ENCODER_CHUNK_SIZE;
+
+static uint16_t chunk3L = 3 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk3H = 4 * ENCODER_CHUNK_SIZE;
+
+static uint16_t chunk4L = 4 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk4H = 5 * ENCODER_CHUNK_SIZE;
+
+static uint16_t chunk5L = 5 * ENCODER_CHUNK_SIZE;
+static uint16_t chunk5H = 6 * ENCODER_CHUNK_SIZE;
+
+
+static uint16_t encoderToLUT(uint16_t position)
+{
+  uint16_t step = 0;
+  if (position > chunk0L && position < chunk0H)
+  {
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+  else if (position > chunk1L && position < chunk1H)
+  {
+    position = position - (ENCODER_CHUNK_SIZE*1);
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+  else if (position > chunk2L && position < chunk2H)
+  {
+
+    position = position - (ENCODER_CHUNK_SIZE*2); 
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+  else if (position > chunk3L && position < chunk3H)
+  {
+
+    position = position - (ENCODER_CHUNK_SIZE*3);
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+  else if (position > chunk4L && position < chunk4H)
+  {
+
+    position = position - (ENCODER_CHUNK_SIZE*4);
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+  else if (position > chunk5L && position < chunk5H)
+  {
+
+    position = position - (ENCODER_CHUNK_SIZE*5);
+    step = position * STEPS / (ENCODER_CHUNK_SIZE);
+  }
+
+  return step;
+}
+
+static uint32_t LUTrevCount = 0;
+
+
+
+/*
 //TODO move this
 extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
                                 1 * CHUNK_SIZE,
@@ -11,7 +86,7 @@ extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
                                 4 * CHUNK_SIZE,
                                 5 * CHUNK_SIZE};
 
-
+*/
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
@@ -61,108 +136,181 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 //*/
 }
 
-static uint8_t encoderToLUT(uint16_t position)
-{
-  uint8_t chunk = (position * CHUNK_AMOUNT) / ENCODER_MAX;
-  return ((position - chunk_low[chunk]) * (STEPS)) / CHUNK_SIZE;
-}
 
-//TODO probably a better way to handle these
-uint32_t step_size = STRETCH;
 
-uint32_t current_sin_u, next_sin_u;
-uint32_t current_sin_v, next_sin_v;
-uint32_t current_sin_w, next_sin_w;
-uint16_t sin_diff;
-uint16_t sin_size;
-uint16_t sin_step = STRETCH;
-uint8_t next_step;
+uint16_t count = 0;
+
+bool down = false;
 
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
-	++motor->count;
-	
-  //TODO Figure out what to do with this stretch
-	//if(motor->count==motor->stretch){
-#ifdef OPENLOOP
-
-if (sin_step == step_size)
-{
-    
-		++motor->u;
-		++motor->v;
-		++motor->w;
-
-		if(motor->u >= motor->steps){
-			motor->u = 0;
-		}
-		if(motor->v >= motor->steps){
-			motor->v = 0;
+ 	uint16_t step; 
+  uint16_t next_step;
+  palClearLine(LINE_LED_GREEN);
+	//configure = true;
+  
+  if (count > 100)
+  {
+    if (!down)
+    {
+      step_size++;
+      //sin_step++;
     }
-		if(motor->w >= motor->steps){
-			motor->w = 0;
-		}
-}
+    else
+    {
+      step_size = step_size - 1;
+      //sin_step = sin_step - 1;
+    }
+    count = 0;
+  }
 
+  if (step_size >= 100)
+  {
+    down = true;
+    //step_size = 1;
+    //sin_step = 1;
+    //count = 5001;
+  }
+  else if (step_size < 2)
+  {
+    down = false;
+    //count = 5001;
+  }
+#ifdef CONFIGURE
 
+      //bldc.u = 0;
+      //bldc.v = 120;
+      //bldc.w = 240;
+ 
+    if (LUTrevCount < 6 * 360)
+    {
+      if (motor->count == motor->stretch){
+      motor->u += STEP_SIZE;
+      motor->v += STEP_SIZE;
+      motor->w += STEP_SIZE;
+
+      LUTrevCount++;
+
+      if(motor->u >= motor->steps){
+			  motor->u = 0 + motor->u - motor->steps;
+		  }
+		  if(motor->v >= motor->steps){
+			  motor->v = 0 + motor->v - motor->steps;
+		  }
+		  if(motor->w >= motor->steps){
+			  motor->w = 0 + motor->w - motor->steps;
+		  }
+      motor->count = 0;
+     }
+     ++motor->count;
+    }
+    else
+    {
+      motor->u = 0;
+      motor->v = 120;
+      motor->w = 240;
+    }
+    
+  
 #endif
-#ifndef OPENLOOP 
+
+#ifndef CONFIGURE    
+	  //++bldc.count;
+
+	  //if(bldc.count==bldc.stretch){
+#ifdef BRUTEFORCE
+		  motor->u += step_size;
+		  motor->v += step_size;
+		  motor->w += step_size;
+
+		  if(motor->u >= motor->steps){
+			  motor->u = 0 + motor->u - motor->steps;
+		  }
+		  if(motor->v >= motor->steps){
+			  motor->v = 0 + motor->v - motor->steps;
+		  }
+		  if(motor->w >= motor->steps){
+			  motor->w = 0 + motor->w - motor->steps;
+		  }
+#endif
+#ifndef BRUTEFORCE
+
+//		int step = 360/(1<<14)*bldc.position;
 if (sin_step == step_size)
 {
-      next_step = encoderToLUT(motor->position) + motor->skip;
+      step = encoderToLUT(motor->position);
+		  next_step = step + SKIP;
+
+
 
       motor->u = (next_step)%360;
 		  motor->v = (motor->u + motor->phase_shift)%360;
 		  motor->w = (motor->v + motor->phase_shift)%360;
 
+/*
+    if (motor->u > 360)
+    {
+      motor->u = 0 + (motor->u - 360);
+    }
+    if (motor->v > 360)
+    {
+      motor->v = 0 + (motor->v - 360);
+    }
+    if (motor->w > 360)
+    {
+      motor->w = 0 + (motor->w - 360);
+    }
+*/
 }
 #endif
-
-	//	motor->count=0;
-	//}
-if (motor->stretch > 1)
+	//	  motor->count=0;
+	 // }
+#endif
+if (SKIP)
 {
-  if (sin_step == step_size)
-  {
-    current_sin_u = motor->sinctrl[motor->u];
-    current_sin_v = motor->sinctrl[motor->v];
-    current_sin_w = motor->sinctrl[motor->w];
-    next_sin_u = motor->sinctrl[motor->u + 1];
-    next_sin_v = motor->sinctrl[motor->v + 1];
-    next_sin_w = motor->sinctrl[motor->w + 1];
+if (sin_step == step_size)
+{
+  current_sin_u = motor->sinctrl[motor->u];
+  current_sin_v = motor->sinctrl[motor->v];
+  current_sin_w = motor->sinctrl[motor->w];
+  next_sin_u = motor->sinctrl[motor->u + 1];
+  next_sin_v = motor->sinctrl[motor->v + 1];
+  next_sin_w = motor->sinctrl[motor->w + 1];
   
-    if (current_sin_u < next_sin_u)
-    {
-      sin_diff = next_sin_u - current_sin_u;
-
-      sin_size = sin_diff / step_size;
-    }
-    else if (current_sin_v < next_sin_v)
-    {
-      sin_diff = next_sin_v - current_sin_v;
-      sin_size = sin_diff / step_size;
-    }  
-    else
-    {
-      sin_diff = next_sin_w - current_sin_w;
-      sin_size = sin_diff / step_size;
-    }
-  }
-
-  current_sin_u = current_sin_u + sin_size;
-  current_sin_v = current_sin_v + sin_size;
-  current_sin_w = current_sin_w + sin_size;
-
-  sin_step = sin_step - 1;
-
-  if (sin_step == 0)
+  if (current_sin_u < next_sin_u)
   {
-    current_sin_u = next_sin_u;
-    current_sin_v = next_sin_v;
-    current_sin_w = next_sin_w;
-    sin_step = step_size;
+    sin_diff = next_sin_u - current_sin_u;
+    //sin_diff_v = next_sin_v - current_sin_v;
+    //sin_diff_w = next_sin_w - current_sin_w;
+
+    sin_size = sin_diff / step_size;
   }
+  else if (current_sin_v < next_sin_v)
+  {
+    sin_diff = next_sin_v - current_sin_v;
+    sin_size = sin_diff / step_size;
+  }  
+  else
+  {
+    sin_diff = next_sin_w - current_sin_w;
+    sin_size = sin_diff / step_size;
+  }
+}
+
+current_sin_u = current_sin_u + sin_size;
+current_sin_v = current_sin_v + sin_size;
+current_sin_w = current_sin_w + sin_size;
+
+sin_step = sin_step - 1;
+
+if (sin_step == 0)
+{
+  current_sin_u = next_sin_u;
+  current_sin_v = next_sin_v;
+  current_sin_w = next_sin_w;
+  sin_step = step_size;
+}
 }
 else
 {
@@ -170,11 +318,11 @@ else
   current_sin_v = motor->sinctrl[motor->v];
   current_sin_w = motor->sinctrl[motor->w];
 }
-
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_u)));
+
 
 pwmEnableChannelI(
 		&PWMD1,
@@ -182,15 +330,18 @@ pwmEnableChannelI(
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_v))
 	);
 
+
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_W,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_w))
 	);
 
-
-
+		//chThdSleepSeconds(1);
+  count++;
 }
+
+
 
 static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
   (void)pwmp;

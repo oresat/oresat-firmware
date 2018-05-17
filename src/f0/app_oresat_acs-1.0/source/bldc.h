@@ -7,6 +7,7 @@
 
 #include <unistd.h>
 
+//#define BRUTEFORCE
 //#define OPENLOOP
 
 #define THREAD_SIZE	(1<<7)
@@ -18,10 +19,11 @@
 #define STEPS			360 
 #define STRETCH		2
 #define SKIP      1
+#define STEP_SIZE 1
 
 #define ENCODER_MAX 1<<14
 #define CHUNK_AMOUNT 6
-#define CHUNK_SIZE ENCODER_MAX / CHUNK_AMOUNT
+#define ENCODER_CHUNK_SIZE 2730
 
 #define PWM_TIMER_FREQ	48e6 // Hz
 
