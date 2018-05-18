@@ -52,7 +52,7 @@ static void trans_cleanup(ACS *acs){
 
 		case ST_MTQR:
 			mtqrExit();
-
+			break;
 		default:
 
 			break;

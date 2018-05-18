@@ -5,7 +5,6 @@
 #include "hal.h"
 #include "bldc.h"
 #include "magnetorquer.h"
-//#include "chmtx.h"
 #include "chprintf.h"
 #include "oresat.h"
 
@@ -19,7 +18,7 @@
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
-/*
+/**
  *	can_message
  *
  * 	Byte		Name		Use
@@ -71,17 +70,17 @@ typedef enum{
 
 typedef enum {
 	EV_ANY=-1,
-	EV_OFF,					// 0
-	EV_INIT,				// 1
-	EV_RDY,					// 2
-	EV_RW,					// 3
-	EV_MTQR,				// 4
-	EV_STATUS,			// 5
-	EV_RW_START,		// 6
-	EV_RW_STOP,			// 7
-	EV_MTQR_START,  // 8
-	EV_MTQR_STOP,   // 9
-	EV_END // this must be the last event
+	EV_OFF,					/// 0
+	EV_INIT,				/// 1
+	EV_RDY,					/// 2
+	EV_RW,					/// 3
+	EV_MTQR,				/// 4
+	EV_STATUS,			/// 5
+	EV_RW_START,		/// 6
+	EV_RW_STOP,			/// 7
+	EV_MTQR_START,  /// 8
+	EV_MTQR_STOP,   /// 9
+	EV_END /// EV_END must be the last event
 }acs_event;
 
 typedef struct{
@@ -91,7 +90,7 @@ typedef struct{
 
 typedef struct{
 	acs_state cur_state;
-	acs_event event; // the most recent event
+	acs_event event; /// the most recent event
 	can_buffer can_buf;
 	bldc motor;
 	MTQR mtqr;

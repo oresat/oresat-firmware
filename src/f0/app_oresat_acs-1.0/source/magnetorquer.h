@@ -5,24 +5,34 @@
 #include "hal.h"
 #include "chprintf.h"
 
-#define MTQR_PWM_TIMER_FREQ  	2e6
-#define MTQR_PWM_FREQ 				2e3  // periods per second
+#define MTQR_PWM_TIMER_FREQ  	2e6	/// PWM Timer frequency
+#define MTQR_PWM_FREQ 				2e3 /// periods per second
 
 #define MTQR_PWM_PERIOD MTQR_PWM_TIMER_FREQ/MTQR_PWM_FREQ
 
-#define PWM_CH_MTQR      			0    // pwm channel
-
-#define PH				 						6u
-#define ENABLE    						7u
+#define PWM_CH_MTQR      			0   /// pwm channel
+#define MTQR_STARTING_DC			0		/// starting duty cycle
+#define PH				 						6u	/// Phase (motor direction)
+#define ENABLE    						7u	/// Encoder chip enable
+																	/// Logic low
 
 #define EXIT_SUCCESS 					0
 #define EXIT_FAILURE 					1
 
+/**
+ *
+ *
+ *
+ *
+ *
+ * 
+ */
+
 static const PWMConfig pwm_MTQRcfg = {
-	MTQR_PWM_TIMER_FREQ,     // Frequency
-	MTQR_PWM_PERIOD,         // period duration 
-	NULL,               // Callback
-	{                   // Channels
+	MTQR_PWM_TIMER_FREQ,    // Frequency
+	MTQR_PWM_PERIOD,        // period duration 
+	NULL,               		// Callback
+	{ // Channels
 		{PWM_OUTPUT_ACTIVE_HIGH,NULL},
 		{PWM_OUTPUT_DISABLED,NULL},
 		{PWM_OUTPUT_DISABLED,NULL},
@@ -35,11 +45,13 @@ static const PWMConfig pwm_MTQRcfg = {
 
 typedef struct{
 	uint8_t direction;
+	uint16_t pwm_dc; /// duty cycle
 }MTQR;
 
 extern void mtqrInit(MTQR *mtqr);
 extern void mtqrStart(void);
 extern void mtqrStop(void);
+extern void mtqrSetDC(uint16_t dc);
 extern void mtqrExit(void);
 	
 #endif

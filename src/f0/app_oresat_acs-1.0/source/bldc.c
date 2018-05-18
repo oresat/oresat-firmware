@@ -3,6 +3,12 @@
 
 bldc *motor;
 
+/**
+ *
+ *
+ *
+ */
+
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
@@ -42,17 +48,19 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 }
 
 static void pwmCallback(uint8_t channel,sinctrl_t step){
- // palSetLine(LINE_LED_GREEN);
-//*
 	pwmEnableChannelI(
 		&PWMD1,
 		channel,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
 	);
-//*/
 }
 
-// pwm period callback
+/**
+ *
+ *
+ *
+ */
+
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
 //  palClearLine(LINE_LED_GREEN);
@@ -145,21 +153,27 @@ extern void bldcStart(){
 	palSetLine(LINE_LED_GREEN);
 	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
-//*
+	
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->u));
   pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->v));
   pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
-//*/
-//*
+	
 	pwmEnableChannelNotification(&PWMD1,PWM_U);
   pwmEnableChannelNotification(&PWMD1,PWM_V);
   pwmEnableChannelNotification(&PWMD1,PWM_W);
-//*/
 }
 
 extern void bldcStop(){
-//  palClearLine(LINE_LED_GREEN);
+  palClearLine(LINE_LED_GREEN);
 	pwmStop(&PWMD1);
+}
+
+extern void bldcSetDC(uint8_t channel,uint16_t dc){
+	pwmEnableChannelI(
+		&PWMD1,
+		channel,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(dc))
+	);
 }
 
 extern void bldcExit(){

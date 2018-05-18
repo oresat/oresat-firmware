@@ -1,13 +1,21 @@
 #ifndef _BLDC_H_
 #define _BLDC_H_
 
+/**
+ *
+ *
+ *
+ *
+ *
+ */
+
 #include "ch.h"
 #include "hal.h"
 #include "bldc.h"
 
 #include <unistd.h>
 
-#define OPENLOOP
+#define OPENLOOP /// open loop control (oxymoron)
 
 #define THREAD_SIZE	(1<<7)
 
@@ -18,21 +26,21 @@
 #define STEPS			360 
 #define STRETCH		1
 
-#define PWM_TIMER_FREQ	48e6 // Hz
-
-//**************************************************************
-//
-// TODO: we need to do math ASAP
-//
-#define PWM_FREQ				15e3 // periods per sec
+#define PWM_TIMER_FREQ	48e6 /// Hz
+#define PWM_FREQ				15e3 /// periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
-//**************************************************************
 
-#define PWM_U					0U
-#define PWM_V					1U
-#define PWM_W					2U
+#define PWM_U			0U
+#define PWM_V			1U
+#define PWM_W			2U
 
 #define sinctrl_t uint16_t 
+
+/**
+ *
+ *
+ *
+ */
 
 typedef struct{
 	int count,		// period counter
@@ -62,6 +70,7 @@ extern THD_FUNCTION(spiThread,arg);
 extern void bldcInit(bldc *pbldc);
 extern void bldcStart(void);
 extern void bldcStop(void);
+extern void bldcSetDC(uint8_t channel,uint16_t dc);
 extern void bldcExit(void);
 
 #endif
