@@ -271,6 +271,10 @@ static int acs_statemachine(ACS *acs){
 
 extern int acsInit(ACS *acs){
 	(void)acs;
+//	palSetPadMode(GPIOA,GPIOA_TIM1_CH1,PAL_MODE_OUTPUT_PUSHPULL);
+//	palSetPad(GPIOB,ENABLE);	
+//	palClearPad(GPIOA,GPIOA_TIM1_CH1);	
+//	palClearPad(GPIOB,PH);
 	mtqrInit(&acs->mtqr);
 	return EXIT_SUCCESS;
 }

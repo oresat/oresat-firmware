@@ -3,21 +3,20 @@
 extern void mtqrInit(MTQR *mtqr){
 	(void)mtqr;
 //	palSetPad(GPIOB,PH);    // Phase selection (direction of motor).
-	
-	//palClearPad(GPIOB,6u);    // Phase selection (direction of motor).
-//	palSetPad(GPIOB,ENABLE);
+	palSetPadMode(GPIOB,PH,PAL_MODE_OUTPUT_PUSHPULL); // Phase direction
+  palSetPadMode(GPIOB,ENABLE,PAL_MODE_OUTPUT_PUSHPULL); 
+	palClearPad(GPIOB,ENABLE);	
+	palClearPad(GPIOB,PH);
 }
 
 extern void mtqrStart(){
-	palSetPadMode(GPIOB,PH,PAL_MODE_OUTPUT_PUSHPULL); // Phase direction
-  palSetPadMode(GPIOB,ENABLE,PAL_MODE_OUTPUT_PUSHPULL); 
 	pwmStart(&PWMD1,&pwm_MTQRcfg);
 	palSetPad(GPIOB,ENABLE);        // Set Enable high.
 	palSetPad(GPIOB,PH);
 	pwmEnableChannel(
 		&PWMD1,
 		PWM_CH_MTQR,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,5000)
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,10000)
 	);
 /*
 	while(true){
