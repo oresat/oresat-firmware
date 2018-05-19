@@ -13,7 +13,7 @@ uint16_t sin_diff;
 uint16_t sin_size;
 uint16_t sin_step = STRETCH;
 
-
+/*
 static uint16_t chunk0L = 0 * ENCODER_CHUNK_SIZE;
 static uint16_t chunk0H = 1 * ENCODER_CHUNK_SIZE;
 
@@ -31,53 +31,7 @@ static uint16_t chunk4H = 5 * ENCODER_CHUNK_SIZE;
 
 static uint16_t chunk5L = 5 * ENCODER_CHUNK_SIZE;
 static uint16_t chunk5H = 6 * ENCODER_CHUNK_SIZE;
-
-
-static uint16_t encoderToLUT(uint16_t position)
-{
-  uint16_t step = 0;
-  if (position > chunk0L && position < chunk0H)
-  {
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-  else if (position > chunk1L && position < chunk1H)
-  {
-    position = position - (ENCODER_CHUNK_SIZE*1);
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-  else if (position > chunk2L && position < chunk2H)
-  {
-
-    position = position - (ENCODER_CHUNK_SIZE*2); 
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-  else if (position > chunk3L && position < chunk3H)
-  {
-
-    position = position - (ENCODER_CHUNK_SIZE*3);
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-  else if (position > chunk4L && position < chunk4H)
-  {
-
-    position = position - (ENCODER_CHUNK_SIZE*4);
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-  else if (position > chunk5L && position < chunk5H)
-  {
-
-    position = position - (ENCODER_CHUNK_SIZE*5);
-    step = position * STEPS / (ENCODER_CHUNK_SIZE);
-  }
-
-  return step;
-}
-
-static uint32_t LUTrevCount = 0;
-
-
-
-/*
+*/
 //TODO move this
 extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
                                 1 * CHUNK_SIZE,
@@ -86,7 +40,22 @@ extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
                                 4 * CHUNK_SIZE,
                                 5 * CHUNK_SIZE};
 
-*/
+
+static uint16_t encoderToLut(uint16_t position)
+{
+  uint16_t step = 0;
+  uint8_t chunk = (position * CHUNK_AMOUNT) / ENCODER_MAX;
+  step = ((position - chunk_low[chunk]) * (STEPS)) / CHUNK_SIZE;
+
+  return step;
+}
+
+static uint32_t LUTrevCount = 0;
+
+
+
+
+
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
@@ -106,15 +75,6 @@ THD_FUNCTION(spiThread,arg){
 
 		motor->position = 0x3FFF & motor->spi_rxbuf[0];
 	 
-		step = motor->position*360/(1<<14);
-		chprintf(DEBUG_CHP,"enc pos: %u \n",motor->position);        
-		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
-		step = (step + motor->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
-		step = (step + motor->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
-
-		chThdSleepMilliseconds(100);
   }
 
 	spiReleaseBus(&SPID1);    // Release ownership of bus.
@@ -138,10 +98,12 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 
 
 
-uint16_t count = 0;
+//uint16_t count = 0;
 
 bool down = false;
 
+uint8_t diff = 0;
+uint8_t stretch_count = 0;  
 // pwm period callback
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
@@ -149,7 +111,7 @@ static void pwmpcb(PWMDriver *pwmp) {
   uint16_t next_step;
   palClearLine(LINE_LED_GREEN);
 	//configure = true;
-  
+  /*
   if (count > 100)
   {
     if (!down)
@@ -176,148 +138,50 @@ static void pwmpcb(PWMDriver *pwmp) {
   {
     down = false;
     //count = 5001;
-  }
-#ifdef CONFIGURE
-
-      //bldc.u = 0;
-      //bldc.v = 120;
-      //bldc.w = 240;
- 
-    if (LUTrevCount < 6 * 360)
-    {
-      if (motor->count == motor->stretch){
-      motor->u += STEP_SIZE;
-      motor->v += STEP_SIZE;
-      motor->w += STEP_SIZE;
-
-      LUTrevCount++;
-
-      if(motor->u >= motor->steps){
-			  motor->u = 0 + motor->u - motor->steps;
-		  }
-		  if(motor->v >= motor->steps){
-			  motor->v = 0 + motor->v - motor->steps;
-		  }
-		  if(motor->w >= motor->steps){
-			  motor->w = 0 + motor->w - motor->steps;
-		  }
-      motor->count = 0;
-     }
-     ++motor->count;
-    }
-    else
-    {
-      motor->u = 0;
-      motor->v = 120;
-      motor->w = 240;
-    }
-    
-  
-#endif
-
-#ifndef CONFIGURE    
-	  //++bldc.count;
-
-	  //if(bldc.count==bldc.stretch){
+  }*/
 #ifdef BRUTEFORCE
 		  motor->u += step_size;
 		  motor->v += step_size;
 		  motor->w += step_size;
 
-		  if(motor->u >= motor->steps){
-			  motor->u = 0 + motor->u - motor->steps;
-		  }
-		  if(motor->v >= motor->steps){
-			  motor->v = 0 + motor->v - motor->steps;
-		  }
-		  if(motor->w >= motor->steps){
-			  motor->w = 0 + motor->w - motor->steps;
-		  }
+			  motor->u = motor->u % 360;
+			  motor->v = motor->v % 360;
+			  motor->w = motor->w % 360;
+		  
+  current_sin_u = motor->sinctrl[motor->u];
+  current_sin_v = motor->sinctrl[motor->v];
+  current_sin_w = motor->sinctrl[motor->w];
+
+
+
 #endif
 #ifndef BRUTEFORCE
 
-//		int step = 360/(1<<14)*bldc.position;
-if (sin_step == step_size)
+if (stretch_count == 0)
 {
-      step = encoderToLUT(motor->position);
-		  next_step = step + SKIP;
-
-
-
-      motor->u = (next_step)%360;
-		  motor->v = (motor->u + motor->phase_shift)%360;
-		  motor->w = (motor->v + motor->phase_shift)%360;
-
-/*
-    if (motor->u > 360)
-    {
-      motor->u = 0 + (motor->u - 360);
-    }
-    if (motor->v > 360)
-    {
-      motor->v = 0 + (motor->v - 360);
-    }
-    if (motor->w > 360)
-    {
-      motor->w = 0 + (motor->w - 360);
-    }
-*/
-}
-#endif
-	//	  motor->count=0;
-	 // }
-#endif
-if (SKIP)
-{
-if (sin_step == step_size)
-{
+  motor->u = encoderToLut(motor->position);
+  motor->v = (motor->u + motor->phase_shift) % 360;
+  motor->w = (motor->v + motor->phase_shift) % 360;
   current_sin_u = motor->sinctrl[motor->u];
   current_sin_v = motor->sinctrl[motor->v];
   current_sin_w = motor->sinctrl[motor->w];
-  next_sin_u = motor->sinctrl[motor->u + 1];
-  next_sin_v = motor->sinctrl[motor->v + 1];
-  next_sin_w = motor->sinctrl[motor->w + 1];
-  
-  if (current_sin_u < next_sin_u)
-  {
-    sin_diff = next_sin_u - current_sin_u;
-    //sin_diff_v = next_sin_v - current_sin_v;
-    //sin_diff_w = next_sin_w - current_sin_w;
+  next_sin_u = motor->sinctrl[motor->u+1];
+  next_sin_v = motor->sinctrl[motor->v+1];
+  next_sin_w = motor->sinctrl[motor->w+1];
 
-    sin_size = sin_diff / step_size;
-  }
-  else if (current_sin_v < next_sin_v)
-  {
-    sin_diff = next_sin_v - current_sin_v;
-    sin_size = sin_diff / step_size;
-  }  
-  else
-  {
-    sin_diff = next_sin_w - current_sin_w;
-    sin_size = sin_diff / step_size;
-  }
+  diff = (current_sin_u > next_sin_u) ? (current_sin_u - next_sin_u) : (next_sin_u - current_sin_u);
+  stretch_count = motor->stretch;
 }
 
-current_sin_u = current_sin_u + sin_size;
-current_sin_v = current_sin_v + sin_size;
-current_sin_w = current_sin_w + sin_size;
+current_sin_u += diff;
+current_sin_v += diff;
+current_sin_w += diff;
 
-sin_step = sin_step - 1;
+stretch_count--;
 
-if (sin_step == 0)
-{
-  current_sin_u = next_sin_u;
-  current_sin_v = next_sin_v;
-  current_sin_w = next_sin_w;
-  sin_step = step_size;
-}
-}
-else
-{
-  current_sin_u = motor->sinctrl[motor->u];
-  current_sin_v = motor->sinctrl[motor->v];
-  current_sin_w = motor->sinctrl[motor->w];
-}
+#endif
+
+
 pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
@@ -337,8 +201,8 @@ pwmEnableChannelI(
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(current_sin_w))
 	);
 
-		//chThdSleepSeconds(1);
-  count++;
+	//chThdSleepSeconds(1);
+  //count++;
 }
 
 
@@ -363,9 +227,9 @@ static PWMConfig pwmRWcfg = {
   PWM_PERIOD,	
   pwmpcb,
   {
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmUcb},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmVcb},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, pwmWcb},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
    {PWM_OUTPUT_DISABLED, NULL}
   },
   0,
@@ -391,7 +255,7 @@ extern void bldcInit(bldc *pbldc){
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
-		NORMALPRIO + 1,
+		NORMALPRIO,
 		spiThread,
 		NULL
 	);
@@ -408,9 +272,9 @@ extern void bldcStart(){
   pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
 //*/
 //*
-	pwmEnableChannelNotification(&PWMD1,PWM_U);
-  pwmEnableChannelNotification(&PWMD1,PWM_V);
-  pwmEnableChannelNotification(&PWMD1,PWM_W);
+	//pwmEnableChannelNotification(&PWMD1,PWM_U);
+  //pwmEnableChannelNotification(&PWMD1,PWM_V);
+  //pwmEnableChannelNotification(&PWMD1,PWM_W);
 //*/
 }
 

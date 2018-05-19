@@ -17,21 +17,23 @@
 
 #define SCALE			2
 #define STEPS			360 
-#define STRETCH		2
+#define STRETCH		1
 #define SKIP      1
 #define STEP_SIZE 1
 
 #define ENCODER_MAX 1<<14
 #define CHUNK_AMOUNT 6
-#define ENCODER_CHUNK_SIZE 2730
+#define CHUNK_SIZE 2730
 
+
+//TODO DEBUG Try increasing this?
 #define PWM_TIMER_FREQ	48e6 // Hz
 
 //**************************************************************
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				20e3 // periods per sec
+#define PWM_FREQ				8e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 
