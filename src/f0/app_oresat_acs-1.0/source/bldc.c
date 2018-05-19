@@ -4,14 +4,10 @@
 bldc *motor;
 
 //TODO temp test
-uint32_t step_size = STRETCH;
 
 uint32_t current_sin_u, next_sin_u;
 uint32_t current_sin_v, next_sin_v;
 uint32_t current_sin_w, next_sin_w;
-uint16_t sin_diff;
-uint16_t sin_size;
-uint16_t sin_step = STRETCH;
 
 /*
 static uint16_t chunk0L = 0 * ENCODER_CHUNK_SIZE;
@@ -98,7 +94,7 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 
 
 
-//uint16_t count = 0;
+uint16_t count = 0;
 
 bool down = false;
 
@@ -112,37 +108,37 @@ static void pwmpcb(PWMDriver *pwmp) {
   palClearLine(LINE_LED_GREEN);
 	//configure = true;
   /*
-  if (count > 100)
+  if (count > 1000)
   {
     if (!down)
     {
-      step_size++;
+      motor->stretch++;
       //sin_step++;
     }
     else
     {
-      step_size = step_size - 1;
+      motor->stretch = motor->stretch - 1;
       //sin_step = sin_step - 1;
     }
     count = 0;
   }
 
-  if (step_size >= 100)
+  if (motor->stretch >= 100)
   {
     down = true;
     //step_size = 1;
     //sin_step = 1;
     //count = 5001;
   }
-  else if (step_size < 2)
+  else if (motor->stretch < 2)
   {
     down = false;
     //count = 5001;
   }*/
 #ifdef BRUTEFORCE
-		  motor->u += step_size;
-		  motor->v += step_size;
-		  motor->w += step_size;
+		  motor->u += motor->skip;
+		  motor->v += motor->skip;
+		  motor->w += motor->skip;
 
 			  motor->u = motor->u % 360;
 			  motor->v = motor->v % 360;
@@ -170,6 +166,7 @@ if (stretch_count == 0)
   next_sin_w = motor->sinctrl[motor->w+1];
 
   diff = (current_sin_u > next_sin_u) ? (current_sin_u - next_sin_u) : (next_sin_u - current_sin_u);
+  diff = diff / motor->stretch;
   stretch_count = motor->stretch;
 }
 

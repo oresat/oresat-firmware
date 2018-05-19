@@ -15,7 +15,7 @@
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-#define SCALE			2
+#define SCALE			10
 #define STEPS			360 
 #define STRETCH		1
 #define SKIP      1
@@ -26,14 +26,13 @@
 #define CHUNK_SIZE 2730
 
 
-//TODO DEBUG Try increasing this?
 #define PWM_TIMER_FREQ	48e6 // Hz
 
 //**************************************************************
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				8e3 // periods per sec
+#define PWM_FREQ				5e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 
