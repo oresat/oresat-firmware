@@ -22,6 +22,7 @@ char *event_name[] = {
 	"EV_RW_START",
 	"EV_RW_STOP",
   "EV_RW_STRETCH",
+  "EV_RW_CONTROL",
 	"EV_STATUS",
 	"EV_END"
 };
@@ -125,13 +126,36 @@ static int trap_rw_stop(ACS *acs){
 	return EXIT_SUCCESS;
 }
 
-// TODO how to pass parameter in with CAN
 static int trap_rw_stretch(ACS *acs)
 {
   (void)acs;
-  // Change stretch here.
-  // or call another function.
-  acs->motor.stretch = acs->can_buf.recv[2];
+  // TODO have a better data system.
+  acs->motor.stretch = acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_control(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.openLoop = (bool) acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_skip(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.skip = acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_scale(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.scale = acs->data;
+  return EXIT_SUCCESS;
 }
 
 static int trap_fsm_status(ACS *acs){
@@ -143,6 +167,9 @@ const acs_trap trap[] = {
 	{ST_RW, 	EV_RW_START,	&trap_rw_start},
 	{ST_RW, 	EV_RW_STOP,		&trap_rw_stop},
   {ST_RW,   EV_RW_STRETCH,&trap_rw_stretch},
+  {ST_RW,   EV_RW_CONTROL,&trap_rw_control},
+  {ST_RW,   EV_RW_SKIP,   &trap_rw_skip},
+  {ST_RW,   EV_RW_SCALE,   &trap_rw_scale},
 //	{ST_MTQR, EV_STATUS,	&trap_mtqr_status},
 	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
 };
@@ -197,7 +224,8 @@ static acs_event getNextEvent(ACS *acs){
 		case NOP:
 			break;
 		case CHG_STATE:
-			event = recv[ARG_BYTE];			
+			event = recv[ARG_BYTE];
+      acs->data = recv[ARG_BYTE+1];			
 			break;
 		case REPORT_STATUS:
 			event = EV_STATUS;			
@@ -242,6 +270,11 @@ static int acs_statemachine(ACS *acs){
 			}
 		}
     chThdSleepMilliseconds(500);
+    chprintf(DEBUG_CHP, "motor stretch: %d\r\n", acs->motor.stretch);
+    chprintf(DEBUG_CHP, "motor openLoop: %d\r\n", acs->motor.openLoop);
+    chprintf(DEBUG_CHP, "motor skip: %d\r\n\n", acs->motor.skip);
+    chprintf(DEBUG_CHP, "motor scale: %d\r\n\n", acs->motor.scale);
+
 	}
 	
 	return EXIT_SUCCESS;
@@ -262,9 +295,9 @@ THD_FUNCTION(acsThread,acs){
 	chEvtRegister(&rpdo_event,&el,0);
 
 	acs_statemachine(acs);
-  
-//	while (!chThdShouldTerminateX()) {
-//    chThdSleepMilliseconds(500);
-//  }
+  /*
+	while (!chThdShouldTerminateX()) {
+    chThdSleepMilliseconds(500);
+  }*/
 }
 

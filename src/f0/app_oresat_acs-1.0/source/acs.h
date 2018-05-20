@@ -79,6 +79,9 @@ typedef enum {
 	EV_RW_START,		// 6
 	EV_RW_STOP,			// 7
   EV_RW_STRETCH,  // 8
+  EV_RW_CONTROL,  // 9
+  EV_RW_SKIP,     // a
+  EV_RW_SCALE,    // b
 	EV_END // this must be the last event
 }acs_event;
 
@@ -92,6 +95,7 @@ typedef struct{
 	acs_event event; // the most recent event
 	can_buffer can_buf;
 	bldc motor;
+  uint8_t data;
 }ACS;
 
 typedef struct{

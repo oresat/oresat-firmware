@@ -15,7 +15,7 @@
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-#define SCALE			10
+#define SCALE			100
 #define STEPS			360 
 #define STRETCH		1
 #define SKIP      1
@@ -32,7 +32,7 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				5e3 // periods per sec
+#define PWM_FREQ				20e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 
@@ -50,7 +50,13 @@ typedef struct{
       skip;  
 			sinctrl_t u,v,w,// signals
 			phase_shift;		// 
+  uint16_t current_sin_u, next_sin_u,
+           current_sin_v, next_sin_v,
+           current_sin_w, next_sin_w;
+  uint8_t stretch_count;
+  uint8_t sin_diff;
 	uint16_t position;				// motor position from encoder
+  bool openLoop;
 					 sinctrl_t const *sinctrl; // pointer to the sin lut
 	uint16_t spi_rxbuf[2]; // receive buffer
 	thread_t *p_spi_thread;
