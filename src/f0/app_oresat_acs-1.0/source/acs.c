@@ -274,6 +274,7 @@ static int acs_statemachine(ACS *acs){
     chprintf(DEBUG_CHP, "motor openLoop: %d\r\n", acs->motor.openLoop);
     chprintf(DEBUG_CHP, "motor skip: %d\r\n\n", acs->motor.skip);
     chprintf(DEBUG_CHP, "motor scale: %d\r\n\n", acs->motor.scale);
+    chprintf(DEBUG_CHP, "motor samples: %d\r\n\n", acs->motor.samples[0]);
 
 	}
 	

@@ -3,6 +3,28 @@
 
 bldc *motor;
 
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+    (void)adcp;
+    (void)err;
+}
+
+/*
+ * ADC conversion group.
+ * Mode:        Continuous, 8 samples of 1 channel, SW triggered.
+ * Channels:    A0 
+ */
+static const ADCConversionGroup adcgrpcfg = {
+    TRUE,
+    ADC_GRP_NUM_CHANNELS,
+    NULL,
+    adcerrorcallback,
+    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGRR1 */
+    ADC_TR(0, 0),                                     /* TR */
+    ADC_SMPR_SMP_239P5,                                /* SMPR */
+    ADC_CHSELR_CHSEL0                                /* CHSELR */
+};
+
+
 //TODO move this
 extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
                                 1 * CHUNK_SIZE,
@@ -147,6 +169,14 @@ extern void bldcInit(bldc *pbldc){
 	motor->w = motor->v + motor->phase_shift;
   motor->openLoop = false;
 
+
+  adcStart(&ADCD1, NULL); 
+  /*
+  * Starts an ADC continuous conversion.
+  */
+  adcStartConversion(&ADCD1, &adcgrpcfg, motor->samples, ADC_GRP_BUF_DEPTH);
+
+
 //*
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
@@ -165,6 +195,7 @@ extern void bldcStart(){
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->u));
   pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->v));
   pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
+
 }
 
 extern void bldcStop(){

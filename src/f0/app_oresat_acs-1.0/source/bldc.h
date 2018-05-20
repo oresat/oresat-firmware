@@ -7,10 +7,9 @@
 
 #include <unistd.h>
 
-//#define BRUTEFORCE
-//#define OPENLOOP
-
-#define THREAD_SIZE	(1<<7)
+// TODO had to reduce this to compile with new ADC code
+// We should figure out what an actual good value is
+#define THREAD_SIZE	(120)
 
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
@@ -32,13 +31,16 @@
 //
 // TODO: we need to do math ASAP
 //
-#define PWM_FREQ				20e3 // periods per sec
+#define PWM_FREQ				15e3 // periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 //**************************************************************
 
 #define PWM_U					0U
 #define PWM_V					1U
 #define PWM_W					2U
+
+#define ADC_GRP_NUM_CHANNELS  1
+#define ADC_GRP_BUF_DEPTH     8 
 
 #define sinctrl_t uint16_t 
 
@@ -60,6 +62,9 @@ typedef struct{
 					 sinctrl_t const *sinctrl; // pointer to the sin lut
 	uint16_t spi_rxbuf[2]; // receive buffer
 	thread_t *p_spi_thread;
+ 
+  adcsample_t samples[ADC_GRP_NUM_CHANNELS * ADC_GRP_BUF_DEPTH]; // ADC conversion storage array
+
 } bldc;
 
 static const SPIConfig spicfg = {
