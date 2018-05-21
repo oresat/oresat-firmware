@@ -67,6 +67,15 @@ typedef struct{
 
 } bldc;
 
+extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
+                                1 * CHUNK_SIZE,
+                                2 * CHUNK_SIZE,
+                                3 * CHUNK_SIZE,
+                                4 * CHUNK_SIZE,
+                                5 * CHUNK_SIZE};
+
+
+
 static const SPIConfig spicfg = {
 	false,              // Enables circular buffer if == 1
 	NULL,               // Operation complete call back.

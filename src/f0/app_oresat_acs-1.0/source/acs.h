@@ -95,6 +95,7 @@ typedef struct{
 	acs_event event; // the most recent event
 	can_buffer can_buf;
 	bldc motor;
+  // TODO find a better way to handle it
   uint8_t data;
 }ACS;
 

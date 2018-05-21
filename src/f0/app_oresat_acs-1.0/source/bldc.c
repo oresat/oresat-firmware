@@ -8,6 +8,8 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
     (void)err;
 }
 
+
+// TODO, combine this a timer to not spam interrupts so much?
 /*
  * ADC conversion group.
  * Mode:        Continuous, 8 samples of 1 channel, SW triggered.
@@ -23,15 +25,6 @@ static const ADCConversionGroup adcgrpcfg = {
     ADC_SMPR_SMP_239P5,                                /* SMPR */
     ADC_CHSELR_CHSEL0                                /* CHSELR */
 };
-
-
-//TODO move this
-extern uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
-                                1 * CHUNK_SIZE,
-                                2 * CHUNK_SIZE,
-                                3 * CHUNK_SIZE,
-                                4 * CHUNK_SIZE,
-                                5 * CHUNK_SIZE};
 
 
 static uint16_t encoderToLut(uint16_t position)
