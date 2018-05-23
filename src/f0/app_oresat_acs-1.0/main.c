@@ -47,7 +47,7 @@ static void app_main(void) {
 	chThdCreateStatic(
 		wa_acsThread,
 		sizeof(wa_acsThread), 
-		NORMALPRIO, 
+		NORMALPRIO+1, 
 		acsThread, 
 		&acs	
 	);

@@ -8,12 +8,42 @@ bldc *motor;
  *
  *
  */
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+    (void)adcp;
+    (void)err;
+}
+
+
+// TODO, combine this a timer to not spam interrupts so much?
+/*
+ * ADC conversion group.
+ * Mode:        Continuous, 8 samples of 1 channel, SW triggered.
+ * Channels:    A0 
+ */
+static const ADCConversionGroup adcgrpcfg = {
+    TRUE,
+    ADC_GRP_NUM_CHANNELS,
+    NULL,
+    adcerrorcallback,
+    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGRR1 */
+    ADC_TR(0, 0),                                     /* TR */
+    ADC_SMPR_SMP_239P5,                                /* SMPR */
+    ADC_CHSELR_CHSEL0                                /* CHSELR */
+};
+
+static uint16_t encoderToLut(uint16_t position)
+{
+  uint16_t step = 0;
+  uint8_t chunk = (position * CHUNK_AMOUNT) / ENCODER_MAX;
+  step = ((position - chunk_low[chunk]) * (STEPS)) / CHUNK_SIZE;
+
+  return step;
+}
 
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
 	chRegSetThreadName("spiThread");
-	int step;
 
   spiStart(&SPID1,&spicfg);            	// Start driver.
   spiAcquireBus(&SPID1);                // Gain ownership of bus.
@@ -28,31 +58,24 @@ THD_FUNCTION(spiThread,arg){
 
 		motor->position = 0x3FFF & motor->spi_rxbuf[0];
 	 
-		step = motor->position*360/(1<<14);
-		chprintf(DEBUG_CHP,"enc pos: %u \n",motor->position);        
-		chprintf(DEBUG_CHP,"phase 1: %u \n", step);     
-		step = (step + motor->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 2: %u \n",step);     
-		step = (step + motor->phase_shift)%360;
-		chprintf(DEBUG_CHP,"phase 3: %u \n\n",step);     
-
-		chThdSleepMilliseconds(100);
   }
 
 	spiReleaseBus(&SPID1);    // Release ownership of bus.
 	spiStop(&SPID1);          // Stop driver.
 }
 
-static sinctrl_t scale(sinctrl_t duty_cycle){
-	return (duty_cycle*motor->scale)/10;	
-}
+//static sinctrl_t scale(sinctrl_t duty_cycle){
+//	return (duty_cycle*motor->scale)/10;	
+//}
 
-static void pwmCallback(uint8_t channel,sinctrl_t step){
-	pwmEnableChannelI(
-		&PWMD1,
-		channel,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
-	);
+//static void pwmCallback(uint8_t channel,sinctrl_t step){
+//	pwmEnableChannelI(
+//		&PWMD1,
+//		channel,
+//		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
+//	);
+static sinctrl_t scale(sinctrl_t duty_cycle){
+	return ((duty_cycle*motor->scale)/100) + ((10000*(motor->scale/2))/100);	
 }
 
 /**
@@ -63,51 +86,67 @@ static void pwmCallback(uint8_t channel,sinctrl_t step){
 
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
-//  palClearLine(LINE_LED_GREEN);
-	++motor->count;
-	
-	if(motor->count==motor->stretch){
-#ifdef OPENLOOP
-		++motor->u;
-		++motor->v;
-		++motor->w;
+  
+if (motor->openLoop)
+{
+  motor->u += motor->skip;
+	motor->v += motor->skip;
+	motor->w += motor->skip;
 
-		if(motor->u >= motor->steps){
-			motor->u = 0;
-		}
-		if(motor->v >= motor->steps){
-			motor->v = 0;
-		}
-		if(motor->w >= motor->steps){
-			motor->w = 0;
-		}
-#endif
-#ifndef OPENLOOP 
-//*
- 		int step; 
-		step = motor->position*360/(1<<14);
-		motor->u = (step + 1 + motor->phase_shift)%360;
-		motor->v = (motor->u + motor->phase_shift)%360;
-		motor->w = (motor->v + motor->phase_shift)%360;
-//*/
-#endif
-		motor->count=0;
-	}
+	motor->u = motor->u % 360;
+	motor->v = motor->v % 360;
+	motor->w = motor->w % 360;
+		  
+  motor->current_sin_u = motor->sinctrl[motor->u];
+  motor->current_sin_v = motor->sinctrl[motor->v];
+  motor->current_sin_w = motor->sinctrl[motor->w];
+
+}
+else
+{
+  if (motor->stretch_count == 0)
+  {
+    motor->u = encoderToLut(motor->position);
+    motor->v = (motor->u + motor->phase_shift) % 360;
+    motor->w = (motor->v + motor->phase_shift) % 360;
+    motor->current_sin_u = motor->sinctrl[motor->u];
+    motor->current_sin_v = motor->sinctrl[motor->v];
+    motor->current_sin_w = motor->sinctrl[motor->w];
+    motor->next_sin_u = motor->sinctrl[motor->u+1];
+    motor->next_sin_v = motor->sinctrl[motor->v+1];
+    motor->next_sin_w = motor->sinctrl[motor->w+1];
+
+    motor->sin_diff = (motor->current_sin_u > motor->next_sin_u) ? (motor->current_sin_u - motor->next_sin_u) : (motor->next_sin_u - motor->current_sin_u);
+    motor->sin_diff = motor->sin_diff / motor->stretch;
+    motor->stretch_count = motor->stretch;
 }
 
-static void pwmUcb(PWMDriver *pwmp){ // channel 1 callback
-  (void)pwmp;
-	pwmCallback(PWM_U,motor->u);
+  motor->current_sin_u += motor->sin_diff;
+  motor->current_sin_v += motor->sin_diff;
+  motor->current_sin_w += motor->sin_diff;
+
+  motor->stretch_count = motor->stretch_count - 1;
 }
 
-static void pwmVcb(PWMDriver *pwmp){ // channel 2 callback
-  (void)pwmp;
-	pwmCallback(PWM_V,motor->v);
-}
 
-static void pwmWcb(PWMDriver *pwmp){ // channel 3 callback
-  (void)pwmp;
-	pwmCallback(PWM_W,motor->w);
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_U,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_u)));
+
+
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_V,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_v))
+	);
+
+
+pwmEnableChannelI(
+		&PWMD1,
+		PWM_W,
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_w))
+	);
 }
 
 static PWMConfig pwmRWcfg = {
@@ -115,9 +154,9 @@ static PWMConfig pwmRWcfg = {
   PWM_PERIOD,	
   pwmpcb,
   {
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmUcb},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmVcb},
-   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH,pwmWcb},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
+   {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
    {PWM_OUTPUT_DISABLED, NULL}
   },
   0,
@@ -129,7 +168,9 @@ extern void bldcInit(bldc *pbldc){
 	motor = pbldc;
 	motor->steps = STEPS;
 	motor->stretch = STRETCH;
+  motor->stretch_count = 0;
 	motor->scale = SCALE;
+  motor->skip = SKIP;
 	motor->sinctrl = sinctrl360;
 	motor->count = 0;
 	motor->position = 0;
@@ -137,12 +178,21 @@ extern void bldcInit(bldc *pbldc){
 	motor->u = 0;
 	motor->v = motor->u + motor->phase_shift;
 	motor->w = motor->v + motor->phase_shift;
+  motor->openLoop = false;
+
+
+  adcStart(&ADCD1, NULL); 
+  /*
+  * Starts an ADC continuous conversion.
+  */
+  adcStartConversion(&ADCD1, &adcgrpcfg, motor->samples, ADC_GRP_BUF_DEPTH);
+
 
 //*
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
-		NORMALPRIO + 1,
+		NORMALPRIO,
 		spiThread,
 		NULL
 	);
@@ -150,21 +200,15 @@ extern void bldcInit(bldc *pbldc){
 }
 
 extern void bldcStart(){
-	palSetLine(LINE_LED_GREEN);
 	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
 	
 	pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->u));
   pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->v));
   pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
-	
-	pwmEnableChannelNotification(&PWMD1,PWM_U);
-  pwmEnableChannelNotification(&PWMD1,PWM_V);
-  pwmEnableChannelNotification(&PWMD1,PWM_W);
 }
 
 extern void bldcStop(){
-  palClearLine(LINE_LED_GREEN);
 	pwmStop(&PWMD1);
 }
 

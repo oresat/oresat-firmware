@@ -72,10 +72,18 @@ static void app_main(void){
 	chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
-		NORMALPRIO + 1,
+		HIGHPRIO,
 		spiThread,
 		NULL
 	);
+
+  /*chThdCreateStatic(
+		wa_debugThread,
+		sizeof(wa_debugThread), 
+		NORMALPRIO, 
+		debugThread, 
+		NULL
+	);*/
 //*/
 	while(true){
 		chThdSleepMilliseconds(1000);

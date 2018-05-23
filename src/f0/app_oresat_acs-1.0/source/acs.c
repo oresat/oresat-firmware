@@ -20,8 +20,13 @@ char *event_name[] = {
 	"EV_REP",
 	"EV_RW_START",
 	"EV_RW_STOP",
-	"EV_MTQR_START",
-	"EV_MTQR_STOP",
+//<<<<<<< HEAD
+//	"EV_MTQR_START",
+//	"EV_MTQR_STOP",
+//=======
+  "EV_RW_STRETCH",
+  "EV_RW_CONTROL",
+//>>>>>>> dev_max_integrate_encoder
 	"EV_STATUS",
 	"EV_END"
 };
@@ -106,7 +111,7 @@ static int state_mtqr(ACS *acs){
 	(void)acs;
 	trans_cleanup(acs);
 	print_state(ST_MTQR);
-	mtqrInit(&acs->mtqr);
+//	mtqrInit(&acs->mtqr);
 	return ST_MTQR;
 }
 
@@ -129,7 +134,8 @@ static int trap_rw_stop(ACS *acs){
 	bldcStop();
 	return EXIT_SUCCESS;
 }
-
+/*
+<<<<<<< HEAD
 static int trap_mtqr_start(ACS *acs){
 	// *******critical section**********
 	chSysLock();
@@ -149,6 +155,39 @@ static int trap_mtqr_stop(ACS *acs){
 	// *******end critical section**********
 	mtqrStop();
 	return EXIT_SUCCESS;
+*/
+//=======
+static int trap_rw_stretch(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.stretch = acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_control(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.openLoop = (bool) acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_skip(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.skip = acs->data;
+  return EXIT_SUCCESS;
+}
+
+static int trap_rw_scale(ACS *acs)
+{
+  (void)acs;
+  // TODO have a better data system.
+  acs->motor.scale = acs->data;
+  return EXIT_SUCCESS;
+//>>>>>> dev_max_integrate_encoder
 }
 
 static int trap_fsm_status(ACS *acs){
@@ -157,11 +196,21 @@ static int trap_fsm_status(ACS *acs){
 }
 
 const acs_trap trap[] = {
-	{ST_RW,			EV_RW_START,		&trap_rw_start},
-	{ST_RW,			EV_RW_STOP,			&trap_rw_stop},
-	{ST_MTQR,		EV_MTQR_START,	&trap_mtqr_start},
-	{ST_MTQR,		EV_MTQR_STOP,		&trap_mtqr_stop},
-	{ST_ANY,		EV_STATUS,			&trap_fsm_status}
+//<<<<<<< HEAD
+//	{ST_RW,			EV_RW_START,		&trap_rw_start},
+//	{ST_RW,			EV_RW_STOP,			&trap_rw_stop},
+//	{ST_MTQR,		EV_MTQR_START,	&trap_mtqr_start},
+//	{ST_MTQR,		EV_MTQR_STOP,		&trap_mtqr_stop},
+//	{ST_ANY,		EV_STATUS,			&trap_fsm_status}
+//=======
+	{ST_RW, 	EV_RW_START,	&trap_rw_start},
+	{ST_RW, 	EV_RW_STOP,		&trap_rw_stop},
+  {ST_RW,   EV_RW_STRETCH,&trap_rw_stretch},
+  {ST_RW,   EV_RW_CONTROL,&trap_rw_control},
+  {ST_RW,   EV_RW_SKIP,   &trap_rw_skip},
+  {ST_RW,   EV_RW_SCALE,   &trap_rw_scale},
+	{ST_ANY, 	EV_STATUS,		&trap_fsm_status}
+//>>>>>>> dev_max_integrate_encoder
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
@@ -219,7 +268,8 @@ static acs_event getNextEvent(ACS *acs){
 		case NOP:
 			break;
 		case CHG_STATE:
-			event = recv[ARG_BYTE];			
+			event = recv[ARG_BYTE];
+      acs->data = recv[ARG_BYTE+1];			
 			break;
 		case CALL_TRAP:
 //			event = EV_STATUS;			
@@ -264,6 +314,12 @@ static int acs_statemachine(ACS *acs){
 			}
 		}
     chThdSleepMilliseconds(500);
+    chprintf(DEBUG_CHP, "motor stretch: %d\r\n", acs->motor.stretch);
+    chprintf(DEBUG_CHP, "motor openLoop: %d\r\n", acs->motor.openLoop);
+    chprintf(DEBUG_CHP, "motor skip: %d\r\n\n", acs->motor.skip);
+    chprintf(DEBUG_CHP, "motor scale: %d\r\n\n", acs->motor.scale);
+    chprintf(DEBUG_CHP, "motor samples: %d\r\n\n", acs->motor.samples[0]);
+
 	}
 	
 	return EXIT_SUCCESS;
@@ -275,7 +331,7 @@ extern int acsInit(ACS *acs){
 //	palSetPad(GPIOB,ENABLE);	
 //	palClearPad(GPIOA,GPIOA_TIM1_CH1);	
 //	palClearPad(GPIOB,PH);
-	mtqrInit(&acs->mtqr);
+	//mtqrInit(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 
