@@ -11,7 +11,7 @@
 #define MTQR_PWM_PERIOD MTQR_PWM_TIMER_FREQ/MTQR_PWM_FREQ
 
 #define PWM_CH_MTQR      			0   /// pwm channel
-#define MTQR_STARTING_DC			0		/// starting duty cycle
+#define MTQR_STARTING_DC			5000		/// starting duty cycle
 #define PH				 						6u	/// Phase (motor direction)
 #define ENABLE    						7u	/// Encoder chip enable
 																	/// Logic low

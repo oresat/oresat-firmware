@@ -11,7 +11,6 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "bldc.h"
 
 #include <unistd.h>
 
@@ -57,12 +56,12 @@
 
 typedef struct{
 	uint16_t count,		// period counter
-			scale,		// scales the duty cycle
-			steps,		// number of steps in lut 
-			stretch,
-      skip;  
-			sinctrl_t u,v,w,// signals
-			phase_shift;		// 
+					 scale,		// scales the duty cycle
+					 steps,		// number of steps in lut 
+					 stretch,
+					 skip;  
+	sinctrl_t u,v,w,// signals
+						phase_shift;		// 
   uint16_t current_sin_u, next_sin_u,
            current_sin_v, next_sin_v,
            current_sin_w, next_sin_w;

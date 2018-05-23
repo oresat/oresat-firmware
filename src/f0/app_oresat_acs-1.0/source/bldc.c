@@ -25,10 +25,10 @@ static const ADCConversionGroup adcgrpcfg = {
     ADC_GRP_NUM_CHANNELS,
     NULL,
     adcerrorcallback,
-    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGRR1 */
-    ADC_TR(0, 0),                                     /* TR */
-    ADC_SMPR_SMP_239P5,                                /* SMPR */
-    ADC_CHSELR_CHSEL0                                /* CHSELR */
+    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,      /* CFGRR1 */
+    ADC_TR(0, 0),                              /* TR */
+    ADC_SMPR_SMP_239P5,                        /* SMPR */
+    ADC_CHSELR_CHSEL0                          /* CHSELR */
 };
 
 static uint16_t encoderToLut(uint16_t position)
@@ -64,16 +64,13 @@ THD_FUNCTION(spiThread,arg){
 	spiStop(&SPID1);          // Stop driver.
 }
 
-//static sinctrl_t scale(sinctrl_t duty_cycle){
-//	return (duty_cycle*motor->scale)/10;	
-//}
-
 //static void pwmCallback(uint8_t channel,sinctrl_t step){
 //	pwmEnableChannelI(
 //		&PWMD1,
 //		channel,
 //		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
 //	);
+
 static sinctrl_t scale(sinctrl_t duty_cycle){
 	return ((duty_cycle*motor->scale)/100) + ((10000*(motor->scale/2))/100);	
 }
@@ -87,62 +84,57 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
-if (motor->openLoop)
-{
-  motor->u += motor->skip;
-	motor->v += motor->skip;
-	motor->w += motor->skip;
+	if(motor->openLoop){
+		motor->u += motor->skip;
+		motor->v += motor->skip;
+		motor->w += motor->skip;
 
-	motor->u = motor->u % 360;
-	motor->v = motor->v % 360;
-	motor->w = motor->w % 360;
-		  
-  motor->current_sin_u = motor->sinctrl[motor->u];
-  motor->current_sin_v = motor->sinctrl[motor->v];
-  motor->current_sin_w = motor->sinctrl[motor->w];
+		motor->u = motor->u % 360;
+		motor->v = motor->v % 360;
+		motor->w = motor->w % 360;
+				
+		motor->current_sin_u = motor->sinctrl[motor->u];
+		motor->current_sin_v = motor->sinctrl[motor->v];
+		motor->current_sin_w = motor->sinctrl[motor->w];
+	}else{
+		if (motor->stretch_count == 0){
+			motor->u = encoderToLut(motor->position);
+			motor->v = (motor->u + motor->phase_shift) % 360;
+			motor->w = (motor->v + motor->phase_shift) % 360;
+			motor->current_sin_u = motor->sinctrl[motor->u];
+			motor->current_sin_v = motor->sinctrl[motor->v];
+			motor->current_sin_w = motor->sinctrl[motor->w];
+			motor->next_sin_u = motor->sinctrl[motor->u+1];
+			motor->next_sin_v = motor->sinctrl[motor->v+1];
+			motor->next_sin_w = motor->sinctrl[motor->w+1];
 
-}
-else
-{
-  if (motor->stretch_count == 0)
-  {
-    motor->u = encoderToLut(motor->position);
-    motor->v = (motor->u + motor->phase_shift) % 360;
-    motor->w = (motor->v + motor->phase_shift) % 360;
-    motor->current_sin_u = motor->sinctrl[motor->u];
-    motor->current_sin_v = motor->sinctrl[motor->v];
-    motor->current_sin_w = motor->sinctrl[motor->w];
-    motor->next_sin_u = motor->sinctrl[motor->u+1];
-    motor->next_sin_v = motor->sinctrl[motor->v+1];
-    motor->next_sin_w = motor->sinctrl[motor->w+1];
+			motor->sin_diff = (motor->current_sin_u > motor->next_sin_u)?
+												(motor->current_sin_u - motor->next_sin_u) : 
+												(motor->next_sin_u - motor->current_sin_u);
+			motor->sin_diff = motor->sin_diff / motor->stretch;
+			motor->stretch_count = motor->stretch;
+		}
 
-    motor->sin_diff = (motor->current_sin_u > motor->next_sin_u) ? (motor->current_sin_u - motor->next_sin_u) : (motor->next_sin_u - motor->current_sin_u);
-    motor->sin_diff = motor->sin_diff / motor->stretch;
-    motor->stretch_count = motor->stretch;
-}
+		motor->current_sin_u += motor->sin_diff;
+		motor->current_sin_v += motor->sin_diff;
+		motor->current_sin_w += motor->sin_diff;
 
-  motor->current_sin_u += motor->sin_diff;
-  motor->current_sin_v += motor->sin_diff;
-  motor->current_sin_w += motor->sin_diff;
+		motor->stretch_count = motor->stretch_count - 1;
+	}
 
-  motor->stretch_count = motor->stretch_count - 1;
-}
-
-
-pwmEnableChannelI(
+	pwmEnableChannelI(
 		&PWMD1,
 		PWM_U,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_u)));
+		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_u))
+	);
 
-
-pwmEnableChannelI(
+	pwmEnableChannelI(
 		&PWMD1,
 		PWM_V,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_v))
 	);
 
-
-pwmEnableChannelI(
+	pwmEnableChannelI(
 		&PWMD1,
 		PWM_W,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_w))
@@ -180,15 +172,12 @@ extern void bldcInit(bldc *pbldc){
 	motor->w = motor->v + motor->phase_shift;
   motor->openLoop = false;
 
-
   adcStart(&ADCD1, NULL); 
   /*
   * Starts an ADC continuous conversion.
   */
   adcStartConversion(&ADCD1, &adcgrpcfg, motor->samples, ADC_GRP_BUF_DEPTH);
 
-
-//*
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
@@ -196,7 +185,6 @@ extern void bldcInit(bldc *pbldc){
 		spiThread,
 		NULL
 	);
-//*/
 }
 
 extern void bldcStart(){
