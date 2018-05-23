@@ -56,8 +56,8 @@ typedef enum{
 	BLINK
 }can_msg_type;
 
-extern char *state_name[];
-extern char *event_name[];
+//extern char *state_name[];
+//extern char *event_name[];
 
 typedef enum{
 	ST_ANY=-1,
@@ -81,8 +81,8 @@ typedef enum {
   EV_RW_CONTROL,  /// 8
   EV_RW_SKIP,     /// 9
   EV_RW_SCALE,    /// a
-//	EV_MTQR_START,  /// b
-//	EV_MTQR_STOP,   /// c
+	EV_MTQR_START,  /// b
+	EV_MTQR_STOP,   /// c
 	EV_END // this must be the last event
 }acs_event;
 
@@ -106,8 +106,6 @@ typedef struct{
 	acs_event event;
 	int (*fn)(ACS *acs);
 }acs_transition,acs_trap;
-
-//extern int acs_statemachine(ACS *acs);
 
 extern int acsInit(ACS *acs);
 

@@ -1,6 +1,8 @@
 #include "acs.h" 
+
 event_listener_t el;
 
+/*
 char *state_name[] = {
 	"ST_ANY",
 	"ST_OFF",
@@ -27,14 +29,10 @@ char *event_name[] = {
 	"EV_MTQR_STOP",
 	"EV_END"
 };
+//*/
 
-#define STATE_STRING "*Calling transition -> " 
-#define TRAP_STRING "*Calling trap -> " 
-
-static void print_state(int state){
-	(void)state;
-//	chprintf(DEBUG_CHP,"%s%s\n\r",STATE_STRING,state_name[state+1]); 
-}
+//#define STATE_STRING "*Calling transition -> " 
+//#define TRAP_STRING "*Calling trap -> " 
 
 static void trans_cleanup(ACS *acs){
 	switch(acs->cur_state){
@@ -49,11 +47,11 @@ static void trans_cleanup(ACS *acs){
 			break;
 
 		case ST_RW:
-			bldcExit();
+			bldcExit(&acs->motor);
 			break;
 
 		case ST_MTQR:
-			mtqrExit();
+			mtqrExit(&acs->mtqr);
 			break;
 		default:
 
@@ -79,27 +77,23 @@ static void update_recv(ACS *acs,int recv_byte){
 
 static int state_off(ACS *acs){
 	(void)acs;
-	print_state(ST_OFF);
 	return ST_OFF;
 }
 
 static int state_init(ACS *acs){
 	(void)acs;
-	print_state(ST_INIT);
 	return ST_INIT;
 }
 
 static int state_rdy(ACS *acs){
 	(void)acs;
 	trans_cleanup(acs);
-	print_state(ST_RDY);
 	return ST_RDY;
 }
 
 static int state_rw(ACS *acs){
 	(void)acs;
 	trans_cleanup(acs);
-	print_state(ST_RW);
 	bldcInit(&acs->motor);
 	return ST_RW;
 }
@@ -107,7 +101,6 @@ static int state_rw(ACS *acs){
 static int state_mtqr(ACS *acs){
 	(void)acs;
 	trans_cleanup(acs);
-	print_state(ST_MTQR);
 //	mtqrInit(&acs->mtqr);
 	return ST_MTQR;
 }
@@ -118,7 +111,7 @@ static int trap_rw_start(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_RW_START;
 	chSysUnlock();
 	// *******end critical section**********
-	bldcStart();
+	bldcStart(&acs->motor);
 	return EXIT_SUCCESS;
 }
 
@@ -128,18 +121,18 @@ static int trap_rw_stop(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_RW_STOP;
 	chSysUnlock();
 	// *******end critical section**********
-	bldcStop();
+	bldcStop(&acs->motor);
 	return EXIT_SUCCESS;
 }
 
-/*
+//*
 static int trap_mtqr_start(ACS *acs){
 	// *******critical section**********
 	chSysLock();
 	acs->can_buf.send[LAST_TRAP]=EV_MTQR_START;
 	chSysUnlock();
 	// *******end critical section**********
-	mtqrStart();
+	mtqrStart(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 
@@ -150,7 +143,7 @@ static int trap_mtqr_stop(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_MTQR_STOP;
 	chSysUnlock();
 	// *******end critical section**********
-	mtqrStop();
+	mtqrStop(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 //*/
@@ -188,19 +181,14 @@ static int trap_rw_scale(ACS *acs)
 }
 
 const acs_trap trap[] = {
-//	{ST_RW,			EV_RW_START,		&trap_rw_start},
-//	{ST_RW,			EV_RW_STOP,			&trap_rw_stop},
-//	{ST_MTQR,		EV_MTQR_START,	&trap_mtqr_start},
-//	{ST_MTQR,		EV_MTQR_STOP,		&trap_mtqr_stop},
-//	{ST_ANY,		EV_STATUS,			&trap_fsm_status}
 	{ST_RW, 	EV_RW_START,		&trap_rw_start},
 	{ST_RW, 	EV_RW_STOP,			&trap_rw_stop},
   {ST_RW,   EV_RW_STRETCH,	&trap_rw_stretch},
   {ST_RW,   EV_RW_CONTROL,	&trap_rw_control},
   {ST_RW,   EV_RW_SKIP,			&trap_rw_skip},
   {ST_RW,   EV_RW_SCALE,   	&trap_rw_scale},
-//	{ST_MTQR,	EV_MTQR_START,	&trap_mtqr_start},
-//	{ST_MTQR,	EV_MTQR_STOP,		&trap_mtqr_stop},
+	{ST_MTQR,	EV_MTQR_START,	&trap_mtqr_start},
+	{ST_MTQR,	EV_MTQR_STOP,		&trap_mtqr_stop},
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
@@ -263,10 +251,9 @@ static acs_event getNextEvent(ACS *acs){
       acs->data = recv[ARG_BYTE+1];			
 			break;
 		case CALL_TRAP:
-//			event = EV_STATUS;			
-			break;
-		case BLINK:
-			// TODO: implement
+			//	event = EV_STATUS;
+			// TODO: we should seperate the trap from the change
+			// state command
 			break;
 		default:
 			break;
@@ -318,10 +305,7 @@ static int acs_statemachine(ACS *acs){
 
 extern int acsInit(ACS *acs){
 	(void)acs;
-	palSetPadMode(GPIOB,ENABLE,PAL_MODE_OUTPUT_PUSHPULL);
-//	palSetPad(GPIOB,ENABLE);	
-	palClearPad(GPIOB,ENABLE);
-//	mtqrInit(&acs->mtqr);
+	mtqrInit(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 

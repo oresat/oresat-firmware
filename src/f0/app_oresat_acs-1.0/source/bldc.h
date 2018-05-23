@@ -19,7 +19,7 @@
 //#define THREAD_SIZE	(1<<7)
 // TODO had to reduce this to compile with new ADC code
 // We should figure out what an actual good value is
-#define THREAD_SIZE	(120)
+#define THREAD_SIZE	(96)
 
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
@@ -72,17 +72,18 @@ typedef struct{
 					 sinctrl_t const *sinctrl; // pointer to the sin lut
 	uint16_t spi_rxbuf[2]; // receive buffer
 	thread_t *p_spi_thread;
- 
   adcsample_t samples[ADC_GRP_NUM_CHANNELS * ADC_GRP_BUF_DEPTH]; // ADC conversion storage array
-
+	int started;
 } bldc;
 
-static const uint16_t chunk_low[6] = {0 * CHUNK_SIZE,
-                                1 * CHUNK_SIZE,
-                                2 * CHUNK_SIZE,
-                                3 * CHUNK_SIZE,
-                                4 * CHUNK_SIZE,
-                                5 * CHUNK_SIZE};
+static const uint16_t chunk_low[6] = {
+	0 * CHUNK_SIZE,
+	1 * CHUNK_SIZE,
+	2 * CHUNK_SIZE,
+	3 * CHUNK_SIZE,
+	4 * CHUNK_SIZE,
+	5 * CHUNK_SIZE
+};
 
 
 
@@ -99,9 +100,9 @@ extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 extern THD_FUNCTION(spiThread,arg);
 
 extern void bldcInit(bldc *pbldc);
-extern void bldcStart(void);
-extern void bldcStop(void);
+extern void bldcStart(bldc *pbldc);
+extern void bldcStop(bldc *pbldc);
 extern void bldcSetDC(uint8_t channel,uint16_t dc);
-extern void bldcExit(void);
+extern void bldcExit(bldc *pbldc);
 
 #endif
