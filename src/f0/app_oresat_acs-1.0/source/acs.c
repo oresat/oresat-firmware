@@ -2,38 +2,16 @@
 
 event_listener_t el;
 
-/*
-char *state_name[] = {
-	"ST_ANY",
-	"ST_OFF",
-	"ST_INIT",
-	"ST_RDY",
-	"ST_RW",
-	"ST_MTQR"
-};
 
-char *event_name[] = {
-	"EV_ANY",
-	"EV_OFF",
-	"EV_INIT",
-	"EV_RDY",
-	"EV_RW",
-	"EV_MTQR",
-	"EV_RW_START",
-	"EV_RW_STOP",
-  "EV_RW_STRETCH",
-  "EV_RW_CONTROL",
-  "EV_RW_SKIP",     
-  "EV_RW_SCALE",    
-	"EV_MTQR_START",
-	"EV_MTQR_STOP",
-	"EV_END"
-};
-//*/
-
-//#define STATE_STRING "*Calling transition -> " 
-//#define TRAP_STRING "*Calling trap -> " 
-
+/**
+ * @brief  cleans up on transition
+ * @note    
+ *
+ * @param[in] acs      pointer to the @p ACS object
+ *                     @p ACS caonnot be NULL
+ *
+ * @api
+ */
 static void trans_cleanup(ACS *acs){
 	switch(acs->cur_state){
 		case ST_OFF:
@@ -86,20 +64,20 @@ static int state_init(ACS *acs){
 }
 
 static int state_rdy(ACS *acs){
-	(void)acs;
+//	(void)acs;
 	trans_cleanup(acs);
 	return ST_RDY;
 }
 
 static int state_rw(ACS *acs){
-	(void)acs;
+//	(void)acs;
 	trans_cleanup(acs);
 	bldcInit(&acs->motor);
 	return ST_RW;
 }
 
 static int state_mtqr(ACS *acs){
-	(void)acs;
+//	(void)acs;
 	trans_cleanup(acs);
 //	mtqrInit(&acs->mtqr);
 	return ST_MTQR;
