@@ -122,31 +122,8 @@ static void pwmpcb(PWMDriver *pwmp) {
 		motor->stretch_count = motor->stretch_count - 1;
 	}
 
-/*
-	pwmEnableChannelI(
-		&PWMD1,
-		PWM_U,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_u))
-	);
-//*/
 	bldcSetDC(PWM_U,motor->current_sin_u);
-
-/*
-	pwmEnableChannelI(
-		&PWMD1,
-		PWM_V,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_v))
-	);
-//*/
 	bldcSetDC(PWM_V,motor->current_sin_v);
-
-/*
-	pwmEnableChannelI(
-		&PWMD1,
-		PWM_W,
-		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->current_sin_w))
-	);
-//*/
 	bldcSetDC(PWM_W,motor->current_sin_w);
 }
 
@@ -181,12 +158,10 @@ extern void bldcInit(bldc *pbldc){
 	motor->w = motor->v + motor->phase_shift;
   motor->openLoop = false;
 	motor->started = FALSE;
-  adcStart(&ADCD1, NULL); 
-  /*
-  * Starts an ADC continuous conversion.
-  */
+	
+	adcStart(&ADCD1, NULL); 
   adcStartConversion(&ADCD1, &adcgrpcfg, motor->samples, ADC_GRP_BUF_DEPTH);
-
+	
 	motor->p_spi_thread=chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
@@ -198,7 +173,7 @@ extern void bldcInit(bldc *pbldc){
 
 extern void bldcStart(bldc *pbldc){
 	if(pbldc->started){
-		return;
+		return; 
 	}
 	pwmStart(&PWMD1,&pwmRWcfg);
   pwmEnablePeriodicNotification(&PWMD1);
@@ -213,6 +188,10 @@ extern void bldcStop(bldc *pbldc){
 	if(!pbldc->started){
 		return;
 	}
+	pwmDisableChannel(&PWMD1,PWM_U);
+  pwmDisableChannel(&PWMD1,PWM_V);
+  pwmDisableChannel(&PWMD1,PWM_W);
+  pwmDisablePeriodicNotification(&PWMD1);
 	pwmStop(&PWMD1);
 	pbldc->started = FALSE;
 }
@@ -226,9 +205,11 @@ extern void bldcSetDC(uint8_t channel,uint16_t dc){
 }
 
 extern void bldcExit(bldc *pbldc){
-	chThdTerminate(motor->p_spi_thread);
-	if(!pbldc->started){
-		return;
+	if(pbldc->started){
+		bldcStop(pbldc);
 	}
-	bldcStop(pbldc);
+  adcStopConversion(&ADCD1);
+  adcStop(&ADCD1); 
+	chThdTerminate(motor->p_spi_thread);
+	chThdWait(motor->p_spi_thread);
 }
