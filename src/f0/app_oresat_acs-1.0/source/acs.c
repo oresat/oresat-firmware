@@ -126,6 +126,28 @@ static int trap_mtqr_stop(ACS *acs){
 }
 //*/
 
+static int trap_mtqr_dc(ACS *acs){
+	(void)acs;
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_MTQR_DC;
+	chSysUnlock();
+	// *******end critical section**********
+	mtqrSetDC((acs->recv[ARG_BYTE]<<8) |	acs->recv[ARG_BYTE+1]);
+	return EXIT_SUCCESS;
+}
+
+static int trap_mtqr_dir(ACS *acs){
+	(void)acs;
+	// *******critical section**********
+	chSysLock();
+	acs->can_buf.send[LAST_TRAP]=EV_MTQR_STOP;
+	chSysUnlock();
+	// *******end critical section**********
+	mtqrStop(&acs->mtqr);
+	return EXIT_SUCCESS;
+}
+
 static int trap_rw_stretch(ACS *acs)
 {
   (void)acs;
@@ -167,6 +189,8 @@ const acs_trap trap[] = {
   {ST_RW,   EV_RW_SCALE,   	&trap_rw_scale},
 	{ST_MTQR,	EV_MTQR_START,	&trap_mtqr_start},
 	{ST_MTQR,	EV_MTQR_STOP,		&trap_mtqr_stop},
+	{ST_MTQR,	EV_MTQR_DC,			&trap_mtqr_dc},
+	{ST_MTQR,	EV_MTQR_DIR,		&trap_mtqr_dir},
 };
 
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
@@ -208,25 +232,25 @@ const acs_transition trans[] = {
 
 static acs_event getNextEvent(ACS *acs){
 	acs_event event = EV_ANY;
-	uint8_t recv[CAN_BUF_SIZE]={0};
+//	uint8_t recv[CAN_BUF_SIZE]={0};
 
 // synchronized with the CAN thread
 	chEvtWaitAny(ALL_EVENTS);	
 // ******critical section*******
 	chSysLock();
 	for(int i=0;i<CAN_BUF_SIZE;++i){
-		recv[i]=acs->can_buf.recv[i];
+		acs->recv[i]=acs->can_buf.recv[i];
 		acs->can_buf.recv[i]=0;
 	}
 	chSysUnlock();
 // ******end critical section*******
 
-	switch(recv[MSG_TYPE]){
+	switch(acs->recv[MSG_TYPE]){
 		case NOP:
 			break;
 		case CHG_STATE:
-			event = recv[ARG_BYTE];
-      acs->data = recv[ARG_BYTE+1];			
+			event = acs->recv[ARG_BYTE];
+      acs->data = acs->recv[ARG_BYTE+1];			
 			break;
 		case CALL_TRAP:
 			//	event = EV_STATUS;

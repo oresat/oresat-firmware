@@ -8,6 +8,9 @@
 #define MTQR_PWM_TIMER_FREQ  	2e6	/// PWM Timer frequency
 #define MTQR_PWM_FREQ 				2e3 /// periods per second
 
+#define FORWARD 0
+#define REVERSE 1
+
 #define MTQR_PWM_PERIOD MTQR_PWM_TIMER_FREQ/MTQR_PWM_FREQ
 
 #define PWM_CH_MTQR      			0   /// pwm channel

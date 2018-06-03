@@ -83,6 +83,8 @@ typedef enum {
   EV_RW_SCALE,    ///< a
 	EV_MTQR_START,  ///< b
 	EV_MTQR_STOP,   ///< c
+	EV_MTQR_DC,			///< d
+	EV_MTQR_DIR,		///< e
 	EV_END /// this must be the last event
 }acs_event;
 
@@ -99,6 +101,7 @@ typedef struct{
 	MTQR mtqr;
   // TODO find a better way to handle it
   uint8_t data;
+	uint8_t recv[CAN_BUF_SIZE];
 }ACS;
 
 typedef struct{

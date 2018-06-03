@@ -46,6 +46,14 @@ extern void mtqrSetDC(uint16_t dc){
 	);
 }
 
+extern void mtqrSetDir(uint8_t dc){
+	if(dc==FORWARD){	
+		palClearPad(GPIOB,PH); /// phase direction 
+	}else if(dc==REVERSE){
+		palSetPad(GPIOB,PH); /// phase direction 
+	}
+}
+
 extern void mtqrExit(MTQR *mtqr){
 	if(!mtqr->started){	
 		return;
