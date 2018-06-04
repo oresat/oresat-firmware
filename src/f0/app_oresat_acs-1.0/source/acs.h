@@ -39,7 +39,9 @@
 
 typedef enum{
 	MSG_TYPE=0,
-	ARG_BYTE
+	ARG_BYTE,
+	ARG_BYTE1,
+	ARG_BYTE2
 }can_msg;
 
 typedef enum{

@@ -15,7 +15,8 @@
 
 #define PWM_CH_MTQR      			0   /// pwm channel
 #define MTQR_STARTING_DC			5000		/// starting duty cycle
-#define PH				 						6u	/// Phase (motor direction)
+#define PH				 						9u	/// Phase (motor direction)
+//#define PH				 						6u	/// Phase (motor direction)
 #define ENABLE    						3u	/// Chip enable
 //#define ENABLE    						7u	/// Chip enable
 																	/// Logic low
@@ -57,6 +58,7 @@ extern void mtqrInit(MTQR *mtqr);
 extern void mtqrStart(MTQR *mtqr);
 extern void mtqrStop(MTQR *mtqr);
 extern void mtqrSetDC(uint16_t dc);
+extern void mtqrSetDir(uint8_t dc);
 extern void mtqrExit(MTQR *mtqr);
 	
 #endif

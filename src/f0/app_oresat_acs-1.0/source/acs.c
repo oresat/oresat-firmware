@@ -133,7 +133,7 @@ static int trap_mtqr_dc(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_MTQR_DC;
 	chSysUnlock();
 	// *******end critical section**********
-	mtqrSetDC((acs->recv[ARG_BYTE]<<8) |	acs->recv[ARG_BYTE+1]);
+	mtqrSetDC((acs->recv[ARG_BYTE+1]<<8) |	acs->recv[ARG_BYTE+2]);
 	return EXIT_SUCCESS;
 }
 
@@ -144,7 +144,7 @@ static int trap_mtqr_dir(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_MTQR_STOP;
 	chSysUnlock();
 	// *******end critical section**********
-	mtqrStop(&acs->mtqr);
+	mtqrSetDir(acs->recv[ARG_BYTE+1]);
 	return EXIT_SUCCESS;
 }
 
