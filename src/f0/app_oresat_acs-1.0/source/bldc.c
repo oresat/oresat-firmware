@@ -156,7 +156,7 @@ extern void bldcInit(bldc *pbldc){
 	motor->u = 0;
 	motor->v = motor->u + motor->phase_shift;
 	motor->w = motor->v + motor->phase_shift;
-  motor->openLoop = false;
+  motor->openLoop = true;
 	motor->started = FALSE;
 	
 	adcStart(&ADCD1, NULL); 

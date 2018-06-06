@@ -14,7 +14,7 @@
 
 #include <unistd.h>
 
-//#define OPENLOOP /// open loop control (oxymoron)
+#define OPENLOOP /// open loop control (oxymoron)
 
 //#define THREAD_SIZE	(1<<7)
 // TODO had to reduce this to compile with new ADC code
@@ -28,7 +28,7 @@
 #define STEPS			360 
 #define STRETCH		1
 #define SKIP      1
-#define STEP_SIZE 1
+#define STEP_SIZE 100
 
 #define ENCODER_MAX 1<<14
 #define CHUNK_AMOUNT 6

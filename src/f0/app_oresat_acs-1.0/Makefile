@@ -87,8 +87,8 @@ PROJECT   = app_oresat_acs
 
 # Define board here
 #BOARD     = ST_NUCLEO32_F042K6
-BOARD     = ORESAT_ACS_V1_1
-#BOARD     = ORESAT_ACS_V3
+#BOARD     = ORESAT_ACS_V1_1
+BOARD     = ORESAT_ACS_V3
 
 #Project sources
 PROJ_ROOT = ../../..

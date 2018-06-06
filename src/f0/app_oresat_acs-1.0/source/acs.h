@@ -55,11 +55,7 @@ typedef enum{
 	NOP=0,
 	CHG_STATE,
 	CALL_TRAP,
-	BLINK
 }can_msg_type;
-
-//extern char *state_name[];
-//extern char *event_name[];
 
 typedef enum{
 	ST_ANY=-1,
