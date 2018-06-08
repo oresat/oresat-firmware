@@ -13,8 +13,8 @@
 #include "can_threads.h"
 
 //Definitions
-#define CAN_ID_TPDO(n)  ((n << 8) | 0x80)
-#define CAN_ID_RPDO(n)  ((n + 1) << 8)
+#define CAN_ID_TPDO(n, m)  ((n << 8) | 0x80) | m
+#define CAN_ID_RPDO(n, m)  ((n + 1) << 8) | m
 
 #undef HAL_USE_CAN
 #undef STM32_CAN_USE_CAN1

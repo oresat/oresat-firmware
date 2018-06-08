@@ -76,8 +76,9 @@ void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, u
 
     // If the can_id is zero, set the default value (TPDO# base ID + Node ID)
     if (!can_id) {
-        tpdo[pdo_num].msg.SID = (((pdo_num + 1) << 8) | 0x80) + node.node_id;
+        tpdo[pdo_num].msg.SID = CAN_ID_TPDO(pdo_num, node.node_id);
     } else {
+        chDbgAssert(can_id > 0x180 || can_id < 0x580, "Error: TPDO CANID out of range");
         tpdo[pdo_num].msg.SID = can_id;
     }
 
