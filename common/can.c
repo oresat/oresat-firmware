@@ -100,6 +100,7 @@ void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t 
     if (!can_id) {
         rpdo[pdo_num].can_id = ((pdo_num + 2) << 8) + node.node_id;
     } else {
+        chDbgAssert(can_id > 0x180 || can_id < 0x580, "Error: TPDO CANID out of range");
         rpdo[pdo_num].can_id = can_id;
     }
 
