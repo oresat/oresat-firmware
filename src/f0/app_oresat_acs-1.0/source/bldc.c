@@ -31,8 +31,12 @@ static const ADCConversionGroup adcgrpcfg = {
     ADC_CHSELR_CHSEL0                          /* CHSELR */
 };
 
-static uint16_t encoderToLut(uint16_t position)
-{
+/**
+ *
+ *
+ *
+ */
+static uint16_t encoderToLut(uint16_t position){
   uint16_t step = 0;
   uint8_t chunk = (position * CHUNK_AMOUNT) / ENCODER_MAX;
   step = ((position - chunk_low[chunk]) * (STEPS)) / CHUNK_SIZE;
@@ -40,6 +44,11 @@ static uint16_t encoderToLut(uint16_t position)
   return step;
 }
 
+/**
+ *
+ *
+ *
+ */
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
   (void)arg;
@@ -64,13 +73,6 @@ THD_FUNCTION(spiThread,arg){
 	spiStop(&SPID1);          // Stop driver.
 }
 
-//static void pwmCallback(uint8_t channel,sinctrl_t step){
-//	pwmEnableChannelI(
-//		&PWMD1,
-//		channel,
-//		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,scale(motor->sinctrl[step]))
-//	);
-
 static sinctrl_t scale(sinctrl_t duty_cycle){
 	return ((duty_cycle*motor->scale)/100) + ((10000*(motor->scale/2))/100);	
 }
@@ -80,7 +82,6 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
  *
  *
  */
-
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
@@ -127,6 +128,11 @@ static void pwmpcb(PWMDriver *pwmp) {
 	bldcSetDC(PWM_W,motor->current_sin_w);
 }
 
+/**
+ *
+ *
+ *
+ */
 static PWMConfig pwmRWcfg = {
   PWM_TIMER_FREQ,	
   PWM_PERIOD,	
@@ -142,6 +148,11 @@ static PWMConfig pwmRWcfg = {
   0
 };
 
+/**
+ *
+ *
+ *
+ */
 extern void bldcInit(bldc *pbldc){
 	motor = pbldc;
 	motor->steps = STEPS;
@@ -171,6 +182,11 @@ extern void bldcInit(bldc *pbldc){
 	);
 }
 
+/**
+ *
+ *
+ *
+ */
 extern void bldcStart(bldc *pbldc){
 	if(pbldc->started){
 		return; 
@@ -184,6 +200,11 @@ extern void bldcStart(bldc *pbldc){
 	pbldc->started = TRUE;
 }
 
+/**
+ *
+ *
+ *
+ */
 extern void bldcStop(bldc *pbldc){
 	if(!pbldc->started){
 		return;
@@ -196,6 +217,11 @@ extern void bldcStop(bldc *pbldc){
 	pbldc->started = FALSE;
 }
 
+/**
+ *
+ *
+ *
+ */
 extern void bldcSetDC(uint8_t channel,uint16_t dc){
 	pwmEnableChannelI(
 		&PWMD1,
@@ -204,6 +230,11 @@ extern void bldcSetDC(uint8_t channel,uint16_t dc){
 	);
 }
 
+/**
+ *
+ *
+ *
+ */
 extern void bldcExit(bldc *pbldc){
 	if(pbldc->started){
 		bldcStop(pbldc);
