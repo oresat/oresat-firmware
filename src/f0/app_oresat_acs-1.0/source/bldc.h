@@ -14,6 +14,7 @@
 
 #include <unistd.h>
 
+// TODO: openloop is going away
 #define OPENLOOP /// open loop control (oxymoron)
 
 //#define THREAD_SIZE	(1<<7)
@@ -21,9 +22,27 @@
 // We should figure out what an actual good value is
 #define THREAD_SIZE	(96)
 
+// serial debugging
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
+
+/**
+ * TODO: the definitions of STEP, STRETCH, and SKIP
+ * evolved over the course of various experiments. These
+ * will completely change in v2.0.
+ *
+ * SCALE: Duty cycle scaling factor from 0-100 %
+ *
+ * STEPS: the number of discrete steps in the LUT
+ *
+ * STRETCH: 
+ *
+ * SKIP:
+ *
+ * STEP_SIZE: 
+ *
+ */
 #define SCALE			100
 #define STEPS			360 
 #define STRETCH		1

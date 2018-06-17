@@ -33,7 +33,7 @@ static SerialConfig ser_cfg ={
 };
 
 /**
- * Application initialization section
+ * @brief Application initialization section
  *
  *
  */
@@ -51,7 +51,7 @@ static void app_init(void) {
 }
 
 /**
- * main appliction section:
+ * @brief main appliction section
  *
  * starts the acs thread and then sleeps
  *
@@ -71,7 +71,7 @@ static void app_main(void) {
 }
 
 /**
- * main:
+ * @brief main
  *
  * calls initialization functions
  * and then calls app_main()
@@ -82,7 +82,7 @@ int main(void){
 	chSysInit();
 	oresat_init(CAN_NODE);
 
-	// Initialize and start app
+	/// Initialize and start app
 	app_init();
 	app_main();
 

@@ -392,7 +392,7 @@ static int acs_statemachine(ACS *acs){
 		}
     chThdSleepMilliseconds(500);
 /*
-		
+	// this stuff is for debugging	
     chprintf(DEBUG_CHP, "motor stretch: %d\r\n", acs->motor.stretch);
     chprintf(DEBUG_CHP, "motor openLoop: %d\r\n", acs->motor.openLoop);
     chprintf(DEBUG_CHP, "motor skip: %d\r\n\n", acs->motor.skip);

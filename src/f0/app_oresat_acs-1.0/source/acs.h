@@ -8,6 +8,11 @@
 #include "chprintf.h"
 #include "oresat.h"
 
+// TODO: Thread sizes cause continual problems for managing memory
+// if the threads are too small it breaks, if the thread working
+// areas are too large then you run out of memory. One solution 
+// is to move to a mcu with more memory.
+
 #define WA_ACS_THD_SIZE (1<<7)
 #define CAN_NODE 				0x3F // max 0x7f
 #define CAN_BUF_SIZE 		8
@@ -19,21 +24,20 @@
 #define EXIT_FAILURE 1
 
 /**
- *	can_message
+ *	@brief can_msg enumeraton
  *
- * 	Byte		Name		Use
- * 	0				
- *	1
- *	2
- *	3
- *	4
- *	5
+ *	TODO: This is going to change in v2.0 once a protocol
+ *	is decided for communication with the ACS
  *
- *	CMD
- *
- *
- *
- *
+ * 	Byte		Name				Use
+ * 	0 			MSG_TYPE		CHG_STATE is the only current implementation
+ *	1				ARG_BYTE		used for passing arguments
+ *	2				ARG_BYTE1		used for passing arguments
+ *	3				ARG_BYTE2		used for passing arguments
+ *	4				unimplemented
+ *	5				unimplemented
+ *	6				unimplemented
+ *	7				unimplemented
  *
  */
 typedef enum{
@@ -44,8 +48,12 @@ typedef enum{
 }can_msg;
 
 /**
+ * @brief enumeration for the recv buffer
  *
+ *	TODO: This is going to change in v2.0 once a protocol
+ *	is decided for communication with the ACS
  *
+ * 
  *
  */
 typedef enum{
@@ -56,7 +64,10 @@ typedef enum{
 }can_recv;
 
 /**
+ * @brief enumeration for CAN message types
  *
+ *	TODO: This is going to change in v2.0 once a protocol
+ *	is decided for communication with the ACS
  *
  *
  */
@@ -67,8 +78,10 @@ typedef enum{
 }can_msg_type;
 
 /**
+ * @brief enumeration for ACS states
  *
- *
+ *	TODO: This is going to change in v2.0 to more
+ *	accurately reflect how the ACS will operate
  *
  */
 typedef enum{
@@ -81,9 +94,13 @@ typedef enum{
 }acs_state;
 
 /**
+ * @brief enumeration for all the possible events
  *
+ *	TODO: This is going to change in v2.0 to more
+ *	accurately reflect how the ACS will operate
  *
- *
+ * hexidecimal values are passed to the ACS via 
+ * the bus.
  */
 typedef enum {
 	EV_ANY=-1,
@@ -106,8 +123,8 @@ typedef enum {
 }acs_event;
 
 /**
- *
- *
+ * @brief can_buffer structure holds the send and recv
+ * buffers that are registered with the CAN bus
  *
  */
 typedef struct{
@@ -116,9 +133,9 @@ typedef struct{
 }can_buffer;
 
 /**
+ * @brief ACS structure for maintaining the ACS state
  *
- *
- *
+ * TODO: This structure is likely to change for v2.0
  */
 typedef struct{
 	acs_state cur_state;
@@ -127,13 +144,14 @@ typedef struct{
 	bldc motor;
 	MTQR mtqr;
   // TODO find a better way to handle it
+	// data was a bandaid
   uint8_t data;
 	uint8_t recv[CAN_BUF_SIZE];
 }ACS;
 
 /**
- *
- *
+ * @brief structure for manipulating state transistions
+ * and trap functions
  *
  */
 typedef struct{
