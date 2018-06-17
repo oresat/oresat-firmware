@@ -2,15 +2,11 @@
 
 event_listener_t el;
 
-
 /**
  * @brief  cleans up on transition
- * @note    
  *
  * @param[in] acs      pointer to the @p ACS object
  *                     @p ACS caonnot be NULL
- *
- * @api
  */
 static void trans_cleanup(ACS *acs){
 	switch(acs->cur_state){
@@ -37,6 +33,12 @@ static void trans_cleanup(ACS *acs){
 	}
 }
 
+/**
+ * @brief updates the recv buffer
+ *
+ * @note this is a critical section
+ * 
+ */
 static void update_recv(ACS *acs,int recv_byte){
 	switch(recv_byte){
 		case ERROR_CODE:
@@ -53,36 +55,62 @@ static void update_recv(ACS *acs,int recv_byte){
 	}
 }
 
+/**
+ * @brief returns the off state
+ *
+ *
+ */
 static int state_off(ACS *acs){
 	(void)acs;
 	return ST_OFF;
 }
 
+/**
+ * @brief returns the init state
+ *
+ *
+ */
 static int state_init(ACS *acs){
 	(void)acs;
 	return ST_INIT;
 }
 
+/**
+ * @brief returns the ready state
+ *
+ *
+ */
 static int state_rdy(ACS *acs){
-//	(void)acs;
 	trans_cleanup(acs);
 	return ST_RDY;
 }
 
+/**
+ * @brief return the reaction wheel state
+ *
+ *
+ */
 static int state_rw(ACS *acs){
-//	(void)acs;
 	trans_cleanup(acs);
 	bldcInit(&acs->motor);
 	return ST_RW;
 }
 
+/**
+ * @brief returns the magnetorquer state
+ *
+ *
+ */
 static int state_mtqr(ACS *acs){
-//	(void)acs;
 	trans_cleanup(acs);
-//	mtqrInit(&acs->mtqr);
 	return ST_MTQR;
 }
 
+/**
+ * @brief function to start the the reaction wheels
+ *
+ *
+ */
 static int trap_rw_start(ACS *acs){
 	// *******critical section**********
 	chSysLock();
@@ -93,6 +121,11 @@ static int trap_rw_start(ACS *acs){
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief function to stop the reaction wheels
+ *
+ *
+ */
 static int trap_rw_stop(ACS *acs){
 	// *******critical section**********
 	chSysLock();
@@ -103,7 +136,11 @@ static int trap_rw_stop(ACS *acs){
 	return EXIT_SUCCESS;
 }
 
-//*
+/**
+ * @brief function to start the magnetorquer
+ *
+ *
+ */
 static int trap_mtqr_start(ACS *acs){
 	// *******critical section**********
 	chSysLock();
@@ -114,6 +151,11 @@ static int trap_mtqr_start(ACS *acs){
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief function to stop the magnetorquer
+ *
+ *
+ */
 static int trap_mtqr_stop(ACS *acs){
 	(void)acs;
 	// *******critical section**********
@@ -124,8 +166,13 @@ static int trap_mtqr_stop(ACS *acs){
 	mtqrStop(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
-//*/
 
+/**
+ * @brief function to change the PWM
+ * duty cycle for the magnetorquer
+ *
+ *
+ */
 static int trap_mtqr_dc(ACS *acs){
 	(void)acs;
 	// *******critical section**********
@@ -133,10 +180,16 @@ static int trap_mtqr_dc(ACS *acs){
 	acs->can_buf.send[LAST_TRAP]=EV_MTQR_DC;
 	chSysUnlock();
 	// *******end critical section**********
-	mtqrSetDC((acs->recv[ARG_BYTE+1]<<8) |	acs->recv[ARG_BYTE+2]);
+	mtqrSetDC((acs->recv[ARG_BYTE+1]<<8) | acs->recv[ARG_BYTE+2]);
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief function for function for changing the 
+ * polarity of the magnetorquer
+ *
+ *
+ */
 static int trap_mtqr_dir(ACS *acs){
 	(void)acs;
 	// *******critical section**********
@@ -148,38 +201,62 @@ static int trap_mtqr_dir(ACS *acs){
 	return EXIT_SUCCESS;
 }
 
-static int trap_rw_stretch(ACS *acs)
-{
+/**
+ * @brief 
+ *
+ *
+ */
+static int trap_rw_stretch(ACS *acs){
   (void)acs;
   // TODO have a better data system.
   acs->motor.stretch = acs->data;
   return EXIT_SUCCESS;
 }
 
-static int trap_rw_control(ACS *acs)
-{
+/**
+ * @brief 
+ *
+ *
+ */
+static int trap_rw_control(ACS *acs){
   (void)acs;
   // TODO have a better data system.
   acs->motor.openLoop = (bool) acs->data;
   return EXIT_SUCCESS;
 }
 
-static int trap_rw_skip(ACS *acs)
-{
+/**
+ * @brief 
+ *
+ *
+ */
+static int trap_rw_skip(ACS *acs){
   (void)acs;
   // TODO have a better data system.
   acs->motor.skip = acs->data;
   return EXIT_SUCCESS;
 }
 
-static int trap_rw_scale(ACS *acs)
-{
+/**
+ * @brief 
+ *
+ *
+ */
+static int trap_rw_scale(ACS *acs){
   (void)acs;
   // TODO have a better data system.
   acs->motor.scale = acs->data;
   return EXIT_SUCCESS;
 }
 
+/**
+ * @brief trap function table
+ *
+ * thes table defines the events allowed 
+ * to be called in states, and the function
+ * that needs to be called on a successful 
+ * match
+ */
 const acs_trap trap[] = {
 	{ST_RW, 	EV_RW_START,		&trap_rw_start},
 	{ST_RW, 	EV_RW_STOP,			&trap_rw_stop},
@@ -193,8 +270,14 @@ const acs_trap trap[] = {
 	{ST_MTQR,	EV_MTQR_DIR,		&trap_mtqr_dir},
 };
 
+/// determines the total number of events
 #define EVENT_COUNT (int)(sizeof(trap)/sizeof(acs_trap))
 
+/**
+ * @brief control falls here when a state change
+ * request is unrecognized
+ *
+ */
 static int fsm_trap(ACS *acs){
 	int i,trap_status;
 
@@ -217,6 +300,14 @@ static int fsm_trap(ACS *acs){
 	return acs->cur_state;
 }
 
+/**
+ * @brief state transition table
+ *
+ * this state transistion table defines
+ * legal transitions and and what function
+ * is called upon a successful match in
+ * the table.
+ */
 const acs_transition trans[] = {
 	{ST_INIT, 	EV_RDY,		&state_rdy},
 	{ST_INIT, 	EV_OFF,		&state_off},
@@ -228,13 +319,16 @@ const acs_transition trans[] = {
 	{ST_ANY, 		EV_ANY,		&fsm_trap}
 };
 
+/// TRANS_COUNT define the total number of legal transitions
 #define TRANS_COUNT (int)(sizeof(trans)/sizeof(acs_transition))
 
+/**
+ * @brief waits for events on the CAN bus and processes them
+ *
+ *
+ */
 static acs_event getNextEvent(ACS *acs){
 	acs_event event = EV_ANY;
-//	uint8_t recv[CAN_BUF_SIZE]={0};
-
-// synchronized with the CAN thread
 	chEvtWaitAny(ALL_EVENTS);	
 // ******critical section*******
 	chSysLock();
@@ -254,7 +348,8 @@ static acs_event getNextEvent(ACS *acs){
 			break;
 		case CALL_TRAP:
 			//	event = EV_STATUS;
-			// TODO: we should seperate the trap from the change
+			// TODO: we should seperate the trap from the 
+			// state changes in the next version
 			// state command
 			break;
 		default:
@@ -262,17 +357,19 @@ static acs_event getNextEvent(ACS *acs){
 	}
 
 	if(event < EV_ANY || event >= EV_END){
-	//	printf("error, event out of range\n");
 		return (acs_event)acs->cur_state; 
 	}
 
 	return event;
 }
 
+/**
+ * @brief the ACS state machine
+ *
+ *
+ */
 static int acs_statemachine(ACS *acs){
 	int i;
-	//palSetLine(LINE_LED_GREEN);
-	
 	acs->cur_state = state_init(acs);
 	update_recv(acs,ACS_STATE);
 	
@@ -294,23 +391,35 @@ static int acs_statemachine(ACS *acs){
 			}
 		}
     chThdSleepMilliseconds(500);
+/*
+		
     chprintf(DEBUG_CHP, "motor stretch: %d\r\n", acs->motor.stretch);
     chprintf(DEBUG_CHP, "motor openLoop: %d\r\n", acs->motor.openLoop);
     chprintf(DEBUG_CHP, "motor skip: %d\r\n\n", acs->motor.skip);
     chprintf(DEBUG_CHP, "motor scale: %d\r\n\n", acs->motor.scale);
     chprintf(DEBUG_CHP, "motor samples: %d\r\n\n", acs->motor.samples[0]);
-
+//*/
 	}
 	
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief general ACS initialization
+ *
+ *
+ */
 extern int acsInit(ACS *acs){
 	(void)acs;
 	mtqrInit(&acs->mtqr);
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief ACS thread and thread working area
+ *
+ *
+ */
 THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
 THD_FUNCTION(acsThread,acs){
   chRegSetThreadName("acsThread");

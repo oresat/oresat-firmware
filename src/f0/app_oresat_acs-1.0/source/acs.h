@@ -36,7 +36,6 @@
  *
  *
  */
-
 typedef enum{
 	MSG_TYPE=0,
 	ARG_BYTE,
@@ -44,6 +43,11 @@ typedef enum{
 	ARG_BYTE2
 }can_msg;
 
+/**
+ *
+ *
+ *
+ */
 typedef enum{
 	ERROR_CODE = 0,
 	ACS_STATE,
@@ -51,12 +55,22 @@ typedef enum{
 	LAST_TRAP,
 }can_recv;
 
+/**
+ *
+ *
+ *
+ */
 typedef enum{
 	NOP=0,
 	CHG_STATE,
 	CALL_TRAP,
 }can_msg_type;
 
+/**
+ *
+ *
+ *
+ */
 typedef enum{
 	ST_ANY=-1,
 	ST_OFF,
@@ -66,6 +80,11 @@ typedef enum{
 	ST_MTQR
 }acs_state;
 
+/**
+ *
+ *
+ *
+ */
 typedef enum {
 	EV_ANY=-1,
 	EV_OFF,					///< 0
@@ -86,11 +105,21 @@ typedef enum {
 	EV_END /// this must be the last event
 }acs_event;
 
+/**
+ *
+ *
+ *
+ */
 typedef struct{
 	uint8_t send[CAN_BUF_SIZE];
 	uint8_t recv[CAN_BUF_SIZE];	
 }can_buffer;
 
+/**
+ *
+ *
+ *
+ */
 typedef struct{
 	acs_state cur_state;
 	acs_event event; /// the most recent event
@@ -102,6 +131,11 @@ typedef struct{
 	uint8_t recv[CAN_BUF_SIZE];
 }ACS;
 
+/**
+ *
+ *
+ *
+ */
 typedef struct{
 	acs_state state;
 	acs_event event;

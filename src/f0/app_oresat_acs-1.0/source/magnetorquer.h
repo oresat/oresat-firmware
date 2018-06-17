@@ -25,11 +25,7 @@
  *
  *
  *
- *
- *
- * 
  */
-
 static const PWMConfig pwm_MTQRcfg = {
 	MTQR_PWM_TIMER_FREQ,    // Frequency
 	MTQR_PWM_PERIOD,        // period duration 
@@ -45,6 +41,11 @@ static const PWMConfig pwm_MTQRcfg = {
 	0
 };
 
+/**
+ *
+ *
+ *
+ */
 typedef struct{
 	uint8_t direction;
 	int started;
