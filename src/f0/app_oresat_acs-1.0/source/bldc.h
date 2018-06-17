@@ -14,15 +14,15 @@
 
 #include <unistd.h>
 
-// TODO: openloop is going away
+/// TODO: openloop is going away
 #define OPENLOOP /// open loop control (oxymoron)
 
 //#define THREAD_SIZE	(1<<7)
-// TODO had to reduce this to compile with new ADC code
-// We should figure out what an actual good value is
+/// TODO had to reduce this to compile with new ADC code
+/// We should figure out what an actual good value is
 #define THREAD_SIZE	(96)
 
-// serial debugging
+/// serial debugging
 #define DEBUG_SERIAL SD2
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
 
@@ -49,10 +49,13 @@
 #define SKIP      1
 #define STEP_SIZE 100
 
+/// encoder has 14 bits of precision
 #define ENCODER_MAX 1<<14
+/// chunk amount is the number of times through
+/// the LUT for 1 revolution of the reaction wheel
 #define CHUNK_AMOUNT 6
+/// chunk size is the number
 #define CHUNK_SIZE 2730
-
 
 #define PWM_TIMER_FREQ	48e6 /// Hz
 #define PWM_FREQ				15e3 /// periods per sec
