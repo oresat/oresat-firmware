@@ -111,7 +111,7 @@ typedef enum{
  * the bus.
  */
 typedef enum {
-	EV_ANY=-1,
+	EV_ANY=-1,      ///< -1
 	EV_OFF,					///< 0
 	EV_INIT,				///< 1
 	EV_RDY,					///< 2

@@ -208,7 +208,7 @@ static int trap_mtqr_dir(ACS *acs){
  */
 static int trap_rw_stretch(ACS *acs){
   (void)acs;
-  // TODO have a better data system.
+  /// TODO have a better data system.
   acs->motor.stretch = acs->data;
   return EXIT_SUCCESS;
 }
@@ -219,7 +219,7 @@ static int trap_rw_stretch(ACS *acs){
  */
 static int trap_rw_control(ACS *acs){
   (void)acs;
-  // TODO have a better data system.
+  /// TODO have a better data system.
   acs->motor.openLoop = (bool) acs->data;
   return EXIT_SUCCESS;
 }
@@ -230,7 +230,7 @@ static int trap_rw_control(ACS *acs){
  */
 static int trap_rw_skip(ACS *acs){
   (void)acs;
-  // TODO have a better data system.
+  /// TODO have a better data system.
   acs->motor.skip = acs->data;
   return EXIT_SUCCESS;
 }
@@ -241,7 +241,7 @@ static int trap_rw_skip(ACS *acs){
  */
 static int trap_rw_scale(ACS *acs){
   (void)acs;
-  // TODO have a better data system.
+  /// TODO have a better data system.
   acs->motor.scale = acs->data;
   return EXIT_SUCCESS;
 }
@@ -348,8 +348,8 @@ static acs_event getNextEvent(ACS *acs){
 			break;
 		case CALL_TRAP:
 			//	event = EV_STATUS;
-			// TODO: we should seperate the trap from the 
-			// state changes in the next version
+			/// TODO: we should seperate the trap from the 
+			/// state changes in the next version
 			// state command
 			break;
 		default:
