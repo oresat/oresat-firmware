@@ -151,7 +151,7 @@ typedef struct{
 	can_buffer can_buf;
 	bldc motor;
 	MTQR mtqr;
-  /// TODO find a better way to handle it
+  /// TODO: find a better way to handle it
 	/// data was a bandaid
   uint8_t data;
 	uint8_t recv[CAN_BUF_SIZE];
