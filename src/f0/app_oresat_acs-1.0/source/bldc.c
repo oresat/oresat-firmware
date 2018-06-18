@@ -15,7 +15,7 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
 
 
 /**
- * TODO, combine this with a timer to not spam interrupts so much?
+ * TODO: combine this with a timer to not spam interrupts so much?
  * @brief ADC conversion group, used to configure the ADC driver
  * Mode:        Continuous, 1 sample of 1 channel, SW triggered.
  * Channels:    A0 

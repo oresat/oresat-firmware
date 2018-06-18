@@ -10,7 +10,7 @@
 #define OPENLOOP /// open loop control (oxymoron)
 
 //#define THREAD_SIZE	(1<<7)
-/// TODO had to reduce this to compile with new ADC code
+/// TODO: had to reduce this to compile with new ADC code
 /// We should figure out what an actual good value is
 #define THREAD_SIZE	(96)
 
