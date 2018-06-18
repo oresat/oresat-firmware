@@ -68,7 +68,7 @@
 #define GPIOA_USART2_RX             3U
 #define GPIOA_FAULT_BLDC            4U
 #define GPIOA_SPI1_SCK              5U
-#define PGIOA_PA6
+#define GPIOA_PA6                   6U
 #define GPIOA_SPI1_NSS              6U
 #define GPIOA_TIM1_CH1N             7U
 #define GPIOA_TIM1_CH1              8U
