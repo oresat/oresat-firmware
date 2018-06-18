@@ -1,22 +1,15 @@
 # oresat-firmware
-The general information and overview for the Firmware portion of the ACS system are contained in the wiki located [here](https://github.com/oresat/oresat-firmware/wiki/ACS-Firmware).
-If you are looking for the ACS Hardware, look over [here](https://github.com/oresat/oresat-acs-board), start with the README.
+## ACS (Attitude Control System)
+### Firmware
+* [General information and overview](https://github.com/oresat/oresat-firmware/wiki/ACS-Firmware).
+* [Code Documentation](http://oresat.org/ACS-Capstone-2018/firmware-doc/files.html)
+
+### Hardware
+[General Information and Overview](https://github.com/oresat/oresat-acs-board) (start with the README.)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-----------old Miles stuff-------------
+## General OreSat firmware info:
+### Directions from Miles
 
 To initialize the ChibiOS submodule, run:
 ```git submodule update --init```
