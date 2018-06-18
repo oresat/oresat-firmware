@@ -25,3 +25,9 @@ Requires `make`, `arm-none-eabi-gcc`, `arm-none-eabi-gdb`, and `openocd` to buil
 
 ### Hardware
 [General Information and Overview](https://github.com/oresat/oresat-acs-board) (start with the README.)
+
+## Notes
+### Troubleshooting
+If the ChibiOS reference gets updated in oresat-firmware, run the following commands to sync to the proper reference:
+```git submodule sync```
+```git submodule update```
