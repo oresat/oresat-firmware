@@ -39,8 +39,7 @@
 #include "oresat.h"
 #include "acs.h"
 
-ACSdata data;
-//uint8_t data[8];
+ACSdata data = {};
 
 static SerialConfig ser_cfg = {
 	115200,     //Baud rate
@@ -50,9 +49,11 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	acsInit();	 
-	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,8,data.acs);
+	acsInit(&data);	
+	//data.acs[0] = 1;
+	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,CAN_BUF,data.recv);
 //	initTPDO();
+	canTPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,0,0,CAN_BUF,data.send);
 
 	sdStart(&SD2,&ser_cfg); // Start up debug output
 }
@@ -71,10 +72,18 @@ static void app_main(void){
 	chThdCreateStatic(
 		wa_spiThread,
 		sizeof(wa_spiThread),
-		NORMALPRIO + 1,
+		HIGHPRIO,
 		spiThread,
 		NULL
 	);
+
+  /*chThdCreateStatic(
+		wa_debugThread,
+		sizeof(wa_debugThread), 
+		NORMALPRIO, 
+		debugThread, 
+		NULL
+	);*/
 //*/
 	while(true){
 		chThdSleepMilliseconds(1000);
