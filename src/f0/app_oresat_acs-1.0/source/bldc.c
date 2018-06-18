@@ -19,6 +19,7 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
  * @brief ADC conversion group, used to configure the ADC driver
  * Mode:        Continuous, 1 sample of 1 channel, SW triggered.
  * Channels:    A0 
+ * Slowest sample rate possible, as putting it too high can lock other systems out.
  */
 static const ADCConversionGroup adcgrpcfg = {
     TRUE,
