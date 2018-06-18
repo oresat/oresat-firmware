@@ -54,6 +54,16 @@ typedef enum{
  *	TODO: This is going to change in v2.0 once a protocol
  *	is decided for communication with the ACS
  *
+ *	Byte		Name				Use
+ * 	0 			unimplemented
+ *	1				STATE				current state
+ *	2				LAST_EVENT	last event received
+ *	3				unimplemented
+ *	4				unimplemented
+ *	5				unimplemented
+ *	6				unimplemented
+ *	7				unimplemented
+ *
  */
 typedef enum{
 	ERROR_CODE = 0,
