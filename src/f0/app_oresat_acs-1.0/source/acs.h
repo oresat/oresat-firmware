@@ -8,7 +8,7 @@
 #include "chprintf.h"
 #include "oresat.h"
 
-/*
+/**
  * TODO: Thread sizes cause continual problems for managing memory
  * if the threads are too small it breaks, if the thread working
  * areas are too large then you run out of memory. One solution 
@@ -151,8 +151,8 @@ typedef struct{
 	can_buffer can_buf;
 	bldc motor;
 	MTQR mtqr;
-  // TODO find a better way to handle it
-	// data was a bandaid
+  /// TODO find a better way to handle it
+	/// data was a bandaid
   uint8_t data;
 	uint8_t recv[CAN_BUF_SIZE];
 }ACS;
