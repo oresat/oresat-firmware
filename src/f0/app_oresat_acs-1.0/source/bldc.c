@@ -51,7 +51,6 @@ static uint16_t encoderToLut(uint16_t position){
 /**
  * @brief Handles the SPI transaction, getting the position from the encoder
  *
- *
  */
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg){
@@ -80,7 +79,6 @@ THD_FUNCTION(spiThread,arg){
 /**
  * @brief Scales the duty ccycle value from LUT 0 - 100%
  *
- *
  */
 static sinctrl_t scale(sinctrl_t duty_cycle){
 	return ((duty_cycle*motor->scale)/100) + ((10000*(motor->scale/2))/100);	
@@ -98,7 +96,7 @@ static sinctrl_t scale(sinctrl_t duty_cycle){
 static void pwmpcb(PWMDriver *pwmp) {
   (void)pwmp;
   
-        // If open loop, ignore encoder feedback.
+  /// If open loop, ignore encoder feedback.
 	if(motor->openLoop){
 		motor->u += motor->skip;
 		motor->v += motor->skip;
@@ -123,9 +121,9 @@ static void pwmpcb(PWMDriver *pwmp) {
 			motor->next_sin_v = motor->sinctrl[motor->v+1];
 			motor->next_sin_w = motor->sinctrl[motor->w+1];
 
-			// Calculate the difference between the current step in the LUT
-			// and the next step in the LUT, and break it up
-			// into the desired amount of steps in between the two
+			/// Calculate the difference between the current step in the LUT
+			/// and the next step in the LUT, and break it up
+			/// into the desired amount of steps in between the two
 			motor->sin_diff = (motor->current_sin_u > motor->next_sin_u)?
 												(motor->current_sin_u - motor->next_sin_u) : 
 												(motor->next_sin_u - motor->current_sin_u);
@@ -175,7 +173,6 @@ static PWMConfig pwmRWcfg = {
 /**
  * @brief Sets up initial values for the BLDC object
  *
- *
  */
 extern void bldcInit(bldc *pbldc){
 	motor = pbldc;
@@ -209,7 +206,6 @@ extern void bldcInit(bldc *pbldc){
 /**
  * @brief Enables the three PWM channels, starting to go through the LUT
  *
- *
  */
 extern void bldcStart(bldc *pbldc){
 	if(pbldc->started){
@@ -227,7 +223,6 @@ extern void bldcStart(bldc *pbldc){
 /**
  * @brief Stops BLDC control
  *
- *
  */
 extern void bldcStop(bldc *pbldc){
 	if(!pbldc->started){
@@ -244,7 +239,6 @@ extern void bldcStop(bldc *pbldc){
 /**
  * @brief Changes duty cycle for a given channel
  *
- *
  */
 extern void bldcSetDC(uint8_t channel,uint16_t dc){
 	pwmEnableChannelI(
@@ -256,7 +250,6 @@ extern void bldcSetDC(uint8_t channel,uint16_t dc){
 
 /**
  * @ brief Tear down drivers in a sane way.
- *
  *
  */
 extern void bldcExit(bldc *pbldc){

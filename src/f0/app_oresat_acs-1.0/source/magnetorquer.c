@@ -29,7 +29,7 @@ extern void mtqrStart(MTQR *mtqr){
 	pwmStart(&PWMD1,&pwm_MTQRcfg);  // Starting pwm driver.
 	mtqrSetDC(MTQR_STARTING_DC);    // Setting duty cycle of output.
 	palSetPad(GPIOB,ENABLE);        // Turning on motor driver.
-	mtqr->started	= TRUE;         // Setting to on state.
+	mtqr->started	= TRUE;         	// Setting to on state.
 }
 
 /**
@@ -47,7 +47,7 @@ extern void mtqrStop(MTQR *mtqr){
  	pwmDisableChannel(&PWMD1,PWM_CH_MTQR);  // Disabling channel output.
 	palClearPad(GPIOB,ENABLE);              // Shutting off STSPIN250 driver.
 	pwmStop(&PWMD1);                        // Stopping PWM driver.
-	mtqr->started	= FALSE;                // Changing state to off.
+	mtqr->started	= FALSE;                	// Changing state to off.
 }
 
 /**
@@ -59,7 +59,7 @@ extern void mtqrStop(MTQR *mtqr){
  *
  */
 extern void mtqrSetDC(uint16_t dc){
-	pwmEnableChannel(                               // Setting duty cycle output using paramater.
+	pwmEnableChannel(                       // Setting duty cycle output using paramater.
 		&PWMD1,
 		PWM_CH_MTQR,
 		PWM_PERCENTAGE_TO_WIDTH(&PWMD1,dc)

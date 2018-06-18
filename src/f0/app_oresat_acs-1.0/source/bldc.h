@@ -53,6 +53,7 @@
 #define PWM_FREQ				15e3 /// periods per sec
 #define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
 
+/// PWM signals
 #define PWM_U			0U
 #define PWM_V			1U
 #define PWM_W			2U
@@ -91,13 +92,13 @@
  *
  */
 typedef struct{
-	uint16_t count,		// period counter
-					 scale,		// scales the duty cycle
-					 steps,		// number of steps in lut 
+	uint16_t count,		/// period counter
+					 scale,		/// scales the duty cycle
+					 steps,		/// number of steps in lut 
 					 stretch,
 					 skip;  
-	sinctrl_t u,v,w,// signals
-						phase_shift;		// 
+	sinctrl_t u,v,w,/// signals
+						phase_shift;		/// should be by 120 degrees 
   uint16_t current_sin_u, next_sin_u,
            current_sin_v, next_sin_v,
            current_sin_w, next_sin_w;
@@ -148,19 +149,19 @@ static const SPIConfig spicfg = {
 };
 
 extern THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
-// Prototype for spi thread function.
+/// Prototype for spi thread function.
 extern THD_FUNCTION(spiThread,arg);
 
-// Function prototype with no return type. Takes bldc type as paramater.
+/// Function prototype with no return type. Takes bldc type as paramater.
 extern void bldcInit(bldc *pbldc);
-// Function prototype with no return type. Takes bldc type as paramater.
+/// Function prototype with no return type. Takes bldc type as paramater.
 extern void bldcStart(bldc *pbldc);
-// Function prototype with no return type. Takes bldc type as paramater.
+/// Function prototype with no return type. Takes bldc type as paramater.
 extern void bldcStop(bldc *pbldc);
-// Function prototype with no return type. Takes 8 bit unsigned integer and a 
-// 16 bit unsigned integer as argument.
+/// Function prototype with no return type. Takes 8 bit unsigned integer and a 
+/// 16 bit unsigned integer as argument.
 extern void bldcSetDC(uint8_t channel,uint16_t dc);
-// Function prototype with no return type. Takes bldc type as paramater.
+/// Function prototype with no return type. Takes bldc type as paramater.
 extern void bldcExit(bldc *pbldc);
 
 #endif

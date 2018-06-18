@@ -8,11 +8,12 @@
 #include "chprintf.h"
 #include "oresat.h"
 
-// TODO: Thread sizes cause continual problems for managing memory
-// if the threads are too small it breaks, if the thread working
-// areas are too large then you run out of memory. One solution 
-// is to move to a mcu with more memory.
-
+/*
+ * TODO: Thread sizes cause continual problems for managing memory
+ * if the threads are too small it breaks, if the thread working
+ * areas are too large then you run out of memory. One solution 
+ * is to move to a mcu with more memory.
+ */
 #define WA_ACS_THD_SIZE (1<<7)
 #define CAN_NODE 				0x3F // max 0x7f
 #define CAN_BUF_SIZE 		8
@@ -53,8 +54,6 @@ typedef enum{
  *	TODO: This is going to change in v2.0 once a protocol
  *	is decided for communication with the ACS
  *
- * 
- *
  */
 typedef enum{
 	ERROR_CODE = 0,
@@ -68,7 +67,6 @@ typedef enum{
  *
  *	TODO: This is going to change in v2.0 once a protocol
  *	is decided for communication with the ACS
- *
  *
  */
 typedef enum{

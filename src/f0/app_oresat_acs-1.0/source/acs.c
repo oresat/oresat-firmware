@@ -58,7 +58,6 @@ static void update_recv(ACS *acs,int recv_byte){
 /**
  * @brief returns the off state
  *
- *
  */
 static int state_off(ACS *acs){
 	(void)acs;
@@ -67,7 +66,6 @@ static int state_off(ACS *acs){
 
 /**
  * @brief returns the init state
- *
  *
  */
 static int state_init(ACS *acs){
@@ -78,7 +76,6 @@ static int state_init(ACS *acs){
 /**
  * @brief returns the ready state
  *
- *
  */
 static int state_rdy(ACS *acs){
 	trans_cleanup(acs);
@@ -87,7 +84,6 @@ static int state_rdy(ACS *acs){
 
 /**
  * @brief return the reaction wheel state
- *
  *
  */
 static int state_rw(ACS *acs){
@@ -99,7 +95,6 @@ static int state_rw(ACS *acs){
 /**
  * @brief returns the magnetorquer state
  *
- *
  */
 static int state_mtqr(ACS *acs){
 	trans_cleanup(acs);
@@ -109,6 +104,7 @@ static int state_mtqr(ACS *acs){
 /**
  * @brief function to start the the reaction wheels
  *
+ * @note this is a critical section
  *
  */
 static int trap_rw_start(ACS *acs){
@@ -124,6 +120,7 @@ static int trap_rw_start(ACS *acs){
 /**
  * @brief function to stop the reaction wheels
  *
+ * @note this is a critical section
  *
  */
 static int trap_rw_stop(ACS *acs){
@@ -139,6 +136,7 @@ static int trap_rw_stop(ACS *acs){
 /**
  * @brief function to start the magnetorquer
  *
+ * @note this is a critical section
  *
  */
 static int trap_mtqr_start(ACS *acs){
@@ -154,6 +152,7 @@ static int trap_mtqr_start(ACS *acs){
 /**
  * @brief function to stop the magnetorquer
  *
+ * @note this is a critical section
  *
  */
 static int trap_mtqr_stop(ACS *acs){
@@ -171,6 +170,7 @@ static int trap_mtqr_stop(ACS *acs){
  * @brief function to change the PWM
  * duty cycle for the magnetorquer
  *
+ * @note this is a critical section
  *
  */
 static int trap_mtqr_dc(ACS *acs){
@@ -188,6 +188,7 @@ static int trap_mtqr_dc(ACS *acs){
  * @brief function for function for changing the 
  * polarity of the magnetorquer
  *
+ * @note this is a critical section
  *
  */
 static int trap_mtqr_dir(ACS *acs){
@@ -204,7 +205,6 @@ static int trap_mtqr_dir(ACS *acs){
 /**
  * @brief Changes how many steps are added in between each LUT step
  *
- *
  */
 static int trap_rw_stretch(ACS *acs){
   (void)acs;
@@ -215,7 +215,6 @@ static int trap_rw_stretch(ACS *acs){
 
 /**
  * @brief Closed loop using encoder, or brute forcing with open loop
- *
  *
  */
 static int trap_rw_control(ACS *acs){
@@ -228,7 +227,6 @@ static int trap_rw_control(ACS *acs){
 /**
  * @brief Changes how many steps are skipped in the LUT when going to next step
  *
- *
  */
 static int trap_rw_skip(ACS *acs){
   (void)acs;
@@ -239,7 +237,6 @@ static int trap_rw_skip(ACS *acs){
 
 /**
  * @brief Changes the scale factor, modifying LUT value by 0-100%
- *
  *
  */
 static int trap_rw_scale(ACS *acs){
@@ -276,6 +273,8 @@ const acs_trap trap[] = {
 /**
  * @brief control falls here when a state change
  * request is unrecognized
+ *
+ * * @note this is a critical section
  *
  */
 static int fsm_trap(ACS *acs){
@@ -325,6 +324,7 @@ const acs_transition trans[] = {
 /**
  * @brief waits for events on the CAN bus and processes them
  *
+ * @note this is a critical section
  *
  */
 static acs_event getNextEvent(ACS *acs){
@@ -366,6 +366,7 @@ static acs_event getNextEvent(ACS *acs){
 /**
  * @brief the ACS state machine
  *
+ * @note this is a critical section
  *
  */
 static int acs_statemachine(ACS *acs){
@@ -407,7 +408,6 @@ static int acs_statemachine(ACS *acs){
 /**
  * @brief general ACS initialization
  *
- *
  */
 extern int acsInit(ACS *acs){
 	(void)acs;
@@ -417,7 +417,6 @@ extern int acsInit(ACS *acs){
 
 /**
  * @brief ACS thread and thread working area
- *
  *
  */
 THD_WORKING_AREA(wa_acsThread,WA_ACS_THD_SIZE);
