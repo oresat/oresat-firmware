@@ -1,14 +1,6 @@
 #ifndef _BLDC_H_
 #define _BLDC_H_
 
-/**
- *
- *
- *
- *
- *
- */
-
 #include "ch.h"
 #include "hal.h"
 
@@ -30,24 +22,24 @@
 /**
  * TODO: the definitions of STEP, STRETCH, and SKIP
  * evolved over the course of various experiments. These
- * will completely change in v2.0.
- *
- * SCALE: Duty cycle scaling factor from 0-100 %
+ * will completely change in v2.0. Below is their intended and
+ * eventual meanings.
  *
  * STEPS: the number of discrete steps in the LUT
  *
- * STRETCH: 
+ * STRETCH: How many periods the current LUT value is repeated
  *
- * SKIP:
+ * SKIP: How many steps are skipped in the LUT to get the next value
  *
- * STEP_SIZE: 
+ * SMOOTH: Smoothing out the transition between LUT values by increasing the amount of steps in between 
+ *
+ * SCALE: Duty cycle scaling factor from 0-100 %
  *
  */
 #define SCALE			100
 #define STEPS			360 
 #define STRETCH		1
 #define SKIP      1
-#define STEP_SIZE 100
 
 /// encoder has 14 bits of precision
 #define ENCODER_MAX 1<<14
@@ -71,8 +63,31 @@
 #define sinctrl_t uint16_t 
 
 /**
+ * @brief The structure that defines and characterizes
+ * a motor and how it's being control
  *
+ * steps: Steps in the LUT
  *
+ * stretch: How many steps are added in between LUT steps
+ *
+ * skip: How many steps are skipped in the LUT
+ *
+ * u, v, and w: The three sin signals, that traverse through the LUT
+ * current_sin_u,v,w and next_sin_u,v,w: Used in calculation of values for stretch
+ *
+ * sin_diff: Difference in LUT steps for stretch
+ *
+ * position: Position from encode, a value of 0 - 2^14
+ *
+ * openLoop: Controls whether encoder feedback is used
+ *
+ * sinctrl: The LUT
+ *
+ * spi_rxbuff: Where the encoder position is after SPI transmission
+ *
+ * p_spi_thread: Spi thread for the encoder feedback
+ *
+ * samples: Samples from the ADC.
  *
  */
 typedef struct{
@@ -98,8 +113,10 @@ typedef struct{
 } bldc;
 
 /**
+ * @brief The low value used to break up the encoder value into regions
  *
- *
+ * Allows us to translate the encoder 0 - 2^14 into 6 discrete chunks
+ * of 0-360 for use in the LUT.
  *
  */
 static const uint16_t chunk_low[6] = {
@@ -113,8 +130,9 @@ static const uint16_t chunk_low[6] = {
 
 
 /**
+ * @brief Control structure used to configure the SPI driver
  *
- *
+ * 
  *
  */
 static const SPIConfig spicfg = {

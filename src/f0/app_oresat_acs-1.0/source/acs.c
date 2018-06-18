@@ -202,7 +202,7 @@ static int trap_mtqr_dir(ACS *acs){
 }
 
 /**
- * @brief 
+ * @brief Changes how many steps are added in between each LUT step
  *
  *
  */
@@ -214,7 +214,7 @@ static int trap_rw_stretch(ACS *acs){
 }
 
 /**
- * @brief 
+ * @brief Closed loop using encoder, or brute forcing with open loop
  *
  *
  */
@@ -226,7 +226,7 @@ static int trap_rw_control(ACS *acs){
 }
 
 /**
- * @brief 
+ * @brief Changes how many steps are skipped in the LUT when going to next step
  *
  *
  */
@@ -238,7 +238,7 @@ static int trap_rw_skip(ACS *acs){
 }
 
 /**
- * @brief 
+ * @brief Changes the scale factor, modifying LUT value by 0-100%
  *
  *
  */
@@ -252,7 +252,7 @@ static int trap_rw_scale(ACS *acs){
 /**
  * @brief trap function table
  *
- * thes table defines the events allowed 
+ * this table defines the events allowed 
  * to be called in states, and the function
  * that needs to be called on a successful 
  * match
