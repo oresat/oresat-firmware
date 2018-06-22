@@ -9,14 +9,14 @@
  */
 THD_WORKING_AREA(can_rpdo_wa, 128);
 THD_FUNCTION(can_rpdo, p) {
-    event_listener_t        el;
+    event_listener_t        can_el;
     CANRxFrame              rxmsg;
 
     (void)p;
     // Set thread name
     chRegSetThreadName("receiver");
     // Register RX event
-    chEvtRegister(&CAND1.rxfull_event, &el, 0);
+    chEvtRegister(&CAND1.rxfull_event, &can_el, 0);
 
     // Start RX Loop
     while (!chThdShouldTerminateX()) {
@@ -44,13 +44,14 @@ THD_FUNCTION(can_rpdo, p) {
                         rpdo[i].pdata[j] = rxmsg.data8[j];
                     }
                     chSysUnlock();
+                    chEvtBroadcast(&rpdo_event);
                 }
             }
         }
     }
 
     //Unregister RX event before terminating thread
-    chEvtUnregister(&CAND1.rxfull_event, &el);
+    chEvtUnregister(&CAND1.rxfull_event, &can_el);
     chThdExit(MSG_OK);
 }
 
@@ -86,6 +87,9 @@ THD_FUNCTION(can_tpdo, p) {
     chThdExit(MSG_OK);
 }
 
+/*
+ * Heartbeat thread.
+ */
 THD_WORKING_AREA(can_hb_wa, 64);
 THD_FUNCTION(can_hb, p) {
     (void)p;

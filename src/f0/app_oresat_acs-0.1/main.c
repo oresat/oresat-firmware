@@ -34,11 +34,12 @@
 //=== ChibiOS header files
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
 //=== Project header files
-#include "can.h"
+#include "oresat.h"
 #include "acs.h"
+
+ACSdata data = {};
 
 static SerialConfig ser_cfg = {
 	115200,     //Baud rate
@@ -48,16 +49,42 @@ static SerialConfig ser_cfg = {
 };
 
 static void app_init(void){
-	acs_init();	 
-	can_init(CAN_NODE,200);
+	acsInit(&data);	
+	//data.acs[0] = 1;
+	canRPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,CAN_BUF,data.recv);
+//	initTPDO();
+	canTPDOObjectInit(CAN_PDO_1,CAN_ID_DEFAULT,0,0,CAN_BUF,data.send);
+
 	sdStart(&SD2,&ser_cfg); // Start up debug output
 }
 
 static void app_main(void){
-  can_start();
-	
-	chThdCreateStatic(waACSThread,sizeof(waACSThread),NORMALPRIO,ACSThread,NULL);
+//*
+	chThdCreateStatic(
+		wa_acsThread,
+		sizeof(wa_acsThread), 
+		NORMALPRIO, 
+		acsThread, 
+		NULL
+	);
+//*/
+//*
+	chThdCreateStatic(
+		wa_spiThread,
+		sizeof(wa_spiThread),
+		HIGHPRIO,
+		spiThread,
+		NULL
+	);
 
+  /*chThdCreateStatic(
+		wa_debugThread,
+		sizeof(wa_debugThread), 
+		NORMALPRIO, 
+		debugThread, 
+		NULL
+	);*/
+//*/
 	while(true){
 		chThdSleepMilliseconds(1000);
 	}
@@ -66,6 +93,8 @@ static void app_main(void){
 int main(void) {
 	halInit();
 	chSysInit();
+	
+	oresat_init(CAN_NODE);
 	
 	app_init();
 	app_main();
