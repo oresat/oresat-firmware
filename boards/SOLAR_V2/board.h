@@ -167,7 +167,7 @@
 /*
  * IO lines assignments.
  */
-//#define LINE_PIN0                 PAL_LINE(GPIOA, 0U)
+#define LINE_LED_GREEN              PAL_LINE(GPIOA, 4U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -210,11 +210,11 @@
 /*
  * GPIOA setup:
  *
- * PA0  - SHDN_STM                  (output pulldown).
- * PA1  - ZSPM-NFLT                 (output pulldown).
+ * PA0  - SHDN_STM                  (output floating).
+ * PA1  - ZSPM-NFLT                 (input pullup).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
- * PA4  - DEBUG                     (output pullup).
+ * PA4  - DEBUG                     (output pulldown).
  * PA5  - TP9                       (output pullup).
  * PA6  - TP10                      (output pullup).
  * PA7  - TP11                      (output pullup).
@@ -228,7 +228,7 @@
  * PA15 - NC                        (output pulldown).
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_OUTPUT(GPIOA_SHDN_STM) |      \
-                                     PIN_MODE_OUTPUT(GPIOA_ZSPM-NFLT) |     \
+                                     PIN_MODE_INPUT(GPIOA_ZSPM-NFLT) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_OUTPUT(GPIOA_DEBUG) |         \
@@ -244,21 +244,21 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SWCLK) |      \
                                      PIN_MODE_OUTPUT(GPIOA_PIN15_NC))
 #define VAL_GPIOA_OTYPER            (PIN_OTYPE_OPENDRAIN(GPIOA_SHDN_STM) |  \
-                                     PIN_OTYPE_OPENDRAIN(GPIOA_ZSPM-NFLT) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_ZSPM-NFLT) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_DEBUG) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOA_TP9) |        \
                                      PIN_OTYPE_PUSHPULL(GPIOA_TP10) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_TP11) |       \
-                                     PIN_OTYPE_OPENDRAIN(GPIOA_PIN8_NC) |   \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_PIN8_NC) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_SILENT) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_SHDN) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_RX) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_TX) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SWDIO) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SWCLK) |      \
-                                     PIN_OTYPE_OPENDRAIN(GPIOA_PIN15_NC))
+                                     PIN_OTYPE_PUSHPULL(GPIOA_PIN15_NC))
 #define VAL_GPIOA_OSPEEDR           (PIN_OSPEED_HIGH(GPIOA_SHDN_STM) |      \
                                      PIN_OSPEED_HIGH(GPIOA_ZSPM-NFLT) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
@@ -275,8 +275,8 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWDIO) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15_NC))
-#define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_SHDN_STM) |   \
-                                     PIN_PUPDR_PULLDOWN(GPIOA_ZSPM-NFLT) |  \
+#define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_SHDN_STM) |   \
+                                     PIN_PUPDR_PULLUP(GPIOA_ZSPM-NFLT) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_PULLDOWN(GPIOA_DEBUG) |      \
@@ -295,7 +295,7 @@
                                      PIN_ODR_HIGH(GPIOA_ZSPM-NFLT) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
-                                     PIN_ODR_HIGH(GPIOA_DEBUG) |            \
+                                     PIN_ODR_LOW(GPIOA_DEBUG) |             \
                                      PIN_ODR_HIGH(GPIOA_TP9) |              \
                                      PIN_ODR_HIGH(GPIOA_TP10) |             \
                                      PIN_ODR_HIGH(GPIOA_TP11) |             \
