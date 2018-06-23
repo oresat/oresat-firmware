@@ -290,7 +290,7 @@
                                      PIN_PUPDR_PULLUP(GPIOA_CAN_RX) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_CAN_TX) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_SWDIO) |        \
-                                     PIN_PUPDR_PULLUP(GPIOA_SWCLK) |        \
+                                     PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_PULLDOWN(GPIOA_CAN_SILENT))
 #define VAL_GPIOA_ODR               (PIN_ODR_HIGH(GPIOA_CURR_FDB_MAG) |     \
                                      PIN_ODR_HIGH(GPIOA_CURR_FDB_BLDC) |    \
