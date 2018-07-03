@@ -1,7 +1,8 @@
 #include "oresat.h"
 
 void oresat_init(uint8_t node_id) {
-    uint8_t obr_node_id = (FLASH->OBR & FLASH_OBR_DATA0) >> FLASH_OBR_DATA0_Pos;
+    /*uint8_t obr_node_id = (FLASH->OBR & FLASH_OBR_DATA0) >> FLASH_OBR_DATA0_Pos;*/
+    uint8_t obr_node_id = 0xFF;
 
     //If node ID is not overridden, set node ID
     if (node_id == 0) {
