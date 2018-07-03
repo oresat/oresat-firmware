@@ -27,7 +27,7 @@
 /*===========================================================================*/
 
 /*
- * Protocard V1.1 Board Configuration
+ * Protocard V2 Board Configuration
  * PART: STM32F042K6T6
  * PACKAGE: LQFP32
  */
@@ -35,8 +35,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_PROTOCARD_V1_1
-#define BOARD_NAME                  "Protocard V1.1"
+#define BOARD_PROTOCARD_V2
+#define BOARD_NAME                  "Protocard V2"
 
 /*
  * Board oscillators-related settings.

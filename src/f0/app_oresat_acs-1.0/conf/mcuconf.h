@@ -43,21 +43,21 @@
 #define STM32_HSI14_ENABLED                 TRUE
 #define STM32_HSI48_ENABLED                 FALSE
 #define STM32_LSI_ENABLED                   TRUE
-#define STM32_HSE_ENABLED                   FALSE
+#define STM32_HSE_ENABLED                   TRUE
 #define STM32_LSE_ENABLED                   FALSE
 #define STM32_SW                            STM32_SW_PLL
-#define STM32_PLLSRC                        STM32_PLLSRC_HSI_DIV2
+#define STM32_PLLSRC                        STM32_PLLSRC_HSE
 #define STM32_PREDIV_VALUE                  1
-#define STM32_PLLMUL_VALUE                  12
+#define STM32_PLLMUL_VALUE                  3
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE                          STM32_PPRE_DIV1
-#define STM32_MCOSEL                        STM32_MCOSEL_NOCLOCK
+#define STM32_MCOSEL                        STM32_MCOSEL_SYSCLK
 #define STM32_MCOPRE                        STM32_MCOPRE_DIV1
 #define STM32_PLLNODIV                      STM32_PLLNODIV_DIV2
 #define STM32_USBSW                         STM32_USBSW_HSI48
 #define STM32_CECSW                         STM32_CECSW_HSI
 #define STM32_I2C1SW                        STM32_I2C1SW_HSI
-#define STM32_USART1SW                      STM32_USART1SW_PCLK
+#define STM32_USART1SW                      STM32_USART1SW_HSI
 #define STM32_RTCSEL                        STM32_RTCSEL_LSI
 
 /*
@@ -73,7 +73,7 @@
 /*
  * ADC driver system settings.
  */
-#define STM32_ADC_USE_ADC1                  FALSE
+#define STM32_ADC_USE_ADC1                  TRUE
 #define STM32_ADC_ADC1_CKMODE               STM32_ADC_CKMODE_ADCCLK
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
 #define STM32_ADC_ADC1_DMA_IRQ_PRIORITY     2
@@ -134,7 +134,7 @@
 /*
  * PWM driver system settings.
  */
-#define STM32_PWM_USE_ADVANCED             	TRUE 
+#define STM32_PWM_USE_ADVANCED              TRUE
 #define STM32_PWM_USE_TIM1                  TRUE
 #define STM32_PWM_USE_TIM2                  FALSE
 #define STM32_PWM_USE_TIM3                  FALSE
