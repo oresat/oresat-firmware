@@ -7,6 +7,8 @@ THD_FUNCTION(Thread1, arg) {
   (void)arg;
   chRegSetThreadName("blinker");
 
+  palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
+
   while (!chThdShouldTerminateX()) {
     palClearLine(LINE_LED_GREEN);
     chThdSleepMilliseconds(500);
