@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -Og -ggdb -fomit-frame-pointer -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -138,7 +138,7 @@ CSRC = $(ALLCSRC) \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC = $(AllCPPSRC)
+CPPSRC = $(ALLCPPSRC)
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
@@ -168,29 +168,6 @@ INCDIR = $(ALLINC) $(TESTINC) $(CONFDIR)
 
 #
 # Project, sources and paths
-##############################################################################
-
-##############################################################################
-# Start of user section
-#
-
-# List all user C define here, like -D_DEBUG=1
-UDEFS =
-
-# Define ASM defines here
-UADEFS =
-
-# List all user directories here
-UINCDIR = $(PROJ_INC)
-
-# List the user directory to look for the libraries here
-ULIBDIR = $(PROJ_SRC)
-
-# List all user libraries here
-ULIBS =
-
-#
-# End of user section
 ##############################################################################
 
 ##############################################################################
@@ -232,6 +209,29 @@ CPPWARN = -Wall -Wextra -Wundef
 # Compiler settings
 ##############################################################################
 
-RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
+##############################################################################
+# Start of user section
+#
+
+# List all user C define here, like -D_DEBUG=1
+UDEFS =
+
+# Define ASM defines here
+UADEFS =
+
+# List all user directories here
+UINCDIR = $(PROJ_INC)
+
+# List the user directory to look for the libraries here
+ULIBDIR = $(PROJ_SRC)
+
+# List all user libraries here
+ULIBS =
+
+#
+# End of user defines
+##############################################################################
+
+RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
 include $(RULESPATH)/rules.mk
 include $(TOOLCHAIN)/toolchain.mk
