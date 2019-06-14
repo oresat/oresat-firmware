@@ -90,6 +90,125 @@ uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t r
 }
 
 
+/**
+ * Shutdown after reset the AX5043
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_shutdown(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_POWERDOWN;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+
+/**
+ * Standby the AX5043
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_standby(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  //ax5043_write_reg(spip, AX5043_REG_PWRMODE, AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT | AX5043_POWERDOWN, ret_value);
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_STANDBY;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+/**
+ * Enable FIFO in AX5043
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_fifo_en(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_FIFO_ENABLED;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+/**
+ * put AX5043 in synthesizer RX mode
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_synth_rx(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_SYNTH_RX;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+/**
+ * changes AX5043 to full RX mode
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_full_rx(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_FULL_RX;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+
+/**
+ * put AX5043 in synthesizer TX mode
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_synth_tx(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_SYNTH_TX;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+
+/**
+ * changes AX5043 to full TX mode
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_full_tx(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  uint8_t value;
+  value = ax5043_read_reg(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, ret_value);
+  value = value & 0xF0;
+  value = value | AX5043_FULL_TX;
+  ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
+}
+
+
 
 
 

@@ -348,6 +348,33 @@ void ax5043_reset(SPIDriver * spip)
 }
 
 
+
+/**
+ * Set adress registers in AX5043
+ * @param spip: SPI Configuration.
+ * @return void 
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_set_addr_regs(SPIDriver * spip)
+{
+
+  uint8_t ret_value[3]={0,0,0};
+  //set address values
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR0, (uint8_t)0x32, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR1, (uint8_t)0x34, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR2, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR3, (uint8_t)0x00, ret_value);
+  //set address mask
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)0xFF, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)0x00, ret_value);
+
+
+}
+
+
+
 /**
  * prepare AX5043 for tx
  * @param spip: SPI Configuration.
@@ -427,15 +454,7 @@ void ax5043_prepare_rx(SPIDriver * spip)
   ax5043_write_reg(spip, AX5043_REG_IRQMASK1, (uint8_t)0x00, ret_value);
   
   //set address values
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR0, (uint8_t)0x33, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR1, (uint8_t)0x34, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR2, (uint8_t)0x00, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR3, (uint8_t)0x00, ret_value);
-  //set address mask
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)0xFF, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)0x00, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)0x00, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)0x00, ret_value);
+  ax5043_set_addr_regs(spip);
 
 }
 

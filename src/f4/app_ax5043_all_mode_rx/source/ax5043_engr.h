@@ -28,6 +28,7 @@ void ax5043_set_regs_rxcont_singleparamset(SPIDriver * spip);
 
 void ax5043_reset(SPIDriver * spip);
 void ax5043_prepare_tx(SPIDriver * spip);
+void ax5043_prepare_tx(SPIDriver * spip);
 void ax5043_prepare_rx(SPIDriver * spip);
 void ax5043_init_registers_common(SPIDriver * spip);
 uint8_t axradio_get_pllvcoi(SPIDriver * spip);

@@ -30,12 +30,22 @@
 #include "util_version.h"
 #include "util_numbers.h"
 #include "ax5043.h"
-#include "ax5043_engr.h"
 
+//#include "adf7030.h"
 
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
 
+
+const struct axradio_address remoteaddr_tx = {
+	{ 0x32, 0x34, 0x00, 0x00}
+};
+const struct axradio_address_mask localaddr_tx = {
+	{ 0x33, 0x34, 0x00, 0x00},
+	{ 0xFF, 0x00, 0x00, 0x00}
+};
+
+uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
 
 /*
  * Serial Driver Configuration
@@ -86,7 +96,7 @@ static const SPIConfig spicfg_tx =
 
 
 /*
- * Initialize the SPI drivers and configure the adf7030 chips
+ * Initialize the SPI drivers and configure the ax5043 chips
  */
 static void app_init(void)
 {
@@ -109,17 +119,29 @@ static void app_init(void)
 
     spiStart(&SPID1, &spicfg_rx);
     spiStart(&SPID2, &spicfg_tx);
+	//spiSelect(&SPID2);
 
+
+
+
+
+    //uint16_t reg=0;
+    //uint8_t value=0;
+    //uint8_t value1=0x55;
+    //uint8_t ret_value[3]={0,0,0};
+    //int i;
 
 
 
     chprintf(DEBUG_CHP, "Configuring AX5043\r\n");
+    chThdSleepMilliseconds(50);
     ax5043_init(&SPID2);
+    ax5043_set_addr(&SPID2, localaddr_tx);
     chprintf(DEBUG_CHP, "done reseting AX5043\r\n");
 
 
 
-  ax5043_prepare_rx(&SPID2);
+     ax5043_prepare_rx(&SPID2);
   
 
 
@@ -132,7 +154,9 @@ static void app_init(void)
  */
 static void main_loop(void)
 {
-
+  chThdSleepMilliseconds(500);
+  uint8_t packet_len=0;
+  uint8_t ret_value[3]={0,0,0};
 
   /* Enabling events on both edges of the button line.*/
   //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
@@ -142,10 +166,18 @@ static void main_loop(void)
   while(true)
   {
     //palWaitLineTimeout(LINE_BUTTON, TIME_INFINITE);
+    //palWaitLineTimeout(LINE_ARD_A5, TIME_INFINITE);
     palWaitLineTimeout(LINE_ARD_A5, TIME_MS2I(5000));
-    chprintf(DEBUG_CHP, "Reading FIFO\r\n");
-    //ax5043_receive(&SPID2);
-    receive_loop(&SPID2);
+
+    if (palReadLine(LINE_ARD_A5))
+      chprintf(DEBUG_CHP, "\r\r int line is HIGH ** \r\n");
+    else
+      chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
+    
+    packet_len=receive_loop(&SPID2, axradio_rxbuffer);
+
+    if(packet_len > 0)
+      chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
   }
 
 }
@@ -160,6 +192,13 @@ int main(void)
     chSysInit();
     app_init();
 
+    // Enabling events on both edges of the button line.*/
+    //palEnableLineEvent(GPIOC_SX_DIO3, PAL_EVENT_MODE_RISING_EDGES);
+
+	//chThdCreateStatic(waThread_sx1236_rx,      sizeof(waThread_sx1236_rx),   NORMALPRIO, Thread_sx1236_rx, NULL);
+    //chThdSleepMilliseconds(500);
+    //chThdCreateStatic(waThread_sx1236_tx,      sizeof(waThread_sx1236_tx),   NORMALPRIO, Thread_sx1236_tx, NULL);
+    chThdSleepMilliseconds(500);
 
     main_loop();
     return 0;

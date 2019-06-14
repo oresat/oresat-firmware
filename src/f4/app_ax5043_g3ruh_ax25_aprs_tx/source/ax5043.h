@@ -725,8 +725,6 @@ void ax5043_receive(SPIDriver * spip);
 uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 void transmit_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
-uint8_t receive_loop(SPIDriver * spip);
 
 #endif
 //! @}

@@ -17,7 +17,26 @@
 
 
 
+/**
+ * The maximum allowed frame size
 
+#define MAX_FRAME_LEN                   1024
+
+#define RX_BAUDRATE                     9600
+#define TX_BAUDRATE                     9600
+
+#define MIN_RF_FREQ_INT_VCO_RFDIV0      800000000
+#define MAX_RF_FREQ_INT_VCO_RFDIV0      1050000000
+
+#define MIN_RF_FREQ_INT_VCO_RFDIV1      (MIN_RF_FREQ_INT_VCO_RFDIV0 / 2)
+#define MAX_RF_FREQ_INT_VCO_RFDIV1      (MAX_RF_FREQ_INT_VCO_RFDIV0 / 2)
+
+#define MIN_RF_FREQ_EXT_VCO_RFDIV0      54000000
+#define MAX_RF_FREQ_EXT_VCO_RFDIV0      525000000
+
+#define MIN_RF_FREQ_EXT_VCO_RFDIV1      (MIN_RF_FREQ_EXT_VCO_RFDIV0 / 2)
+#define MAX_RF_FREQ_EXT_VCO_RFDIV1      (MAX_RF_FREQ_EXT_VCO_RFDIV0 / 2)
+ */
 
 /******************************************************************************
  ********************  AX5043 control SPI registers ***************************
@@ -679,13 +698,35 @@ struct axradio_address_mask {
 //function declaration starts here
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-
+void ax5043_set_regs(SPIDriver * spip);
+void ax5043_set_regs_tx(SPIDriver * spip);
+void ax5043_set_regs_rx(SPIDriver * spip);
+void ax5043_set_regs_rxcont(SPIDriver * spip);
+void ax5043_set_regs_rxcont_singleparamset(SPIDriver * spip);
 void ax5043_shutdown(SPIDriver * spip);
 void ax5043_standby(SPIDriver * spip);
 void ax5043_fifo_en(SPIDriver * spip);
 void ax5043_full_rx(SPIDriver * spip);
 void ax5043_synth_tx(SPIDriver * spip);
 void ax5043_full_tx(SPIDriver * spip);
+void ax5043_reset(SPIDriver * spip);
+void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
+void ax5043_set_local_addr(SPIDriver * spip);
+void ax5043_prepare_tx(SPIDriver * spip);
+void ax5043_prepare_rx(SPIDriver * spip);
+void ax5043_init_registers_common(SPIDriver * spip);
+uint8_t axradio_get_pllvcoi(SPIDriver * spip);
+
+void ax5043_init(SPIDriver * spip);
+void ax5043_receive(SPIDriver * spip);
+
+
+//functions added from bradenburg's code.
+uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+void transmit_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
+void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
+uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]);
 
 #endif
 //! @}

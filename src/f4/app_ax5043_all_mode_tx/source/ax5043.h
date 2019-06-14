@@ -677,9 +677,15 @@ struct axradio_address_mask {
 };
 
 //function declaration starts here
-uint8_t ax5043_write_reg_spi(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-void ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
+uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
+
+void ax5043_shutdown(SPIDriver * spip);
+void ax5043_standby(SPIDriver * spip);
+void ax5043_fifo_en(SPIDriver * spip);
+void ax5043_full_rx(SPIDriver * spip);
+void ax5043_synth_tx(SPIDriver * spip);
+void ax5043_full_tx(SPIDriver * spip);
 
 #endif
 //! @}
