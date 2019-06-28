@@ -1,4 +1,4 @@
-/*! \file ax5043.h */
+/*! \file ax5043_common.h */
 
 
 /*!
@@ -6,8 +6,8 @@
  *  * @{
  *
  */
-#ifndef _AX5043_H
-#define _AX5043_H
+#ifndef _AX5043_COMMON_H
+#define _AX5043_COMMON_H
 
 #define DEBUG_SERIAL  SD2
 #define DEBUG_CHP     ((BaseSequentialStream *) &DEBUG_SERIAL)
@@ -17,7 +17,23 @@
 
 
 
+/**
+ * The maximum allowed frame size
 
+#define MAX_FRAME_LEN                   1024
+
+#define MIN_RF_FREQ_INT_VCO_RFDIV0      800000000
+#define MAX_RF_FREQ_INT_VCO_RFDIV0      1050000000
+
+#define MIN_RF_FREQ_INT_VCO_RFDIV1      (MIN_RF_FREQ_INT_VCO_RFDIV0 / 2)
+#define MAX_RF_FREQ_INT_VCO_RFDIV1      (MAX_RF_FREQ_INT_VCO_RFDIV0 / 2)
+
+#define MIN_RF_FREQ_EXT_VCO_RFDIV0      54000000
+#define MAX_RF_FREQ_EXT_VCO_RFDIV0      525000000
+
+#define MIN_RF_FREQ_EXT_VCO_RFDIV1      (MIN_RF_FREQ_EXT_VCO_RFDIV0 / 2)
+#define MAX_RF_FREQ_EXT_VCO_RFDIV1      (MAX_RF_FREQ_EXT_VCO_RFDIV0 / 2)
+ */
 
 /******************************************************************************
  ********************  AX5043 control SPI registers ***************************
@@ -679,13 +695,18 @@ struct axradio_address_mask {
 //function declaration starts here
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-
 void ax5043_shutdown(SPIDriver * spip);
 void ax5043_standby(SPIDriver * spip);
 void ax5043_fifo_en(SPIDriver * spip);
 void ax5043_full_rx(SPIDriver * spip);
 void ax5043_synth_tx(SPIDriver * spip);
 void ax5043_full_tx(SPIDriver * spip);
+void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
+void ax5043_reset(SPIDriver * spip);
+void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
+void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
 
 #endif
 //! @}
