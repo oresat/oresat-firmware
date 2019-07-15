@@ -27,21 +27,20 @@
 /*===========================================================================*/
 
 /*
- * Board description
- * PART: PART_NUM
- * PACKAGE: PACKAGE
+ * ACS V4.x STM32L452CE Board Configuration
+ * PART: STM32L452CEU3
+ * PACKAGE: UFQFPN48
  */
 
 /*
  * Board identifier.
  */
-#define BOARD_TEMPLATE
-#define BOARD_NAME                  "Board name"
+#define BOARD_ORESAT_ACS_V4
+#define BOARD_NAME                  "OreSat ACS V4.x"
 
 /*
  * Board oscillators-related settings.
  * NOTE: LSE not fitted.
- * NOTE: HSE not fitted.
  */
 #if !defined(STM32_LSECLK)
 #define STM32_LSECLK                0U
@@ -50,13 +49,13 @@
 #define STM32_LSEDRV                (3U << 3U)
 
 #if !defined(STM32_HSECLK)
-#define STM32_HSECLK                0U
+#define STM32_HSECLK                16000000U
 #endif
 
 /*
  * MCU type as defined in the ST header.
  */
-#define STM32F042x6
+#define STM32L452xx
 
 /*
  * IO pins assignments.
