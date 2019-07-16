@@ -205,7 +205,13 @@
 /*
  * IO lines assignments.
  */
-//#define LINE_PIN0                 PAL_LINE(GPIOA, 0U)
+#define LINE_SPI1_CS                PAL_LINE(GPIOA, 4U)
+#define LINE_BLDC_EN                PAL_LINE(GPIOA, 12U)
+#define LINE_MAG_DIR                PAL_LINE(GPIOB, 3U)
+#define LINE_CAN_SILENT             PAL_LINE(GPIOB, 4U)
+#define LINE_MAG_STBY               PAL_LINE(GPIOB, 7U)
+#define LINE_MAG_EN                 PAL_LINE(GPIOB, 9U)
+#define LINE_BLDC_STBY              PAL_LINE(GPIOB, 12U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
