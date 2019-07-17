@@ -10,6 +10,7 @@
  * http://www.bittiming.can-wiki.info/
  */
 #ifdef STM32F0xx_MCUCONF
+// 1Mbps based on 48MHz APB Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -21,11 +22,12 @@ const CANConfig cancfg = {
     CAN_BTR_SJW(0)    |     //Synchronization Jump Width
     CAN_BTR_TS1(12)   |     //Time Segment 1
     CAN_BTR_TS2(1)    |     //Time Segment 2
-    CAN_BTR_BRP(5)          //Bit Rate Prescaler
+    CAN_BTR_BRP(2)          //Bit Rate Prescaler
 };
 #endif
 
 #ifdef STM32F4xx_MCUCONF
+// 1Mbps based on 45MHz APB1 Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -35,13 +37,14 @@ const CANConfig cancfg = {
     // Note: Convert to zero based values here when using the calculator
     // CAN_BTR_LBKM     |     //Loopback Mode (Debug)
     CAN_BTR_SJW(0)    |     //Synchronization Jump Width
-    CAN_BTR_TS1(14)   |     //Time Segment 1
+    CAN_BTR_TS1(11)   |     //Time Segment 1
     CAN_BTR_TS2(1)    |     //Time Segment 2
-    CAN_BTR_BRP(4)          //Bit Rate Prescaler
+    CAN_BTR_BRP(2)          //Bit Rate Prescaler
 };
 #endif
 
 #ifdef STM32L4xx_MCUCONF
+// 1Mbps based on 80MHz APB1 Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -51,7 +54,7 @@ const CANConfig cancfg = {
     // Note: Convert to zero based values here when using the calculator
     // CAN_BTR_LBKM     |     //Loopback Mode (Debug)
     CAN_BTR_SJW(0)    |     //Synchronization Jump Width
-    CAN_BTR_TS1(14)   |     //Time Segment 1
+    CAN_BTR_TS1(12)   |     //Time Segment 1
     CAN_BTR_TS2(1)    |     //Time Segment 2
     CAN_BTR_BRP(4)          //Bit Rate Prescaler
 };
