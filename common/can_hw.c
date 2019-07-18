@@ -10,7 +10,7 @@
  * http://www.bittiming.can-wiki.info/
  */
 #ifdef STM32F0xx_MCUCONF
-// 1Mbps based on 48MHz APB Clock
+// ~87.5% sample point 1Mbps based on 48MHz APB Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -27,7 +27,7 @@ const CANConfig cancfg = {
 #endif
 
 #ifdef STM32F4xx_MCUCONF
-// 1Mbps based on 45MHz APB1 Clock
+// ~87.5% sample point 1Mbps based on 45MHz APB1 Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -44,7 +44,7 @@ const CANConfig cancfg = {
 #endif
 
 #ifdef STM32L4xx_MCUCONF
-// 1Mbps based on 80MHz APB1 Clock
+// ~87.5% sample point 1Mbps based on 80MHz APB1 Clock
 const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management

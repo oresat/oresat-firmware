@@ -17,8 +17,6 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     // Initialize node configuration data
     node.node_id = node_id;
     node.err_code = 0x00;
-    //TODO: Implement actual bitrate calculations
-    node.bitrate = 1000U;
     node.heartbeat_time = heartbeat;
     node.error_reg = 0x00;
 

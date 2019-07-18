@@ -53,7 +53,6 @@ typedef enum {
 typedef struct {
     uint8_t     node_id;
     uint8_t     err_code;
-    uint32_t    bitrate;
     uint32_t    heartbeat_time;
     CANTxFrame  heartbeat_msg;
     uint8_t     error_reg;
