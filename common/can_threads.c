@@ -26,7 +26,7 @@ THD_FUNCTION(can_rpdo, p) {
             continue;
         }
 
-        while (canReceive(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
+        while (canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
             for (uint8_t i = 0; i < 4; ++i) {
                 if (rpdo[i].pdata == NULL) {
@@ -82,7 +82,7 @@ THD_FUNCTION(can_tpdo, p) {
             chSysUnlock();
 
             // Transmit the PDO
-            canTransmit(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
+            canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
         }
         chThdSleepMilliseconds(200);
     }
@@ -99,7 +99,7 @@ THD_FUNCTION(can_hb, p) {
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
-        canTransmit(&CAND1, CAN_ANY_MAILBOX, &node.heartbeat_msg, TIME_MS2I(100));
+        canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &node.heartbeat_msg, TIME_MS2I(100));
         chThdSleepMilliseconds(node.heartbeat_time);
     }
 
