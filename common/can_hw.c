@@ -46,17 +46,10 @@ void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_
 }
 
 uint8_t can_hw_init(void) {
-    flt_reg_t reg;
-
-    reg.raw = 0;
-    reg.flt_short.id.STID = 0x01;
-    reg.flt_short.mask_id.STID = 0x7F;
-    canFilterInit(can_filters, filter_entries++, reg, reg, 0);
-
-    canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     /*
      * Activates CAN driver 1.
      */
+    canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     canStart(&CAND1, &cancfg);
 
     return true;
