@@ -58,6 +58,10 @@ static const CANFilter can_filters[] = {
         CAN_FLT_EID1(0) | CAN_FLT_IDE1(0) | CAN_FLT_RTR1(0) | CAN_FLT_SID1(0x07F) },// Mask/ID
 };
 
+void can_filter_init(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
+
+}
+
 uint8_t can_hw_init(void) {
     /*
      * Activates CAN driver 1.
