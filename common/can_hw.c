@@ -41,15 +41,22 @@ void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_
     cfp->mode       = (flags && CAN_FLT_MODE_MASK) >> CAN_FLT_MODE_POS;
     cfp->scale      = (flags && CAN_FLT_SCALE_MASK) >> CAN_FLT_SCALE_POS;
     cfp->assignment = (flags && CAN_FLT_FIFO_MASK) >> CAN_FLT_FIFO_POS;
-    cfp->register1  = reg1;
-    cfp->register2  = reg2;
+    cfp->register1  = reg1.raw;
+    cfp->register2  = reg2.raw;
 }
 
 uint8_t can_hw_init(void) {
+    flt_reg_t reg;
+
+    reg.raw = 0;
+    reg.flt_short.id.STID = 0x01;
+    reg.flt_short.mask_id.STID = 0x7F;
+    canFilterInit(can_filters, filter_entries++, reg, reg, 0);
+
+    canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     /*
      * Activates CAN driver 1.
      */
-    canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     canStart(&CAND1, &cancfg);
 
     return true;
