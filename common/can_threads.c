@@ -2,6 +2,8 @@
  * CAN Subsystem Threads
  */
 
+//Project headers
+#include "can.h"
 #include "can_threads.h"
 
 /*

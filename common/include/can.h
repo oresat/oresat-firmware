@@ -8,11 +8,11 @@
 #include "ch.h"
 #include "hal.h"
 
-//Project headers
-#include "can_hw.h"
-#include "can_threads.h"
-
 //Definitions
+#ifndef DEFAULT_TPDO_TIMEOUT
+#define DEFAULT_TPDO_TIMEOUT 200U
+#endif
+
 #define CAN_ID_TPDO(n, m)  ((n << 8) | 0x80) | m
 #define CAN_ID_RPDO(n, m)  ((n + 1) << 8) | m
 
@@ -59,10 +59,9 @@ typedef struct {
 } can_node_t;
 
 typedef struct {
+    virtual_timer_t event_timer;
     uint32_t    event_time;
     uint32_t    inhibit_time;
-    uint32_t    inhibit_timestamp;
-    uint8_t     inhibit_status;
     uint8_t     *pdata;
     CANTxFrame  msg;
 } can_tpdo_t;
@@ -88,7 +87,7 @@ void can_init(uint8_t node_id, uint32_t heartbeat);
 void can_start(void);
 
 //TPDO/RPDO initializations
-void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata);
+void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_time, uint32_t inhibit_time, uint8_t len, uint8_t *pdata);
 void canRPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint8_t len, uint8_t *pdata);
 
 //Reset functions

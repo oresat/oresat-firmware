@@ -8,11 +8,6 @@
 #include "ch.h"
 #include "hal.h"
 
-//Project headers
-#include "can.h"
-
-//Definitions
-
 //Thread prototypes
 extern THD_WORKING_AREA(can_rpdo_wa, 128);
 extern THD_FUNCTION(can_rpdo, p);

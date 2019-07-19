@@ -2,7 +2,10 @@
  * CAN Subsystem Implementation
  */
 
+#include "oresat.h"
 #include "can.h"
+#include "can_hw.h"
+#include "can_threads.h"
 
 can_node_t node;
 can_tpdo_t tpdo[4];
@@ -52,33 +55,32 @@ void can_start(void) {
 // TPDO Initialization
 // pdo_num is a zero-based index of TPDO 1-4
 // can_id is the CAN Message ID the TPDO is sent with. Set to zero (0) to use default
-void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_tim, uint32_t inhibit_tim, uint8_t len, uint8_t *pdata) {
+void canTPDOObjectInit(can_pdo_t pdo_num, can_id_t can_id, uint32_t event_time, uint32_t inhibit_time, uint8_t len, uint8_t *pdata) {
+    // Sanity check on parameters
     // If the pdo_num is greater than 3 (TPDO 4), report error
     chDbgAssert(pdo_num <= 3, "Error: Invalid PDO number");
+    if (event_time == 0) {
+        event_time = DEFAULT_TPDO_TIMEOUT;
+    }
+    // If the can_id is zero, set the default value (TPDO# base ID + Node ID)
+    if (can_id == 0) {
+        can_id = CAN_ID_TPDO(pdo_num, node.node_id);
+    } else {
+        chDbgAssert(can_id > 0x180 && can_id < 0x580, "Error: TPDO CANID out of range");
+    }
 
     // Initialize TPDO configuration data
-    // TODO: Handle zero timeout
-    if (event_tim == 0) {
-        event_tim = 200;
-    }
-    tpdo[pdo_num].event_time = event_tim;
-    tpdo[pdo_num].inhibit_time = inhibit_tim;
-    tpdo[pdo_num].inhibit_timestamp = 0x00;
-    tpdo[pdo_num].inhibit_status = 0x00;
+    chVTObjectInit(&tpdo[pdo_num].event_timer);
+
+    tpdo[pdo_num].event_time = event_time;
+    tpdo[pdo_num].inhibit_time = inhibit_time;
     tpdo[pdo_num].pdata = pdata;
 
     // Initialize TPDO TX Frame
     tpdo[pdo_num].msg.IDE = CAN_IDE_STD;
     tpdo[pdo_num].msg.RTR = CAN_RTR_DATA;
     tpdo[pdo_num].msg.DLC = len;
-
-    // If the can_id is zero, set the default value (TPDO# base ID + Node ID)
-    if (!can_id) {
-        tpdo[pdo_num].msg.SID = CAN_ID_TPDO(pdo_num, node.node_id);
-    } else {
-        chDbgAssert(can_id > 0x180 || can_id < 0x580, "Error: TPDO CANID out of range");
-        tpdo[pdo_num].msg.SID = can_id;
-    }
+    tpdo[pdo_num].msg.SID = can_id;
 
     return;
 }
