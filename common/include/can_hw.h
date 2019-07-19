@@ -19,11 +19,18 @@
 #define TXOR 0x10
 #define BOFF 0x80
 
-#define CAN_FLT_MASK    (0U)
-#define CAN_FLT_LIST    (1U)
-#define CAN_FLT_16BIT   (0U)
-#define CAN_FLT_32BIT   (1U)
-#define CAN_FLT_FIFO(n) (n)
+#define CAN_FLT_MODE_POS    0
+#define CAN_FLT_MODE_MASK   (1 << CAN_FLT_MODE_POS)
+#define CAN_FLT_MASK_MODE   (0 << CAN_FLT_MODE_POS)
+#define CAN_FLT_LIST_MODE   (1 << CAN_FLT_MODE_POS)
+#define CAN_FLT_SCALE_POS   0
+#define CAN_FLT_SCALE_MASK  (1 << CAN_FLT_SCALE_POS)
+#define CAN_FLT_16BIT       (0 << CAN_FLT_SCALE_POS)
+#define CAN_FLT_32BIT       (1 << CAN_FLT_SCALE_POS)
+#define CAN_FLT_FIFO_POS    0
+#define CAN_FLT_FIFO_MASK   (1 << CAN_FLT_FIFO_POS)
+#define CAN_FLT_FIFO0       (0 << CAN_FLT_FIFO_POS)
+#define CAN_FLT_FIFO1       (1 << CAN_FLT_FIFO_POS)
 
 typedef union {
     struct {
@@ -52,7 +59,7 @@ typedef union {
 
 
 //Function prototypes
-void can_filter_init(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags);
+void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags);
 uint8_t can_hw_init(void);
 
 #endif

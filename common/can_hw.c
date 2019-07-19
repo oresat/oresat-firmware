@@ -22,20 +22,6 @@
 #error "No CAN Config for this MCU"
 #endif
 
-#define CAN_FLT_MASK    (0U)
-#define CAN_FLT_LIST    (1U)
-#define CAN_FLT_16BIT   (0U)
-#define CAN_FLT_32BIT   (1U)
-#define CAN_FLT_FIFO(n) (n)
-#define CAN_FLT_EID0(n) (n)
-#define CAN_FLT_IDE0(n) (n << 3)
-#define CAN_FLT_RTR0(n) (n << 4)
-#define CAN_FLT_SID0(n) (n << 5)
-#define CAN_FLT_EID1(n) (n << 16)
-#define CAN_FLT_IDE1(n) (n << 19)
-#define CAN_FLT_RTR1(n) (n << 20)
-#define CAN_FLT_SID1(n) (n << 21)
-
 static const CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -47,26 +33,23 @@ static const CANConfig cancfg = {
     CAN_BTR
 };
 
-static const CANFilter can_filters[] = {
-    {   0,                                                                          // Filter Number
-        CAN_FLT_MASK,                                                               // Mode
-        CAN_FLT_16BIT,                                                              // Scale
-        CAN_FLT_FIFO(0),                                                            // Assigned FIFO
-        CAN_FLT_EID0(0) | CAN_FLT_IDE0(0) | CAN_FLT_RTR0(0) | CAN_FLT_SID0(0x000) | // ID
-        CAN_FLT_EID1(0) | CAN_FLT_IDE1(0) | CAN_FLT_RTR1(0) | CAN_FLT_SID1(0x07F) , // Mask/ID
-        CAN_FLT_EID0(0) | CAN_FLT_IDE0(0) | CAN_FLT_RTR0(0) | CAN_FLT_SID0(0x000) | // ID
-        CAN_FLT_EID1(0) | CAN_FLT_IDE1(0) | CAN_FLT_RTR1(0) | CAN_FLT_SID1(0x07F) },// Mask/ID
-};
+static CANFilter can_filters[STM32_CAN_MAX_FILTERS];
+static uint32_t filter_entries = 0;
 
-void can_filter_init(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
-
+void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
+    cfp->filter     = filter_num;
+    cfp->mode       = (flags && CAN_FLT_MODE_MASK) >> CAN_FLT_MODE_POS;
+    cfp->scale      = (flags && CAN_FLT_SCALE_MASK) >> CAN_FLT_SCALE_POS;
+    cfp->assignment = (flags && CAN_FLT_FIFO_MASK) >> CAN_FLT_FIFO_POS;
+    cfp->register1  = reg1;
+    cfp->register2  = reg2;
 }
 
 uint8_t can_hw_init(void) {
     /*
      * Activates CAN driver 1.
      */
-    canSTM32SetFilters(&CAND1, 0xE, sizeof(can_filters)/sizeof(can_filters[0]), can_filters);
+    canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     canStart(&CAND1, &cancfg);
 
     return true;
