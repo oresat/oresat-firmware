@@ -36,7 +36,7 @@ static const CANConfig cancfg = {
 static CANFilter can_filters[STM32_CAN_MAX_FILTERS];
 static uint32_t filter_entries = 0;
 
-void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
+void canFilterObjectCreate(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
     cfp->filter     = filter_num;
     cfp->mode       = (flags && CAN_FLT_MODE_MASK) >> CAN_FLT_MODE_POS;
     cfp->scale      = (flags && CAN_FLT_SCALE_MASK) >> CAN_FLT_SCALE_POS;
@@ -45,7 +45,7 @@ void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_
     cfp->register2  = reg2.raw;
 }
 
-uint8_t can_hw_init(void) {
+uint8_t canHWInit(void) {
     /*
      * Activates CAN driver 1.
      */
