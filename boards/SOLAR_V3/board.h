@@ -449,8 +449,8 @@
                                      PIN_ODR_HIGH(GPIOB_TP12) |             \
                                      PIN_ODR_HIGH(GPIOB_TP13) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN5) |             \
-                                     PIN_ODR_HIGH(GPIOB_PIN6) |             \
-                                     PIN_ODR_HIGH(GPIOB_PIN7) |             \
+                                     PIN_ODR_HIGH(GPIOB_I2C1_SCL) |         \
+                                     PIN_ODR_HIGH(GPIOB_I2C1_SDA) |         \
                                      PIN_ODR_HIGH(GPIOB_PIN8) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN9) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN10) |            \
