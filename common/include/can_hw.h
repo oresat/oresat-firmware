@@ -23,11 +23,11 @@
 #define CAN_FLT_MODE_MASK   (1 << CAN_FLT_MODE_POS)
 #define CAN_FLT_MASK_MODE   (0 << CAN_FLT_MODE_POS)
 #define CAN_FLT_LIST_MODE   (1 << CAN_FLT_MODE_POS)
-#define CAN_FLT_SCALE_POS   0
+#define CAN_FLT_SCALE_POS   1
 #define CAN_FLT_SCALE_MASK  (1 << CAN_FLT_SCALE_POS)
 #define CAN_FLT_16BIT       (0 << CAN_FLT_SCALE_POS)
 #define CAN_FLT_32BIT       (1 << CAN_FLT_SCALE_POS)
-#define CAN_FLT_FIFO_POS    0
+#define CAN_FLT_FIFO_POS    2
 #define CAN_FLT_FIFO_MASK   (1 << CAN_FLT_FIFO_POS)
 #define CAN_FLT_FIFO0       (0 << CAN_FLT_FIFO_POS)
 #define CAN_FLT_FIFO1       (1 << CAN_FLT_FIFO_POS)
@@ -39,7 +39,7 @@ typedef union {
         uint32_t IDE        :1 ;
         uint32_t EXID       :18;
         uint32_t STID       :11;
-    } flt_long;
+    } scale_32;
     struct {
         struct {
             uint16_t EXIT   :3 ;
@@ -53,13 +53,13 @@ typedef union {
             uint16_t RTR    :1 ;
             uint16_t STID   :11;
         } mask_id;
-    } flt_short;
+    } scale_16;
     uint32_t raw;
 } flt_reg_t;
 
 
 //Function prototypes
-void canFilterInit(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags);
-uint8_t can_hw_init(void);
+void canFilterObjectCreate(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags);
+uint8_t canHWInit(void);
 
 #endif
