@@ -3,6 +3,7 @@
  */
 
 #include "can_hw.h"
+#include "can.h"
 
 /*
  * CAN Register configuration
@@ -33,10 +34,36 @@ static const CANConfig cancfg = {
     CAN_BTR
 };
 
+typedef union {
+    struct {
+        uint32_t            :1 ;
+        uint32_t RTR        :1 ;
+        uint32_t IDE        :1 ;
+        uint32_t EXID       :18;
+        uint32_t STID       :11;
+    } scale_32;
+    struct {
+        struct {
+            uint16_t EXIT   :3 ;
+            uint16_t IDE    :1 ;
+            uint16_t RTR    :1 ;
+            uint16_t STID   :11;
+        } id;
+        struct {
+            uint16_t EXIT   :3 ;
+            uint16_t IDE    :1 ;
+            uint16_t RTR    :1 ;
+            uint16_t STID   :11;
+        } mask_id;
+    } scale_16;
+    uint32_t raw;
+} flt_reg_t;
+
 static CANFilter can_filters[STM32_CAN_MAX_FILTERS];
 static uint32_t filter_entries = 0;
 
-void canFilterObjectCreate(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags) {
+void canFilterObjectCreate(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, flt_reg_t reg2, uint8_t flags)
+{
     cfp->filter     = filter_num;
     cfp->mode       = (flags && CAN_FLT_MODE_MASK) >> CAN_FLT_MODE_POS;
     cfp->scale      = (flags && CAN_FLT_SCALE_MASK) >> CAN_FLT_SCALE_POS;
@@ -45,10 +72,32 @@ void canFilterObjectCreate(CANFilter *cfp, uint16_t filter_num, flt_reg_t reg1, 
     cfp->register2  = reg2.raw;
 }
 
-uint8_t canHWInit(void) {
+int canFilterAdd(uint32_t id, uint32_t mask_id, uint8_t mode)
+{
+    uint16_t filter_entry;
+    flt_reg_t reg1, reg2;
+
+    if (filter_entries >= STM32_CAN_MAX_FILTERS)
+        return -1;
+
+    filter_entry = filter_entries++;
+    reg1.raw = 0;
+    reg2.raw = 0;
+
+    reg1.scale_32.STID = id;
+    reg2.scale_32.STID = mask_id;
+    canFilterObjectCreate(&can_filters[filter_entry], filter_entry, reg1, reg2, \
+            (mode?CAN_FLT_LIST_MODE:CAN_FLT_MASK_MODE) | \
+            CAN_FLT_32BIT | CAN_FLT_FIFO0);
+    return filter_entry;
+}
+
+uint8_t canHWInit(uint16_t node_id)
+{
     /*
      * Activates CAN driver 1.
      */
+    canFilterAdd(CAN_ID_NMT_SERVICE, CAN_ID_SYNC, CAN_FLT_LIST_MODE);
     canSTM32SetFilters(&CAND1, 0xE, filter_entries, can_filters);
     canStart(&CAND1, &cancfg);
 

@@ -40,7 +40,7 @@ void can_init(uint8_t node_id, uint32_t heartbeat) {
     chEvtObjectInit(&rpdo_event);
 
     // Initialize the hardware
-    canHWInit();
+    canHWInit(node_id);
 
     return;
 }
