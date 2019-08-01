@@ -58,6 +58,8 @@ extern "C" {
 #include <stdint.h>         /* for 'int8_t' to 'uint64_t' */
 #include <stdbool.h>        /* for 'true', 'false' */
 
+#define CO_USE_GLOBALS
+#define CO_USE_OWN_CRC16
 
 /**
  * @defgroup CO_driver Driver

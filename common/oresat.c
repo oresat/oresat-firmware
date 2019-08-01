@@ -1,4 +1,5 @@
 #include "oresat.h"
+#include "CANopen.h"
 
 void oresat_init(uint8_t node_id) {
     /*uint8_t obr_node_id = (FLASH->OBR & FLASH_OBR_DATA0) >> FLASH_OBR_DATA0_Pos;*/
@@ -13,9 +14,10 @@ void oresat_init(uint8_t node_id) {
         node_id = obr_node_id;
     }
     //Initialize CAN Subsystem
-    can_init(node_id, 500);
+    /*can_init(node_id, 500);*/
     //Start CAN Subsystem
-    can_start();
+    /*can_start();*/
 
+    CO_init(0,node_id,1000);
     return;
 }
