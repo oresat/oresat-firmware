@@ -157,7 +157,7 @@ void CO_CANmodule_disable(CO_CANmodule_t *CANmodule){
 
 /******************************************************************************/
 uint16_t CO_CANrxMsg_readIdent(const CO_CANrxMsg_t *rxMsg){
-    return (uint16_t) rxMsg->ident;
+    return (uint16_t) rxMsg->SID;
 }
 
 
@@ -367,7 +367,7 @@ void CO_CANinterrupt(CO_CANmodule_t *CANmodule){
         bool_t msgMatched = false;
 
         rcvMsg = 0; /* get message from module here */
-        rcvMsgIdent = rcvMsg->ident;
+        rcvMsgIdent = rcvMsg->SID;
         if(CANmodule->useCANrxFilters){
             /* CAN module filters are used. Message with known 11-bit identifier has */
             /* been received */

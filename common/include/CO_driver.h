@@ -171,14 +171,14 @@ extern "C" {
  * CO_SYNC_initCallback() function.
  * @{
  */
-    #define CO_LOCK_CAN_SEND()  /**< Lock critical section in CO_CANsend() */
-    #define CO_UNLOCK_CAN_SEND()/**< Unlock critical section in CO_CANsend() */
+    #define CO_LOCK_CAN_SEND()      chSysLock()     /**< Lock critical section in CO_CANsend() */
+    #define CO_UNLOCK_CAN_SEND()    chSysUnlock()   /**< Unlock critical section in CO_CANsend() */
 
-    #define CO_LOCK_EMCY()      /**< Lock critical section in CO_errorReport() or CO_errorReset() */
-    #define CO_UNLOCK_EMCY()    /**< Unlock critical section in CO_errorReport() or CO_errorReset() */
+    #define CO_LOCK_EMCY()          chSysLock()     /**< Lock critical section in CO_errorReport() or CO_errorReset() */
+    #define CO_UNLOCK_EMCY()        chSysUnlock()   /**< Unlock critical section in CO_errorReport() or CO_errorReset() */
 
-    #define CO_LOCK_OD()        /**< Lock critical section when accessing Object Dictionary */
-    #define CO_UNLOCK_OD()      /**< Unock critical section when accessing Object Dictionary */
+    #define CO_LOCK_OD()            chSysLock()     /**< Lock critical section when accessing Object Dictionary */
+    #define CO_UNLOCK_OD()          chSysUnlock()   /**< Unock critical section when accessing Object Dictionary */
 /** @} */
 
 /**
@@ -250,9 +250,17 @@ typedef enum{
  */
 typedef struct{
     /** CAN identifier. It must be read through CO_CANrxMsg_readIdent() function. */
-    uint32_t            ident;
-    uint8_t             DLC ;           /**< Length of CAN message */
-    uint8_t             data[8];        /**< 8 data bytes */
+    uint8_t             FMI;            /**< Filter id.          */
+    uint16_t            TIME;           /**< Time stamp.         */
+    uint8_t             DLC:4;          /**< Data length.        */
+    uint8_t             RTR:1;          /**< Frame type.         */
+    uint8_t             IDE:1;          /**< Identifier type.    */
+    union {
+        uint32_t        SID:11;         /**< Standard identifier.*/
+        uint32_t        EID:29;         /**< Extended identifier.*/
+        uint32_t        _align1;
+    };
+    uint8_t             data[8];        /**< Frame data.         */
 }CO_CANrxMsg_t;
 
 
