@@ -19,21 +19,63 @@
 #define TXOR 0x10
 #define BOFF 0x80
 
-#define CAN_FLT_MODE_POS    0
-#define CAN_FLT_MODE_MASK   (1 << CAN_FLT_MODE_POS)
-#define CAN_FLT_MASK_MODE   (0 << CAN_FLT_MODE_POS)
-#define CAN_FLT_LIST_MODE   (1 << CAN_FLT_MODE_POS)
-#define CAN_FLT_SCALE_POS   1
-#define CAN_FLT_SCALE_MASK  (1 << CAN_FLT_SCALE_POS)
-#define CAN_FLT_16BIT       (0 << CAN_FLT_SCALE_POS)
-#define CAN_FLT_32BIT       (1 << CAN_FLT_SCALE_POS)
-#define CAN_FLT_FIFO_POS    2
-#define CAN_FLT_FIFO_MASK   (1 << CAN_FLT_FIFO_POS)
-#define CAN_FLT_FIFO0       (0 << CAN_FLT_FIFO_POS)
-#define CAN_FLT_FIFO1       (1 << CAN_FLT_FIFO_POS)
+/*
+ * CAN Register configuration
+ * Timing calculator:
+ * http://www.bittiming.can-wiki.info/
+ * Note: Convert to zero based values here when using the calculator
+ */
+#if defined(STM32F0xx_MCUCONF)
+// ~87.5% sample point 1Mbps based on 48MHz APB Clock
+#define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(12)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
+#elif defined(STM32F4xx_MCUCONF)
+// ~87.5% sample point 1Mbps based on 45MHz APB1 Clock
+#define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(11)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
+#elif defined(STM32L4xx_MCUCONF)
+// ~87.5% sample point 1Mbps based on 80MHz APB1 Clock
+#define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(12)|CAN_BTR_TS2(1)|CAN_BTR_BRP((5000/n)-1))
+#else
+#error "No CAN Config for this MCU"
+#endif
 
-//Function prototypes
-int canFilterAdd(uint32_t id, uint32_t mask_id, uint8_t mode);
+typedef struct {
+    CANDriver *candev;
+    CANConfig cancfg;
+} candev_t;
+
+typedef struct {
+    uint32_t stdid   :11 ;
+    uint32_t extid   :18 ;
+    uint32_t rtr     :1  ;
+    uint32_t ide     :1  ;
+    uint32_t fifo    :1  ;
+} can_flt_t;
+
+typedef union {
+    struct {
+        uint32_t            :1 ;
+        uint32_t RTR        :1 ;
+        uint32_t IDE        :1 ;
+        uint32_t EXID       :18;
+        uint32_t STID       :11;
+    } scale32;
+    struct {
+        struct {
+            uint16_t EXIT   :3 ;
+            uint16_t IDE    :1 ;
+            uint16_t RTR    :1 ;
+            uint16_t STID   :11;
+        } id;
+        struct {
+            uint16_t EXIT   :3 ;
+            uint16_t IDE    :1 ;
+            uint16_t RTR    :1 ;
+            uint16_t STID   :11;
+        } mask_id;
+    } scale16;
+    uint32_t raw;
+} flt_reg_t;
+
 uint8_t canHWInit(uint16_t node_id);
 
 #endif

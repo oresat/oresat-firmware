@@ -13,11 +13,13 @@ void oresat_init(uint8_t node_id) {
         }
         node_id = obr_node_id;
     }
-    //Initialize CAN Subsystem
-    /*can_init(node_id, 500);*/
-    //Start CAN Subsystem
-    /*can_start();*/
 
-    CO_init(0,node_id,1000);
+    //TODO: If the node_id is out of range, request a new node ID
+    if (node_id > 0x7F)
+        node_id = 0x7F;
+
+    //Initialize CAN Subsystem
+    CO_init((uint32_t)&CAND1,node_id,1000);
+
     return;
 }

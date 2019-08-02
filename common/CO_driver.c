@@ -48,18 +48,33 @@
 
 #include "CO_driver.h"
 #include "CO_Emergency.h"
+#include "can_hw.h"
 
+CANFilter can_filters[STM32_CAN_MAX_FILTERS];
+uint32_t filter_entries = 0;
+
+CANConfig cancfg = {
+    // MCR (Master Control Register)
+    CAN_MCR_ABOM      |     //Automatic Bus-Off Management
+    CAN_MCR_AWUM      |     //Automatic Wakeup Mode
+    CAN_MCR_TXFP      ,     //Transmit FIFO Priority
+    // BTR (Bit Timing Register)
+    //CAN_BTR_LBKM     |     //Loopback Mode (Debug)
+    CAN_BTR(1000)           //Default to 1000Mbps
+};
 
 /******************************************************************************/
 void CO_CANsetConfigurationMode(int32_t CANbaseAddress){
     /* Put CAN module in configuration mode */
+    canStop((CANDriver *)CANbaseAddress);
 }
 
 
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule){
     /* Put CAN module in normal mode */
-
+    canSTM32SetFilters((CANDriver *)CANmodule->CANbaseAddress, 0xE, filter_entries, can_filters);
+    canStart((CANDriver *)CANmodule->CANbaseAddress, &cancfg);
     CANmodule->CANnormal = true;
 }
 
@@ -110,7 +125,7 @@ CO_ReturnError_t CO_CANmodule_init(
 
 
     /* Configure CAN timing */
-
+    cancfg.btr = CAN_BTR(CANbitRate);
 
     /* Configure CAN module hardware filters */
     if(CANmodule->useCANrxFilters){
@@ -136,6 +151,7 @@ CO_ReturnError_t CO_CANmodule_init(
 /******************************************************************************/
 void CO_CANmodule_disable(CO_CANmodule_t *CANmodule){
     /* turn off the module */
+    canStop((CANDriver *)CANmodule->CANbaseAddress);
 }
 
 

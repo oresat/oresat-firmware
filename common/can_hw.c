@@ -34,31 +34,6 @@ static const CANConfig cancfg = {
     CAN_BTR
 };
 
-typedef union {
-    struct {
-        uint32_t            :1 ;
-        uint32_t RTR        :1 ;
-        uint32_t IDE        :1 ;
-        uint32_t EXID       :18;
-        uint32_t STID       :11;
-    } scale_32;
-    struct {
-        struct {
-            uint16_t EXIT   :3 ;
-            uint16_t IDE    :1 ;
-            uint16_t RTR    :1 ;
-            uint16_t STID   :11;
-        } id;
-        struct {
-            uint16_t EXIT   :3 ;
-            uint16_t IDE    :1 ;
-            uint16_t RTR    :1 ;
-            uint16_t STID   :11;
-        } mask_id;
-    } scale_16;
-    uint32_t raw;
-} flt_reg_t;
-
 static CANFilter can_filters[STM32_CAN_MAX_FILTERS];
 static uint32_t filter_entries = 0;
 
