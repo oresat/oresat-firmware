@@ -250,17 +250,22 @@ typedef enum{
  */
 typedef struct{
     /** CAN identifier. It must be read through CO_CANrxMsg_readIdent() function. */
-    uint8_t             FMI;            /**< Filter id.          */
-    uint16_t            TIME;           /**< Time stamp.         */
-    uint8_t             DLC:4;          /**< Data length.        */
-    uint8_t             RTR:1;          /**< Frame type.         */
-    uint8_t             IDE:1;          /**< Identifier type.    */
     union {
-        uint32_t        SID:11;         /**< Standard identifier.*/
-        uint32_t        EID:29;         /**< Extended identifier.*/
-        uint32_t        _align1;
+        CANRxFrame              rxFrame;
+        struct {
+            uint8_t             FMI;            /**< Filter id.          */
+            uint16_t            TIME;           /**< Time stamp.         */
+            uint8_t             DLC:4;          /**< Data length.        */
+            uint8_t             RTR:1;          /**< Frame type.         */
+            uint8_t             IDE:1;          /**< Identifier type.    */
+            union {
+                uint32_t        SID:11;         /**< Standard identifier.*/
+                uint32_t        EID:29;         /**< Extended identifier.*/
+                uint32_t        _align1;
+            };
+            uint8_t             data[8];        /**< Frame data.         */
+        };
     };
-    uint8_t             data[8];        /**< Frame data.         */
 }CO_CANrxMsg_t;
 
 
@@ -279,10 +284,21 @@ typedef struct{
  * Transmit message object.
  */
 typedef struct{
-    uint32_t            ident;          /**< CAN identifier as aligned in CAN module */
-    uint8_t             DLC ;           /**< Length of CAN message. (DLC may also be part of ident) */
-    uint8_t             data[8];        /**< 8 data bytes */
-    volatile bool_t     bufferFull;     /**< True if previous message is still in buffer */
+    union {
+        CANTxFrame              txFrame;
+        struct {
+            uint8_t             DLC:4;          /**< Data length.        */
+            uint8_t             RTR:1;          /**< Frame type.         */
+            uint8_t             IDE:1;          /**< Identifier type.    */
+            union {
+                uint32_t        SID:11;         /**< Standard identifier.*/
+                uint32_t        EID:29;         /**< Extended identifier.*/
+                uint32_t        _align1;
+            };
+            uint8_t             data[8];        /**< Frame data.         */
+        };
+    };
+    volatile bool_t     bufferFull;             /**< True if previous message is still in buffer */
     /** Synchronous PDO messages has this flag set. It prevents them to be sent outside the synchronous window */
     volatile bool_t     syncFlag;
 }CO_CANtx_t;

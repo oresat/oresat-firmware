@@ -218,9 +218,9 @@ CO_CANtx_t *CO_CANtxBufferInit(
 
         /* CAN identifier, DLC and rtr, bit aligned with CAN module transmit buffer.
          * Microcontroller specific. */
-        buffer->ident = ((uint32_t)ident & 0x07FFU)
-                      | ((uint32_t)(((uint32_t)noOfBytes & 0xFU) << 12U))
-                      | ((uint32_t)(rtr ? 0x8000U : 0U));
+        buffer->SID = ident;
+        buffer->DLC = noOfBytes;
+        buffer->RTR = rtr;
 
         buffer->bufferFull = false;
         buffer->syncFlag = syncFlag;
@@ -238,7 +238,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer){
     if(buffer->bufferFull){
         if(!CANmodule->firstCANtxMessage){
             /* don't set error, if bootup message is still on buffers */
-            CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_CAN_TX_OVERFLOW, CO_EMC_CAN_OVERRUN, buffer->ident);
+            CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_CAN_TX_OVERFLOW, CO_EMC_CAN_OVERRUN, buffer->SID);
         }
         err = CO_ERROR_TX_OVERFLOW;
     }
