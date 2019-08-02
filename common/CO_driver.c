@@ -103,7 +103,7 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->txArray = txArray;
     CANmodule->txSize = txSize;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = (rxSize <= 32U) ? true : false;/* microcontroller dependent */
+    CANmodule->useCANrxFilters = false;/* TODO: Implement filters */
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
@@ -129,12 +129,14 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure CAN module hardware filters */
     if(CANmodule->useCANrxFilters){
+        /* TODO: Implement filters */
         /* CAN module filters are used, they will be configured with */
         /* CO_CANrxBufferInit() functions, called by separate CANopen */
         /* init functions. */
         /* Configure all masks so, that received message must match filter */
     }
     else{
+        /* TODO: Implement filters */
         /* CAN module filters are not used, all messages with standard 11-bit */
         /* identifier will be received */
         /* Configure mask 0 so, that all messages with standard identifier are accepted */
@@ -190,7 +192,7 @@ CO_ReturnError_t CO_CANrxBufferInit(
 
         /* Set CAN hardware module filter and mask. */
         if(CANmodule->useCANrxFilters){
-
+            /* TODO: Implement filters */
         }
     }
     else{
@@ -237,19 +239,19 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer){
     /* Verify overflow */
     if(buffer->bufferFull){
         if(!CANmodule->firstCANtxMessage){
-            /* don't set error, if bootup message is still on buffers */
+            /* Don't set error, if bootup message is still on buffers */
             CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_CAN_TX_OVERFLOW, CO_EMC_CAN_OVERRUN, buffer->SID);
         }
         err = CO_ERROR_TX_OVERFLOW;
     }
 
     CO_LOCK_CAN_SEND();
-    /* if CAN TX buffer is free, copy message to it */
-    if(1 && CANmodule->CANtxCount == 0){
+    /* If CAN TX buffer is free, attempt to send it */
+    if(CANmodule->CANtxCount == 0 && \
+            !canTryTransmitI((CANDriver *)CANmodule->CANbaseAddress, CAN_ANY_MAILBOX, &buffer->txFrame)){
         CANmodule->bufferInhibitFlag = buffer->syncFlag;
-        /* copy message and txRequest */
     }
-    /* if no buffer is free, message will be sent by interrupt */
+    /* If no buffer is free, message will be sent by interrupt */
     else{
         buffer->bufferFull = true;
         CANmodule->CANtxCount++;
@@ -267,6 +269,7 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule){
     CO_LOCK_CAN_SEND();
     /* Abort message from CAN module, if there is synchronous TPDO.
      * Take special care with this functionality. */
+    /* TODO: Figure out how to distinguish synchronous TPDOs in TX mailboxes */
     if(/*messageIsOnCanBuffer && */CANmodule->bufferInhibitFlag){
         /* clear TXREQ */
         CANmodule->bufferInhibitFlag = false;
