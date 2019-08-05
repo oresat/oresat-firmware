@@ -2,15 +2,7 @@
 #include "CANopen.h"
 #include "can_threads.h"
 
-typedef struct {
-    void *wa;
-    size_t wa_size;
-    tprio_t prio;
-    tfunc_t thread_func;
-    void *arg;
-} worker_thread_t;
-
-worker_thread_t worker_threads[ORESAT_MAX_THREADS];
+thread_descriptor_t workers[ORESAT_MAX_THREADS];
 uint32_t num_workers = 0;
 
 int reg_worker(void *wa, size_t wa_size, tprio_t prio, tfunc_t thread_func, void *arg)
@@ -19,11 +11,7 @@ int reg_worker(void *wa, size_t wa_size, tprio_t prio, tfunc_t thread_func, void
         return -1;
     }
 
-    worker_threads[num_workers].wa = wa;
-    worker_threads[num_workers].wa_size = wa_size;
-    worker_threads[num_workers].prio = prio;
-    worker_threads[num_workers].thread_func = thread_func;
-    worker_threads[num_workers].arg = arg;
+    /* TODO: Register worker threads */
 
     return num_workers++;
 }
@@ -66,7 +54,7 @@ void oresat_start(void)
     CO_CANsetNormalMode(CO->CANmodule[0]);
 
     for (i = 0; i < num_workers; i++) {
-        chThdCreateStatic(worker_threads[i].wa, worker_threads[i].wa_size, worker_threads[i].prio, worker_threads[i].thread_func, worker_threads[i].arg);
+        /* TODO: Start worker threads */
     }
 
     while (true) {
