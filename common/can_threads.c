@@ -9,7 +9,7 @@
 /*
  * Receiver thread.
  */
-THD_WORKING_AREA(can_rx_wa, 128);
+THD_WORKING_AREA(can_rx_wa, 0x40);
 THD_FUNCTION(can_rx, p) {
     event_listener_t    can_el;
     CO_CANrxMsg_t       rcvMsg;             /* Received message */
@@ -73,7 +73,7 @@ THD_FUNCTION(can_rx, p) {
 /*
  * Transmitter thread.
  */
-THD_WORKING_AREA(can_tx_wa, 128);
+THD_WORKING_AREA(can_tx_wa, 0x40);
 THD_FUNCTION(can_tx, p) {
     event_listener_t    can_el;
 

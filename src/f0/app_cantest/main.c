@@ -36,25 +36,10 @@ static SerialConfig ser_cfg =
 
 static void app_init(void) {
     //=== App initialization
+    reg_worker(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
-
-}
-
-static void main_app(void) {
-    //=== Start application threads
-
-    //Example thread creation
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-    /*
-     * Begin main loop
-     */
-    while (true)
-    {
-        chThdSleepMilliseconds(1000);
-    }
 }
 
 int main(void) {
@@ -67,11 +52,11 @@ int main(void) {
      */
     halInit();
     chSysInit();
-    oresat_init(0);
+    oresat_init(ORESAT_DEFAULT_ID);
 
-    // Initialize and start app
+    // Initialize and start
     app_init();
-    main_app();
+    oresat_start();
 
     return 0;
 }
