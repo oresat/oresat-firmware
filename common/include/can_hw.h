@@ -8,9 +8,6 @@
 #include "ch.h"
 #include "hal.h"
 
-//Project headers
-#include "can.h"
-
 //Definitions
 #define INIT 0x01
 #define CERR 0x02
@@ -75,7 +72,5 @@ typedef union {
     } scale16;
     uint32_t raw;
 } flt_reg_t;
-
-uint8_t canHWInit(uint16_t node_id);
 
 #endif

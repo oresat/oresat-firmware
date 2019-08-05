@@ -6,7 +6,6 @@ PROJINC       = $(PROJ_SRC)/include             \
                 $(CO_STACK)
 
 PROJSRC       = $(PROJ_SRC)/can_threads.c       \
-                $(PROJ_SRC)/can.c               \
                 $(PROJ_SRC)/CO_driver.c         \
                 $(CO_STACK)/CO_SDO.c            \
                 $(CO_STACK)/CO_Emergency.c      \

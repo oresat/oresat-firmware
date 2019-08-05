@@ -128,11 +128,3 @@ THD_FUNCTION(can_tx, p) {
     chEvtUnregister(&candev->rxfull_event, &can_el);
     chThdExit(MSG_OK);
 }
-
-void can_start_threads(void) {
-    /*
-     * Starting the transmitter and receiver threads.
-     */
-    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
-}
