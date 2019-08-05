@@ -9,12 +9,10 @@
 #include "hal.h"
 
 //Thread prototypes
-extern THD_WORKING_AREA(can_rpdo_wa, 128);
-extern THD_FUNCTION(can_rpdo, p);
+extern THD_WORKING_AREA(can_rx_wa, 128);
+extern THD_FUNCTION(can_rx, p);
 extern THD_WORKING_AREA(can_tpdo_wa, 128);
 extern THD_FUNCTION(can_tpdo, p);
-extern THD_WORKING_AREA(can_hb_wa, 64);
-extern THD_FUNCTION(can_hb, p);
 
 void can_start_threads(void);
 #endif

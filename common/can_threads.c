@@ -3,57 +3,70 @@
  */
 
 //Project headers
-#include "can.h"
 #include "can_threads.h"
+#include "CO_driver.h"
 
 /*
  * Receiver thread.
  */
-THD_WORKING_AREA(can_rpdo_wa, 128);
-THD_FUNCTION(can_rpdo, p) {
-    event_listener_t        can_el;
-    CANRxFrame              rxmsg;
+THD_WORKING_AREA(can_rx_wa, 128);
+THD_FUNCTION(can_rx, p) {
+    event_listener_t    can_el;
+    CO_CANrxMsg_t       rcvMsg;             /* Received message */
+    uint8_t             index;              /* index of received message */
+    uint32_t            rcvMsgIdent;        /* identifier of the received message */
+    CO_CANrx_t          *buffer = NULL;     /* receive message buffer from CO_CANmodule_t object. */
+    bool_t              msgMatched = false;
+    CO_CANmodule_t      *CANmodule = p;
+    CANDriver           *candev = (CANDriver *)CANmodule->CANbaseAddress;
 
-    (void)p;
     // Set thread name
-    chRegSetThreadName("receiver");
+    chRegSetThreadName("CAN Receiver");
     // Register RX event
-    chEvtRegister(&CAND1.rxfull_event, &can_el, 0);
+    chEvtRegister(&candev->rxfull_event, &can_el, 0);
 
     // Start RX Loop
     while (!chThdShouldTerminateX()) {
         if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0) {
+            /* No activity, continue and check if thread should terminate */
             continue;
         }
 
-        while (canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE) == MSG_OK) {
+        while (canReceiveTimeout(candev, CAN_ANY_MAILBOX, &rcvMsg.rxFrame, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
-            for (uint8_t i = 0; i < 4; ++i) {
-                if (rpdo[i].pdata == NULL) {
-                    // RPDO is undefined. Continue to next
-                    continue;
-                }
-
-                // If the data received matches this RPDO, copy the data
-                if (rxmsg.SID == rpdo[i].can_id){
-                    if (rxmsg.DLC != rpdo[i].len) {
-                        // TODO: Exception
-                        continue;
-                    }
-
-                    chSysLock();
-                    for (uint8_t j = 0; j < rxmsg.DLC; ++j) {
-                        rpdo[i].pdata[j] = rxmsg.data8[j];
-                    }
-                    chSysUnlock();
-                    chEvtBroadcast(&rpdo_event);
+            rcvMsgIdent = rcvMsg.SID | (rcvMsg.RTR << 11);
+            if(CANmodule->useCANrxFilters){
+                /* CAN module filters are used. Message with known 11-bit identifier has */
+                /* been received */
+                index = rcvMsg.FMI;  /* Get index of the received message */
+                if(index < CANmodule->rxSize){
+                    buffer = &CANmodule->rxArray[index];
+                    msgMatched = true;
                 }
             }
+            else{
+                /* CAN module filters are not used, message with any standard 11-bit identifier */
+                /* has been received. Search rxArray form CANmodule for the same CAN-ID. */
+                buffer = &CANmodule->rxArray[0];
+                for(index = CANmodule->rxSize; index > 0U; index--){
+                    if(((rcvMsgIdent ^ buffer->ident) & buffer->mask) == 0U){
+                        msgMatched = true;
+                        break;
+                    }
+                    buffer++;
+                }
+            }
+
+            /* Call specific function, which will process the message */
+            if(msgMatched && (buffer != NULL) && (buffer->pFunct != NULL)){
+                buffer->pFunct(buffer->object, &rcvMsg);
+            }
+
         }
     }
 
     //Unregister RX event before terminating thread
-    chEvtUnregister(&CAND1.rxfull_event, &can_el);
+    chEvtUnregister(&candev->rxfull_event, &can_el);
     chThdExit(MSG_OK);
 }
 
@@ -67,42 +80,8 @@ THD_FUNCTION(can_tpdo, p) {
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
-        for (uint8_t i = 0; i < 4; ++i)
-        {
-            if (tpdo[i].pdata == NULL) {
-                // TPDO is undefined. Continue to next
-                continue;
-            }
 
-            chSysLock();
-            for (uint8_t j = 0; j < tpdo[i].msg.DLC; ++j)
-            {
-                tpdo[i].msg.data8[j] = tpdo[i].pdata[j];
-            }
-            chSysUnlock();
-
-            // Transmit the PDO
-            canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &tpdo[i].msg, TIME_MS2I(100));
-        }
-        chThdSleepMilliseconds(200);
     }
-    chThdExit(MSG_OK);
-}
-
-/*
- * Heartbeat thread.
- */
-THD_WORKING_AREA(can_hb_wa, 64);
-THD_FUNCTION(can_hb, p) {
-    (void)p;
-    chRegSetThreadName("heartbeat");
-
-    // Start TX Loop
-    while (!chThdShouldTerminateX()) {
-        canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &node.heartbeat_msg, TIME_MS2I(100));
-        chThdSleepMilliseconds(node.heartbeat_time);
-    }
-
     chThdExit(MSG_OK);
 }
 
@@ -110,7 +89,6 @@ void can_start_threads(void) {
     /*
      * Starting the transmitter and receiver threads.
      */
-    chThdCreateStatic(can_rpdo_wa, sizeof(can_rpdo_wa), NORMALPRIO + 7, can_rpdo, NULL);
+    chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
     chThdCreateStatic(can_tpdo_wa, sizeof(can_tpdo_wa), NORMALPRIO + 7, can_tpdo, NULL);
-    chThdCreateStatic(can_hb_wa, sizeof(can_hb_wa), NORMALPRIO + 7, can_hb, NULL);
 }

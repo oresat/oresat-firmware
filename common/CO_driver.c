@@ -50,9 +50,6 @@
 #include "CO_Emergency.h"
 #include "can_hw.h"
 
-CANFilter can_filters[STM32_CAN_MAX_FILTERS];
-uint32_t filter_entries = 0;
-
 CANConfig cancfg = {
     // MCR (Master Control Register)
     CAN_MCR_ABOM      |     //Automatic Bus-Off Management
@@ -73,7 +70,7 @@ void CO_CANsetConfigurationMode(int32_t CANbaseAddress){
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule){
     /* Put CAN module in normal mode */
-    canSTM32SetFilters((CANDriver *)CANmodule->CANbaseAddress, 0xE, filter_entries, can_filters);
+    canSTM32SetFilters((CANDriver *)CANmodule->CANbaseAddress, 0xE, CANmodule->useCANrxFilters, CANmodule->canFilters);
     canStart((CANDriver *)CANmodule->CANbaseAddress, &cancfg);
     CANmodule->CANnormal = true;
 }
@@ -91,7 +88,7 @@ CO_ReturnError_t CO_CANmodule_init(
 {
     uint16_t i;
 
-    /* verify arguments */
+    /* Verify arguments */
     if(CANmodule==NULL || rxArray==NULL || txArray==NULL){
         return CO_ERROR_ILLEGAL_ARGUMENT;
     }
@@ -103,7 +100,7 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->txArray = txArray;
     CANmodule->txSize = txSize;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = false;/* TODO: Implement filters */
+    CANmodule->useCANrxFilters = (rxSize <= STM32_CAN_MAX_FILTERS ? rxSize : 0);
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
@@ -121,7 +118,7 @@ CO_ReturnError_t CO_CANmodule_init(
     }
 
 
-    /* Configure CAN module registers */
+    /* TODO: Check if we need this: Configure CAN module registers */
 
 
     /* Configure CAN timing */
@@ -129,21 +126,21 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure CAN module hardware filters */
     if(CANmodule->useCANrxFilters){
-        /* TODO: Implement filters */
         /* CAN module filters are used, they will be configured with */
         /* CO_CANrxBufferInit() functions, called by separate CANopen */
         /* init functions. */
-        /* Configure all masks so, that received message must match filter */
-    }
-    else{
-        /* TODO: Implement filters */
-        /* CAN module filters are not used, all messages with standard 11-bit */
-        /* identifier will be received */
-        /* Configure mask 0 so, that all messages with standard identifier are accepted */
+        /* Configure all masks so that received message must match filter */
+        for (i = 0U; i < rxSize; i++) {
+            CANmodule->canFilters[i].filter = i;
+            CANmodule->canFilters[i].mode = 0;                  /* Mask Mode */
+            CANmodule->canFilters[i].scale = 1;                 /* 32bit scale (easy but inefficient) */
+            CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
+            CANmodule->canFilters[i].register1 = 0;             /* Clear out the ID */
+            CANmodule->canFilters[i].register2 = 0xFFFFFFFFU;   /* Initialize masks */
+        }
     }
 
-
-    /* configure CAN interrupt registers */
+    /* TODO: Check if we need this: Configure CAN interrupt registers */
 
 
     return CO_ERROR_NO;
@@ -192,7 +189,11 @@ CO_ReturnError_t CO_CANrxBufferInit(
 
         /* Set CAN hardware module filter and mask. */
         if(CANmodule->useCANrxFilters){
-            /* TODO: Implement filters */
+            flt_reg_t filter;
+            filter.raw = 0;
+            filter.scale32.STID = ident;
+            filter.scale32.RTR = rtr;
+            CANmodule->canFilters[index].register1 = filter.raw;
         }
     }
     else{
@@ -305,6 +306,7 @@ void CO_CANverifyErrors(CO_CANmodule_t *CANmodule){
     CO_EM_t* em = (CO_EM_t*)CANmodule->em;
     uint32_t err;
 
+    /* TODO: Check this whole thing after figuring out error handling */
     /* get error counters from module. Id possible, function may use different way to
      * determine errors. */
     rxErrors = CANmodule->txSize;
