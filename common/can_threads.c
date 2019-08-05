@@ -21,7 +21,7 @@ THD_FUNCTION(can_rx, p) {
     CANDriver           *candev = (CANDriver *)CANmodule->CANbaseAddress;
 
     // Set thread name
-    chRegSetThreadName("CAN Receiver");
+    chRegSetThreadName("receiver");
     // Register RX event
     chEvtRegister(&candev->rxfull_event, &can_el, 0);
 
@@ -73,15 +73,59 @@ THD_FUNCTION(can_rx, p) {
 /*
  * Transmitter thread.
  */
-THD_WORKING_AREA(can_tpdo_wa, 128);
-THD_FUNCTION(can_tpdo, p) {
-    (void)p;
+THD_WORKING_AREA(can_tx_wa, 128);
+THD_FUNCTION(can_tx, p) {
+    event_listener_t    can_el;
+
+    CO_CANmodule_t      *CANmodule = p;
+    CANDriver           *candev = (CANDriver *)CANmodule->CANbaseAddress;
+
+    // Set thread name
     chRegSetThreadName("transmitter");
+    // Register TX event
+    chEvtRegister(&candev->txempty_event, &can_el, 0);
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
+        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0) {
+            /* No activity, continue and check if thread should terminate */
+            continue;
+        }
 
+        /* First CAN message (bootup) was sent successfully */
+        CANmodule->firstCANtxMessage = false;
+        /* clear flag from previous message */
+        CANmodule->bufferInhibitFlag = false;
+        /* Are there any new messages waiting to be sent */
+        if(CANmodule->CANtxCount > 0U){
+            uint16_t i;             /* index of transmitting message */
+
+            /* first buffer */
+            CO_CANtx_t *buffer = &CANmodule->txArray[0];
+            /* search through whole array of pointers to transmit message buffers. */
+            for(i = CANmodule->txSize; i > 0U; i--){
+                /* if message buffer is full, send it. */
+                if(buffer->bufferFull){
+                    buffer->bufferFull = false;
+                    CANmodule->CANtxCount--;
+
+                    /* Copy message to CAN buffer */
+                    CANmodule->bufferInhibitFlag = buffer->syncFlag;
+                    CO_CANsend(CANmodule, buffer);
+                    break;                      /* exit for loop */
+                }
+                buffer++;
+            }/* end of for loop */
+
+            /* Clear counter if no more messages */
+            if(i == 0U){
+                CANmodule->CANtxCount = 0U;
+            }
+        }
     }
+
+    //Unregister TX event before terminating thread
+    chEvtUnregister(&candev->rxfull_event, &can_el);
     chThdExit(MSG_OK);
 }
 
@@ -90,5 +134,5 @@ void can_start_threads(void) {
      * Starting the transmitter and receiver threads.
      */
     chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), NORMALPRIO + 7, can_rx, NULL);
-    chThdCreateStatic(can_tpdo_wa, sizeof(can_tpdo_wa), NORMALPRIO + 7, can_tpdo, NULL);
+    chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), NORMALPRIO + 7, can_tx, NULL);
 }
