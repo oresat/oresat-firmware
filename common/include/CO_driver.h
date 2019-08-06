@@ -195,6 +195,7 @@ extern "C" {
  * \endcode
  * @{
  */
+ /* TODO: Research and double check this stuff */
 /** Memory barrier */
 #define CANrxMemoryBarrier()
 /** Check if new message has arrived */
@@ -225,7 +226,7 @@ extern "C" {
  * Return values of some CANopen functions. If function was executed
  * successfully it returns 0 otherwise it returns <0.
  */
-typedef enum{
+typedef enum {
     CO_ERROR_NO                 = 0,    /**< Operation completed successfully */
     CO_ERROR_ILLEGAL_ARGUMENT   = -1,   /**< Error in function arguments */
     CO_ERROR_OUT_OF_MEMORY      = -2,   /**< Memory allocation failed */
@@ -241,14 +242,14 @@ typedef enum{
     CO_ERROR_PARAMETERS         = -12,  /**< Error in function function parameters */
     CO_ERROR_DATA_CORRUPT       = -13,  /**< Stored data are corrupt */
     CO_ERROR_CRC                = -14   /**< CRC does not match */
-}CO_ReturnError_t;
+} CO_ReturnError_t;
 
 
 /**
  * CAN receive message structure as aligned in CAN module. It is different in
  * different microcontrollers. It usually contains other variables.
  */
-typedef struct{
+typedef struct {
     /** CAN identifier. It must be read through CO_CANrxMsg_readIdent() function. */
     union {
         CANRxFrame              rxFrame;
@@ -266,24 +267,24 @@ typedef struct{
             uint8_t             data[8];        /**< Frame data.         */
         };
     };
-}CO_CANrxMsg_t;
+} CO_CANrxMsg_t;
 
 
 /**
  * Received message object
  */
-typedef struct{
+typedef struct {
     uint16_t            ident;          /**< Standard CAN Identifier (bits 0..10) + RTR (bit 11) */
     uint16_t            mask;           /**< Standard Identifier mask with same alignment as ident */
     void               *object;         /**< From CO_CANrxBufferInit() */
     void              (*pFunct)(void *object, const CO_CANrxMsg_t *message);  /**< From CO_CANrxBufferInit() */
-}CO_CANrx_t;
+} CO_CANrx_t;
 
 
 /**
  * Transmit message object.
  */
-typedef struct{
+typedef struct {
     union {
         CANTxFrame              txFrame;
         struct {
@@ -301,13 +302,13 @@ typedef struct{
     volatile bool_t     bufferFull;             /**< True if previous message is still in buffer */
     /** Synchronous PDO messages has this flag set. It prevents them to be sent outside the synchronous window */
     volatile bool_t     syncFlag;
-}CO_CANtx_t;
+} CO_CANtx_t;
 
 
 /**
  * CAN module object. It may be different in different microcontrollers.
  */
-typedef struct{
+typedef struct {
     int32_t             CANbaseAddress; /**< From CO_CANmodule_init() */
     CANDriver          *cand;           /**< CANDriver for ChibiOS */
     CANConfig           cancfg;         /**< CANConfig for ChibiOS */
@@ -333,7 +334,7 @@ typedef struct{
     volatile uint16_t   CANtxCount;
     uint32_t            errOld;         /**< Previous state of CAN errors */
     void               *em;             /**< Emergency object */
-}CO_CANmodule_t;
+} CO_CANmodule_t;
 
 
 /**

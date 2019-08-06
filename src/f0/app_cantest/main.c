@@ -43,9 +43,8 @@ static void app_init(void) {
 }
 
 int main(void) {
-    oresat_init(ORESAT_DEFAULT_ID);
-
     // Initialize and start
+    oresat_init(ORESAT_DEFAULT_ID);
     app_init();
     oresat_start();
 
