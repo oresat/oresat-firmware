@@ -12,7 +12,7 @@
 THD_WORKING_AREA(can_rx_wa, 0x40);
 THD_FUNCTION(can_rx, p)
 {
-    event_listener_t    can_el;
+    event_listener_t    rx_el;
     CO_CANmodule_t      *CANmodule = p;
     CO_CANrxMsg_t       rcvMsg;             /* Received message */
     uint8_t             index;              /* index of received message */
@@ -23,7 +23,7 @@ THD_FUNCTION(can_rx, p)
     // Set thread name
     chRegSetThreadName("receiver");
     // Register RX event
-    chEvtRegister(&CANmodule->cand->rxfull_event, &can_el, 0);
+    chEvtRegister(&CANmodule->cand->rxfull_event, &rx_el, 0);
 
     // Start RX Loop
     while (!chThdShouldTerminateX()) {
@@ -64,7 +64,7 @@ THD_FUNCTION(can_rx, p)
     }
 
     //Unregister RX event before terminating thread
-    chEvtUnregister(&CANmodule->cand->rxfull_event, &can_el);
+    chEvtUnregister(&CANmodule->cand->rxfull_event, &rx_el);
     chThdExit(MSG_OK);
 }
 
@@ -74,13 +74,13 @@ THD_FUNCTION(can_rx, p)
 THD_WORKING_AREA(can_tx_wa, 0x40);
 THD_FUNCTION(can_tx, p)
 {
-    event_listener_t    can_el;
+    event_listener_t    tx_el;
     CO_CANmodule_t      *CANmodule = p;
 
     // Set thread name
     chRegSetThreadName("transmitter");
     // Register TX event
-    chEvtRegister(&CANmodule->cand->txempty_event, &can_el, 0);
+    chEvtRegister(&CANmodule->cand->txempty_event, &tx_el, 0);
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
@@ -122,6 +122,6 @@ THD_FUNCTION(can_tx, p)
     }
 
     //Unregister TX event before terminating thread
-    chEvtUnregister(&CANmodule->cand->txempty_event, &can_el);
+    chEvtUnregister(&CANmodule->cand->txempty_event, &tx_el);
     chThdExit(MSG_OK);
 }
