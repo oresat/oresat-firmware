@@ -2,18 +2,21 @@
 #include "CANopen.h"
 #include "can_threads.h"
 
-thread_descriptor_t workers[ORESAT_MAX_THREADS];
-uint32_t num_workers = 0;
+static struct {
+    thread_descriptor_t workers[ORESAT_MAX_THREADS];
+    uint32_t num_workers;
+    uint8_t node_id;
+} node_cfg;
 
 int reg_worker(void *wa, size_t wa_size, tprio_t prio, tfunc_t thread_func, void *arg)
 {
-    if (num_workers == ORESAT_MAX_THREADS) {
+    if (node_cfg.num_workers == ORESAT_MAX_THREADS) {
         return -1;
     }
 
     /* TODO: Register worker threads */
 
-    return num_workers++;
+    return node_cfg.num_workers++;
 }
 
 void oresat_init(uint8_t node_id)
@@ -37,11 +40,12 @@ void oresat_init(uint8_t node_id)
     if (node_id > 0x7F) {
         node_id = 0x7F;
     }
+    node_cfg.node_id = node_id;
 
     return;
 }
 
-void oresat_start(void)
+void oresat_start(CANDriver *cand, uint16_t bitrate)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     uint32_t i;
@@ -50,27 +54,32 @@ void oresat_start(void)
         CO_ReturnError_t err;
 
         /* Initialize CAN Subsystem */
-        /*err = CO_init((uint32_t)&CAND1, node_id, 1000);*/
-        /*if (err != CO_ERROR_NO) {*/
-            /*while(1);*/
+        err = CO_init((uint32_t)cand, node_cfg.node_id, bitrate);
+        if (err != CO_ERROR_NO) {
+            while(1);
             /*CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);*/
-        /*}*/
+        }
 
-        /*chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, &CO->CANmodule[0]);*/
-        /*chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, &CO->CANmodule[0]);*/
+        chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, &CO->CANmodule[0]);
+        chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, &CO->CANmodule[0]);
 
-        /*CO_CANsetNormalMode(CO->CANmodule[0]);*/
+        CO_CANsetNormalMode(CO->CANmodule[0]);
 
         /* Start app workers */
-        for (i = 0; i < num_workers; i++) {
+        for (i = 0; i < node_cfg.num_workers; i++) {
             /* TODO: Start worker threads */
         }
 
-        chThdSleepMilliseconds(1000);
+        reset = CO_RESET_NOT;
+        while (reset == CO_RESET_NOT) {
+            chThdSleepMilliseconds(1000);
+            /*reset = CO_process(CO, timer1msDiff, NULL);*/
+        }
     }
 
-    CO_delete((uint32_t)&CAND1);
+    CO_delete((uint32_t)cand);
 
     /* Reset */
+    NVIC_SystemReset();
     return;
 }
