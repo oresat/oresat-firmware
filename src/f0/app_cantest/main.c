@@ -43,15 +43,6 @@ static void app_init(void) {
 }
 
 int main(void) {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
     oresat_init(ORESAT_DEFAULT_ID);
 
     // Initialize and start
