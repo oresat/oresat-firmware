@@ -73,4 +73,9 @@ typedef union {
     uint32_t raw;
 } flt_reg_t;
 
+uint16_t crc16_ccitt(
+        const uint8_t   block[],
+        uint32_t        blockLength,
+        uint16_t        crc);
+
 #endif
