@@ -18,12 +18,11 @@ THD_FUNCTION(can_rx, p) {
     CO_CANrx_t          *buffer = NULL;     /* receive message buffer from CO_CANmodule_t object. */
     bool_t              msgMatched = false;
     CO_CANmodule_t      *CANmodule = p;
-    CANDriver           *candev = (CANDriver *)CANmodule->CANbaseAddress;
 
     // Set thread name
     chRegSetThreadName("receiver");
     // Register RX event
-    chEvtRegister(&candev->rxfull_event, &can_el, 0);
+    chEvtRegister(&CANmodule->cand->rxfull_event, &can_el, 0);
 
     // Start RX Loop
     while (!chThdShouldTerminateX()) {
@@ -32,7 +31,7 @@ THD_FUNCTION(can_rx, p) {
             continue;
         }
 
-        while (canReceiveTimeout(candev, CAN_ANY_MAILBOX, &rcvMsg.rxFrame, TIME_IMMEDIATE) == MSG_OK) {
+        while (canReceiveTimeout(CANmodule->cand, CAN_ANY_MAILBOX, &rcvMsg.rxFrame, TIME_IMMEDIATE) == MSG_OK) {
             /* Process message.*/
             rcvMsgIdent = rcvMsg.SID | (rcvMsg.RTR << 11);
             if(CANmodule->useCANrxFilters){
@@ -66,7 +65,7 @@ THD_FUNCTION(can_rx, p) {
     }
 
     //Unregister RX event before terminating thread
-    chEvtUnregister(&candev->rxfull_event, &can_el);
+    chEvtUnregister(&CANmodule->cand->rxfull_event, &can_el);
     chThdExit(MSG_OK);
 }
 
@@ -78,12 +77,11 @@ THD_FUNCTION(can_tx, p) {
     event_listener_t    can_el;
 
     CO_CANmodule_t      *CANmodule = p;
-    CANDriver           *candev = (CANDriver *)CANmodule->CANbaseAddress;
 
     // Set thread name
     chRegSetThreadName("transmitter");
     // Register TX event
-    chEvtRegister(&candev->txempty_event, &can_el, 0);
+    chEvtRegister(&CANmodule->cand->txempty_event, &can_el, 0);
 
     // Start TX Loop
     while (!chThdShouldTerminateX()) {
@@ -125,6 +123,6 @@ THD_FUNCTION(can_tx, p) {
     }
 
     //Unregister TX event before terminating thread
-    chEvtUnregister(&candev->rxfull_event, &can_el);
+    chEvtUnregister(&CANmodule->cand->txempty_event, &can_el);
     chThdExit(MSG_OK);
 }

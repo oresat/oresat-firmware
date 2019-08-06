@@ -70,8 +70,9 @@ void CO_CANsetConfigurationMode(int32_t CANbaseAddress){
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule){
     /* Put CAN module in normal mode */
-    canSTM32SetFilters((CANDriver *)CANmodule->CANbaseAddress, 0xE, CANmodule->useCANrxFilters, CANmodule->canFilters);
-    canStart((CANDriver *)CANmodule->CANbaseAddress, &cancfg);
+    /* TODO: Fix magic number 0xE here */
+    canSTM32SetFilters(CANmodule->cand, 0xE, CANmodule->useCANrxFilters, CANmodule->canFilters);
+    canStart(CANmodule->cand, &CANmodule->cancfg);
     CANmodule->CANnormal = true;
 }
 
@@ -95,6 +96,7 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANbaseAddress = CANbaseAddress;
+    CANmodule->cand = (CANDriver *)CANbaseAddress;
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
     CANmodule->txArray = txArray;
@@ -117,12 +119,18 @@ CO_ReturnError_t CO_CANmodule_init(
         txArray[i].bufferFull = false;
     }
 
-
-    /* TODO: Check if we need this: Configure CAN module registers */
-
+    /* Configure CAN module registers */
+    CANmodule->cancfg.mcr = (
+            /* MCR (Master Control Register) */
+            CAN_MCR_ABOM      |     //Automatic Bus-Off Management
+            CAN_MCR_AWUM      |     //Automatic Wakeup Mode
+            CAN_MCR_TXFP      );    //Transmit FIFO Priority
 
     /* Configure CAN timing */
-    cancfg.btr = CAN_BTR(CANbitRate);
+    CANmodule->cancfg.btr = (
+            /* BTR (Bit Timing Register) */
+            /*CAN_BTR_LBKM     |     //Loopback Mode (Debug) */
+            CAN_BTR(CANbitRate));   //Calculate BTR value and set
 
     /* Configure CAN module hardware filters */
     if(CANmodule->useCANrxFilters){
@@ -150,7 +158,7 @@ CO_ReturnError_t CO_CANmodule_init(
 /******************************************************************************/
 void CO_CANmodule_disable(CO_CANmodule_t *CANmodule){
     /* turn off the module */
-    canStop((CANDriver *)CANmodule->CANbaseAddress);
+    canStop(CANmodule->cand);
 }
 
 
@@ -249,7 +257,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer){
     CO_LOCK_CAN_SEND();
     /* If CAN TX buffer is free, attempt to send it */
     if(CANmodule->CANtxCount == 0 && \
-            !canTryTransmitI((CANDriver *)CANmodule->CANbaseAddress, CAN_ANY_MAILBOX, &buffer->txFrame)){
+            !canTryTransmitI(CANmodule->cand, CAN_ANY_MAILBOX, &buffer->txFrame)){
         CANmodule->bufferInhibitFlag = buffer->syncFlag;
     }
     /* If no buffer is free, message will be sent by interrupt */
