@@ -18,8 +18,6 @@ int reg_worker(void *wa, size_t wa_size, tprio_t prio, tfunc_t thread_func, void
 
 void oresat_init(uint8_t node_id)
 {
-    CO_ReturnError_t err;
-
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers
@@ -40,30 +38,39 @@ void oresat_init(uint8_t node_id)
         node_id = 0x7F;
     }
 
-    //Initialize CAN Subsystem
-    err = CO_init((uint32_t)&CAND1, node_id, 1000);
-    if (err != CO_ERROR_NO) {
-        while(1);
-        /*CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);*/
-    }
-
     return;
 }
 
 void oresat_start(void)
 {
+    CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     uint32_t i;
 
-    /*chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, &CO->CANmodule[0]);*/
-    /*chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, &CO->CANmodule[0]);*/
+    while (reset != CO_RESET_APP) {
+        CO_ReturnError_t err;
 
-    /*CO_CANsetNormalMode(CO->CANmodule[0]);*/
+        /* Initialize CAN Subsystem */
+        /*err = CO_init((uint32_t)&CAND1, node_id, 1000);*/
+        /*if (err != CO_ERROR_NO) {*/
+            /*while(1);*/
+            /*CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);*/
+        /*}*/
 
-    for (i = 0; i < num_workers; i++) {
-        /* TODO: Start worker threads */
-    }
+        /*chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, &CO->CANmodule[0]);*/
+        /*chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, &CO->CANmodule[0]);*/
 
-    while (true) {
+        /*CO_CANsetNormalMode(CO->CANmodule[0]);*/
+
+        /* Start app workers */
+        for (i = 0; i < num_workers; i++) {
+            /* TODO: Start worker threads */
+        }
+
         chThdSleepMilliseconds(1000);
     }
+
+    CO_delete((uint32_t)&CAND1);
+
+    /* Reset */
+    return;
 }
