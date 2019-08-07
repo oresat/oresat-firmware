@@ -60,8 +60,10 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
+        chThdCreateStatic(can_wa, sizeof(can_wa), HIGHPRIO, can, CO);
+
         cand->rxfull_cb = CO_CANrx_cb;
-        cand->txempty_cb = CO_CANrx_cb;
+        cand->txempty_cb = CO_CANtx_cb;
 
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
