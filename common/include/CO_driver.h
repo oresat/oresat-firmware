@@ -206,6 +206,8 @@ extern "C" {
 #define CLEAR_CANrxNew(rxNew) {CANrxMemoryBarrier(); rxNew = (void*)0L;}
 /** @} */
 
+#define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
+
 /**
  * @defgroup CO_dataTypes Data types
  * @{
@@ -264,7 +266,12 @@ typedef struct {
                 uint32_t        EID:29;         /**< Extended identifier.*/
                 uint32_t        _align1;
             };
-            uint8_t             data[8];        /**< Frame data.         */
+            union {
+                uint8_t         data[8];        /**< Frame data.         */
+                uint16_t        data16[4];      /**< Frame data.         */
+                uint32_t        data32[2];      /**< Frame data.         */
+                uint64_t        data64[1];      /**< Frame data.         */
+            };
         };
     };
 } CO_CANrxMsg_t;
@@ -296,7 +303,12 @@ typedef struct {
                 uint32_t        EID:29;         /**< Extended identifier.*/
                 uint32_t        _align1;
             };
-            uint8_t             data[8];        /**< Frame data.         */
+            union {
+                uint8_t         data[8];        /**< Frame data.         */
+                uint16_t        data16[4];      /**< Frame data.         */
+                uint32_t        data32[2];      /**< Frame data.         */
+                uint64_t        data64[1];      /**< Frame data.         */
+            };
         };
     };
     volatile bool_t     bufferFull;             /**< True if previous message is still in buffer */
@@ -505,6 +517,25 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule);
  */
 void CO_CANverifyErrors(CO_CANmodule_t *CANmodule);
 
+/**
+ * Receives CAN messages.
+ *
+ * Function must be called directly from high priority CAN RX interrupt.
+ *
+ * @param canp The driver associated with the interrupt.
+ * @param flags The mailbox associated with interrupt.
+ */
+void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
+
+/**
+ * Transmits CAN messages.
+ *
+ * Function must be called directly from high priority CAN TX interrupt.
+ *
+ * @param canp The driver associated with the interrupt.
+ * @param flags The mailbox associated with interrupt.
+ */
+void CO_CANtx_cb(CANDriver *canp, uint32_t flags);
 
 #ifdef __cplusplus
 }
