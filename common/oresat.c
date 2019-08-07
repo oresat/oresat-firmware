@@ -33,7 +33,7 @@ void oresat_init(uint8_t node_id)
 
     /* If node ID is not overridden, set node ID from user data byte */
     if (node_id == ORESAT_DEFAULT_ID) {
-        node_id = (FLASH->OBR & FLASH_OBR_DATA0) >> FLASH_OBR_DATA0_Pos;
+        node_id = (FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos;
     }
 
     //TODO: If node ID is invalid, get new node ID
@@ -48,7 +48,8 @@ void oresat_init(uint8_t node_id)
 void oresat_start(CANDriver *cand, uint16_t bitrate)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    uint32_t i;
+    uint16_t sleep_ms;
+    systime_t prev_time, cur_time, diff_time;
 
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
@@ -56,8 +57,7 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
         /* Initialize CAN Subsystem */
         err = CO_init((uint32_t)cand, node_cfg.node_id, bitrate);
         if (err != CO_ERROR_NO) {
-            while(1);
-            /*CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);*/
+            CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
         chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, CO->CANmodule[0]);
@@ -66,14 +66,18 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         /* Start app workers */
-        for (i = 0; i < node_cfg.num_workers; i++) {
+        for (uint32_t i = 0; i < node_cfg.num_workers; i++) {
             /* TODO: Start worker threads */
         }
 
         reset = CO_RESET_NOT;
+        prev_time = chVTGetSystemTimeX();
         while (reset == CO_RESET_NOT) {
-            chThdSleepMilliseconds(1000);
-            /*reset = CO_process(CO, timer1msDiff, NULL);*/
+            sleep_ms = 50U;
+            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
+            prev_time = cur_time;
+            reset = CO_process(CO, chTimeI2MS(diff_time), &sleep_ms);
+            chThdSleepMilliseconds(sleep_ms);
         }
     }
 
