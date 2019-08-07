@@ -308,12 +308,13 @@ void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
     CO_EM_t* em = (CO_EM_t*)CANmodule->em;
     uint32_t err;
 
-    /* TODO: Check this whole thing after figuring out error handling */
+    /* TODO: Optimize this stuff... Lots of extra code where a register would suffice */
     /* get error counters from module. Id possible, function may use different way to
      * determine errors. */
-    rxErrors = CANmodule->txSize;
-    txErrors = CANmodule->txSize;
-    overflow = CANmodule->txSize;
+    rxErrors = (CANmodule->cand->can->ESR & CAN_ESR_REC_Msk) >> CAN_ESR_REC_Pos;
+    txErrors = (CANmodule->cand->can->ESR & CAN_ESR_TEC_Msk) >> CAN_ESR_TEC_Pos;
+    overflow = ((CANmodule->cand->can->RF0R & CAN_RF0R_FOVR0_Msk) |
+               ((CANmodule->cand->can->RF1R & CAN_RF1R_FOVR1_Msk) << 1)) >> CAN_RF0R_FOVR0_Pos;
 
     err = ((uint32_t)txErrors << 16) | ((uint32_t)rxErrors << 8) | overflow;
 
