@@ -9,8 +9,6 @@
 #include "hal.h"
 
 //Thread prototypes
-extern THD_WORKING_AREA(can_rx_wa, 0x40);
-extern THD_FUNCTION(can_rx, p);
-extern THD_WORKING_AREA(can_tx_wa, 0x40);
-extern THD_FUNCTION(can_tx, p);
+extern THD_WORKING_AREA(can_wa, 0x40);
+extern THD_FUNCTION(can, p);
 #endif
