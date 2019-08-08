@@ -2,24 +2,33 @@
 #include "CANopen.h"
 #include "can_threads.h"
 
-static struct {
-    thread_descriptor_t workers[ORESAT_MAX_THREADS];
-    uint32_t num_workers;
-    uint8_t node_id;
-} node_cfg;
+typedef struct {
+    thread_descriptor_t desc;
+    thread_t *tp;
+} worker_t;
 
-int reg_worker(void *wa, size_t wa_size, tprio_t prio, tfunc_t thread_func, void *arg)
+static worker_t workers[ORESAT_MAX_THREADS];
+static uint32_t num_workers;
+
+int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg)
 {
-    if (node_cfg.num_workers == ORESAT_MAX_THREADS) {
+    worker_t *wp;
+    if (num_workers == ORESAT_MAX_THREADS) {
         return -1;
     }
 
-    /* TODO: Register worker threads */
+    wp = &workers[num_workers];
+    wp->desc.name = name;
+    wp->desc.wbase = THD_WORKING_AREA_BASE(wa);
+    wp->desc.wend = THD_WORKING_AREA_END(wa + wa_size);
+    wp->desc.prio = prio;
+    wp->desc.funcp = funcp;
+    wp->desc.arg = arg;
 
-    return node_cfg.num_workers++;
+    return num_workers++;
 }
 
-void oresat_init(uint8_t node_id)
+void oresat_init(uint8_t node_id, uint16_t bitrate)
 {
     /*
      * System initializations.
@@ -40,12 +49,13 @@ void oresat_init(uint8_t node_id)
     if (node_id > 0x7F) {
         node_id = 0x7F;
     }
-    node_cfg.node_id = node_id;
+    OD_CANNodeID = node_id;
+    OD_CANBitRate = bitrate;
 
     return;
 }
 
-void oresat_start(CANDriver *cand, uint16_t bitrate)
+void oresat_start(CANDriver *cand)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     thread_t *can_tp;
@@ -56,7 +66,7 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
         CO_ReturnError_t err;
 
         /* Initialize CAN Subsystem */
-        err = CO_init((uint32_t)cand, node_cfg.node_id, bitrate);
+        err = CO_init((uint32_t)cand, OD_CANNodeID, OD_CANBitRate);
         if (err != CO_ERROR_NO) {
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
@@ -69,8 +79,8 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         /* Start app workers */
-        for (uint32_t i = 0; i < node_cfg.num_workers; i++) {
-            /* TODO: Start worker threads */
+        for (uint32_t i = 0; i < num_workers; i++) {
+            workers[i].tp = chThdCreate(&workers[i].desc);
         }
 
         reset = CO_RESET_NOT;
@@ -81,6 +91,11 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
             prev_time = cur_time;
             reset = CO_process(CO, chTimeI2MS(diff_time), &sleep_ms);
             chThdSleepMilliseconds(sleep_ms);
+        }
+
+        for (uint32_t i = 0; i < num_workers; i++) {
+            chThdTerminate(workers[i].tp);
+            chThdWait(workers[i].tp);
         }
         chThdTerminate(can_tp);
         chThdWait(can_tp);

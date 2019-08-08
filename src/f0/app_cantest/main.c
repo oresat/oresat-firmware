@@ -37,7 +37,7 @@ static SerialConfig ser_cfg =
 static void app_init(void)
 {
     //=== App initialization
-    reg_worker(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    reg_worker("Test Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     // Start up debug output
     sdStart(&SD2, &ser_cfg);
@@ -46,8 +46,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init(ORESAT_DEFAULT_ID);
+    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
     app_init();
-    oresat_start(&CAND1, ORESAT_DEFAULT_BITRATE);
+    oresat_start(&CAND1);
     return 0;
 }
