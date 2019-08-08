@@ -58,7 +58,6 @@ extern "C" {
 #include "hal.h"
 
 #define CO_USE_GLOBALS
-#define CO_USE_OWN_CRC16
 
 /**
  * @defgroup CO_driver Driver
@@ -195,7 +194,6 @@ extern "C" {
  * \endcode
  * @{
  */
- /* TODO: Research and double check this stuff */
 /** Memory barrier */
 #define CANrxMemoryBarrier()
 /** Check if new message has arrived */
@@ -262,9 +260,12 @@ typedef struct {
             uint8_t             RTR:1;          /**< Frame type.         */
             uint8_t             IDE:1;          /**< Identifier type.    */
             union {
-                uint32_t        SID:11;         /**< Standard identifier.*/
-                uint32_t        EID:29;         /**< Extended identifier.*/
-                uint32_t        _align1;
+                struct {
+                    uint32_t    SID:11;         /**< Standard identifier.*/
+                };
+                struct {
+                    uint32_t    EID:29;         /**< Extended identifier.*/
+                };
             };
             union {
                 uint8_t         data[8];        /**< Frame data.         */
@@ -299,9 +300,12 @@ typedef struct {
             uint8_t             RTR:1;          /**< Frame type.         */
             uint8_t             IDE:1;          /**< Identifier type.    */
             union {
-                uint32_t        SID:11;         /**< Standard identifier.*/
-                uint32_t        EID:29;         /**< Extended identifier.*/
-                uint32_t        _align1;
+                struct {
+                    uint32_t    SID:11;         /**< Standard identifier.*/
+                };
+                struct {
+                    uint32_t    EID:29;         /**< Extended identifier.*/
+                };
             };
             union {
                 uint8_t         data[8];        /**< Frame data.         */

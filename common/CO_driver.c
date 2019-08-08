@@ -139,9 +139,6 @@ CO_ReturnError_t CO_CANmodule_init(
         }
     }
 
-    /* TODO: Check if we need this: Configure CAN interrupt registers */
-
-
     return CO_ERROR_NO;
 }
 
@@ -362,6 +359,7 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
     uint32_t            rcvMsgIdent;        /* identifier of the received message */
     CO_CANrx_t          *buffer = NULL;     /* receive message buffer from CO_CANmodule_t object. */
     bool_t              msgMatched = false;
+    (void)flags;
 
     if (canp == NULL)
         return;
@@ -400,6 +398,7 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
 void CO_CANtx_cb(CANDriver *canp, uint32_t flags)
 {
     CO_CANmodule_t      *CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
+    (void)flags;
 
     if (canp == NULL)
         return;
