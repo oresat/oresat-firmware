@@ -304,56 +304,49 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 /******************************************************************************/
 void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
 {
-    uint16_t rxErrors, txErrors, overflow;
-    CO_EM_t* em = (CO_EM_t*)CANmodule->em;
+    CO_EM_t *em = (CO_EM_t*)CANmodule->em;
+    CAN_TypeDef *canp = CANmodule->cand->can;
     uint32_t err;
 
-    /* TODO: Optimize this stuff... Lots of extra code where a register would suffice */
-    /* get error counters from module. Id possible, function may use different way to
-     * determine errors. */
-    rxErrors = (CANmodule->cand->can->ESR & CAN_ESR_REC_Msk) >> CAN_ESR_REC_Pos;
-    txErrors = (CANmodule->cand->can->ESR & CAN_ESR_TEC_Msk) >> CAN_ESR_TEC_Pos;
-    overflow = ((CANmodule->cand->can->RF0R & CAN_RF0R_FOVR0_Msk) |
-               ((CANmodule->cand->can->RF1R & CAN_RF1R_FOVR1_Msk) << 1)) >> CAN_RF0R_FOVR0_Pos;
-
-    err = ((uint32_t)txErrors << 16) | ((uint32_t)rxErrors << 8) | overflow;
+    /* Get ESR and FOVRx values */
+    err = (canp->ESR | ((canp->RF0R & CAN_RF0R_FOVR0_Msk) << 4) | ((canp->RF1R & CAN_RF1R_FOVR1_Msk) << 5));
 
     if (CANmodule->errOld != err) {
         CANmodule->errOld = err;
 
-        if (txErrors >= 256U) {                             /* bus off */
+        if (err & CAN_ESR_BOFF) {                           /* bus off */
             CO_errorReport(em, CO_EM_CAN_TX_BUS_OFF, CO_EMC_BUS_OFF_RECOVERED, err);
         } else {                                            /* not bus off */
             CO_errorReset(em, CO_EM_CAN_TX_BUS_OFF, err);
 
-            if ((rxErrors >= 96U) || (txErrors >= 96U)) {   /* bus warning */
+            if (err & CAN_ESR_EWGF) {                       /* bus warning */
                 CO_errorReport(em, CO_EM_CAN_BUS_WARNING, CO_EMC_NO_ERROR, err);
-            }
-
-            if (rxErrors >= 128U) {                         /* RX bus passive */
-                CO_errorReport(em, CO_EM_CAN_RX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
             } else {
-                CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
+                CO_errorReset(em, CO_EM_CAN_BUS_WARNING, err);
             }
 
-            if (txErrors >= 128U) {                         /* TX bus passive */
-                if (!CANmodule->firstCANtxMessage) {
-                    CO_errorReport(em, CO_EM_CAN_TX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
+            if (err & CAN_ESR_EPVF) {
+                if (_FLD2VAL(CAN_ESR_REC, err) >= 128U) {   /* RX bus passive */
+                    CO_errorReport(em, CO_EM_CAN_RX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
+                } else {
+                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
                 }
-            } else {
-                bool_t isError = CO_isError(em, CO_EM_CAN_TX_BUS_PASSIVE);
-                if (isError) {
+                if (_FLD2VAL(CAN_ESR_TEC, err) >= 128U) {   /* TX bus passive */
+                    if (!CANmodule->firstCANtxMessage) {
+                        CO_errorReport(em, CO_EM_CAN_TX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
+                    }
+                } else {
                     CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
                     CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
                 }
-            }
-
-            if ((rxErrors < 96U) && (txErrors < 96U)) {     /* no error */
-                CO_errorReset(em, CO_EM_CAN_BUS_WARNING, err);
+            } else {
+                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
+                    CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
+                    CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
             }
         }
 
-        if (overflow != 0U) {                               /* CAN RX bus overflow */
+        if (err & 0xFF00) {                                 /* CAN RX bus overflow */
             CO_errorReport(em, CO_EM_CAN_RXB_OVERFLOW, CO_EMC_CAN_OVERRUN, err);
         }
     }

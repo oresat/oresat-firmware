@@ -31,9 +31,9 @@ void oresat_init(uint8_t node_id)
     halInit();
     chSysInit();
 
-    /* If node ID is not overridden, set node ID from user data byte */
+    /* If node ID is not overridden, set node ID from user data byte 0 */
     if (node_id == ORESAT_DEFAULT_ID) {
-        node_id = (FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos;
+        node_id = _FLD2VAL(FLASH_OBR_DATA0, FLASH->OBR);
     }
 
     //TODO: If node ID is invalid, get new node ID
