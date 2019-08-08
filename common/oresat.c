@@ -48,6 +48,7 @@ void oresat_init(uint8_t node_id)
 void oresat_start(CANDriver *cand, uint16_t bitrate)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
+    thread_t *can_tp;
     uint16_t sleep_ms;
     systime_t prev_time, cur_time, diff_time;
 
@@ -60,7 +61,7 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
-        chThdCreateStatic(can_wa, sizeof(can_wa), HIGHPRIO, can, CO);
+        can_tp = chThdCreateStatic(can_wa, sizeof(can_wa), HIGHPRIO, can, CO);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
@@ -81,6 +82,8 @@ void oresat_start(CANDriver *cand, uint16_t bitrate)
             reset = CO_process(CO, chTimeI2MS(diff_time), &sleep_ms);
             chThdSleepMilliseconds(sleep_ms);
         }
+        chThdTerminate(can_tp);
+        chThdWait(can_tp);
     }
 
     CO_delete((uint32_t)cand);
