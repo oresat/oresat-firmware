@@ -34,44 +34,20 @@ static SerialConfig ser_cfg =
 };
 
 
-static void app_init(void) {
+static void app_init(void)
+{
     //=== App initialization
+    reg_worker("Test Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     // Start up debug output
     sdStart(&LPSD1, &ser_cfg);
-
 }
 
-static void main_app(void) {
-    //=== Start application threads
-
-    //Example thread creation
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-    /*
-     * Begin main loop
-     */
-    while (true)
-    {
-        chThdSleepMilliseconds(1000);
-    }
-}
-
-int main(void) {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-    oresat_init(0);
-
-    // Initialize and start app
+int main(void)
+{
+    // Initialize and start
+    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
     app_init();
-    main_app();
-
+    oresat_start(&CAND1);
     return 0;
 }
