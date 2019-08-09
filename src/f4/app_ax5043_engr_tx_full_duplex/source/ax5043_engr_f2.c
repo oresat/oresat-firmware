@@ -364,7 +364,6 @@ void ax5043_f2_prepare_rx(SPIDriver * spip)
 }
 
 
- 
 
 uint8_t axradio_f2_get_pllvcoi(SPIDriver * spip)
 {
@@ -380,6 +379,26 @@ uint8_t axradio_f2_get_pllvcoi(SPIDriver * spip)
     }
     return ax5043_read_reg(spip, AX5043_REG_PLLVCOI, (uint8_t)0x00, ret_value);
 }
+
+
+
+ void ax5043_f2_init_registers_common(SPIDriver * spip)
+{
+    uint8_t ret_value[3]={0,0,0};
+    uint8_t rng = axradio_f2_phy_chanpllrng[0];
+    if (rng & 0x20)
+        chprintf(DEBUG_CHP, "\r\r ERROR at ax5043_init_registers_common --\r\n");
+    if ( ax5043_read_reg(spip, AX5043_REG_PLLLOOP, (uint8_t)0x00, ret_value) & 0x80) {
+        ax5043_write_reg(spip, AX5043_REG_PLLRANGINGB, (uint8_t)(rng & 0x0F), ret_value);
+    } else {
+       ax5043_write_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(rng & 0x0F), ret_value);
+    }
+    rng = axradio_f2_get_pllvcoi(spip);
+   if (rng & 0x80)
+        ax5043_write_reg(spip, AX5043_REG_PLLVCOI, (uint8_t)(rng), ret_value);
+}
+
+ 
 
 
 /**

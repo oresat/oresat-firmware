@@ -703,7 +703,6 @@ void ax5043_synth_tx(SPIDriver * spip);
 void ax5043_full_tx(SPIDriver * spip);
 void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
 void ax5043_reset(SPIDriver * spip);
-void ax5043_init_registers_common(SPIDriver * spip);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);

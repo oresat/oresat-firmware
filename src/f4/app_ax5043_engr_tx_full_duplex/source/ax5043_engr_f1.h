@@ -24,6 +24,7 @@ void ax5043_f1_set_regs_rxcont_singleparamset(SPIDriver * spip);
 void ax5043_f1_prepare_tx(SPIDriver * spip);
 void ax5043_f1_prepare_rx(SPIDriver * spip);
 uint8_t axradio_f1_get_pllvcoi(SPIDriver * spip);
+void ax5043_f1_init_registers_common(SPIDriver * spip);
 void ax5043_f1_init(SPIDriver * spip);
 void transmit_f1_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
 uint8_t transmit_f1_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);

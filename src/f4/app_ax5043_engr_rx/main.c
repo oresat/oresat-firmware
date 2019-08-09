@@ -135,13 +135,13 @@ static void app_init(void)
 
     chprintf(DEBUG_CHP, "Configuring AX5043\r\n");
     chThdSleepMilliseconds(50);
-    ax5043_init(&SPID1);
-    ax5043_set_addr(&SPID1, localaddr_tx);
+    ax5043_init(&SPID2);
+    ax5043_set_addr(&SPID2, localaddr_tx);
     chprintf(DEBUG_CHP, "done reseting AX5043\r\n");
 
 
 
-     ax5043_prepare_rx(&SPID1);
+     ax5043_prepare_rx(&SPID2);
   
 
 
@@ -160,7 +160,7 @@ static void main_loop(void)
 
   /* Enabling events on both edges of the button line.*/
   //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
-  palEnableLineEvent(LINE_ARD_A5, PAL_EVENT_MODE_RISING_EDGE);
+  palEnableLineEvent(LINE_SX_INT0, PAL_EVENT_MODE_RISING_EDGE);
 
 
   while(true)
@@ -176,7 +176,7 @@ static void main_loop(void)
     else
       chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
     
-    packet_len=receive_loop(&SPID1, axradio_rxbuffer);
+    packet_len=receive_loop(&SPID2, axradio_rxbuffer);
 
     if(packet_len > 0)
       chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);

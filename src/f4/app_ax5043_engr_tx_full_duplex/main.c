@@ -31,7 +31,9 @@
 #include "chprintf.h"
 #include "util_version.h"
 #include "util_numbers.h"
-#include "ax5043.h"
+#include "ax5043_common.h"
+#include "ax5043_engr_f1.h"
+#include "ax5043_engr_f2.h"
 
 
 //#include "adf7030.h"
@@ -46,6 +48,9 @@ const struct axradio_address_mask localaddr_tx = {
 	{ 0x32, 0x34, 0x00, 0x00},
 	{ 0xFF, 0x00, 0x00, 0x00}
 };
+
+uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
+
 const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3A, 0x43, 0x51, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3A, 0x54, 0x65, 0x73, 0x74, 0x7B, 0x30, 0x30, 0x30, 0x30, 0x31 };
 const uint8_t framing_insert_counter = 1;
 const uint8_t framing_counter_pos = 0;
@@ -123,16 +128,60 @@ static void app_init(void)
 }
 
 
-THD_WORKING_AREA(waAx5043_tx, 256);
+
+
+THD_WORKING_AREA(waAx5043_rx, 1024);
+THD_FUNCTION(ax5043_rx, arg) 
+{
+  (void)arg;
+  uint8_t packet_len=0;
+  uint8_t ret_value[3]={0,0,0};
+
+  ax5043_f2_init(&SPID1);
+  ax5043_set_addr(&SPID1, localaddr_tx);
+  chprintf(DEBUG_CHP, "done reseting AX5043 rx \r\n");
+  chThdSleepMilliseconds(50);
+  
+  ax5043_f2_init(&SPID1);
+  ax5043_f2_prepare_rx(&SPID1);
+
+  /* Enabling events on both edges of the button line.*/
+  //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
+  palEnableLineEvent(LINE_SX_INT0, PAL_EVENT_MODE_RISING_EDGE);
+
+
+
+  //palWaitLineTimeout(LINE_BUTTON, TIME_INFINITE);
+  //palWaitLineTimeout(LINE_ARD_A5, TIME_INFINITE);
+  while(true)
+  {
+    palWaitLineTimeout(LINE_SX_INT0, TIME_MS2I(5000));
+
+    if (palReadLine(LINE_SX_INT0))
+      chprintf(DEBUG_CHP, "\r\r int line is HIGH ** \r\n");
+    else
+      chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
+    
+    packet_len=receive_f2_loop(&SPID1, axradio_rxbuffer);
+
+    if(packet_len > 0)
+      chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
+  }
+
+
+}
+
+
+THD_WORKING_AREA(waAx5043_tx, 1024);
 THD_FUNCTION(ax5043_tx, arg)
 {
   (void)arg;
   uint16_t pkt_counter = 0;
 
-  chThdSleepMilliseconds(50);
-  ax5043_f1_init(&SPID1);
-  ax5043_set_addr(&SPID1, localaddr_tx);
-  ax5043_f1_prepare_tx(&SPID1);
+  chThdSleepMilliseconds(500);
+  ax5043_f1_init(&SPID2);
+  ax5043_set_addr(&SPID2, localaddr_tx);
+  ax5043_f1_prepare_tx(&SPID2);
   chprintf(DEBUG_CHP, "done reseting AX5043 tx\r\n");
 
 
@@ -148,51 +197,12 @@ THD_FUNCTION(ax5043_tx, arg)
 	    }
 
 		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		transmit_f1_packet(&SPID1, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
+		transmit_f1_packet(&SPID2, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
 	}
 
 }
-
-THD_WORKING_AREA(waAx5043_rx, 256);
-THD_FUNCTION(ax5043_rx, arg) 
-{
-  (void)arg;
-  uint8_t packet_len=0;
-  uint8_t ret_value[3]={0,0,0}
-
-  ax5043_f2_init(&SPID2);
-  ax5043_set_addr(&SPID2, localaddr_tx);
-  chprintf(DEBUG_CHP, "done reseting AX5043 rx \r\n");
-  chThdSleepMilliseconds(50);
-  
-  ax5043_f2_init(&SPID2);
-  ax5043_f2_prepare_rx(&SPID2);
-
-  /* Enabling events on both edges of the button line.*/
-  //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
-  palEnableLineEvent(LINE_ARD_A5, PAL_EVENT_MODE_RISING_EDGE);
-
-
-
-  //palWaitLineTimeout(LINE_BUTTON, TIME_INFINITE);
-  //palWaitLineTimeout(LINE_ARD_A5, TIME_INFINITE);
-  palWaitLineTimeout(LINE_ARD_A5, TIME_MS2I(5000));
-
-  if (palReadLine(LINE_ARD_A5))
-    chprintf(DEBUG_CHP, "\r\r int line is HIGH ** \r\n");
-  else
-    chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
-    
-  packet_len=receive_loop(&SPID2, axradio_rxbuffer);
-
-  if(packet_len > 0)
-    chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
-
-
-}
-
 
 
 /*
@@ -205,9 +215,9 @@ static void main_loop(void)
 
 	while (true)
     {
-      chThdSleepMilliseconds(500);
+      chThdSleepMilliseconds(15000);
       chprintf(DEBUG_CHP, ".");
-		  palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
+      //palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
     }
 
 }
@@ -223,8 +233,9 @@ int main(void)
     app_init();
 
     chThdCreateStatic(waAx5043_rx, sizeof(waAx5043_rx), NORMALPRIO, ax5043_rx, NULL);
+    chThdSleepMilliseconds(5000);
     chThdCreateStatic(waAx5043_tx, sizeof(waAx5043_tx), NORMALPRIO, ax5043_tx, NULL);
-    chThdSleepMilliseconds(15000);
+    chThdSleepMilliseconds(500);
 
     main_loop();
     return 0;
