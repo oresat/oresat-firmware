@@ -256,7 +256,7 @@ void ax5043_reset(SPIDriver * spip)
   //chThdSleepMicroseconds(5);
 
   //read the powermode register
-  value=ax5043_read_reg(&SPID2, AX5043_REG_PWRMODE, value, ret_value);
+  value=ax5043_read_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
   //write to powermode register for enabling XOEN and REFIN and shutdown mode
   //page 33 in programming manual
   //value = value | AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT;
@@ -265,7 +265,7 @@ void ax5043_reset(SPIDriver * spip)
 
   //ax5043_write_reg(spip, AX5043_REG_MODULATION, (uint8_t)0x00, ret_value);
   ax5043_write_reg(spip, AX5043_REG_SCRATCH, (uint8_t)0xAA, ret_value);
-  value = ax5043_read_reg(&SPID2, AX5043_REG_SCRATCH, (uint8_t)0x00, ret_value);
+  value = ax5043_read_reg(spip, AX5043_REG_SCRATCH, (uint8_t)0x00, ret_value);
   if (value != 0xAA)
   {
         chprintf(DEBUG_CHP, "Scratch register does not match 0\r\n");
@@ -281,6 +281,7 @@ void ax5043_reset(SPIDriver * spip)
   
 
 }
+
 
 
 
