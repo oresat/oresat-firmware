@@ -108,14 +108,3 @@ void oresat_start(CANDriver *cand)
     NVIC_SystemReset();
     return;
 }
-
-void oresat_NMT_cb(CO_NMT_internalState_t state)
-{
-    if (state == CO_NMT_OPERATIONAL) {
-        /* Start worker threads */
-
-    } else {
-        /* Stop worker threads */
-
-    }
-}
