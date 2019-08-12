@@ -1,5 +1,4 @@
 #include "oresat.h"
-#include "CANopen.h"
 #include "can_threads.h"
 
 typedef struct {
@@ -108,4 +107,15 @@ void oresat_start(CANDriver *cand)
     /* Reset */
     NVIC_SystemReset();
     return;
+}
+
+void oresat_NMT_cb(CO_NMT_internalState_t state)
+{
+    if (state == CO_NMT_OPERATIONAL) {
+        /* Start worker threads */
+
+    } else {
+        /* Stop worker threads */
+
+    }
 }
