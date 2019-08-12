@@ -28,6 +28,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Following clarification and special exception to the GNU General Public
+ * License is included to the distribution terms of CANopenNode:
+ *
+ * Linking this library statically or dynamically with other modules is
+ * making a combined work based on this library. Thus, the terms and
+ * conditions of the GNU General Public License cover the whole combination.
+ *
+ * As a special exception, the copyright holders of this library give
+ * you permission to link this library with independent modules to
+ * produce an executable, regardless of the license terms of these
+ * independent modules, and to copy and distribute the resulting
+ * executable under terms of your choice, provided that you also meet,
+ * for each linked independent module, the terms and conditions of the
+ * license of that module. An independent module is a module which is
+ * not derived from or based on this library. If you modify this
+ * library, you may extend this exception to your version of the
+ * library, but you are not obliged to do so. If you do not wish
+ * to do so, delete this exception statement from your version.
  */
 
 
@@ -55,11 +74,11 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     CANopenSocket
+      FileName:     OreSat C3
       FileVersion:  -
-      CreationTime: 12:05:34
-      CreationDate: 2016-07-26
-      CreatedBy:    JP
+      CreationTime: 15:05:26
+      CreationDate: 2019-08-12
+      CreatedBy:    Miles Simpson
 *******************************************************************************/
 
 
@@ -82,14 +101,14 @@
    #define CO_NO_RPDO                     16  //Associated objects from index 1400 to 160F, count = 32
    #define CO_NO_TPDO                     16  //Associated objects from index 1800 to 1A0F, count = 32
    #define CO_NO_NMT_MASTER               1
-   #define CO_NO_TRACE                    32  //Associated objects from index 2301 to 2420, count = 65
+   #define CO_NO_TRACE                    0
    #define CO_NO_LSS_SERVER               0
    #define CO_NO_LSS_CLIENT               0
 
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             169
+   #define CO_OD_NoOfElements             104
 
 
 /*******************************************************************************
@@ -172,28 +191,6 @@
                UNSIGNED32     epochTimeOffsetMs;
                }              OD_time_t;
 
-/*2301[32]  */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     size;
-               UNSIGNED8      axisNo;
-               VISIBLE_STRING name[30];
-               VISIBLE_STRING color[20];
-               UNSIGNED32     map;
-               UNSIGNED8      format;
-               UNSIGNED8      trigger;
-               INTEGER32      threshold;
-               }              OD_traceConfig_t;
-
-/*2401[32]  */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     size;
-               INTEGER32      value;
-               INTEGER32      min;
-               INTEGER32      max;
-               DOMAIN         plot;
-               UNSIGNED32     triggerTime;
-               }              OD_trace_t;
-
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -219,8 +216,6 @@ struct sCO_OD_RAM{
 /*2110      */ INTEGER32      variableInt32[32];
 /*2120      */ OD_testVar_t   testVar;
 /*2130      */ OD_time_t      time;
-/*2400      */ UNSIGNED8      traceEnable;
-/*2401[32]  */ OD_trace_t     trace[32];
 /*6000      */ UNSIGNED8      readInput8Bit[8];
 /*6200      */ UNSIGNED8      writeOutput8Bit[8];
 /*6401      */ INTEGER16      readAnalogueInput16Bit[12];
@@ -267,7 +262,6 @@ struct sCO_OD_ROM{
 /*2101      */ UNSIGNED8      CANNodeID;
 /*2102      */ UNSIGNED16     CANBitRate;
 /*2111      */ INTEGER32      variableROMInt32[16];
-/*2301[32]  */ OD_traceConfig_t traceConfig[32];
 
                UNSIGNED32     LastWord;
 };
@@ -433,15 +427,6 @@ extern struct sCO_OD_ROM CO_OD_ROM;
 
 /*2130, Data Type: OD_time_t */
       #define OD_time                                    CO_OD_RAM.time
-
-/*2301[32], Data Type: OD_traceConfig_t, Array[32] */
-      #define OD_traceConfig                             CO_OD_ROM.traceConfig
-
-/*2400, Data Type: UNSIGNED8 */
-      #define OD_traceEnable                             CO_OD_RAM.traceEnable
-
-/*2401[32], Data Type: OD_trace_t, Array[32] */
-      #define OD_trace                                   CO_OD_RAM.trace
 
 /*6000, Data Type: UNSIGNED8, Array[8] */
       #define OD_readInput8Bit                           CO_OD_RAM.readInput8Bit
