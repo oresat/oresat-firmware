@@ -9,8 +9,8 @@
 /*
  * CAN Worker Thread
  */
-THD_WORKING_AREA(can_wa, 0x40);
-THD_FUNCTION(can, p)
+THD_WORKING_AREA(can_rt_wa, 0x40);
+THD_FUNCTION(can_rt, p)
 {
     systime_t prev_time, cur_time, diff_time;
     CO_t *CO = p;
