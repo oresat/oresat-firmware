@@ -51,7 +51,7 @@
  * @brief   Enables the CAN subsystem.
  */
 #if !defined(HAL_USE_CAN) || defined(__DOXYGEN__)
-#define HAL_USE_CAN                         TRUE
+#define HAL_USE_CAN                         FALSE
 #endif
 
 /**
@@ -256,7 +256,7 @@
  * @brief   Enforces the driver to use direct callbacks rather than OSAL events.
  */
 #if !defined(CAN_ENFORCE_USE_CALLBACKS) || defined(__DOXYGEN__)
-#define CAN_ENFORCE_USE_CALLBACKS           FALSE
+#define CAN_ENFORCE_USE_CALLBACKS           TRUE
 #endif
 
 /*===========================================================================*/

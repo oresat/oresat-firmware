@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x200
+  USE_PROCESS_STACKSIZE = 0x100
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x100
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -105,9 +105,6 @@ DEPDIR   := $(APP_ROOT)/.dep
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# Project specific files.
-include $(PROJ_SRC)/common.mk
-
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
@@ -126,7 +123,6 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 #include $(CHIBIOS)/test/lib/test.mk
 #include $(CHIBIOS)/test/rt/rt_test.mk
 #include $(CHIBIOS)/test/oslib/oslib_test.mk
-include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
@@ -165,10 +161,10 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
 
 # Define ASM defines here
-UADEFS =
+UADEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
 
 # List all user directories here
 UINCDIR = $(PROJ_INC)
