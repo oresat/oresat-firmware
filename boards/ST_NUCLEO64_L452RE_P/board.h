@@ -422,8 +422,8 @@
                                      PIN_PUPDR_FLOATING(GPIOA_PIN5) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN6) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN7) |       \
-                                     PIN_PUPDR_FLOATING(GPIOA_PIN8) |       \
-                                     PIN_PUPDR_FLOATING(GPIOA_PIN9) |       \
+                                     PIN_PUPDR_PULLUP(GPIOA_PIN8) |         \
+                                     PIN_PUPDR_PULLUP(GPIOA_PIN9) |         \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN10) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN11) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN12) |      \
@@ -506,8 +506,8 @@
  * PB5  - PIN5                      (analog).
  * PB6  - PIN6                      (analog).
  * PB7  - PIN7                      (analog).
- * PB8  - PIN8                      (analog).
- * PB9  - PIN9                      (analog).
+ * PB8  - PIN8                      (alternate 9).
+ * PB9  - PIN9                      (alternate 9).
  * PB10 - PIN10                     (analog).
  * PB11 - PIN11                     (analog).
  * PB12 - PIN12                     (analog).
@@ -523,8 +523,8 @@
                                      PIN_MODE_ANALOG(GPIOB_PIN5) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN6) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN7) |          \
-                                     PIN_MODE_ANALOG(GPIOB_PIN8) |          \
-                                     PIN_MODE_ANALOG(GPIOB_PIN9) |          \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN8) |       \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN9) |       \
                                      PIN_MODE_ANALOG(GPIOB_PIN10) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN11) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN12) |         \
@@ -603,8 +603,8 @@
                                      PIN_AFIO_AF(GPIOB_PIN5, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN6, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN7, 0U))
-#define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_PIN8, 0U) |          \
-                                     PIN_AFIO_AF(GPIOB_PIN9, 0U) |          \
+#define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_PIN8, 9U) |          \
+                                     PIN_AFIO_AF(GPIOB_PIN9, 9U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN10, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN11, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN12, 0U) |         \
