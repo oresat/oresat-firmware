@@ -34,6 +34,7 @@
 #include "ax5043_common.h"
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
+#include "ax5043_driver.h"
 
 
 //#include "adf7030.h"
@@ -41,11 +42,12 @@
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-const struct axradio_address remoteaddr_tx = {
+
+axradio_address_t remoteaddr = {
 	{ 0x33, 0x34, 0x00, 0x00}
 };
-const struct axradio_address_mask localaddr_tx = {
-	{ 0x32, 0x34, 0x00, 0x00},
+axradio_address_mask_t localaddr = {
+	{ 0x33, 0x34, 0x00, 0x00},
 	{ 0xFF, 0x00, 0x00, 0x00}
 };
 
@@ -70,7 +72,7 @@ static SerialConfig ser_cfg =
 /*
  * Receive and Transmit SPI Configurations
  */
-static const SPIConfig spicfg_rx =
+static const SPIConfig spicfg1 =
 {
     false,
     NULL,                                   // Operation complete callback
@@ -86,7 +88,7 @@ static const SPIConfig spicfg_rx =
     0, // SPI_CR2_SSOE,
 };
 
-static const SPIConfig spicfg_tx =
+static const SPIConfig spicfg2 =
 {
     false,
     NULL,                                   // Operation complete callback
@@ -102,6 +104,23 @@ static const SPIConfig spicfg_tx =
     0, // SPI_CR2_SSOE,
 };
 
+
+
+static ax5043_drv_t ax5043_driver =
+{
+  &SPID1,
+  &SPID2,
+  AX5043_F1,
+  AX5043_F2,
+  AX5043_RX,
+  AX5043_TX,
+  LINE_SX_INT0,
+  LINE_SX_INT1,
+  AX5043_IDLE,
+  AX5043_IDLE,
+  &remoteaddr,
+  &localaddr 
+};
 
 /*
  * Initialize the SPI drivers and configure the ax5043 chips
@@ -123,66 +142,22 @@ static void app_init(void)
              , version_info.hardware.id_low
             );
 
-    spiStart(&SPID1, &spicfg_rx);
-    spiStart(&SPID2, &spicfg_tx);
+    spiStart(&SPID1, &spicfg1);
+    spiStart(&SPID2, &spicfg2);
 }
 
 
 
 
-THD_WORKING_AREA(waAx5043_rx, 1024);
-THD_FUNCTION(ax5043_rx, arg) 
-{
-  (void)arg;
-  uint8_t packet_len=0;
-  uint8_t ret_value[3]={0,0,0};
 
-  ax5043_f2_init(&SPID1);
-  ax5043_set_addr(&SPID1, localaddr_tx);
-  chprintf(DEBUG_CHP, "done reseting AX5043 rx \r\n");
-  chThdSleepMilliseconds(50);
-  
-  ax5043_f2_init(&SPID1);
-  ax5043_f2_prepare_rx(&SPID1);
-
-  /* Enabling events on both edges of the button line.*/
-  //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
-  palEnableLineEvent(LINE_SX_INT0, PAL_EVENT_MODE_RISING_EDGE);
-
-
-
-  //palWaitLineTimeout(LINE_BUTTON, TIME_INFINITE);
-  //palWaitLineTimeout(LINE_ARD_A5, TIME_INFINITE);
-  while(true)
-  {
-    palWaitLineTimeout(LINE_SX_INT0, TIME_MS2I(5000));
-
-    if (palReadLine(LINE_SX_INT0))
-      chprintf(DEBUG_CHP, "\r\r int line is HIGH ** \r\n");
-    else
-      chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
-    
-    packet_len=receive_f2_loop(&SPID1, axradio_rxbuffer);
-
-    if(packet_len > 0)
-      chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
-  }
-
-
-}
-
-
-THD_WORKING_AREA(waAx5043_tx, 1024);
-THD_FUNCTION(ax5043_tx, arg)
+THD_WORKING_AREA(waAx5043_tx_thd, 1024);
+THD_FUNCTION(ax5043_tx_thd, arg)
 {
   (void)arg;
   uint16_t pkt_counter = 0;
 
   chThdSleepMilliseconds(500);
-  ax5043_f1_init(&SPID2);
-  ax5043_set_addr(&SPID2, localaddr_tx);
-  ax5043_f1_prepare_tx(&SPID2);
-  chprintf(DEBUG_CHP, "done reseting AX5043 tx\r\n");
+
 
 
 	for (;;) {
@@ -197,7 +172,7 @@ THD_FUNCTION(ax5043_tx, arg)
 	    }
 
 		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		transmit_f1_packet(&SPID2, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
+		ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
 	}
@@ -232,10 +207,9 @@ int main(void)
     chSysInit();
     app_init();
 
-    chThdCreateStatic(waAx5043_rx, sizeof(waAx5043_rx), NORMALPRIO, ax5043_rx, NULL);
+    ax5043_init(&ax5043_driver);
     chThdSleepMilliseconds(5000);
-    chThdCreateStatic(waAx5043_tx, sizeof(waAx5043_tx), NORMALPRIO, ax5043_tx, NULL);
-    chThdSleepMilliseconds(500);
+    chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
 
     main_loop();
     return 0;

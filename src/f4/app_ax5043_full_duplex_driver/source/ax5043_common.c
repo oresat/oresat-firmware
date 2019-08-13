@@ -213,19 +213,19 @@ void ax5043_full_tx(SPIDriver * spip)
  * @return void 
  * TODO return a -ve return code if there are any errors
  */
-void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr)
+void ax5043_set_addr(SPIDriver * spip, axradio_address_mask_t *local_addr)
 {
   uint8_t ret_value[3]={0,0,0};
   //set address values
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR0, (uint8_t)local_addr.addr[0], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR1, (uint8_t)local_addr.addr[1], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR2, (uint8_t)local_addr.addr[2], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR3, (uint8_t)local_addr.addr[3], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR0, (uint8_t)local_addr->addr[0], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR1, (uint8_t)local_addr->addr[1], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR2, (uint8_t)local_addr->addr[2], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDR3, (uint8_t)local_addr->addr[3], ret_value);
   //set address mask
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)local_addr.mask[0], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)local_addr.mask[1], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)local_addr.mask[2], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)local_addr.mask[3], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)local_addr->mask[0], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)local_addr->mask[1], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)local_addr->mask[2], ret_value);
+  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)local_addr->mask[3], ret_value);
 }
 
 /**

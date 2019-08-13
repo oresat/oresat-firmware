@@ -14,21 +14,22 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+//#include <ax5043_common.h>
 
 
+#define AX5043_F1       0
+#define AX5043_F2       1
+#define AX5043_F3       2
+#define AX5043_F4       3
 
 
-typedef struct
-{
-  SPIDriver * ax5043_spip1;
-  SPIDriver * ax5043_spip2;
-  ax5043_frequency_t ax5043_freq1;
-  ax5043_frequency_t ax5043_freq2;
-  ax5043_mode_t ax5043_mode1;
-  ax5043_mode_t ax5043_mode2;
-  ioline_t ax5043_int1;
-  ioline_t ax5043_int2;
-} ax5043_drv_t;
+#define AX5043_RX       0
+#define AX5043_TX       1
+#define AX5043_OFF      2
+
+
+#define AX5043_BUSY     0
+#define AX5043_IDLE     1
 
 
 typedef enum {
@@ -36,7 +37,7 @@ typedef enum {
     ax5043_f2,
     ax5043_f3,
     ax5043_f4
-} ax5043_frequency_t;
+} ax5043_config_t;
 
 
 typedef enum {
@@ -46,23 +47,42 @@ typedef enum {
 } ax5043_mode_t;
 
 
+typedef enum {
+    ax5043_busy,
+    ax5043_idle,
+} ax5043_state_t;
+
+
+typedef struct
+{
+  SPIDriver * ax5043_spip1;
+  SPIDriver * ax5043_spip2;
+  ax5043_config_t ax5043_config1;
+  ax5043_config_t ax5043_config2;
+  ax5043_mode_t ax5043_mode1;
+  ax5043_mode_t ax5043_mode2;
+  ioline_t ax5043_int1;
+  ioline_t ax5043_int2;
+  ax5043_state_t ax5043_state1;
+  ax5043_state_t ax5043_state2;
+  axradio_address_t *remoteaddr;
+  axradio_address_mask_t *localaddr;
+} ax5043_drv_t;
+
 
 
 //function declaration starts here
-uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-void ax5043_shutdown(SPIDriver * spip);
-void ax5043_standby(SPIDriver * spip);
-void ax5043_fifo_en(SPIDriver * spip);
-void ax5043_full_rx(SPIDriver * spip);
-void ax5043_synth_tx(SPIDriver * spip);
-void ax5043_full_tx(SPIDriver * spip);
-void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
-void ax5043_reset(SPIDriver * spip);
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
+uint8_t ax5043_radio1_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config);
+uint8_t ax5043_radio2_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config);
+uint8_t ax5043_radio1_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode);
+uint8_t ax5043_radio2_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode);
+uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p);
+uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p);
+uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen);
+uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen);
+uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen);
+uint8_t ax5043_radio2_cw_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen);
+uint8_t ax5043_init(ax5043_drv_t *ax5043_driver_p);
 
 #endif
 //! @}

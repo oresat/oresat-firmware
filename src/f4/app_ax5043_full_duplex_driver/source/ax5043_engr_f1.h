@@ -14,7 +14,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
+#include "ax5043_common.h"
 
 void ax5043_f1_set_regs(SPIDriver * spip);
 void ax5043_f1_set_regs_tx(SPIDriver * spip);
@@ -27,7 +27,7 @@ uint8_t axradio_f1_get_pllvcoi(SPIDriver * spip);
 void ax5043_f1_init_registers_common(SPIDriver * spip);
 void ax5043_f1_init(SPIDriver * spip);
 void transmit_f1_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
-uint8_t transmit_f1_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+uint8_t transmit_f1_packet(SPIDriver * spip, axradio_address_t *addr, axradio_address_mask_t *axradio_localaddr, uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_f1_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]);
 
 #endif

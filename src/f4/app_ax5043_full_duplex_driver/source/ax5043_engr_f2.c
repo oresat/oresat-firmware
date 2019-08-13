@@ -690,13 +690,12 @@ pktend:
  * 
  */
 
-uint8_t transmit_f2_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) 
+uint8_t transmit_f2_packet(SPIDriver * spip, axradio_address_t *addr, axradio_address_mask_t *axradio_localaddr, uint8_t *pkt, uint16_t pktlen) 
 {
     uint8_t ret_value[3]={0,0,0};
 	axradio_trxstate_t axradio_trxstate;
 	uint16_t axradio_txbuffer_len;
 	uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
-	struct axradio_address_mask axradio_localaddr;
 	uint16_t axradio_txbuffer_cnt = 0;
 
     axradio_txbuffer_len = pktlen + axradio_f2_framing_maclen;
@@ -707,7 +706,7 @@ uint8_t transmit_f2_packet(SPIDriver * spip, const struct axradio_address *addr,
     if (axradio_f2_framing_destaddrpos != 0xff)
         memcpy(&axradio_txbuffer[axradio_f2_framing_destaddrpos], &addr->addr, axradio_f2_framing_addrlen);
     if (axradio_f2_framing_sourceaddrpos != 0xff)
-        memcpy(&axradio_txbuffer[axradio_f2_framing_sourceaddrpos], &axradio_localaddr.addr, axradio_f2_framing_addrlen);
+        memcpy(&axradio_txbuffer[axradio_f2_framing_sourceaddrpos], &axradio_localaddr->addr, axradio_f2_framing_addrlen);
     if (axradio_f2_framing_lenmask) {
         uint8_t len_byte = (uint8_t)(axradio_txbuffer_len - axradio_f2_framing_lenoffs) & axradio_f2_framing_lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
         axradio_txbuffer[axradio_f2_framing_lenpos] = (axradio_txbuffer[axradio_f2_framing_lenpos] & (uint8_t)~axradio_f2_framing_lenmask) | len_byte;

@@ -683,14 +683,14 @@ typedef enum {
 
 
 //! Structure containing a four byte X.25 address
-struct axradio_address {
+typedef struct{
     uint8_t addr[4]; //!< Four byte X.25 address
-};
+}axradio_address_t;
 
-struct axradio_address_mask {
+typedef struct{
     uint8_t addr[4];
     uint8_t mask[4];
-};
+}axradio_address_mask_t;
 
 //function declaration starts here
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
@@ -701,7 +701,7 @@ void ax5043_fifo_en(SPIDriver * spip);
 void ax5043_full_rx(SPIDriver * spip);
 void ax5043_synth_tx(SPIDriver * spip);
 void ax5043_full_tx(SPIDriver * spip);
-void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
+void ax5043_set_addr(SPIDriver * spip, axradio_address_mask_t *local_addr);
 void ax5043_reset(SPIDriver * spip);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
