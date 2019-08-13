@@ -39,18 +39,12 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
     halInit();
     chSysInit();
 
-    /* If node ID is not overridden, set node ID from user data byte 0 */
-    if (node_id == ORESAT_DEFAULT_ID) {
+    /* If node ID is not overridden, use default node ID */
+    if (node_id != ORESAT_DEFAULT_ID && node_id <= 0x7F) {
         /* TODO: Implement Node ID system properly */
-        /*node_id = _FLD2VAL(FLASH_OBR_DATA0, FLASH->OBR);*/
-        node_id = 0xFF;
+        OD_CANNodeID = node_id;
     }
 
-    //TODO: If node ID is invalid, get new node ID
-    if (node_id > 0x7F) {
-        node_id = 0x7F;
-    }
-    OD_CANNodeID = node_id;
     OD_CANBitRate = bitrate;
 
     return;
