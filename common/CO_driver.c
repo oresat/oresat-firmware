@@ -61,8 +61,7 @@ void CO_CANsetConfigurationMode(int32_t CANbaseAddress)
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 {
     /* Put CAN module in normal mode */
-    /* TODO: Fix magic number 0xE here */
-    canSTM32SetFilters(CANmodule->cand, 0xE, CANmodule->useCANrxFilters,
+    canSTM32SetFilters(CANmodule->cand, 0, CANmodule->useCANrxFilters,
             CANmodule->canFilters);
     canStart(CANmodule->cand, &CANmodule->cancfg);
     CANmodule->CANnormal = true;
