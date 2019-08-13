@@ -112,8 +112,8 @@ static ax5043_drv_t ax5043_driver =
   &SPID2,
   AX5043_F1,
   AX5043_F2,
-  AX5043_RX,
   AX5043_TX,
+  AX5043_RX,
   LINE_SX_INT0,
   LINE_SX_INT1,
   AX5043_IDLE,
@@ -172,7 +172,7 @@ THD_FUNCTION(ax5043_tx_thd, arg)
 	    }
 
 		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
+		ax5043_radio1_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
 	}
