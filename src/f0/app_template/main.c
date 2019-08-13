@@ -32,19 +32,6 @@ static SerialConfig ser_cfg =
     0,                                      /* CR3 Config   */
 };
 
-/* ADC Group Configuration */
-static const ADCConversionGroup adcgrpcfg =
-{
-    TRUE,                                   /* Circular Buffer Mode */
-    1,                                      /* Number of Channels   */
-    NULL,                                   /* Completion Callback  */
-    NULL,                                   /* Error Callback       */
-    ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,   /* CFGR1                */
-    ADC_TR(0, 0),                           /* TR                   */
-    ADC_SMPR_SMP_28P5,                      /* SMPR                 */
-    ADC_CHSELR_CHSEL16                      /* CHSELR               */
-};
-
 static void app_init(void)
 {
     /* App initialization */
@@ -52,10 +39,6 @@ static void app_init(void)
 
     /* Start up debug output */
     sdStart(&SD2, &ser_cfg);
-    adcStart(&ADCD1, NULL);
-    adcSTM32SetCCR(ADC_CCR_VBATEN | ADC_CCR_TSEN | ADC_CCR_VREFEN);
-    /*adcStartConversion(&ADCD1, &adcgrpcfg, OD_temperature, ODL_temperature_arrayLength);*/
-    /*adcStopConversion(&ADCD1);*/
 }
 
 int main(void)
