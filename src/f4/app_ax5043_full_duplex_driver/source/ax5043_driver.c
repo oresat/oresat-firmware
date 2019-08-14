@@ -17,6 +17,7 @@
 #include "ax5043_common.h"
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
+#include "ax5043_ax25_f3.h"
 #include "ax5043_driver.h"
 
 
@@ -59,7 +60,21 @@ uint8_t ax5043_radio_startup(SPIDriver * spip, ax5043_config_t config, ax5043_mo
       ax5043_f2_prepare_rx(spip);
     }
     break;
-
+    
+  case ax5043_f3:
+    ax5043_f3_init(spip);
+    
+    switch(mode) {
+    case ax5043_rx:
+      ax5043_f3_prepare_rx(spip);
+      break;
+    case ax5043_tx:
+      ax5043_f3_prepare_tx(spip);
+      break;
+    default:  
+      ax5043_f3_prepare_rx(spip);
+    }
+    break;
     
   default:
     ax5043_f1_init(spip);
@@ -148,8 +163,20 @@ uint8_t ax5043_radio_mode(SPIDriver * spip, ax5043_config_t config, ax5043_mode_
       ax5043_f2_prepare_rx(spip);
     }
     break;
-
     
+  case ax5043_f3:
+    switch(mode) {
+    case ax5043_rx:
+      ax5043_f3_prepare_rx(spip);
+      break;
+    case ax5043_tx:
+      ax5043_f3_prepare_tx(spip);
+      break;
+    default:  
+      ax5043_f3_prepare_rx(spip);
+    }
+    break;
+        
   default:
     switch(mode) {
     case ax5043_rx:
@@ -201,6 +228,31 @@ uint8_t ax5043_radio2_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 }
 
 
+/**
+ * Change AX5043 radio2 receive.
+ * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
+ * @return the value of the register.
+ */
+uint8_t ax5043_radio_rx(SPIDriver * spip, ax5043_config_t config, uint8_t axradio_rxbuffer[])
+{
+  uint8_t packet_len=0; 
+  
+  switch(config) {
+  case ax5043_f1: 
+    packet_len=receive_f1_loop(spip, axradio_rxbuffer);
+    break;
+  case ax5043_f2: 
+    packet_len=receive_f2_loop(spip, axradio_rxbuffer);
+    break;
+  case ax5043_f3: 
+    packet_len=receive_f3_loop(spip, axradio_rxbuffer);
+    break;
+  default:
+    return 0;
+  }
+  return packet_len;
+}
+
 
 /**
  * Change AX5043 radio1 receive.
@@ -221,7 +273,7 @@ uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
     
     if (ax5043_driver_p->ax5043_mode1 == AX5043_RX)
     {
-      packet_len=receive_f1_loop(ax5043_driver_p->ax5043_spip1, axradio_rxbuffer);
+      packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, axradio_rxbuffer);
 
       if(packet_len > 0)
         chprintf(DEBUG_CHP,"INFO:R1 Received packet %d\r\n",axradio_rxbuffer[3]);
@@ -250,12 +302,36 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
     
     if (ax5043_driver_p->ax5043_mode2 == AX5043_RX)
     {
-      packet_len=receive_f2_loop(ax5043_driver_p->ax5043_spip2, axradio_rxbuffer);
+      packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, axradio_rxbuffer);
 
       if(packet_len > 0)
         chprintf(DEBUG_CHP,"INFO:R2 Received packet %d\r\n",axradio_rxbuffer[3]);
     }
   }  
+  return 0; 
+}
+
+
+/**
+ * Change AX5043 radio1 mode.
+ * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
+ * @return the value of the register.
+ */
+uint8_t ax5043_radio_packet_tx(SPIDriver * spip, ax5043_config_t config, ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
+{
+  switch(config) {
+  case ax5043_f1: 
+    transmit_f1_packet(spip, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+    break;
+  case ax5043_f2: 
+    transmit_f2_packet(spip, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+    break;
+  case ax5043_f3: 
+    transmit_f3_packet(spip, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+    break;
+  default: 
+    return 1;
+  }
   return 0; 
 }
 
@@ -267,7 +343,7 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
  */
 uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
 {
-  transmit_f1_packet(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+  ax5043_radio_packet_tx(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, ax5043_driver_p, pkt, pktlen);
   return 0; 
 }
 
@@ -280,7 +356,7 @@ uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
  */
 uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
 {
-  transmit_f2_packet(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+  ax5043_radio_packet_tx(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, ax5043_driver_p, pkt, pktlen);
   return 0; 
 }
 

@@ -34,6 +34,7 @@
 #include "ax5043_common.h"
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
+#include "ax5043_ax25_f3.h"
 #include "ax5043_driver.h"
 
 
@@ -48,14 +49,16 @@ axradio_address_t remoteaddr = {
 };
 axradio_address_mask_t localaddr = {
 	{ 0x33, 0x34, 0x00, 0x00},
-	{ 0xFF, 0x00, 0x00, 0x00}
+	{ 0xFF, 0x00, 0x00, 0x00}         // make it { 0x00, 0x00, 0x00, 0x00} to receive AX25 packets
 };
 
 uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
 
-const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3A, 0x43, 0x51, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3A, 0x54, 0x65, 0x73, 0x74, 0x7B, 0x30, 0x30, 0x30, 0x30, 0x31 };
-const uint8_t framing_insert_counter = 1;
+const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3E, 0x54, 0x65, 0x73, 0x74 };
+
+//const uint8_t framing_insert_counter = 1;    //uncomment for normal packets
 const uint8_t framing_counter_pos = 0;
+const uint8_t framing_insert_counter = 0;     //uncomment for Ax.25 packets
 
 /*
  * Serial Driver Configuration
@@ -111,9 +114,9 @@ static ax5043_drv_t ax5043_driver =
   &SPID1,
   &SPID2,
   AX5043_F1,
-  AX5043_F2,
-  AX5043_TX,
+  AX5043_F3,
   AX5043_RX,
+  AX5043_TX,
   LINE_SX_INT0,
   LINE_SX_INT1,
   AX5043_IDLE,
@@ -172,7 +175,7 @@ THD_FUNCTION(ax5043_tx_thd, arg)
 	    }
 
 		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		ax5043_radio1_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
+		ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
 	}
