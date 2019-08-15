@@ -209,7 +209,6 @@ static void app_init(void)
   ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
 
   ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
-
   ax5043_standby(&SPID2);
   chThdSleepMilliseconds(10000);
   SetWpm(5);

@@ -18,7 +18,9 @@
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
 #include "ax5043_ax25_f3.h"
+#include "ax5043_cw_f4.h"
 #include "ax5043_driver.h"
+#include "morse.h"
 
 
 
@@ -75,7 +77,22 @@ uint8_t ax5043_radio_startup(SPIDriver * spip, ax5043_config_t config, ax5043_mo
       ax5043_f3_prepare_rx(spip);
     }
     break;
+
+  case ax5043_f4:
+    ax5043_f4_init(spip);
     
+    switch(mode) {
+    case ax5043_rx:
+      ax5043_f4_prepare_rx(spip);
+      break;
+    case ax5043_tx:
+      ax5043_f4_prepare_tx(spip);
+      break;
+    default:  
+      ax5043_f4_prepare_rx(spip);
+    }
+    break;
+        
   default:
     ax5043_f1_init(spip);
     
@@ -176,6 +193,20 @@ uint8_t ax5043_radio_mode(SPIDriver * spip, ax5043_config_t config, ax5043_mode_
       ax5043_f3_prepare_rx(spip);
     }
     break;
+  
+    
+  case ax5043_f4:
+    switch(mode) {
+    case ax5043_rx:
+      ax5043_f4_prepare_rx(spip);
+      break;
+    case ax5043_tx:
+      ax5043_f4_prepare_tx(spip);
+      break;
+    default:  
+      ax5043_f4_prepare_rx(spip);
+    }
+    break;
         
   default:
     switch(mode) {
@@ -246,6 +277,9 @@ uint8_t ax5043_radio_rx(SPIDriver * spip, ax5043_config_t config, uint8_t axradi
     break;
   case ax5043_f3: 
     packet_len=receive_f3_loop(spip, axradio_rxbuffer);
+    break;
+  case ax5043_f4: 
+    packet_len=receive_f4_loop(spip, axradio_rxbuffer);
     break;
   default:
     return 0;
@@ -329,6 +363,9 @@ uint8_t ax5043_radio_packet_tx(SPIDriver * spip, ax5043_config_t config, ax5043_
   case ax5043_f3: 
     transmit_f3_packet(spip, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
     break;
+  case ax5043_f4: 
+    transmit_f4_packet(spip, ax5043_driver_p->remoteaddr, ax5043_driver_p->localaddr, pkt, pktlen);
+    break;
   default: 
     return 1;
   }
@@ -360,7 +397,28 @@ uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
   return 0; 
 }
 
+/**
+ * I do not understand why this is required. Not mentioned in datasheet or programming manual.
+ * Removing this will make the transmission to take time before it reaches peak power.
+ * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
+ * @return the value of the register.
+ */
+uint8_t ax5043_radio_prepare_cw(SPIDriver * spip)
+{
+  uint8_t ret_value[3]={0,0,0};
+  ax5043_full_tx(spip);
+    
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xff, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
+    
+  ax5043_standby(spip);
+  return 0; 
 
+}
 
 
 /**
@@ -368,9 +426,12 @@ uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
  * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
  * @return the value of the register.
  */
-uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
+uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
-    return 0; 
+  ax5043_radio_prepare_cw(ax5043_driver_p->ax5043_spip1);
+  SetWpm(5);
+  SendMessage(ax5043_driver_p->ax5043_spip1, pkt, pktlen);
+  return 0; 
 
 }
 
@@ -381,8 +442,11 @@ uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_
  * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
  * @return the value of the register.
  */
-uint8_t ax5043_radio2_cw_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
+uint8_t ax5043_radio2_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
+  ax5043_radio_prepare_cw(ax5043_driver_p->ax5043_spip2);
+  SetWpm(5);
+  SendMessage(ax5043_driver_p->ax5043_spip2, pkt, pktlen);
   return 0; 
 
 }

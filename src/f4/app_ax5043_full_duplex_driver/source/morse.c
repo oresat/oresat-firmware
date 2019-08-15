@@ -11,11 +11,11 @@ The code here refers to logic and snippets from Adam Parker - KD5OOL
 #include "chprintf.h"
 
 #include "morse.h"
-#include "ax5043.h"
+#include "ax5043_common.h"
 
 
-#define MAX_MESSAGE_SIZE 512
-char beaconMessage[MAX_MESSAGE_SIZE];
+//#define MAX_MESSAGE_SIZE 512
+//char beaconMessage[MAX_MESSAGE_SIZE];
 uint16_t ditLength;
 
 static const char *alpha[] = {
@@ -67,11 +67,11 @@ void SendDot(SPIDriver * spip)
 
   ax5043_full_tx(spip);
   chprintf(DEBUG_CHP, "Dot\r\n");
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);//preamble
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);//preamble
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
   chThdSleepMilliseconds(DIT_MS);
   ax5043_standby(spip);
 
@@ -84,11 +84,11 @@ void SendDash(SPIDriver * spip)
 
   ax5043_full_tx(spip);
   chprintf(DEBUG_CHP, "Dash\r\n");
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);//preamble
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);//preamble
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
   chThdSleepMilliseconds(DASH_MS);
   ax5043_standby(spip);
 }
@@ -112,9 +112,9 @@ void ElementSleep(void)
 void SetWpm(int wpm)
 {
     ditLength = 1200/wpm;
-    chprintf(DEBUG_CHP, "ditLength = %d\r\n", ditLength);
 }
 
+/*
 void SetMessage(char *message)
 {
     memset(beaconMessage, 0, MAX_MESSAGE_SIZE);
@@ -123,6 +123,7 @@ void SetMessage(char *message)
         len = MAX_MESSAGE_SIZE-1;
     memcpy(beaconMessage, message, len);
 }
+*/
 
 const char *AsciiToMorse(char letter)
 {
@@ -140,12 +141,13 @@ const char *AsciiToMorse(char letter)
     return SPACE;
 }
 
-void SendMessage(SPIDriver * spip)
+
+void SendMessage(SPIDriver * spip, char beaconMessage[], uint16_t pktlen )
 {
     int element;
     int index = 0;
     const char *morse;
-    while (beaconMessage[index] != '\0')
+    while (index < pktlen)
     {
         morse = AsciiToMorse(beaconMessage[index]);
 
@@ -159,6 +161,7 @@ void SendMessage(SPIDriver * spip)
                 break;
             case '.':
                 SendDot(spip);
+                break;
             }
 
             if (morse[element] == ' ')
@@ -177,7 +180,7 @@ void SendMessage(SPIDriver * spip)
         }
 
         index++;
+        //chprintf(DEBUG_CHP, ".. \r\n");
     }
 }
-
 

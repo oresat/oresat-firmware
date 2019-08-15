@@ -35,6 +35,7 @@
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
 #include "ax5043_ax25_f3.h"
+#include "ax5043_cw_f4.h"
 #include "ax5043_driver.h"
 
 
@@ -56,6 +57,7 @@ uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
 
 const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3E, 0x54, 0x65, 0x73, 0x74 };
 
+char cw_message[] = "KG7ZVV Malay Das testing AX5043";
 //const uint8_t framing_insert_counter = 1;    //uncomment for normal packets
 const uint8_t framing_counter_pos = 0;
 const uint8_t framing_insert_counter = 0;     //uncomment for Ax.25 packets
@@ -114,7 +116,7 @@ static ax5043_drv_t ax5043_driver =
   &SPID1,
   &SPID2,
   AX5043_F1,
-  AX5043_F3,
+  AX5043_F4,
   AX5043_RX,
   AX5043_TX,
   LINE_SX_INT0,
@@ -158,27 +160,53 @@ THD_FUNCTION(ax5043_tx_thd, arg)
 {
   (void)arg;
   uint16_t pkt_counter = 0;
+    uint8_t ret_value[3]={0,0,0};
 
   chThdSleepMilliseconds(500);
 
 
+/* //This is for packet
+  for (;;) {
+    static uint8_t demo_packet_[sizeof(demo_packet)];
+    //uint16_t pkt_counter = 0;
 
-	for (;;) {
-	    static uint8_t demo_packet_[sizeof(demo_packet)];
-	    //uint16_t pkt_counter = 0;
+    ++pkt_counter;
+    memcpy(demo_packet_, demo_packet, sizeof(demo_packet));
+    if (framing_insert_counter) {
+        demo_packet_[framing_counter_pos] = (uint8_t)(pkt_counter & 0xFF);
+        demo_packet_[framing_counter_pos+1] = (uint8_t)((pkt_counter>>8) & 0xFF);
+    }
 
-	    ++pkt_counter;
-	    memcpy(demo_packet_, demo_packet, sizeof(demo_packet));
-	    if (framing_insert_counter) {
-	        demo_packet_[framing_counter_pos] = (uint8_t)(pkt_counter & 0xFF);
-	        demo_packet_[framing_counter_pos+1] = (uint8_t)((pkt_counter>>8) & 0xFF);
-	    }
-
-		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
+    chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
+    ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
-	}
+  }
+  */
+  
+  // This is for CW
+  /*ax5043_f4_init(&SPID2);
+  ax5043_f4_prepare_tx(&SPID2);
+  ax5043_full_tx(&SPID2);
+
+  
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xff, ret_value);
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
+  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
+  
+  
+  ax5043_standby(&SPID2);*/
+  //chThdSleepMilliseconds(50);
+  for (;;) {
+    chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
+
+    ax5043_radio2_cw_tx(&ax5043_driver, cw_message, sizeof(cw_message));
+    
+    chThdSleepMilliseconds(500);
+  }  
 
 }
 
