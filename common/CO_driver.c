@@ -352,7 +352,7 @@ void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
 /******************************************************************************/
 void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
 {
-    CO_CANmodule_t      *CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
+    CO_CANmodule_t      *CANmodule;
     CO_CANrxMsg_t       rcvMsg;             /* Received message */
     uint8_t             index;              /* index of received message */
     uint32_t            rcvMsgIdent;        /* identifier of the received message */
@@ -362,6 +362,7 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
 
     if (canp == NULL)
         return;
+    CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
 
     chSysLockFromISR();
     canTryReceiveI(canp, CAN_ANY_MAILBOX, &rcvMsg.rxFrame);
@@ -396,11 +397,12 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
 
 void CO_CANtx_cb(CANDriver *canp, uint32_t flags)
 {
-    CO_CANmodule_t      *CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
+    CO_CANmodule_t      *CANmodule;
     (void)flags;
 
     if (canp == NULL)
         return;
+    CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
 
     chSysLockFromISR();
     /* First CAN message (bootup) was sent successfully */
