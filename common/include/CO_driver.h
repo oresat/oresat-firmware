@@ -328,8 +328,6 @@ typedef struct {
     int32_t             CANbaseAddress; /**< From CO_CANmodule_init() */
     CANDriver          *cand;           /**< CANDriver for ChibiOS */
     CANConfig           cancfg;         /**< CANConfig for ChibiOS */
-    event_listener_t    rx_el;          /**< CAN RX full event listener */
-    event_listener_t    tx_el;          /**< CAN TX empty event listener */
     CO_CANrx_t         *rxArray;        /**< From CO_CANmodule_init() */
     uint16_t            rxSize;         /**< From CO_CANmodule_init() */
     CO_CANtx_t         *txArray;        /**< From CO_CANmodule_init() */
@@ -522,6 +520,26 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule);
  * @param CANmodule This object.
  */
 void CO_CANverifyErrors(CO_CANmodule_t *CANmodule);
+
+/**
+ * Receives CAN messages.
+ *
+ * Function must be called directly from high priority CAN RX interrupt.
+ *
+ * @param canp The driver associated with the interrupt.
+ * @param flags The mailbox associated with interrupt.
+ */
+void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
+
+/**
+ * Transmits CAN messages.
+ *
+ * Function must be called directly from high priority CAN TX interrupt.
+ *
+ * @param canp The driver associated with the interrupt.
+ * @param flags The mailbox associated with interrupt.
+ */
+void CO_CANtx_cb(CANDriver *canp, uint32_t flags);
 
 #ifdef __cplusplus
 }

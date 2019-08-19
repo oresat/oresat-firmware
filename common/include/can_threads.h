@@ -11,8 +11,4 @@
 //Thread prototypes
 extern THD_WORKING_AREA(can_rt_wa, 0x40);
 extern THD_FUNCTION(can_rt, p);
-extern THD_WORKING_AREA(can_rx_wa, 0x40);
-extern THD_FUNCTION(can_rx, p);
-extern THD_WORKING_AREA(can_tx_wa, 0x40);
-extern THD_FUNCTION(can_tx, p);
 #endif
