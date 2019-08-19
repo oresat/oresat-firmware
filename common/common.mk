@@ -5,8 +5,7 @@ PROJINC       = $(PROJ_SRC)/include             \
                 $(CANOPEN_SRC)                  \
                 $(CO_STACK)
 
-PROJSRC       = $(PROJ_SRC)/can_threads.c       \
-                $(PROJ_SRC)/CO_driver.c         \
+PROJSRC       = $(PROJ_SRC)/CO_driver.c         \
                 $(CO_STACK)/CO_SDO.c            \
                 $(CO_STACK)/CO_Emergency.c      \
                 $(CO_STACK)/CO_NMT_Heartbeat.c  \

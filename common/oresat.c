@@ -1,5 +1,4 @@
 #include "oresat.h"
-#include "can_threads.h"
 
 typedef struct {
     thread_descriptor_t desc;
@@ -8,6 +7,71 @@ typedef struct {
 
 static worker_t workers[ORESAT_MAX_THREADS];
 static uint32_t num_workers;
+
+static event_source_t oresat_event;
+
+/* CAN Worker Threads */
+THD_WORKING_AREA(can_rt_wa, 0x40);
+THD_FUNCTION(can_rt, p)
+{
+    systime_t prev_time, cur_time, diff_time;
+    CO_t *CO = p;
+
+    // Set thread name
+    chRegSetThreadName("can_rt");
+
+    prev_time = chVTGetSystemTimeX();
+    // Start Loop
+    while (!chThdShouldTerminateX()) {
+        if (CO->CANmodule[0]->CANnormal) {
+            bool_t syncWas;
+
+            /* Process Sync and read inputs */
+            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
+            syncWas = CO_process_SYNC_RPDO(CO, chTimeI2US(diff_time));
+            /* Further I/O or nonblocking application code may go here. */
+            /* Write outputs */
+            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
+            CO_process_TPDO(CO, syncWas, chTimeI2US(diff_time));
+            prev_time = cur_time;
+        }
+
+        chThdSleepMicroseconds(1000);
+    }
+
+    chThdExit(MSG_OK);
+}
+
+THD_WORKING_AREA(can_wrk_wa, 0x40);
+THD_FUNCTION(can_wrk, p)
+{
+    event_listener_t can_el;
+    (void)p;
+
+    // Set thread name
+    chRegSetThreadName("can_wrk");
+    // Register RX event
+    chEvtRegister(&oresat_event, &can_el, 0);
+
+    /* Start app workers */
+    for (uint32_t i = 0; i < num_workers; i++) {
+        workers[i].tp = chThdCreate(&workers[i].desc);
+    }
+
+    while (!chThdShouldTerminateX()) {
+        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0)
+            continue;
+
+    }
+
+    for (uint32_t i = 0; i < num_workers; i++) {
+        chThdTerminate(workers[i].tp);
+        chThdWait(workers[i].tp);
+    }
+
+    chEvtUnregister(&oresat_event, &can_el);
+    chThdExit(MSG_OK);
+}
 
 int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg)
 {
@@ -53,7 +117,7 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
 void oresat_start(CANDriver *cand)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    thread_t *can_rt_tp;
+    thread_t *can_rt_tp, *can_wrk_tp;
     uint16_t sleep_ms;
     systime_t prev_time, cur_time, diff_time;
 
@@ -67,16 +131,12 @@ void oresat_start(CANDriver *cand)
         }
 
         can_rt_tp = chThdCreateStatic(can_rt_wa, sizeof(can_rt_wa), HIGHPRIO, can_rt, CO);
+        can_wrk_tp = chThdCreateStatic(can_wrk_wa, sizeof(can_wrk_wa), HIGHPRIO, can_wrk, CO);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
 
         CO_CANsetNormalMode(CO->CANmodule[0]);
-
-        /* Start app workers */
-        for (uint32_t i = 0; i < num_workers; i++) {
-            workers[i].tp = chThdCreate(&workers[i].desc);
-        }
 
         reset = CO_RESET_NOT;
         prev_time = chVTGetSystemTimeX();
@@ -88,12 +148,10 @@ void oresat_start(CANDriver *cand)
             chThdSleepMilliseconds(sleep_ms);
         }
 
-        for (uint32_t i = 0; i < num_workers; i++) {
-            chThdTerminate(workers[i].tp);
-            chThdWait(workers[i].tp);
-        }
         chThdTerminate(can_rt_tp);
+        chThdTerminate(can_wrk_tp);
         chThdWait(can_rt_tp);
+        chThdWait(can_wrk_tp);
     }
 
     CO_delete((uint32_t)cand);
