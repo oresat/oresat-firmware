@@ -67,8 +67,8 @@ void oresat_start(CANDriver *cand)
         }
 
         can_rt_tp = chThdCreateStatic(can_rt_wa, sizeof(can_rt_wa), HIGHPRIO, can_rt, CO);
-        can_rx_tp = chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, CO->CANmodule);
-        can_tx_tp = chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, CO->CANmodule);
+        can_rx_tp = chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, CO->CANmodule[0]);
+        can_tx_tp = chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, CO->CANmodule[0]);
 
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
