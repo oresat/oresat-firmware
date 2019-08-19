@@ -53,7 +53,7 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
 void oresat_start(CANDriver *cand)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    thread_t *can_rt_tp;
+    thread_t *can_rt_tp, *can_rx_tp, *can_tx_tp;
     uint16_t sleep_ms;
     systime_t prev_time, cur_time, diff_time;
 
@@ -67,9 +67,8 @@ void oresat_start(CANDriver *cand)
         }
 
         can_rt_tp = chThdCreateStatic(can_rt_wa, sizeof(can_rt_wa), HIGHPRIO, can_rt, CO);
-
-        cand->rxfull_cb = CO_CANrx_cb;
-        cand->txempty_cb = CO_CANtx_cb;
+        can_rx_tp = chThdCreateStatic(can_rx_wa, sizeof(can_rx_wa), HIGHPRIO, can_rx, CO);
+        can_tx_tp = chThdCreateStatic(can_tx_wa, sizeof(can_tx_wa), HIGHPRIO, can_tx, CO);
 
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
@@ -93,7 +92,11 @@ void oresat_start(CANDriver *cand)
             chThdWait(workers[i].tp);
         }
         chThdTerminate(can_rt_tp);
+        chThdTerminate(can_rx_tp);
+        chThdTerminate(can_tx_tp);
         chThdWait(can_rt_tp);
+        chThdWait(can_rx_tp);
+        chThdWait(can_tx_tp);
     }
 
     CO_delete((uint32_t)cand);
