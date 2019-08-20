@@ -1,4 +1,5 @@
 #include "oresat.h"
+#include "events.h"
 #include "CANopen.h"
 
 typedef struct {
@@ -9,14 +10,10 @@ typedef struct {
 static worker_t workers[ORESAT_MAX_THREADS];
 static uint32_t num_workers;
 
-static evhandler_t evhandlers[] = {
-    NULL
-};
-
-EVENTSOURCE_DECL(oresat_event);
+static thread_t *can_rt_tp, *can_events_tp;
 
 /* CAN Worker Threads */
-THD_WORKING_AREA(can_rt_wa, 0x40);
+THD_WORKING_AREA(can_rt_wa, 0x64);
 THD_FUNCTION(can_rt, p)
 {
     systime_t prev_time, cur_time, diff_time;
@@ -47,37 +44,36 @@ THD_FUNCTION(can_rt, p)
     chThdExit(MSG_OK);
 }
 
-THD_WORKING_AREA(can_wrk_wa, 0x40);
-THD_FUNCTION(can_wrk, p)
+void CO_NMT_cb(CO_NMT_internalState_t state)
 {
-    event_listener_t can_el;
-    eventmask_t events;
-    (void)p;
-
-    // Set thread name
-    chRegSetThreadName("can_wrk");
-    // Register RX event
-    chEvtRegisterMask(&oresat_event, &can_el, 0);
-
-    /* Start app workers */
-    for (uint32_t i = 0; i < num_workers; i++) {
-        workers[i].tp = chThdCreate(&workers[i].desc);
+    syssts_t sts;
+    sts = chSysGetStatusAndLockX();
+    if (state == CO_NMT_OPERATIONAL) {
+        chEvtSignalI(can_events_tp, EVENT_MASK(ORESAT_NMT_OPERATIONAL));
+    } else {
+        chEvtSignalI(can_events_tp, EVENT_MASK(ORESAT_NMT_NONOPERATIONAL));
     }
+    chSysRestoreStatusX(sts);
+}
 
-    while (!chThdShouldTerminateX()) {
-        events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100));
-        if (events == 0)
-            continue;
-        chEvtDispatch(evhandlers, events);
+void oresat_NMT_event(eventid_t id)
+{
+    if (id == ORESAT_NMT_OPERATIONAL) {
+        /* Start app workers */
+        for (uint32_t i = 0; i < num_workers; i++) {
+            if (workers[i].tp == NULL) {
+                workers[i].tp = chThdCreate(&workers[i].desc);
+            }
+        }
+    } else {
+        for (uint32_t i = 0; i < num_workers; i++) {
+            if (workers[i].tp) {
+                chThdTerminate(workers[i].tp);
+                chThdWait(workers[i].tp);
+                workers[i].tp = NULL;
+            }
+        }
     }
-
-    for (uint32_t i = 0; i < num_workers; i++) {
-        chThdTerminate(workers[i].tp);
-        chThdWait(workers[i].tp);
-    }
-
-    chEvtUnregister(&oresat_event, &can_el);
-    chThdExit(MSG_OK);
 }
 
 int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg)
@@ -124,7 +120,6 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
 void oresat_start(CANDriver *cand)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    thread_t *can_rt_tp, *can_wrk_tp;
     uint16_t sleep_ms;
     systime_t prev_time, cur_time, diff_time;
 
@@ -137,13 +132,18 @@ void oresat_start(CANDriver *cand)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
+        reg_event(ORESAT_NMT_OPERATIONAL, oresat_NMT_event);
+        reg_event(ORESAT_NMT_NONOPERATIONAL, oresat_NMT_event);
+
         can_rt_tp = chThdCreateStatic(can_rt_wa, sizeof(can_rt_wa), HIGHPRIO, can_rt, CO);
-        can_wrk_tp = chThdCreateStatic(can_wrk_wa, sizeof(can_wrk_wa), HIGHPRIO, can_wrk, CO);
+        can_events_tp = chThdCreateStatic(can_events_wa, sizeof(can_events_wa), HIGHPRIO-1, can_events, NULL);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
 
         CO_CANsetNormalMode(CO->CANmodule[0]);
+
+        CO_NMT_initCallback(CO->NMT, CO_NMT_cb);
 
         reset = CO_RESET_NOT;
         prev_time = chVTGetSystemTimeX();
@@ -156,9 +156,10 @@ void oresat_start(CANDriver *cand)
         }
 
         chThdTerminate(can_rt_tp);
-        chThdTerminate(can_wrk_tp);
+        chThdTerminate(can_events_tp);
         chThdWait(can_rt_tp);
-        chThdWait(can_wrk_tp);
+        chThdWait(can_events_tp);
+        unreg_all_events();
     }
 
     CO_delete((uint32_t)cand);
