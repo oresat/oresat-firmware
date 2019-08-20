@@ -1,4 +1,5 @@
 #include "oresat.h"
+#include "CANopen.h"
 
 typedef struct {
     thread_descriptor_t desc;
@@ -8,7 +9,11 @@ typedef struct {
 static worker_t workers[ORESAT_MAX_THREADS];
 static uint32_t num_workers;
 
-static event_source_t oresat_event;
+static evhandler_t evhandlers[] = {
+    NULL
+};
+
+EVENTSOURCE_DECL(oresat_event);
 
 /* CAN Worker Threads */
 THD_WORKING_AREA(can_rt_wa, 0x40);
@@ -46,12 +51,13 @@ THD_WORKING_AREA(can_wrk_wa, 0x40);
 THD_FUNCTION(can_wrk, p)
 {
     event_listener_t can_el;
+    eventmask_t events;
     (void)p;
 
     // Set thread name
     chRegSetThreadName("can_wrk");
     // Register RX event
-    chEvtRegister(&oresat_event, &can_el, 0);
+    chEvtRegisterMask(&oresat_event, &can_el, 0);
 
     /* Start app workers */
     for (uint32_t i = 0; i < num_workers; i++) {
@@ -59,9 +65,10 @@ THD_FUNCTION(can_wrk, p)
     }
 
     while (!chThdShouldTerminateX()) {
-        if (chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100)) == 0)
+        events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(100));
+        if (events == 0)
             continue;
-
+        chEvtDispatch(evhandlers, events);
     }
 
     for (uint32_t i = 0; i < num_workers; i++) {

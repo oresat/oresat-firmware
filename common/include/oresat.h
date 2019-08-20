@@ -3,7 +3,6 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "CANopen.h"
 
 #ifndef ORESAT_MAX_THREADS
 #define ORESAT_MAX_THREADS 5
@@ -11,6 +10,8 @@
 
 #define ORESAT_DEFAULT_ID 0
 #define ORESAT_DEFAULT_BITRATE 1000
+
+extern event_source_t oresat_event;
 
 /* OreSat applications API */
 int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg);
