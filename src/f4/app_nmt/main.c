@@ -17,7 +17,6 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"

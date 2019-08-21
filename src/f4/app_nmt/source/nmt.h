@@ -5,7 +5,7 @@
 #include "hal.h"
 
 // Example blinker thread prototypes
-extern THD_WORKING_AREA(nmt_wa, 128);
+extern THD_WORKING_AREA(nmt_wa, 0x100);
 extern THD_FUNCTION(nmt, arg);
 
 #endif
