@@ -3,9 +3,7 @@
 // Example blinker thread
 THD_WORKING_AREA(waThread1, 128);
 THD_FUNCTION(Thread1, arg) {
-
   (void)arg;
-  chRegSetThreadName("thread1");
 
   while (!chThdShouldTerminateX()) {
     palClearLine(LINE_LED_GREEN);
@@ -13,4 +11,7 @@ THD_FUNCTION(Thread1, arg) {
     palSetLine(LINE_LED_GREEN);
     chThdSleepMilliseconds(500);
   }
+
+  palClearLine(LINE_LED_GREEN);
+  chThdExit(MSG_OK);
 }
