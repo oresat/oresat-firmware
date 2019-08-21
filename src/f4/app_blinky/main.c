@@ -14,46 +14,9 @@
     limitations under the License.
 */
 
-//=== ChibiOS header files
+/* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
-
-//=== Project header files
-#include "blinky.h"
-
-//=== Serial configuration
-static SerialConfig ser_cfg =
-{
-    115200,     //Baud rate
-    0,          //
-    0,          //
-    0,          //
-};
-
-
-static void app_init(void) {
-    //=== App initialization
-
-    // Start up debug output
-    sdStart(&SD2, &ser_cfg);
-
-}
-
-static void main_app(void) {
-    //=== Start application threads
-
-    //Blinker thread
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-    /*
-     * Begin main loop
-     */
-    while (true)
-    {
-        chThdSleepMilliseconds(1000);
-    }
-}
 
 int main(void) {
     /*
@@ -66,9 +29,13 @@ int main(void) {
     halInit();
     chSysInit();
 
-    // Initialize and start app
-    app_init();
-    main_app();
+    while (true)
+    {
+        palClearLine(LINE_LED_GREEN);
+        chThdSleepMilliseconds(500);
+        palSetLine(LINE_LED_GREEN);
+        chThdSleepMilliseconds(500);
+    }
 
     return 0;
 }

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-//=== ChibiOS header files
+/* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
 
