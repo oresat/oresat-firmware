@@ -8,8 +8,9 @@ THD_FUNCTION(nmt, arg) {
     CO_SDOclient_return_t ret;
     systime_t prev_time, cur_time, diff_time;
     BaseSequentialStream *chp = (BaseSequentialStream *)&SD2;
-    uint8_t data[31];
-    uint32_t dataSize;
+    uint8_t data[31] = {0};
+    uint32_t dataSize = 0;
+    uint32_t abortCode = 0;
     (void)arg;
 
     palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
@@ -24,12 +25,16 @@ THD_FUNCTION(nmt, arg) {
             do {
                 diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
                 prev_time = cur_time;
-                ret = CO_SDOclientUpload(CO->SDOclient[0], diff_time, 1000, &dataSize, NULL);
+                ret = CO_SDOclientUpload(CO->SDOclient[0], chTimeI2MS(diff_time), 1000, &dataSize, &abortCode);
                 chThdSleepMilliseconds(10);
             } while (ret > 0);
             CO_SDOclientClose(CO->SDOclient[0]);
             data[dataSize] = '\0';
-            chprintf(chp, "Received string: %s\r\n", data);
+            if (abortCode == CO_SDO_AB_NONE) {
+                chprintf(chp, "Received string: %s\r\n", data);
+            } else {
+                chprintf(chp, "Received abort code: %x\r\n", abortCode);
+            }
         }
     }
 
