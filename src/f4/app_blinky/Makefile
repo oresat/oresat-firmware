@@ -106,7 +106,7 @@ DEPDIR   := $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
-include $(PROJ_SRC)/common.mk
+#include $(PROJ_SRC)/common.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
