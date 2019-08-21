@@ -377,6 +377,12 @@ void CO_CANsetConfigurationMode(int32_t CANbaseAddress);
  */
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule);
 
+/**
+ * (Re)set CAN filters
+ *
+ * @param CANmodule This object.
+ */
+void CO_CANsetFilters(CO_CANmodule_t *CANmodule);
 
 /**
  * Initialize CAN module object.

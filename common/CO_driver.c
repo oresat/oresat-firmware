@@ -68,6 +68,15 @@ void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 }
 
 /******************************************************************************/
+void CO_CANsetFilters(CO_CANmodule_t *CANmodule)
+{
+    canStop(CANmodule->cand);
+    canSTM32SetFilters(CANmodule->cand, 0, CANmodule->useCANrxFilters,
+            CANmodule->canFilters);
+    canStart(CANmodule->cand, &CANmodule->cancfg);
+}
+
+/******************************************************************************/
 CO_ReturnError_t CO_CANmodule_init(
         CO_CANmodule_t         *CANmodule,
         int32_t                 CANbaseAddress,
@@ -191,6 +200,9 @@ CO_ReturnError_t CO_CANrxBufferInit(
             filter.scale32.STID = ident;
             filter.scale32.RTR = rtr;
             CANmodule->canFilters[index].register1 = filter.raw;
+            if (CANmodule->CANnormal) {
+                CO_CANsetFilters(CANmodule);
+            }
         }
     } else {
         ret = CO_ERROR_ILLEGAL_ARGUMENT;
