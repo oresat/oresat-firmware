@@ -15,7 +15,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]) {
     uint8_t subindex = 0;
 
     if (argc < 4) {
-        chprintf(chp, "Usage; sdo read|write <NodeID> <index> <subindex> [write_value]\r\n");
+        chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [write_value]\r\n");
         return;
     }
 
@@ -37,11 +37,35 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]) {
         chprintf(chp, "Invalid command: %s\r\n", argv[0]);
         return;
     }
+}
 
+void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[]) {
+    uint8_t node_id = 0;
+    if (argc < 2) {
+        chprintf(chp, "Usage: nmt start|stop|preop|resetcomm|resetnode <NodeID>\r\n");
+        return;
+    }
+    node_id = strtoul(argv[1], NULL, 0);
+
+    if (!strcmp(argv[0], "start")) {
+        CO_sendNMTcommand(CO, CO_NMT_ENTER_OPERATIONAL, node_id);
+    } else if (!strcmp(argv[0], "stop")) {
+        CO_sendNMTcommand(CO, CO_NMT_ENTER_STOPPED, node_id);
+    } else if (!strcmp(argv[0], "preop")) {
+        CO_sendNMTcommand(CO, CO_NMT_ENTER_PRE_OPERATIONAL, node_id);
+    } else if (!strcmp(argv[0], "resetcomm")) {
+        CO_sendNMTcommand(CO, CO_NMT_RESET_COMMUNICATION, node_id);
+    } else if (!strcmp(argv[0], "resetnode")) {
+        CO_sendNMTcommand(CO, CO_NMT_RESET_NODE, node_id);
+    } else {
+        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
+        return;
+    }
 }
 
 static const ShellCommand commands[] = {
     {"sdo", cmd_sdo},
+    {"nmt", cmd_nmt},
     {NULL, NULL}
 };
 
