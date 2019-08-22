@@ -2,49 +2,39 @@
 #include <string.h>
 
 #include "nmt.h"
-#include "CANopen.h"
+#include "CO_master.h"
 #include "chprintf.h"
 #include "shell.h"
 
-void usage(BaseSequentialStream *chp) {
-    chprintf(chp, "Usage; sdo read|write <NodeID> <index> <subindex> [write_value]\r\n");
-}
-
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]) {
+    uint8_t data[31] = {0};
+    uint32_t data_len = 0;
+    uint32_t abrt_code = 0;
+    uint8_t node_id = 0;
+    uint16_t index = 0;
+    uint8_t subindex = 0;
+
     if (argc < 4) {
-        usage(chp);
+        chprintf(chp, "Usage; sdo read|write <NodeID> <index> <subindex> [write_value]\r\n");
         return;
     }
 
+    node_id = strtoul(argv[1], NULL, 0);
+    index = strtoul(argv[2], NULL, 0);
+    subindex = strtoul(argv[3], NULL, 0);
+
     if (!strcmp(argv[0], "read")) {
-        CO_SDOclient_return_t ret;
-        systime_t prev_time, cur_time, diff_time;
-        uint8_t data[31] = {0};
-        uint32_t dataSize = 0;
-        uint32_t abortCode = 0;
-
-        CO_SDOclient_setup(CO->SDOclient[0], 0, 0, strtoul(argv[1], NULL, 0));
-        CO_SDOclientUploadInitiate(CO->SDOclient[0], strtoul(argv[2], NULL, 0), strtoul(argv[3], NULL, 0), data, 30, false);
-        prev_time = chVTGetSystemTimeX();
-        do {
-            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
-            prev_time = cur_time;
-            ret = CO_SDOclientUpload(CO->SDOclient[0], chTimeI2MS(diff_time), 1000, &dataSize, &abortCode);
-            chThdSleepMilliseconds(10);
-        } while (ret > 0);
-        CO_SDOclientClose(CO->SDOclient[0]);
-        data[dataSize] = '\0';
-        if (abortCode == CO_SDO_AB_NONE) {
-            chprintf(chp, "Received %u byte string: %s\r\n", dataSize, data);
+        sdo_upload(CO->SDOclient[0], node_id, index, subindex, data, sizeof(data) - 1, &data_len, &abrt_code, 1000, false);
+        data[data_len] = '\0';
+        if (abrt_code == CO_SDO_AB_NONE) {
+            chprintf(chp, "Received %u byte string: %s\r\n", data_len, data);
         } else {
-            chprintf(chp, "Received abort code: %x\r\n", abortCode);
+            chprintf(chp, "Received abort code: %x\r\n", abrt_code);
         }
-
-    } else if (!strcmp(argv[0], "write")) {
-
+    } else if (!strcmp(argv[0], "write") && argc < 5) {
+        /*sdo_download(CO->SDOclient[0], node_id, index, subindex, data, strlen(data), &abrt_code, 1000, false);*/
     } else {
         chprintf(chp, "Invalid command: %s\r\n", argv[0]);
-        usage(chp);
         return;
     }
 
