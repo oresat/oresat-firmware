@@ -17,27 +17,20 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "shell.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "nmt.h"
 
-/* Serial configuration */
-static SerialConfig ser_cfg =
-{
-    115200,                                 /* Baud rate    */
-    0,                                      /* CR1 Config   */
-    0,                                      /* CR2 Config   */
-    0,                                      /* CR3 Config   */
-};
-
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker("NMT Worker", nmt_wa, sizeof(nmt_wa), NORMALPRIO, nmt, NULL);
+    reg_worker("NMT Shell", nmt_wa, sizeof(nmt_wa), NORMALPRIO, nmt, NULL);
 
-    /* Start up debug output */
-    sdStart(&SD2, &ser_cfg);
+    /* Initialize shell and start serial interface */
+    shellInit();
+    sdStart(&SD2, NULL);
 }
 
 int main(void)
