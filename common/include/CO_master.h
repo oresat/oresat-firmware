@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "CANopen.h"
+#include "CO_SDOmaster.h"
 
 int sdo_upload(
         CO_SDOclient_t *SDOclient,
