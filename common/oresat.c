@@ -152,7 +152,8 @@ void oresat_start(CANDriver *cand)
             diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
             prev_time = cur_time;
             reset = CO_process(CO, chTimeI2MS(diff_time), &sleep_ms);
-            chThdSleepMilliseconds(sleep_ms);
+            if (sleep_ms)
+                chThdSleepMilliseconds(sleep_ms);
         }
 
         chThdTerminate(can_rt_tp);
