@@ -1,6 +1,10 @@
 #ifndef _ORESAT_H_
 #define _ORESAT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ch.h"
 #include "hal.h"
 
@@ -18,4 +22,7 @@ int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t
 void oresat_init(uint8_t node_id, uint16_t bitrate);
 void oresat_start(CANDriver *cand);
 
+#ifdef __cplusplus
+}
+#endif /*__cplusplus*/
 #endif

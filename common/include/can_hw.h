@@ -4,6 +4,10 @@
 #ifndef _CAN_HW_H_
 #define _CAN_HW_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //ChibiOS headers
 #include "ch.h"
 #include "hal.h"
@@ -73,4 +77,7 @@ typedef union {
     uint32_t raw;
 } flt_reg_t;
 
+#ifdef __cplusplus
+}
+#endif /*__cplusplus*/
 #endif

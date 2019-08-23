@@ -1,6 +1,10 @@
 #ifndef _CO_MASTER_H_
 #define _CO_MASTER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "CANopen.h"
 
 int sdo_upload(
@@ -26,4 +30,7 @@ int sdo_download(
         uint16_t        timeout,
         bool            block);
 
+#ifdef __cplusplus
+}
+#endif /*__cplusplus*/
 #endif

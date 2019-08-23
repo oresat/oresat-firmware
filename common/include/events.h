@@ -1,6 +1,10 @@
 #ifndef _EVENTS_H_
 #define _EVENTS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ch.h"
 
 #define ORESAT_NMT_OPERATIONAL 0
@@ -15,4 +19,7 @@ void unreg_all_events(void);
 extern THD_WORKING_AREA(can_events_wa, 0x40);
 extern THD_FUNCTION(can_events, p);
 
+#ifdef __cplusplus
+}
+#endif /*__cplusplus*/
 #endif
