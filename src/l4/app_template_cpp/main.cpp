@@ -62,7 +62,7 @@ static void appMain(void)
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   /// Begin main loop
-  while (true)
+  while(true)
   {
     chThdSleepMilliseconds(1000);
   }
