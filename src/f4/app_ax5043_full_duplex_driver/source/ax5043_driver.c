@@ -26,9 +26,9 @@
 
 
 /**
- * Change AX5043 radio1 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Radio startup code.
+ * @param spip: SPI Configuration, config: The set-up file details, mode: RX, TX or OFF.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio_startup(SPIDriver * spip, ax5043_config_t config, ax5043_mode_t mode)
 {
@@ -118,9 +118,9 @@ uint8_t ax5043_radio_startup(SPIDriver * spip, ax5043_config_t config, ax5043_mo
 
 
 /**
- * Change AX5043 radio1 frequency.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Change AX5043 radio1 configuraion.
+ * @param ax5043_driver_p: Radio driver, config: The set-up file details.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio1_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config)
 {
@@ -132,9 +132,9 @@ uint8_t ax5043_radio1_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t 
 }
 
 /**
- * Change AX5043 radio2 frequency.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Change AX5043 radio2 configuraion.
+ * @param ax5043_driver_p: Radio driver, config: The set-up file details.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio2_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config)
 {
@@ -148,9 +148,9 @@ uint8_t ax5043_radio2_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t 
 
 
 /**
- * Change AX5043 radio1 mode.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Change AX5043 radio mode (rx, tx, off).
+ * @param ax5043_driver_p: Radio driver, config: The set-up file details, mode: rx, tx, off.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio_mode(SPIDriver * spip, ax5043_config_t config, ax5043_mode_t mode)
 {
@@ -231,9 +231,9 @@ uint8_t ax5043_radio_mode(SPIDriver * spip, ax5043_config_t config, ax5043_mode_
 
 
 /**
- * Change AX5043 radio1 mode.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Change AX5043 radio1 mode (rx, tx, off).
+ * @param ax5043_driver_p: Radio driver, mode: rx, tx, off.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio1_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 {
@@ -246,9 +246,9 @@ uint8_t ax5043_radio1_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 
 
 /**
- * Change AX5043 radio2 mode.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Change AX5043 radio2 mode (rx, tx, off).
+ * @param ax5043_driver_p: Radio driver, mode: rx, tx, off.
+ * @return Success or error code.
  */
 uint8_t ax5043_radio2_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 {
@@ -260,9 +260,9 @@ uint8_t ax5043_radio2_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 
 
 /**
- * Change AX5043 radio2 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Receive packets from AX5043 radio.
+ * @param ax5043_driver_p: Radio driver, config: The set-up file details, axradio_rxbuffer: Receive buffer.
+ * @return the packet length.
  */
 uint8_t ax5043_radio_rx(SPIDriver * spip, ax5043_config_t config, uint8_t axradio_rxbuffer[])
 {
@@ -289,9 +289,9 @@ uint8_t ax5043_radio_rx(SPIDriver * spip, ax5043_config_t config, uint8_t axradi
 
 
 /**
- * Change AX5043 radio1 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Receive packets from AX5043 radio1.
+ * @param ax5043_driver_p: Radio driver.
+ * @return The function is an infinite loop waiting to receive data from radio.
  */
 uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
 {
@@ -318,9 +318,9 @@ uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
 
 
 /**
- * Change AX5043 radio2 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Receive packets from AX5043 radio2.
+ * @param ax5043_driver_p: Radio driver.
+ * @return The function is an infinite loop waiting to receive data from radio.
  */
 uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
 {
@@ -347,9 +347,10 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
 
 
 /**
- * Change AX5043 radio1 mode.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * Send packets via AX5043 radio.
+ * @param spip: SPI Configuration, config: The set-up file details, 
+ *              ax5043_driver_p: Radio driver, pkt: address of the packet, pktlen: length of packet
+ * @return error code.
  */
 uint8_t ax5043_radio_packet_tx(SPIDriver * spip, ax5043_config_t config, ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
 {
@@ -374,8 +375,8 @@ uint8_t ax5043_radio_packet_tx(SPIDriver * spip, ax5043_config_t config, ax5043_
 
 
 /**
- * Change AX5043 radio1 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
+ * Send packets via AX5043 radio1.
+ * @param ax5043_driver_p: Radio driver, pkt: address of the packet, pktlen: length of packet
  * @return the value of the register.
  */
 uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
@@ -387,8 +388,8 @@ uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
 
 
 /**
- * Change AX5043 radio2 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
+ * Send packets via AX5043 radio2.
+ * @param ax5043_driver_p: Radio driver, pkt: address of the packet, pktlen: length of packet
  * @return the value of the register.
  */
 uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
@@ -398,16 +399,20 @@ uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
 }
 
 /**
- * I do not understand why this is required. Not mentioned in datasheet or programming manual.
- * Removing this will make the transmission to take time before it reaches peak power.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * send CW/morse via AX5043 radio.
+ * @param spip: SPI Configuration
+ * @return error code
  */
 uint8_t ax5043_radio_prepare_cw(SPIDriver * spip)
 {
   uint8_t ret_value[3]={0,0,0};
   ax5043_full_tx(spip);
-    
+
+/**
+ * This is not mentioned in datasheet or programming manual but is required.
+ * Removing this will make the transmission to transmit in low power for a few seconds
+ * before it reaches peak power.
+ */    
   ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
@@ -422,9 +427,9 @@ uint8_t ax5043_radio_prepare_cw(SPIDriver * spip)
 
 
 /**
- * Change AX5043 radio1 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * send CW/morse via AX5043 radio1.
+ * @param ax5043_driver_p: Radio driver, pkt: address of the packet, pktlen: length of packet
+ * @return error code
  */
 uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
@@ -438,9 +443,9 @@ uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t 
 
 
 /**
- * Change AX5043 radio1 receive.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value of the register.
+ * send CW/morse via AX5043 radio2.
+ * @param ax5043_driver_p: Radio driver, pkt: address of the packet, pktlen: length of packet
+ * @return error code
  */
 uint8_t ax5043_radio2_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
