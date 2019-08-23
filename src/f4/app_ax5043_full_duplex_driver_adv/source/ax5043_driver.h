@@ -67,6 +67,8 @@ typedef struct
   binary_semaphore_t *ax5043_bsem2;
   axradio_address_t *remoteaddr;
   axradio_address_mask_t *localaddr;
+  mailbox_t * ax5043_rx_mb1;
+  mailbox_t * ax5043_rx_mb2;
 } ax5043_drv_t;
 
 
