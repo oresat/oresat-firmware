@@ -18,7 +18,8 @@
 #include "ch.h"
 #include "hal.h"
 
-int main(void) {
+int main(void)
+{
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers

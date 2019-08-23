@@ -134,12 +134,12 @@ LDSCRIPT= $(STARTUPLD)/STM32L452xE.ld
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CSRC = $(ALLCSRC) \
-       $(TESTSRC) 
+       $(TESTSRC)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
-				 main.cpp
+	     main.cpp
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)

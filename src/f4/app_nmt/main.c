@@ -23,6 +23,9 @@
 #include "oresat.h"
 #include "nmt.h"
 
+/**
+ * @brief App Initialization
+ */
 static void app_init(void)
 {
     /* App initialization */
@@ -33,6 +36,9 @@ static void app_init(void)
     sdStart(&SD2, NULL);
 }
 
+/**
+ * @brief Main Application
+ */
 int main(void)
 {
     // Initialize and start

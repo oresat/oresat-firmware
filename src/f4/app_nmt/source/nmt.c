@@ -87,7 +87,8 @@ static const ShellConfig shell_cfg = {
 
 THD_WORKING_AREA(shell_wa, 0x200);
 THD_WORKING_AREA(nmt_wa, 0x200);
-THD_FUNCTION(nmt, arg) {
+THD_FUNCTION(nmt, arg)
+{
     (void)arg;
 
     while (!chThdShouldTerminateX()) {

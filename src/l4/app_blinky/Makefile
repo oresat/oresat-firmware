@@ -105,9 +105,6 @@ DEPDIR   := $(APP_ROOT)/.dep
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# Project specific files.
-include $(PROJ_SRC)/common.mk
-
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
@@ -165,10 +162,10 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
 
 # Define ASM defines here
-UADEFS =
+UADEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
 
 # List all user directories here
 UINCDIR = $(PROJ_INC)

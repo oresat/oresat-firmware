@@ -17,30 +17,26 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "thread1.h"
 
-/* Serial configuration */
-static SerialConfig ser_cfg =
-{
-    115200,                                 /* Baud rate    */
-    0,                                      /* CR1 Config   */
-    0,                                      /* CR2 Config   */
-    0,                                      /* CR3 Config   */
-};
-
+/**
+ * @brief App Initialization
+ */
 static void app_init(void)
 {
     /* App initialization */
     reg_worker("Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
     /* Start up debug output */
-    sdStart(&SD2, &ser_cfg);
+    sdStart(&LPSD1, NULL);
 }
 
+/**
+ * @brief Main Application
+ */
 int main(void)
 {
     // Initialize and start
