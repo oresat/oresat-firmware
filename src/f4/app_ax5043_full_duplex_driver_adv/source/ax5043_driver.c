@@ -1,4 +1,4 @@
-/*! \file ax5043_driver.h */
+/*! \file ax5043_driver.c */
 
 
 /*!
@@ -317,10 +317,13 @@ uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
     {
       msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
       packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, axradio_rxbuffer);
-      chBSemSignal(ax5043_driver_p->ax5043_bsem1);
       
       if(packet_len > 0)
+      {
         chprintf(DEBUG_CHP,"INFO:R1 Received packet %d\r\n",axradio_rxbuffer[3]);
+        (void)chMBPost(ax5043_driver_p->ax5043_rx_mb1, (msg_t)axradio_rxbuffer);
+      }
+      chBSemSignal(ax5043_driver_p->ax5043_bsem1);
     }
   }
   return 0; 
@@ -348,10 +351,13 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
     {
       msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem2, TIME_MS2I(120));
       packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, axradio_rxbuffer);
-      chBSemSignal(ax5043_driver_p->ax5043_bsem2);
 
       if(packet_len > 0)
+      {
         chprintf(DEBUG_CHP,"INFO:R2 Received packet %d\r\n",axradio_rxbuffer[3]);
+        (void)chMBPost(ax5043_driver_p->ax5043_rx_mb2, (msg_t)axradio_rxbuffer);
+      }
+      chBSemSignal(ax5043_driver_p->ax5043_bsem2);
     }
   }  
   return 0; 
@@ -522,4 +528,3 @@ uint8_t ax5043_init(ax5043_drv_t *ax5043_driver_p)
 
 
 //!@
-
