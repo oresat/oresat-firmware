@@ -321,7 +321,7 @@ uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
       if(packet_len > 0)
       {
         chprintf(DEBUG_CHP,"INFO:R1 Received packet %d\r\n",axradio_rxbuffer[3]);
-        (void)chMBPost(ax5043_driver_p->ax5043_rx_mb1, (msg_t)axradio_rxbuffer);
+        (void)chMBPostTimeout(ax5043_driver_p->ax5043_rx_mb1, (msg_t)axradio_rxbuffer, TIME_MS2I(10000));
       }
       chBSemSignal(ax5043_driver_p->ax5043_bsem1);
     }
@@ -355,7 +355,7 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
       if(packet_len > 0)
       {
         chprintf(DEBUG_CHP,"INFO:R2 Received packet %d\r\n",axradio_rxbuffer[3]);
-        (void)chMBPost(ax5043_driver_p->ax5043_rx_mb2, (msg_t)axradio_rxbuffer);
+        (void)chMBPostTimeout(ax5043_driver_p->ax5043_rx_mb2, (msg_t)axradio_rxbuffer, TIME_MS2I(10000));
       }
       chBSemSignal(ax5043_driver_p->ax5043_bsem2);
     }

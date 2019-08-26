@@ -30,6 +30,8 @@
 #include <string.h>
 #include "ch.h"
 #include "hal.h"
+#include "shell.h"
+
 #include "chprintf.h"
 #include "util_version.h"
 #include "util_numbers.h"
@@ -45,6 +47,8 @@
 
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
+
+#define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
 
 
 axradio_address_t remoteaddr = {
@@ -227,10 +231,11 @@ THD_FUNCTION(radio1_rx, arg)
   (void)arg;
 
   while (true) {
-    void *pbuf; 
+    msg_t pbuf; 
     /* Waiting for radio1 rx buffer.*/
-    msg_t msg = chMBFetch(&radio1_rx_mb, (msg_t *)&pbuf);
-    chprintf(DEBUG_CHP,"INFO: rx on radio 1\r\n");
+    msg_t msg = chMBFetchTimeout(&radio1_rx_mb, &pbuf, TIME_MS2I(10000));
+    if (msg == MSG_OK)
+      chprintf(DEBUG_CHP,"INFO: rx on radio 1\r\n");
   }
 
 }
@@ -241,10 +246,11 @@ THD_FUNCTION(radio2_rx, arg)
   (void)arg;
 
   while (true) {
-    void *pbuf; 
+    msg_t pbuf; 
     /* Waiting for radio1 rx buffer.*/
-    msg_t msg = chMBFetch(&radio2_rx_mb, (msg_t *)&pbuf);
-    chprintf(DEBUG_CHP,"INFO: rx on radio 2\r\n");
+    msg_t msg = chMBFetchTimeout(&radio2_rx_mb, &pbuf, TIME_MS2I(10000));
+    if (msg == MSG_OK)
+      chprintf(DEBUG_CHP,"INFO: rx on radio 2\r\n");
   }
 
 }
@@ -269,18 +275,56 @@ static void main_loop(void)
 
 
 /*
+ * shell commands
+ */
+static void mmd(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  (void)argv;
+  if (argc > 0) {
+    chprintf(sd, "Usage: mmd\r\n");
+    return;
+  }
+
+  chprintf(sd, "testing\r\n");
+}
+ 
+ 
+static const ShellCommand commands[] = {
+  {"mmd", mmd},
+  {NULL, NULL}
+};
+
+static const ShellConfig shell_cfg1 = {
+  (BaseSequentialStream *)&SD2,
+  commands
+};
+
+/*
  * Entry to our code
  */
 int main(void)
 {
-    halInit();
-    chSysInit();
-    app_init();
+  thread_t *shelltp1;
+  
+  halInit();
+  chSysInit();
+  app_init();
 
-    ax5043_init(&ax5043_driver);
-    chThdSleepMilliseconds(5000);
-    chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
+  ax5043_init(&ax5043_driver);
+  chThdSleepMilliseconds(5000);
+  chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
+  chThdCreateStatic(waradio1_rx, sizeof(waradio1_rx), NORMALPRIO,radio1_rx, NULL);
+  chThdCreateStatic(waradio2_rx, sizeof(waradio2_rx), NORMALPRIO,radio2_rx, NULL);
+    
+  /*
+   * Shell manager initialization.
+   * Event zero is shell exit.
+   */
+  shellInit();
+  shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+                                       "shell1", NORMALPRIO + 1,
+                                       shellThread, (void *)&shell_cfg1);
 
-    main_loop();
-    return 0;
+  main_loop();
+  return 0;
 }

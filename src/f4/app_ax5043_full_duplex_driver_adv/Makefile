@@ -106,6 +106,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files
 include $(PROJ_SRC)/common.mk
+include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
