@@ -167,10 +167,10 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
 
     /* Configuring common registers.*/
     cr[0] = MAX7310_AD_OUTPUT_REG;
-    cr[1] = output;
-    cr[2] = polarity;
-    cr[3] = iomode;
-    cr[4] = timeout;
+    cr[1] = devp->config->output;
+    cr[2] = devp->config->polarity;
+    cr[3] = devp->config->iomode;
+    cr[4] = devp->config->timeout;
 #if MAX7310_USE_I2C
 #if MAX7310_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
