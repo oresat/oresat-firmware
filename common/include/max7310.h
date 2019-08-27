@@ -42,19 +42,43 @@
  * @name    MAX7310 Register addresses
  * @{
  */
-#define MAX7310_AD_INPUT_REG                0x00
-#define MAX7310_AD_OUTPUT_REG               0x01
-#define MAX7310_AD_POLARITY_REG             0x02
-#define MAX7310_AD_CONFIG_REG               0x03
+#define MAX7310_AD_INPUT                    0x00
+#define MAX7310_AD_ODR                      0x01
+#define MAX7310_AD_POL                      0x02
+#define MAX7310_AD_MODE                     0x03
 #define MAX7310_AD_TIMEOUT                  0x04
 /** @} */
 
 /**
- * @name    MAX7310 register port bits
+ * @name    MAX7310 General IO pin register bits
  * @{
  */
 #define MAX7310_REG_MASK                    0xFF
-#define MAX7310_PORT(n)                     (1 << n)
+#define MAX7310_PIN_MASK(n)                 (1 << n)
+/** @} */
+
+/**
+ * @name    MAX7310 Output data register bits
+ * @{
+ */
+#define MAX7310_PIN_ODR_LOW(n)              (0 << n)
+#define MAX7310_PIN_ODR_HIGH(n)             (1 << n)
+/** @} */
+
+/**
+ * @name    MAX7310 Polarity register bits
+ * @{
+ */
+#define MAX7310_PIN_POL_STD(n)              (0 << n)
+#define MAX7310_PIN_POL_INV(n)              (1 << n)
+/** @} */
+
+/**
+ * @name    MAX7310 Mode register bits
+ * @{
+ */
+#define MAX7310_PIN_MODE_OUTPUT(n)          (0 << n)
+#define MAX7310_PIN_MODE_INPUT(n)           (1 << n)
 /** @} */
 
 /**

@@ -166,7 +166,7 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
     devp->config = config;
 
     /* Configuring common registers.*/
-    cr[0] = MAX7310_AD_OUTPUT_REG;
+    cr[0] = MAX7310_AD_ODR;
     cr[1] = devp->config->output;
     cr[2] = devp->config->polarity;
     cr[3] = devp->config->iomode;
@@ -210,19 +210,19 @@ void max7310Stop(MAX7310Driver *devp) {
 #endif /* MAX7310_SHARED_I2C */
 
         /* Reset to input.*/
-        cr[0] = MAX7310_AD_CONFIG_REG;
+        cr[0] = MAX7310_AD_MODE;
         cr[1] = 0xFF;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
                 cr, 1);
 
         /* Reset output reg to 0.*/
-        cr[0] = MAX7310_AD_OUTPUT_REG;
+        cr[0] = MAX7310_AD_ODR;
         cr[1] = 0;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
                 cr, 1);
 
         /* Reset polarity.*/
-        cr[0] = MAX7310_AD_POLARITY_REG;
+        cr[0] = MAX7310_AD_POL;
         cr[1] = 0xF0;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
                 cr, 1);
