@@ -63,7 +63,7 @@ msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
 msg_t max7310I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n + 1, NULL, 0,
-            TIME_INFINITE)
+            TIME_INFINITE);
 }
 #endif /* MAX7310_USE_I2C */
 
@@ -79,7 +79,7 @@ msg_t max7310I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
  *
  * @return      msg     The result of the setting operation
  */
-static msg_t (*set_output)(MAX7310Driver *devp, uint8_t output) {
+static msg_t set_output(MAX7310Driver *devp, uint8_t output) {
 
     return MSG_OK;
 }
@@ -92,7 +92,7 @@ static msg_t (*set_output)(MAX7310Driver *devp, uint8_t output) {
  *
  * @return      msg     The result of the setting operation
  */
-static msg_t (*set_polarity)(MAX7310Driver *devp, uint8_t polarity) {
+static msg_t set_polarity(MAX7310Driver *devp, uint8_t polarity) {
 
     return MSG_OK;
 }
@@ -105,7 +105,7 @@ static msg_t (*set_polarity)(MAX7310Driver *devp, uint8_t polarity) {
  *
  * @return      msg     The result of the setting operation
  */
-static msg_t (*set_iomode)(MAX7310Driver *devp, uint8_t iomode) {
+static msg_t set_iomode(MAX7310Driver *devp, uint8_t iomode) {
 
     return MSG_OK;
 }
@@ -118,7 +118,7 @@ static msg_t (*set_iomode)(MAX7310Driver *devp, uint8_t iomode) {
  *
  * @return      msg     The result of the setting operation
  */
-static msg_t (*set_timeout)(MAX7310Driver *devp, max7310_timeout_t timeout) {
+static msg_t set_timeout(MAX7310Driver *devp, max7310_timeout_t timeout) {
 
     return MSG_OK;
 }
