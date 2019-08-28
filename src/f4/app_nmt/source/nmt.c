@@ -12,7 +12,8 @@
 
 static uint8_t data[BUF_SIZE];
 
-void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[]) {
+void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
+{
     uint8_t node_id = 0;
     if (argc < 2) {
         chprintf(chp, "Usage: nmt start|stop|preop|resetcomm|resetnode <NodeID>\r\n");
@@ -36,7 +37,8 @@ void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[]) {
     }
 }
 
-void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]) {
+void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
+{
     uint32_t data_len = 0;
     uint32_t abrt_code = 0;
     uint8_t node_id = 0;
@@ -74,9 +76,34 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]) {
     }
 }
 
+void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    opd_addr_t opd_addr = 0;
+
+    if (argc < 2) {
+        chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
+        return;
+    }
+
+    opd_addr = strtoul(argv[1], NULL, 0);
+
+    if (!strcmp(argv[0], "enable")) {
+
+    } else if (!strcmp(argv[0], "disable")) {
+
+    } else if (!strcmp(argv[0], "status")) {
+
+    } else {
+        chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
+        return;
+    }
+
+}
+
 static const ShellCommand commands[] = {
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
+    {"opd", cmd_opd},
     {NULL, NULL}
 };
 
