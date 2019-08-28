@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "nmt.h"
+#include "command.h"
 #include "CO_master.h"
 #include "chprintf.h"
 #include "shell.h"
@@ -113,8 +113,8 @@ static const ShellConfig shell_cfg = {
 };
 
 THD_WORKING_AREA(shell_wa, 0x200);
-THD_WORKING_AREA(nmt_wa, 0x200);
-THD_FUNCTION(nmt, arg)
+THD_WORKING_AREA(cmd_wa, 0x200);
+THD_FUNCTION(cmd, arg)
 {
     (void)arg;
 

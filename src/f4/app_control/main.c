@@ -21,7 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "nmt.h"
+#include "command.h"
 
 /**
  * @brief App Initialization
@@ -29,7 +29,10 @@
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker("NMT Shell", nmt_wa, sizeof(nmt_wa), NORMALPRIO, nmt, NULL);
+    reg_worker("Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
+
+    /* Initialize OPD */
+    opd_init();
 
     /* Initialize shell and start serial interface */
     shellInit();
