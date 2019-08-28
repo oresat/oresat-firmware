@@ -33,7 +33,7 @@ static void app_init(void)
 
     /* Initialize OPD */
     opd_init();
-    opd_start();
+    opd_start(OPD_PROTOCARD1);
 
     /* Initialize shell and start serial interface */
     shellInit();
