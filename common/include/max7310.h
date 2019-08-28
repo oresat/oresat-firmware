@@ -39,6 +39,17 @@
 /** @} */
 
 /**
+ * @name    MAX7310 Device Characteristics
+ *
+ * @{
+ */
+
+#define MAX7310_MIN_ADDR                    0x8
+#define MAX7310_MAX_ADDR                    0x3F
+
+/** @} */
+
+/**
  * @name    MAX7310 Register addresses
  * @{
  */
@@ -180,11 +191,11 @@ typedef struct {
     /**
      * @brief MAX7310 output states
      */
-    uint8_t                     output;
+    uint8_t                     odr;
     /**
      * @brief MAX7310 polarity inversion
      */
-    uint8_t                     polarity;
+    uint8_t                     pol;
     /**
      * @brief MAX7310 IO mode
      */
@@ -258,7 +269,7 @@ extern "C" {
 #endif
 void max7310ObjectInit(MAX7310Driver *devp);
 void max7310Start(MAX7310Driver *devp, const MAX7310Config *config);
-void max7310(MAX7310Driver *devp);
+void max7310Stop(MAX7310Driver *devp);
 #ifdef __cplusplus
 }
 #endif
