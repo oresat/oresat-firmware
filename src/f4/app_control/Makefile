@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_nmt
+PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
