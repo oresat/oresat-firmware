@@ -43,7 +43,7 @@ static MAX7310Driver MAX7310D1;
 static const I2CConfig i2cconfig = {
     OPMODE_I2C,
     400000,
-    FAST_DUTY_CYCLE_2,
+    FAST_DUTY_CYCLE_16_9,
 };
 
 static MAX7310Config devconfig = {
