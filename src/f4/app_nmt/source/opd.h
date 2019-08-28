@@ -7,4 +7,7 @@ typedef enum {
     OPD_PROTOCARD3 = 0x1A,
 } opd_addr_t;
 
+void opd_init(void);
+void opd_enable(opd_addr_t opd_addr);
+void opd_disable(opd_addr_t opd_addr);
 #endif

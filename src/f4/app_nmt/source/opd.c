@@ -38,13 +38,15 @@
                             MAX7310_PIN_MODE_OUTPUT(OPD_PULLUP)     |   \
                             MAX7310_PIN_MODE_OUTPUT(OPD_LED))
 
+static MAX7310Driver MAX7310D1;
+
 static const I2CConfig i2cconfig = {
     OPMODE_I2C,
     400000,
     STD_DUTY_CYCLE,
 };
 
-static const MAX7310Config devconfig = {
+static MAX7310Config devconfig = {
     &I2CD1,
     &i2cconfig,
     OPD_PROTOCARD1,
@@ -53,3 +55,29 @@ static const MAX7310Config devconfig = {
     OPD_MODE_VAL,
     MAX7310_TIMEOUT_ENABLED
 };
+
+void opd_init(void)
+{
+    max7310ObjectInit(&MAX7310D1);
+}
+
+void opd_start(opd_addr_t opd_addr)
+{
+    devconfig.saddr = opd_addr;
+    max7310Start(&MAX7310D1, &devconfig);
+}
+
+void opd_stop(void)
+{
+    max7310Stop(&MAX7310D1);
+}
+
+void opd_enable(opd_addr_t opd_addr)
+{
+
+}
+
+void opd_disable(opd_addr_t opd_addr)
+{
+
+}
