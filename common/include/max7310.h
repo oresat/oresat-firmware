@@ -223,8 +223,7 @@ typedef struct {
  * @brief   @p MAX7310 specific methods with inherited ones.
  */
 #define _max7310_methods                                                    \
-  _base_object_methods                                                      \
-  _max7310_methods_alone
+    _base_object_methods
 
 /**
  * @extends BaseObjectVMT
@@ -232,18 +231,18 @@ typedef struct {
  * @brief @p MAX7310 virtual methods table.
  */
 struct MAX7310VMT {
-  _max7310_methods
+    _max7310_methods
 };
 
 /**
  * @brief   @p MAX7310Driver specific data.
  */
 #define _max7310_data                                                       \
-  _base_object_data                                                         \
-  /* Driver state.*/                                                        \
-  max7310_state_t           state;                                          \
-  /* Current configuration data.*/                                          \
-  const MAX7310Config       *config;
+    _base_object_data                                                       \
+    /* Driver state.*/                                                      \
+    max7310_state_t           state;                                        \
+    /* Current configuration data.*/                                        \
+    const MAX7310Config       *config;
 
 /**
  * @brief MAX710 GPIO Expander class.
@@ -271,6 +270,7 @@ void max7310ObjectInit(MAX7310Driver *devp);
 void max7310Start(MAX7310Driver *devp, const MAX7310Config *config);
 void max7310Stop(MAX7310Driver *devp);
 uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg);
+void max7310WriteRaw(MAX7310Driver *devp, uint8_t reg, uint8_t value);
 #ifdef __cplusplus
 }
 #endif
