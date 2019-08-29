@@ -325,4 +325,36 @@ void max7310Stop(MAX7310Driver *devp) {
     }
     devp->state = MAX7310_STOP;
 }
+
+/**
+ * @brief   Reads MAX7310 register as raw value.
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] reg        the register to read
+ *
+ * @api
+ */
+uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
+    uint8_t retval;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310ReadRaw(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &retval, 1);
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+    return retval;
+}
+
 /** @} */
