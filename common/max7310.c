@@ -240,7 +240,7 @@ void max7310ObjectInit(MAX7310Driver *devp) {
  * @api
  */
 void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
-    uint8_t cr[5];
+    uint8_t cr[2];
     osalDbgCheck((devp != NULL) && (config != NULL));
 
     osalDbgAssert((devp->state == MAX7310_STOP) ||
@@ -261,8 +261,22 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
 #endif /* MAX7310_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    max7310I2CWriteRegister(config->i2cp, config->saddr,
-            cr, 5);
+    cr[0] = MAX7310_AD_ODR;
+    cr[1] = config->odr;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
+            cr, 1);
+    cr[0] = MAX7310_AD_POL;
+    cr[1] = config->pol;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
+            cr, 1);
+    cr[0] = MAX7310_AD_MODE;
+    cr[1] = config->iomode;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
+            cr, 1);
+    cr[0] = MAX7310_AD_TIMEOUT;
+    cr[1] = config->timeout;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
+            cr, 1);
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(config->i2cp);
