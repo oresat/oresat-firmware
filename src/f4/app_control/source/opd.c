@@ -112,7 +112,14 @@ void opd_disable(opd_addr_t opd_addr)
 
 }
 
-uint8_t opd_status(opd_addr_t opd_addr)
+int opd_status(opd_addr_t opd_addr, opd_status_t *status)
 {
-    return max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_INPUT);
+    if (opd_dev[opd_addr].valid != true)
+        return -1;
+    status->input = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_INPUT);
+    status->odr = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
+    status->pol = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_POL);
+    status->mode = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_MODE);
+    status->timeout = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_TIMEOUT);
+    return 0;
 }
