@@ -482,8 +482,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_SWO) |        \
                                      PIN_OTYPE_PUSHPULL(GPIOB_ARD_D5) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOB_ARD_D4) |     \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SCL) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SDA) |   \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN1_RX) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN1_TX) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_ARD_D6) |     \
