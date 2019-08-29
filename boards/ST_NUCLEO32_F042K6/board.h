@@ -406,8 +406,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_ARD_D13) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI1_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI1_MOSI) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SCL) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SDA) |   \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN10) |      \
