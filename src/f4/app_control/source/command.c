@@ -78,6 +78,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    opd_status_t status = {0};
     opd_addr_t opd_addr = 0;
 
     if (argc < 2) {
@@ -92,6 +93,16 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "disable")) {
         opd_disable(opd_addr);
     } else if (!strcmp(argv[0], "status")) {
+        if (!opd_status(opd_addr, &status)) {
+            chprintf(chp, "Read status of 0x%02X:\r\n", opd_addr);
+            chprintf(chp, "Input:       %02X\r\n", status.input);
+            chprintf(chp, "Output:      %02X\r\n", status.odr);
+            chprintf(chp, "Polarity:    %02X\r\n", status.pol);
+            chprintf(chp, "Mode:        %02X\r\n", status.mode);
+            chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
+        } else {
+            chprintf(chp, "Invalid address\r\n");
+        }
     } else {
         chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
         return;
