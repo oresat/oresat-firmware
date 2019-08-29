@@ -92,13 +92,6 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "disable")) {
         opd_disable(opd_addr);
     } else if (!strcmp(argv[0], "status")) {
-        uint8_t temp;
-        i2cAcquireBus(&I2CD1);
-        for (i2caddr_t i = 0x08; i < 0x40; i++) {
-            if (i2cMasterReceiveTimeout(&I2CD1, i, &temp, 1, TIME_MS2I(10)) == MSG_OK)
-                chprintf(chp, "Got response from %u\r\n", i);
-        }
-        i2cReleaseBus(&I2CD1);
     } else {
         chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
         return;

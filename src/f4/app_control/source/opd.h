@@ -8,7 +8,8 @@ typedef enum {
 } opd_addr_t;
 
 void opd_init(void);
-void opd_start(opd_addr_t opd_addr);
+void opd_start(void);
+void opd_stop(void);
 void opd_enable(opd_addr_t opd_addr);
 void opd_disable(opd_addr_t opd_addr);
 #endif
