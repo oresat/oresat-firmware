@@ -270,6 +270,7 @@ extern "C" {
 void max7310ObjectInit(MAX7310Driver *devp);
 void max7310Start(MAX7310Driver *devp, const MAX7310Config *config);
 void max7310Stop(MAX7310Driver *devp);
+uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg);
 #ifdef __cplusplus
 }
 #endif
