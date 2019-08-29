@@ -111,3 +111,8 @@ void opd_disable(opd_addr_t opd_addr)
 {
 
 }
+
+uint8_t opd_status(opd_addr_t opd_addr)
+{
+    return max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_INPUT);
+}

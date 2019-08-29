@@ -12,4 +12,5 @@ void opd_start(void);
 void opd_stop(void);
 void opd_enable(opd_addr_t opd_addr);
 void opd_disable(opd_addr_t opd_addr);
+uint8_t opd_status(opd_addr_t opd_addr);
 #endif
