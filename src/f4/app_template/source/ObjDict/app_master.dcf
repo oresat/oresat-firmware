@@ -2,13 +2,13 @@
 FileName=app_master.dcf
 FileVersion=0
 FileRevision=0
-LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_template/source/ObjDict/app_master.eds
+LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict/app_master.eds
 EDSVersion=4.0
 Description=OreSat Master Node.
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:23PM
+ModificationTime=1:50PM
 ModificationDate=08-30-2019
 ModifiedBy=
 
@@ -51,10 +51,9 @@ Lines=0
 
 [DeviceCommissioning]
 NodeId=0
-NodeName=
 BaudRate=0
 NetNumber=0
-CANopenManager=1
+CANopenManager=0
 LSS_SerialNumber=0
 
 [MandatoryObjects]
@@ -393,7 +392,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=CANopenNode
+DefaultValue=Oresat Master Node
 ParameterValue=
 PDOMapping=0
 
@@ -3119,7 +3118,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x180
+DefaultValue=0x00000180+$NODEID
 ParameterValue=
 PDOMapping=0
 
@@ -3130,7 +3129,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=255
+DefaultValue=254
 ParameterValue=
 PDOMapping=0
 
@@ -3141,7 +3140,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=100
+DefaultValue=0
 ParameterValue=
 PDOMapping=0
 
@@ -3203,7 +3202,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x280
+DefaultValue=0x00000280+$NODEID
 ParameterValue=
 PDOMapping=0
 
@@ -3287,7 +3286,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x380
+DefaultValue=0x00000380+$NODEID
 ParameterValue=
 PDOMapping=0
 
@@ -3371,7 +3370,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x480
+DefaultValue=0x00000480+$NODEID
 ParameterValue=
 PDOMapping=0
 
@@ -4463,7 +4462,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000108
+DefaultValue=0x00000000
 ParameterValue=
 PDOMapping=0
 
@@ -4474,7 +4473,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000208
+DefaultValue=0x00000000
 ParameterValue=
 PDOMapping=0
 
@@ -6141,7 +6140,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x00000001
 ParameterValue=
 PDOMapping=0
 
@@ -9017,7 +9016,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x20
+DefaultValue=0x01
 ParameterValue=
 PDOMapping=0
 
@@ -9028,7 +9027,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=250
+DefaultValue=1000
 ParameterValue=
 PDOMapping=0
 

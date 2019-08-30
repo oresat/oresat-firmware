@@ -2,7 +2,7 @@
 FileName=app_master.eds
 FileVersion=0
 FileRevision=0
-LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict/app_master.eds
+LastEDS=
 EDSVersion=4.0
 Description=OreSat Master Node.
 CreationTime=12:18PM
@@ -2583,7 +2583,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x180
+DefaultValue=0x00000180+$NODEID
 PDOMapping=0
 
 [1800sub2]
@@ -2592,7 +2592,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=255
+DefaultValue=254
 PDOMapping=0
 
 [1800sub3]
@@ -2601,7 +2601,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=100
+DefaultValue=0
 PDOMapping=0
 
 [1800sub4]
@@ -2652,7 +2652,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x280
+DefaultValue=0x00000280+$NODEID
 PDOMapping=0
 
 [1801sub2]
@@ -2721,7 +2721,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x380
+DefaultValue=0x00000380+$NODEID
 PDOMapping=0
 
 [1802sub2]
@@ -2790,7 +2790,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x480
+DefaultValue=0x00000480+$NODEID
 PDOMapping=0
 
 [1803sub2]
@@ -3687,7 +3687,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000108
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A00sub2]
@@ -3696,7 +3696,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000208
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A00sub3]

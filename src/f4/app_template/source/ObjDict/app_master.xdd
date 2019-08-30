@@ -13,7 +13,7 @@
         <ProfileTechnology>Canopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xsi:type="ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2019-08-30" fileModificationTime="13:24:00.0000000-07:00" fileModifiedBy="" fileVersion="0" supportedLanguages="en">
+    <ProfileBody xsi:type="ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2019-08-30" fileModificationTime="13:50:00.0000000-07:00" fileModifiedBy="" fileVersion="0" supportedLanguages="en">
       <DeviceIdentity>
         <vendorName readOnly="true">Portland State Aerospace Society</vendorName>
         <vendorID>0</vendorID>
@@ -189,7 +189,7 @@ bit    31: set to 0</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="CANopenNode" />
+            <defaultValue value="Oresat Master Node" />
           </parameter>
           <parameter uniqueID="UID_PARAM_1009" access="const">
             <label lang="en">Manufacturer hardware version</label>
@@ -2451,7 +2451,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="$NODEID+0x180" />
+            <defaultValue value="0x00000180+$NODEID" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180002" access="readWrite">
             <label lang="en">transmission type</label>
@@ -2459,7 +2459,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="255" />
+            <defaultValue value="254" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180003" access="readWrite">
             <label lang="en">inhibit time</label>
@@ -2467,7 +2467,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="100" />
+            <defaultValue value="0" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180004" access="readWrite">
             <label lang="en">compatibility entry</label>
@@ -2515,7 +2515,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="$NODEID+0x280" />
+            <defaultValue value="0x00000280+$NODEID" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180102" access="readWrite">
             <label lang="en">transmission type</label>
@@ -2579,7 +2579,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="$NODEID+0x380" />
+            <defaultValue value="0x00000380+$NODEID" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180202" access="readWrite">
             <label lang="en">transmission type</label>
@@ -2643,7 +2643,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="$NODEID+0x480" />
+            <defaultValue value="0x00000480+$NODEID" />
           </parameter>
           <parameter uniqueID="UID_PARAM_180302" access="readWrite">
             <label lang="en">transmission type</label>
@@ -3481,7 +3481,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x60000108" />
+            <defaultValue value="0x00000000" />
           </parameter>
           <parameter uniqueID="UID_PARAM_1a0002" access="readWrite">
             <label lang="en">mapped object 2</label>
@@ -3489,7 +3489,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x60000208" />
+            <defaultValue value="0x00000000" />
           </parameter>
           <parameter uniqueID="UID_PARAM_1a0003" access="readWrite">
             <label lang="en">mapped object 3</label>
@@ -6909,7 +6909,7 @@ Valid values are from 1 to 127:</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x20" />
+            <defaultValue value="0x01" />
           </parameter>
           <parameter uniqueID="UID_PARAM_2102" access="readWrite">
             <label lang="en">CAN bit rate</label>
@@ -6920,7 +6920,7 @@ Valid values are in [kbps]:
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="250" />
+            <defaultValue value="1000" />
           </parameter>
           <parameter uniqueID="UID_PARAM_2103" access="readWrite">
             <label lang="en">SYNC counter</label>
