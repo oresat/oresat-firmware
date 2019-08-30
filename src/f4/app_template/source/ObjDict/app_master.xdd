@@ -6909,7 +6909,7 @@ Valid values are from 1 to 127:</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x01" />
+            <defaultValue value="0x70" />
           </parameter>
           <parameter uniqueID="UID_PARAM_2102" access="readWrite">
             <label lang="en">CAN bit rate</label>

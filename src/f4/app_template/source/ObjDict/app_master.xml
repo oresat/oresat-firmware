@@ -1229,7 +1229,7 @@ Generic errors (critical):
 Manufacturer specific errors:
 Manufacturer may define its own constants up to index 0xFF. Of course, he must then define large enough buffer for error status bits (up to 32 bytes).</description>
     </CANopenObject>
-    <CANopenObject index="2101" name="CAN node ID" objectType="VAR" memoryType="ROM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0x01" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="2101" name="CAN node ID" objectType="VAR" memoryType="ROM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0x70" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>CAN Node ID is CANopenNode specific variable. It sets node-ID for device on CANopen network. Node-ID can be set on other ways too, for example with DIP switches. More advanced solution is use of LSS.
 
 Valid values are from 1 to 127:</description>
