@@ -122,14 +122,14 @@
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     16   //Associated objects: 14xx, 16xx
   #define CO_NO_TPDO                     16   //Associated objects: 18xx, 1Axx
-  #define CO_NO_NMT_MASTER               0
+  #define CO_NO_NMT_MASTER               1
   #define CO_NO_TRACE                    0
 
 
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             96
+   #define CO_OD_NoOfElements             99
 
 
 /*******************************************************************************
@@ -1017,6 +1017,273 @@
 /*1F80 */
         #define OD_1F80_NMTStartup                                  0x1F80
 
+/*1F81 */
+        #define OD_1F81_slaveAssignment                             0x1F81
+
+        #define OD_1F81_0_slaveAssignment_maxSubIndex               0
+        #define OD_1F81_1_slaveAssignment_                          1
+        #define OD_1F81_2_slaveAssignment_                          2
+        #define OD_1F81_3_slaveAssignment_                          3
+        #define OD_1F81_4_slaveAssignment_                          4
+        #define OD_1F81_5_slaveAssignment_                          5
+        #define OD_1F81_6_slaveAssignment_                          6
+        #define OD_1F81_7_slaveAssignment_                          7
+        #define OD_1F81_8_slaveAssignment_                          8
+        #define OD_1F81_9_slaveAssignment_                          9
+        #define OD_1F81_10_slaveAssignment_                         10
+        #define OD_1F81_11_slaveAssignment_                         11
+        #define OD_1F81_12_slaveAssignment_                         12
+        #define OD_1F81_13_slaveAssignment_                         13
+        #define OD_1F81_14_slaveAssignment_                         14
+        #define OD_1F81_15_slaveAssignment_                         15
+        #define OD_1F81_16_slaveAssignment_                         16
+        #define OD_1F81_17_slaveAssignment_                         17
+        #define OD_1F81_18_slaveAssignment_                         18
+        #define OD_1F81_19_slaveAssignment_                         19
+        #define OD_1F81_20_slaveAssignment_                         20
+        #define OD_1F81_21_slaveAssignment_                         21
+        #define OD_1F81_22_slaveAssignment_                         22
+        #define OD_1F81_23_slaveAssignment_                         23
+        #define OD_1F81_24_slaveAssignment_                         24
+        #define OD_1F81_25_slaveAssignment_                         25
+        #define OD_1F81_26_slaveAssignment_                         26
+        #define OD_1F81_27_slaveAssignment_                         27
+        #define OD_1F81_28_slaveAssignment_                         28
+        #define OD_1F81_29_slaveAssignment_                         29
+        #define OD_1F81_30_slaveAssignment_                         30
+        #define OD_1F81_31_slaveAssignment_                         31
+        #define OD_1F81_32_slaveAssignment_                         32
+        #define OD_1F81_33_slaveAssignment_                         33
+        #define OD_1F81_34_slaveAssignment_                         34
+        #define OD_1F81_35_slaveAssignment_                         35
+        #define OD_1F81_36_slaveAssignment_                         36
+        #define OD_1F81_37_slaveAssignment_                         37
+        #define OD_1F81_38_slaveAssignment_                         38
+        #define OD_1F81_39_slaveAssignment_                         39
+        #define OD_1F81_40_slaveAssignment_                         40
+        #define OD_1F81_41_slaveAssignment_                         41
+        #define OD_1F81_42_slaveAssignment_                         42
+        #define OD_1F81_43_slaveAssignment_                         43
+        #define OD_1F81_44_slaveAssignment_                         44
+        #define OD_1F81_45_slaveAssignment_                         45
+        #define OD_1F81_46_slaveAssignment_                         46
+        #define OD_1F81_47_slaveAssignment_                         47
+        #define OD_1F81_48_slaveAssignment_                         48
+        #define OD_1F81_49_slaveAssignment_                         49
+        #define OD_1F81_50_slaveAssignment_                         50
+        #define OD_1F81_51_slaveAssignment_                         51
+        #define OD_1F81_52_slaveAssignment_                         52
+        #define OD_1F81_53_slaveAssignment_                         53
+        #define OD_1F81_54_slaveAssignment_                         54
+        #define OD_1F81_55_slaveAssignment_                         55
+        #define OD_1F81_56_slaveAssignment_                         56
+        #define OD_1F81_57_slaveAssignment_                         57
+        #define OD_1F81_58_slaveAssignment_                         58
+        #define OD_1F81_59_slaveAssignment_                         59
+        #define OD_1F81_60_slaveAssignment_                         60
+        #define OD_1F81_61_slaveAssignment_                         61
+        #define OD_1F81_62_slaveAssignment_                         62
+        #define OD_1F81_63_slaveAssignment_                         63
+        #define OD_1F81_64_slaveAssignment_                         64
+        #define OD_1F81_65_slaveAssignment_                         65
+        #define OD_1F81_66_slaveAssignment_                         66
+        #define OD_1F81_67_slaveAssignment_                         67
+        #define OD_1F81_68_slaveAssignment_                         68
+        #define OD_1F81_69_slaveAssignment_                         69
+        #define OD_1F81_70_slaveAssignment_                         70
+        #define OD_1F81_71_slaveAssignment_                         71
+        #define OD_1F81_72_slaveAssignment_                         72
+        #define OD_1F81_73_slaveAssignment_                         73
+        #define OD_1F81_74_slaveAssignment_                         74
+        #define OD_1F81_75_slaveAssignment_                         75
+        #define OD_1F81_76_slaveAssignment_                         76
+        #define OD_1F81_77_slaveAssignment_                         77
+        #define OD_1F81_78_slaveAssignment_                         78
+        #define OD_1F81_79_slaveAssignment_                         79
+        #define OD_1F81_80_slaveAssignment_                         80
+        #define OD_1F81_81_slaveAssignment_                         81
+        #define OD_1F81_82_slaveAssignment_                         82
+        #define OD_1F81_83_slaveAssignment_                         83
+        #define OD_1F81_84_slaveAssignment_                         84
+        #define OD_1F81_85_slaveAssignment_                         85
+        #define OD_1F81_86_slaveAssignment_                         86
+        #define OD_1F81_87_slaveAssignment_                         87
+        #define OD_1F81_88_slaveAssignment_                         88
+        #define OD_1F81_89_slaveAssignment_                         89
+        #define OD_1F81_90_slaveAssignment_                         90
+        #define OD_1F81_91_slaveAssignment_                         91
+        #define OD_1F81_92_slaveAssignment_                         92
+        #define OD_1F81_93_slaveAssignment_                         93
+        #define OD_1F81_94_slaveAssignment_                         94
+        #define OD_1F81_95_slaveAssignment_                         95
+        #define OD_1F81_96_slaveAssignment_                         96
+        #define OD_1F81_97_slaveAssignment_                         97
+        #define OD_1F81_98_slaveAssignment_                         98
+        #define OD_1F81_99_slaveAssignment_                         99
+        #define OD_1F81_100_slaveAssignment_                        100
+        #define OD_1F81_101_slaveAssignment_                        101
+        #define OD_1F81_102_slaveAssignment_                        102
+        #define OD_1F81_103_slaveAssignment_                        103
+        #define OD_1F81_104_slaveAssignment_                        104
+        #define OD_1F81_105_slaveAssignment_                        105
+        #define OD_1F81_106_slaveAssignment_                        106
+        #define OD_1F81_107_slaveAssignment_                        107
+        #define OD_1F81_108_slaveAssignment_                        108
+        #define OD_1F81_109_slaveAssignment_                        109
+        #define OD_1F81_110_slaveAssignment_                        110
+        #define OD_1F81_111_slaveAssignment_                        111
+        #define OD_1F81_112_slaveAssignment_                        112
+        #define OD_1F81_113_slaveAssignment_                        113
+        #define OD_1F81_114_slaveAssignment_                        114
+        #define OD_1F81_115_slaveAssignment_                        115
+        #define OD_1F81_116_slaveAssignment_                        116
+        #define OD_1F81_117_slaveAssignment_                        117
+        #define OD_1F81_118_slaveAssignment_                        118
+        #define OD_1F81_119_slaveAssignment_                        119
+        #define OD_1F81_120_slaveAssignment_                        120
+        #define OD_1F81_121_slaveAssignment_                        121
+        #define OD_1F81_122_slaveAssignment_                        122
+        #define OD_1F81_123_slaveAssignment_                        123
+        #define OD_1F81_124_slaveAssignment_                        124
+        #define OD_1F81_125_slaveAssignment_                        125
+        #define OD_1F81_126_slaveAssignment_                        126
+        #define OD_1F81_127_slaveAssignment_                        127
+
+/*1F82 */
+        #define OD_1F82_requestNMT                                  0x1F82
+
+        #define OD_1F82_0_requestNMT_maxSubIndex                    0
+        #define OD_1F82_1_requestNMT_                               1
+        #define OD_1F82_2_requestNMT_                               2
+        #define OD_1F82_3_requestNMT_                               3
+        #define OD_1F82_4_requestNMT_                               4
+        #define OD_1F82_5_requestNMT_                               5
+        #define OD_1F82_6_requestNMT_                               6
+        #define OD_1F82_7_requestNMT_                               7
+        #define OD_1F82_8_requestNMT_                               8
+        #define OD_1F82_9_requestNMT_                               9
+        #define OD_1F82_10_requestNMT_                              10
+        #define OD_1F82_11_requestNMT_                              11
+        #define OD_1F82_12_requestNMT_                              12
+        #define OD_1F82_13_requestNMT_                              13
+        #define OD_1F82_14_requestNMT_                              14
+        #define OD_1F82_15_requestNMT_                              15
+        #define OD_1F82_16_requestNMT_                              16
+        #define OD_1F82_17_requestNMT_                              17
+        #define OD_1F82_18_requestNMT_                              18
+        #define OD_1F82_19_requestNMT_                              19
+        #define OD_1F82_20_requestNMT_                              20
+        #define OD_1F82_21_requestNMT_                              21
+        #define OD_1F82_22_requestNMT_                              22
+        #define OD_1F82_23_requestNMT_                              23
+        #define OD_1F82_24_requestNMT_                              24
+        #define OD_1F82_25_requestNMT_                              25
+        #define OD_1F82_26_requestNMT_                              26
+        #define OD_1F82_27_requestNMT_                              27
+        #define OD_1F82_28_requestNMT_                              28
+        #define OD_1F82_29_requestNMT_                              29
+        #define OD_1F82_30_requestNMT_                              30
+        #define OD_1F82_31_requestNMT_                              31
+        #define OD_1F82_32_requestNMT_                              32
+        #define OD_1F82_33_requestNMT_                              33
+        #define OD_1F82_34_requestNMT_                              34
+        #define OD_1F82_35_requestNMT_                              35
+        #define OD_1F82_36_requestNMT_                              36
+        #define OD_1F82_37_requestNMT_                              37
+        #define OD_1F82_38_requestNMT_                              38
+        #define OD_1F82_39_requestNMT_                              39
+        #define OD_1F82_40_requestNMT_                              40
+        #define OD_1F82_41_requestNMT_                              41
+        #define OD_1F82_42_requestNMT_                              42
+        #define OD_1F82_43_requestNMT_                              43
+        #define OD_1F82_44_requestNMT_                              44
+        #define OD_1F82_45_requestNMT_                              45
+        #define OD_1F82_46_requestNMT_                              46
+        #define OD_1F82_47_requestNMT_                              47
+        #define OD_1F82_48_requestNMT_                              48
+        #define OD_1F82_49_requestNMT_                              49
+        #define OD_1F82_50_requestNMT_                              50
+        #define OD_1F82_51_requestNMT_                              51
+        #define OD_1F82_52_requestNMT_                              52
+        #define OD_1F82_53_requestNMT_                              53
+        #define OD_1F82_54_requestNMT_                              54
+        #define OD_1F82_55_requestNMT_                              55
+        #define OD_1F82_56_requestNMT_                              56
+        #define OD_1F82_57_requestNMT_                              57
+        #define OD_1F82_58_requestNMT_                              58
+        #define OD_1F82_59_requestNMT_                              59
+        #define OD_1F82_60_requestNMT_                              60
+        #define OD_1F82_61_requestNMT_                              61
+        #define OD_1F82_62_requestNMT_                              62
+        #define OD_1F82_63_requestNMT_                              63
+        #define OD_1F82_64_requestNMT_                              64
+        #define OD_1F82_65_requestNMT_                              65
+        #define OD_1F82_66_requestNMT_                              66
+        #define OD_1F82_67_requestNMT_                              67
+        #define OD_1F82_68_requestNMT_                              68
+        #define OD_1F82_69_requestNMT_                              69
+        #define OD_1F82_70_requestNMT_                              70
+        #define OD_1F82_71_requestNMT_                              71
+        #define OD_1F82_72_requestNMT_                              72
+        #define OD_1F82_73_requestNMT_                              73
+        #define OD_1F82_74_requestNMT_                              74
+        #define OD_1F82_75_requestNMT_                              75
+        #define OD_1F82_76_requestNMT_                              76
+        #define OD_1F82_77_requestNMT_                              77
+        #define OD_1F82_78_requestNMT_                              78
+        #define OD_1F82_79_requestNMT_                              79
+        #define OD_1F82_80_requestNMT_                              80
+        #define OD_1F82_81_requestNMT_                              81
+        #define OD_1F82_82_requestNMT_                              82
+        #define OD_1F82_83_requestNMT_                              83
+        #define OD_1F82_84_requestNMT_                              84
+        #define OD_1F82_85_requestNMT_                              85
+        #define OD_1F82_86_requestNMT_                              86
+        #define OD_1F82_87_requestNMT_                              87
+        #define OD_1F82_88_requestNMT_                              88
+        #define OD_1F82_89_requestNMT_                              89
+        #define OD_1F82_90_requestNMT_                              90
+        #define OD_1F82_91_requestNMT_                              91
+        #define OD_1F82_92_requestNMT_                              92
+        #define OD_1F82_93_requestNMT_                              93
+        #define OD_1F82_94_requestNMT_                              94
+        #define OD_1F82_95_requestNMT_                              95
+        #define OD_1F82_96_requestNMT_                              96
+        #define OD_1F82_97_requestNMT_                              97
+        #define OD_1F82_98_requestNMT_                              98
+        #define OD_1F82_99_requestNMT_                              99
+        #define OD_1F82_100_requestNMT_                             100
+        #define OD_1F82_101_requestNMT_                             101
+        #define OD_1F82_102_requestNMT_                             102
+        #define OD_1F82_103_requestNMT_                             103
+        #define OD_1F82_104_requestNMT_                             104
+        #define OD_1F82_105_requestNMT_                             105
+        #define OD_1F82_106_requestNMT_                             106
+        #define OD_1F82_107_requestNMT_                             107
+        #define OD_1F82_108_requestNMT_                             108
+        #define OD_1F82_109_requestNMT_                             109
+        #define OD_1F82_110_requestNMT_                             110
+        #define OD_1F82_111_requestNMT_                             111
+        #define OD_1F82_112_requestNMT_                             112
+        #define OD_1F82_113_requestNMT_                             113
+        #define OD_1F82_114_requestNMT_                             114
+        #define OD_1F82_115_requestNMT_                             115
+        #define OD_1F82_116_requestNMT_                             116
+        #define OD_1F82_117_requestNMT_                             117
+        #define OD_1F82_118_requestNMT_                             118
+        #define OD_1F82_119_requestNMT_                             119
+        #define OD_1F82_120_requestNMT_                             120
+        #define OD_1F82_121_requestNMT_                             121
+        #define OD_1F82_122_requestNMT_                             122
+        #define OD_1F82_123_requestNMT_                             123
+        #define OD_1F82_124_requestNMT_                             124
+        #define OD_1F82_125_requestNMT_                             125
+        #define OD_1F82_126_requestNMT_                             126
+        #define OD_1F82_127_requestNMT_                             127
+
+/*1F89 */
+        #define OD_1F89_bootTime                                    0x1F89
+
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
 
@@ -1110,6 +1377,9 @@ struct sCO_OD_RAM{
 /*1010      */ UNSIGNED32      storeParameters[1];
 /*1011      */ UNSIGNED32      restoreDefaultParameters[1];
 /*1280      */ OD_SDOClientParameter_t SDOClientParameter[1];
+/*1F81      */ UNSIGNED32      slaveAssignment[127];
+/*1F82      */ UNSIGNED8       requestNMT[127];
+/*1F89      */ UNSIGNED32     bootTime;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
@@ -1235,6 +1505,19 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*1F80, Data Type: UNSIGNED32 */
         #define OD_NMTStartup                                       CO_OD_ROM.NMTStartup
+
+/*1F81, Data Type: UNSIGNED32, Array[127] */
+        #define OD_slaveAssignment                                  CO_OD_RAM.slaveAssignment
+        #define ODL_slaveAssignment_arrayLength                     127
+        #define ODA_slaveAssignment_                                0
+
+/*1F82, Data Type: UNSIGNED8, Array[127] */
+        #define OD_requestNMT                                       CO_OD_RAM.requestNMT
+        #define ODL_requestNMT_arrayLength                          127
+        #define ODA_requestNMT_                                     0
+
+/*1F89, Data Type: UNSIGNED32 */
+        #define OD_bootTime                                         CO_OD_RAM.bootTime
 
 /*2100, Data Type: OCTET_STRING */
         #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
