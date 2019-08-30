@@ -32,7 +32,7 @@
 #include "util_version.h"
 #include "util_numbers.h"
 
-
+#include "si4123.h"
 
 
 #define     DEBUG_SERIAL                    SD2
@@ -116,14 +116,28 @@ static void app_init(void)
 
 
 
-
 THD_WORKING_AREA(waSI4123_thd, 1024);
 THD_FUNCTION(SI4123_thd, arg)
 {
   (void)arg;
  
-  chThdSleepMilliseconds(500);
+  palSetLine(LINE_SI_SENB);
+  palSetLine(LINE_SI_SDATA);
+  palSetLine(LINE_SI_SCLK);
+  
+  write_reg(SI4123_REG_MAIN_CONFIG, 0b0011000000000100);
+  write_reg(SI4123_REG_PHASE_GAIN,  0b0000000000000000);
+  write_reg(SI4123_REG_PWRDOWN,     0b0000000000000011);
+  write_reg(SI4123_REG_RF1_NDIV,    0b0000010011110001);
+  write_reg(SI4123_REG_RF2_NDIV,    0b0000000000000000);
+  write_reg(SI4123_REG_IF_NDIV,     0b0000001101101001);
+  write_reg(SI4123_REG_RF1_RDIV,    0b0000000000010000);
+  write_reg(SI4123_REG_RF2_RDIV,    0b0000000000000000);
+  write_reg(SI4123_REG_IF_RDIV,     0b0000000000100000);
 
+  palSetLine(LINE_SI_SENB);
+  palSetLine(LINE_SI_SDATA);
+  palSetLine(LINE_SI_SCLK);
 
 }
 
