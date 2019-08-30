@@ -13,7 +13,7 @@
         <ProfileTechnology>Canopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xsi:type="ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_OD.eds" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2019-08-30" fileModificationTime="12:00:00.0000000-07:00" fileModifiedBy="" fileVersion="0" supportedLanguages="en">
+    <ProfileBody xsi:type="ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2019-08-30" fileModificationTime="12:00:00.0000000-07:00" fileModifiedBy="" fileVersion="0" supportedLanguages="en">
       <DeviceIdentity>
         <vendorName readOnly="true">Portland State Aerospace Society</vendorName>
         <vendorID>0</vendorID>
@@ -581,7 +581,7 @@ value = 255:     asynchronous</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="255" />
+            <defaultValue value="254" />
           </parameter>
           <parameter uniqueID="UID_PARAM_1401" access="readWrite">
             <label lang="en">RPDO communication parameter</label>
@@ -699,7 +699,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="2" />
+            <defaultValue value="0" />
           </parameter>
           <parameter uniqueID="UID_PARAM_160001" access="readWrite">
             <label lang="en">mapped object 1</label>
@@ -707,7 +707,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x62000108" />
+            <defaultValue value="0x00000000" />
           </parameter>
           <parameter uniqueID="UID_PARAM_160002" access="readWrite">
             <label lang="en">mapped object 2</label>
@@ -715,7 +715,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="0x62000208" />
+            <defaultValue value="0x00000000" />
           </parameter>
           <parameter uniqueID="UID_PARAM_160003" access="readWrite">
             <label lang="en">mapped object 3</label>
@@ -1921,7 +1921,7 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
         <ProfileTechnology>Canopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xsi:type="ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_OD.eds" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2019-08-30" fileVersion="0" supportedLanguages="en">
+    <ProfileBody xsi:type="ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2019-08-30" fileVersion="0" supportedLanguages="en">
       <ApplicationLayers>
         <CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" dataType="0007" lowLimit="" highLimit="" accessType="ro" actualValue="" denotation="" edseditor_extenstion_storagelocation="ROM" PDOmapping="no" uniqueIDRef="UID_PARAM_1000" />
