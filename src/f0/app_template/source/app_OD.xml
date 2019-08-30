@@ -582,75 +582,6 @@ main cycle max time - maximum mainline function cycle time in percent of timer p
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="01" name="main PCB supply" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
-    <CANopenObject index="2110" name="Variable Int32" objectType="ARRAY" memoryType="RAM" dataType="0x04" accessType="rw" PDOmapping="optional" subNumber="17" disabled="false" TPDOdetectCOS="true">
-      <description>Vartiable is free to use by application.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="16" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="01" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="02" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="03" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="04" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="05" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="06" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="07" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="08" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="09" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0a" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0b" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0c" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0d" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0e" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0f" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="10" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-    </CANopenObject>
-    <CANopenObject index="2111" name="Variable ROM Int32" objectType="ARRAY" memoryType="ROM" dataType="0x04" accessType="rw" PDOmapping="optional" subNumber="17" disabled="false" TPDOdetectCOS="true">
-      <description>Vartiable is free to use by application.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="16" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="01" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="02" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="03" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="04" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="05" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="06" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="07" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="08" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="09" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0a" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0b" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0c" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0d" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0e" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0f" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="10" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-    </CANopenObject>
-    <CANopenObject index="2112" name="Variable NV Int32" objectType="ARRAY" memoryType="EEPROM" dataType="0x04" accessType="rw" PDOmapping="optional" subNumber="17" disabled="false" TPDOdetectCOS="true">
-      <description>Vartiable is free to use by application. Variable is stored to internal baterry powered SRAM.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="16" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="01" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="02" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="03" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="04" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="05" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="06" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="07" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="08" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="09" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0a" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0b" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0c" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0d" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0e" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="0f" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="10" name="int32" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="true" />
-    </CANopenObject>
-    <CANopenObject index="2120" name="test var" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="6" disabled="false" TPDOdetectCOS="false">
-      <description />
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="5" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="I64" objectType="VAR" dataType="0x15" accessType="rw" PDOmapping="optional" defaultValue="0x1234567890ABCDEFLL" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="U64" objectType="VAR" dataType="0x1b" accessType="rw" PDOmapping="optional" defaultValue="0x234567890ABCDEF1LL" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="R32" objectType="VAR" dataType="0x08" accessType="rw" PDOmapping="optional" defaultValue="12.345" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="R64" objectType="VAR" dataType="0x11" accessType="rw" PDOmapping="optional" defaultValue="456.789" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="domain" objectType="VAR" dataType="0x0f" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
     <CANopenObject index="2130" name="Time" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="4" disabled="false" TPDOdetectCOS="false">
       <description>Variable displays current time.
 
@@ -662,145 +593,16 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
       <CANopenSubObject subIndex="02" name="Epoch time base ms" objectType="VAR" dataType="0x1b" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="03" name="Epoch time offset ms" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
-    <CANopenObject index="2301" name="Trace config" objectType="REC" memoryType="ROM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="9" disabled="true" TPDOdetectCOS="false">
-      <description>Trace is used for recording variables.
-
-See also Trace.
-
-Size - Maximum number of trace records in circular buffer. By reading it returns actual buffer size (If zero, malloc may had been failed at startup). By writing it sets the size, which will be valid after next reboot. (It is necessary to store parameters before (0x1010).)
-
-Axis no - If value is different than zero, trace is enabled. Value is informative and describes group of traces (Multiple traces can belong to single axis.). By reading it returns zero if trace is disabled or if it is not configured properly. When trace is enabled, internal buffer is cleared.
-
-Name - name of the trace as a string (informative).
-
-Color - color of the trace as a string (informative).
-
-Map - Map to variable in object dictionary, similar as PDO map(two bytes of index, one byte of subindex and 1 byte of bitlength. It's value will be copied to trace.value in case index and subindex are correct. If map index and subindex is zero, RPDO may be mapped to trace.value, for example. Valid values of map.bitlength is 08, 10 or 20 or 00, which indicates 8-bit, 16bit, 32-bit or default-size variable. Trace must be disabled, if mapping is written (Axis no set to 0). 
-
-Format - If first bit is zero, then value is used as signed integer otherwise as unsigned integer. If format is 0 or 1, text points are generated for time and value: "123;321\n140;345\n..." If format is 2 or 3, binary data is generated: 4-byte timestamp and 4-byte value. If format is 4 or 5, SVG path is generated: "M123,321H140V345...".
-
-Trigger - 0=disabled, 1=rising edge, 2=falling edge, 3=both edges.
-
-Threshold - If integer value passes threshold (based on trigger setting), time is recorded into 'trigger time'.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="8" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Size" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="100" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Axis no" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Name" objectType="VAR" dataType="0x09" accessType="rw" PDOmapping="no" defaultValue="Trace1                        " TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Color" objectType="VAR" dataType="0x09" accessType="rw" PDOmapping="no" defaultValue="red                 " TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Map" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x60000108" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Format" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="07" name="Trigger" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="08" name="Threshold" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="2302" name="Trace config" objectType="REC" memoryType="ROM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="9" disabled="true" TPDOdetectCOS="false">
-      <description />
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="8" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Size" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Axis no" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Name" objectType="VAR" dataType="0x09" accessType="rw" PDOmapping="no" defaultValue="Trace2                        " TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Color" objectType="VAR" dataType="0x09" accessType="rw" PDOmapping="no" defaultValue="green               " TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Map" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Format" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="07" name="Trigger" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="08" name="Threshold" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="2400" name="Trace enable" objectType="VAR" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="optional" defaultValue="0" subNumber="0" disabled="true" TPDOdetectCOS="false">
-      <description>This object controls, how many trace objects (beginning from index 0x2401) are enabled. If zero, all traces are disabled.</description>
-    </CANopenObject>
-    <CANopenObject index="2401" name="Trace" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="7" disabled="true" TPDOdetectCOS="false">
-      <description>Trace is used for recording variables.
-
-See also Trace config.
-
-Size - Number of current records in buffer.
-
-Value - Latest value. If traceConfig.map (index and subindex) is valid, then mapped variable will be copied here.
-
-Min, Max - Minimum and maximum value.
-
-Plot - SVG path generated from the values from circular buffer. For time axis is used Time-&gt;'Epoch time offset ms'. When Plot is read, internal buffer is emptied.
-
-Trigger time - If integer value passes 'TraceConfig-&gt;threshold', then time is recorded into this variable.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="6" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Size" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Value" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Min" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Max" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Plot" objectType="VAR" dataType="0x0f" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Trigger time" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="2402" name="Trace" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="7" disabled="true" TPDOdetectCOS="false">
-      <description />
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="6" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Size" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Value" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Min" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Max" objectType="VAR" dataType="0x04" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Plot" objectType="VAR" dataType="0x0f" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Trigger time" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="6000" name="Read input 8 bit" objectType="ARRAY" memoryType="RAM" dataType="0x05" accessType="ro" PDOmapping="optional" subNumber="9" disabled="false" TPDOdetectCOS="true">
-      <description>Digital inputs from hardware.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="8" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="01" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="02" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="03" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="04" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="05" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="06" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="07" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-      <CANopenSubObject subIndex="08" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="true" />
-    </CANopenObject>
-    <CANopenObject index="6200" name="Write output 8 bit" objectType="ARRAY" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="optional" subNumber="9" disabled="false" TPDOdetectCOS="false">
-      <description>Digital outputs on hardware.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="8" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="07" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="08" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0x00" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="6401" name="Read analogue input 16 bit" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" subNumber="13" disabled="false" TPDOdetectCOS="false">
-      <description>Analogue inputs from hardware. The integer value is left adjusted.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="12" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="07" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="08" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="09" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="0a" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="0b" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="0c" name="Input" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
-    <CANopenObject index="6411" name="Write analogue output 16 bit" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="rw" PDOmapping="optional" subNumber="9" disabled="false" TPDOdetectCOS="false">
-      <description>Analogue outputs on hardware. The integer value is left adjusted.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="8" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="06" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="07" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="08" name="Output" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-    </CANopenObject>
   </CANopenObjectList>
   <other>
-      <file fileName="app_OD.xml" fileCreator="JP" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="11:19AM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/app_OD.eds" />
+    <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="12:00PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/app_OD.eds" />
     <DeviceIdentity>
-      <vendorName>CANopenNode</vendorName>
+      <vendorName>Portland State Aerospace Society</vendorName>
       <vendorNumber>0</vendorNumber>
-      <productName>CANopenNode</productName>
+      <productName>OreSat Template</productName>
       <productNumber>0</productNumber>
       <productText>
-        <description>CANopenNode is an open source software stack used for serial communication of multiple devices over the CAN/CANopen Network.</description>
+        <description>OreSat Template Application Object Dictionary</description>
       </productText>
     </DeviceIdentity>
     <capabilities>

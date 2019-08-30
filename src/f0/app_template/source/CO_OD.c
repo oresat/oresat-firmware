@@ -99,7 +99,6 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1F80*/ 0x0000L,
 /*2101*/ 0x30L,
 /*2102*/ 0xFA,
-/*2111*/ {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -120,13 +119,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2107*/ {1000, 0, 0, 0, 0},
 /*2108*/ {0},
 /*2109*/ {0},
-/*2110*/ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-/*2120*/ {0x5L, 0x1234567890ABCDEFL, 0x234567890ABCDEF1L, 12.345, 456.789, 0},
 /*2130*/ {0x3L, {'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 0x00000000L, 0x0000L},
-/*6000*/ {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-/*6200*/ {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-/*6401*/ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-/*6411*/ {0, 0, 0, 0, 0, 0, 0, 0},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -137,7 +130,6 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            CO_OD_FIRST_LAST_WORD,
 
 /*2106*/ 0x0000L,
-/*2112*/ {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -324,15 +316,6 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_ROM.TPDOMappingParameter[3].mappedObject8, 0x8D, 0x4 },
 };
 
-/*0x2120*/ const CO_OD_entryRecord_t OD_record2120[6] = {
-           {(void*)&CO_OD_RAM.testVar.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.testVar.I64, 0xBE, 0x8 },
-           {(void*)&CO_OD_RAM.testVar.U64, 0xBE, 0x8 },
-           {(void*)&CO_OD_RAM.testVar.R32, 0xBE, 0x4 },
-           {(void*)&CO_OD_RAM.testVar.R64, 0xBE, 0x8 },
-           {(void*)0, 0x0E, 0x0 },
-};
-
 /*0x2130*/ const CO_OD_entryRecord_t OD_record2130[4] = {
            {(void*)&CO_OD_RAM.time.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.time.string, 0x06, 0x1E },
@@ -390,13 +373,5 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2107, 0x05, 0xBE,  2, (void*)&CO_OD_RAM.performance[0]},
 {0x2108, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.temperature[0]},
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
-{0x2110, 0x10, 0xFE,  4, (void*)&CO_OD_RAM.variableInt32[0]},
-{0x2111, 0x10, 0xFD,  4, (void*)&CO_OD_ROM.variableROM_Int32[0]},
-{0x2112, 0x10, 0xFF,  4, (void*)&CO_OD_EEPROM.variableNV_Int32[0]},
-{0x2120, 0x05, 0x00,  0, (void*)&OD_record2120},
 {0x2130, 0x03, 0x00,  0, (void*)&OD_record2130},
-{0x6000, 0x08, 0x66,  1, (void*)&CO_OD_RAM.readInput8Bit[0]},
-{0x6200, 0x08, 0x3E,  1, (void*)&CO_OD_RAM.writeOutput8Bit[0]},
-{0x6401, 0x0C, 0xA6,  2, (void*)&CO_OD_RAM.readAnalogueInput16Bit[0]},
-{0x6411, 0x08, 0xBE,  2, (void*)&CO_OD_RAM.writeAnalogueOutput16Bit[0]},
 };

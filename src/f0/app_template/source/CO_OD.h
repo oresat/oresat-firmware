@@ -94,19 +94,19 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_OD.xml
+      FileName:     app_OD.dcf
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
-      CreatedBy:    JP
+      CreatedBy:    Miles Simpson
 *******************************************************************************/
 
 
 /*******************************************************************************
    DEVICE INFO:
-      VendorName:     CANopenNode
+      VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    CANopenNode
+      ProductName:    OreSat Template
       ProductNumber:  0
 *******************************************************************************/
 
@@ -129,7 +129,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             55
+   #define CO_OD_NoOfElements             47
 
 
 /*******************************************************************************
@@ -189,40 +189,12 @@
                UNSIGNED32     mappedObject7;
                UNSIGNED32     mappedObject8;
                }              OD_TPDOMappingParameter_t;
-/*2120      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               INTEGER64      I64;
-               UNSIGNED64     U64;
-               REAL32         R32;
-               REAL64         R64;
-               DOMAIN         domain;
-               }              OD_testVar_t;
 /*2130      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                VISIBLE_STRING string[30];
                UNSIGNED64     epochTimeBaseMs;
                UNSIGNED32     epochTimeOffsetMs;
                }              OD_time_t;
-/*2301      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     size;
-               UNSIGNED8      axisNo;
-               VISIBLE_STRING name[30];
-               VISIBLE_STRING color[20];
-               UNSIGNED32     map;
-               UNSIGNED8      format;
-               UNSIGNED8      trigger;
-               INTEGER32      threshold;
-               }              OD_traceConfig_t;
-/*2401      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     size;
-               INTEGER32      value;
-               INTEGER32      min;
-               INTEGER32      max;
-               DOMAIN         plot;
-               UNSIGNED32     triggerTime;
-               }              OD_trace_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -549,79 +521,6 @@
         #define OD_2109_0_voltage_maxSubIndex                       0
         #define OD_2109_1_voltage_mainPCBSupply                     1
 
-/*2110 */
-        #define OD_2110_variableInt32                               0x2110
-
-        #define OD_2110_0_variableInt32_maxSubIndex                 0
-        #define OD_2110_1_variableInt32_int32                       1
-        #define OD_2110_2_variableInt32_int32                       2
-        #define OD_2110_3_variableInt32_int32                       3
-        #define OD_2110_4_variableInt32_int32                       4
-        #define OD_2110_5_variableInt32_int32                       5
-        #define OD_2110_6_variableInt32_int32                       6
-        #define OD_2110_7_variableInt32_int32                       7
-        #define OD_2110_8_variableInt32_int32                       8
-        #define OD_2110_9_variableInt32_int32                       9
-        #define OD_2110_10_variableInt32_int32                      10
-        #define OD_2110_11_variableInt32_int32                      11
-        #define OD_2110_12_variableInt32_int32                      12
-        #define OD_2110_13_variableInt32_int32                      13
-        #define OD_2110_14_variableInt32_int32                      14
-        #define OD_2110_15_variableInt32_int32                      15
-        #define OD_2110_16_variableInt32_int32                      16
-
-/*2111 */
-        #define OD_2111_variableROM_Int32                           0x2111
-
-        #define OD_2111_0_variableROM_Int32_maxSubIndex             0
-        #define OD_2111_1_variableROM_Int32_int32                   1
-        #define OD_2111_2_variableROM_Int32_int32                   2
-        #define OD_2111_3_variableROM_Int32_int32                   3
-        #define OD_2111_4_variableROM_Int32_int32                   4
-        #define OD_2111_5_variableROM_Int32_int32                   5
-        #define OD_2111_6_variableROM_Int32_int32                   6
-        #define OD_2111_7_variableROM_Int32_int32                   7
-        #define OD_2111_8_variableROM_Int32_int32                   8
-        #define OD_2111_9_variableROM_Int32_int32                   9
-        #define OD_2111_10_variableROM_Int32_int32                  10
-        #define OD_2111_11_variableROM_Int32_int32                  11
-        #define OD_2111_12_variableROM_Int32_int32                  12
-        #define OD_2111_13_variableROM_Int32_int32                  13
-        #define OD_2111_14_variableROM_Int32_int32                  14
-        #define OD_2111_15_variableROM_Int32_int32                  15
-        #define OD_2111_16_variableROM_Int32_int32                  16
-
-/*2112 */
-        #define OD_2112_variableNV_Int32                            0x2112
-
-        #define OD_2112_0_variableNV_Int32_maxSubIndex              0
-        #define OD_2112_1_variableNV_Int32_int32                    1
-        #define OD_2112_2_variableNV_Int32_int32                    2
-        #define OD_2112_3_variableNV_Int32_int32                    3
-        #define OD_2112_4_variableNV_Int32_int32                    4
-        #define OD_2112_5_variableNV_Int32_int32                    5
-        #define OD_2112_6_variableNV_Int32_int32                    6
-        #define OD_2112_7_variableNV_Int32_int32                    7
-        #define OD_2112_8_variableNV_Int32_int32                    8
-        #define OD_2112_9_variableNV_Int32_int32                    9
-        #define OD_2112_10_variableNV_Int32_int32                   10
-        #define OD_2112_11_variableNV_Int32_int32                   11
-        #define OD_2112_12_variableNV_Int32_int32                   12
-        #define OD_2112_13_variableNV_Int32_int32                   13
-        #define OD_2112_14_variableNV_Int32_int32                   14
-        #define OD_2112_15_variableNV_Int32_int32                   15
-        #define OD_2112_16_variableNV_Int32_int32                   16
-
-/*2120 */
-        #define OD_2120_testVar                                     0x2120
-
-        #define OD_2120_0_testVar_maxSubIndex                       0
-        #define OD_2120_1_testVar_I64                               1
-        #define OD_2120_2_testVar_U64                               2
-        #define OD_2120_3_testVar_R32                               3
-        #define OD_2120_4_testVar_R64                               4
-        #define OD_2120_5_testVar_domain                            5
-
 /*2130 */
         #define OD_2130_time                                        0x2130
 
@@ -629,62 +528,6 @@
         #define OD_2130_1_time_string                               1
         #define OD_2130_2_time_epochTimeBaseMs                      2
         #define OD_2130_3_time_epochTimeOffsetMs                    3
-
-/*6000 */
-        #define OD_6000_readInput8Bit                               0x6000
-
-        #define OD_6000_0_readInput8Bit_maxSubIndex                 0
-        #define OD_6000_1_readInput8Bit_input                       1
-        #define OD_6000_2_readInput8Bit_input                       2
-        #define OD_6000_3_readInput8Bit_input                       3
-        #define OD_6000_4_readInput8Bit_input                       4
-        #define OD_6000_5_readInput8Bit_input                       5
-        #define OD_6000_6_readInput8Bit_input                       6
-        #define OD_6000_7_readInput8Bit_input                       7
-        #define OD_6000_8_readInput8Bit_input                       8
-
-/*6200 */
-        #define OD_6200_writeOutput8Bit                             0x6200
-
-        #define OD_6200_0_writeOutput8Bit_maxSubIndex               0
-        #define OD_6200_1_writeOutput8Bit_output                    1
-        #define OD_6200_2_writeOutput8Bit_output                    2
-        #define OD_6200_3_writeOutput8Bit_output                    3
-        #define OD_6200_4_writeOutput8Bit_output                    4
-        #define OD_6200_5_writeOutput8Bit_output                    5
-        #define OD_6200_6_writeOutput8Bit_output                    6
-        #define OD_6200_7_writeOutput8Bit_output                    7
-        #define OD_6200_8_writeOutput8Bit_output                    8
-
-/*6401 */
-        #define OD_6401_readAnalogueInput16Bit                      0x6401
-
-        #define OD_6401_0_readAnalogueInput16Bit_maxSubIndex        0
-        #define OD_6401_1_readAnalogueInput16Bit_input              1
-        #define OD_6401_2_readAnalogueInput16Bit_input              2
-        #define OD_6401_3_readAnalogueInput16Bit_input              3
-        #define OD_6401_4_readAnalogueInput16Bit_input              4
-        #define OD_6401_5_readAnalogueInput16Bit_input              5
-        #define OD_6401_6_readAnalogueInput16Bit_input              6
-        #define OD_6401_7_readAnalogueInput16Bit_input              7
-        #define OD_6401_8_readAnalogueInput16Bit_input              8
-        #define OD_6401_9_readAnalogueInput16Bit_input              9
-        #define OD_6401_10_readAnalogueInput16Bit_input             10
-        #define OD_6401_11_readAnalogueInput16Bit_input             11
-        #define OD_6401_12_readAnalogueInput16Bit_input             12
-
-/*6411 */
-        #define OD_6411_writeAnalogueOutput16Bit                    0x6411
-
-        #define OD_6411_0_writeAnalogueOutput16Bit_maxSubIndex      0
-        #define OD_6411_1_writeAnalogueOutput16Bit_output           1
-        #define OD_6411_2_writeAnalogueOutput16Bit_output           2
-        #define OD_6411_3_writeAnalogueOutput16Bit_output           3
-        #define OD_6411_4_writeAnalogueOutput16Bit_output           4
-        #define OD_6411_5_writeAnalogueOutput16Bit_output           5
-        #define OD_6411_6_writeAnalogueOutput16Bit_output           6
-        #define OD_6411_7_writeAnalogueOutput16Bit_output           7
-        #define OD_6411_8_writeAnalogueOutput16Bit_output           8
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -717,7 +560,6 @@ struct sCO_OD_ROM{
 /*1F80      */ UNSIGNED32     NMTStartup;
 /*2101      */ UNSIGNED8      CANNodeID;
 /*2102      */ UNSIGNED16     CANBitRate;
-/*2111      */ INTEGER32       variableROM_Int32[16];
 
                UNSIGNED32     LastWord;
 };
@@ -737,13 +579,7 @@ struct sCO_OD_RAM{
 /*2107      */ UNSIGNED16      performance[5];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
-/*2110      */ INTEGER32       variableInt32[16];
-/*2120      */ OD_testVar_t    testVar;
 /*2130      */ OD_time_t       time;
-/*6000      */ UNSIGNED8       readInput8Bit[8];
-/*6200      */ UNSIGNED8       writeOutput8Bit[8];
-/*6401      */ INTEGER16       readAnalogueInput16Bit[12];
-/*6411      */ INTEGER16       writeAnalogueOutput16Bit[8];
 
                UNSIGNED32     LastWord;
 };
@@ -753,7 +589,6 @@ struct sCO_OD_EEPROM{
                UNSIGNED32     FirstWord;
 
 /*2106      */ UNSIGNED32     powerOnCounter;
-/*2112      */ INTEGER32       variableNV_Int32[16];
 
                UNSIGNED32     LastWord;
 };
@@ -899,44 +734,6 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
         #define ODL_voltage_arrayLength                             1
         #define ODA_voltage_mainPCBSupply                           0
 
-/*2110, Data Type: INTEGER32, Array[16] */
-        #define OD_variableInt32                                    CO_OD_RAM.variableInt32
-        #define ODL_variableInt32_arrayLength                       16
-        #define ODA_variableInt32_int32                             0
-
-/*2111, Data Type: INTEGER32, Array[16] */
-        #define OD_variableROM_Int32                                CO_OD_ROM.variableROM_Int32
-        #define ODL_variableROM_Int32_arrayLength                   16
-        #define ODA_variableROM_Int32_int32                         0
-
-/*2112, Data Type: INTEGER32, Array[16] */
-        #define OD_variableNV_Int32                                 CO_OD_EEPROM.variableNV_Int32
-        #define ODL_variableNV_Int32_arrayLength                    16
-        #define ODA_variableNV_Int32_int32                          0
-
-/*2120, Data Type: testVar_t */
-        #define OD_testVar                                          CO_OD_RAM.testVar
-
 /*2130, Data Type: time_t */
         #define OD_time                                             CO_OD_RAM.time
-
-/*6000, Data Type: UNSIGNED8, Array[8] */
-        #define OD_readInput8Bit                                    CO_OD_RAM.readInput8Bit
-        #define ODL_readInput8Bit_arrayLength                       8
-        #define ODA_readInput8Bit_input                             0
-
-/*6200, Data Type: UNSIGNED8, Array[8] */
-        #define OD_writeOutput8Bit                                  CO_OD_RAM.writeOutput8Bit
-        #define ODL_writeOutput8Bit_arrayLength                     8
-        #define ODA_writeOutput8Bit_output                          0
-
-/*6401, Data Type: INTEGER16, Array[12] */
-        #define OD_readAnalogueInput16Bit                           CO_OD_RAM.readAnalogueInput16Bit
-        #define ODL_readAnalogueInput16Bit_arrayLength              12
-        #define ODA_readAnalogueInput16Bit_input                    0
-
-/*6411, Data Type: INTEGER16, Array[8] */
-        #define OD_writeAnalogueOutput16Bit                         CO_OD_RAM.writeAnalogueOutput16Bit
-        #define ODL_writeAnalogueOutput16Bit_arrayLength            8
-        #define ODA_writeAnalogueOutput16Bit_output                 0
 
