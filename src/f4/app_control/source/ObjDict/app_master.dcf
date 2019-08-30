@@ -8,7 +8,7 @@ Description=OreSat Master Node.
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:23PM
+ModificationTime=1:50PM
 ModificationDate=08-30-2019
 ModifiedBy=
 
@@ -54,7 +54,7 @@ NodeId=0
 NodeName=
 BaudRate=0
 NetNumber=0
-CANopenManager=1
+CANopenManager=0
 LSS_SerialNumber=0
 
 [MandatoryObjects]
@@ -393,7 +393,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=CANopenNode
+DefaultValue=Oresat Master Node
 ParameterValue=
 PDOMapping=0
 
@@ -6141,7 +6141,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x00000001
 ParameterValue=
 PDOMapping=0
 
@@ -9017,7 +9017,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x20
+DefaultValue=0x01
 ParameterValue=
 PDOMapping=0
 
@@ -9028,7 +9028,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=250
+DefaultValue=1000
 ParameterValue=
 PDOMapping=0
 

@@ -69,7 +69,7 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1005*/ 0x0080L,
 /*1006*/ 0x0000L,
 /*1007*/ 0x0000L,
-/*1008*/ {'C', 'A', 'N', 'o', 'p', 'e', 'n', 'N', 'o', 'd', 'e'},
+/*1008*/ {'O', 'r', 'e', 's', 'a', 't', ' ', 'M', 'a', 's', 't', 'e', 'r', ' ', 'N', 'o', 'd', 'e'},
 /*1009*/ {'3', '.', '0', '0'},
 /*100A*/ {'3', '.', '0', '0'},
 /*1014*/ 0x0080L,
@@ -145,8 +145,8 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1A0E*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1A0F*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1F80*/ 0x0001L,
-/*2101*/ 0x20L,
-/*2102*/ 0xFA,
+/*2101*/ 0x1L,
+/*2102*/ 0x3E8,
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -873,7 +873,7 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1005, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.COB_ID_SYNCMessage},
 {0x1006, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.communicationCyclePeriod},
 {0x1007, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.synchronousWindowLength},
-{0x1008, 0x00, 0x05, 11, (void*)&CO_OD_ROM.manufacturerDeviceName},
+{0x1008, 0x00, 0x05, 18, (void*)&CO_OD_ROM.manufacturerDeviceName},
 {0x1009, 0x00, 0x05,  4, (void*)&CO_OD_ROM.manufacturerHardwareVersion},
 {0x100A, 0x00, 0x05,  4, (void*)&CO_OD_ROM.manufacturerSoftwareVersion},
 {0x1010, 0x01, 0x8E,  4, (void*)&CO_OD_RAM.storeParameters[0]},

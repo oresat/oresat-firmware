@@ -47,7 +47,7 @@ bit    31: set to 0</description>
     <CANopenObject index="1007" name="Synchronous window length" objectType="VAR" memoryType="ROM" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>bit 0-31:  window leghth after SYNC when PDOS must be transmited in µs, (0 = not used)</description>
     </CANopenObject>
-    <CANopenObject index="1008" name="Manufacturer device name" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="CANopenNode" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="1008" name="Manufacturer device name" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="Oresat Master Node" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>Name of the manufacturer as string</description>
     </CANopenObject>
     <CANopenObject index="1009" name="Manufacturer hardware version" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="3.00" subNumber="0" disabled="false" TPDOdetectCOS="false">
@@ -1229,7 +1229,7 @@ Generic errors (critical):
 Manufacturer specific errors:
 Manufacturer may define its own constants up to index 0xFF. Of course, he must then define large enough buffer for error status bits (up to 32 bytes).</description>
     </CANopenObject>
-    <CANopenObject index="2101" name="CAN node ID" objectType="VAR" memoryType="ROM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0x20" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="2101" name="CAN node ID" objectType="VAR" memoryType="ROM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0x01" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>CAN Node ID is CANopenNode specific variable. It sets node-ID for device on CANopen network. Node-ID can be set on other ways too, for example with DIP switches. More advanced solution is use of LSS.
 
 Valid values are from 1 to 127:</description>
@@ -1239,7 +1239,7 @@ Valid values are from 1 to 127:</description>
   if(var &gt; 127) return 0x06090031L;  //Value of parameter written too high.
 }</accessFunctionPreCode>
     </CANopenObject>
-    <CANopenObject index="2102" name="CAN bit rate" objectType="VAR" memoryType="ROM" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="250" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="2102" name="CAN bit rate" objectType="VAR" memoryType="ROM" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="1000" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>CAN Bit-Rate is CANopenNode specific variable. It sets CAN Bit-Rate for device on CANopen network.
 
 Valid values are in [kbps]:
@@ -1303,7 +1303,7 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
     </CANopenObject>
   </CANopenObjectList>
   <other>
-    <file fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="08-30-2019" fileCreationTime="12:18PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="1:24PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_template/source/ObjDict/app_master.eds" />
+    <file fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="08-30-2019" fileCreationTime="12:18PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="1:50PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict/app_master.eds" />
     <DeviceIdentity>
       <vendorName>Portland State Aerospace Society</vendorName>
       <vendorNumber>0</vendorNumber>
