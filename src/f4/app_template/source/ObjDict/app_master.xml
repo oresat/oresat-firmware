@@ -691,7 +691,7 @@ mapped object  (subindex 1...8)
 bit   0-7: data length in bits
 bit  8-15: subindex from OD
 bit 16-31: index from OD</description>
-      <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="2" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="01" name="mapped object 1" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="02" name="mapped object 2" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="03" name="mapped object 3" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
@@ -1303,7 +1303,7 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
     </CANopenObject>
   </CANopenObjectList>
   <other>
-    <file fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="08-30-2019" fileCreationTime="12:18PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="1:50PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_control/source/ObjDict/app_master.eds" />
+    <file fileName="app_master.xml" fileCreator="Miles Simpson" fileCreationDate="08-30-2019" fileCreationTime="12:18PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="1:50PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_template/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f4/app_template/source/ObjDict/app_master.eds" />
     <DeviceIdentity>
       <vendorName>Portland State Aerospace Society</vendorName>
       <vendorNumber>0</vendorNumber>

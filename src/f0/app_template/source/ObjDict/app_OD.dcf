@@ -1588,7 +1588,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=2
+DefaultValue=0
 ParameterValue=
 PDOMapping=0
 

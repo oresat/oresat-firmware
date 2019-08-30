@@ -3473,7 +3473,7 @@ bit 16-31: index from OD</description>
             <denotation>
               <label lang="en" />
             </denotation>
-            <defaultValue value="2" />
+            <defaultValue value="0" />
           </parameter>
           <parameter uniqueID="UID_PARAM_1a0001" access="readWrite">
             <label lang="en">mapped object 1</label>
