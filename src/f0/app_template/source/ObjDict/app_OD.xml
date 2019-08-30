@@ -595,7 +595,7 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
     </CANopenObject>
   </CANopenObjectList>
   <other>
-    <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="12:00PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/app_OD.eds" />
+      <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="12:00PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/ObjDict/app_OD.eds" />
     <DeviceIdentity>
       <vendorName>Portland State Aerospace Society</vendorName>
       <vendorNumber>0</vendorNumber>
