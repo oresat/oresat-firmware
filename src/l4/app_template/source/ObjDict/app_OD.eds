@@ -2,7 +2,7 @@
 FileName=app_OD.eds
 FileVersion=0
 FileRevision=0
-LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_template/source/ObjDict/app_OD.eds
+LastEDS=
 EDSVersion=4.0
 Description=OreSat Template Application Object Dictionary
 CreationTime=2:51PM
@@ -1058,7 +1058,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=255
+DefaultValue=254
 PDOMapping=0
 
 [1800sub3]
@@ -1067,7 +1067,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=100
+DefaultValue=0
 PDOMapping=0
 
 [1800sub4]
@@ -1325,7 +1325,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000108
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A00sub2]
@@ -1334,7 +1334,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000208
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A00sub3]
@@ -1689,7 +1689,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x30
+DefaultValue=0x7F
 PDOMapping=0
 
 [2102]
@@ -1698,7 +1698,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=250
+DefaultValue=1000
 PDOMapping=0
 
 [2103]

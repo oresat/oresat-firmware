@@ -94,7 +94,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_OD.eds
+      FileName:     app_OD.dcf
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
