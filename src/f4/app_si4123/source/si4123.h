@@ -37,7 +37,7 @@
 
 
 //function declaration starts here
-void write_reg(uint8_t address, uint32_t data);
+void si_write_reg(uint8_t address, uint32_t data);
 
 #endif
 //! @}

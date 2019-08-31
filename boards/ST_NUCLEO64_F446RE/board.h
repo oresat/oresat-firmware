@@ -559,9 +559,9 @@
  *
  * PC0  - AX_INT0                   (input pull down).
  * PC1  - AX_INT1                   (input pull down).
- * PC2  - SI_SCLK                   (input pullup).
- * PC3  - SI_SDATA                  (input pullup).
- * PC4  - SI_SENB                   (input pullup).
+ * PC2  - SI_SCLK                   (output push-pull).
+ * PC3  - SI_SDATA                  (output push-pull).
+ * PC4  - SI_SENB                   (output push-pull).
  * PC5  - PIN5                      (input pullup).
  * PC6  - PIN6                      (input pullup).
  * PC7  - PIN7                      (input pullup).
@@ -576,9 +576,9 @@
  */
 #define VAL_GPIOC_MODER             (PIN_MODE_INPUT(GPIOC_AX_INT0) |         \
                                      PIN_MODE_INPUT(GPIOC_AX_INT1) |         \
-                                     PIN_MODE_INPUT(GPIOC_SI_SCLK) |           \
-                                     PIN_MODE_INPUT(GPIOC_SI_SDATA) |          \
-                                     PIN_MODE_INPUT(GPIOC_SI_SENB) |           \
+                                     PIN_MODE_OUTPUT(GPIOC_SI_SCLK) |           \
+                                     PIN_MODE_OUTPUT(GPIOC_SI_SDATA) |          \
+                                     PIN_MODE_OUTPUT(GPIOC_SI_SENB) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN5) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN6) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN7) |         \

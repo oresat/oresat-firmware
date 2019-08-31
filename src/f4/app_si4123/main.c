@@ -51,43 +51,6 @@ static SerialConfig ser_cfg =
 };
 
 
-/*
- * Receive and Transmit SPI Configurations
- */
-static const SPIConfig spicfg1 =
-{
-    false,
-    NULL,                                   // Operation complete callback
-    GPIOA,                                  // Slave select port
-    GPIOA_SPI1_NSS,                         // Slave select pad
-    // SPI cr1 data                            (see 446 ref man.)
-    SPI_CR1_SPE     |                       // SPI enable
-    SPI_CR1_MSTR    |                       // Master
-    //SPI_CR1_BR_2    |
-    SPI_CR1_BR_1    |
-    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
-    SPI_CR1_SSM,
-    0, // SPI_CR2_SSOE,
-};
-
-static const SPIConfig spicfg2 =
-{
-    false,
-    NULL,                                   // Operation complete callback
-    GPIOB,                                  // Slave select port
-    GPIOB_SPI2_NSS,                         // Slave select pad
-    // SPI cr1 data                         (see 446 ref man.)
-    SPI_CR1_SPE     |                       // SPI enable
-    SPI_CR1_MSTR    |                       // Master
-    //SPI_CR1_BR_2    |
-    SPI_CR1_BR_1    |
-    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
-    SPI_CR1_SSM,
-    0, // SPI_CR2_SSOE,
-};
-
-
-
 
 /*
  * Initialize the SPI drivers and configure the ax5043 chips
@@ -109,8 +72,6 @@ static void app_init(void)
              , version_info.hardware.id_low
             );
 
-    spiStart(&SPID1, &spicfg1);
-    spiStart(&SPID2, &spicfg2);
 }
 
 
@@ -119,25 +80,27 @@ static void app_init(void)
 THD_WORKING_AREA(waSI4123_thd, 1024);
 THD_FUNCTION(SI4123_thd, arg)
 {
-  (void)arg;
+  (void)arg;    
  
   palSetLine(LINE_SI_SENB);
   palSetLine(LINE_SI_SDATA);
   palSetLine(LINE_SI_SCLK);
   
-  write_reg(SI4123_REG_MAIN_CONFIG, 0b0011000000000100);
-  write_reg(SI4123_REG_PHASE_GAIN,  0b0000000000000000);
-  write_reg(SI4123_REG_PWRDOWN,     0b0000000000000011);
-  write_reg(SI4123_REG_RF1_NDIV,    0b0000010011110001);
-  write_reg(SI4123_REG_RF2_NDIV,    0b0000000000000000);
-  write_reg(SI4123_REG_IF_NDIV,     0b0000001101101001);
-  write_reg(SI4123_REG_RF1_RDIV,    0b0000000000010000);
-  write_reg(SI4123_REG_RF2_RDIV,    0b0000000000000000);
-  write_reg(SI4123_REG_IF_RDIV,     0b0000000000100000);
+  si_write_reg(SI4123_REG_MAIN_CONFIG, 0b000011000000000100);
+  si_write_reg(SI4123_REG_PHASE_GAIN,  0b000000000000000000);
+  si_write_reg(SI4123_REG_PWRDOWN,     0b000000000000000011);
+  si_write_reg(SI4123_REG_RF1_NDIV,    0b000000010011110001);
+  si_write_reg(SI4123_REG_RF2_NDIV,    0b000000000000000000);
+  si_write_reg(SI4123_REG_IF_NDIV,     0b000000001101101001);
+  si_write_reg(SI4123_REG_RF1_RDIV,    0b000000000000010000);
+  si_write_reg(SI4123_REG_RF2_RDIV,    0b000000000000000000);
+  si_write_reg(SI4123_REG_IF_RDIV,     0b000000000000100000);
 
   palSetLine(LINE_SI_SENB);
   palSetLine(LINE_SI_SDATA);
   palSetLine(LINE_SI_SCLK);
+  
+  //palClearLine(LINE_SI_SCLK);
 
 }
 
@@ -152,7 +115,7 @@ static void main_loop(void)
 
 	while (true)
     {
-      chThdSleepMilliseconds(15000);
+      chThdSleepMilliseconds(5000);
       chprintf(DEBUG_CHP, ".");
       //palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
     }
@@ -169,7 +132,7 @@ int main(void)
     chSysInit();
     app_init();
 
-    chThdSleepMilliseconds(5000);
+    //chThdSleepMilliseconds(5000);
     chThdCreateStatic(waSI4123_thd, sizeof(waSI4123_thd), NORMALPRIO,SI4123_thd, NULL);
 
     main_loop();
