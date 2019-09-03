@@ -46,10 +46,20 @@ static struct {
     bool valid;
 } opd_dev[OPD_ADDR_MAX];
 
+/*
 static const I2CConfig i2cconfig = {
     OPMODE_I2C,
     100000,
     STD_DUTY_CYCLE,
+};
+//*/
+
+static const I2CConfig i2cconfig = {
+  STM32_TIMINGR_PRESC(15U) |
+  STM32_TIMINGR_SCLDEL(4U) | STM32_TIMINGR_SDADEL(2U) |
+  STM32_TIMINGR_SCLH(15U)  | STM32_TIMINGR_SCLL(21U),
+  0,
+  0
 };
 
 static MAX7310Config defconfig = {
