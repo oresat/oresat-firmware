@@ -2,7 +2,7 @@
 FileName=app_OD.dcf
 FileVersion=0
 FileRevision=0
-LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_solar_v3/source/ObjDict/app_OD.eds
+LastEDS=/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_protocard_v3/source/ObjDict/app_OD.eds
 EDSVersion=4.0
 Description=OreSat Template Application Object Dictionary
 CreationTime=2:51PM
