@@ -2,53 +2,7 @@
 #include "events.h"
 #include "CANopen.h"
 
-typedef struct {
-    thread_descriptor_t desc;
-    thread_t *tp;
-} worker_t;
-
-static worker_t workers[ORESAT_MAX_THREADS];
-static uint32_t num_workers;
-
 EVENTSOURCE_DECL(cos_event);
-
-void oresat_NMT_event(eventid_t id)
-{
-    if (id == ORESAT_NMT_OPERATIONAL) {
-        /* Start app workers */
-        for (uint32_t i = 0; i < num_workers; i++) {
-            if (workers[i].tp == NULL) {
-                workers[i].tp = chThdCreate(&workers[i].desc);
-            }
-        }
-    } else {
-        for (uint32_t i = 0; i < num_workers; i++) {
-            if (workers[i].tp) {
-                chThdTerminate(workers[i].tp);
-                chThdWait(workers[i].tp);
-                workers[i].tp = NULL;
-            }
-        }
-    }
-}
-
-int reg_worker(const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg)
-{
-    worker_t *wp;
-    if (num_workers == ORESAT_MAX_THREADS) {
-        return -1;
-    }
-
-    wp = &workers[num_workers];
-    wp->desc.name = name;
-    wp->desc.wbase = THD_WORKING_AREA_BASE(wa);
-    wp->desc.wend = THD_WORKING_AREA_END(wa + wa_size);
-    wp->desc.prio = prio;
-    wp->desc.funcp = funcp;
-    wp->desc.arg = arg;
-
-    return num_workers++;
-}
 
 void oresat_init(uint8_t node_id, uint16_t bitrate)
 {
@@ -105,8 +59,8 @@ void oresat_start(CANDriver *cand)
         timeout = 0;
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
-            events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
             timecheck = 50;
+            events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
 
             /* Process CO objects */
             CO_process_TPDO(CO, CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time))),
