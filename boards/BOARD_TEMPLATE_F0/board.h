@@ -469,10 +469,10 @@
                                      PIN_AFIO_AF(GPIOB_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN10, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN11, 0U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN12, 5U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN13, 5U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN14, 5U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN15, 5U))
+                                     PIN_AFIO_AF(GPIOB_PIN12, 0U) |         \
+                                     PIN_AFIO_AF(GPIOB_PIN13, 0U) |         \
+                                     PIN_AFIO_AF(GPIOB_PIN14, 0U) |         \
+                                     PIN_AFIO_AF(GPIOB_PIN15, 0U))
 
 /*
  * GPIOC setup:

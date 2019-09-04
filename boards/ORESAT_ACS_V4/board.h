@@ -36,20 +36,20 @@
  * Board identifier.
  */
 #define BOARD_ORESAT_ACS_V4
-#define BOARD_NAME                  "OreSat ACS V4.1"
+#define BOARD_NAME                  "OreSat ACS V4.x"
 
 /*
  * Board oscillators-related settings.
  * NOTE: LSE not fitted.
  */
 #if !defined(STM32_LSECLK)
-#define STM32_LSECLK                32768U
+#define STM32_LSECLK                0U
 #endif
 
 #define STM32_LSEDRV                (3U << 3U)
 
 #if !defined(STM32_HSECLK)
-#define STM32_HSECLK                8000000U
+#define STM32_HSECLK                16000000U
 #endif
 
 /*
@@ -62,8 +62,8 @@
  */
 #define GPIOA_MAG_CURR_FDB          0U
 #define GPIOA_BLDC_CURR_FDB         1U
-#define GPIOA_USART2_TX             2U
-#define GPIOA_USART2_RX             3U
+#define GPIOA_LPUART1_TX            2U
+#define GPIOA_LPUART1_RX            3U
 #define GPIOA_SPI1_CS               4U
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
@@ -90,8 +90,8 @@
 #define GPIOB_MAG_STBY              7U
 #define GPIOB_MAG_FAULT             8U
 #define GPIOB_MAG_EN                9U
-#define GPIOB_PIN10                 10U
-#define GPIOB_PIN11                 11U
+#define GPIOB_I2C2_SCL              10U
+#define GPIOB_I2C2_SDA              11U
 #define GPIOB_BLDC_STBY             12U
 #define GPIOB_BLDC_INUH             13U
 #define GPIOB_TIM1_CH1N             13U
@@ -207,15 +207,13 @@
  */
 #define LINE_SPI1_CS                PAL_LINE(GPIOA, 4U)
 #define LINE_BLDC_EN                PAL_LINE(GPIOA, 12U)
+#define LINE_DEBUG_2                PAL_LINE(GPIOB, 1U)
+#define LINE_DEBUG_1                PAL_LINE(GPIOB, 2U)
 #define LINE_MAG_DIR                PAL_LINE(GPIOB, 3U)
 #define LINE_CAN_SILENT             PAL_LINE(GPIOB, 4U)
 #define LINE_MAG_STBY               PAL_LINE(GPIOB, 7U)
 #define LINE_MAG_EN                 PAL_LINE(GPIOB, 9U)
 #define LINE_BLDC_STBY              PAL_LINE(GPIOB, 12U)
-#define LINE_DEBUG_1                PAL_LINE(GPIOB, 2U)
-#define LINE_DEBUG_2                PAL_LINE(GPIOB, 1U)
-//#define LINE_DEBUG_1                PAL_LINE(GPIOB, 2U)
-//#define LINE_DEBUG_2                PAL_LINE(GPIOB, 1U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -264,8 +262,8 @@
  *
  * PA0  - MAG_CURR_FDB              (analog).
  * PA1  - BLDC_CURR_FDB             (analog).
- * PA2  - USART2_TX                 (alternate 7).
- * PA3  - USART2_RX                 (alternate 7).
+ * PA2  - LPUART1_TX                (alternate 8).
+ * PA3  - LPUART1_RX                (alternate 8).
  * PA4  - SPI1_CS                   (output pushpull maximum).
  * PA5  - SPI1_SCK                  (alternate 5).
  * PA6  - SPI1_MISO                 (alternate 5).
@@ -281,8 +279,8 @@
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_ANALOG(GPIOA_MAG_CURR_FDB) |  \
                                      PIN_MODE_ANALOG(GPIOA_BLDC_CURR_FDB) | \
-                                     PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
-                                     PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
+                                     PIN_MODE_ALTERNATE(GPIOA_LPUART1_TX) | \
+                                     PIN_MODE_ALTERNATE(GPIOA_LPUART1_RX) | \
                                      PIN_MODE_OUTPUT(GPIOA_SPI1_CS) |       \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
@@ -297,8 +295,8 @@
                                      PIN_MODE_ANALOG(GPIOA_MAG_PWM))
 #define VAL_GPIOA_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOA_MAG_CURR_FDB) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_BLDC_CURR_FDB) | \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_LPUART1_TX) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_LPUART1_RX) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_CS) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |  \
@@ -313,8 +311,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_MAG_PWM))
 #define VAL_GPIOA_OSPEEDR           (PIN_OSPEED_HIGH(GPIOA_MAG_CURR_FDB) |  \
                                      PIN_OSPEED_HIGH(GPIOA_BLDC_CURR_FDB) | \
-                                     PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
-                                     PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
+                                     PIN_OSPEED_HIGH(GPIOA_LPUART1_TX) |    \
+                                     PIN_OSPEED_HIGH(GPIOA_LPUART1_RX) |    \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_CS) |       \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_SCK) |      \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MISO) |     \
@@ -329,8 +327,8 @@
                                      PIN_OSPEED_HIGH(GPIOA_MAG_PWM))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_MAG_CURR_FDB) | \
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_CURR_FDB) | \
-                                     PIN_PUPDR_FLOATING(GPIOA_USART2_TX) |  \
-                                     PIN_PUPDR_FLOATING(GPIOA_USART2_RX) |  \
+                                     PIN_PUPDR_FLOATING(GPIOA_LPUART1_TX) | \
+                                     PIN_PUPDR_FLOATING(GPIOA_LPUART1_RX) | \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_CS) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_SCK) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_MISO) |  \
@@ -345,8 +343,8 @@
                                      PIN_PUPDR_FLOATING(GPIOA_MAG_PWM))
 #define VAL_GPIOA_ODR               (PIN_ODR_HIGH(GPIOA_MAG_CURR_FDB) |     \
                                      PIN_ODR_HIGH(GPIOA_BLDC_CURR_FDB) |    \
-                                     PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
-                                     PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
+                                     PIN_ODR_HIGH(GPIOA_LPUART1_TX) |       \
+                                     PIN_ODR_HIGH(GPIOA_LPUART1_RX) |       \
                                      PIN_ODR_LOW(GPIOA_SPI1_CS) |           \
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
@@ -361,8 +359,8 @@
                                      PIN_ODR_HIGH(GPIOA_MAG_PWM))
 #define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_MAG_CURR_FDB, 0U) |  \
                                      PIN_AFIO_AF(GPIOA_BLDC_CURR_FDB, 0U) | \
-                                     PIN_AFIO_AF(GPIOA_USART2_TX, 7U) |     \
-                                     PIN_AFIO_AF(GPIOA_USART2_RX, 7U) |     \
+                                     PIN_AFIO_AF(GPIOA_LPUART1_TX, 8U) |    \
+                                     PIN_AFIO_AF(GPIOA_LPUART1_RX, 8U) |    \
                                      PIN_AFIO_AF(GPIOA_SPI1_CS, 0U) |       \
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
@@ -377,8 +375,8 @@
                                      PIN_AFIO_AF(GPIOA_MAG_PWM, 0U))
 #define VAL_GPIOA_ASCR              (PIN_ASCR_DISABLED(GPIOA_MAG_CURR_FDB) | \
                                      PIN_ASCR_DISABLED(GPIOA_BLDC_CURR_FDB) |  \
-                                     PIN_ASCR_DISABLED(GPIOA_USART2_TX) |   \
-                                     PIN_ASCR_DISABLED(GPIOA_USART2_RX) |   \
+                                     PIN_ASCR_DISABLED(GPIOA_LPUART1_TX) |  \
+                                     PIN_ASCR_DISABLED(GPIOA_LPUART1_RX) |  \
                                      PIN_ASCR_DISABLED(GPIOA_SPI1_CS) |     \
                                      PIN_ASCR_DISABLED(GPIOA_SPI1_SCK) |    \
                                      PIN_ASCR_DISABLED(GPIOA_SPI1_MISO) |   \
@@ -393,14 +391,15 @@
                                      PIN_ASCR_DISABLED(GPIOA_MAG_PWM))
 #define VAL_GPIOA_LOCKR             (PIN_LOCKR_DISABLED(GPIOA_MAG_CURR_FDB) | \
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_CURR_FDB) | \
-                                     PIN_LOCKR_DISABLED(GPIOA_USART2_TX) |  \
-                                     PIN_LOCKR_DISABLED(GPIOA_USART2_RX) |  \
+                                     PIN_LOCKR_DISABLED(GPIOA_LPUART1_TX) | \
+                                     PIN_LOCKR_DISABLED(GPIOA_LPUART1_RX) | \
                                      PIN_LOCKR_DISABLED(GPIOA_SPI1_CS) |    \
                                      PIN_LOCKR_DISABLED(GPIOA_SPI1_SCK) |   \
                                      PIN_LOCKR_DISABLED(GPIOA_SPI1_MISO) |  \
                                      PIN_LOCKR_DISABLED(GPIOA_PIN7) |       \
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_INUL) |  \
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_INVL) |  \
+                                     PIN_LOCKR_DISABLED(GPIOA_BLDC_INWL) |  \
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_FAULT) | \
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_EN) |    \
                                      PIN_LOCKR_DISABLED(GPIOA_SWDIO) |      \
@@ -420,8 +419,8 @@
  * PB7  - MAG_STBY                  (output pushpull maximum).
  * PB8  - MAG_FAULT                 (analog).
  * PB9  - MAG_EN                    (output pushpull maximum).
- * PB10 - PIN10                     (analog).
- * PB11 - PIN11                     (analog).
+ * PB10 - I2C2_SCL                  (altenrate 4).
+ * PB11 - I2C2_SDA                  (altenrate 4).
  * PB12 - BLDC_STBY                 (output pushpull maximum).
  * PB13 - BLDC_INUH TIM1_CH1N       (alternate 1).
  * PB14 - BLDC_INVH TIM1_CH2N       (alternate 1).
@@ -429,7 +428,7 @@
  */
 #define VAL_GPIOB_MODER             (PIN_MODE_ANALOG(GPIOB_PIN0) |          \
                                      PIN_MODE_OUTPUT(GPIOB_DEBUG_2) |       \
-                                     PIN_MODE_OUTPUT(GPIOB_DEBUG_1) |    \
+                                     PIN_MODE_OUTPUT(GPIOB_DEBUG_1) |       \
                                      PIN_MODE_OUTPUT(GPIOB_MAG_DIR) |       \
                                      PIN_MODE_OUTPUT(GPIOB_CAN_SILENT) |    \
                                      PIN_MODE_ALTERNATE(GPIOB_CAN1_RX) |    \
@@ -437,15 +436,15 @@
                                      PIN_MODE_OUTPUT(GPIOB_MAG_STBY) |      \
                                      PIN_MODE_ANALOG(GPIOB_MAG_FAULT) |     \
                                      PIN_MODE_OUTPUT(GPIOB_MAG_EN) |        \
-                                     PIN_MODE_ANALOG(GPIOB_PIN10) |         \
-                                     PIN_MODE_ANALOG(GPIOB_PIN11) |         \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SCL) |   \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SDA) |   \
                                      PIN_MODE_OUTPUT(GPIOB_BLDC_STBY) |     \
                                      PIN_MODE_ALTERNATE(GPIOB_BLDC_INUH) |  \
                                      PIN_MODE_ALTERNATE(GPIOB_BLDC_INVH) |  \
                                      PIN_MODE_ALTERNATE(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_PIN0) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_DEBUG_2) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_DEBUG_1) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_DEBUG_2) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_DEBUG_1) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MAG_DIR) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN_SILENT) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN1_RX) |    \
@@ -453,15 +452,15 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_MAG_STBY) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MAG_FAULT) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MAG_EN) |     \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_PIN10) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_PIN11) |      \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_BLDC_INUH) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_BLDC_STBY) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_BLDC_INVH) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_PIN0) |          \
-                                     PIN_OSPEED_HIGH(GPIOB_DEBUG_2) |          \
-                                     PIN_OSPEED_HIGH(GPIOB_DEBUG_1) |          \
+                                     PIN_OSPEED_HIGH(GPIOB_DEBUG_2) |       \
+                                     PIN_OSPEED_HIGH(GPIOB_DEBUG_1) |       \
                                      PIN_OSPEED_HIGH(GPIOB_MAG_DIR) |       \
                                      PIN_OSPEED_HIGH(GPIOB_CAN_SILENT) |    \
                                      PIN_OSPEED_HIGH(GPIOB_CAN1_RX) |       \
@@ -469,15 +468,15 @@
                                      PIN_OSPEED_HIGH(GPIOB_MAG_STBY) |      \
                                      PIN_OSPEED_HIGH(GPIOB_MAG_FAULT) |     \
                                      PIN_OSPEED_HIGH(GPIOB_MAG_EN) |        \
-                                     PIN_OSPEED_HIGH(GPIOB_PIN10) |         \
-                                     PIN_OSPEED_HIGH(GPIOB_PIN11) |         \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SCL) |      \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SDA) |      \
                                      PIN_OSPEED_HIGH(GPIOB_BLDC_STBY) |     \
                                      PIN_OSPEED_HIGH(GPIOB_BLDC_INUH) |     \
                                      PIN_OSPEED_HIGH(GPIOB_BLDC_INVH) |     \
                                      PIN_OSPEED_HIGH(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_PUPDR             (PIN_PUPDR_FLOATING(GPIOB_PIN0) |       \
-                                     PIN_PUPDR_FLOATING(GPIOB_DEBUG_2) |       \
-                                     PIN_PUPDR_FLOATING(GPIOB_DEBUG_1) |       \
+                                     PIN_PUPDR_FLOATING(GPIOB_DEBUG_2) |    \
+                                     PIN_PUPDR_FLOATING(GPIOB_DEBUG_1) |    \
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_DIR) |    \
                                      PIN_PUPDR_FLOATING(GPIOB_CAN_SILENT) | \
                                      PIN_PUPDR_FLOATING(GPIOB_CAN1_RX) |    \
@@ -485,15 +484,15 @@
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_STBY) |   \
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_FAULT) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_EN) |     \
-                                     PIN_PUPDR_FLOATING(GPIOB_PIN10) |      \
-                                     PIN_PUPDR_FLOATING(GPIOB_PIN11) |      \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SCL) |     \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SDA) |     \
                                      PIN_PUPDR_FLOATING(GPIOB_BLDC_STBY) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_BLDC_INUH) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_BLDC_INVH) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_ODR               (PIN_ODR_HIGH(GPIOB_PIN0) |             \
-                                     PIN_ODR_LOW(GPIOB_DEBUG_2) |             \
-                                     PIN_ODR_LOW(GPIOB_DEBUG_1) |             \
+                                     PIN_ODR_LOW(GPIOB_DEBUG_2) |           \
+                                     PIN_ODR_LOW(GPIOB_DEBUG_1) |           \
                                      PIN_ODR_LOW(GPIOB_MAG_DIR) |           \
                                      PIN_ODR_LOW(GPIOB_CAN_SILENT) |        \
                                      PIN_ODR_HIGH(GPIOB_CAN1_RX) |          \
@@ -501,15 +500,15 @@
                                      PIN_ODR_LOW(GPIOB_MAG_STBY) |          \
                                      PIN_ODR_HIGH(GPIOB_MAG_FAULT) |        \
                                      PIN_ODR_LOW(GPIOB_MAG_EN) |            \
-                                     PIN_ODR_HIGH(GPIOB_PIN10) |            \
-                                     PIN_ODR_HIGH(GPIOB_PIN11) |            \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SCL) |         \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SDA) |         \
                                      PIN_ODR_LOW(GPIOB_BLDC_STBY) |         \
                                      PIN_ODR_HIGH(GPIOB_BLDC_INUH) |        \
                                      PIN_ODR_HIGH(GPIOB_BLDC_INVH) |        \
                                      PIN_ODR_HIGH(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_PIN0, 0U) |          \
-                                     PIN_AFIO_AF(GPIOB_DEBUG_2, 0U) |          \
-                                     PIN_AFIO_AF(GPIOB_DEBUG_1, 0U) |          \
+                                     PIN_AFIO_AF(GPIOB_DEBUG_2, 0U) |       \
+                                     PIN_AFIO_AF(GPIOB_DEBUG_2, 0U) |       \
                                      PIN_AFIO_AF(GPIOB_MAG_DIR, 0U) |       \
                                      PIN_AFIO_AF(GPIOB_CAN_SILENT, 0U) |    \
                                      PIN_AFIO_AF(GPIOB_CAN1_RX, 0U) |       \
@@ -517,15 +516,15 @@
                                      PIN_AFIO_AF(GPIOB_MAG_STBY, 0U))
 #define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_MAG_FAULT, 0U) |     \
                                      PIN_AFIO_AF(GPIOB_MAG_EN, 0U) |        \
-                                     PIN_AFIO_AF(GPIOB_PIN10, 0U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN11, 0U) |         \
+                                     PIN_AFIO_AF(GPIOB_I2C2_SCL, 4U) |      \
+                                     PIN_AFIO_AF(GPIOB_I2C2_SDA, 4U) |      \
                                      PIN_AFIO_AF(GPIOB_BLDC_STBY, 0U) |     \
                                      PIN_AFIO_AF(GPIOB_BLDC_INUH, 1U) |     \
                                      PIN_AFIO_AF(GPIOB_BLDC_INVH, 1U) |     \
                                      PIN_AFIO_AF(GPIOB_BLDC_INWH, 1U))
 #define VAL_GPIOB_ASCR              (PIN_ASCR_DISABLED(GPIOB_PIN0) |        \
-                                     PIN_ASCR_DISABLED(GPIOB_DEBUG_2) |        \
-                                     PIN_ASCR_DISABLED(GPIOB_DEBUG_1) |        \
+                                     PIN_ASCR_DISABLED(GPIOB_DEBUG_2) |     \
+                                     PIN_ASCR_DISABLED(GPIOB_DEBUG_1) |     \
                                      PIN_ASCR_DISABLED(GPIOB_MAG_DIR) |     \
                                      PIN_ASCR_DISABLED(GPIOB_CAN_SILENT) |  \
                                      PIN_ASCR_DISABLED(GPIOB_CAN1_RX) |     \
@@ -533,15 +532,15 @@
                                      PIN_ASCR_DISABLED(GPIOB_MAG_STBY) |    \
                                      PIN_ASCR_DISABLED(GPIOB_MAG_FAULT) |   \
                                      PIN_ASCR_DISABLED(GPIOB_MAG_EN) |      \
-                                     PIN_ASCR_DISABLED(GPIOB_PIN10) |       \
-                                     PIN_ASCR_DISABLED(GPIOB_PIN11) |       \
+                                     PIN_ASCR_DISABLED(GPIOB_I2C2_SCL) |    \
+                                     PIN_ASCR_DISABLED(GPIOB_I2C2_SDA) |    \
                                      PIN_ASCR_DISABLED(GPIOB_BLDC_STBY) |   \
                                      PIN_ASCR_DISABLED(GPIOB_BLDC_INUH) |   \
                                      PIN_ASCR_DISABLED(GPIOB_BLDC_INVH) |   \
                                      PIN_ASCR_DISABLED(GPIOB_BLDC_INWH))
 #define VAL_GPIOB_LOCKR             (PIN_LOCKR_DISABLED(GPIOB_PIN0) |       \
-                                     PIN_LOCKR_DISABLED(GPIOB_DEBUG_2) |       \
-                                     PIN_LOCKR_DISABLED(GPIOB_DEBUG_1) |       \
+                                     PIN_LOCKR_DISABLED(GPIOB_DEBUG_2) |    \
+                                     PIN_LOCKR_DISABLED(GPIOB_DEBUG_1) |    \
                                      PIN_LOCKR_DISABLED(GPIOB_MAG_DIR) |    \
                                      PIN_LOCKR_DISABLED(GPIOB_CAN_SILENT) | \
                                      PIN_LOCKR_DISABLED(GPIOB_CAN1_RX) |    \
@@ -549,8 +548,8 @@
                                      PIN_LOCKR_DISABLED(GPIOB_MAG_STBY) |   \
                                      PIN_LOCKR_DISABLED(GPIOB_MAG_FAULT) |  \
                                      PIN_LOCKR_DISABLED(GPIOB_MAG_EN) |     \
-                                     PIN_LOCKR_DISABLED(GPIOB_PIN10) |      \
-                                     PIN_LOCKR_DISABLED(GPIOB_PIN11) |      \
+                                     PIN_LOCKR_DISABLED(GPIOB_I2C2_SCL) |   \
+                                     PIN_LOCKR_DISABLED(GPIOB_I2C2_SDA) |   \
                                      PIN_LOCKR_DISABLED(GPIOB_BLDC_STBY) |  \
                                      PIN_LOCKR_DISABLED(GPIOB_BLDC_INUH) |  \
                                      PIN_LOCKR_DISABLED(GPIOB_BLDC_INVH) |  \
@@ -1322,6 +1321,7 @@
  * PH15 - PIN15                     (analog).
  */
 #define VAL_GPIOH_MODER             (PIN_MODE_ANALOG(GPIOH_OSC_IN) |        \
+                                     PIN_MODE_ANALOG(GPIOH_OSC_OUT) |       \
                                      PIN_MODE_ANALOG(GPIOH_PIN2) |          \
                                      PIN_MODE_ANALOG(GPIOH_BOOT0) |         \
                                      PIN_MODE_ANALOG(GPIOH_PIN4) |          \
@@ -1337,6 +1337,7 @@
                                      PIN_MODE_ANALOG(GPIOH_PIN14) |         \
                                      PIN_MODE_ANALOG(GPIOH_PIN15))
 #define VAL_GPIOH_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOH_OSC_IN) |     \
+                                     PIN_OTYPE_PUSHPULL(GPIOH_OSC_OUT) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOH_PIN2) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOH_BOOT0) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOH_PIN4) |       \
@@ -1352,6 +1353,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOH_PIN14) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOH_PIN15))
 #define VAL_GPIOH_OSPEEDR           (PIN_OSPEED_HIGH(GPIOH_OSC_IN) |        \
+                                     PIN_OSPEED_HIGH(GPIOH_OSC_OUT) |       \
                                      PIN_OSPEED_HIGH(GPIOH_PIN2) |          \
                                      PIN_OSPEED_HIGH(GPIOH_BOOT0) |         \
                                      PIN_OSPEED_HIGH(GPIOH_PIN4) |          \
@@ -1367,6 +1369,7 @@
                                      PIN_OSPEED_HIGH(GPIOH_PIN14) |         \
                                      PIN_OSPEED_HIGH(GPIOH_PIN15))
 #define VAL_GPIOH_PUPDR             (PIN_PUPDR_FLOATING(GPIOH_OSC_IN) |     \
+                                     PIN_PUPDR_FLOATING(GPIOH_OSC_OUT) |    \
                                      PIN_PUPDR_FLOATING(GPIOH_PIN2) |       \
                                      PIN_PUPDR_FLOATING(GPIOH_BOOT0) |      \
                                      PIN_PUPDR_FLOATING(GPIOH_PIN4) |       \
@@ -1382,6 +1385,7 @@
                                      PIN_PUPDR_FLOATING(GPIOH_PIN14) |      \
                                      PIN_PUPDR_FLOATING(GPIOH_PIN15))
 #define VAL_GPIOH_ODR               (PIN_ODR_HIGH(GPIOH_OSC_IN) |           \
+                                     PIN_ODR_HIGH(GPIOH_OSC_OUT) |          \
                                      PIN_ODR_HIGH(GPIOH_PIN2) |             \
                                      PIN_ODR_HIGH(GPIOH_BOOT0) |            \
                                      PIN_ODR_HIGH(GPIOH_PIN4) |             \
@@ -1397,6 +1401,7 @@
                                      PIN_ODR_HIGH(GPIOH_PIN14) |            \
                                      PIN_ODR_HIGH(GPIOH_PIN15))
 #define VAL_GPIOH_AFRL              (PIN_AFIO_AF(GPIOH_OSC_IN, 0U) |        \
+                                     PIN_AFIO_AF(GPIOH_OSC_OUT, 0U) |       \
                                      PIN_AFIO_AF(GPIOH_PIN2, 0U) |          \
                                      PIN_AFIO_AF(GPIOH_BOOT0, 0U) |         \
                                      PIN_AFIO_AF(GPIOH_PIN4, 0U) |          \
@@ -1412,6 +1417,7 @@
                                      PIN_AFIO_AF(GPIOH_PIN14, 0U) |         \
                                      PIN_AFIO_AF(GPIOH_PIN15, 0U))
 #define VAL_GPIOH_ASCR              (PIN_ASCR_DISABLED(GPIOH_OSC_IN) |      \
+                                     PIN_ASCR_DISABLED(GPIOH_OSC_OUT) |     \
                                      PIN_ASCR_DISABLED(GPIOH_PIN2) |        \
                                      PIN_ASCR_DISABLED(GPIOH_BOOT0) |       \
                                      PIN_ASCR_DISABLED(GPIOH_PIN4) |        \
@@ -1427,6 +1433,7 @@
                                      PIN_ASCR_DISABLED(GPIOH_PIN14) |       \
                                      PIN_ASCR_DISABLED(GPIOH_PIN15))
 #define VAL_GPIOH_LOCKR             (PIN_LOCKR_DISABLED(GPIOH_OSC_IN) |     \
+                                     PIN_LOCKR_DISABLED(GPIOH_OSC_OUT) |    \
                                      PIN_LOCKR_DISABLED(GPIOH_PIN2) |       \
                                      PIN_LOCKR_DISABLED(GPIOH_BOOT0) |      \
                                      PIN_LOCKR_DISABLED(GPIOH_PIN4) |       \
