@@ -96,6 +96,7 @@ CO_ReturnError_t CO_CANmodule_init(
     /* Configure object variables */
     CANmodule->CANbaseAddress = CANbaseAddress;
     CANmodule->cand = (CANDriver *)CANbaseAddress;
+    chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
     CANmodule->txArray = txArray;
@@ -404,6 +405,7 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
     if (msgMatched && (buffer != NULL) && (buffer->pFunct != NULL)) {
         buffer->pFunct(buffer->object, &rcvMsg);
     }
+    chEvtBroadcastI(&CANmodule->rx_event);
     chSysUnlockFromISR();
 }
 
