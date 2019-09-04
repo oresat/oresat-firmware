@@ -31,8 +31,9 @@
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker(
-        "Example thread",
+    /*reg_worker(*/
+    chThdCreateStatic(
+        /*"Example thread",*/
         waThread1,
         sizeof(waThread1),
         NORMALPRIO,
@@ -40,8 +41,9 @@ static void app_init(void)
         NULL
     );
 
-    reg_worker(
-        "Command Shell",
+    /*reg_worker(*/
+    chThdCreateStatic(
+        /*"Command Shell",*/
         cmd_wa,
         sizeof(cmd_wa),
         NORMALPRIO,
@@ -64,6 +66,8 @@ int main(void)
     // Initialize and start
     oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
     app_init();
-    oresat_start(&CAND1);
+    /*oresat_start(&CAND1);*/
+    while (true)
+        chThdSleepMilliseconds(1000);
     return 0;
 }
