@@ -10,6 +10,8 @@ typedef struct {
 static worker_t workers[ORESAT_MAX_THREADS];
 static uint32_t num_workers;
 
+event_source_t cos_event;
+
 void oresat_NMT_event(eventid_t id)
 {
     if (id == ORESAT_NMT_OPERATIONAL) {
@@ -76,8 +78,9 @@ void oresat_start(CANDriver *cand)
     event_listener_t el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
+    sysinterval_t timeout, maxtimeout;
     systime_t prev_time;
-    sysinterval_t timeout = TIME_MS2I(OD_producerHeartbeatTime);
+    uint16_t timecheck;
 
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
@@ -88,7 +91,10 @@ void oresat_start(CANDriver *cand)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
+        maxtimeout = TIME_MS2I(OD_producerHeartbeatTime);
+
         chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &el, ALL_EVENTS);
+        chEvtRegisterMask(&cos_event, &el, ALL_EVENTS);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
@@ -96,16 +102,22 @@ void oresat_start(CANDriver *cand)
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         reset = CO_RESET_NOT;
-        chEvtSignal(chThdGetSelfX(), EVENT_MASK(0));
+        timeout = 0;
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
             events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
+            timecheck = 50;
 
             /* Process CO objects */
             CO_process_TPDO(CO, CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time))),
                     chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
-            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), NULL);
+            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timecheck);
             prev_time = chVTGetSystemTime();
+            if (timecheck == 50) {
+                timeout = maxtimeout;
+            } else {
+                timeout = TIME_MS2I(timecheck);
+            }
         }
 
         chEvtUnregister(&CO->CANmodule[0]->rx_event, &el);
