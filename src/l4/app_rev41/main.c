@@ -17,62 +17,43 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-//#include "shell.h"
 #include "chprintf.h"
+#include "shell.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "acs_command.h"
 #include "thread1.h"
 
-#define CH_DBG_SYSTEM_STATE_CHECK TRUE
-#define DEBUG_SERIAL LPSD1
-#define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)
-
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-  /* App initialization */
-  /*
-  reg_worker(
-    "Example thread", 
-    waThread1, 
-    sizeof(waThread1), 
-    NORMALPRIO, 
-    Thread1, 
-    NULL
-  );
-  //*/
-  
-  /* App initialization */
-  /*
-  reg_worker(
-    "Command Shell", 
-    cmd_wa, 
-    sizeof(cmd_wa), 
-    NORMALPRIO, 
-    cmd, 
-    NULL
-  );
-  //*/
+    /* App initialization */
+    reg_worker(
+        "Example thread",
+        waThread1,
+        sizeof(waThread1),
+        NORMALPRIO,
+        Thread1,
+        NULL
+    );
 
-  /* Initialize OPD */
-//  opd_init();
-//  opd_start();
+    reg_worker(
+        "Command Shell",
+        cmd_wa,
+        sizeof(cmd_wa),
+        NORMALPRIO,
+        cmd,
+        NULL
+    );
 
-  /* Initialize shell and start serial interface */
-//  shellInit();
+    /* Initialize shell and start serial interface */
+    shellInit();
 
-  /* Start up debug output */
-  sdStart(&LPSD1, NULL);
-  /*
-  palSetLine(LINE_DEBUG_2);
-  palSetLine(LINE_DEBUG_1);
-  palSetPad(GPIOB,1U);
-  palSetPad(GPIOB,2U);
-  //*/
+    /* Start up debug output */
+    sdStart(&LPSD1, NULL);
 }
 
 /**
@@ -80,12 +61,9 @@ static void app_init(void)
  */
 int main(void)
 {
-  // Initialize and start
-  oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
-  app_init();
-  oresat_start(&CAND1);
- // BaseSequentialStream *chp = NULL;
-  chprintf(DEBUG_CHP, "Dbg LEDs on");
-  //chprintf(chp, "Dbg LEDs on");
-  return 0;
+    // Initialize and start
+    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
+    app_init();
+    oresat_start(&CAND1);
+    return 0;
 }

@@ -1,4 +1,4 @@
- 
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,7 +29,6 @@ static const ShellCommand commands[] = {
 
 static const ShellConfig shell_cfg = {
   (BaseSequentialStream *)&LPSD1,
-  //(BaseSequentialStream *)&SD2,
   commands
 };
 
@@ -41,9 +40,9 @@ THD_FUNCTION(cmd, arg)
 
   while (!chThdShouldTerminateX()) {
     thread_t *shell_tp = chThdCreateStatic(
-      shell_wa, 
-      sizeof(shell_wa), 
-      NORMALPRIO, shellThread, 
+      shell_wa,
+      sizeof(shell_wa),
+      NORMALPRIO, shellThread,
       (void *)&shell_cfg
     );
     chThdWait(shell_tp);
