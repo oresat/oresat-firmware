@@ -76,7 +76,8 @@ void oresat_start(CANDriver *cand)
     event_listener_t el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    systime_t prev_time, cur_time, diff_time;
+    systime_t prev_time;
+    sysinterval_t timeout = TIME_MS2I(OD_producerHeartbeatTime);
 
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
@@ -96,18 +97,15 @@ void oresat_start(CANDriver *cand)
 
         reset = CO_RESET_NOT;
         chEvtSignal(chThdGetSelfX(), EVENT_MASK(0));
-        prev_time = chVTGetSystemTimeX();
+        prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
-            events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(OD_producerHeartbeatTime));
-
-            /* Calculate time difference */
-            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
-            prev_time = cur_time;
+            events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
 
             /* Process CO objects */
-            CO_process_TPDO(CO, CO_process_SYNC_RPDO(CO, chTimeI2US(diff_time)),
-                    chTimeI2US(diff_time));
-            reset = CO_process(CO, chTimeI2MS(diff_time), NULL);
+            CO_process_TPDO(CO, CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time))),
+                    chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
+            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), NULL);
+            prev_time = chVTGetSystemTime();
         }
 
         chEvtUnregister(&CO->CANmodule[0]->rx_event, &el);
