@@ -330,9 +330,9 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="6" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000180+$NODEID" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="02" name="transmission type" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="254" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="inhibit time" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="10000" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="03" name="inhibit time" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="04" name="compatibility entry" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="10000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="06" name="SYNC start value" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
     <CANopenObject index="1801" name="TPDO communication parameter" objectType="REC" memoryType="ROM" dataType="0x20" accessType="rw" PDOmapping="no" subNumber="7" accessFunctionName="CO_ODF_TPDOcom" disabled="false" TPDOdetectCOS="false">
