@@ -73,7 +73,8 @@ void oresat_start(CANDriver *cand)
             }
         }
 
-        chEvtUnregister(&CO->CANmodule[0]->rx_event, &el);
+        chEvtUnregister(&cos_event, &cos_el);
+        chEvtUnregister(&CO->CANmodule[0]->rx_event, &can_el);
     }
 
     CO_delete((uint32_t)cand);
