@@ -10,7 +10,7 @@ typedef struct {
 static worker_t workers[ORESAT_MAX_THREADS];
 static uint32_t num_workers;
 
-event_source_t cos_event;
+EVENTSOURCE_DECL(cos_event);
 
 void oresat_NMT_event(eventid_t id)
 {
