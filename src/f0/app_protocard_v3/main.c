@@ -17,11 +17,9 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-#include "shell.h"
 
 /* Project header files */
 #include "oresat.h"
-#include "command.h"
 #include "thread1.h"
 
 /**
@@ -30,15 +28,9 @@
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker("Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    reg_worker("Blinky Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    reg_worker("Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
-    /* Initialize OPD */
-    opd_init();
-    opd_start();
-
-    /* Initialize shell and start serial interface */
-    shellInit();
+    /* Start up debug output */
     sdStart(&SD2, NULL);
 }
 
