@@ -31,9 +31,8 @@ void oresat_start(CANDriver *cand)
     event_listener_t can_el, cos_el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    sysinterval_t timeout, maxtimeout;
     systime_t prev_time;
-    uint16_t timecheck;
+    uint16_t timeout;
 
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
@@ -43,8 +42,6 @@ void oresat_start(CANDriver *cand)
         if (err != CO_ERROR_NO) {
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
-
-        maxtimeout = TIME_MS2I(OD_producerHeartbeatTime);
 
         chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &can_el, ALL_EVENTS);
         chEvtRegisterMask(&cos_event, &cos_el, ALL_EVENTS);
@@ -59,19 +56,14 @@ void oresat_start(CANDriver *cand)
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
             bool_t syncWas;
-            timecheck = 50;
-            events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
+            events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(timeout));
+            timeout = 50;
 
             /* Process CO objects */
             syncWas = CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
             CO_process_TPDO(CO, syncWas, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
-            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timecheck);
+            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timeout);
             prev_time = chVTGetSystemTime();
-            if (timecheck == 50  && syncWas = false) {
-                timeout = maxtimeout;
-            } else {
-                timeout = 0;
-            }
         }
 
         chEvtUnregister(&cos_event, &cos_el);
