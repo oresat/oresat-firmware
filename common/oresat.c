@@ -87,7 +87,7 @@ void oresat_start(CANDriver *cand)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
-        chEvtRegister(&CO->CANmodule[0]->rx_event, &el, ALL_EVENTS);
+        chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &el, ALL_EVENTS);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
@@ -95,6 +95,7 @@ void oresat_start(CANDriver *cand)
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         reset = CO_RESET_NOT;
+        chEvtSignal(chThdGetSelfX(), EVENT_MASK(0));
         prev_time = chVTGetSystemTimeX();
         while (reset == CO_RESET_NOT) {
             events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(OD_producerHeartbeatTime));
