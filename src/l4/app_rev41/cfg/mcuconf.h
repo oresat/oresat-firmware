@@ -46,7 +46,7 @@
 #define STM32_LSI_ENABLED                   TRUE
 #define STM32_HSE_ENABLED                   TRUE
 #define STM32_LSE_ENABLED                   FALSE
-#define STM32_MSIPLL_ENABLED                TRUE
+#define STM32_MSIPLL_ENABLED                FALSE
 #define STM32_MSIRANGE                      STM32_MSIRANGE_4M
 #define STM32_MSISRANGE                     STM32_MSISRANGE_4M
 #define STM32_SW                            STM32_SW_PLL
@@ -64,7 +64,7 @@
 #define STM32_MCOSEL                        STM32_MCOSEL_NOCLOCK
 #define STM32_MCOPRE                        STM32_MCOPRE_DIV1
 #define STM32_LSCOSEL                       STM32_LSCOSEL_NOCLOCK
-#define STM32_PLLSAI1N_VALUE                72
+#define STM32_PLLSAI1N_VALUE                18
 #define STM32_PLLSAI1PDIV_VALUE             6
 #define STM32_PLLSAI1P_VALUE                7
 #define STM32_PLLSAI1Q_VALUE                6

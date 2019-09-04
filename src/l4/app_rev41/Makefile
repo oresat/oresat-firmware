@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template
+PROJECT   = app_rev41
 
 # Target settings.
 MCU       = cortex-m4
@@ -107,7 +107,6 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/opd.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
