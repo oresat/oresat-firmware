@@ -186,7 +186,7 @@
 #define GPIOG_PIN15                 15U
 
 #define GPIOH_OSC_IN                0U
-#define GPIOH_OSCOUT                1U
+#define GPIOH_OSC_OUT               1U
 #define GPIOH_PIN2                  2U
 #define GPIOH_BOOT0                 3U
 #define GPIOH_PIN4                  4U
