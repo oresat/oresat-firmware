@@ -58,6 +58,7 @@ void oresat_start(CANDriver *cand)
         timeout = 0;
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
+            bool_t syncWas;
             timecheck = 50;
             events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
 
