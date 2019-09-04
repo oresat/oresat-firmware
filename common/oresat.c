@@ -62,14 +62,14 @@ void oresat_start(CANDriver *cand)
             events = chEvtWaitAnyTimeout(ALL_EVENTS, timeout);
 
             /* Process CO objects */
-            CO_process_TPDO(CO, CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time))),
-                    chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
+            syncWas = CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
+            CO_process_TPDO(CO, syncWas, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
             reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timecheck);
             prev_time = chVTGetSystemTime();
-            if (timecheck == 50) {
+            if (timecheck == 50  && syncWas = false) {
                 timeout = maxtimeout;
             } else {
-                timeout = TIME_MS2I(timecheck);
+                timeout = 0;
             }
         }
 
