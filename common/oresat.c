@@ -1,5 +1,4 @@
 #include "oresat.h"
-#include "events.h"
 #include "CANopen.h"
 
 EVENTSOURCE_DECL(cos_event);
@@ -29,7 +28,7 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
 
 void oresat_start(CANDriver *cand)
 {
-    event_listener_t el;
+    event_listener_t can_el, cos_el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     sysinterval_t timeout, maxtimeout;
@@ -47,8 +46,8 @@ void oresat_start(CANDriver *cand)
 
         maxtimeout = TIME_MS2I(OD_producerHeartbeatTime);
 
-        chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &el, ALL_EVENTS);
-        chEvtRegisterMask(&cos_event, &el, ALL_EVENTS);
+        chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &can_el, ALL_EVENTS);
+        chEvtRegisterMask(&cos_event, &cos_el, ALL_EVENTS);
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
