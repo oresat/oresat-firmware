@@ -32,7 +32,6 @@ void oresat_start(CANDriver *cand)
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     systime_t prev_time;
-    uint16_t timeout;
 
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
@@ -44,7 +43,7 @@ void oresat_start(CANDriver *cand)
         }
 
         chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &can_el, ALL_EVENTS);
-        chEvtRegisterMask(&cos_event, &cos_el, ALL_EVENTS);
+        /*chEvtRegisterMask(&cos_event, &cos_el, ALL_EVENTS);*/
 
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
@@ -52,21 +51,23 @@ void oresat_start(CANDriver *cand)
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         reset = CO_RESET_NOT;
-        timeout = 0;
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
+            uint16_t timeout = ((typeof(timeout))-1);
             bool_t syncWas;
-            events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(timeout));
-            timeout = 50;
 
-            /* Process CO objects */
+            /* Process all CO objects */
             syncWas = CO_process_SYNC_RPDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
             CO_process_TPDO(CO, syncWas, chTimeI2US(chVTTimeElapsedSinceX(prev_time)));
             reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timeout);
+
+            /* Wait for an event or timeout if no pending actions, whichever comes first */
             prev_time = chVTGetSystemTime();
+            timeout = ((syncWas || reset) ? 0 : timeout);
+            events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_MS2I(timeout));
         }
 
-        chEvtUnregister(&cos_event, &cos_el);
+        /*chEvtUnregister(&cos_event, &cos_el);*/
         chEvtUnregister(&CO->CANmodule[0]->rx_event, &can_el);
     }
 
