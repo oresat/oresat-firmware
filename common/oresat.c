@@ -1,7 +1,38 @@
 #include "oresat.h"
+#include "events.h"
 #include "CANopen.h"
 
+typedef enum {
+    ORESAT_RX_EVENT = 0,
+    ORESAT_COS_EVENT,
+    ORESAT_NMT_NONOPERATIONAL,
+    ORESAT_NMT_OPERATIONAL,
+} oresat_eventid_t;
+
 EVENTSOURCE_DECL(cos_event);
+static thread_t *oresat_tp;
+evreg_t event_registry;
+
+void CO_NMT_cb(CO_NMT_internalState_t state)
+{
+    syssts_t sts;
+    sts = chSysGetStatusAndLockX();
+    if (state == CO_NMT_OPERATIONAL) {
+        chEvtSignalI(oresat_tp, EVENT_MASK(ORESAT_NMT_OPERATIONAL));
+    } else {
+        chEvtSignalI(oresat_tp, EVENT_MASK(ORESAT_NMT_NONOPERATIONAL));
+    }
+    chSysRestoreStatusX(sts);
+}
+
+void nmt_handler(eventid_t eventid)
+{
+    if (eventid == ORESAT_NMT_OPERATIONAL) {
+        start_workers();
+    } else {
+        stop_workers();
+    }
+}
 
 void oresat_init(uint8_t node_id, uint16_t bitrate)
 {
@@ -33,6 +64,8 @@ void oresat_start(CANDriver *cand)
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     systime_t prev_time;
 
+    oresat_tp = chThdGetSelfX();
+
     while (reset != CO_RESET_APP) {
         CO_ReturnError_t err;
 
@@ -42,12 +75,18 @@ void oresat_start(CANDriver *cand)
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
 
-        chEvtRegisterMask(&CO->CANmodule[0]->rx_event, &can_el, ALL_EVENTS);
-        /*chEvtRegisterMask(&cos_event, &cos_el, ALL_EVENTS);*/
+        /* Register events */
+        chEvtRegister(&CO->CANmodule[0]->rx_event, &can_el, ORESAT_RX_EVENT);
+        chEvtRegister(&cos_event, &cos_el, ORESAT_COS_EVENT);
+        reg_event(&event_registry, ORESAT_NMT_OPERATIONAL, nmt_handler);
+        reg_event(&event_registry, ORESAT_NMT_NONOPERATIONAL, nmt_handler);
 
+        /* Register CAN interrupt callbacks */
         cand->rxfull_cb = CO_CANrx_cb;
         cand->txempty_cb = CO_CANtx_cb;
+        CO_NMT_initCallback(CO->NMT, CO_NMT_cb);
 
+        /* Enter normal operating mode */
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         reset = CO_RESET_NOT;
@@ -66,15 +105,20 @@ void oresat_start(CANDriver *cand)
             prev_time = chVTGetSystemTime();
             if ((timeout_ms * 1000) < timeout) timeout = timeout_ms * 1000;
             events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
+            if (events) event_dispatch(&event_registry, events);
         }
 
-        /*chEvtUnregister(&cos_event, &cos_el);*/
+        /* Shutting down */
+        /* Deregister all events */
+        clear_evreg(&event_registry);
+        chEvtUnregister(&cos_event, &cos_el);
         chEvtUnregister(&CO->CANmodule[0]->rx_event, &can_el);
     }
 
+    /* Deinitialize CO stack */
     CO_delete((uint32_t)cand);
 
-    /* Reset */
+    /* Initiate System Reset */
     NVIC_SystemReset();
     return;
 }
