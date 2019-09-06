@@ -94,7 +94,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_master.dcf
+      FileName:     app_master.eds
       FileVersion:  0
       CreationTime: 12:18PM
       CreationDate: 08-30-2019
