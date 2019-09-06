@@ -57,8 +57,8 @@ void oresat_start(CANDriver *cand)
             uint16_t timeout_ms = ((typeof(timeout_ms))-1);
 
             /* Process all CO objects */
-            CO_process_SYNC_PDO(CO, chTimeI2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
-            reset = CO_process(CO, chTimeI2MS(chVTTimeElapsedSinceX(prev_time)), &timeout_ms);
+            CO_process_SYNC_PDO(CO, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+            reset = CO_process(CO, TIME_I2MS(chVTTimeElapsedSinceX(prev_time)), &timeout_ms);
 
             /* Wait for an event or timeout if no pending actions, whichever comes first */
             prev_time = chVTGetSystemTime();
