@@ -7,17 +7,15 @@ extern "C" {
 
 #include "ch.h"
 
-#define ORESAT_NMT_OPERATIONAL 0
-#define ORESAT_NMT_NONOPERATIONAL 1
+typedef struct {
+    eventmask_t registered_events;
+    evhandler_t evhandlers[32];
+} evreg_t;
 
-extern event_source_t oresat_event;
-
-void reg_event(eventid_t event, evhandler_t event_handler);
-void unreg_event(eventid_t event);
-void unreg_all_events(void);
-
-extern THD_WORKING_AREA(can_events_wa, 0x40);
-extern THD_FUNCTION(can_events, p);
+void clear_evreg(evreg_t *evreg);
+void reg_event(evreg_t *evreg, eventid_t event, evhandler_t event_handler);
+void unreg_event(evreg_t *evreg, eventid_t event);
+void event_dispatch(evreg_t *evreg, eventmask_t events);
 
 #ifdef __cplusplus
 }
