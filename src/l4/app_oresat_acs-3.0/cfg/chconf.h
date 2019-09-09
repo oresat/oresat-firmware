@@ -15,7 +15,7 @@
 */
 
 /**
- * @file    templates/chconf.h
+ * @file    rt/templates/chconf.h
  * @brief   Configuration file template.
  * @details A copy of this file must be placed in each project directory, it
  *          contains the application specific kernel settings.
@@ -411,7 +411,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_CFG_USE_FACTORY)
-#define CH_CFG_USE_FACTORY                  TRUE
+#define CH_CFG_USE_FACTORY                  FALSE
 #endif
 
 /**
@@ -480,7 +480,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_STATISTICS)
-#define CH_DBG_STATISTICS                   FALSE
+#define CH_DBG_STATISTICS                   TRUE
 #endif
 
 /**
