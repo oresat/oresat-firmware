@@ -178,7 +178,7 @@ UINCDIR = $(PROJ_INC)
 ULIBDIR = $(PROJ_SRC)
 
 # List all user libraries here
-ULIBS =
+ULIBS = -lm
 
 #
 # End of user section

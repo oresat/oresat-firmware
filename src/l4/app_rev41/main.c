@@ -21,41 +21,70 @@
 #include "shell.h"
 
 /* Project header files */
+#include "acs.h"
 #include "oresat.h"
+#include "acs_common.h"
 #include "acs_command.h"
-#include "thread1.h"
+//#include "thread1.h"
+
+ACS acs = { }; /// Global ACS struct
 
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-    /* App initialization */
-    /*reg_worker(*/
-    chThdCreateStatic(
-        /*"Example thread",*/
-        waThread1,
-        sizeof(waThread1),
-        NORMALPRIO,
-        Thread1,
-        NULL
-    );
+  acs_init(&acs);
 
-    /*reg_worker(*/
-    chThdCreateStatic(
-        /*"Command Shell",*/
-        cmd_wa,
-        sizeof(cmd_wa),
-        NORMALPRIO,
-        cmd,
-        NULL
-    );
+  /* Initialize shell and start serial interface */
+  shellInit();
 
-    /* Initialize shell and start serial interface */
-    shellInit();
+  /* Start up debug output */
+  sdStart(&LPSD1, NULL);
+}
 
-    /* Start up debug output */
-    sdStart(&LPSD1, NULL);
+static void app_main(void)
+{
+  
+  /* App initialization */
+  /*
+  //reg_worker(
+  chThdCreateStatic(
+    //"Example thread",
+    waThread1,
+    sizeof(waThread1),
+    NORMALPRIO,
+    Thread1,
+    NULL
+  );
+  //*/
+
+  //reg_worker(
+  //*
+  chThdCreateStatic(
+    //"Command Shell",
+    cmd_wa,
+    sizeof(cmd_wa),
+    NORMALPRIO,
+    cmd,
+    NULL
+  );
+  //*/
+
+//*
+	chThdCreateStatic( /// Create ACS thread
+		waACS_Thread,
+		sizeof(waACS_Thread),
+		NORMALPRIO + 1,
+		ACS_Thread,
+		&acs	
+	);
+//*/
+
+  while(true)
+  { /// main loop
+		chThdSleepMilliseconds(1000);
+	}
 }
 
 /**
@@ -63,11 +92,11 @@ static void app_init(void)
  */
 int main(void)
 {
-    // Initialize and start
-    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
-    app_init();
-    /*oresat_start(&CAND1);*/
-    while (true)
-        chThdSleepMilliseconds(1000);
-    return 0;
+  // Initialize and start
+  oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
+  app_init();
+  /*oresat_start(&CAND1);*/
+	app_main();
+  
+  return 0;
 }

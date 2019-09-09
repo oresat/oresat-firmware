@@ -1,17 +1,5 @@
-# app_template
+# App-specific Source
 
-This is the template app for new applications.
+Put any .h or .c files (besides main.c) you want to compile with your app in here. They will automatically build when you run make.
 
-To create a new app, simply copy the app_template directory and name it whatever you like.
-
-```
-cp -R app_template app_<name>
-```
-
-If building for a specific board, update the `BOARD =` line to the board
-defined in the `boards` directory
-
-Then, open the Makefile and edit the line `PROJECT =` to whatever name you chose:
-```
-PROJECT   = app_<name>
-```
+If you don't want them to build, move them to another directory or the app's top level directory to effectively "disable" them.

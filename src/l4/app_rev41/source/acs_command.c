@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "acs_command.h"
+#include "acs.h"
 //#include "CO_master.h"
 #include "chprintf.h"
 #include "shell.h"
@@ -11,19 +12,35 @@ void cmd_dbgon(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
-  chprintf(chp, "Dbg LEDs on");
+  //chprintf(chp, "Dbg LEDs on\n\r");
+  palSetPad(GPIOB,1U);
+  palSetPad(GPIOB,2U);
 }
 
 void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
-  chprintf(chp, "Dbg LEDs off");
+  //chprintf(chp, "Dbg LEDs off");
+  palClearPad(GPIOB,1U);
+  palClearPad(GPIOB,2U);
+}
+
+void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
+{
+  
+}
+
+void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    
 }
 
 static const ShellCommand commands[] = {
   {"dbgon", cmd_dbgon},
   {"dbgoff", cmd_dbgoff},
+  {"cs", cmd_changeState},
+  {"rw", cmd_reactionWheelCtrl},
   {NULL, NULL}
 };
 
