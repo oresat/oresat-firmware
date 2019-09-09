@@ -328,6 +328,7 @@ typedef struct {
     int32_t             CANbaseAddress; /**< From CO_CANmodule_init() */
     CANDriver          *cand;           /**< CANDriver for ChibiOS */
     CANConfig           cancfg;         /**< CANConfig for ChibiOS */
+    event_source_t      rx_event;       /**< Receive event */
     CO_CANrx_t         *rxArray;        /**< From CO_CANmodule_init() */
     uint16_t            rxSize;         /**< From CO_CANmodule_init() */
     CO_CANtx_t         *txArray;        /**< From CO_CANmodule_init() */

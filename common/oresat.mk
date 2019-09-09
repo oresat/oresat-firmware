@@ -20,6 +20,7 @@ PROJSRC       = $(PROJ_SRC)/CO_driver.c         \
                 $(CO_STACK)/crc16-ccitt.c       \
                 $(CANOPEN_SRC)/CANopen.c        \
                 $(PROJ_SRC)/events.c            \
+                $(PROJ_SRC)/worker.c            \
                 $(PROJ_SRC)/oresat.c
 
 

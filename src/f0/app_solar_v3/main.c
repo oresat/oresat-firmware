@@ -22,13 +22,16 @@
 #include "oresat.h"
 #include "thread1.h"
 
+static worker_t worker1;
+
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker("Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    init_worker(&worker1, "Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    reg_worker(&worker1);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);

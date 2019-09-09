@@ -24,14 +24,19 @@
 #include "command.h"
 #include "thread1.h"
 
+static worker_t shell_worker;
+static worker_t led_worker;
+
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker("Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    reg_worker("Blinky Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    init_worker(&shell_worker, "Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
+    init_worker(&led_worker, "Blinky Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    reg_worker(&shell_worker);
+    reg_worker(&led_worker);
 
     /* Initialize OPD */
     opd_init();
