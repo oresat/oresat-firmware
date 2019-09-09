@@ -5,11 +5,11 @@
 #define OPD_ADDR_MAX        (MAX7310_MAX_ADDR + 1)
 
 /* IO Pin Assignments */
-#define OPD_SCL             0U
-#define OPD_SDA             1U
+#define OPD_SCL             3U /* TODO: Revert this when the time comes */
+#define OPD_SDA             4U /* TODO: Revert this when the time comes */
 #define OPD_FAULT           2U
-#define OPD_EN              3U
-#define OPD_CB_RESET        4U
+#define OPD_EN              0U /* TODO: Revert this when the time comes */
+#define OPD_CB_RESET        1U /* TODO: Revert this when the time comes */
 #define OPD_BOOT0           5U
 #define OPD_PULLUP          6U
 #define OPD_LED             7U
@@ -23,21 +23,21 @@
                             MAX7310_PIN_ODR_LOW(OPD_BOOT0)          |   \
                             MAX7310_PIN_ODR_LOW(OPD_PULLUP)         |   \
                             MAX7310_PIN_ODR_LOW(OPD_LED))
-#define OPD_POL_VAL        (MAX7310_PIN_POL_STD(OPD_SCL)            |   \
-                            MAX7310_PIN_POL_STD(OPD_SDA)            |   \
-                            MAX7310_PIN_POL_STD(OPD_FAULT)          |   \
+#define OPD_POL_VAL        (MAX7310_PIN_POL_INV(OPD_SCL)            |   \
+                            MAX7310_PIN_POL_INV(OPD_SDA)            |   \
+                            MAX7310_PIN_POL_INV(OPD_FAULT)          |   \
                             MAX7310_PIN_POL_STD(OPD_EN)             |   \
                             MAX7310_PIN_POL_STD(OPD_CB_RESET)       |   \
                             MAX7310_PIN_POL_STD(OPD_BOOT0)          |   \
                             MAX7310_PIN_POL_STD(OPD_PULLUP)         |   \
                             MAX7310_PIN_POL_STD(OPD_LED))
-#define OPD_MODE_VAL       (MAX7310_PIN_MODE_OUTPUT(OPD_SCL)        |   \
-                            MAX7310_PIN_MODE_OUTPUT(OPD_SDA)        |   \
+#define OPD_MODE_VAL       (MAX7310_PIN_MODE_INPUT(OPD_SCL)         |   \
+                            MAX7310_PIN_MODE_INPUT(OPD_SDA)         |   \
                             MAX7310_PIN_MODE_INPUT(OPD_FAULT)       |   \
-                            MAX7310_PIN_MODE_OUTPUT(OPD_EN)         |   \
-                            MAX7310_PIN_MODE_OUTPUT(OPD_CB_RESET)   |   \
-                            MAX7310_PIN_MODE_OUTPUT(OPD_BOOT0)      |   \
-                            MAX7310_PIN_MODE_OUTPUT(OPD_PULLUP)     |   \
+                            MAX7310_PIN_MODE_INPUT(OPD_EN)          |   \
+                            MAX7310_PIN_MODE_INPUT(OPD_CB_RESET)    |   \
+                            MAX7310_PIN_MODE_INPUT(OPD_BOOT0)       |   \
+                            MAX7310_PIN_MODE_INPUT(OPD_PULLUP)      |   \
                             MAX7310_PIN_MODE_OUTPUT(OPD_LED))
 
 static struct {
@@ -120,6 +120,11 @@ void opd_disable(opd_addr_t opd_addr)
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval &= ~MAX7310_PIN_MASK(OPD_LED);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
+}
+
+void opd_reset(opd_addr_t opd_addr)
+{
+
 }
 
 int opd_status(opd_addr_t opd_addr, opd_status_t *status)
