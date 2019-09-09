@@ -19,69 +19,30 @@
  */
 #include "ch.h"
 #include "hal.h"
+#include "shell.h"
 #include "acs_common.h"
 
 /** 
  *	Project header files
  */
 #include "acs.h"
+#include "oresat.h"
+#include "acs_command.h"
 
 ACS acs = { }; /// Global ACS struct
-
-/**
- *	Structure for serial configuration
- */
-static SerialConfig ser_cfg =
-{
-	115200,  /// Baud rate
-	0,       //
-	0,       //
-	0,       //
-};
-
-/**
- *	pinConfig: for pin configuration
- *  /// TODO: fix the board file so
- *	/// this can go away
- */
-static void pinConfig(void)
-{
-//	palSetPadMode(GPIOA,GPIOA_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
-};
 
 /**
  *	App initialization function
  */
 static void app_init(void)
 {
-	pinConfig();
-
-  /// Initialize CAN
-  canRPDOObjectInit(
-    CAN_PDO_1, 
-    CAN_ID_DEFAULT, 
-    CAN_BUF_SIZE, 
-    acs.can_buf.cmd
-  );
-	
-  canTPDOObjectInit(
-    CAN_PDO_1, 
-    CAN_ID_DEFAULT, 
-    0, 
-    0, 
-    CAN_BUF_SIZE, 
-    acs.can_buf.status
-  );
-
   acs_init(&acs);
 
+  /* Initialize shell and start serial interface */
+  shellInit();
+  
+  /*oresat_start(&CAND1);*/
   sdStart(&DEBUG_SERIAL, &ser_cfg);	/// Start serial support
-
-  dbgSerialOut("Serial driver started...\n\r", 0, 300);
-  chprintf(DEBUG_CHP, "Serial test...\n\r");
-  float test = 11.2;
-  chprintf(DEBUG_CHP, "%d\n\r",(int)(test * 10));
-  chprintf(DEBUG_CHP, "%f\n\r",test);
 }
 
 /**
@@ -99,16 +60,6 @@ static void app_main(void)
 	);
 //*/
 
-#ifdef DEBUG_LOOP
-	chThdCreateStatic( /// Create CANdbg thread
-		waCANDBG_Thread,
-		sizeof(waCANDBG_Thread),
-		NORMALPRIO,
-		CANDBG_Thread,
-		&acs	
-	);
-#endif
-
   while(true)
   { /// main loop
 		chThdSleepMilliseconds(1000);
@@ -125,7 +76,7 @@ int main(void)
 	 */
 	halInit();
 	chSysInit();
-	oresat_init(CAN_NODE_ID);
+  oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
 
 	/**
 	 * App init and main

@@ -16,7 +16,7 @@ extern EXIT_STATUS acs_init(ACS *acs)
 	(void)acs;
 	// need to initialize things
   bldcInit(&acs->motor);
-  mtqrInit(&acs->mtqr);
+//  mtqrInit(&acs->mtqr);
 	return STATUS_SUCCESS;
 }	
 
@@ -26,9 +26,11 @@ extern EXIT_STATUS acs_init(ACS *acs)
 inline static EXIT_STATUS entry_helper(ACS *acs, ACS_VALID_STATE next_state)
 {
 /// ******critical section***********
+/*
 	chSysLock();
 	acs->can_buf.status[CAN_SM_STATE] = next_state;
 	chSysUnlock();
+//*/
 /// ******end critical section*******
   
   dbgSerialOut("entry_helper: %u \n\r", next_state, 500);
@@ -46,9 +48,11 @@ inline static EXIT_STATUS exit_helper(ACS *acs)
   dbgSerialOut("exit_helper: %u \n\r", acs->can_buf.status[CAN_SM_STATE], 500);
 
 /// ******critical section***********
+/*
 	chSysLock();
 	acs->can_buf.status[CAN_SM_PREV_STATE] = acs->can_buf.status[CAN_SM_STATE];
 	chSysUnlock();
+//*/
 /// ******end critical section*******
 	
   return STATUS_SUCCESS;
@@ -173,7 +177,7 @@ static EXIT_STATUS fn_rw_start(ACS *acs)
 	(void)acs;
   chprintf(DEBUG_CHP, "start bldc\n\r");
 
-//* 
+/* 
   chSysLock(); 
   acs->can_buf.status[CAN_SEMAPHORE_STATE] = chBSemGetStateI(acs->motor.pBldc_bsem)+1;
   chSysUnlock(); 
@@ -193,7 +197,7 @@ static EXIT_STATUS fn_rw_stop(ACS *acs)
   chprintf(DEBUG_CHP, "stop bldc\n\r");
   bldcStop(&acs->motor);
 
-//* 
+/* 
   chSysLock(); 
   acs->can_buf.status[CAN_SEMAPHORE_STATE] = chBSemGetStateI(acs->motor.pBldc_bsem)+1;
   chSysUnlock(); 
@@ -382,9 +386,11 @@ static EXIT_STATUS transitionState(ACS *acs)
 static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status)
 {
   /// ******critical section********
+/*
     chSysLock();
     acs->can_buf.status[can_status] = status;
     chSysUnlock();
+//*/
 	/// ******end critical section*******
   
   return STATUS_SUCCESS;
@@ -393,12 +399,14 @@ static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status
 static EXIT_STATUS receiveCommand(ACS *acs)
 {
   /// ******critical section*******
+/*
 	chSysLock();
 	for(int i = 0;i < CAN_BUF_SIZE; ++i){
 		acs->cmd[i] = acs->can_buf.cmd[i];
 		acs->can_buf.cmd[i] = 0x00;
 	}
 	chSysUnlock();
+//*/
   /// ******end critical section*******
 	
   return STATUS_SUCCESS;

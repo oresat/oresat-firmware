@@ -4,55 +4,6 @@
 
 BLDCMotor *gpMotor = NULL;
 
-/**
- * @brief Currently not used.
- *
- */
-/*
-static void adcerrorcallback(ADCDriver *adcp, adcerror_t err)
-{
-  (void)adcp;
-  (void)err;
-}
-//*/
-
-/**
- * TODO: combine this with a timer to not spam interrupts so much?
- * @brief ADC conversion group, used to configure the ADC driver
- * Mode:        Continuous, 1 sample of 1 channel, SW triggered.
- * Channels:    A0 
- * Slowest sample rate possible, as putting it too high can lock other systems out.
- */
-/*
-static const ADCConversionGroup adcgrpcfg = {
-  TRUE,
-  ADC_GRP_NUM_CHANNELS,
-  NULL,
-  adcerrorcallback,
-  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,      // CFGRR1 
-  ADC_TR(0, 0),                              // TR 
-  ADC_SMPR_SMP_239P5,                        // SMPR 
-  ADC_CHSELR_CHSEL0                          // CHSELR 
-};
-//*/
-
-/*
-static const ADCConversionGroup adcgrpcfg = 
-{
-  TRUE,
-  ADC_GRP_NUM_CHANNELS,
-  NULL,
-  adcerrorcallback,
-  0,                        // CR1
-  ADC_CR2_SWSTART,          // CR2
-  ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3),
-  0,                        // SMPR2 
-  0,                        // SQR1 
-  0,                        // SQR2
-  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN11)
-};
-//*/
-
 float normalizePosition(uint16_t encoderValue)
 {
   float encoderFloatValue = encoderValue;
