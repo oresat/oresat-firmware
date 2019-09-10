@@ -12,6 +12,7 @@ void cmd_dbgon(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
+  (void)chp;
   //chprintf(chp, "Dbg LEDs on\n\r");
   palSetPad(GPIOB,1U);
   palSetPad(GPIOB,2U);
@@ -21,6 +22,7 @@ void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
+  (void)chp;
   //chprintf(chp, "Dbg LEDs off");
   palClearPad(GPIOB,1U);
   palClearPad(GPIOB,2U);
@@ -28,19 +30,40 @@ void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[])
 
 void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
 {
+  (void)argc;
+  //(void)argv;
+  (void)chp;
   
+  if(strcmp(argv[1],"active"))
+  {
+    
+  }
+
 }
 
 void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[])
 {
+  (void)argc;
+  (void)argv;
+  (void)chp;
+
+}
+
+void cmd_magnetorquerCtrl(BaseSequentialStream *chp, int argc, char *argv[])
+{
+  (void)argc;
+  (void)argv;
+  (void)chp;
     
 }
 
+//*
 static const ShellCommand commands[] = {
   {"dbgon", cmd_dbgon},
   {"dbgoff", cmd_dbgoff},
   {"cs", cmd_changeState},
   {"rw", cmd_reactionWheelCtrl},
+  {"mtqr", cmd_reactionWheelCtrl},
   {NULL, NULL}
 };
 
@@ -68,3 +91,5 @@ THD_FUNCTION(cmd, arg)
 
   chThdExit(MSG_OK);
 }
+
+//*/

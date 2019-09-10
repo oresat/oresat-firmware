@@ -60,7 +60,7 @@ static void app_main(void)
   //*/
 
   //reg_worker(
-  //*
+  /*
   chThdCreateStatic(
     //"Command Shell",
     cmd_wa,

@@ -166,11 +166,6 @@ typedef enum
 extern THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 extern THD_FUNCTION(ACS_Thread, arg);
 
-#ifdef DEBUG_LOOP
-THD_WORKING_AREA(waCANDBG_Thread,ACS_THREAD_SIZE);
-THD_FUNCTION(CANDBG_Thread, arg);
-#endif
-
 EXIT_STATUS acs_init(ACS *acs);
 
 #endif // end _ACS_H_

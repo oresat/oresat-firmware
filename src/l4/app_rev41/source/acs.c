@@ -1,6 +1,8 @@
 #include "acs.h"
+#include "acs_command.h"
 #include "ch.h"
 #include "hal.h"
+//#include "shell.h"
 
 /**
  *	event_lister is used for synchronization between 
@@ -8,6 +10,43 @@
  */
 //static event_listener_t el;
 static event_listener_t sel; // serial even listener
+static event_source_t acs_event_source;
+
+/*
+static const ShellCommand commands[] = {
+  {"dbgon", cmd_dbgon},
+  {"dbgoff", cmd_dbgoff},
+  {"cs", cmd_changeState},
+  {"rw", cmd_reactionWheelCtrl},
+  {"mtqr", cmd_reactionWheelCtrl},
+  {NULL, NULL}
+};
+
+static const ShellConfig shell_cfg = {
+  (BaseSequentialStream *)&LPSD1,
+  commands
+};
+
+THD_WORKING_AREA(shell_wa, 0x200);
+THD_WORKING_AREA(cmd_wa, 0x200);
+THD_FUNCTION(cmd, arg)
+{
+  (void)arg;
+
+  while (!chThdShouldTerminateX()) {
+    thread_t *shell_tp = chThdCreateStatic(
+      shell_wa,
+      sizeof(shell_wa),
+      NORMALPRIO, shellThread,
+      (void *)&shell_cfg
+    );
+    chThdWait(shell_tp);
+    chThdSleepMilliseconds(500);
+  }
+
+  chThdExit(MSG_OK);
+}
+//*/
 
 /**
  *	@brief ACS initialization function
@@ -91,7 +130,10 @@ static ACS_VALID_STATE exit_rdy(ACS *acs)
 static ACS_VALID_STATE entry_rw(ACS *acs)
 {
   entry_helper(acs, ST_RW);
-
+//  eventmask_t events = 0;
+  chSysLockFromISR();
+  chEvtSignalI((thread_t *)ACS_Thread, (eventmask_t)ST_RW);
+  chSysUnlockFromISR();
   return ST_RW;
 }
 
@@ -472,33 +514,20 @@ THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 THD_FUNCTION(ACS_Thread,acs)
 {
   chRegSetThreadName("acs_thread");
-  
+  //*
+  chThdCreateStatic(
+    //"Command Shell",
+    cmd_wa,
+    sizeof(cmd_wa),
+    NORMALPRIO,
+    cmd,
+    NULL
+  );
+  //*/
+ 
  // chEvtRegister(&rpdo_event,&el,0);
-  chEvtRegister(&rpdo_event,&sel,0);
+  //chEvtRegister(&rpdo_event,&sel,0);
 
 	acs_statemachine(acs);
 }
-
-/**
- *	ACS debug loop
- */
-#ifdef DEBUG_LOOP
-THD_WORKING_AREA(waCANDBG_Thread,ACS_THREAD_SIZE);
-THD_FUNCTION(CANDBG_Thread,acs)
-{
-  chRegSetThreadName("can_dbg_thread");
-  
-  uint8_t ping = 0u;
-  
-  while(1)
-  {
-    chSysLock();
-    ((ACS *)acs)->can_buf.status[CAN_STATUS_PING] = ++ping;
-    chSysUnlock();
-
-    chThdSleepMilliseconds(5*1000);
-  }
-}
-#endif
-
 
