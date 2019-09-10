@@ -47,13 +47,13 @@ bit    31: set to 0</description>
     <CANopenObject index="1007" name="Synchronous window length" objectType="VAR" memoryType="ROM" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>bit 0-31:  window leghth after SYNC when PDOS must be transmited in µs, (0 = not used)</description>
     </CANopenObject>
-    <CANopenObject index="1008" name="Manufacturer device name" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="CANopenNode" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="1008" name="Manufacturer device name" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="OreSat Protocard" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>Name of the manufacturer as string</description>
     </CANopenObject>
-    <CANopenObject index="1009" name="Manufacturer hardware version" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="3.00" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="1009" name="Manufacturer hardware version" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="3.2" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>Name of the hardware version as string</description>
     </CANopenObject>
-    <CANopenObject index="100a" name="Manufacturer software version" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="3.00" subNumber="0" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="100a" name="Manufacturer software version" objectType="VAR" memoryType="ROM" dataType="0x09" accessType="const" PDOmapping="no" defaultValue="0.1.0" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>Name of the software version as string.</description>
     </CANopenObject>
     <CANopenObject index="1010" name="Store parameters" objectType="ARRAY" memoryType="RAM" dataType="0x07" accessType="rw" PDOmapping="no" subNumber="2" accessFunctionName="CO_ODF_1010" disabled="false" TPDOdetectCOS="false">
@@ -332,7 +332,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
       <CANopenSubObject subIndex="02" name="transmission type" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="254" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="03" name="inhibit time" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="04" name="compatibility entry" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="10000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="06" name="SYNC start value" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
     <CANopenObject index="1801" name="TPDO communication parameter" objectType="REC" memoryType="ROM" dataType="0x20" accessType="rw" PDOmapping="no" subNumber="7" accessFunctionName="CO_ODF_TPDOcom" disabled="false" TPDOdetectCOS="false">
@@ -383,9 +383,9 @@ mapped object  (subindex 1...8)
 bit   0-7: data length in bits
 bit  8-15: subindex from OD
 bit 16-31: index from OD</description>
-      <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="mapped object 1" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="mapped object 2" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="2" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="mapped object 1" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x21080110" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="02" name="mapped object 2" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x21090110" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="03" name="mapped object 3" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="04" name="mapped object 4" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="05" name="mapped object 5" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="no" defaultValue="0x00000000" TPDOdetectCOS="false" />
@@ -548,39 +548,15 @@ Valid values are in [kbps]:
     <CANopenObject index="2104" name="SYNC time" objectType="VAR" memoryType="RAM" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="0" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>SYNC Time is incremented each timer period and reset to zero, each time SYNC is received or transmitted.</description>
     </CANopenObject>
-    <CANopenObject index="2106" name="Power-on counter" objectType="VAR" memoryType="EEPROM" dataType="0x07" accessType="ro" PDOmapping="no" defaultValue="0" subNumber="0" disabled="false" TPDOdetectCOS="false">
-      <description>Power on Counter counts total microcontroller resets in it's lifetime. Variable is an example of EEPROM usage.</description>
-    </CANopenObject>
-    <CANopenObject index="2107" name="Performance" objectType="ARRAY" memoryType="RAM" dataType="0x06" accessType="rw" PDOmapping="optional" subNumber="6" disabled="false" TPDOdetectCOS="false">
-      <description>Internal performance of the microcontroller.
-
-cycles per second - cycle frequency of internal timer.
-timer cycle time - current timer cycle time in percent of timer period.
-timer cycle max time - maximum timer cycle time in percent of timer period.
-main cycle time - current mainline function cycle time in percent of timer period.
-main cycle max time - maximum mainline function cycle time in percent of timer period.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="5" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="cycles per second" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="1000" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="timer cycle time" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="03" name="timer cycle max time" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="04" name="main cycle time" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="05" name="main cycle max time" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
-      <accessFunctionPreCode>if(WRITING){
-  UNSIGNED16 var;
-  memcpySwap2((UNSIGNED8*)&amp;var, (UNSIGNED8*)dataBuff);
-  if(!((subIndex == 3 || subIndex == 5) &amp;&amp; var == 0))
-    return 0x06090030; //Invalid value for parameter
-}</accessFunctionPreCode>
-    </CANopenObject>
     <CANopenObject index="2108" name="Temperature" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" subNumber="2" disabled="false" TPDOdetectCOS="false">
       <description>Current temperature on device in 0,1°C.</description>
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="main PCB" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="MCU Junction" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
     <CANopenObject index="2109" name="Voltage" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" subNumber="2" disabled="false" TPDOdetectCOS="false">
       <description>Current voltage on device in 0,1V.</description>
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="main PCB supply" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="MCU VREF" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
     <CANopenObject index="2130" name="Time" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="4" disabled="false" TPDOdetectCOS="false">
       <description>Variable displays current time.
@@ -595,14 +571,14 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
     </CANopenObject>
   </CANopenObjectList>
   <other>
-    <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="08-30-2019" fileModificationTime="12:00PM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_protocard_v3/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_protocard_v3/source/ObjDict/app_OD.eds" />
+    <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="09-10-2019" fileModificationTime="9:18AM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_protocard_v3/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_protocard_v3/source/ObjDict/app_OD.eds" />
     <DeviceIdentity>
       <vendorName>Portland State Aerospace Society</vendorName>
       <vendorNumber>0</vendorNumber>
-      <productName>OreSat Template</productName>
+      <productName>OreSat Protocard</productName>
       <productNumber>0</productNumber>
       <productText>
-        <description>OreSat Template Application Object Dictionary</description>
+        <description>OreSat Protocard Object Dictionary</description>
       </productText>
     </DeviceIdentity>
     <capabilities>
@@ -680,7 +656,6 @@ Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is c
       <supportedBaudRate value="125 Kbps" />
       <supportedBaudRate value="250 Kbps" />
       <supportedBaudRate value="500 Kbps" />
-      <supportedBaudRate value="800 Kbps" />
       <supportedBaudRate value="1000 Kbps" />
     </baudRate>
     <dummyUsage>
