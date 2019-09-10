@@ -88,7 +88,13 @@ void opd_disable(opd_addr_t opd_addr)
 
 void opd_reset(opd_addr_t opd_addr)
 {
-
+    uint8_t regval;
+    regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
+    regval |= MAX7310_PIN_MASK(OPD_CB_RESET);
+    max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
+    chThdSleepMilliseconds(100);
+    regval &= ~MAX7310_PIN_MASK(OPD_CB_RESET);
+    max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
 }
 
 int opd_status(opd_addr_t opd_addr, opd_status_t *status)

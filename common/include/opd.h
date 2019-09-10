@@ -1,6 +1,8 @@
 #ifndef OPD_H
 #define OPD_H
 
+#include "max7310.h"
+
 /* IO Pin Assignments */
 #define OPD_SCL             3U /* TODO: Revert this when the time comes */
 #define OPD_SDA             4U /* TODO: Revert this when the time comes */
@@ -32,7 +34,7 @@
                             MAX7310_PIN_MODE_INPUT(OPD_SDA)         |   \
                             MAX7310_PIN_MODE_INPUT(OPD_FAULT)       |   \
                             MAX7310_PIN_MODE_INPUT(OPD_EN)          |   \
-                            MAX7310_PIN_MODE_INPUT(OPD_CB_RESET)    |   \
+                            MAX7310_PIN_MODE_OUTPUT(OPD_CB_RESET)   |   \
                             MAX7310_PIN_MODE_INPUT(OPD_BOOT0)       |   \
                             MAX7310_PIN_MODE_INPUT(OPD_PULLUP)      |   \
                             MAX7310_PIN_MODE_OUTPUT(OPD_LED))

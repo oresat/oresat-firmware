@@ -82,7 +82,7 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     opd_addr_t opd_addr = 0;
 
     if (argc < 2) {
-        chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
+        chprintf(chp, "Usage: opd enable|disable|reset|status <opd_addr>\r\n");
         return;
     }
 
@@ -92,16 +92,23 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
         opd_enable(opd_addr);
     } else if (!strcmp(argv[0], "disable")) {
         opd_disable(opd_addr);
+    } else if (!strcmp(argv[0], "reset")) {
+        opd_reset(opd_addr);
     } else if (!strcmp(argv[0], "status")) {
+        chprintf(chp, "Status of board 0x%02X: ", opd_addr);
         if (!opd_status(opd_addr, &status)) {
-            chprintf(chp, "Read status of 0x%02X:\r\n", opd_addr);
+            chprintf(chp, "CONNECTED\r\n");
+            chprintf(chp, "State: %s-%s\r\n",
+                    (status.odr & MAX7310_PIN_MASK(OPD_LED) ? "ENABLED" : "DISABLED"),
+                    (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
+            chprintf(chp, "Raw register values:\r\n");
             chprintf(chp, "Input:       %02X\r\n", status.input);
             chprintf(chp, "Output:      %02X\r\n", status.odr);
             chprintf(chp, "Polarity:    %02X\r\n", status.pol);
             chprintf(chp, "Mode:        %02X\r\n", status.mode);
             chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
         } else {
-            chprintf(chp, "Invalid address\r\n");
+            chprintf(chp, "NOT CONNECTED\r\n");
         }
     } else {
         chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
