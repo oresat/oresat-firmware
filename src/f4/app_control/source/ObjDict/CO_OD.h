@@ -129,7 +129,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             99
+   #define CO_OD_NoOfElements             97
 
 
 /*******************************************************************************
@@ -1299,30 +1299,17 @@
 /*2104 */
         #define OD_2104_SYNCTime                                    0x2104
 
-/*2106 */
-        #define OD_2106_powerOnCounter                              0x2106
-
-/*2107 */
-        #define OD_2107_performance                                 0x2107
-
-        #define OD_2107_0_performance_maxSubIndex                   0
-        #define OD_2107_1_performance_cyclesPerSecond               1
-        #define OD_2107_2_performance_timerCycleTime                2
-        #define OD_2107_3_performance_timerCycleMaxTime             3
-        #define OD_2107_4_performance_mainCycleTime                 4
-        #define OD_2107_5_performance_mainCycleMaxTime              5
-
 /*2108 */
         #define OD_2108_temperature                                 0x2108
 
         #define OD_2108_0_temperature_maxSubIndex                   0
-        #define OD_2108_1_temperature_mainPCB                       1
+        #define OD_2108_1_temperature_MCU_Junction                  1
 
 /*2109 */
         #define OD_2109_voltage                                     0x2109
 
         #define OD_2109_0_voltage_maxSubIndex                       0
-        #define OD_2109_1_voltage_mainPCBSupply                     1
+        #define OD_2109_1_voltage_MCU_VREF                          1
 
 /*2130 */
         #define OD_2130_time                                        0x2130
@@ -1346,8 +1333,8 @@ struct sCO_OD_ROM{
 /*1006      */ UNSIGNED32     communicationCyclePeriod;
 /*1007      */ UNSIGNED32     synchronousWindowLength;
 /*1008      */ VISIBLE_STRING manufacturerDeviceName[18];
-/*1009      */ VISIBLE_STRING manufacturerHardwareVersion[4];
-/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[4];
+/*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
+/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
 /*1014      */ UNSIGNED32     COB_ID_EMCY;
 /*1015      */ UNSIGNED16     inhibitTimeEMCY;
 /*1016      */ UNSIGNED32      consumerHeartbeatTime[4];
@@ -1383,7 +1370,6 @@ struct sCO_OD_RAM{
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
-/*2107      */ UNSIGNED16      performance[5];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
 /*2130      */ OD_time_t       time;
@@ -1395,7 +1381,6 @@ struct sCO_OD_RAM{
 struct sCO_OD_EEPROM{
                UNSIGNED32     FirstWord;
 
-/*2106      */ UNSIGNED32     powerOnCounter;
 
                UNSIGNED32     LastWord;
 };
@@ -1439,11 +1424,11 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*1009, Data Type: VISIBLE_STRING */
         #define OD_manufacturerHardwareVersion                      CO_OD_ROM.manufacturerHardwareVersion
-        #define ODL_manufacturerHardwareVersion_stringLength        4
+        #define ODL_manufacturerHardwareVersion_stringLength        3
 
 /*100A, Data Type: VISIBLE_STRING */
         #define OD_manufacturerSoftwareVersion                      CO_OD_ROM.manufacturerSoftwareVersion
-        #define ODL_manufacturerSoftwareVersion_stringLength        4
+        #define ODL_manufacturerSoftwareVersion_stringLength        5
 
 /*1010, Data Type: UNSIGNED32, Array[1] */
         #define OD_storeParameters                                  CO_OD_RAM.storeParameters
@@ -1535,27 +1520,15 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*2104, Data Type: UNSIGNED16 */
         #define OD_SYNCTime                                         CO_OD_RAM.SYNCTime
 
-/*2106, Data Type: UNSIGNED32 */
-        #define OD_powerOnCounter                                   CO_OD_EEPROM.powerOnCounter
-
-/*2107, Data Type: UNSIGNED16, Array[5] */
-        #define OD_performance                                      CO_OD_RAM.performance
-        #define ODL_performance_arrayLength                         5
-        #define ODA_performance_cyclesPerSecond                     0
-        #define ODA_performance_timerCycleTime                      1
-        #define ODA_performance_timerCycleMaxTime                   2
-        #define ODA_performance_mainCycleTime                       3
-        #define ODA_performance_mainCycleMaxTime                    4
-
 /*2108, Data Type: INTEGER16, Array[1] */
         #define OD_temperature                                      CO_OD_RAM.temperature
         #define ODL_temperature_arrayLength                         1
-        #define ODA_temperature_mainPCB                             0
+        #define ODA_temperature_MCU_Junction                        0
 
 /*2109, Data Type: INTEGER16, Array[1] */
         #define OD_voltage                                          CO_OD_RAM.voltage
         #define ODL_voltage_arrayLength                             1
-        #define ODA_voltage_mainPCBSupply                           0
+        #define ODA_voltage_MCU_VREF                                0
 
 /*2130, Data Type: time_t */
         #define OD_time                                             CO_OD_RAM.time
