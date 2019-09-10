@@ -1,8 +1,6 @@
 #ifndef OPD_H
 #define OPD_H
 
-#include "max7310.h"
-
 /* IO Pin Assignments */
 #define OPD_SCL             3U /* TODO: Revert this when the time comes */
 #define OPD_SDA             4U /* TODO: Revert this when the time comes */

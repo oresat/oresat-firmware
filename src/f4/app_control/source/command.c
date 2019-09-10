@@ -3,6 +3,8 @@
 
 #include "command.h"
 #include "CO_master.h"
+#include "opd.h"
+#include "max7310.h"
 #include "chprintf.h"
 #include "shell.h"
 
