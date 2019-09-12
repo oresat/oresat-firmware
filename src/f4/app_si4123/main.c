@@ -14,10 +14,11 @@
     limitations under the License.
 */
 
-/***************************************************
+/********************************************************************
  *     Modification Log
- *     04/15/2018    Malay Das    Initial Code.
- ***************************************************/
+ *     09/05/2019    Malay Das    Initial Code.
+ *     09/12/2019    Malay Das    Added user entry via chibios shell.
+ ********************************************************************/
 
 
 /*
@@ -31,8 +32,9 @@
 #include "chprintf.h"
 #include "util_version.h"
 #include "util_numbers.h"
+#include "shell.h"
 
-#include "si4123.h"
+#include "si41xx.h"
 
 
 #define     DEBUG_SERIAL                    SD2
@@ -75,52 +77,227 @@ static void app_init(void)
 }
 
 
+/*
+ *This function bit bangs the si41xx registers with default values.
+ *The dafult values are set as
+ *  RF1 output = 1265 MHz
+ *  RF2 output = disabled
+ *  IF output  = 436.5 MHz
+ *The following pins are connected between M4 and si41xx chip
+ *LINE_SI_SCLK                PAL_LINE(GPIOC, 2U)
+ *LINE_SI_SDATA               PAL_LINE(GPIOC, 3U)
+ *LINE_SI_SENB                PAL_LINE(GPIOC, 4U)  
+ */
 
-
-THD_WORKING_AREA(waSI4123_thd, 1024);
-THD_FUNCTION(SI4123_thd, arg)
-{
-  (void)arg;    
- 
-  palSetLine(LINE_SI_SENB);
-  palSetLine(LINE_SI_SDATA);
-  palSetLine(LINE_SI_SCLK);
-  
-  si_write_reg(SI4123_REG_MAIN_CONFIG, 0b000011000000000100);
-  si_write_reg(SI4123_REG_PHASE_GAIN,  0b000000000000000000);
-  si_write_reg(SI4123_REG_PWRDOWN,     0b000000000000000011);
-  si_write_reg(SI4123_REG_RF1_NDIV,    0b000000010011110001);
-  //si_write_reg(SI4123_REG_RF2_NDIV,    0b000000000000000000);
-  si_write_reg(SI4123_REG_IF_NDIV,     0b000000001101101001);
-  si_write_reg(SI4123_REG_RF1_RDIV,    0b000000000000010000);
-  //si_write_reg(SI4123_REG_RF2_RDIV,    0b000000000000000000);
-  si_write_reg(SI4123_REG_IF_RDIV,     0b000000000000100000);
+static void si41xx_init(void) 
+{   
 
   palSetLine(LINE_SI_SENB);
   palSetLine(LINE_SI_SDATA);
   palSetLine(LINE_SI_SCLK);
   
-  //palClearLine(LINE_SI_SCLK);
+  si_write_reg(SI41XX_REG_MAIN_CONFIG, 0b000011000000000100);
+  si_write_reg(SI41XX_REG_PHASE_GAIN,  0b000000000000000000);
+  si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000011);
+  si_write_reg(SI41XX_REG_RF1_NDIV,    0b000000010011110001);
+  si_write_reg(SI41XX_REG_IF_NDIV,     0b000000001101101001);
+  si_write_reg(SI41XX_REG_RF1_RDIV,    0b000000000000010000);
+  si_write_reg(SI41XX_REG_IF_RDIV,     0b000000000000100000);
+
+  palSetLine(LINE_SI_SENB);
+  palSetLine(LINE_SI_SDATA);
+  palSetLine(LINE_SI_SCLK);
 
 }
 
 
 /*
- * main loop blinks the led
+ * The main loop. 
+ * Currently it does not have any utility. It keeps waiting.
  */
 static void main_loop(void)
 {
-    chThdSleepMilliseconds(500);
 
-
-	while (true)
-    {
-      chThdSleepMilliseconds(5000);
-      chprintf(DEBUG_CHP, ".");
-      //palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
-    }
+  while (true)
+  {
+    chThdSleepMilliseconds(15000);
+  }
 
 }
+
+
+/*
+ * shell commands for user entry.
+ * This lets the user update any register via the chibios shell.
+ * Requires register address and register value as entry.
+ */
+static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  uint32_t reg_address;
+  uint32_t reg_value;
+  
+  if (argc < 2) {
+    chprintf(sd, "Usage: reg <register address> <register value in decimal>\r\n");
+    return;
+  }
+
+  reg_address = strtoul(argv[0], NULL, 0);
+  reg_value = strtoul(argv[1], NULL, 0);
+  
+  si_write_reg(reg_address, reg_value);
+  chprintf(sd, "INFO: Updated register %d with value 0x%x.\r\n", reg_address, reg_value);
+}
+
+
+/*
+ * shell commands for user entry
+ * This lets the user update RF1 registers via the chibios shell
+ * Requires frequency and phase values in KHz.
+ */
+static void rf1(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  uint32_t freq;
+  uint32_t phase;
+  uint32_t ndiv;
+  uint32_t rdiv;
+  
+  if (argc < 2) {
+    chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+
+  freq = strtoul(argv[0], NULL, 10);
+  phase = strtoul(argv[1], NULL, 10);  
+  
+  if (freq == 0) {
+    chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  if (phase == 0) {
+    chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  rdiv = SI41XX_FREF * 1000/phase;
+  ndiv = freq * rdiv / (1000*SI41XX_FREF);
+  
+  si_write_reg(SI41XX_REG_RF1_NDIV, ndiv);
+  si_write_reg(SI41XX_REG_RF1_RDIV, rdiv);
+  
+  chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
+}
+
+
+/*
+ * shell commands for user entry
+ * This lets the user update RF2 registers via the chibios shell
+ * Requires frequency and phase values in KHz. This should not be used for si4123
+ */
+static void rf2(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  uint32_t freq;
+  uint32_t phase;
+  uint32_t ndiv;
+  uint32_t rdiv;
+  
+  if (argc < 2) {
+    chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+
+  freq = strtoul(argv[0], NULL, 10);
+  phase = strtoul(argv[1], NULL, 10);  
+  
+  if (freq == 0) {
+    chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  if (phase == 0) {
+    chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  rdiv = SI41XX_FREF * 1000/phase;
+  ndiv = freq * rdiv / (1000*SI41XX_FREF);
+  
+  si_write_reg(SI41XX_REG_RF2_NDIV, ndiv);
+  si_write_reg(SI41XX_REG_RF2_RDIV, rdiv);
+  
+  chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
+}
+
+
+/*
+ * shell commands for user entry
+ * This lets the user update IF registers via the chibios shell
+ * Requires frequency and phase values in KHz.
+ */
+static void ifr(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  uint32_t freq;
+  uint32_t phase;
+  uint32_t ndiv;
+  uint32_t rdiv;
+  
+  if (argc < 2) {
+    chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+
+  freq = strtoul(argv[0], NULL, 10);
+  phase = strtoul(argv[1], NULL, 10);  
+  
+  if (freq == 0) {
+    chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  if (phase == 0) {
+    chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+    return;
+  }
+  rdiv = SI41XX_FREF * 1000/phase;
+  ndiv = freq * rdiv / (1000*SI41XX_FREF);
+  
+  si_write_reg(SI41XX_REG_IF_NDIV, ndiv);
+  si_write_reg(SI41XX_REG_IF_RDIV, rdiv);
+  
+  chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
+}
+
+
+/*
+ * shell commands for user entry
+ * Provides a list of comamnds and their description to Chibios shell user.
+ */
+static void si_help(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  (void) argc;
+  (void) argv;
+  
+  chprintf(sd, "Available commands:\r\n");
+  chprintf(sd, "    reg:   Update registers,Usage reg <register address> <register value in decimal>\r\n");
+  chprintf(sd, "    rf1:   Update RF1 registers,Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
+  chprintf(sd, "    rf2:   Update RF2 registers,Usage: rf2 <frequency in KHz> <Phase detector in KHz>\r\n");
+  chprintf(sd, "    ifr:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in KHz>\r\n");
+  chprintf(sd, "    ?:   provides list of commands\n\n\r\n");
+}
+ 
+
+/*
+ * shell commands for user entry
+ * This is the list of shell commands defined in this program
+ */ 
+static const ShellCommand commands[] = {
+  {"reg", reg},
+  {"rf1", rf1},
+  {"rf2", rf2},
+  {"ifr", ifr},
+  {"?", si_help},
+  {NULL, NULL}
+};
+
+static const ShellConfig shell_cfg1 = {
+  (BaseSequentialStream *)&SD2,
+  commands
+};
 
 
 /*
@@ -128,13 +305,21 @@ static void main_loop(void)
  */
 int main(void)
 {
-    halInit();
-    chSysInit();
-    app_init();
+  
+  halInit();
+  chSysInit();
+  app_init();
 
-    //chThdSleepMilliseconds(5000);
-    chThdCreateStatic(waSI4123_thd, sizeof(waSI4123_thd), NORMALPRIO,SI4123_thd, NULL);
+  si41xx_init();
+    
+  /*
+   * Shell manager initialization.
+   */
+  shellInit();
+  chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(2048),
+                                       "shell1", NORMALPRIO + 1,
+                                       shellThread, (void *)&shell_cfg1);
 
-    main_loop();
-    return 0;
+  main_loop();
+  return 0;
 }

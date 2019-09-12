@@ -14,7 +14,7 @@
 #include "hal.h"
 #include "chprintf.h"
 
-#include "si4123.h"
+#include "si41xx.h"
 
 
 
