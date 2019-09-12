@@ -345,7 +345,7 @@
  * @note    Mutexes are recommended.
  */
 #if !defined(CH_CFG_USE_HEAP)
-#define CH_CFG_USE_HEAP                     FALSE
+#define CH_CFG_USE_HEAP                     TRUE
 #endif
 
 /**
@@ -713,7 +713,7 @@
  * @brief   Enables the use of the WFI instruction in the idle thread loop.
  */
 #if !defined(CORTEX_ENABLE_WFI_IDLE)
-#define CORTEX_ENABLE_WFI_IDLE              TRUE
+#define CORTEX_ENABLE_WFI_IDLE              FALSE
 #endif
 
 #endif  /* CHCONF_H */
