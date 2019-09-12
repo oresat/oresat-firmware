@@ -99,6 +99,7 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1F80*/ 0x0000L,
 /*2101*/ 0x7FL,
 /*2102*/ 0x3E8,
+/*2106*/ {0x00, 0x00, 0x00},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -116,8 +117,9 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*2103*/ 0x00,
 /*2104*/ 0x00,
-/*2108*/ {0},
-/*2109*/ {0},
+/*2107*/ {0x00, 0x00, 0x00},
+/*2108*/ {0x00},
+/*2109*/ {0x00},
 /*2130*/ {0x3L, {'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 0x00000000L, 0x0000L},
 
            CO_OD_FIRST_LAST_WORD,
@@ -367,6 +369,8 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2102, 0x00, 0x8D,  2, (void*)&CO_OD_ROM.CANBitRate},
 {0x2103, 0x00, 0x8E,  2, (void*)&CO_OD_RAM.SYNCCounter},
 {0x2104, 0x00, 0x86,  2, (void*)&CO_OD_RAM.SYNCTime},
+{0x2106, 0x03, 0x85,  2, (void*)&CO_OD_ROM.calibration[0]},
+{0x2107, 0x03, 0xA6,  2, (void*)&CO_OD_RAM.sensors[0]},
 {0x2108, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.temperature[0]},
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
 {0x2130, 0x03, 0x00,  0, (void*)&OD_record2130},
