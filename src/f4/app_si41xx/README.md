@@ -8,40 +8,26 @@ This code can be used with Si4133 family. But please ensure that defaults values
 
 # Registers and Functionality for SI4133 family
 
-
-Part    RF1  RF2   IF
-
-Si4133   X    X    X
-
-Si4123   X    -    X
-
-Si4122   -    X    X
-
-Si4113   X    X    -
-
-Si4112   -    -    X
+    Part    RF1  RF2   IF
+    Si4133   X    X    X
+    Si4123   X    -    X
+    Si4122   -    X    X
+    Si4113   X    X    -
+    Si4112   -    -    X
 
 
 # Summary of default values for Si4123:
-Reg    17                    0   Addr   Notes
 
-0       00 0011 0000 0000 0100   0000   Main config
-
-1       00 0000 0000 0000 0000   0001   P.D. Gain
-
-2       00 0000 0000 0000 0011   0010   Enable outputs
-
-3       00 0000 1001 1110 0010   0011   N for RF1 (2530)
-
-4       00 0000 0000 0000 0000   0100   N for RF2 (0)
-
-5       00 0000 0011 0110 1001   0101   N for IF (873)
-
-6       00 0000 0000 0010 0000   0110   R for RF1 (32)
-
-7       00 0000 0000 0000 0000   0111   R for RF2 (0)
-
-8       00 0000 0000 0010 0000   1000   R for IF (32)
+    Reg    17                    0   Addr   Notes
+    0       00 0011 0000 0000 0100   0000   Main config
+    1       00 0000 0000 0000 0000   0001   P.D. Gain
+    2       00 0000 0000 0000 0011   0010   Enable outputs
+    3       00 0000 1001 1110 0010   0011   N for RF1 (2530)
+    4       00 0000 0000 0000 0000   0100   N for RF2 (0)
+    5       00 0000 0011 0110 1001   0101   N for IF (873)
+    6       00 0000 0000 0010 0000   0110   R for RF1 (32)
+    7       00 0000 0000 0000 0000   0111   R for RF2 (0)
+    8       00 0000 0000 0010 0000   1000   R for IF (32)
 
 
 FYI: EXTERNAL OSC REFERENCE = 16.000 MHz
