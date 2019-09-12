@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = SI41XX_SYNTH
+PROJECT   = APP_SI41XX
 
 # Define board here
 BOARD     = ST_NUCLEO64_F446RE
