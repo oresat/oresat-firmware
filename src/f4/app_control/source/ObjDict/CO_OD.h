@@ -129,7 +129,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             97
+   #define CO_OD_NoOfElements             99
 
 
 /*******************************************************************************
@@ -1299,6 +1299,22 @@
 /*2104 */
         #define OD_2104_SYNCTime                                    0x2104
 
+/*2106 */
+        #define OD_2106_calibration                                 0x2106
+
+        #define OD_2106_0_calibration_maxSubIndex                   0
+        #define OD_2106_1_calibration_TS_CAL1                       1
+        #define OD_2106_2_calibration_TS_CAL2                       2
+        #define OD_2106_3_calibration_VREFINT_CAL                   3
+
+/*2107 */
+        #define OD_2107_sensors                                     0x2107
+
+        #define OD_2107_0_sensors_maxSubIndex                       0
+        #define OD_2107_1_sensors_MCU_Temperature                   1
+        #define OD_2107_2_sensors_MCU_VREFINT                       2
+        #define OD_2107_3_sensors_MCU_VBAT                          3
+
 /*2108 */
         #define OD_2108_temperature                                 0x2108
 
@@ -1309,7 +1325,7 @@
         #define OD_2109_voltage                                     0x2109
 
         #define OD_2109_0_voltage_maxSubIndex                       0
-        #define OD_2109_1_voltage_MCU_VREF                          1
+        #define OD_2109_1_voltage_MCU_VDDA                          1
 
 /*2130 */
         #define OD_2130_time                                        0x2130
@@ -1350,6 +1366,7 @@ struct sCO_OD_ROM{
 /*1F80      */ UNSIGNED32     NMTStartup;
 /*2101      */ UNSIGNED8      CANNodeID;
 /*2102      */ UNSIGNED16     CANBitRate;
+/*2106      */ UNSIGNED16      calibration[3];
 
                UNSIGNED32     LastWord;
 };
@@ -1370,6 +1387,7 @@ struct sCO_OD_RAM{
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
+/*2107      */ UNSIGNED16      sensors[3];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
 /*2130      */ OD_time_t       time;
@@ -1520,6 +1538,20 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*2104, Data Type: UNSIGNED16 */
         #define OD_SYNCTime                                         CO_OD_RAM.SYNCTime
 
+/*2106, Data Type: UNSIGNED16, Array[3] */
+        #define OD_calibration                                      CO_OD_ROM.calibration
+        #define ODL_calibration_arrayLength                         3
+        #define ODA_calibration_TS_CAL1                             0
+        #define ODA_calibration_TS_CAL2                             1
+        #define ODA_calibration_VREFINT_CAL                         2
+
+/*2107, Data Type: UNSIGNED16, Array[3] */
+        #define OD_sensors                                          CO_OD_RAM.sensors
+        #define ODL_sensors_arrayLength                             3
+        #define ODA_sensors_MCU_Temperature                         0
+        #define ODA_sensors_MCU_VREFINT                             1
+        #define ODA_sensors_MCU_VBAT                                2
+
 /*2108, Data Type: INTEGER16, Array[1] */
         #define OD_temperature                                      CO_OD_RAM.temperature
         #define ODL_temperature_arrayLength                         1
@@ -1528,7 +1560,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*2109, Data Type: INTEGER16, Array[1] */
         #define OD_voltage                                          CO_OD_RAM.voltage
         #define ODL_voltage_arrayLength                             1
-        #define ODA_voltage_MCU_VREF                                0
+        #define ODA_voltage_MCU_VDDA                                0
 
 /*2130, Data Type: time_t */
         #define OD_time                                             CO_OD_RAM.time

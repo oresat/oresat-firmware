@@ -1256,15 +1256,31 @@ Valid values are in [kbps]:
     <CANopenObject index="2104" name="SYNC time" objectType="VAR" memoryType="RAM" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="0" subNumber="0" disabled="false" TPDOdetectCOS="false">
       <description>SYNC Time is incremented each timer period and reset to zero, each time SYNC is received or transmitted.</description>
     </CANopenObject>
-    <CANopenObject index="2108" name="Temperature" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" subNumber="2" disabled="false" TPDOdetectCOS="false">
-      <description>Current temperature on device in 0,1°C.</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="MCU Junction" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+    <CANopenObject index="2106" name="Calibration" objectType="ARRAY" memoryType="ROM" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="" subNumber="4" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+      <description>Factory Device Calibration Data</description>
+      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="3" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="TS_CAL1" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="02" name="TS_CAL2" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="03" name="VREFINT_CAL" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <accessFunctionPreCode />
     </CANopenObject>
-    <CANopenObject index="2109" name="Voltage" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" subNumber="2" disabled="false" TPDOdetectCOS="false">
-      <description>Current voltage on device in 0,1V.</description>
+    <CANopenObject index="2107" name="Sensors" objectType="ARRAY" memoryType="RAM" dataType="0x06" accessType="ro" PDOmapping="optional" defaultValue="" subNumber="4" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+      <description>Raw sensor data</description>
+      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="3" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="02" name="MCU VREFINT" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="03" name="MCU VBAT" objectType="VAR" dataType="0x06" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <accessFunctionPreCode />
+    </CANopenObject>
+    <CANopenObject index="2108" name="Temperature" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" subNumber="2" disabled="false" TPDOdetectCOS="false">
+      <description>Current temperature on device in 0.1°C.</description>
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="01" name="MCU VREF" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="MCU Junction" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
+    </CANopenObject>
+    <CANopenObject index="2109" name="Voltage" objectType="ARRAY" memoryType="RAM" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" subNumber="2" disabled="false" TPDOdetectCOS="false">
+      <description>Current voltage on device in 0.01V.</description>
+      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="optional" defaultValue="1" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="01" name="MCU VDDA" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
     <CANopenObject index="2130" name="Time" objectType="REC" memoryType="RAM" dataType="0x00" accessType="rw" PDOmapping="no" subNumber="4" disabled="false" TPDOdetectCOS="false">
       <description>Variable displays current time.
@@ -1274,7 +1290,7 @@ String - returns current time as string.
 Epoch time ms - Milliseconds since unix epoch (1.1.1970, 00:00:00, UTC). It is calculated as base + offset. Base is calculated on startup of program and offset increments continuously since then. 'Epoch time offset ms' overflows each 49,7 days. 'Epoch time base ms' is recalculated in case of overflow or in case of write to 'Epoch time offset ms'. It is rounded to one minute.</description>
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="3" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="01" name="String" objectType="VAR" dataType="0x09" accessType="ro" PDOmapping="no" defaultValue="-                             " TPDOdetectCOS="false" />
-      <CANopenSubObject subIndex="02" name="Epoch time base ms" objectType="VAR" dataType="0x1b" accessType="ro" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
+      <CANopenSubObject subIndex="02" name="Epoch time base ms" objectType="VAR" dataType="0x1b" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false" />
       <CANopenSubObject subIndex="03" name="Epoch time offset ms" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false" />
     </CANopenObject>
   </CANopenObjectList>
