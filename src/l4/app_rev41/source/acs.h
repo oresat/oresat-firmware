@@ -167,5 +167,6 @@ extern THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 extern THD_FUNCTION(ACS_Thread, arg);
 
 EXIT_STATUS acs_init(ACS *acs);
+extern EXIT_STATUS transitionState(ACS *acs);
 
 #endif // end _ACS_H_

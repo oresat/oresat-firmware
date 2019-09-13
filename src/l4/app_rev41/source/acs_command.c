@@ -8,6 +8,8 @@
 #include "chprintf.h"
 #include "shell.h"
 
+ACS *pacs = NULL;
+
 void cmd_dbgon(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
@@ -31,14 +33,24 @@ void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[])
 void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
-  //(void)argv;
-  (void)chp;
+  (void)argv;
+ // (void)chp;
   
+  chprintf(chp, "change state\n\r");
+  pacs->can_buf.cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
+  pacs->can_buf.cmd[CAN_CMD_ARG] = ST_MAX_PWR;
+  transitionState(pacs);
+  /*
   if(strcmp(argv[1],"active"))
   {
-    
+//    chSysLockFromISR();
+    pacs->can_buf.cmd[CAN_CMD_ARG] = CMD_CHANGE_STATE;
+    pacs->can_buf.cmd[CAN_CMD_2] = ST_MAX_PWR;
+    transitionState(pacs);
+//    chEvtSignalI(uart_thread, events);
+//    chSysUnlockFromISR();
   }
-
+  //*/
 }
 
 void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[])
@@ -76,7 +88,8 @@ THD_WORKING_AREA(shell_wa, 0x200);
 THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
-  (void)arg;
+//  (void)arg;
+  pacs = (ACS *)&arg;
 
   while (!chThdShouldTerminateX()) {
     thread_t *shell_tp = chThdCreateStatic(

@@ -2,7 +2,7 @@
 #include "acs_command.h"
 #include "ch.h"
 #include "hal.h"
-//#include "shell.h"
+#include "shell.h"
 
 /**
  *	event_lister is used for synchronization between 
@@ -11,42 +11,6 @@
 //static event_listener_t el;
 static event_listener_t sel; // serial even listener
 static event_source_t acs_event_source;
-
-/*
-static const ShellCommand commands[] = {
-  {"dbgon", cmd_dbgon},
-  {"dbgoff", cmd_dbgoff},
-  {"cs", cmd_changeState},
-  {"rw", cmd_reactionWheelCtrl},
-  {"mtqr", cmd_reactionWheelCtrl},
-  {NULL, NULL}
-};
-
-static const ShellConfig shell_cfg = {
-  (BaseSequentialStream *)&LPSD1,
-  commands
-};
-
-THD_WORKING_AREA(shell_wa, 0x200);
-THD_WORKING_AREA(cmd_wa, 0x200);
-THD_FUNCTION(cmd, arg)
-{
-  (void)arg;
-
-  while (!chThdShouldTerminateX()) {
-    thread_t *shell_tp = chThdCreateStatic(
-      shell_wa,
-      sizeof(shell_wa),
-      NORMALPRIO, shellThread,
-      (void *)&shell_cfg
-    );
-    chThdWait(shell_tp);
-    chThdSleepMilliseconds(500);
-  }
-
-  chThdExit(MSG_OK);
-}
-//*/
 
 /**
  *	@brief ACS initialization function
@@ -186,6 +150,8 @@ static ACS_VALID_STATE exit_mtqr(ACS *acs)
 static ACS_VALID_STATE entry_max_pwr(ACS *acs)
 {
   entry_helper(acs, ST_MAX_PWR);
+
+  chprintf(DEBUG_CHP, "Max power!\n\r");
 	
   return ST_MAX_PWR;
 }
@@ -390,11 +356,13 @@ static EXIT_STATUS requestFunction(ACS *acs)
 /**
  *	transitionState
  */
-static EXIT_STATUS transitionState(ACS *acs)
+EXIT_STATUS transitionState(ACS *acs)
+// static EXIT_STATUS transitionState(ACS *acs)
 {
 	ACS_VALID_STATE state = acs->cmd[CAN_CMD_ARG];
 
-  dbgSerialOut("StateRequest: %u\n\r", state, 500);
+//  dbgSerialOut("StateRequest: %u\n\r", state, 500);
+  chprintf(DEBUG_CHP, "StateRequest: %u\n\r", state);
 	
   if(state <= ST_NOP || state >= ST_END)
   {
@@ -407,7 +375,7 @@ static EXIT_STATUS transitionState(ACS *acs)
 		if((acs->state.current == valid_transition[i].cur_state) && 
         (state == valid_transition[i].req_state))
     {
-      dbgSerialOut("ValidChange: %u\n\r", state, 1000);
+//      dbgSerialOut("ValidChange: %u\n\r", state, 1000);
       
       acs->fn_exit(acs);
 			acs->fn_exit=valid_transition[i].fn_exit;
@@ -417,7 +385,7 @@ static EXIT_STATUS transitionState(ACS *acs)
 		}
     else
     {
-      dbgSerialOut("InvalidChange: %u\n\r", state, 1000);
+//      dbgSerialOut("InvalidChange: %u\n\r", state, 1000);
     }
 	}
 
@@ -521,7 +489,8 @@ THD_FUNCTION(ACS_Thread,acs)
     sizeof(cmd_wa),
     NORMALPRIO,
     cmd,
-    NULL
+    (void *)acs
+    //(void *)&acs
   );
   //*/
  
