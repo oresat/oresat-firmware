@@ -66,7 +66,7 @@ void SendDot(SPIDriver * spip)
   uint8_t ret_value[3]={0,0,0};
 
   ax5043_full_tx(spip);
-  chprintf(DEBUG_CHP, "Dot\r\n");
+  //chprintf(DEBUG_CHP, "Dot\r\n");
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
@@ -83,7 +83,7 @@ void SendDash(SPIDriver * spip)
   uint8_t ret_value[3]={0,0,0};
 
   ax5043_full_tx(spip);
-  chprintf(DEBUG_CHP, "Dash\r\n");
+  //chprintf(DEBUG_CHP, "Dash\r\n");
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);

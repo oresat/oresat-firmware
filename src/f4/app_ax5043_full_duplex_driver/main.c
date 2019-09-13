@@ -17,6 +17,8 @@
 /***************************************************
  *     Modification Log
  *     04/15/2018    Malay Das    Initial Code.
+ *     08/09/2019    Malay Das    Initial Driver.
+ *     08/23/2019    Malay Das    Add mailbox functionality.
  ***************************************************/
 
 
@@ -28,6 +30,8 @@
 #include <string.h>
 #include "ch.h"
 #include "hal.h"
+#include "shell.h"
+
 #include "chprintf.h"
 #include "util_version.h"
 #include "util_numbers.h"
@@ -43,6 +47,8 @@
 
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
+
+#define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
 
 
 axradio_address_t remoteaddr = {
@@ -61,6 +67,21 @@ char cw_message[] = "KG7ZVV Malay Das testing AX5043";
 //const uint8_t framing_insert_counter = 1;    //uncomment for normal packets
 const uint8_t framing_counter_pos = 0;
 const uint8_t framing_insert_counter = 0;     //uncomment for Ax.25 packets
+
+
+//semaphores to indicate idle/busy radio
+binary_semaphore_t radio1_bsem;
+binary_semaphore_t radio2_bsem;
+
+
+//mailboxes to receive the radio packets
+#define NUM_BUFFERS 16
+ 
+static msg_t radio1_rx_queue[NUM_BUFFERS];
+static mailbox_t radio1_rx_mb; 
+static msg_t radio2_rx_queue[NUM_BUFFERS];
+static mailbox_t radio2_rx_mb;
+
 
 /*
  * Serial Driver Configuration
@@ -121,10 +142,12 @@ static ax5043_drv_t ax5043_driver =
   AX5043_TX,
   LINE_SX_INT0,
   LINE_SX_INT1,
-  AX5043_IDLE,
-  AX5043_IDLE,
+  &radio1_bsem,
+  &radio2_bsem,
   &remoteaddr,
-  &localaddr 
+  &localaddr,
+  &radio1_rx_mb,
+  &radio2_rx_mb  
 };
 
 /*
@@ -149,6 +172,10 @@ static void app_init(void)
 
     spiStart(&SPID1, &spicfg1);
     spiStart(&SPID2, &spicfg2);
+    
+  /* Creating the mailboxes.*/
+    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);   
+    chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);      
 }
 
 
@@ -185,21 +212,8 @@ THD_FUNCTION(ax5043_tx_thd, arg)
   */
   
   // This is for CW
-  /*ax5043_f4_init(&SPID2);
-  ax5043_f4_prepare_tx(&SPID2);
-  ax5043_full_tx(&SPID2);
 
-  
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)(AX5043_REPEATDATA_CMD|0x00), ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0xff, ret_value);
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
-  ax5043_write_reg(&SPID2, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
-  
-  
-  ax5043_standby(&SPID2);*/
-  //chThdSleepMilliseconds(50);
+
   for (;;) {
     chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
 
@@ -207,6 +221,37 @@ THD_FUNCTION(ax5043_tx_thd, arg)
     
     chThdSleepMilliseconds(500);
   }  
+
+}
+
+
+THD_WORKING_AREA(waradio1_rx, 1024);
+THD_FUNCTION(radio1_rx, arg) 
+{
+  (void)arg;
+
+  while (true) {
+    msg_t pbuf; 
+    /* Waiting for radio1 rx buffer.*/
+    msg_t msg = chMBFetchTimeout(&radio1_rx_mb, &pbuf, TIME_MS2I(10000));
+    if (msg == MSG_OK)
+      chprintf(DEBUG_CHP,"INFO: rx on radio 1\r\n");
+  }
+
+}
+
+THD_WORKING_AREA(waradio2_rx, 1024);
+THD_FUNCTION(radio2_rx, arg) 
+{
+  (void)arg;
+
+  while (true) {
+    msg_t pbuf; 
+    /* Waiting for radio1 rx buffer.*/
+    msg_t msg = chMBFetchTimeout(&radio2_rx_mb, &pbuf, TIME_MS2I(10000));
+    if (msg == MSG_OK)
+      chprintf(DEBUG_CHP,"INFO: rx on radio 2\r\n");
+  }
 
 }
 
@@ -230,18 +275,56 @@ static void main_loop(void)
 
 
 /*
+ * shell commands
+ */
+static void mmd(BaseSequentialStream *sd, int argc, char *argv[]) {
+
+  (void)argv;
+  if (argc > 0) {
+    chprintf(sd, "Usage: mmd\r\n");
+    return;
+  }
+
+  chprintf(sd, "testing\r\n");
+}
+ 
+ 
+static const ShellCommand commands[] = {
+  {"mmd", mmd},
+  {NULL, NULL}
+};
+
+static const ShellConfig shell_cfg1 = {
+  (BaseSequentialStream *)&SD2,
+  commands
+};
+
+/*
  * Entry to our code
  */
 int main(void)
 {
-    halInit();
-    chSysInit();
-    app_init();
+  thread_t *shelltp1;
+  
+  halInit();
+  chSysInit();
+  app_init();
 
-    ax5043_init(&ax5043_driver);
-    chThdSleepMilliseconds(5000);
-    chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
+  ax5043_init(&ax5043_driver);
+  chThdSleepMilliseconds(5000);
+  chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
+  chThdCreateStatic(waradio1_rx, sizeof(waradio1_rx), NORMALPRIO,radio1_rx, NULL);
+  chThdCreateStatic(waradio2_rx, sizeof(waradio2_rx), NORMALPRIO,radio2_rx, NULL);
+    
+  /*
+   * Shell manager initialization.
+   * Event zero is shell exit.
+   */
+  shellInit();
+  shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+                                       "shell1", NORMALPRIO + 1,
+                                       shellThread, (void *)&shell_cfg1);
 
-    main_loop();
-    return 0;
+  main_loop();
+  return 0;
 }

@@ -692,6 +692,16 @@ typedef struct{
     uint8_t mask[4];
 }axradio_address_mask_t;
 
+
+//Structure for storing registers and other configuration details.
+typedef struct{
+    uint8_t reg_values[280];
+    uint8_t config[43];
+    uint8_t remoteaddr[4];
+    uint8_t localaddr[4];
+    uint8_t localadr_mask[4];
+}axradio_config_t;
+
 //function declaration starts here
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);

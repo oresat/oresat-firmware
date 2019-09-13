@@ -1,4 +1,4 @@
-/*! \file ax5043_driver.h */
+/*! \file ax5043_driver.c */
 
 
 /*!
@@ -124,9 +124,11 @@ uint8_t ax5043_radio_startup(SPIDriver * spip, ax5043_config_t config, ax5043_mo
  */
 uint8_t ax5043_radio1_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
   ax5043_radio_startup(ax5043_driver_p->ax5043_spip1, config, ax5043_driver_p->ax5043_mode1);
   ax5043_set_addr(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->localaddr);
   ax5043_driver_p->ax5043_config1 = config;
+  chBSemSignal(ax5043_driver_p->ax5043_bsem1);
   return 0;
 
 }
@@ -138,9 +140,11 @@ uint8_t ax5043_radio1_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t 
  */
 uint8_t ax5043_radio2_chg_config(ax5043_drv_t *ax5043_driver_p, ax5043_config_t config)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem2, TIME_MS2I(120));
   ax5043_radio_startup(ax5043_driver_p->ax5043_spip2, config, ax5043_driver_p->ax5043_mode2);
   ax5043_set_addr(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->localaddr);
   ax5043_driver_p->ax5043_config2 = config;
+  chBSemSignal(ax5043_driver_p->ax5043_bsem2);
   return 0;  
 
 }
@@ -237,8 +241,10 @@ uint8_t ax5043_radio_mode(SPIDriver * spip, ax5043_config_t config, ax5043_mode_
  */
 uint8_t ax5043_radio1_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
   ax5043_radio_mode(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, mode);
   ax5043_driver_p->ax5043_mode1 = mode;
+  chBSemSignal(ax5043_driver_p->ax5043_bsem1);
   return 0;  
 
 }
@@ -252,8 +258,10 @@ uint8_t ax5043_radio1_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
  */
 uint8_t ax5043_radio2_mode(ax5043_drv_t *ax5043_driver_p, ax5043_mode_t mode)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem2, TIME_MS2I(120));
   ax5043_radio_mode(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, mode);
   ax5043_driver_p->ax5043_mode2 = mode;
+  chBSemSignal(ax5043_driver_p->ax5043_bsem2);
   return 0;  
 
 }
@@ -307,10 +315,15 @@ uint8_t ax5043_radio1_rx(ax5043_drv_t *ax5043_driver_p)
     
     if (ax5043_driver_p->ax5043_mode1 == AX5043_RX)
     {
+      msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
       packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, axradio_rxbuffer);
-
+      
       if(packet_len > 0)
+      {
         chprintf(DEBUG_CHP,"INFO:R1 Received packet %d\r\n",axradio_rxbuffer[3]);
+        (void)chMBPostTimeout(ax5043_driver_p->ax5043_rx_mb1, (msg_t)axradio_rxbuffer, TIME_MS2I(10000));
+      }
+      chBSemSignal(ax5043_driver_p->ax5043_bsem1);
     }
   }
   return 0; 
@@ -336,10 +349,15 @@ uint8_t ax5043_radio2_rx(ax5043_drv_t *ax5043_driver_p)
     
     if (ax5043_driver_p->ax5043_mode2 == AX5043_RX)
     {
+      msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem2, TIME_MS2I(120));
       packet_len=ax5043_radio_rx(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, axradio_rxbuffer);
 
       if(packet_len > 0)
+      {
         chprintf(DEBUG_CHP,"INFO:R2 Received packet %d\r\n",axradio_rxbuffer[3]);
+        (void)chMBPostTimeout(ax5043_driver_p->ax5043_rx_mb2, (msg_t)axradio_rxbuffer, TIME_MS2I(10000));
+      }
+      chBSemSignal(ax5043_driver_p->ax5043_bsem2);
     }
   }  
   return 0; 
@@ -381,7 +399,9 @@ uint8_t ax5043_radio_packet_tx(SPIDriver * spip, ax5043_config_t config, ax5043_
  */
 uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
   ax5043_radio_packet_tx(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, ax5043_driver_p, pkt, pktlen);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem1);
   return 0; 
 }
 
@@ -394,7 +414,9 @@ uint8_t ax5043_radio1_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uin
  */
 uint8_t ax5043_radio2_packet_tx(ax5043_drv_t *ax5043_driver_p, uint8_t *pkt, uint16_t pktlen)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem2, TIME_MS2I(120));
   ax5043_radio_packet_tx(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, ax5043_driver_p, pkt, pktlen);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem2);
   return 0; 
 }
 
@@ -433,9 +455,11 @@ uint8_t ax5043_radio_prepare_cw(SPIDriver * spip)
  */
 uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
   ax5043_radio_prepare_cw(ax5043_driver_p->ax5043_spip1);
   SetWpm(5);
   SendMessage(ax5043_driver_p->ax5043_spip1, pkt, pktlen);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem1);
   return 0; 
 
 }
@@ -449,9 +473,11 @@ uint8_t ax5043_radio1_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t 
  */
 uint8_t ax5043_radio2_cw_tx(ax5043_drv_t *ax5043_driver_p, char pkt[], uint16_t pktlen)
 {
+  msg_t msg = chBSemWaitTimeout(ax5043_driver_p->ax5043_bsem1, TIME_MS2I(120));
   ax5043_radio_prepare_cw(ax5043_driver_p->ax5043_spip2);
   SetWpm(5);
   SendMessage(ax5043_driver_p->ax5043_spip2, pkt, pktlen);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem2);
   return 0; 
 
 }
@@ -460,9 +486,11 @@ THD_WORKING_AREA(waAx5043_radio1, 1024);
 THD_FUNCTION(ax5043_radio1, ax5043_driver_ptr) 
 {
   ax5043_drv_t* ax5043_driver_p=(ax5043_drv_t*)ax5043_driver_ptr;
-  
+
+  chBSemObjectInit(ax5043_driver_p->ax5043_bsem1, true);  
   ax5043_radio_startup(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->ax5043_config1, ax5043_driver_p->ax5043_mode1);
   ax5043_set_addr(ax5043_driver_p->ax5043_spip1, ax5043_driver_p->localaddr);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem1);
   chprintf(DEBUG_CHP, "done reseting AX5043 radio1 \r\n");
   ax5043_radio1_rx(ax5043_driver_p);
 
@@ -473,8 +501,11 @@ THD_WORKING_AREA(waAx5043_radio2, 1024);
 THD_FUNCTION(ax5043_radio2, ax5043_driver_ptr)
 {
   ax5043_drv_t* ax5043_driver_p=(ax5043_drv_t*)ax5043_driver_ptr;
+  
+  chBSemObjectInit(ax5043_driver_p->ax5043_bsem2, true);  
   ax5043_radio_startup(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->ax5043_config2, ax5043_driver_p->ax5043_mode2);
   ax5043_set_addr(ax5043_driver_p->ax5043_spip2, ax5043_driver_p->localaddr);
+  chBSemSignal(ax5043_driver_p->ax5043_bsem2);
   chprintf(DEBUG_CHP, "done reseting AX5043 radio2 \r\n");
 
   ax5043_radio2_rx(ax5043_driver_p);
@@ -497,4 +528,3 @@ uint8_t ax5043_init(ax5043_drv_t *ax5043_driver_p)
 
 
 //!@
-
