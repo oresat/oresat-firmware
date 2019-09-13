@@ -4,12 +4,12 @@ FileVersion=0
 FileRevision=0
 LastEDS=
 EDSVersion=4.0
-Description=OreSat Master Node.
+Description=OreSat Master Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:50PM
-ModificationDate=08-30-2019
+ModificationTime=9:43AM
+ModificationDate=09-10-2019
 ModifiedBy=
 
 [DeviceInfo]
@@ -342,7 +342,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=Oresat Master Node
+DefaultValue=OreSat Master Node
 PDOMapping=0
 
 [1009]
@@ -351,7 +351,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=3.00
+DefaultValue=0.0
 PDOMapping=0
 
 [100A]
@@ -360,7 +360,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=3.00
+DefaultValue=0.0.0
 PDOMapping=0
 
 [1010]
@@ -7451,19 +7451,52 @@ DefaultValue=0
 PDOMapping=0
 
 [2106]
-ParameterName=Power-on counter
+ParameterName=Calibration
+ObjectType=0x8
+;StorageLocation=ROM
+SubNumber=0x4
+
+[2106sub0]
+ParameterName=max sub-index
 ObjectType=0x7
-;StorageLocation=EEPROM
-DataType=0x0007
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=3
+PDOMapping=0
+
+[2106sub1]
+ParameterName=TS_CAL1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[2106sub2]
+ParameterName=TS_CAL2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[2106sub3]
+ParameterName=VREFINT_CAL
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0006
 AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
 [2107]
-ParameterName=Performance
+ParameterName=Sensors
 ObjectType=0x8
 ;StorageLocation=RAM
-SubNumber=0x6
+SubNumber=0x4
 
 [2107sub0]
 ParameterName=max sub-index
@@ -7471,51 +7504,33 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=5
+DefaultValue=3
 PDOMapping=1
 
 [2107sub1]
-ParameterName=cycles per second
+ParameterName=MCU Temperature
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
-AccessType=rw
-DefaultValue=1000
+AccessType=ro
+DefaultValue=0
 PDOMapping=1
 
 [2107sub2]
-ParameterName=timer cycle time
+ParameterName=MCU VREFINT
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
-AccessType=rw
+AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
 [2107sub3]
-ParameterName=timer cycle max time
+ParameterName=MCU VBAT
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
-AccessType=rw
-DefaultValue=0
-PDOMapping=1
-
-[2107sub4]
-ParameterName=main cycle time
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=rw
-DefaultValue=0
-PDOMapping=1
-
-[2107sub5]
-ParameterName=main cycle max time
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=rw
+AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
@@ -7535,11 +7550,11 @@ DefaultValue=1
 PDOMapping=1
 
 [2108sub1]
-ParameterName=main PCB
+ParameterName=MCU Junction
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
-AccessType=rw
+AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
@@ -7559,11 +7574,11 @@ DefaultValue=1
 PDOMapping=1
 
 [2109sub1]
-ParameterName=main PCB supply
+ParameterName=MCU VDDA
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
-AccessType=rw
+AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
@@ -7596,7 +7611,7 @@ ParameterName=Epoch time base ms
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x001B
-AccessType=ro
+AccessType=rw
 DefaultValue=0
 PDOMapping=0
 

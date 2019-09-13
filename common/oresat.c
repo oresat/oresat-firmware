@@ -1,5 +1,6 @@
 #include "oresat.h"
 #include "events.h"
+#include "sensors.h"
 #include "CANopen.h"
 
 typedef enum {
@@ -45,6 +46,7 @@ void oresat_init(uint8_t node_id, uint16_t bitrate)
      */
     halInit();
     chSysInit();
+    sensors_init();
 
     /* If node ID is not overridden, use default node ID */
     if (node_id != ORESAT_DEFAULT_ID && node_id <= 0x7F) {
@@ -96,6 +98,7 @@ void oresat_start(CANDriver *cand)
             uint16_t timeout_ms = ((typeof(timeout_ms))-1);
 
             /* Process all CO objects */
+            sensors_trig();
             reset = CO_process(CO, TIME_I2MS(chVTTimeElapsedSinceX(prev_time)), &timeout_ms);
             if (reset != CO_RESET_NOT)
                 continue;

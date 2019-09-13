@@ -69,9 +69,9 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1005*/ 0x0080L,
 /*1006*/ 0x0000L,
 /*1007*/ 0x0000L,
-/*1008*/ {'O', 'r', 'e', 's', 'a', 't', ' ', 'M', 'a', 's', 't', 'e', 'r', ' ', 'N', 'o', 'd', 'e'},
-/*1009*/ {'3', '.', '0', '0'},
-/*100A*/ {'3', '.', '0', '0'},
+/*1008*/ {'O', 'r', 'e', 'S', 'a', 't', ' ', 'M', 'a', 's', 't', 'e', 'r', ' ', 'N', 'o', 'd', 'e'},
+/*1009*/ {'0', '.', '0'},
+/*100A*/ {'0', '.', '0', '.', '0'},
 /*1014*/ 0x0080L,
 /*1015*/ 0x64,
 /*1016*/ {0x00000000, 0x00000000, 0x00000000, 0x00000000},
@@ -147,6 +147,7 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1F80*/ 0x0001L,
 /*2101*/ 0x1L,
 /*2102*/ 0x3E8,
+/*2106*/ {0x00, 0x00, 0x00},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -168,9 +169,9 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*2103*/ 0x00,
 /*2104*/ 0x00,
-/*2107*/ {1000, 0, 0, 0, 0},
-/*2108*/ {0},
-/*2109*/ {0},
+/*2107*/ {0x00, 0x00, 0x00},
+/*2108*/ {0x00},
+/*2109*/ {0x00},
 /*2130*/ {0x3L, {'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 0x00000000L, 0x0000L},
 
            CO_OD_FIRST_LAST_WORD,
@@ -181,7 +182,6 @@ struct sCO_OD_RAM CO_OD_RAM = {
 struct sCO_OD_EEPROM CO_OD_EEPROM = {
            CO_OD_FIRST_LAST_WORD,
 
-/*2106*/ 0x0000L,
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -858,7 +858,7 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 /*0x2130*/ const CO_OD_entryRecord_t OD_record2130[4] = {
            {(void*)&CO_OD_RAM.time.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.time.string, 0x06, 0x1E },
-           {(void*)&CO_OD_RAM.time.epochTimeBaseMs, 0x86, 0x8 },
+           {(void*)&CO_OD_RAM.time.epochTimeBaseMs, 0x8E, 0x8 },
            {(void*)&CO_OD_RAM.time.epochTimeOffsetMs, 0xBE, 0x4 },
 };
 
@@ -874,8 +874,8 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1006, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.communicationCyclePeriod},
 {0x1007, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.synchronousWindowLength},
 {0x1008, 0x00, 0x05, 18, (void*)&CO_OD_ROM.manufacturerDeviceName},
-{0x1009, 0x00, 0x05,  4, (void*)&CO_OD_ROM.manufacturerHardwareVersion},
-{0x100A, 0x00, 0x05,  4, (void*)&CO_OD_ROM.manufacturerSoftwareVersion},
+{0x1009, 0x00, 0x05,  3, (void*)&CO_OD_ROM.manufacturerHardwareVersion},
+{0x100A, 0x00, 0x05,  5, (void*)&CO_OD_ROM.manufacturerSoftwareVersion},
 {0x1010, 0x01, 0x8E,  4, (void*)&CO_OD_RAM.storeParameters[0]},
 {0x1011, 0x01, 0x8E,  4, (void*)&CO_OD_RAM.restoreDefaultParameters[0]},
 {0x1014, 0x00, 0x85,  4, (void*)&CO_OD_ROM.COB_ID_EMCY},
@@ -960,8 +960,8 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2102, 0x00, 0x8D,  2, (void*)&CO_OD_ROM.CANBitRate},
 {0x2103, 0x00, 0x8E,  2, (void*)&CO_OD_RAM.SYNCCounter},
 {0x2104, 0x00, 0x86,  2, (void*)&CO_OD_RAM.SYNCTime},
-{0x2106, 0x00, 0x87,  4, (void*)&CO_OD_EEPROM.powerOnCounter},
-{0x2107, 0x05, 0xBE,  2, (void*)&CO_OD_RAM.performance[0]},
+{0x2106, 0x03, 0x85,  2, (void*)&CO_OD_ROM.calibration[0]},
+{0x2107, 0x03, 0xA6,  2, (void*)&CO_OD_RAM.sensors[0]},
 {0x2108, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.temperature[0]},
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
 {0x2130, 0x03, 0x00,  0, (void*)&OD_record2130},
