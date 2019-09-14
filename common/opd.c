@@ -92,7 +92,7 @@ void opd_reset(opd_addr_t opd_addr)
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval |= MAX7310_PIN_MASK(OPD_CB_RESET);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
-    chThdSleepMilliseconds(100);
+    chThdSleepMilliseconds(10);
     regval &= ~MAX7310_PIN_MASK(OPD_CB_RESET);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
 }
