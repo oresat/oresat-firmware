@@ -57,16 +57,14 @@ typedef struct
 {
   SPIDriver * ax5043_spip1;
   SPIDriver * ax5043_spip2;
-  ax5043_config_t ax5043_config1;
-  ax5043_config_t ax5043_config2;
+  axradio_config_t * ax5043_config1;
+  axradio_config_t * ax5043_config2;
   ax5043_mode_t ax5043_mode1;
   ax5043_mode_t ax5043_mode2;
   ioline_t ax5043_int1;
   ioline_t ax5043_int2;
   binary_semaphore_t *ax5043_bsem1;
   binary_semaphore_t *ax5043_bsem2;
-  axradio_address_t *remoteaddr;
-  axradio_address_mask_t *localaddr;
   mailbox_t * ax5043_rx_mb1;
   mailbox_t * ax5043_rx_mb2;
 } ax5043_drv_t;
