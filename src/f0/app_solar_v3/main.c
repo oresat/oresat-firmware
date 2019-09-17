@@ -20,7 +20,7 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "thread1.h"
+#include "solar.h"
 
 static worker_t worker1;
 
@@ -30,7 +30,7 @@ static worker_t worker1;
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    init_worker(&worker1, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);
     reg_worker(&worker1);
 
     /* Start up debug output */

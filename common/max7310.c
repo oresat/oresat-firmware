@@ -30,7 +30,6 @@
 /**
  * @brief   Reads registers value using I2C.
  * @pre     The I2C interface must be initialized and the driver started.
- * @note    IF_ADD_INC bit must be 1 in CTRL_REG8
  *
  * @param[in]  i2cp      pointer to the I2C interface
  * @param[in]  sad       slave address without R bit
@@ -113,11 +112,6 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
     devp->config = config;
 
     /* Configuring common registers.*/
-    cr[0] = MAX7310_AD_ODR;
-    cr[1] = config->odr;
-    cr[2] = config->pol;
-    cr[3] = config->iomode;
-    cr[4] = config->timeout;
 #if MAX7310_USE_I2C
 #if MAX7310_SHARED_I2C
     i2cAcquireBus(config->i2cp);
@@ -235,7 +229,7 @@ uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
 }
 
 /**
- * @brief   Reads MAX7310 register as raw value.
+ * @brief   Writes MAX7310 register as raw value.
  *
  * @param[in] devp       pointer to the @p MAX7310Driver object
  * @param[in] reg        the register to write to
