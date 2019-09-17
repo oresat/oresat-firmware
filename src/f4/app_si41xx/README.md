@@ -99,9 +99,9 @@ Evaluated Defaults:
   
 #  Chibios shell functions available 
 
-    reg:   Update registers,Usage reg <register address> <register value in dec.>
+    reg:   Update registers,Usage reg <register address in decmal/hexadecimal> <register value in binary/decimal/hexadecimal>
     rf1:   Update RF1 registers,Usage: rf1 <frequency in KHz> <Phase detector in Khz>
     rf2:   Update RF2 registers,Usage: rf2 <frequency in KHz> <Phase detector in Khz>
-    ifr:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in Khz>
+    if:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in Khz>
     help:  provides list of commands
     ?:     provides list of commands 

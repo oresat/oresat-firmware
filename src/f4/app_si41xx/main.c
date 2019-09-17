@@ -137,12 +137,14 @@ static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
   uint32_t reg_value;
   
   if (argc < 2) {
-    chprintf(sd, "Usage: reg <register address> <register value in decimal>\r\n");
-    return;
+    chprintf(sd, "Usage: reg <register address in decimal/hexadecimal> <register value in binary/decimal/hexadecimal>\r\n");
+    chprintf(sd, "Example:   reg 2 12\r\n");
+    chprintf(sd, "           reg 2 0xCA\r\n");
+    chprintf(sd, "           reg 2 0b10\r\n");
   }
 
   reg_address = strtoul(argv[0], NULL, 0);
-  reg_value = strtoul(argv[1], NULL, 0);
+  reg_value = strtoul((argv[1][0] == '0' && argv[1][1] == 'b') ?  argv[1]+2: argv[1], NULL, (argv[1][0] == '0' && argv[1][1] == 'b') ? 2 : 0);
   
   si_write_reg(reg_address, reg_value);
   chprintf(sd, "INFO: Updated register %d with value 0x%x.\r\n", reg_address, reg_value);
@@ -273,10 +275,10 @@ static void si_help(BaseSequentialStream *sd, int argc, char *argv[]) {
   (void) argv;
   
   chprintf(sd, "Available commands:\r\n");
-  chprintf(sd, "    reg:   Update registers,Usage reg <register address> <register value in decimal>\r\n");
+  chprintf(sd, "    reg:   Update registers,Usage reg <register address> <register value>\r\n");
   chprintf(sd, "    rf1:   Update RF1 registers,Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
   chprintf(sd, "    rf2:   Update RF2 registers,Usage: rf2 <frequency in KHz> <Phase detector in KHz>\r\n");
-  chprintf(sd, "    ifr:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in KHz>\r\n");
+  chprintf(sd, "    if:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in KHz>\r\n");
   chprintf(sd, "    ?:   provides list of commands\n\n\r\n");
 }
  
@@ -289,7 +291,7 @@ static const ShellCommand commands[] = {
   {"reg", reg},
   {"rf1", rf1},
   {"rf2", rf2},
-  {"ifr", ifr},
+  {"if", ifr},
   {"?", si_help},
   {NULL, NULL}
 };
