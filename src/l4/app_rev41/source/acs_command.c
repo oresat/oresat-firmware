@@ -33,23 +33,38 @@ void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[])
 void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
 {
   (void)argc;
-  (void)argv;
+ // (void)argv;
  // (void)chp;
+ 
+ // eventmask_t events = 0;
   
-  chprintf(chp, "change state\n\r");
-  pacs->can_buf.cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
-  pacs->can_buf.cmd[CAN_CMD_ARG] = ST_MAX_PWR;
-  transitionState(pacs);
-  /*
+  //chprintf(chp, "changeState %s\n\r", argv[1]);
+  //*
   if(strcmp(argv[1],"active"))
   {
-//    chSysLockFromISR();
-    pacs->can_buf.cmd[CAN_CMD_ARG] = CMD_CHANGE_STATE;
-    pacs->can_buf.cmd[CAN_CMD_2] = ST_MAX_PWR;
-    transitionState(pacs);
-//    chEvtSignalI(uart_thread, events);
-//    chSysUnlockFromISR();
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = ST_MAX_PWR;
+    chprintf(chp, "changeState active%s\n\r",argv[1]);
+//    chSysLock();
+//    chEvtSignal(pacs->pacsthread, CMD_CHANGE_STATE);
+//    chSysUnlock();
   }
+  else if(strcmp(argv[1],"passive"))
+  {
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = ST_RDY;
+    chprintf(chp, "changeState passive %s\n\r", argv[1]);
+  }
+  else
+  {
+    chprintf(chp, "Invalid state change request %s\n\r", argv[1]);
+    return;
+  }
+  chprintf(chp, "sending signal\n\r", argv[1]);
+  //chEvtSignal(pacs->pacsthread, 0);
+  chEvtSignal(pacs->pacsthread, CMD_CHANGE_STATE);
+  //chEvtSignal(pacs->pacsthread,EVENT_MASK(0));
+//  handleEvent(pacs);
   //*/
 }
 
@@ -58,7 +73,23 @@ void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[])
   (void)argc;
   (void)argv;
   (void)chp;
-
+  
+  if(strcmp(argv[1],"on"))
+  {
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_START;
+  }
+  else if(strcmp(argv[1],"on"))
+  {
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_STOP;
+  }
+  else
+  {
+    chprintf(chp, "Invalid option: %s\n\r", argv[1]);
+    return;
+  }
+  handleEvent(pacs);
 }
 
 void cmd_magnetorquerCtrl(BaseSequentialStream *chp, int argc, char *argv[])
@@ -67,6 +98,9 @@ void cmd_magnetorquerCtrl(BaseSequentialStream *chp, int argc, char *argv[])
   (void)argv;
   (void)chp;
     
+  //pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
+  //pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_STOP;
+  //handleEvent(pacs);
 }
 
 //*
@@ -89,7 +123,7 @@ THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
 //  (void)arg;
-  pacs = (ACS *)&arg;
+  pacs = (ACS *)arg;
 
   while (!chThdShouldTerminateX()) {
     thread_t *shell_tp = chThdCreateStatic(

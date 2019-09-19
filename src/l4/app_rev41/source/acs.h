@@ -100,6 +100,15 @@ struct ACS
 	ACS_VALID_FUNCTION function;
 	ACS_VALID_STATE (*fn_exit)(ACS *acs);
   BLDCMotor motor;
+  thread_t *pacsthread;
+  /**
+   *	event_lister is used for synchronization between 
+   *	the ACS and the CAN thread
+   */
+  //static event_listener_t el;
+  event_listener_t sel; // serial event listener
+  event_source_t ses;
+
  // MTQR mtqr;
 };
 
@@ -167,6 +176,7 @@ extern THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 extern THD_FUNCTION(ACS_Thread, arg);
 
 EXIT_STATUS acs_init(ACS *acs);
-extern EXIT_STATUS transitionState(ACS *acs);
+//extern EXIT_STATUS transitionState(ACS *acs);
+extern EXIT_STATUS handleEvent(ACS *acs);
 
 #endif // end _ACS_H_

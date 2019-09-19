@@ -5,14 +5,6 @@
 #include "shell.h"
 
 /**
- *	event_lister is used for synchronization between 
- *	the ACS and the CAN thread
- */
-//static event_listener_t el;
-static event_listener_t sel; // serial even listener
-static event_source_t acs_event_source;
-
-/**
  *	@brief ACS initialization function
  */
 extern EXIT_STATUS acs_init(ACS *acs)
@@ -356,7 +348,7 @@ static EXIT_STATUS requestFunction(ACS *acs)
 /**
  *	transitionState
  */
-EXIT_STATUS transitionState(ACS *acs)
+static EXIT_STATUS transitionState(ACS *acs)
 // static EXIT_STATUS transitionState(ACS *acs)
 {
 	ACS_VALID_STATE state = acs->cmd[CAN_CMD_ARG];
@@ -411,6 +403,7 @@ static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status
 static EXIT_STATUS receiveCommand(ACS *acs)
 {
 	(void)acs;
+  chprintf(DEBUG_CHP, "CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0]);
   /// ******critical section*******
 //*
 	chSysLock();
@@ -428,16 +421,18 @@ static EXIT_STATUS receiveCommand(ACS *acs)
 /**
  *	handles events off the CAN bus
  */
-static EXIT_STATUS handleEvent(ACS *acs)
+EXIT_STATUS handleEvent(ACS *acs)
 {
 	EXIT_STATUS status = STATUS_SUCCESS;
 
   /// block until there is an event from CAN
+  chprintf(DEBUG_CHP, "waiting\n\r");
   chEvtWaitAny(ALL_EVENTS);	
+  chprintf(DEBUG_CHP, "got event\n\r");
   receiveCommand(acs); // should probably rename to be more descriptive
 
-  dbgSerialOut("CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0], 1000);
-	
+  //dbgSerialOut("CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0], 1000);
+
   switch(acs->cmd[CAN_CMD_0])
   {
     case CMD_NOP:
@@ -463,7 +458,7 @@ static EXIT_STATUS acs_statemachine(ACS *acs)
 {
 	acs->state.current = entry_rdy(acs);
 	acs->fn_exit = exit_rdy;
-  
+
   dbgSerialOut("Entering acs_statemachine...\n\r", 0, 500);
 
   while(!chThdShouldTerminateX())
@@ -482,6 +477,25 @@ THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 THD_FUNCTION(ACS_Thread,acs)
 {
   chRegSetThreadName("acs_thread");
+
+ /*
+  chEvtRegisterMask(
+    &acs->ses,
+    &acs->sel,
+    EVENT_MASK(CMD_CHANGE_STATE)
+  );
+//*/
+
+//*
+  chEvtRegister(
+//  chEvtRegisterMask(
+    &((ACS *)acs)->ses,
+    &((ACS *)acs)->sel,
+    CMD_CHANGE_STATE
+    //EVENT_MASK(0)
+  );
+//*/
+
   //*
   chThdCreateStatic(
     //"Command Shell",
@@ -490,10 +504,9 @@ THD_FUNCTION(ACS_Thread,acs)
     NORMALPRIO,
     cmd,
     (void *)acs
-    //(void *)&acs
   );
   //*/
- 
+
  // chEvtRegister(&rpdo_event,&el,0);
   //chEvtRegister(&rpdo_event,&sel,0);
 

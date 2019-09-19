@@ -72,13 +72,15 @@ static void app_main(void)
   //*/
 
 //*
-	chThdCreateStatic( /// Create ACS thread
+	thread_t *pacsthread = chThdCreateStatic( /// Create ACS thread
 		waACS_Thread,
 		sizeof(waACS_Thread),
 		NORMALPRIO + 1,
 		ACS_Thread,
 		&acs	
 	);
+
+  acs.pacsthread = pacsthread;
 //*/
 
   while(true)
