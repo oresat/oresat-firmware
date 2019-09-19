@@ -29,7 +29,7 @@ typedef union {
                 uint8_t datah;
                 uint8_t datal;
             };
-            uint16_t data;
+            uint8_t data[2];
         };
     };
     uint8_t txbuf[3];
@@ -115,14 +115,15 @@ void max580xObjectInit(MAX580XDriver *devp) {
  */
 void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config) {
     cmd_t command;
-    osalDbgCheck((devp != NULL) && (config != NULL));
 
+    osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == MAX580X_STOP) ||
             (devp->state == MAX580X_READY),
             "max580xStart(), invalid state");
 
     devp->config = config;
-    command.data = 0;
+    command.datah = 0;
+    command.datal = 0;
 
     /* Configuring common registers.*/
 #if MAX580X_USE_I2C
@@ -149,6 +150,25 @@ void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config) {
     command.datal = config->default_cfg;
     max580xI2CWriteRegister(config->i2cp, config->saddr,
             command.txbuf, sizeof(cmd_t));
+    max580xI2CReadRegister(config->i2cp, config->saddr, MAX580X_CMD_NOP, command.data, sizeof(command.data));
+    switch (command.datal) {
+        case MAX5805:
+            devp->res = MAX5805_RES;
+            devp->range = 4096;
+            break;
+        case MAX5803:
+            devp->res = MAX5803_RES;
+            devp->range = 256;
+            break;
+        case MAX5804:
+            devp->res = MAX5804_RES;
+            devp->range = 1024;
+            break;
+        default:
+            devp->res = 0;
+            devp->range = 0;
+            break;
+    }
 
 #if MAX580X_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -168,7 +188,6 @@ void max580xStop(MAX580XDriver *devp) {
     cmd_t command;
 
     osalDbgCheck(devp != NULL);
-
     osalDbgAssert((devp->state == MAX580X_STOP) || (devp->state == MAX580X_READY),
             "max580xStop(), invalid state");
 
@@ -194,17 +213,17 @@ void max580xStop(MAX580XDriver *devp) {
 }
 
 /**
- * @brief   Reads MAX580X DAC as raw value.
+ * @brief   Reads MAX580X DAC Register as raw value.
  *
  * @param[in] devp       pointer to the @p MAX580XDriver object
+ * @param[in] reg        the DAC register to read from
  *
  * @api
  */
-uint16_t max580xReadRaw(MAX580XDriver *devp) {
-    uint16_t retval;
+uint16_t max580xReadRaw(MAX580XDriver *devp, max580x_reg_t reg) {
+    cmd_t command;
 
     osalDbgCheck(devp != NULL);
-
     osalDbgAssert(devp->state == MAX580X_READY,
             "max580xReadRaw(), invalid state");
 
@@ -214,28 +233,30 @@ uint16_t max580xReadRaw(MAX580XDriver *devp) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MAX580X_SHARED_I2C */
 
-    max580xI2CReadRegister(devp->config->i2cp, devp->config->saddr, MAX580X_CMD_CODE_LOAD, (uint8_t*)(&retval), sizeof(retval));
+    command.cmd = reg;
+    max580xI2CReadRegister(devp->config->i2cp, devp->config->saddr, command.cmd, command.data, sizeof(command.data));
 
 #if MAX580X_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX580X_SHARED_I2C */
 #endif /* MAX580X_USE_I2C */
-    return retval;
+    /* TODO: Fix data conversion */
+    return MAX580X_DAC2VAL(*command.data, devp->res);
 }
 
 /**
- * @brief   Writes MAX580X DAC as raw value.
+ * @brief   Writes MAX580X DAC Register as raw value.
  *
  * @param[in] devp       pointer to the @p MAX580XDriver object
- * @param[in] value      the value to write to the DAC
+ * @param[in] value      the value to write to a DAC register
+ * @param[in] reg        the DAC register to write the value into
  *
  * @api
  */
-void max580xWriteRaw(MAX580XDriver *devp, uint16_t value) {
+void max580xWriteRaw(MAX580XDriver *devp, uint16_t value, max580x_reg_t reg) {
     cmd_t command;
 
     osalDbgCheck(devp != NULL);
-
     osalDbgAssert(devp->state == MAX580X_READY,
             "max580xWriteRaw(), invalid state");
 
@@ -245,14 +266,114 @@ void max580xWriteRaw(MAX580XDriver *devp, uint16_t value) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MAX580X_SHARED_I2C */
 
-    command.cmd = MAX580X_CMD_CODE_LOAD;
-    command.data = value;
+    command.cmd = reg;
+    /* TODO: Fix data conversion */
+    command.datah = (MAX580X_VAL2DAC(value, devp->res) & 0xFF00) >> 8;
+    command.datal = MAX580X_VAL2DAC(value, devp->res) & 0xFF;
     max580xI2CWriteRegister(devp->config->i2cp, devp->config->saddr, command.txbuf, 3);
 
 #if MAX580X_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX580X_SHARED_I2C */
 #endif /* MAX580X_USE_I2C */
+}
+
+/**
+ * @brief   Reads MAX580X DAC Register as a voltage.
+ * @details This only works when using an internal reference and assumes sufficient supply.
+ *
+ * @param[in] devp       pointer to the @p MAX580XDriver object
+ * @param[in] reg        the DAC register to read from
+ *
+ * @api
+ */
+uint32_t max580xReadVoltage(MAX580XDriver *devp, max580x_reg_t reg) {
+    uint32_t voltage;
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->config->ref != MAX580X_REF_EXT,
+            "max580xReadVoltage(), REF_EXT not allowed");
+
+    /* TODO: Clean this up, it's terrible */
+    voltage = max580xReadRaw(devp, reg) * 10;
+    switch (devp->config->ref & 3U) {
+        case MAX580X_REF_2500:
+            voltage = voltage * 2500;
+            break;
+        case MAX580X_REF_2048:
+            voltage = voltage * 2048;
+            break;
+        case MAX580X_REF_4096:
+            voltage = voltage * 4096;
+            break;
+    }
+    voltage /= devp->range;
+
+    return voltage;
+}
+
+/**
+ * @brief   Writes MAX580X DAC Register as a voltage.
+ * @details This only works when using an internal reference and assumes sufficient supply.
+ *
+ * @param[in] devp       pointer to the @p MAX580XDriver object
+ * @param[in] voltage    the voltage to write to a DAC register
+ * @param[in] reg        the DAC register to write the value into
+ *
+ * @api
+ */
+void max580xWriteVoltage(MAX580XDriver *devp, uint32_t voltage, max580x_reg_t reg) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->config->ref != MAX580X_REF_EXT,
+            "max580xWriteVoltage(), REF_EXT not allowed");
+
+    /* TODO: Clean this up, it's terrible */
+    /* TODO: Bounds checking */
+    voltage = voltage - (voltage % 5);
+    voltage *= devp->range;
+    switch (devp->config->ref & 3U) {
+        case MAX580X_REF_2500:
+            voltage /= 25000;
+            break;
+        case MAX580X_REF_2048:
+            voltage /= 20480;
+            break;
+        case MAX580X_REF_4096:
+            voltage /= 40960;
+            break;
+    }
+    max580xWriteRaw(devp, voltage, reg);
+}
+
+/**
+ * @brief   Execute MAX580X LOAD instruction.
+ *
+ * @param[in] devp       pointer to the @p MAX580XDriver object
+ *
+ * @api
+ */
+void max580xLoad(MAX580XDriver *devp) {
+    cmd_t command;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == MAX580X_READY,
+            "max580xReadRaw(), invalid state");
+
+#if MAX580X_USE_I2C
+#if MAX580X_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX580X_SHARED_I2C */
+
+    command.cmd = MAX580X_CMD_LOAD;
+    command.datah = 0;
+    command.datal = 0;
+    max580xI2CWriteRegister(devp->config->i2cp, devp->config->saddr, command.txbuf, sizeof(cmd_t));
+
+#if MAX580X_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX580X_SHARED_I2C */
+#endif /* MAX580X_USE_I2C */
+
 }
 
 /** @} */

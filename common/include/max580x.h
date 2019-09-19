@@ -106,6 +106,15 @@
 #define MAX580X_DEFAULT_RETURN              (4U << 5)
 /** @} */
 
+/**
+ * @name    MAX580X RETURN/CODE Data Fields
+ * @{
+ */
+/* TODO: Fix conversions */
+#define MAX580X_DAC2VAL(field,res)          (field >> (16 - res))
+#define MAX580X_VAL2DAC(val,res)            (val << (16 - res))
+/** @} */
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -160,6 +169,33 @@
 typedef struct MAX580XDriver MAX580XDriver;
 
 /**
+ * @name    MAX580X Part IDs
+ */
+typedef enum {
+    MAX5805 = 0x82,
+    MAX5803 = 0x8A,
+    MAX5804 = 0x92,
+} max580x_devid_t;
+
+/**
+ * @name    MAX580X DAC Resolutions
+ */
+typedef enum {
+    MAX5803_RES = 8,
+    MAX5804_RES = 10,
+    MAX5805_RES = 12,
+} max580x_res_t;
+
+/**
+ * @name    MAX580X DAC Registers
+ */
+typedef enum {
+    MAX580X_RETURN = MAX580X_CMD_RETURN,
+    MAX580X_CODE = MAX580X_CMD_CODE,
+    MAX580X_CODE_LOAD = MAX580X_CMD_CODE_LOAD,
+} max580x_reg_t;
+
+/**
  * @brief   Driver state machine possible states.
  */
 typedef enum {
@@ -207,15 +243,7 @@ typedef struct {
 /**
  * @brief   @p MAX580X specific methods.
  */
-#define _max580x_methods_alone                                              \
-    /* Change output state of MAX580X ports.*/                              \
-    msg_t (*set_output)(MAX580XDriver *devp, uint8_t output);               \
-    /* Change polarity of MAX580X ports.*/                                  \
-    msg_t (*set_polarity)(MAX580XDriver *devp, uint8_t polarity);           \
-    /* Change IO mode of MAX580X ports.*/                                   \
-    msg_t (*set_iomode)(MAX580XDriver *devp, uint8_t iomode);               \
-    /* Change timeout setting of MAX580X.*/                                 \
-    msg_t (*set_timeout)(MAX580XDriver *devp, max580x_timeout_t timeout);
+#define _max580x_methods_alone
 
 /**
  * @brief   @p MAX580X specific methods with inherited ones.
@@ -240,7 +268,9 @@ struct MAX580XVMT {
     /* Driver state.*/                                                      \
     max580x_state_t           state;                                        \
     /* Current configuration data.*/                                        \
-    const MAX580XConfig       *config;
+    const MAX580XConfig       *config;                                      \
+    max580x_res_t             res;                                          \
+    uint16_t                  range;
 
 /**
  * @brief MAX710 GPIO Expander class.
@@ -267,8 +297,11 @@ extern "C" {
 void max580xObjectInit(MAX580XDriver *devp);
 void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config);
 void max580xStop(MAX580XDriver *devp);
-uint16_t max580xReadRaw(MAX580XDriver *devp);
-void max580xWriteRaw(MAX580XDriver *devp, uint16_t value);
+uint16_t max580xReadRaw(MAX580XDriver *devp, max580x_reg_t reg);
+void max580xWriteRaw(MAX580XDriver *devp, uint16_t value, max580x_reg_t reg);
+uint32_t max580xReadVoltage(MAX580XDriver *devp, max580x_reg_t reg);
+void max580xWriteVoltage(MAX580XDriver *devp, uint32_t voltage, max580x_reg_t reg);
+void max580xLoad(MAX580XDriver *devp);
 #ifdef __cplusplus
 }
 #endif
