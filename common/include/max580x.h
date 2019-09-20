@@ -110,9 +110,8 @@
  * @name    MAX580X RETURN/CODE Data Fields
  * @{
  */
-/* TODO: Fix conversions */
-#define MAX580X_DAC2VAL(field,res)          (field >> (16 - res))
-#define MAX580X_VAL2DAC(val,res)            (val << (16 - res))
+#define MAX580X_DAC2VAL(field,res)          __REVSH(field >> (16 - res))
+#define MAX580X_VAL2DAC(val,res)            __REVSH(val << (16 - res))
 /** @} */
 
 /*===========================================================================*/

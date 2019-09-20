@@ -25,11 +25,8 @@ typedef union {
     struct __attribute__((packed)) {
         uint8_t cmd;
         union {
-            struct {
-                uint8_t datah;
-                uint8_t datal;
-            };
             uint8_t data[2];
+            uint16_t value;
         };
     };
     uint8_t txbuf[3];
@@ -122,8 +119,7 @@ void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config) {
             "max580xStart(), invalid state");
 
     devp->config = config;
-    command.datah = 0;
-    command.datal = 0;
+    command.value = 0;
 
     /* Configuring common registers.*/
 #if MAX580X_USE_I2C
@@ -139,19 +135,19 @@ void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config) {
     max580xI2CWriteRegister(config->i2cp, config->saddr,
             command.txbuf, sizeof(cmd_t));
     command.cmd = MAX580X_CMD_POWER;
-    command.datal = config->power;
+    command.data[1] = config->power;
     max580xI2CWriteRegister(config->i2cp, config->saddr,
             command.txbuf, sizeof(cmd_t));
     command.cmd = MAX580X_CMD_CONFIG;
-    command.datal = config->aux;
+    command.data[1] = config->aux;
     max580xI2CWriteRegister(config->i2cp, config->saddr,
             command.txbuf, sizeof(cmd_t));
     command.cmd = MAX580X_CMD_DEFAULT;
-    command.datal = config->default_cfg;
+    command.data[1] = config->default_cfg;
     max580xI2CWriteRegister(config->i2cp, config->saddr,
             command.txbuf, sizeof(cmd_t));
     max580xI2CReadRegister(config->i2cp, config->saddr, MAX580X_CMD_NOP, command.data, sizeof(command.data));
-    switch (command.datal) {
+    switch (command.data[1]) {
         case MAX5805:
             devp->res = MAX5805_RES;
             devp->range = 4096;
@@ -240,8 +236,7 @@ uint16_t max580xReadRaw(MAX580XDriver *devp, max580x_reg_t reg) {
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX580X_SHARED_I2C */
 #endif /* MAX580X_USE_I2C */
-    /* TODO: Fix data conversion */
-    return MAX580X_DAC2VAL(*command.data, devp->res);
+    return MAX580X_DAC2VAL(command.value, devp->res);
 }
 
 /**
@@ -267,9 +262,7 @@ void max580xWriteRaw(MAX580XDriver *devp, uint16_t value, max580x_reg_t reg) {
 #endif /* MAX580X_SHARED_I2C */
 
     command.cmd = reg;
-    /* TODO: Fix data conversion */
-    command.datah = (MAX580X_VAL2DAC(value, devp->res) & 0xFF00) >> 8;
-    command.datal = MAX580X_VAL2DAC(value, devp->res) & 0xFF;
+    command.value = MAX580X_VAL2DAC(value, devp->res);
     max580xI2CWriteRegister(devp->config->i2cp, devp->config->saddr, command.txbuf, 3);
 
 #if MAX580X_SHARED_I2C
@@ -365,15 +358,13 @@ void max580xLoad(MAX580XDriver *devp) {
 #endif /* MAX580X_SHARED_I2C */
 
     command.cmd = MAX580X_CMD_LOAD;
-    command.datah = 0;
-    command.datal = 0;
+    command.value = 0;
     max580xI2CWriteRegister(devp->config->i2cp, devp->config->saddr, command.txbuf, sizeof(cmd_t));
 
 #if MAX580X_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX580X_SHARED_I2C */
 #endif /* MAX580X_USE_I2C */
-
 }
 
 /** @} */
