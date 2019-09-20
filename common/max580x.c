@@ -335,7 +335,7 @@ void max580xWriteVoltage(MAX580XDriver *devp, max580x_reg_t reg, uint32_t voltag
             voltage /= 40960;
             break;
     }
-    max580xWriteRaw(devp, voltage, reg);
+    max580xWriteRaw(devp, reg, voltage);
 }
 
 /**
