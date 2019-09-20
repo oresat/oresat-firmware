@@ -65,7 +65,7 @@
 #define GPIOA_USART2_TX             2U
 #define GPIOA_USART2_RX             3U
 #define GPIOA_DEBUG                 4U
-#define GPIOA_TP9                   5U
+#define GPIOA_OUTPUT_EN             5U
 #define GPIOA_TP10                  6U
 #define GPIOA_TP11                  7U
 #define GPIOA_PIN8                  8U
@@ -201,6 +201,7 @@
  */
 #define LINE_LED_GREEN              PAL_LINE(GPIOA, 4U)
 #define LINE_DEBUG                  PAL_LINE(GPIOA, 4U)
+#define LINE_OUTPUT_EN              PAL_LINE(GPIOA, 5U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -248,7 +249,7 @@
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - DEBUG                     (output pulldown).
- * PA5  - TP9                       (analog).
+ * PA5  - OUTPUT_EN                 (output pushpull).
  * PA6  - TP10                      (analog).
  * PA7  - TP11                      (analog).
  * PA8  - PIN8 NOT CONNECTED        (analog).
@@ -265,7 +266,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_OUTPUT(GPIOA_DEBUG) |         \
-                                     PIN_MODE_ANALOG(GPIOA_TP9) |           \
+                                     PIN_MODE_OUTPUT(GPIOA_OUTPUT_EN) |     \
                                      PIN_MODE_ANALOG(GPIOA_TP10) |          \
                                      PIN_MODE_ANALOG(GPIOA_TP11) |          \
                                      PIN_MODE_ANALOG(GPIOA_PIN8) |          \
@@ -281,7 +282,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_DEBUG) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_TP9) |        \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_OUTPUT_EN) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_TP10) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_TP11) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN8) |       \
@@ -297,7 +298,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_DEBUG) |         \
-                                     PIN_OSPEED_HIGH(GPIOA_TP9) |           \
+                                     PIN_OSPEED_HIGH(GPIOA_OUTPUT_EN) |     \
                                      PIN_OSPEED_HIGH(GPIOA_TP10) |          \
                                      PIN_OSPEED_HIGH(GPIOA_TP11) |          \
                                      PIN_OSPEED_HIGH(GPIOA_PIN8) |          \
@@ -313,7 +314,7 @@
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_PULLDOWN(GPIOA_DEBUG) |      \
-                                     PIN_PUPDR_FLOATING(GPIOA_TP9) |        \
+                                     PIN_PUPDR_FLOATING(GPIOA_OUTPUT_EN) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_TP10) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_TP11) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN8) |       \
@@ -329,7 +330,7 @@
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
                                      PIN_ODR_LOW(GPIOA_DEBUG) |             \
-                                     PIN_ODR_HIGH(GPIOA_TP9) |              \
+                                     PIN_ODR_LOW(GPIOA_OUTPUT_EN) |         \
                                      PIN_ODR_HIGH(GPIOA_TP10) |             \
                                      PIN_ODR_HIGH(GPIOA_TP11) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN8) |             \
@@ -345,7 +346,7 @@
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_DEBUG, 0U) |         \
-                                     PIN_AFIO_AF(GPIOA_TP9, 0U) |           \
+                                     PIN_AFIO_AF(GPIOA_OUTPUT_EN, 0U) |     \
                                      PIN_AFIO_AF(GPIOA_TP10, 0U) |          \
                                      PIN_AFIO_AF(GPIOA_TP11, 0U))
 #define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_PIN8, 0U) |          \

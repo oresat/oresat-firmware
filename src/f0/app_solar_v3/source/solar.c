@@ -35,30 +35,47 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
+uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
+{
+    static int32_t perturb_dir = -1;    /* Stores the the direction of the last perturbation of the VI curve */
+    static uint32_t prev_pwr = 0;       /* The power being drawn from the previous iteration of the loop */
+
+    /* If the power decreased, flip perturb_dir */
+    if (pwr < prev_pwr) {
+        perturb_dir *= -1;
+    }
+
+    iadj_v += 5 * perturb_dir;
+    prev_pwr = pwr;
+    return iadj_v;
+}
+
 /* Example blinker thread */
 THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    uint32_t pwr, iadj_v;
+    static uint32_t iadj_v = 15000;
+    uint32_t pwr;
 
     /* Start up drivers for I2C devices */
     ina226Start(&ina226dev, &ina226config);
     max580xStart(&max580xdev, &max580xconfig);
 
+    max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
     while (!chThdShouldTerminateX()) {
-        /* Get current values for power and iadj voltage */
+        /* Get current values for power */
         pwr = ina226ReadPower(&ina226dev);
-        iadj_v = max580xReadVoltage(&max580xdev, MAX580X_CODE_LOAD);
 
         /* Calculate perterbation of iadj */
+        iadj_v = calc_iadj(pwr, iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
 
         /* Toggle LED and sleep */
         palToggleLine(LINE_LED_GREEN);
-        chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(10);
     }
 
     /* Stop drivers for I2C devices */
