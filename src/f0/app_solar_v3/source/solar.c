@@ -37,15 +37,15 @@ static INA226Driver ina226dev;
 
 uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
 {
-    static int32_t perturb_dir = -1;    /* Stores the the direction of the last perturbation of the VI curve */
+    static int32_t perturb = 5;         /* Stores the the last perturbation of the VI curve */
     static uint32_t prev_pwr = 0;       /* The power being drawn from the previous iteration of the loop */
 
-    /* If the power decreased, flip perturb_dir */
+    /* If the power decreased, flip perturb direction */
     if (pwr < prev_pwr) {
-        perturb_dir *= -1;
+        perturb *= -1;
     }
 
-    iadj_v += 5 * perturb_dir;
+    iadj_v += perturb;
     prev_pwr = pwr;
     return iadj_v;
 }
