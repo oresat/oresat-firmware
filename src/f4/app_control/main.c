@@ -21,6 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "opd.h"
 #include "command.h"
 #include "thread1.h"
 

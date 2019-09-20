@@ -3,6 +3,8 @@
 
 #include "command.h"
 #include "CO_master.h"
+#include "opd.h"
+#include "max7310.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -12,11 +14,26 @@
 
 static uint8_t data[BUF_SIZE];
 
+void nmt_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: nmt start|stop|preop|resetcomm|resetnode <NodeID>\r\n");
+}
+
+void sdo_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [blockmode]\r\n");
+}
+
+void opd_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: opd enable|disable|reset|reinit|status <opd_addr>\r\n");
+}
+
 void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
 {
     uint8_t node_id = 0;
     if (argc < 2) {
-        chprintf(chp, "Usage: nmt start|stop|preop|resetcomm|resetnode <NodeID>\r\n");
+        nmt_usage(chp);
         return;
     }
     node_id = strtoul(argv[1], NULL, 0);
@@ -33,6 +50,7 @@ void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
         CO_sendNMTcommand(CO, CO_NMT_RESET_NODE, node_id);
     } else {
         chprintf(chp, "Invalid command: %s\r\n", argv[0]);
+        nmt_usage(chp);
         return;
     }
 }
@@ -47,7 +65,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
     bool block = false;
 
     if (argc < 4) {
-        chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [blockmode]\r\n");
+        sdo_usage(chp);
         return;
     }
 
@@ -69,42 +87,63 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Received abort code: %x\r\n", abrt_code);
         }
     } else if (!strcmp(argv[0], "write")) {
-        sdo_download(CO->SDOclient[0], node_id, index, subindex, data, data_len, &abrt_code, 1000, block);
+        chprintf(chp, "Disabled for now\r\n");
+        /*sdo_download(CO->SDOclient[0], node_id, index, subindex, data, data_len, &abrt_code, 1000, block);*/
     } else {
-        chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [block_mode]\r\n");
+        sdo_usage(chp);
         return;
     }
 }
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    static opd_addr_t opd_addr = 0;
     opd_status_t status = {0};
-    opd_addr_t opd_addr = 0;
 
-    if (argc < 2) {
-        chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
+    if (argc < 1) {
+        opd_usage(chp);
+        return;
+    } else if (argc > 1) {
+        opd_addr = strtoul(argv[1], NULL, 0);
+        chprintf(chp, "Setting persistent board address to 0x%02X\r\n", opd_addr);
+    } else if (opd_addr == 0) {
+        chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
+        opd_usage(chp);
         return;
     }
 
-    opd_addr = strtoul(argv[1], NULL, 0);
-
     if (!strcmp(argv[0], "enable")) {
+        chprintf(chp, "Enabling board 0x%02X\r\n", opd_addr);
         opd_enable(opd_addr);
     } else if (!strcmp(argv[0], "disable")) {
+        chprintf(chp, "Disabling board 0x%02X\r\n", opd_addr);
         opd_disable(opd_addr);
+    } else if (!strcmp(argv[0], "reset")) {
+        chprintf(chp, "Resetting board 0x%02X\r\n", opd_addr);
+        opd_reset(opd_addr);
+    } else if (!strcmp(argv[0], "reinit")) {
+        chprintf(chp, "Reinitializing OPD\r\n", opd_addr);
+        opd_stop();
+        opd_init();
+        opd_start();
     } else if (!strcmp(argv[0], "status")) {
+        chprintf(chp, "Status of board 0x%02X: ", opd_addr);
         if (!opd_status(opd_addr, &status)) {
-            chprintf(chp, "Read status of 0x%02X:\r\n", opd_addr);
+            chprintf(chp, "CONNECTED\r\n");
+            chprintf(chp, "State: %s-%s\r\n",
+                    (status.odr & MAX7310_PIN_MASK(OPD_LED) ? "ENABLED" : "DISABLED"),
+                    (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
+            chprintf(chp, "Raw register values:\r\n");
             chprintf(chp, "Input:       %02X\r\n", status.input);
             chprintf(chp, "Output:      %02X\r\n", status.odr);
             chprintf(chp, "Polarity:    %02X\r\n", status.pol);
             chprintf(chp, "Mode:        %02X\r\n", status.mode);
             chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
         } else {
-            chprintf(chp, "Invalid address\r\n");
+            chprintf(chp, "NOT CONNECTED\r\n");
         }
     } else {
-        chprintf(chp, "Usage: opd enable|disable|status <opd_addr>\r\n");
+        opd_usage(chp);
         return;
     }
 
