@@ -1,4 +1,5 @@
 #include "solar.h"
+#include "ina226.h"
 #include "max580x.h"
 #include "CANopen.h"
 
@@ -10,7 +11,17 @@ static const I2CConfig i2cconfig = {
     0
 };
 
-static MAX580XConfig devconfig = {
+static INA226Config ina226config = {
+    &I2CD1,
+    &i2cconfig,
+    INA226_SADDR,
+    INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
+    INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
+    INA226_CONFIG_AVG_1,
+    5120        /* 10uA/bit with 0.1mOhm shunt */
+};
+
+static MAX580XConfig max580xconfig = {
     &I2CD1,
     &i2cconfig,
     MAX5805_SADDR,
@@ -20,7 +31,8 @@ static MAX580XConfig devconfig = {
     MAX580X_DEFAULT_POR
 };
 
-static MAX580XDriver dev;
+static MAX580XDriver max580xdev;
+static INA226Driver ina226dev;
 
 /* Example blinker thread */
 THD_WORKING_AREA(solar_wa, 0x100);
@@ -28,14 +40,16 @@ THD_FUNCTION(solar, arg)
 {
     (void)arg;
 
-    max580xStart(&dev, &devconfig);
+    ina226Start(&ina226dev, &ina226config);
+    max580xStart(&max580xdev, &max580xconfig);
 
     while (!chThdShouldTerminateX()) {
         palToggleLine(LINE_LED_GREEN);
         chThdSleepMilliseconds(1000);
     }
 
-    max580xStop(&dev);
+    max580xStop(&max580xdev);
+    ina226Stop(&ina226dev);
 
     palClearLine(LINE_LED_GREEN);
     chThdExit(MSG_OK);
