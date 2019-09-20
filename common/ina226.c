@@ -183,36 +183,6 @@ void ina226Stop(INA226Driver *devp) {
 }
 
 /**
- * @brief   Reads INA226 Register as raw value.
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
-    uint8_t value[2];
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == INA226_READY,
-            "ina226ReadRaw(), invalid state");
-
-#if INA226_USE_I2C
-#if INA226_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* INA226_SHARED_I2C */
-
-    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, value, sizeof(value));
-
-#if INA226_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* INA226_SHARED_I2C */
-#endif /* INA226_USE_I2C */
-    return __REVSH(*(uint16_t*)value);
-}
-
-/**
  * @brief   Sets INA226 Alert type and value
  *
  * @param[in] devp       pointer to the @p INA226Driver object
@@ -245,6 +215,36 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
     i2cReleaseBus(devp->config->i2cp);
 #endif /* INA226_SHARED_I2C */
 #endif /* INA226_USE_I2C */
+}
+
+/**
+ * @brief   Reads INA226 Register as raw value.
+ *
+ * @param[in] devp       pointer to the @p INA226Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
+    uint8_t value[2];
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == INA226_READY,
+            "ina226ReadRaw(), invalid state");
+
+#if INA226_USE_I2C
+#if INA226_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* INA226_SHARED_I2C */
+
+    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, value, sizeof(value));
+
+#if INA226_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* INA226_SHARED_I2C */
+#endif /* INA226_USE_I2C */
+    return __REVSH(*(uint16_t*)value);
 }
 
 /**
@@ -285,9 +285,10 @@ uint32_t ina226ReadVBUS(INA226Driver *devp) {
 
 /**
  * @brief   Reads INA226 Current.
+ * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Current in increments of Current_LSB set by CAL
+ * @return               Current in increments of @p curr_lsb
  *
  * @api
  */
@@ -295,17 +296,20 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
     int32_t current;
 
     osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->config->curr_lsb,
+            "ina226ReadCurrent(): invalid curr_lsb value");
 
-    current = ina226ReadRaw(devp, INA226_AD_CURRENT);
+    current = ina226ReadRaw(devp, INA226_AD_CURRENT) * devp->config->curr_lsb;
 
     return current;
 }
 
 /**
  * @brief   Reads INA226 Power.
+ * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Power in increments of (Current_LSB * 25V)
+ * @return               Power in increments of @p curr_lsb * 25V
  *
  * @api
  */
@@ -313,8 +317,10 @@ uint32_t ina226ReadPower(INA226Driver *devp) {
     uint32_t power;
 
     osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->config->curr_lsb,
+            "ina226ReadCurrent(): invalid curr_lsb value");
 
-    power = ina226ReadRaw(devp, INA226_AD_POWER) * 25;
+    power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
 
     return power;
 }
