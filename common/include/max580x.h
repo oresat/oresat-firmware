@@ -297,9 +297,9 @@ void max580xObjectInit(MAX580XDriver *devp);
 void max580xStart(MAX580XDriver *devp, const MAX580XConfig *config);
 void max580xStop(MAX580XDriver *devp);
 uint16_t max580xReadRaw(MAX580XDriver *devp, max580x_reg_t reg);
-void max580xWriteRaw(MAX580XDriver *devp, uint16_t value, max580x_reg_t reg);
+void max580xWriteRaw(MAX580XDriver *devp, max580x_reg_t reg, uint16_t value);
 uint32_t max580xReadVoltage(MAX580XDriver *devp, max580x_reg_t reg);
-void max580xWriteVoltage(MAX580XDriver *devp, uint32_t voltage, max580x_reg_t reg);
+void max580xWriteVoltage(MAX580XDriver *devp, max580x_reg_t reg, uint32_t voltage);
 void max580xLoad(MAX580XDriver *devp);
 #ifdef __cplusplus
 }

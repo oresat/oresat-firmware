@@ -243,12 +243,12 @@ uint16_t max580xReadRaw(MAX580XDriver *devp, max580x_reg_t reg) {
  * @brief   Writes MAX580X DAC Register as raw value.
  *
  * @param[in] devp       pointer to the @p MAX580XDriver object
- * @param[in] value      the value to write to a DAC register
  * @param[in] reg        the DAC register to write the value into
+ * @param[in] value      the value to write to a DAC register
  *
  * @api
  */
-void max580xWriteRaw(MAX580XDriver *devp, uint16_t value, max580x_reg_t reg) {
+void max580xWriteRaw(MAX580XDriver *devp, max580x_reg_t reg, uint16_t value) {
     cmd_t command;
 
     osalDbgCheck(devp != NULL);
@@ -310,12 +310,12 @@ uint32_t max580xReadVoltage(MAX580XDriver *devp, max580x_reg_t reg) {
  * @details This only works when using an internal reference and assumes sufficient supply.
  *
  * @param[in] devp       pointer to the @p MAX580XDriver object
- * @param[in] voltage    the voltage to write to a DAC register
  * @param[in] reg        the DAC register to write the value into
+ * @param[in] voltage    the voltage to write to a DAC register
  *
  * @api
  */
-void max580xWriteVoltage(MAX580XDriver *devp, uint32_t voltage, max580x_reg_t reg) {
+void max580xWriteVoltage(MAX580XDriver *devp, max580x_reg_t reg, uint32_t voltage) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->ref != MAX580X_REF_EXT,
             "max580xWriteVoltage(), REF_EXT not allowed");
