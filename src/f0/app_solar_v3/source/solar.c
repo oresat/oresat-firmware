@@ -3,6 +3,9 @@
 #include "max580x.h"
 #include "CANopen.h"
 
+#define SLEEP_MS 1
+#define STEP_SIZE 5
+
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
     STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
@@ -37,7 +40,7 @@ static INA226Driver ina226dev;
 
 uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
 {
-    static int32_t perturb = 5;         /* Stores the the last perturbation of the VI curve */
+    static int32_t perturb = STEP_SIZE; /* Stores the the last perturbation of the VI curve */
     static uint32_t prev_pwr = 0;       /* The power being drawn from the previous iteration of the loop */
 
     /* If the power decreased, flip perturb direction */
@@ -50,7 +53,7 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
     return iadj_v;
 }
 
-/* Example blinker thread */
+/* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
@@ -61,10 +64,16 @@ THD_FUNCTION(solar, arg)
     /* Start up drivers for I2C devices */
     ina226Start(&ina226dev, &ina226config);
     max580xStart(&max580xdev, &max580xconfig);
+    palSetLine(LINE_LED_GREEN);
 
     max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
     while (!chThdShouldTerminateX()) {
         /* Get current values for power */
+        if (ina226ReadVBUS(&ina226dev) < 450000) {
+            palClearLine(LINE_OUTPUT_EN);
+        } else {
+            palSetLine(LINE_OUTPUT_EN);
+        }
         pwr = ina226ReadPower(&ina226dev);
 
         /* Calculate perterbation of iadj */
@@ -73,9 +82,7 @@ THD_FUNCTION(solar, arg)
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
 
-        /* Toggle LED and sleep */
-        palToggleLine(LINE_LED_GREEN);
-        chThdSleepMilliseconds(10);
+        chThdSleepMilliseconds(SLEEP_MS);
     }
 
     /* Stop drivers for I2C devices */
