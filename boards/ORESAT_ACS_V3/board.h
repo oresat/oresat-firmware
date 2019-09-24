@@ -48,10 +48,8 @@
 
 #define STM32_LSEDRV                (3U << 3U)
 
-#define STM32_HSECLK                16000000U
-
 #if !defined(STM32_HSECLK)
-#define STM32_HSECLK                0U
+#define STM32_HSECLK                16000000U
 #endif
 
 /*

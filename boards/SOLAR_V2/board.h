@@ -35,8 +35,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_ORSAT_SOLAR_V1
-#define BOARD_NAME                  "Oresat solar v2"
+#define BOARD_ORSAT_SOLAR_V2
+#define BOARD_NAME                  "Oresat Solar v2"
 
 /*
  * Board oscillators-related settings.
@@ -164,10 +164,45 @@
 #define GPIOF_PIN14                 14U
 #define GPIOF_PIN15                 15U
 
+#define GPIOG_PIN0                  0U
+#define GPIOG_PIN1                  1U
+#define GPIOG_PIN2                  2U
+#define GPIOG_PIN3                  3U
+#define GPIOG_PIN4                  4U
+#define GPIOG_PIN5                  5U
+#define GPIOG_PIN6                  6U
+#define GPIOG_PIN7                  7U
+#define GPIOG_PIN8                  8U
+#define GPIOG_PIN9                  9U
+#define GPIOG_PIN10                 10U
+#define GPIOG_PIN11                 11U
+#define GPIOG_PIN12                 12U
+#define GPIOG_PIN13                 13U
+#define GPIOG_PIN14                 14U
+#define GPIOG_PIN15                 15U
+
+#define GPIOH_PIN0                  0U
+#define GPIOH_PIN1                  1U
+#define GPIOH_PIN2                  2U
+#define GPIOH_PIN3                  3U
+#define GPIOH_PIN4                  4U
+#define GPIOH_PIN5                  5U
+#define GPIOH_PIN6                  6U
+#define GPIOH_PIN7                  7U
+#define GPIOH_PIN8                  8U
+#define GPIOH_PIN9                  9U
+#define GPIOH_PIN10                 10U
+#define GPIOH_PIN11                 11U
+#define GPIOH_PIN12                 12U
+#define GPIOH_PIN13                 13U
+#define GPIOH_PIN14                 14U
+#define GPIOH_PIN15                 15U
+
 /*
  * IO lines assignments.
  */
 #define LINE_LED_GREEN              PAL_LINE(GPIOA, 4U)
+#define LINE_DEBUG                  PAL_LINE(GPIOA, 4U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */

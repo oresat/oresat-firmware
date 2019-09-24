@@ -358,8 +358,8 @@
                                      PIN_MODE_INPUT(GPIOB_PIN3) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN4) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN5) |           \
-                                     PIN_MODE_INPUT(GPIOB_I2C1_SCL) |       \
-                                     PIN_MODE_INPUT(GPIOB_I2C1_SDA) |       \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C1_SCL) |   \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C1_SDA) |   \
                                      PIN_MODE_INPUT(GPIOB_PIN8) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN9) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN10) |          \
@@ -374,8 +374,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN3) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN4) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN5) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SCL) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SDA) |   \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN10) |      \

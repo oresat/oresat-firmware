@@ -14,64 +14,37 @@
     limitations under the License.
 */
 
-//=== ChibiOS header files
+/* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
-//=== Project header files
+/* Project header files */
 #include "oresat.h"
-
 #include "thread1.h"
 
-//=== Serial configuration
-static SerialConfig ser_cfg =
+static worker_t worker1;
+
+/**
+ * @brief App Initialization
+ */
+static void app_init(void)
 {
-    115200,     //Baud rate
-    0,          //
-    0,          //
-    0,          //
-};
+    /* App initialization */
+    init_worker(&worker1, "Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    reg_worker(&worker1);
 
-
-static void app_init(void) {
-    //=== App initialization
-
-    // Start up debug output
-    sdStart(&SD2, &ser_cfg);
-
+    /* Start up debug output */
+    sdStart(&SD2, NULL);
 }
 
-static void main_app(void) {
-    //=== Start application threads
-
-    //Example thread creation
-    chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-    /*
-     * Begin main loop
-     */
-    while (true)
-    {
-        chThdSleepMilliseconds(1000);
-    }
-}
-
-int main(void) {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-    oresat_init(0);
-
-    // Initialize and start app
+/**
+ * @brief Main Application
+ */
+int main(void)
+{
+    // Initialize and start
+    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
     app_init();
-    main_app();
-
+    oresat_start(&CAND1);
     return 0;
 }

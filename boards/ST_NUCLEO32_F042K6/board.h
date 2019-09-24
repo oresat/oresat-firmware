@@ -255,7 +255,7 @@
  * PA2  - VCP_TX                    (alternate 1).
  * PA3  - ARD_A2                    (input pullup).
  * PA4  - SPI1_NSS                  (output pushpull maximum).
- * PA5  - SPI1_SCK                  (alternate 0).
+ * PA5  - SPI1_SCK                  (input floating).
  * PA6  - ARD_A5                    (input pullup).
  * PA7  - TIM1_CH1N                 (alternate 2).
  * PA8  - TIM1_CH1                  (alternate 2).
@@ -272,7 +272,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_VCP_TX) |     \
                                      PIN_MODE_INPUT(GPIOA_ARD_A2) |         \
                                      PIN_MODE_OUTPUT(GPIOA_SPI1_NSS) |      \
-                                     PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
+                                     PIN_MODE_INPUT(GPIOA_SPI1_SCK) |       \
                                      PIN_MODE_INPUT(GPIOA_ARD_A5) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_TIM1_CH1) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_TIM1_CH1N) |  \
@@ -320,7 +320,7 @@
                                      PIN_PUPDR_FLOATING(GPIOA_VCP_TX) |     \
                                      PIN_PUPDR_PULLUP(GPIOA_ARD_A2) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_NSS) |   \
-                                     PIN_PUPDR_PULLUP(GPIOA_SPI1_SCK) |     \
+                                     PIN_PUPDR_FLOATING(GPIOA_SPI1_SCK) |   \
                                      PIN_PUPDR_PULLUP(GPIOA_ARD_A5) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_TIM1_CH1N) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_TIM1_CH1) |     \
@@ -406,8 +406,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_ARD_D13) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI1_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI1_MOSI) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SCL) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_I2C1_SDA) |   \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN10) |      \
