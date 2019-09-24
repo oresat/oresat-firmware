@@ -4,7 +4,7 @@ This is the central repository for OreSat firmware development.
 
 OreSat uses ChibiOS, a Real Time Operating System (RTOS), for Command, Communication, and Control (C<sup>3</sup>), as well as for its various subsystems. All subsystems communicate via the ECSS CANbus Extension Protocol which is itself based on the CANopen protocol stack and implements the CCSDS Spacecraft Onboard Interface Services recommendations. The C<sup>3</sup> system controller manages the overall satellite, as well as critical communications with ground stations. Subsystems handle specific aspects of satellite operation. The various subsystems are listed below.
 
-Further general documentation can be found [here](doc/README.md)
+Further general documentation can be found [here](doc)
 
 ## Getting Started
 ### Prerequisites
