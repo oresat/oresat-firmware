@@ -1,10 +1,10 @@
-# STM32F042K6
+# STM32L452RE
 
-This is the source directory for all STM32F042K6 applications.
-This device contains an ARM Cortex-M0, and is also known as an M0 or F0.
+This is the source directory for all STM32L452RE applications.
+This device contains an ARM Cortex-M4, and is also known as an L4.
 
-This MCU typically implements low power OreSat subsystems,
-such as solar panels, batteries, and some sensors.
+This MCU typically implements higher power OreSat subsystems,
+such as Reaction Wheels and Magnetorquers.
 
 ## Creating an app
 The template to copy for new applications is [app_template](app_template).
