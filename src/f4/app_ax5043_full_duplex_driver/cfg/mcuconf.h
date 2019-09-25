@@ -56,7 +56,7 @@
 #define STM32_PLLSAIN_VALUE                 192
 #define STM32_PLLSAIM_VALUE                 4
 #define STM32_PLLSAIP_VALUE                 8
-#define STM32_PLLSAIQ_VALUE                 4
+#define STM32_PLLSAIQ_VALUE                 8
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE1                         STM32_PPRE1_DIV4
 #define STM32_PPRE2                         STM32_PPRE2_DIV2
@@ -96,7 +96,7 @@
  * ADC driver system settings.
  */
 #define STM32_ADC_ADCPRE                    ADC_CCR_ADCPRE_DIV4
-#define STM32_ADC_USE_ADC1                  FALSE
+#define STM32_ADC_USE_ADC1                  TRUE
 #define STM32_ADC_USE_ADC2                  FALSE
 #define STM32_ADC_USE_ADC3                  FALSE
 #define STM32_ADC_ADC1_DMA_STREAM           STM32_DMA_STREAM_ID(2, 4)
@@ -114,7 +114,7 @@
  * CAN driver system settings.
  */
 #define STM32_CAN_USE_CAN1                  TRUE
-#define STM32_CAN_USE_CAN2                  FALSE
+#define STM32_CAN_USE_CAN2                  TRUE
 #define STM32_CAN_CAN1_IRQ_PRIORITY         11
 #define STM32_CAN_CAN2_IRQ_PRIORITY         11
 

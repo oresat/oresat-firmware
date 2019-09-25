@@ -71,7 +71,7 @@ void SendDot(SPIDriver * spip)
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);//preamble
-  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit
   chThdSleepMilliseconds(DIT_MS);
   ax5043_standby(spip);
 
@@ -88,7 +88,7 @@ void SendDash(SPIDriver * spip)
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);//preamble
-  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit 
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit
   chThdSleepMilliseconds(DASH_MS);
   ax5043_standby(spip);
 }

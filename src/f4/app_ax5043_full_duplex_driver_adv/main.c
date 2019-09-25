@@ -152,18 +152,6 @@ static void app_init(void)
 {
  // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
-    set_util_fwversion(&version_info);
-    set_util_hwversion(&version_info);
-
-
-    //Print FW/HW information
-    chprintf(DEBUG_CHP, "\r\nFirmware Info\r\n");
-    chprintf(DEBUG_CHP, "FW HASH: %s\r\n", version_info.firmware);
-    chprintf(DEBUG_CHP, "STF0x UNIQUE HW ID (H,C,L):\r\n0x%x\t0x%x\t0x%x\r\n"
-             , version_info.hardware.id_high
-             , version_info.hardware.id_center
-             , version_info.hardware.id_low
-            );
 
     spiStart(&SPID1, &spicfg1);
     spiStart(&SPID2, &spicfg2);

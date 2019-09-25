@@ -578,8 +578,8 @@
 #define AXRADIO_ERR_RESYNCTIMEOUT               0x0a
 #define AXRADIO_ERR_RECEIVESTART                0x0b
 
-#define	EXIT_FAILURE	1	// Failing exit status.  
-#define	EXIT_SUCCESS	0	// Successful exit status. 
+#define	EXIT_FAILURE	1	// Failing exit status.
+#define	EXIT_SUCCESS	0	// Successful exit status.
 
 /**
  * Frequency mode A or B actually selects at which registers

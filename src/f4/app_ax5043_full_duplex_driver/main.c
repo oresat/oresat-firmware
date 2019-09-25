@@ -33,8 +33,6 @@
 #include "shell.h"
 
 #include "chprintf.h"
-#include "util_version.h"
-#include "util_numbers.h"
 #include "ax5043_common.h"
 #include "ax5043_engr_f1.h"
 #include "ax5043_engr_f2.h"
@@ -76,9 +74,9 @@ binary_semaphore_t radio2_bsem;
 
 //mailboxes to receive the radio packets
 #define NUM_BUFFERS 16
- 
+
 static msg_t radio1_rx_queue[NUM_BUFFERS];
-static mailbox_t radio1_rx_mb; 
+static mailbox_t radio1_rx_mb;
 static msg_t radio2_rx_queue[NUM_BUFFERS];
 static mailbox_t radio2_rx_mb;
 
@@ -103,7 +101,7 @@ static const SPIConfig spicfg1 =
     false,
     NULL,                                   // Operation complete callback
     GPIOA,                                  // Slave select port
-    GPIOA_SPI1_NSS,                         // Slave select pad
+    GPIOA_ARD_A0,                           // Slave select pad
     // SPI cr1 data                            (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
@@ -118,8 +116,8 @@ static const SPIConfig spicfg2 =
 {
     false,
     NULL,                                   // Operation complete callback
-    GPIOB,                                  // Slave select port
-    GPIOB_SPI2_NSS,                         // Slave select pad
+    GPIOA,                                  // Slave select port
+    GPIOA_ARD_A1,                           // Slave select pad
     // SPI cr1 data                         (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
@@ -140,14 +138,14 @@ static ax5043_drv_t ax5043_driver =
   AX5043_F4,
   AX5043_RX,
   AX5043_TX,
-  LINE_SX_INT0,
-  LINE_SX_INT1,
+  LINE_ARD_A4,
+  LINE_ARD_A5,
   &radio1_bsem,
   &radio2_bsem,
   &remoteaddr,
   &localaddr,
   &radio1_rx_mb,
-  &radio2_rx_mb  
+  &radio2_rx_mb
 };
 
 /*
@@ -157,25 +155,13 @@ static void app_init(void)
 {
  // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
-    set_util_fwversion(&version_info);
-    set_util_hwversion(&version_info);
-
-
-    //Print FW/HW information
-    chprintf(DEBUG_CHP, "\r\nFirmware Info\r\n");
-    chprintf(DEBUG_CHP, "FW HASH: %s\r\n", version_info.firmware);
-    chprintf(DEBUG_CHP, "STF0x UNIQUE HW ID (H,C,L):\r\n0x%x\t0x%x\t0x%x\r\n"
-             , version_info.hardware.id_high
-             , version_info.hardware.id_center
-             , version_info.hardware.id_low
-            );
 
     spiStart(&SPID1, &spicfg1);
     spiStart(&SPID2, &spicfg2);
-    
+
   /* Creating the mailboxes.*/
-    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);   
-    chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);      
+    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);
+    chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);
 }
 
 
@@ -210,7 +196,7 @@ THD_FUNCTION(ax5043_tx_thd, arg)
     chThdSleepMilliseconds(5000);
   }
   */
-  
+
   // This is for CW
 
 
@@ -218,20 +204,20 @@ THD_FUNCTION(ax5043_tx_thd, arg)
     chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
 
     ax5043_radio2_cw_tx(&ax5043_driver, cw_message, sizeof(cw_message));
-    
+
     chThdSleepMilliseconds(500);
-  }  
+  }
 
 }
 
 
 THD_WORKING_AREA(waradio1_rx, 1024);
-THD_FUNCTION(radio1_rx, arg) 
+THD_FUNCTION(radio1_rx, arg)
 {
   (void)arg;
 
   while (true) {
-    msg_t pbuf; 
+    msg_t pbuf;
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio1_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
@@ -241,12 +227,12 @@ THD_FUNCTION(radio1_rx, arg)
 }
 
 THD_WORKING_AREA(waradio2_rx, 1024);
-THD_FUNCTION(radio2_rx, arg) 
+THD_FUNCTION(radio2_rx, arg)
 {
   (void)arg;
 
   while (true) {
-    msg_t pbuf; 
+    msg_t pbuf;
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio2_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
@@ -254,25 +240,6 @@ THD_FUNCTION(radio2_rx, arg)
   }
 
 }
-
-
-/*
- * main loop blinks the led
- */
-static void main_loop(void)
-{
-    chThdSleepMilliseconds(500);
-
-
-	while (true)
-    {
-      chThdSleepMilliseconds(15000);
-      chprintf(DEBUG_CHP, ".");
-      //palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
-    }
-
-}
-
 
 /*
  * shell commands
@@ -287,8 +254,8 @@ static void mmd(BaseSequentialStream *sd, int argc, char *argv[]) {
 
   chprintf(sd, "testing\r\n");
 }
- 
- 
+
+
 static const ShellCommand commands[] = {
   {"mmd", mmd},
   {NULL, NULL}
@@ -305,7 +272,7 @@ static const ShellConfig shell_cfg1 = {
 int main(void)
 {
   thread_t *shelltp1;
-  
+
   halInit();
   chSysInit();
   app_init();
@@ -315,16 +282,17 @@ int main(void)
   chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
   chThdCreateStatic(waradio1_rx, sizeof(waradio1_rx), NORMALPRIO,radio1_rx, NULL);
   chThdCreateStatic(waradio2_rx, sizeof(waradio2_rx), NORMALPRIO,radio2_rx, NULL);
-    
+
   /*
    * Shell manager initialization.
    * Event zero is shell exit.
    */
   shellInit();
-  shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
-                                       "shell1", NORMALPRIO + 1,
-                                       shellThread, (void *)&shell_cfg1);
-
-  main_loop();
+  while (true) {
+      shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+              "shell1", NORMALPRIO + 1,
+              shellThread, (void *)&shell_cfg1);
+      chThdWait(shelltp1);
+  }
   return 0;
 }
