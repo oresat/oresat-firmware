@@ -33,13 +33,8 @@
 #include "shell.h"
 
 #include "chprintf.h"
-#include "util_version.h"
-#include "util_numbers.h"
 #include "ax5043_common.h"
-#include "ax5043_engr_f1.h"
-#include "ax5043_engr_f2.h"
-#include "ax5043_ax25_f3.h"
-#include "ax5043_cw_f4.h"
+#include "ax5043_setup.h"
 #include "ax5043_driver.h"
 
 
@@ -76,9 +71,9 @@ binary_semaphore_t radio2_bsem;
 
 //mailboxes to receive the radio packets
 #define NUM_BUFFERS 16
- 
+
 static msg_t radio1_rx_queue[NUM_BUFFERS];
-static mailbox_t radio1_rx_mb; 
+static mailbox_t radio1_rx_mb;
 static msg_t radio2_rx_queue[NUM_BUFFERS];
 static mailbox_t radio2_rx_mb;
 
@@ -147,7 +142,7 @@ static ax5043_drv_t ax5043_driver =
   &remoteaddr,
   &localaddr,
   &radio1_rx_mb,
-  &radio2_rx_mb  
+  &radio2_rx_mb
 };
 
 /*
@@ -172,10 +167,10 @@ static void app_init(void)
 
     spiStart(&SPID1, &spicfg1);
     spiStart(&SPID2, &spicfg2);
-    
+
   /* Creating the mailboxes.*/
-    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);   
-    chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);      
+    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);
+    chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);
 }
 
 
@@ -210,7 +205,7 @@ THD_FUNCTION(ax5043_tx_thd, arg)
     chThdSleepMilliseconds(5000);
   }
   */
-  
+
   // This is for CW
 
 
@@ -218,20 +213,20 @@ THD_FUNCTION(ax5043_tx_thd, arg)
     chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
 
     ax5043_radio2_cw_tx(&ax5043_driver, cw_message, sizeof(cw_message));
-    
+
     chThdSleepMilliseconds(500);
-  }  
+  }
 
 }
 
 
 THD_WORKING_AREA(waradio1_rx, 1024);
-THD_FUNCTION(radio1_rx, arg) 
+THD_FUNCTION(radio1_rx, arg)
 {
   (void)arg;
 
   while (true) {
-    msg_t pbuf; 
+    msg_t pbuf;
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio1_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
@@ -241,12 +236,12 @@ THD_FUNCTION(radio1_rx, arg)
 }
 
 THD_WORKING_AREA(waradio2_rx, 1024);
-THD_FUNCTION(radio2_rx, arg) 
+THD_FUNCTION(radio2_rx, arg)
 {
   (void)arg;
 
   while (true) {
-    msg_t pbuf; 
+    msg_t pbuf;
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio2_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
@@ -287,8 +282,8 @@ static void mmd(BaseSequentialStream *sd, int argc, char *argv[]) {
 
   chprintf(sd, "testing\r\n");
 }
- 
- 
+
+
 static const ShellCommand commands[] = {
   {"mmd", mmd},
   {NULL, NULL}
@@ -305,7 +300,7 @@ static const ShellConfig shell_cfg1 = {
 int main(void)
 {
   thread_t *shelltp1;
-  
+
   halInit();
   chSysInit();
   app_init();
@@ -315,7 +310,7 @@ int main(void)
   chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
   chThdCreateStatic(waradio1_rx, sizeof(waradio1_rx), NORMALPRIO,radio1_rx, NULL);
   chThdCreateStatic(waradio2_rx, sizeof(waradio2_rx), NORMALPRIO,radio2_rx, NULL);
-    
+
   /*
    * Shell manager initialization.
    * Event zero is shell exit.

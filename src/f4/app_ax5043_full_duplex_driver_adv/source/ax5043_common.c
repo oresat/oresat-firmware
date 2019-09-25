@@ -26,7 +26,7 @@
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[])
 {
   uint8_t command_buf[3] = {0,0,0};
-  
+
   if(reg <  0x0070)
   {
     command_buf[0]=0x80|reg;
@@ -91,7 +91,7 @@ uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t r
 /**
  * Shutdown after reset the AX5043
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_shutdown(SPIDriver * spip)
@@ -108,7 +108,7 @@ void ax5043_shutdown(SPIDriver * spip)
 /**
  * Standby the AX5043
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_standby(SPIDriver * spip)
@@ -125,7 +125,7 @@ void ax5043_standby(SPIDriver * spip)
 /**
  * Enable FIFO in AX5043
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_fifo_en(SPIDriver * spip)
@@ -141,7 +141,7 @@ void ax5043_fifo_en(SPIDriver * spip)
 /**
  * put AX5043 in synthesizer RX mode
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_synth_rx(SPIDriver * spip)
@@ -158,7 +158,7 @@ void ax5043_synth_rx(SPIDriver * spip)
 /**
  * changes AX5043 to full RX mode
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_full_rx(SPIDriver * spip)
@@ -176,7 +176,7 @@ void ax5043_full_rx(SPIDriver * spip)
 /**
  * put AX5043 in synthesizer TX mode
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_synth_tx(SPIDriver * spip)
@@ -193,7 +193,7 @@ void ax5043_synth_tx(SPIDriver * spip)
 /**
  * changes AX5043 to full TX mode
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_full_tx(SPIDriver * spip)
@@ -210,7 +210,7 @@ void ax5043_full_tx(SPIDriver * spip)
 /**
  * sets AX5043 address registers
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_set_addr(SPIDriver * spip, axradio_address_mask_t *local_addr)
@@ -231,7 +231,7 @@ void ax5043_set_addr(SPIDriver * spip, axradio_address_mask_t *local_addr)
 /**
  * Resets the AX5043
  * @param spip: SPI Configuration.
- * @return void 
+ * @return void
  * TODO return a -ve return code if there are any errors
  */
 void ax5043_reset(SPIDriver * spip)
@@ -250,7 +250,7 @@ void ax5043_reset(SPIDriver * spip)
   //spiUnselect(spip);
   //chThdSleepMicroseconds(10);
 
-  //Reset the chip through powermode register 
+  //Reset the chip through powermode register
   ax5043_write_reg(spip, AX5043_REG_PWRMODE, AX5043_RESET_BIT, ret_value);
   chThdSleepMilliseconds(1);
   //chThdSleepMicroseconds(5);
@@ -278,7 +278,7 @@ void ax5043_reset(SPIDriver * spip)
   }
   //ax5043_write_reg(spip, AX5043_REG_PINFUNCIRQ, (uint8_t)0x02, ret_value);
   //chThdSleepMilliseconds(10);
-  
+
 
 }
 
@@ -289,8 +289,8 @@ void ax5043_reset(SPIDriver * spip)
  * writes to FIFO
  * Takn from Bradenburg library which seems to be taken from onSemi's code
  * @param conf the AX5043 configuration handler
- * @return void 
- * 
+ * @return void
+ *
  */
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len)
 {
@@ -302,9 +302,9 @@ void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len)
 	} while (--len);
 }
 
- 
 
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) 
+
+uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len)
 {
   uint8_t ret_value[3]={0,0,0};
   uint8_t loc = 0;

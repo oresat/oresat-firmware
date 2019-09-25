@@ -673,48 +673,48 @@
  ************ Variable index for variables in config.c file in radiolab********
  *****************************************************************************/
 
-#define AXRADIO_IND_PHY_PN9                            1 
-#define AXRADIO_IND_PHY_NRCHANNELS                     2                        
-#define AXRADIO_IND_PHY_CHANFREQ                       3               
-#define AXRADIO_IND_PHY_CHANPLLRNGINIT                 4           
-#define AXRADIO_IND_PHY_CHANVCOIINIT                   5         
-#define AXRADIO_IND_PHY_CHANPLLRNG                     6       
-#define AXRADIO_IND_PHY_CHANVCOI                       7     
-#define AXRADIO_IND_PHY_VCOCALIB                       8     
-#define AXRADIO_IND_PHY_MAXFREQOFFSET                  9          
-#define AXRADIO_IND_PHY_RSSIOFFSET                     10       
-#define AXRADIO_IND_PHY_RSSIREFERENCE                  11          
-#define AXRADIOPHY_CHANNELBUSY                         12   
-#define AXRADIO_IND_PHY_CS_PERIOD                      13      
-#define AXRADIO_IND_PHY_CS_ENABLED                     14       
-#define AXRADIO_IND_PHY_LBT_RETRIES                    15        
-#define AXRADIO_IND_PHY_LBT_FORCETX                    16        
-#define AXRADIO_IND_PHY_PREAMBLE_WOR_LONGLEN           17                 
-#define AXRADIO_IND_PHY_PREAMBLE_WOR_LEN               18             
-#define AXRADIO_IND_PHY_PREAMBLE_LONGLEN               19             
-#define AXRADIO_IND_PHY_PREAMBLE_LEN                   20         
-#define AXRADIO_IND_PHY_PREAMBLE_BYTE                  21          
-#define AXRADIO_IND_PHY_PREAMBLE_FLAGS                 22           
-#define AXRADIO_IND_PHY_PREAMBLE_APPENDBITS            23                
-#define AXRADIO_IND_PHY_PREAMBLE_APPENDPATTERN         24                   
-#define AXRADIO_IND_FRAMING_MACLEN                     25       
-#define AXRADIO_IND_FRAMING_ADDRLEN                    26        
-#define AXRADIO_IND_FRAMING_DESTADDRPOS                27            
-#define AXRADIO_IND_FRAMING_SOURCEADDRPOS              28              
-#define AXRADIO_IND_FRAMING_LENPOS                     29       
-#define AXRADIO_IND_FRAMING_LENOFFS                    30        
-#define AXRADIO_IND_FRAMING_LENMASK                    31        
-#define AXRADIO_IND_FRAMING_SWCRCLEN                   32         
-#define AXRADIO_IND_FRAMING_SYNCLEN                    33        
-#define AXRADIO_IND_FRAMING_SYNCWORD                   34         
-#define AXRADIO_IND_FRAMING_SYNCFLAGS                  35          
-#define AXRADIO_IND_FRAMING_ENABLE_SFDCALLBACK         36                   
-#define AXRADIO_IND_FRAMING_ACK_TIMEOUT                37            
-#define AXRADIO_IND_FRAMING_ACK_DELAY                  38          
-#define AXRADIO_IND_FRAMING_ACK_RETRANSMISSIONS        39                    
-#define AXRADIO_IND_FRAMING_ACK_SEQNRPOS               40             
-#define AXRADIO_IND_FRAMING_MINPAYLOADLEN              41              
-#define AXRADIO_IND_PHY_INNERFREQLOOP                  42 
+#define AXRADIO_IND_PHY_PN9                            1
+#define AXRADIO_IND_PHY_NRCHANNELS                     2
+#define AXRADIO_IND_PHY_CHANFREQ                       3
+#define AXRADIO_IND_PHY_CHANPLLRNGINIT                 4
+#define AXRADIO_IND_PHY_CHANVCOIINIT                   5
+#define AXRADIO_IND_PHY_CHANPLLRNG                     6
+#define AXRADIO_IND_PHY_CHANVCOI                       7
+#define AXRADIO_IND_PHY_VCOCALIB                       8
+#define AXRADIO_IND_PHY_MAXFREQOFFSET                  9
+#define AXRADIO_IND_PHY_RSSIOFFSET                     10
+#define AXRADIO_IND_PHY_RSSIREFERENCE                  11
+#define AXRADIOPHY_CHANNELBUSY                         12
+#define AXRADIO_IND_PHY_CS_PERIOD                      13
+#define AXRADIO_IND_PHY_CS_ENABLED                     14
+#define AXRADIO_IND_PHY_LBT_RETRIES                    15
+#define AXRADIO_IND_PHY_LBT_FORCETX                    16
+#define AXRADIO_IND_PHY_PREAMBLE_WOR_LONGLEN           17
+#define AXRADIO_IND_PHY_PREAMBLE_WOR_LEN               18
+#define AXRADIO_IND_PHY_PREAMBLE_LONGLEN               19
+#define AXRADIO_IND_PHY_PREAMBLE_LEN                   20
+#define AXRADIO_IND_PHY_PREAMBLE_BYTE                  21
+#define AXRADIO_IND_PHY_PREAMBLE_FLAGS                 22
+#define AXRADIO_IND_PHY_PREAMBLE_APPENDBITS            23
+#define AXRADIO_IND_PHY_PREAMBLE_APPENDPATTERN         24
+#define AXRADIO_IND_FRAMING_MACLEN                     25
+#define AXRADIO_IND_FRAMING_ADDRLEN                    26
+#define AXRADIO_IND_FRAMING_DESTADDRPOS                27
+#define AXRADIO_IND_FRAMING_SOURCEADDRPOS              28
+#define AXRADIO_IND_FRAMING_LENPOS                     29
+#define AXRADIO_IND_FRAMING_LENOFFS                    30
+#define AXRADIO_IND_FRAMING_LENMASK                    31
+#define AXRADIO_IND_FRAMING_SWCRCLEN                   32
+#define AXRADIO_IND_FRAMING_SYNCLEN                    33
+#define AXRADIO_IND_FRAMING_SYNCWORD                   34
+#define AXRADIO_IND_FRAMING_SYNCFLAGS                  35
+#define AXRADIO_IND_FRAMING_ENABLE_SFDCALLBACK         36
+#define AXRADIO_IND_FRAMING_ACK_TIMEOUT                37
+#define AXRADIO_IND_FRAMING_ACK_DELAY                  38
+#define AXRADIO_IND_FRAMING_ACK_RETRANSMISSIONS        39
+#define AXRADIO_IND_FRAMING_ACK_SEQNRPOS               40
+#define AXRADIO_IND_FRAMING_MINPAYLOADLEN              41
+#define AXRADIO_IND_PHY_INNERFREQLOOP                  42
 
 /******************************************************************************
  ************************* Register values ************************************
@@ -912,8 +912,8 @@
 #define AXRADIO_ERR_RESYNCTIMEOUT               0x0a
 #define AXRADIO_ERR_RECEIVESTART                0x0b
 
-#define	EXIT_FAILURE	1	// Failing exit status.  
-#define	EXIT_SUCCESS	0	// Successful exit status. 
+#define	EXIT_FAILURE	1	// Failing exit status.
+#define	EXIT_SUCCESS	0	// Successful exit status.
 
 /**
  * Frequency mode A or B actually selects at which registers
