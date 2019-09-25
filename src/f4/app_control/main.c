@@ -23,10 +23,24 @@
 #include "oresat.h"
 #include "opd.h"
 #include "command.h"
-#include "thread1.h"
 
+/*
+ * Workers
+ */
 static worker_t shell_worker;
-static worker_t led_worker;
+
+/*
+ * Working area for driver.
+ */
+static uint8_t sd_scratchpad[512];
+
+/*
+ * SDIO configuration.
+ */
+static const SDCConfig sdccfg = {
+  sd_scratchpad,
+  SDC_MODE_4BIT
+};
 
 /**
  * @brief App Initialization
@@ -35,9 +49,7 @@ static void app_init(void)
 {
     /* App initialization */
     init_worker(&shell_worker, "Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    init_worker(&led_worker, "Blinky Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
     reg_worker(&shell_worker);
-    reg_worker(&led_worker);
 
     /* Initialize OPD */
     opd_init();
@@ -46,6 +58,9 @@ static void app_init(void)
     /* Initialize shell and start serial interface */
     shellInit();
     sdStart(&SD2, NULL);
+
+    /* Initializes SDIO drivers */
+    sdcStart(&SDCD1, &sdccfg);
 }
 
 /**
