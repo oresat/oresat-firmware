@@ -1,17 +1,15 @@
-#include "thread1.h"
+#include "blink.h"
 
 /* Example blinker thread */
-THD_WORKING_AREA(waThread1, 128);
-THD_FUNCTION(Thread1, arg)
+THD_WORKING_AREA(blink_wa, 0x40);
+THD_FUNCTION(blink, arg)
 {
     (void)arg;
 
     palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
 
     while (!chThdShouldTerminateX()) {
-        palClearLine(LINE_LED_GREEN);
-        chThdSleepMilliseconds(500);
-        palSetLine(LINE_LED_GREEN);
+        palToggleLine(LINE_LED_GREEN);
         chThdSleepMilliseconds(500);
     }
 

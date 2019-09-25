@@ -23,7 +23,7 @@
 #include "oresat.h"
 #include "opd.h"
 #include "command.h"
-#include "thread1.h"
+#include "blink.h"
 
 static worker_t shell_worker;
 static worker_t led_worker;
@@ -35,7 +35,7 @@ static void app_init(void)
 {
     /* App initialization */
     init_worker(&shell_worker, "Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    init_worker(&led_worker, "Blinky Thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    init_worker(&led_worker, "Blinky Thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL);
     reg_worker(&shell_worker);
     reg_worker(&led_worker);
 
