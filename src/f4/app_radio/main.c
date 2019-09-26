@@ -97,8 +97,7 @@ static const SPIConfig spicfg1 =
 {
     false,
     NULL,                                   // Operation complete callback
-    GPIOA,                                  // Slave select port
-    GPIOA_SPI1_NSS,                         // Slave select pad
+    LINE_AX1_CS,
     // SPI cr1 data                            (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
@@ -113,8 +112,7 @@ static const SPIConfig spicfg2 =
 {
     false,
     NULL,                                   // Operation complete callback
-    GPIOB,                                  // Slave select port
-    GPIOB_SPI2_NSS,                         // Slave select pad
+    LINE_AX2_CS,
     // SPI cr1 data                         (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
@@ -135,8 +133,8 @@ static ax5043_drv_t ax5043_driver =
   AX5043_F4,
   AX5043_RX,
   AX5043_TX,
-  LINE_SX_INT0,
-  LINE_SX_INT1,
+  LINE_AX1_IRQ,
+  LINE_AX2_IRQ,
   &radio1_bsem,
   &radio2_bsem,
   &remoteaddr,
@@ -238,25 +236,6 @@ THD_FUNCTION(radio2_rx, arg)
 
 }
 
-
-/*
- * main loop blinks the led
- */
-static void main_loop(void)
-{
-    chThdSleepMilliseconds(500);
-
-
-	while (true)
-    {
-      chThdSleepMilliseconds(15000);
-      chprintf(DEBUG_CHP, ".");
-      //palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
-    }
-
-}
-
-
 /*
  * shell commands
  */
@@ -304,10 +283,11 @@ int main(void)
    * Event zero is shell exit.
    */
   shellInit();
-  shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
-                                       "shell1", NORMALPRIO + 1,
-                                       shellThread, (void *)&shell_cfg1);
-
-  main_loop();
+  while (true) {
+      shelltp1 = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+              "shell1", NORMALPRIO + 1,
+              shellThread, (void *)&shell_cfg1);
+      chThdWait(shelltp1);
+  }
   return 0;
 }

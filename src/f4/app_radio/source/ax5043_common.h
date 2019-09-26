@@ -1,4 +1,4 @@
-/*! \file ax5043_common.h */
+/*! \file ax5043.h */
 
 
 /*!
@@ -6,16 +6,8 @@
  *  * @{
  *
  */
-#ifndef _AX5043_COMMON_H
-#define _AX5043_COMMON_H
-
-#define DEBUG_SERIAL  SD2
-#define DEBUG_CHP     ((BaseSequentialStream *) &DEBUG_SERIAL)
-
-#include <stdbool.h>
-#include <stdint.h>
-
-
+#ifndef _AX5043_H_
+#define _AX5043_H_
 
 /**
  * The maximum allowed frame size
@@ -33,7 +25,7 @@
 
 #define MIN_RF_FREQ_EXT_VCO_RFDIV1      (MIN_RF_FREQ_EXT_VCO_RFDIV0 / 2)
 #define MAX_RF_FREQ_EXT_VCO_RFDIV1      (MAX_RF_FREQ_EXT_VCO_RFDIV0 / 2)
- */
+*/
 
 /******************************************************************************
  ********************  AX5043 control SPI registers ***************************
@@ -382,340 +374,6 @@
 #define AX5043_REG_0xF72                0xF72
 #define AX5043_REG_XTALDIV              0xF35
 
-
-/******************************************************************************
- ************************* Register index in config ***************************
- *****************************************************************************/
-
-#define AX5043_IND_REV                  1
-#define AX5043_IND_SCRATCH              2
-#define AX5043_IND_PWRMODE              3
-#define AX5043_IND_POWSTAT              4
-#define AX5043_IND_POWSTICKYSTAT        5
-#define AX5043_IND_POWIRQMASK           6
-#define AX5043_IND_IRQMASK1             7
-#define AX5043_IND_IRQMASK0             8
-#define AX5043_IND_RADIOEVENTMASK1      9
-#define AX5043_IND_RADIOEVENTMASK0      10
-#define AX5043_IND_IRQREQUEST1          11
-#define AX5043_IND_IRQREQUEST0          12
-#define AX5043_IND_RADIOEVENTREQ1       13
-#define AX5043_IND_RADIOEVENTREQ0       14
-#define AX5043_IND_MODULATION           15
-#define AX5043_IND_ENCODING             16
-#define AX5043_IND_FRAMING              17
-#define AX5043_IND_CRCINIT3             18
-#define AX5043_IND_CRCINIT2             19
-#define AX5043_IND_CRCINIT1             20
-#define AX5043_IND_CRCINIT0             21
-#define AX5043_IND_FEC                  22
-#define AX5043_IND_FECSYNC              23
-#define AX5043_IND_FECSTATUS            24
-#define AX5043_IND_RADIOSTATE           25
-#define AX5043_IND_XTALSTATUS           26
-#define AX5043_IND_PINSTATE             27
-#define AX5043_IND_PINFUNCSYSCLK        28
-#define AX5043_IND_PINFUNCDCLK          29
-#define AX5043_IND_PINFUNCDATA          30
-#define AX5043_IND_PINFUNCIRQ           31
-#define AX5043_IND_PINFUNCANTSEL        32
-#define AX5043_IND_PINFUNCPWRAMP        33
-#define AX5043_IND_PWRAMP               34
-#define AX5043_IND_FIFOSTAT             35
-#define AX5043_IND_FIFODATA             36
-#define AX5043_IND_FIFOCOUNT1           37
-#define AX5043_IND_FIFOCOUNT0           38
-#define AX5043_IND_FIFOFREE1            39
-#define AX5043_IND_FIFOFREE0            40
-#define AX5043_IND_FIFOTHRESH1          41
-#define AX5043_IND_FIFOTHRESH0          42
-#define AX5043_IND_PLLLOOP              43
-#define AX5043_IND_PLLCPI               44
-#define AX5043_IND_PLLVCODIV            45
-#define AX5043_IND_PLLRANGINGA          46
-#define AX5043_IND_FREQA3               47
-#define AX5043_IND_FREQA2               48
-#define AX5043_IND_FREQA1               49
-#define AX5043_IND_FREQA0               50
-#define AX5043_IND_PLLLOOPBOOST         51
-#define AX5043_IND_PLLCPIBOOST          52
-#define AX5043_IND_PLLRANGINGB          53
-#define AX5043_IND_FREQB3               54
-#define AX5043_IND_FREQB2               55
-#define AX5043_IND_FREQB1               56
-#define AX5043_IND_FREQB0               57
-#define AX5043_IND_RSSI                 58
-#define AX5043_IND_BGNDRSSI             59
-#define AX5043_IND_DIVERSITY            60
-#define AX5043_IND_AGCCOUNTER           61
-#define AX5043_IND_TRKDATARATE2         62
-#define AX5043_IND_TRKDATARATE1         63
-#define AX5043_IND_TRKDATARATE0         64
-#define AX5043_IND_TRKAMPL1             65
-#define AX5043_IND_TRKAMPL0             66
-#define AX5043_IND_TRKPHASE1            67
-#define AX5043_IND_TRKPHASE0            68
-#define AX5043_IND_TRKRFFREQ2           69
-#define AX5043_IND_TRKRFFREQ1           70
-#define AX5043_IND_TRKRFFREQ0           71
-#define AX5043_IND_TRKFREQ1             72
-#define AX5043_IND_TRKFREQ0             73
-#define AX5043_IND_TRKFSKDEMOD1         74
-#define AX5043_IND_TRKFSKDEMOD0         75
-#define AX5043_IND_TIMER2               76
-#define AX5043_IND_TIMER1               77
-#define AX5043_IND_TIMER0               78
-#define AX5043_IND_WAKEUPTIMER1         79
-#define AX5043_IND_WAKEUPTIMER0         80
-#define AX5043_IND_WAKEUP1              81
-#define AX5043_IND_WAKEUP0              82
-#define AX5043_IND_WAKEUPFREQ1          83
-#define AX5043_IND_WAKEUPFREQ0          84
-#define AX5043_IND_WAKEUPXOEARLY        85
-#define AX5043_IND_IFFREQ1              86
-#define AX5043_IND_IFFREQ0              87
-#define AX5043_IND_DECIMATION           88
-#define AX5043_IND_RXDATARATE2          89
-#define AX5043_IND_RXDATARATE1          90
-#define AX5043_IND_RXDATARATE0          91
-#define AX5043_IND_MAXDROFFSET2         92
-#define AX5043_IND_MAXDROFFSET1         93
-#define AX5043_IND_MAXDROFFSET0         94
-#define AX5043_IND_MAXRFOFFSET2         95
-#define AX5043_IND_MAXRFOFFSET1         96
-#define AX5043_IND_MAXRFOFFSET0         97
-#define AX5043_IND_FSKDMAX1             98
-#define AX5043_IND_FSKDMAX0             99
-#define AX5043_IND_FSKDMIN1             100
-#define AX5043_IND_FSKDMIN0             101
-#define AX5043_IND_AFSKSPACE1           102
-#define AX5043_IND_AFSKSPACE0           103
-#define AX5043_IND_AFSKMARK1            104
-#define AX5043_IND_AFSKMARK0            105
-#define AX5043_IND_AFSKCTRL             106
-#define AX5043_IND_AMPLFILTER           107
-#define AX5043_IND_FREQUENCYLEAK        108
-#define AX5043_IND_RXPARAMSETS          109
-#define AX5043_IND_RXPARAMCURSET        110
-#define AX5043_IND_AGCGAIN0             111
-#define AX5043_IND_AGCTARGET0           112
-#define AX5043_IND_AGCAHYST0            113
-#define AX5043_IND_AGCMINMAX0           114
-#define AX5043_IND_TIMEGAIN0            115
-#define AX5043_IND_DRGAIN0              116
-#define AX5043_IND_PHASEGAIN0           117
-#define AX5043_IND_FREQUENCYGAINA0      118
-#define AX5043_IND_FREQUENCYGAINB0      119
-#define AX5043_IND_FREQUENCYGAINC0      120
-#define AX5043_IND_FREQUENCYGAIND0      121
-#define AX5043_IND_AMPLITUDEGAIN0       122
-#define AX5043_IND_FREQDEV10            123
-#define AX5043_IND_FREQDEV00            124
-#define AX5043_IND_FOURFSK0             125
-#define AX5043_IND_BBOFFSRES0           126
-#define AX5043_IND_AGCGAIN1             127
-#define AX5043_IND_AGCTARGET1           128
-#define AX5043_IND_AGCAHYST1            129
-#define AX5043_IND_AGCMINMAX1           130
-#define AX5043_IND_TIMEGAIN1            131
-#define AX5043_IND_DRGAIN1              132
-#define AX5043_IND_PHASEGAIN1           133
-#define AX5043_IND_FREQUENCYGAINA1      134
-#define AX5043_IND_FREQUENCYGAINB1      135
-#define AX5043_IND_FREQUENCYGAINC1      136
-#define AX5043_IND_FREQUENCYGAIND1      137
-#define AX5043_IND_AMPLITUDEGAIN1       138
-#define AX5043_IND_FREQDEV11            139
-#define AX5043_IND_FREQDEV01            140
-#define AX5043_IND_FOURFSK1             141
-#define AX5043_IND_BBOFFSRES1           142
-#define AX5043_IND_AGCGAIN2             143
-#define AX5043_IND_AGCTARGET2           144
-#define AX5043_IND_AGCAHYST2            145
-#define AX5043_IND_AGCMINMAX2           146
-#define AX5043_IND_TIMEGAIN2            147
-#define AX5043_IND_DRGAIN2              148
-#define AX5043_IND_PHASEGAIN2           149
-#define AX5043_IND_FREQGAINA2           150
-#define AX5043_IND_FREQGAINB2           151
-#define AX5043_IND_FREQGAINC2           152
-#define AX5043_IND_FREQGAIND2           153
-#define AX5043_IND_AMPLGAIN2            154
-#define AX5043_IND_FREQDEV12            155
-#define AX5043_IND_FREQDEV02            156
-#define AX5043_IND_FOURFSK2             157
-#define AX5043_IND_BBOFFSRES2           158
-#define AX5043_IND_AGCGAIN3             159
-#define AX5043_IND_AGCTARGET3           160
-#define AX5043_IND_AGCAHYST3            161
-#define AX5043_IND_AGCMINMAX3           162
-#define AX5043_IND_TIMEGAIN3            163
-#define AX5043_IND_DRGAIN3              164
-#define AX5043_IND_PHASEGAIN3           165
-#define AX5043_IND_FREQUENCYGAINA3      166
-#define AX5043_IND_FREQUENCYGAINB3      167
-#define AX5043_IND_FREQUENCYGAINC3      168
-#define AX5043_IND_FREQUENCYGAIND3      169
-#define AX5043_IND_AMPLITUDEGAIN3       170
-#define AX5043_IND_FREQDEV13            171
-#define AX5043_IND_FREQDEV03            172
-#define AX5043_IND_FOURFSK3             173
-#define AX5043_IND_BBOFFSRES3           174
-#define AX5043_IND_MODCFGF              175
-#define AX5043_IND_FSKDEV2              176
-#define AX5043_IND_FSKDEV1              177
-#define AX5043_IND_FSKDEV0              178
-#define AX5043_IND_MODCFGA              179
-#define AX5043_IND_TXRATE2              180
-#define AX5043_IND_TXRATE1              181
-#define AX5043_IND_TXRATE0              182
-#define AX5043_IND_TXPWRCOEFFA1         183
-#define AX5043_IND_TXPWRCOEFFA0         184
-#define AX5043_IND_TXPWRCOEFFB1         185
-#define AX5043_IND_TXPWRCOEFFB0         186
-#define AX5043_IND_TXPWRCOEFFC1         187
-#define AX5043_IND_TXPWRCOEFFC0         188
-#define AX5043_IND_TXPWRCOEFFD1         189
-#define AX5043_IND_TXPWRCOEFFD0         190
-#define AX5043_IND_TXPWRCOEFFE1         191
-#define AX5043_IND_TXPWRCOEFFE0         192
-#define AX5043_IND_PLLVCOI              193
-#define AX5043_IND_PLLVCOIR             194
-#define AX5043_IND_PLLLOCKDET           195
-#define AX5043_IND_PLLRNGCLK            196
-#define AX5043_IND_XTALCAP              197
-#define AX5043_IND_BBTUNE               198
-#define AX5043_IND_BBOFFSCAP            199
-#define AX5043_IND_PKTADDRCFG           200
-#define AX5043_IND_PKTLENCFG            201
-#define AX5043_IND_PKTLENOFFSET         202
-#define AX5043_IND_PKTMAXLEN            203
-#define AX5043_IND_PKTADDR3             204
-#define AX5043_IND_PKTADDR2             205
-#define AX5043_IND_PKTADDR1             206
-#define AX5043_IND_PKTADDR0             207
-#define AX5043_IND_PKTADDRMASK3         208
-#define AX5043_IND_PKTADDRMASK2         209
-#define AX5043_IND_PKTADDRMASK1         210
-#define AX5043_IND_PKTADDRMASK0         211
-#define AX5043_IND_MATCH0PAT3           212
-#define AX5043_IND_MATCH0PAT2           213
-#define AX5043_IND_MATCH0PAT1           214
-#define AX5043_IND_MATCH0PAT0           215
-#define AX5043_IND_MATCH0LEN            216
-#define AX5043_IND_MATCH0MIN            217
-#define AX5043_IND_MATCH0MAX            218
-#define AX5043_IND_MATCH1PAT1           219
-#define AX5043_IND_MATCH1PAT0           220
-#define AX5043_IND_MATCH1LEN            221
-#define AX5043_IND_MATCH1MIN            222
-#define AX5043_IND_MATCH1MAX            223
-#define AX5043_IND_TMGTXBOOST           224
-#define AX5043_IND_TMGTXSETTLE          225
-#define AX5043_IND_TMGRXBOOST           226
-#define AX5043_IND_TMGRXSETTLE          227
-#define AX5043_IND_TMGRXOFFSACQ         228
-#define AX5043_IND_TMGRXCOARSEAGC       229
-#define AX5043_IND_TMGRXAGC             230
-#define AX5043_IND_TMGRXRSSI            231
-#define AX5043_IND_TMGRXPREAMBLE1       232
-#define AX5043_IND_TMGRXPREAMBLE2       233
-#define AX5043_IND_TMGRXPREAMBLE3       234
-#define AX5043_IND_RSSIREFERENCE        235
-#define AX5043_IND_RSSIABSTHR           236
-#define AX5043_IND_BGNDRSSIGAIN         237
-#define AX5043_IND_BGNDRSSITHR          238
-#define AX5043_IND_PKTCHUNKSIZE         239
-#define AX5043_IND_PKTMISCFLAGS         240
-#define AX5043_IND_PKTSTOREFLAGS        241
-#define AX5043_IND_PKTACCEPTFLAGS       242
-#define AX5043_IND_GPADCCTRL            243
-#define AX5043_IND_GPADCPERIOD          244
-#define AX5043_IND_GPADC13VALUE1        245
-#define AX5043_IND_GPADC13VALUE0        246
-#define AX5043_IND_LPOSCCONFIG          247
-#define AX5043_IND_LPOSCSTATUS          248
-#define AX5043_IND_LPOSCKFILT1          249
-#define AX5043_IND_LPOSCKFILT0          250
-#define AX5043_IND_LPOSCREF1            251
-#define AX5043_IND_LPOSCREF0            252
-#define AX5043_IND_LPOSCFREQ1           253
-#define AX5043_IND_LPOSCFREQ0           254
-#define AX5043_IND_LPOSCPER1            255
-#define AX5043_IND_LPOSCPER0            256
-#define AX5043_IND_DACVALUE1            257
-#define AX5043_IND_DACVALUE0            258
-#define AX5043_IND_DACCONFIG            259
-#define AX5043_IND_REF                  260
-#define AX5043_IND_0xF00                261
-#define AX5043_IND_0xF0C                262
-#define AX5043_IND_0xF0D                263
-#define AX5043_IND_XTALOSC              264
-#define AX5043_IND_XTALAMPL             265
-#define AX5043_IND_0xF1C                266
-#define AX5043_IND_0xF18                267
-#define AX5043_IND_0xF21                268
-#define AX5043_IND_0xF22                269
-#define AX5043_IND_0xF23                270
-#define AX5043_IND_0xF26                271
-#define AX5043_IND_0xF30                272
-#define AX5043_IND_0xF31                273
-#define AX5043_IND_0xF32                274
-#define AX5043_IND_0xF33                275
-#define AX5043_IND_0xF34                276
-#define AX5043_IND_0xF35                277
-#define AX5043_IND_0xF44                278
-#define AX5043_IND_0xF72                279
-#define AX5043_IND_XTALDIV              280
-
-
-/******************************************************************************
- ************ Variable index for variables in config.c file in radiolab********
- *****************************************************************************/
-
-#define AXRADIO_IND_PHY_PN9                            1
-#define AXRADIO_IND_PHY_NRCHANNELS                     2
-#define AXRADIO_IND_PHY_CHANFREQ                       3
-#define AXRADIO_IND_PHY_CHANPLLRNGINIT                 4
-#define AXRADIO_IND_PHY_CHANVCOIINIT                   5
-#define AXRADIO_IND_PHY_CHANPLLRNG                     6
-#define AXRADIO_IND_PHY_CHANVCOI                       7
-#define AXRADIO_IND_PHY_VCOCALIB                       8
-#define AXRADIO_IND_PHY_MAXFREQOFFSET                  9
-#define AXRADIO_IND_PHY_RSSIOFFSET                     10
-#define AXRADIO_IND_PHY_RSSIREFERENCE                  11
-#define AXRADIOPHY_CHANNELBUSY                         12
-#define AXRADIO_IND_PHY_CS_PERIOD                      13
-#define AXRADIO_IND_PHY_CS_ENABLED                     14
-#define AXRADIO_IND_PHY_LBT_RETRIES                    15
-#define AXRADIO_IND_PHY_LBT_FORCETX                    16
-#define AXRADIO_IND_PHY_PREAMBLE_WOR_LONGLEN           17
-#define AXRADIO_IND_PHY_PREAMBLE_WOR_LEN               18
-#define AXRADIO_IND_PHY_PREAMBLE_LONGLEN               19
-#define AXRADIO_IND_PHY_PREAMBLE_LEN                   20
-#define AXRADIO_IND_PHY_PREAMBLE_BYTE                  21
-#define AXRADIO_IND_PHY_PREAMBLE_FLAGS                 22
-#define AXRADIO_IND_PHY_PREAMBLE_APPENDBITS            23
-#define AXRADIO_IND_PHY_PREAMBLE_APPENDPATTERN         24
-#define AXRADIO_IND_FRAMING_MACLEN                     25
-#define AXRADIO_IND_FRAMING_ADDRLEN                    26
-#define AXRADIO_IND_FRAMING_DESTADDRPOS                27
-#define AXRADIO_IND_FRAMING_SOURCEADDRPOS              28
-#define AXRADIO_IND_FRAMING_LENPOS                     29
-#define AXRADIO_IND_FRAMING_LENOFFS                    30
-#define AXRADIO_IND_FRAMING_LENMASK                    31
-#define AXRADIO_IND_FRAMING_SWCRCLEN                   32
-#define AXRADIO_IND_FRAMING_SYNCLEN                    33
-#define AXRADIO_IND_FRAMING_SYNCWORD                   34
-#define AXRADIO_IND_FRAMING_SYNCFLAGS                  35
-#define AXRADIO_IND_FRAMING_ENABLE_SFDCALLBACK         36
-#define AXRADIO_IND_FRAMING_ACK_TIMEOUT                37
-#define AXRADIO_IND_FRAMING_ACK_DELAY                  38
-#define AXRADIO_IND_FRAMING_ACK_RETRANSMISSIONS        39
-#define AXRADIO_IND_FRAMING_ACK_SEQNRPOS               40
-#define AXRADIO_IND_FRAMING_MINPAYLOADLEN              41
-#define AXRADIO_IND_PHY_INNERFREQLOOP                  42
-
 /******************************************************************************
  ************************* Register values ************************************
  *****************************************************************************/
@@ -797,24 +455,24 @@
 
 
 //fifo commands
-#define AX5043_FIFOCMD_NOP			0x00
-#define AX5043_FIFOCMD_DATA			0x01
-#define AX5043_FIFOCMD_REPEATDATA	0x02
-#define AX5043_FIFOCMD_TIMER		0x10
-#define AX5043_FIFOCMD_RSSI			0x11
-#define AX5043_FIFOCMD_FREQOFFS		0x12
-#define AX5043_FIFOCMD_RFFREQOFFS	0x13
-#define AX5043_FIFOCMD_DATARATE		0x14
-#define AX5043_FIFOCMD_ANTRSSI		0x15
-#define AX5043_FIFOCMD_TXCTRL		0x1C
-#define AX5043_FIFOCMD_TXPWR		0x1D
+#define AX5043_FIFOCMD_NOP              0x00
+#define AX5043_FIFOCMD_DATA             0x01
+#define AX5043_FIFOCMD_REPEATDATA       0x02
+#define AX5043_FIFOCMD_TIMER            0x10
+#define AX5043_FIFOCMD_RSSI             0x11
+#define AX5043_FIFOCMD_FREQOFFS         0x12
+#define AX5043_FIFOCMD_RFFREQOFFS       0x13
+#define AX5043_FIFOCMD_DATARATE         0x14
+#define AX5043_FIFOCMD_ANTRSSI          0x15
+#define AX5043_FIFOCMD_TXCTRL           0x1C
+#define AX5043_FIFOCMD_TXPWR            0x1D
 
 
 
 /**
  * Poweramp pin function, output/Z pull up for board 0.9 with diodes for 1.4V
  */
-#define AX5043_POWERAMP_MODE_OUTPUT     (1 << 2) | 1)
+#define AX5043_POWERAMP_MODE_OUTPUT     ((1 << 2) | 1)
 #define AX5043_POWERAMP_MODE_PULLUP     ((1 << 7) | 1)
 #define AX5043_POWERAMP_MODE_DAC        ((1 << 2) | 1)
 /**
@@ -899,21 +557,21 @@
 /**
  * Define error codes
  */
-#define AXRADIO_ERR_NOERROR                     0x00
-#define AXRADIO_ERR_NOTSUPPORTED                0x01
-#define AXRADIO_ERR_BUSY                        0x02
-#define AXRADIO_ERR_TIMEOUT                     0x03
-#define AXRADIO_ERR_INVALID                     0x04
-#define AXRADIO_ERR_NOCHIP                      0x05
-#define AXRADIO_ERR_RANGING                     0x06
-#define AXRADIO_ERR_LOCKLOST                    0x07
-#define AXRADIO_ERR_RETRANSMISSION              0x08
-#define AXRADIO_ERR_RESYNC                      0x09
-#define AXRADIO_ERR_RESYNCTIMEOUT               0x0a
-#define AXRADIO_ERR_RECEIVESTART                0x0b
+#define AX5043_ERR_NOERROR                     0x00
+#define AX5043_ERR_NOTSUPPORTED                0x01
+#define AX5043_ERR_BUSY                        0x02
+#define AX5043_ERR_TIMEOUT                     0x03
+#define AX5043_ERR_INVALID                     0x04
+#define AX5043_ERR_NOCHIP                      0x05
+#define AX5043_ERR_RANGING                     0x06
+#define AX5043_ERR_LOCKLOST                    0x07
+#define AX5043_ERR_RETRANSMISSION              0x08
+#define AX5043_ERR_RESYNC                      0x09
+#define AX5043_ERR_RESYNCTIMEOUT               0x0a
+#define AX5043_ERR_RECEIVESTART                0x0b
 
-#define	EXIT_FAILURE	1	// Failing exit status.
-#define	EXIT_SUCCESS	0	// Successful exit status.
+#define EXIT_FAILURE    1   // Failing exit status.
+#define EXIT_SUCCESS    0   // Successful exit status.
 
 /**
  * Frequency mode A or B actually selects at which registers
@@ -923,77 +581,71 @@
  * writing every time the two different frequency configurations.
  */
 typedef enum {
-  FREQA_MODE = 0,               //!< FREQA_MODE
-  FREQB_MODE = 1                //!< FREQB_MODE
+    FREQA_MODE = 0,               //!< FREQA_MODE
+    FREQB_MODE = 1                //!< FREQB_MODE
 } freq_mode_t;
 
 typedef enum {
-  VCO_INTERNAL = 0,
-  VCO_EXTERNAL = 1
+    VCO_INTERNAL = 0,
+    VCO_EXTERNAL = 1
 } vco_mode_t;
 
-typedef enum
-{
-  POWERDOWN,
-  DEEPSLEEP,
-  STANDBY,
-  FIFO_ENABLED,
-  RECEIVE_MODE,
-  RECEIVER_RUNNING,
-  RECEIVER_WOR,
-  TRANSMIT_MODE,
-  FULLTX
+typedef enum {
+    POWERDOWN,
+    DEEPSLEEP,
+    STANDBY,
+    FIFO_ENABLED,
+    RECEIVE_MODE,
+    RECEIVER_RUNNING,
+    RECEIVER_WOR,
+    TRANSMIT_MODE,
+    FULLTX
 } power_mode_t;
 
-typedef enum
-{
-  ANTSEL_OUTPUT_0 = 0,
-  ANTSEL_OUTPUT_1,
-  ANTSEL_OUTPUT_Z,
-  ANTSEL_OUTPUT_BB_TUBE_CLK,
-  ANTSEL_OUTPUT_EXT_TCXO_EN,
-  ANTSEL_OUTPUT_DAC,
-  ANTSEL_OUTPUT_DIVERSITY,
-  ANTSEL_OUTPUT_TEST_OBS
+typedef enum {
+    ANTSEL_OUTPUT_0 = 0,
+    ANTSEL_OUTPUT_1,
+    ANTSEL_OUTPUT_Z,
+    ANTSEL_OUTPUT_BB_TUBE_CLK,
+    ANTSEL_OUTPUT_EXT_TCXO_EN,
+    ANTSEL_OUTPUT_DAC,
+    ANTSEL_OUTPUT_DIVERSITY,
+    ANTSEL_OUTPUT_TEST_OBS
 } pfantsel_t;
 
 
-typedef enum
-{
-  PWRAMP_OUTPUT_0 = 0,
-  PWRAMP_OUTPUT_1,
-  PWRAMP_OUTPUT_Z,
-  PWRAMP_INPUT_DiBit_SYNC,
-  PWRAMP_OUTPUT_DiBit_SYNC,
-  PWRAMP_OUTPUT_DAC,
-  PWRAMP_OUTPUT_PA_CTRL,
-  PWRAMP_OUTPUT_EXT_TCXO_EN,
-  PWRAMP_OUTPUT_TEST_OBS,
+typedef enum {
+    PWRAMP_OUTPUT_0 = 0,
+    PWRAMP_OUTPUT_1,
+    PWRAMP_OUTPUT_Z,
+    PWRAMP_INPUT_DiBit_SYNC,
+    PWRAMP_OUTPUT_DiBit_SYNC,
+    PWRAMP_OUTPUT_DAC,
+    PWRAMP_OUTPUT_PA_CTRL,
+    PWRAMP_OUTPUT_EXT_TCXO_EN,
+    PWRAMP_OUTPUT_TEST_OBS,
 } pfpwramp_t;
 
-typedef enum
-{
-  AX5043_OK = 0,
-  AX5043_INVALID_PARAM = 11,
-  AX5043_TIMEOUT = 12,
-  AX5043_NOT_FOUND = 13,
-  AX5043_AUTORANGING_ERROR = 14
+typedef enum {
+    AX5043_OK = 0,
+    AX5043_INVALID_PARAM = 11,
+    AX5043_TIMEOUT = 12,
+    AX5043_NOT_FOUND = 13,
+    AX5043_AUTORANGING_ERROR = 14
 } ax5043_code_t;
 
-typedef struct
-{
-  uint32_t tx_freq;
-  uint32_t rx_freq;
-  uint32_t f_xtal;
-  uint8_t f_xtaldiv;
-  uint32_t tx_baudrate;
-  uint32_t rx_baudrate;
-  SPIDriver *spi;
-  uint8_t rf_init;
-  freq_mode_t freqsel;
-  vco_mode_t vco;
+typedef struct {
+    uint32_t tx_freq;
+    uint32_t rx_freq;
+    uint32_t f_xtal;
+    uint8_t f_xtaldiv;
+    uint32_t tx_baudrate;
+    uint32_t rx_baudrate;
+    SPIDriver *spi;
+    uint8_t rf_init;
+    freq_mode_t freqsel;
+    vco_mode_t vco;
 } ax5043_conf_t;
-
 
 typedef enum {
     trxstate_off,
@@ -1013,44 +665,62 @@ typedef enum {
     trxstate_txcw_xtalwait,
     trxstate_txstream_xtalwait,
     trxstate_txstream
-} axradio_trxstate_t;
-
+} ax5043_trxstate_t;
 
 //! Structure containing a four byte X.25 address
 typedef struct{
     uint8_t addr[4]; //!< Four byte X.25 address
-}axradio_address_t;
+} ax5043_address_t;
 
 typedef struct{
     uint8_t addr[4];
     uint8_t mask[4];
-}axradio_address_mask_t;
+} ax5043_address_mask_t;
 
+typedef struct {
+    uint8_t reg;
+    uint8_t val;
+} ax5043_regval_t;
+
+typedef enum {
+    ax5043_busy,
+    ax5043_idle,
+} ax5043_state_t;
 
 //Structure for storing registers and other configuration details.
 typedef struct{
-    uint8_t reg_values[280];
-    uint8_t config[43];
+    SPIDriver *spip;
+    SPIConfig *spicfg;
+    ax5043_regval_t reg_values[280];
     uint8_t remoteaddr[4];
     uint8_t localaddr[4];
     uint8_t localadr_mask[4];
-}axradio_config_t;
+} AX5043Config;
+
+typedef struct
+{
+    AX5043Config *config;
+    ax5043_trxstate_t state;
+    ioline_t irq;
+    binary_semaphore_t *bsem;
+    mailbox_t *ax5043_rx_mb;
+} AX5043Driver;
 
 //function declaration starts here
-uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-void ax5043_shutdown(SPIDriver * spip);
-void ax5043_standby(SPIDriver * spip);
-void ax5043_fifo_en(SPIDriver * spip);
-void ax5043_full_rx(SPIDriver * spip);
-void ax5043_synth_tx(SPIDriver * spip);
-void ax5043_full_tx(SPIDriver * spip);
-void ax5043_set_addr(SPIDriver * spip, axradio_address_mask_t *local_addr);
-void ax5043_reset(SPIDriver * spip);
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
+uint8_t ax5043_write_reg(AX5043Driver *axp, uint16_t reg, uint8_t value, uint8_t ret_value[]);
+uint8_t ax5043_read_reg(AX5043Driver *axp, uint16_t reg, uint8_t value, uint8_t ret_value[]);
+void ax5043_shutdown(AX5043Driver *axp);
+void ax5043_standby(AX5043Driver *axp);
+void ax5043_fifo_en(AX5043Driver *axp);
+void ax5043_full_rx(AX5043Driver *axp);
+void ax5043_synth_tx(AX5043Driver *axp);
+void ax5043_full_tx(AX5043Driver *axp);
+void ax5043_set_addr(AX5043Driver *axp, ax5043_address_mask_t *local_addr);
+void ax5043_reset(AX5043Driver *axp);
+void ax5043_writefifo(AX5043Driver *axp,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(AX5043Driver *axp, uint8_t ax5043_rxbuffer[], uint8_t len);
+void ax5043_writefifo(AX5043Driver *axp,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(AX5043Driver *axp, uint8_t ax5043_rxbuffer[], uint8_t len) ;
 
 #endif
 //! @}

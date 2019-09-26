@@ -100,8 +100,7 @@ static const SPIConfig spicfg1 =
 {
     false,
     NULL,                                   // Operation complete callback
-    GPIOA,                                  // Slave select port
-    GPIOA_ARD_A0,                           // Slave select pad
+    LINE_AX1_CS,
     // SPI cr1 data                            (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
@@ -116,8 +115,7 @@ static const SPIConfig spicfg2 =
 {
     false,
     NULL,                                   // Operation complete callback
-    GPIOA,                                  // Slave select port
-    GPIOA_ARD_A1,                           // Slave select pad
+    LINE_AX2_CS,
     // SPI cr1 data                         (see 446 ref man.)
     SPI_CR1_SPE     |                       // SPI enable
     SPI_CR1_MSTR    |                       // Master
