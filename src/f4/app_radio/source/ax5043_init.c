@@ -10,7 +10,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#include "ax5043_common.h"
+#include "ax5043.h"
 #include "ax5043_init.h"
 
 // physical layer from config.c file generated from radiolab

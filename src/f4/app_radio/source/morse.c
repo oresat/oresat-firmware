@@ -8,10 +8,9 @@ The code here refers to logic and snippets from Adam Parker - KD5OOL
 
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
 #include "morse.h"
-#include "ax5043_common.h"
+#include "ax5043.h"
 
 
 //#define MAX_MESSAGE_SIZE 512

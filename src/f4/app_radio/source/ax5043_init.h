@@ -9,7 +9,7 @@
 #ifndef _AX5043_INIT_H_
 #define _AX5043_INIT_H_
 
-#include "ax5043_common.h"
+#include "ax5043.h"
 
 void ax5043_set_regs(SPIDriver * spip);
 void ax5043_set_regs_tx(SPIDriver * spip);

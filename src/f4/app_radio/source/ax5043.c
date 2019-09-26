@@ -1,4 +1,4 @@
-/*! \file ax5043.h */
+/*! \file ax5043.c */
 
 
 /*!
@@ -6,15 +6,10 @@
  *  * @{
  *
  */
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
-#include "ax5043_common.h"
+#include "ax5043.h"
 
 
 

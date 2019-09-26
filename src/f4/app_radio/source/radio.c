@@ -6,15 +6,10 @@
  *  * @{
  *
  */
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"
 
-#include "ax5043_common.h"
+#include "ax5043.h"
 #include "ax5043_init.h"
 #include "ax5043_driver.h"
 #include "morse.h"
