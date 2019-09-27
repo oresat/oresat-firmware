@@ -1,6 +1,6 @@
 /**
  * @file    ina226.h
- * @brief   INA226 Digital to Analog Converter.
+ * @brief   INA226 Power Monitor.
  *
  * @addtogroup INA226
  * @ingroup ORESAT
@@ -343,10 +343,10 @@ struct INA226VMT {
     const INA226Config          *config;
 
 /**
- * @brief MAX710 GPIO Expander class.
+ * @brief INA226 Power Monitor class.
  */
 struct INA226Driver {
-    /** @brief Virtual Mthods Table.*/
+    /** @brief Virtual Methods Table.*/
     const struct INA226VMT     *vmt;
     _ina226_data
 };
