@@ -343,11 +343,6 @@ THD_FUNCTION(ax5043_radio2, ax5043_driver_ptr)
 }
 
 
-/**
- * Reds an AX5043 register. This has retry logic. This calls the the function ax5043_write_reg_spi.
- * @param spip: SPI Configuration, reg: Register address, value: register value, ret_value: returned data.
- * @return the value in the register.
- */
 uint8_t ax5043_init(ax5043_drv_t *ax5043_driver_p)
 {
 
