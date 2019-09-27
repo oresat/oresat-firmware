@@ -783,7 +783,7 @@ typedef struct{
  * @brief   TODO: Brief
  */
 typedef struct {
-    uint8_t reg;
+    uint16_t reg;
     uint8_t val;
 } ax5043_regval_t;
 

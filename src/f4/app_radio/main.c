@@ -38,11 +38,7 @@
 
 //#include "adf7030.h"
 
-#define     DEBUG_SERIAL                    SD2
-#define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
-
 #define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
-
 
 ax5043_address_t remoteaddr = {
     { 0x33, 0x34, 0x00, 0x00}
@@ -53,7 +49,139 @@ ax5043_address_mask_t localaddr = {
 };
 
 ax5043_regval_t reg_values[] = {
-    {0x01, 0x00},
+    {AX5043_REG_MODULATION,     0x08},
+    {AX5043_REG_ENCODING,       0x07},
+    {AX5043_REG_FRAMING,        0x14},
+    //{AX5043_REG_FEC,            0x13},
+    {AX5043_REG_CRCINIT3,       0x00},
+    {AX5043_REG_CRCINIT2,       0x00},
+    {AX5043_REG_CRCINIT1,       0xFF},
+    {AX5043_REG_CRCINIT0,       0xFF},
+    {AX5043_REG_PINFUNCSYSCLK,  0x01},
+    {AX5043_REG_PINFUNCDCLK,    0x01},
+    {AX5043_REG_PINFUNCDATA,    0x01},
+    {AX5043_REG_PINFUNCANTSEL,  0x01},
+    {AX5043_REG_PINFUNCPWRAMP,  0x07},
+    {AX5043_REG_WAKEUPXOEARLY,  0x01},
+    {AX5043_REG_IFFREQ1,        0x02},
+    {AX5043_REG_IFFREQ0,        0x0C},
+    {AX5043_REG_DECIMATION,     0x14},
+    {AX5043_REG_RXDATARATE2,    0x00},
+    {AX5043_REG_RXDATARATE1,    0x3E},
+    {AX5043_REG_RXDATARATE0,    0x80},
+    {AX5043_REG_MAXDROFFSET2,   0x00},
+    {AX5043_REG_MAXDROFFSET1,   0x00},
+    {AX5043_REG_MAXDROFFSET0,   0x00},
+    {AX5043_REG_MAXRFOFFSET2,   0x80},
+    {AX5043_REG_MAXRFOFFSET1,   0x01},
+    {AX5043_REG_MAXRFOFFSET0,   0x2F},
+    {AX5043_REG_FSKDMAX1,       0x00},
+    {AX5043_REG_FSKDMAX0,       0xA6},
+    {AX5043_REG_FSKDMIN1,       0xFF},
+    {AX5043_REG_FSKDMIN0,       0x5A},
+    {AX5043_REG_AMPLFILTER,     0x00},
+    {AX5043_REG_RXPARAMSETS,    0xF4},
+    {AX5043_REG_AGCGAIN0,       0xC5},
+    {AX5043_REG_AGCTARGET0,     0x84},
+    {AX5043_REG_TIMEGAIN0,      0xF8},
+    {AX5043_REG_DRGAIN0,        0xF2},
+    {AX5043_REG_PHASEGAIN0,     0xC3},
+    {AX5043_REG_FREQUENCYGAINA0,0x0F},
+    {AX5043_REG_FREQUENCYGAINB0,0x1F},
+    {AX5043_REG_FREQUENCYGAINC0,0x0A},
+    {AX5043_REG_FREQUENCYGAIND0,0x0A},
+    {AX5043_REG_AMPLITUDEGAIN0, 0x06},
+    {AX5043_REG_FREQDEV10,      0x00},
+    {AX5043_REG_FREQDEV00,      0x00},
+    {AX5043_REG_BBOFFSRES0,     0x00},
+    {AX5043_REG_AGCGAIN1,       0xC5},
+    {AX5043_REG_AGCTARGET1,     0x84},
+    {AX5043_REG_AGCAHYST1,      0x00},
+    {AX5043_REG_AGCMINMAX1,     0x00},
+    {AX5043_REG_TIMEGAIN1,      0xF6},
+    {AX5043_REG_DRGAIN1,        0xF1},
+    {AX5043_REG_PHASEGAIN1,     0xC3},
+    {AX5043_REG_FREQUENCYGAINA1,0x0F},
+    {AX5043_REG_FREQUENCYGAINB1,0x1F},
+    {AX5043_REG_FREQUENCYGAINC1,0x0A},
+    {AX5043_REG_FREQUENCYGAIND1,0x0A},
+    {AX5043_REG_AMPLITUDEGAIN1, 0x06},
+    {AX5043_REG_FREQDEV11,      0x00},
+    {AX5043_REG_FREQDEV01,      0x25},
+    {AX5043_REG_FOURFSK1,       0x16},
+    {AX5043_REG_BBOFFSRES1,     0x00},
+    {AX5043_REG_AGCGAIN3,       0xFF},
+    {AX5043_REG_AGCTARGET3,     0x84},
+    {AX5043_REG_AGCAHYST3,      0x00},
+    {AX5043_REG_AGCMINMAX3,     0x00},
+    {AX5043_REG_TIMEGAIN3,      0xF5},
+    {AX5043_REG_DRGAIN3,        0xF0},
+    {AX5043_REG_PHASEGAIN3,     0xC3},
+    {AX5043_REG_FREQUENCYGAINA3,0x0F},
+    {AX5043_REG_FREQUENCYGAINB3,0x1F},
+    {AX5043_REG_FREQUENCYGAINC3,0x0D},
+    {AX5043_REG_FREQUENCYGAIND3,0x0D},
+    {AX5043_REG_AMPLITUDEGAIN3, 0x06},
+    {AX5043_REG_FREQDEV13,      0x00},
+    {AX5043_REG_FREQDEV03,      0x25},
+    {AX5043_REG_FOURFSK3,       0x16},
+    {AX5043_REG_BBOFFSRES3,     0x00},
+    {AX5043_REG_MODCFGF,        0x02},
+    {AX5043_REG_FSKDEV2,        0x00},
+    {AX5043_REG_FSKDEV1,        0x04},
+    {AX5043_REG_FSKDEV0,        0x5E},
+    {AX5043_REG_MODCFGA,        0x05},
+    {AX5043_REG_TXRATE2,        0x00},
+    {AX5043_REG_TXRATE1,        0x0D},
+    {AX5043_REG_TXRATE0,        0x1B},
+    {AX5043_REG_TXPWRCOEFFB1,   0x07},
+    {AX5043_REG_TXPWRCOEFFB0,   0x00},
+    {AX5043_REG_PLLVCOI,        0x99},
+    {AX5043_REG_PLLRNGCLK,      0x05},
+    {AX5043_REG_BBTUNE,         0x0F},
+    {AX5043_REG_BBOFFSCAP,      0x77},
+    {AX5043_REG_PKTADDRCFG,     0x00},
+    {AX5043_REG_PKTLENCFG,      0x00},
+    {AX5043_REG_PKTLENOFFSET,   0x15},
+    {AX5043_REG_PKTMAXLEN,      0xF0},
+    {AX5043_REG_MATCH0PAT3,     0xAA},
+    {AX5043_REG_MATCH0PAT2,     0xCC},
+    {AX5043_REG_MATCH0PAT1,     0xAA},
+    {AX5043_REG_MATCH0PAT0,     0xCC},
+    //{AX5043_REG_MATCH0LEN,      0x9F},
+    //{AX5043_REG_MATCH0MAX,      0x1F},
+    {AX5043_REG_MATCH1PAT1,     0x55},
+    {AX5043_REG_MATCH1PAT0,     0x55},
+    {AX5043_REG_MATCH1LEN,      0x0A},
+    {AX5043_REG_MATCH1MAX,      0x0A},
+    {AX5043_REG_TMGTXBOOST,     0x5B},
+    {AX5043_REG_TMGTXSETTLE,    0x3E},
+    {AX5043_REG_TMGRXBOOST,     0x5B},
+    {AX5043_REG_TMGRXSETTLE,    0x3E},
+    {AX5043_REG_TMGRXOFFSACQ,   0x00},
+    {AX5043_REG_TMGRXCOARSEAGC, 0x9C},
+    {AX5043_REG_TMGRXRSSI,      0x03},
+    {AX5043_REG_TMGRXPREAMBLE2, 0x17},
+    {AX5043_REG_RSSIABSTHR,     0xE3},
+    {AX5043_REG_BGNDRSSITHR,    0x00},
+    {AX5043_REG_PKTCHUNKSIZE,   0x0D},
+    {AX5043_REG_PKTACCEPTFLAGS, 0x39}, //original 20, 3f=accept all errors
+    {AX5043_REG_DACVALUE1,      0x00},
+    {AX5043_REG_DACVALUE0,      0x00},
+    {AX5043_REG_DACCONFIG,      0x00},
+    {AX5043_REG_REF,            0x03},
+    {AX5043_REG_XTALOSC,        0x04},
+    {AX5043_REG_XTALAMPL,       0x00},
+    {AX5043_REG_0xF1C,          0x07},
+    {AX5043_REG_0xF21,          0x68},
+    {AX5043_REG_0xF22,          0XFF},
+    {AX5043_REG_0xF23,          0x84},
+    {AX5043_REG_0xF26,          0x98},
+    {AX5043_REG_0xF34,          0x28},
+    {AX5043_REG_0xF35,          0x11},
+    {AX5043_REG_0xF44,          0x25},
+    {AX5043_REG_PINFUNCIRQ,     0x03},
+    {AX5043_REG_PKTSTOREFLAGS,  0x14},
     {0x00, 0x00}
 };
 
@@ -123,9 +251,9 @@ static const SPIConfig spicfg2 =
 
 
 
-static AX5043Config ax1cfg =
+static AX5043Config axcfg1 =
 {
-  &SPID2,
+  &SPID1,
   &spicfg1,
   LINE_AX1_IRQ,
   reg_values,
@@ -135,20 +263,34 @@ static AX5043Config ax1cfg =
   localaddr.mask
 };
 
+static AX5043Config axcfg2 =
+{
+  &SPID2,
+  &spicfg2,
+  LINE_AX2_IRQ,
+  reg_values,
+  &radio2_rx_mb,
+  remoteaddr.addr,
+  localaddr.addr,
+  localaddr.mask
+};
+
+
+static AX5043Driver axd1;
+static AX5043Driver axd2;
+
 /*
  * Initialize the SPI drivers and configure the ax5043 chips
  */
 static void app_init(void)
 {
- // Start up debug output, chprintf(DEBUG_CHP,...)
-    sdStart(&DEBUG_SERIAL, &ser_cfg);
-
-    spiStart(&SPID1, &spicfg1);
-    spiStart(&SPID2, &spicfg2);
+    sdStart(&SD2, &ser_cfg);
 
   /* Creating the mailboxes.*/
     chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);
     chMBObjectInit(&radio2_rx_mb, radio2_rx_queue, NUM_BUFFERS);
+
+    ax5043Start(&axd1, &axcfg1);
 }
 
 
@@ -177,7 +319,7 @@ THD_FUNCTION(ax5043_tx_thd, arg)
         demo_packet_[framing_counter_pos+1] = (uint8_t)((pkt_counter>>8) & 0xFF);
     }
 
-    chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
+    chprintf((BaseSequentialStream *)&SD2,"INFO: Sending packet %d\r\n",pkt_counter);
     ax5043_radio2_packet_tx(&ax5043_driver, demo_packet_, sizeof(demo_packet));
 
     chThdSleepMilliseconds(5000);
@@ -188,9 +330,9 @@ THD_FUNCTION(ax5043_tx_thd, arg)
 
 
   for (;;) {
-    chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
+    chprintf((BaseSequentialStream *)&SD2,"INFO: Sending CW %d\r\n", sizeof(cw_message));
 
-    ax5043_radio2_cw_tx(&ax5043_driver, cw_message, sizeof(cw_message));
+    /*ax5043_radio2_cw_tx(&ax1d, cw_message, sizeof(cw_message));*/
 
     chThdSleepMilliseconds(500);
   }
@@ -208,7 +350,7 @@ THD_FUNCTION(radio1_rx, arg)
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio1_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
-      chprintf(DEBUG_CHP,"INFO: rx on radio 1\r\n");
+      chprintf((BaseSequentialStream *)&SD2,"INFO: rx on radio 1\r\n");
   }
 
 }
@@ -223,7 +365,7 @@ THD_FUNCTION(radio2_rx, arg)
     /* Waiting for radio1 rx buffer.*/
     msg_t msg = chMBFetchTimeout(&radio2_rx_mb, &pbuf, TIME_MS2I(10000));
     if (msg == MSG_OK)
-      chprintf(DEBUG_CHP,"INFO: rx on radio 2\r\n");
+      chprintf((BaseSequentialStream *)&SD2,"INFO: rx on radio 2\r\n");
   }
 
 }
@@ -231,15 +373,15 @@ THD_FUNCTION(radio2_rx, arg)
 /*
  * shell commands
  */
-static void mmd(BaseSequentialStream *sd, int argc, char *argv[]) {
+static void mmd(BaseSequentialStream *chp, int argc, char *argv[]) {
 
   (void)argv;
   if (argc > 0) {
-    chprintf(sd, "Usage: mmd\r\n");
+    chprintf(chp, "Usage: mmd\r\n");
     return;
   }
 
-  chprintf(sd, "testing\r\n");
+  chprintf(chp, "testing\r\n");
 }
 
 
@@ -264,7 +406,7 @@ int main(void)
   chSysInit();
   app_init();
 
-  ax5043_init(&ax5043_driver);
+  ax5043ObjectInit(&axd1);
   chThdSleepMilliseconds(5000);
   chThdCreateStatic(waAx5043_tx_thd, sizeof(waAx5043_tx_thd), NORMALPRIO,ax5043_tx_thd, NULL);
   chThdCreateStatic(waradio1_rx, sizeof(waradio1_rx), NORMALPRIO,radio1_rx, NULL);
