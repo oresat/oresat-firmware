@@ -33,9 +33,7 @@
 #include "shell.h"
 
 #include "chprintf.h"
-#include "ax5043_common.h"
-#include "ax5043_setup.h"
-#include "ax5043_driver.h"
+#include "ax5043.h"
 
 
 //#include "adf7030.h"
@@ -46,15 +44,20 @@
 #define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
 
 
-axradio_address_t remoteaddr = {
-	{ 0x33, 0x34, 0x00, 0x00}
+ax5043_address_t remoteaddr = {
+    { 0x33, 0x34, 0x00, 0x00}
 };
-axradio_address_mask_t localaddr = {
-	{ 0x33, 0x34, 0x00, 0x00},
-	{ 0xFF, 0x00, 0x00, 0x00}         // make it { 0x00, 0x00, 0x00, 0x00} to receive AX25 packets
+ax5043_address_mask_t localaddr = {
+    { 0x33, 0x34, 0x00, 0x00},
+    { 0xFF, 0x00, 0x00, 0x00}         // make it { 0x00, 0x00, 0x00, 0x00} to receive AX25 packets
 };
 
-uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
+ax5043_regval_t reg_values[] = {
+    {0x01, 0x00},
+    {0x00, 0x00}
+};
+
+uint8_t ax5043_rxbuffer[256];  //buffer to receive radio data
 
 const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3E, 0x54, 0x65, 0x73, 0x74 };
 
@@ -62,11 +65,6 @@ char cw_message[] = "KG7ZVV Malay Das testing AX5043";
 //const uint8_t framing_insert_counter = 1;    //uncomment for normal packets
 const uint8_t framing_counter_pos = 0;
 const uint8_t framing_insert_counter = 0;     //uncomment for Ax.25 packets
-
-
-//semaphores to indicate idle/busy radio
-binary_semaphore_t radio1_bsem;
-binary_semaphore_t radio2_bsem;
 
 
 //mailboxes to receive the radio packets
@@ -125,22 +123,16 @@ static const SPIConfig spicfg2 =
 
 
 
-static ax5043_drv_t ax5043_driver =
+static AX5043Config ax1cfg =
 {
-  &SPID1,
   &SPID2,
-  AX5043_F1,
-  AX5043_F4,
-  AX5043_RX,
-  AX5043_TX,
+  &spicfg1,
   LINE_AX1_IRQ,
-  LINE_AX2_IRQ,
-  &radio1_bsem,
-  &radio2_bsem,
-  &remoteaddr,
-  &localaddr,
+  reg_values,
   &radio1_rx_mb,
-  &radio2_rx_mb
+  remoteaddr.addr,
+  localaddr.addr,
+  localaddr.mask
 };
 
 /*

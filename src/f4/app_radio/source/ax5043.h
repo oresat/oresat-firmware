@@ -813,11 +813,12 @@ typedef struct{
     const SPIConfig *spicfg;
 #endif /* AX5043_USE_SPI */
     ioline_t irq;
-    ax5043_regval_t reg_values[280];
-    /* TODO: Probably move these to an implementation of the driver */
-    uint8_t remoteaddr[4];
-    uint8_t localaddr[4];
-    uint8_t localadr_mask[4];
+    ax5043_regval_t *reg_values;
+    /* TODO: probably move these to an implementation of the driver */
+    mailbox_t *mb;
+    uint8_t *remoteaddr;
+    uint8_t *localaddr;
+    uint8_t *localadr_mask;
 } AX5043Config;
 
 /**
@@ -850,8 +851,6 @@ struct AX5043VMT {
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
     ax5043_trxstate_t           trx_state;                                  \
-    binary_semaphore_t          *bsem;                                      \
-    mailbox_t                   *mb;
 
 /**
  * @brief AX5043 Radio class.
@@ -878,17 +877,17 @@ extern "C" {
 void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 void ax5043Stop(AX5043Driver *devp);
-void ax5043_standby(AX5043Driver *devp);
-void ax5043_fifo_en(AX5043Driver *devp);
-void ax5043_full_rx(AX5043Driver *devp);
-void ax5043_synth_tx(AX5043Driver *devp);
-void ax5043_full_tx(AX5043Driver *devp);
-void ax5043_set_addr(AX5043Driver *devp, ax5043_address_mask_t *local_addr);
-void ax5043_reset(AX5043Driver *devp);
-void ax5043_writefifo(AX5043Driver *devp,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(AX5043Driver *devp, uint8_t ax5043_rxbuffer[], uint8_t len);
-void ax5043_writefifo(AX5043Driver *devp,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(AX5043Driver *devp, uint8_t ax5043_rxbuffer[], uint8_t len) ;
+void ax5043_standby(SPIDriver *spip);
+void ax5043_fifo_en(SPIDriver *spip);
+void ax5043_full_rx(SPIDriver *spip);
+void ax5043_synth_tx(SPIDriver *spip);
+void ax5043_full_tx(SPIDriver *spip);
+void ax5043_set_addr(SPIDriver *spip, ax5043_address_mask_t *local_addr);
+void ax5043_reset(SPIDriver *spip);
+void ax5043_writefifo(SPIDriver *spip,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(SPIDriver *spip, uint8_t ax5043_rxbuffer[], uint8_t len);
+void ax5043_writefifo(SPIDriver *spip,const uint8_t *ptr, uint8_t len);
+uint8_t ax5043_readfifo(SPIDriver *spip, uint8_t ax5043_rxbuffer[], uint8_t len) ;
 #ifdef __cplusplus
 }
 #endif
