@@ -350,8 +350,8 @@
                                      PIN_PUPDR_PULLUP(GPIOA_SPI1_SCK) |     \
                                      PIN_PUPDR_PULLUP(GPIOA_SPI1_MISO) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_SPI1_MOSI) |    \
-                                     PIN_PUPDR_PULLDOWN(GPIOA_AX1_CS) |     \
-                                     PIN_PUPDR_PULLDOWN(GPIOA_AX2_CS) |     \
+                                     PIN_PUPDR_PULLUP(GPIOA_AX1_CS) |       \
+                                     PIN_PUPDR_PULLUP(GPIOA_AX2_CS) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_ARD_D2) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_CAN1_RX) |      \
                                      PIN_PUPDR_PULLUP(GPIOA_CAN1_TX) |      \
@@ -366,8 +366,8 @@
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MOSI) |        \
-                                     PIN_ODR_LOW(GPIOA_AX1_CS) |            \
-                                     PIN_ODR_LOW(GPIOA_AX2_CS) |            \
+                                     PIN_ODR_HIGH(GPIOA_AX1_CS) |           \
+                                     PIN_ODR_HIGH(GPIOA_AX2_CS) |           \
                                      PIN_ODR_HIGH(GPIOA_ARD_D2) |           \
                                      PIN_ODR_HIGH(GPIOA_CAN1_RX) |          \
                                      PIN_ODR_HIGH(GPIOA_CAN1_TX) |          \
@@ -469,7 +469,7 @@
                                      PIN_PUPDR_PULLUP(GPIOB_PIN7) |         \
                                      PIN_PUPDR_PULLUP(GPIOB_I2C1_SCL) |     \
                                      PIN_PUPDR_PULLUP(GPIOB_I2C1_SDA) |     \
-                                     PIN_PUPDR_PULLDOWN(GPIOB_MMC_CS) |     \
+                                     PIN_PUPDR_PULLUP(GPIOB_MMC_CS) |       \
                                      PIN_PUPDR_PULLUP(GPIOB_PIN11) |        \
                                      PIN_PUPDR_PULLUP(GPIOB_PIN12) |        \
                                      PIN_PUPDR_PULLUP(GPIOB_SPI2_SCK) |     \
@@ -485,7 +485,7 @@
                                      PIN_ODR_HIGH(GPIOB_PIN7) |             \
                                      PIN_ODR_HIGH(GPIOB_I2C1_SCL) |         \
                                      PIN_ODR_HIGH(GPIOB_I2C1_SDA) |         \
-                                     PIN_ODR_LOW(GPIOB_MMC_CS) |            \
+                                     PIN_ODR_HIGH(GPIOB_MMC_CS) |           \
                                      PIN_ODR_HIGH(GPIOB_PIN11) |            \
                                      PIN_ODR_HIGH(GPIOB_PIN12) |            \
                                      PIN_ODR_HIGH(GPIOB_SPI2_SCK) |         \
