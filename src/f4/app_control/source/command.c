@@ -169,9 +169,13 @@ static const ShellCommand commands[] = {
     {NULL, NULL}
 };
 
+static char histbuf[SHELL_MAX_HIST_BUFF];
+
 static const ShellConfig shell_cfg = {
     (BaseSequentialStream *)&SD2,
-    commands
+    commands,
+    histbuf,
+    sizeof(histbuf),
 };
 
 THD_WORKING_AREA(shell_wa, 0x200);
