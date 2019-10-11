@@ -17,7 +17,11 @@
 #include "ax5043.h"
 
 
+#define DEBUG_SERIAL  SD2
+#define DEBUG_CHP     ((BaseSequentialStream *) &DEBUG_SERIAL)
 
+#include <stdbool.h>
+#include <stdint.h>
 
 
 // physical layer from config.c file generated from radiolab
@@ -833,7 +837,7 @@ void ax5043_init(SPIDriver * spip)
  * 
  */
 
-void transmit_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt)
+void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt)
 {
     uint8_t ret_value[3]={0,0,0};
 
@@ -997,7 +1001,7 @@ pktend:
 uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) 
 {
     uint8_t ret_value[3]={0,0,0};
-	axradio_trxstate_t axradio_trxstate;
+	ax5043_trxstate_t axradio_trxstate;
 	uint16_t axradio_txbuffer_len;
 	uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
 	struct axradio_address_mask axradio_localaddr;

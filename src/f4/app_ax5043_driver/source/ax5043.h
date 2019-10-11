@@ -1,43 +1,54 @@
 /*! \file ax5043.h */
 
 
-/*!
- * \addtogroup ax5043
- *  * @{
+
+/**
+ * @file    ax5043.h
+ * @brief   AX5043 Radio.
  *
+ * @addtogroup AX5043
+ * @ingroup ORESAT
+ * @{
  */
-#ifndef _AX5043_COMMON_H
-#define _AX5043_COMMON_H
+ 
 
-#define DEBUG_SERIAL  SD2
-#define DEBUG_CHP     ((BaseSequentialStream *) &DEBUG_SERIAL)
+#ifndef _AX5043_H
+#define _AX5043_H
 
-#include <stdbool.h>
-#include <stdint.h>
 
 
 
 /**
- * The maximum allowed frame size
-
-#define MAX_FRAME_LEN                   1024
-
-#define MIN_RF_FREQ_INT_VCO_RFDIV0      800000000
-#define MAX_RF_FREQ_INT_VCO_RFDIV0      1050000000
-
-#define MIN_RF_FREQ_INT_VCO_RFDIV1      (MIN_RF_FREQ_INT_VCO_RFDIV0 / 2)
-#define MAX_RF_FREQ_INT_VCO_RFDIV1      (MAX_RF_FREQ_INT_VCO_RFDIV0 / 2)
-
-#define MIN_RF_FREQ_EXT_VCO_RFDIV0      54000000
-#define MAX_RF_FREQ_EXT_VCO_RFDIV0      525000000
-
-#define MIN_RF_FREQ_EXT_VCO_RFDIV1      (MIN_RF_FREQ_EXT_VCO_RFDIV0 / 2)
-#define MAX_RF_FREQ_EXT_VCO_RFDIV1      (MAX_RF_FREQ_EXT_VCO_RFDIV0 / 2)
+ * @name    Version Identification
+ * @{
  */
+/**
+ * @brief   AX5043 Driver version string.
+ */
+#define AX5043_VERSION                      "1.0.0"
 
-/******************************************************************************
- ********************  AX5043 control SPI registers ***************************
- *****************************************************************************/
+/**
+ * @brief   AX5043 Driver version major number.
+ */
+#define AX5043_MAJOR                        1
+
+/**
+ * @brief   AX5043 Driver version minor number.
+ */
+#define AX5043_MINOR                        0
+
+/**
+ * @brief   AX5043 Driver version patch number.
+ */
+#define AX5043_PATCH                        0
+/** @} */
+
+
+
+/**
+ * @name    AX5043 Register Addresses
+ * @{
+ */
 
 /* Status and test registers */
 #define AX5043_REG_REV                  0x0
@@ -382,9 +393,13 @@
 #define AX5043_REG_0xF72                0xF72
 #define AX5043_REG_XTALDIV              0xF35
 
-/******************************************************************************
- ************************* Register values ************************************
- *****************************************************************************/
+/** @} */
+
+/**
+ * @name    AX5043 Register and bit values
+ * 
+ */
+
 #define AX5043_REV                      0x51
 #define AX5043_SCRATCH_TEST             0xAA
 
@@ -444,25 +459,12 @@
  */
 #define AX5043_CRC16_CCITT              (1 << 4)
 
+
+
 /**
- * FIFO commands
+ * @name    AX5043 FIFO Commands
+ * 
  */
-
-#define AX5043_NOP_CMD                  0x0
-#define AX5043_RSSI_CMD                 0x31
-#define AX5043_TXCTRL_CMD               0x3C
-#define AX5043_FREQOFFS_CMD             0x52
-#define AX5043_ANTRSSI2_CMD             0x55
-#define AX5043_REPEATDATA_CMD           0x62
-#define AX5043_TIMER_CMD                0x70
-#define AX5043_RFREQOFFS_CMD            0x73
-#define AX5043_DATARATE_CMD             0x74
-#define AX5043_ANTRSSI3_CMD             0x75
-#define AX5043_DATA_CMD                 0xE1
-#define AX5043_TXPWR_CMD                0xFD
-
-
-//fifo commands
 #define AX5043_FIFOCMD_NOP			0x00
 #define AX5043_FIFOCMD_DATA			0x01
 #define AX5043_FIFOCMD_REPEATDATA	0x02
@@ -476,15 +478,14 @@
 #define AX5043_FIFOCMD_TXPWR		0x1D
 
 
-
 /**
- * Poweramp pin function, output/Z pull up for board 0.9 with diodes for 1.4V
+ * @brief  Poweramp pin function, output/Z pull up for board 0.9 with diodes for 1.4V
  */
 #define AX5043_POWERAMP_MODE_OUTPUT     (1 << 2) | 1)
 #define AX5043_POWERAMP_MODE_PULLUP     ((1 << 7) | 1)
 #define AX5043_POWERAMP_MODE_DAC        ((1 << 2) | 1)
 /**
- * FIFO commit command
+ * @brief  FIFO commit command
  */
 #define AX5043_FIFO_COMMIT_CMD          (1 << 2)
 #define AX5043_FIFO_PKTSTART            1
@@ -493,15 +494,15 @@
 #define AX5043_FIFO_RAW                 (1 << 4)
 
 /**
- * Maximum chuck that can be committed on the FIFO
+ * @brief  Maximum chuck that can be committed on the FIFO
  */
 #define AX5043_PKTCHUNKSIZE_240         0xd
 
 #define AX5043_FIFO_MAX_SIZE            240
 
 /**
- * When this threshold of free bytes in the TX FIFO is reached,
- * an IRQ is raised
+ * @brief  When this threshold of free bytes in the TX FIFO is reached,
+ *         an IRQ is raised
  */
 #define AX5043_FIFO_FREE_THR            128
 
@@ -511,32 +512,19 @@
 #define AX5043_REVMDONE                 0x1
 
 /**
- * TX antenna transmission mode
+ * @brief  TX antenna transmission mode
  */
 #define AX5043_TX_SINGLE_ENDED          0x2
 
-/**
- * Radio confguration information
- */
-#define CALLSIGN_STATION                (uint8_t*) "KG7ZVV"
-#define CALLSIGN_DESTINATION            (uint8_t*) ""
-
-#define APRS_UHF                        433800000
-#define APRS_UHF_ALT                    432500000
-
-/******************************************************************************
- ************************* RF Configuration ***********************************
- *****************************************************************************/
-#define RX_FREQ_HZ                      433000000
-#define TX_FREQ_HZ                      APRS_UHF
 
 /**
- * Enables/Disables the appropriate setup for deployment on the devboards or
- * the
+ * @brief  Enables/Disables the appropriate setup for deployment on the devboards
  */
 #define PQWS_DEV_BOARD 0
 
-/* Reference Oscillator frequency */
+/**
+ * @brief   Reference Oscillator frequency 
+ */
 #if PQWS_DEV_BOARD
 #define XTAL_FREQ_HZ                    48000000
 #else
@@ -544,14 +532,14 @@
 #endif
 
 /**
- * External PA Control
+ * @brief  External PA Control
  */
 
 #define AX5043_EXT_PA_ENABLE            0
 #define AX5043_EXT_PA_DISABLE           1
 
 /**
- * Ramp up/Ramp down period of the power amplifier in microseconds
+ * @brief  Ramp up/Ramp down period of the power amplifier in microseconds
  */
 #define PWRAMP_RAMP_PERIOD_US           200
 
@@ -563,7 +551,7 @@
 
 
 /**
- * Define error codes
+ * @brief  Error codes
  */
 #define AXRADIO_ERR_NOERROR                     0x00
 #define AXRADIO_ERR_NOTSUPPORTED                0x01
@@ -582,22 +570,27 @@
 #define	EXIT_SUCCESS	0	// Successful exit status. 
 
 /**
- * Frequency mode A or B actually selects at which registers
- * the frequency configuration should be written.
- *
- * This is quite handy for different RX/TX frequencies, to avoid
- * writing every time the two different frequency configurations.
+ * @brief  Frequency mode A or B actually selects at which registers
+ *         the frequency configuration should be written.
+ *         This is quite handy for different RX/TX frequencies, to avoid
+ *         writing every time the two different frequency configurations.
  */
 typedef enum {
   FREQA_MODE = 0,               //!< FREQA_MODE
   FREQB_MODE = 1                //!< FREQB_MODE
 } freq_mode_t;
 
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum {
   VCO_INTERNAL = 0,
   VCO_EXTERNAL = 1
 } vco_mode_t;
 
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum
 {
   POWERDOWN,
@@ -611,6 +604,9 @@ typedef enum
   FULLTX
 } power_mode_t;
 
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum
 {
   ANTSEL_OUTPUT_0 = 0,
@@ -623,7 +619,9 @@ typedef enum
   ANTSEL_OUTPUT_TEST_OBS
 } pfantsel_t;
 
-
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum
 {
   PWRAMP_OUTPUT_0 = 0,
@@ -637,6 +635,9 @@ typedef enum
   PWRAMP_OUTPUT_TEST_OBS,
 } pfpwramp_t;
 
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum
 {
   AX5043_OK = 0,
@@ -646,6 +647,9 @@ typedef enum
   AX5043_AUTORANGING_ERROR = 14
 } ax5043_code_t;
 
+/**
+ * @brief   TODO: Brief
+ */
 typedef struct
 {
   uint32_t tx_freq;
@@ -660,7 +664,9 @@ typedef struct
   vco_mode_t vco;
 } ax5043_conf_t;
 
-
+/**
+ * @brief   TODO: Brief
+ */
 typedef enum {
     trxstate_off,
     trxstate_rx,
@@ -679,20 +685,164 @@ typedef enum {
     trxstate_txcw_xtalwait,
     trxstate_txstream_xtalwait,
     trxstate_txstream
-} axradio_trxstate_t;
+} ax5043_trxstate_t;
 
 
-//! Structure containing a four byte X.25 address
+/**
+ * @brief   Structure containing a four byte sender X.25 address
+ */
 struct axradio_address {
-    uint8_t addr[4]; //!< Four byte X.25 address
+    uint8_t addr[4]; 
 };
 
+/**
+ * @brief   Structure containing a four byte receiver X.25 address and its mask
+ */
 struct axradio_address_mask {
     uint8_t addr[4];
     uint8_t mask[4];
 };
 
-//function declaration starts here
+
+
+/**
+ * @brief   TODO: Brief
+ */
+typedef struct {
+    uint16_t reg;
+    uint8_t val;
+} ax5043_regval_t;
+
+/*===========================================================================*/
+/* Driver pre-compile time settings.                                         */
+/*===========================================================================*/
+
+/**
+ * @name    Configuration options
+ * @{
+ */
+/**
+ * @brief   AX5043 SPI interface switch.
+ * @details If set to @p TRUE the support for SPI is included.
+ * @note    The default is @p TRUE.
+ */
+#if !defined(AX5043_USE_SPI) || defined(__DOXYGEN__)
+#define AX5043_USE_SPI                      TRUE
+#endif
+
+/**
+ * @brief   AX5043 shared SPI switch.
+ * @details If set to @p TRUE the device acquires SPI bus ownership
+ *          on each transaction.
+ * @note    The default is @p FALSE. Requires SPI_USE_MUTUAL_EXCLUSION.
+ */
+#if !defined(AX5043_SHARED_SPI) || defined(__DOXYGEN__)
+#define AX5043_SHARED_SPI                   FALSE
+#endif
+/** @} */
+
+/*===========================================================================*/
+/* Derived constants and error checks.                                       */
+/*===========================================================================*/
+
+#if AX5043_USE_SPI && !HAL_USE_SPI
+#error "AX5043_USE_SPI requires HAL_USE_SPI"
+#endif
+
+#if AX5043_SHARED_SPI && !SPI_USE_MUTUAL_EXCLUSION
+#error "AX5043_SHARED_SPI requires SPI_USE_MUTUAL_EXCLUSION"
+#endif
+
+/*===========================================================================*/
+/* Driver data structures and types.                                         */
+/*===========================================================================*/
+
+/**
+ * @name    AX5043 data structures and types.
+ * @{
+ */
+/**
+ * @brief Structure representing a AX5043 driver.
+ */
+typedef struct AX5043Driver AX5043Driver;
+
+/**
+ * @brief   Driver state machine possible states.
+ */
+typedef enum {
+    AX5043_UNINIT = 0,                  /**< Not initialized.                 */
+    AX5043_STOP = 1,                    /**< Stopped.                         */
+    AX5043_READY = 2,                   /**< Ready.                           */
+    AX5043_BUSY = 3,                    /**< Busy.                            */
+    AX5043_IDLE = 4,                    /**< Idle.                            */
+} ax5043_state_t;
+
+/**
+ * @brief   AX5043 configuration structure.
+ */
+typedef struct{
+#if (AX5043_USE_SPI) || defined(__DOXYGEN__)
+    /**
+     * @brief SPI driver associated with this AX5043.
+     */
+    SPIDriver *spip;
+    /**
+     * @brief SPI configuration associated with this AX5043.
+     */
+    const SPIConfig *spicfg;
+#endif /* AX5043_USE_SPI */
+    ioline_t irq;
+    ax5043_regval_t *reg_values;
+    /* TODO: probably move these to an implementation of the driver */
+    mailbox_t *mb;
+    uint8_t *remoteaddr;
+    uint8_t *localaddr;
+    uint8_t *localadr_mask;
+} AX5043Config;
+
+/**
+ * @brief   @p AX5043 specific methods.
+ */
+#define _ax5043_methods_alone
+
+/**
+ * @brief   @p AX5043 specific methods with inherited ones.
+ */
+#define _ax5043_methods                                                     \
+    _base_object_methods
+
+/**
+ * @extends BaseObjectVMT
+ *
+ * @brief   @p AX5043 virtual methods table.
+ */
+struct AX5043VMT {
+    _ax5043_methods
+};
+
+/**
+ * @brief   @p AX5043Driver specific data.
+ */
+#define _ax5043_data                                                        \
+    _base_object_data                                                       \
+    /* Driver state.*/                                                      \
+    ax5043_state_t              state;                                      \
+    /* Current configuration data.*/                                        \
+    const AX5043Config          *config;                                    \
+    ax5043_trxstate_t           trx_state;                                  \
+
+/**
+ * @brief AX5043 Radio class.
+ */
+struct AX5043Driver {
+    /** @brief Virtual Methods Table.*/
+    const struct AX5043VMT     *vmt;
+    _ax5043_data
+};
+
+/*===========================================================================*/
+/* Function declarations. These are not to be exposed except debugging       */
+/*===========================================================================*/
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 void ax5043_shutdown(SPIDriver * spip);
@@ -709,6 +859,18 @@ void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
 
 
+/*===========================================================================*/
+/* Driver macros.                                                            */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* External declarations.                                                    */
+/*===========================================================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void ax5043_set_regs(SPIDriver * spip);
 void ax5043_set_regs_tx(SPIDriver * spip);
 void ax5043_set_regs_rx(SPIDriver * spip);
@@ -719,9 +881,13 @@ void ax5043_prepare_rx(SPIDriver * spip);
 void ax5043_init_registers_common(SPIDriver * spip);
 uint8_t axradio_get_pllvcoi(SPIDriver * spip);
 void ax5043_init(SPIDriver * spip);
-void transmit_loop(SPIDriver * spip, axradio_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
+void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
 uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /*_AX5043_H_ */
 //! @}
