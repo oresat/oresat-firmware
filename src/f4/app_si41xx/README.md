@@ -1,14 +1,14 @@
 # SI41XX_SYNTH
 
-This code bitbangs synthesizer SI4123 to generate specific RF outputs.
-This code provides an chibios shell interface to update the synthesizers registers or set them up for specific frequencies.
+This code bitbangs synthesizer Si4123 to generate specific RF outputs.
+This code provides an ChibiOS shell interface to update the synthesizers' registers or set them up for specific frequencies.
 
-This code can be used with Si41xx family. But please ensure that defaults values are populated appropriatly for specific chip. This code tested with si4123.
+This code can be used with Si41xx family. But please ensure that defaults values are populated appropriatly for specific chip. This code tested with Si4123.
 
 See the [Operating Guide](Operating-Guide.pdf) for instructions on how to program a Si41xx synthesizer evaluation board with this app and the NUCLEO-F446RE development board.
 
 
-# Registers and Functionality for SI41xx family
+# Registers and Functionality for Si41xx family
 
     Part    RF1  RF2   IF
     Si4133   X    X    X
