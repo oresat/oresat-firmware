@@ -689,6 +689,17 @@ typedef enum {
 
 
 /**
+ * @brief   TODO: Brief
+ */
+typedef enum {
+  common,
+  tx,
+  rx,
+  rx_cont,
+  singleparamset
+} ax5043_reg_group_t;
+
+/**
  * @brief   Structure containing a four byte sender X.25 address
  */
 struct axradio_address {
@@ -711,6 +722,7 @@ struct axradio_address_mask {
 typedef struct {
     uint16_t reg;
     uint8_t val;
+    ax5043_reg_group_t group;
 } ax5043_regval_t;
 
 /*===========================================================================*/

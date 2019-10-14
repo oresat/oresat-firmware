@@ -46,9 +46,153 @@ const struct axradio_address_mask localaddr_tx = {
 	{ 0x32, 0x34, 0x00, 0x00},
 	{ 0xFF, 0x00, 0x00, 0x00}
 };
+
+
 const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3A, 0x43, 0x51, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3A, 0x54, 0x65, 0x73, 0x74, 0x7B, 0x30, 0x30, 0x30, 0x30, 0x31 };
 const uint8_t framing_insert_counter = 1;
 const uint8_t framing_counter_pos = 0;
+
+ax5043_regval_t reg_values[] = {
+  {AX5043_REG_MODULATION,     0x08,common},
+  {AX5043_REG_ENCODING,       0x00,common},
+  {AX5043_REG_FRAMING,        0x24,common},
+  {AX5043_REG_PINFUNCSYSCLK,  0x01,common},
+  {AX5043_REG_PINFUNCDCLK,    0x01,common},
+  {AX5043_REG_PINFUNCDATA,    0x01,common},
+  {AX5043_REG_PINFUNCANTSEL,  0x01,common},
+  {AX5043_REG_PINFUNCPWRAMP,  0x07,common},
+  {AX5043_REG_WAKEUPXOEARLY,  0x01,common},
+  {AX5043_REG_IFFREQ1,        0x0B,common},
+  {AX5043_REG_IFFREQ0,        0x09,common},
+  {AX5043_REG_DECIMATION,     0x02,common},
+  {AX5043_REG_RXDATARATE2,    0x00,common},
+  {AX5043_REG_RXDATARATE1,    0x3C,common},
+  {AX5043_REG_RXDATARATE0,    0x00,common},
+  {AX5043_REG_MAXDROFFSET2,   0x00,common},
+  {AX5043_REG_MAXDROFFSET1,   0x00,common},
+  {AX5043_REG_MAXDROFFSET0,   0x00,common},
+  {AX5043_REG_MAXRFOFFSET2,   0x80,common},
+  {AX5043_REG_MAXRFOFFSET1,   0x01,common},
+  {AX5043_REG_MAXRFOFFSET0,   0x30,common},
+  {AX5043_REG_FSKDMAX1,       0x00,common},
+  {AX5043_REG_FSKDMAX0,       0xA6,common},
+  {AX5043_REG_FSKDMIN1,       0xFF,common},
+  {AX5043_REG_FSKDMIN0,       0x5A,common},
+  {AX5043_REG_AMPLFILTER,     0x00,common},
+  {AX5043_REG_RXPARAMSETS,    0xF4,common},
+  {AX5043_REG_AGCGAIN0,       0x83,common},
+  {AX5043_REG_AGCTARGET0,     0x84,common},
+  {AX5043_REG_TIMEGAIN0,      0xF8,common},
+  {AX5043_REG_DRGAIN0,        0xF2,common},
+  {AX5043_REG_PHASEGAIN0,     0xC3,common},
+  {AX5043_REG_FREQUENCYGAINA0,0x0F,common},
+  {AX5043_REG_FREQUENCYGAINB0,0x1F,common},
+  {AX5043_REG_FREQUENCYGAINC0,0x05,common},
+  {AX5043_REG_FREQUENCYGAIND0,0x05,common},
+  {AX5043_REG_AMPLITUDEGAIN0, 0x06,common},
+  {AX5043_REG_FREQDEV10,      0x00,common},
+  {AX5043_REG_FREQDEV00,      0x00,common},
+  {AX5043_REG_BBOFFSRES0,     0x00,common},
+  {AX5043_REG_AGCGAIN1,       0x83,common},
+  {AX5043_REG_AGCTARGET1,     0x84,common},
+  {AX5043_REG_AGCAHYST1,      0x00,common},
+  {AX5043_REG_AGCMINMAX1,     0x00,common},
+  {AX5043_REG_TIMEGAIN1,      0xF6,common},
+  {AX5043_REG_DRGAIN1,        0xF1,common},
+  {AX5043_REG_PHASEGAIN1,     0xC3,common},
+  {AX5043_REG_FREQUENCYGAINA1,0x0F,common},
+  {AX5043_REG_FREQUENCYGAINB1,0x1F,common},
+  {AX5043_REG_FREQUENCYGAINC1,0x05,common},
+  {AX5043_REG_FREQUENCYGAIND1,0x05,common},
+  {AX5043_REG_AMPLITUDEGAIN1, 0x06,common},
+  {AX5043_REG_FREQDEV11,      0x00,common},
+  {AX5043_REG_FREQDEV01,      0x1C,common},
+  {AX5043_REG_FOURFSK1,       0x16,common},
+  {AX5043_REG_BBOFFSRES1,     0x00,common},
+  {AX5043_REG_AGCGAIN3,       0xFF,common},
+  {AX5043_REG_AGCTARGET3,     0x84,common},
+  {AX5043_REG_AGCAHYST3,      0x00,common},
+  {AX5043_REG_AGCMINMAX3,     0x00,common},
+  {AX5043_REG_TIMEGAIN3,      0xF5,common},
+  {AX5043_REG_DRGAIN3,        0xF0,common},
+  {AX5043_REG_PHASEGAIN3,     0xC3,common},
+  {AX5043_REG_FREQUENCYGAINA3,0x0F,common},
+  {AX5043_REG_FREQUENCYGAINB3,0x1F,common},
+  {AX5043_REG_FREQUENCYGAINC3,0x09,common},
+  {AX5043_REG_FREQUENCYGAIND3,0x09,common},
+  {AX5043_REG_AMPLITUDEGAIN3, 0x06,common},
+  {AX5043_REG_FREQDEV13,      0x00,common},
+  {AX5043_REG_FREQDEV03,      0x1C,common},
+  {AX5043_REG_FOURFSK3,       0x16,common},
+  {AX5043_REG_BBOFFSRES3,     0x00,common},
+  {AX5043_REG_MODCFGF,        0x02,common},
+  {AX5043_REG_FSKDEV2,        0x00,common},
+  {AX5043_REG_FSKDEV1,        0x22,common},
+  {AX5043_REG_FSKDEV0,        0x22,common},
+  {AX5043_REG_MODCFGA,        0x05,common},
+  {AX5043_REG_TXRATE2,        0x00,common},
+  {AX5043_REG_TXRATE1,        0x88,common},
+  {AX5043_REG_TXRATE0,        0x89,common},
+  {AX5043_REG_TXPWRCOEFFB1,   0x07,common},
+  {AX5043_REG_TXPWRCOEFFB0,   0x00,common},
+  {AX5043_REG_PLLVCOI,        0x98,common},
+  {AX5043_REG_PLLRNGCLK,      0x05,common},
+  {AX5043_REG_BBTUNE,         0x03,common},
+  {AX5043_REG_BBOFFSCAP,      0x77,common},
+  {AX5043_REG_PKTADDRCFG,     0x00,common},
+  {AX5043_REG_PKTLENCFG,      0x82,common},
+  {AX5043_REG_PKTLENOFFSET,   0x00,common},
+  {AX5043_REG_PKTMAXLEN,      0xC8,common},
+  {AX5043_REG_MATCH0PAT3,     0xAA,common},
+  {AX5043_REG_MATCH0PAT2,     0xCC,common},
+  {AX5043_REG_MATCH0PAT1,     0xAA,common},
+  {AX5043_REG_MATCH0PAT0,     0xCC,common},
+  {AX5043_REG_MATCH1PAT1,     0x55,common},
+  {AX5043_REG_MATCH1PAT0,     0x55,common},
+  {AX5043_REG_MATCH1LEN,      0x8A,common},
+  {AX5043_REG_MATCH1MAX,      0x0A,common},
+  {AX5043_REG_TMGTXBOOST,     0x5B,common},
+  {AX5043_REG_TMGTXSETTLE,    0x3E,common},
+  {AX5043_REG_TMGRXOFFSACQ,   0x00,common},
+  {AX5043_REG_TMGRXCOARSEAGC, 0x9C,common},
+  {AX5043_REG_TMGRXRSSI,      0x03,common},
+  {AX5043_REG_TMGRXPREAMBLE2, 0x17,common},
+  {AX5043_REG_RSSIABSTHR,     0xEB,common},
+  {AX5043_REG_BGNDRSSITHR,    0x00,common},
+  {AX5043_REG_PKTCHUNKSIZE,   0x0D,common},
+  {AX5043_REG_PKTACCEPTFLAGS, 0x20,common},
+  {AX5043_REG_DACVALUE1,      0x00,common},
+  {AX5043_REG_DACVALUE0,      0x00,common},
+  {AX5043_REG_DACCONFIG,      0x00,common},
+  {AX5043_REG_REF,            0x03,common},
+  {AX5043_REG_XTALOSC,        0x04,common},
+  {AX5043_REG_XTALAMPL,       0x00,common},
+  {AX5043_REG_0xF1C,          0x07,common},
+  {AX5043_REG_0xF21,          0x68,common},
+  {AX5043_REG_0xF22,          0XFF,common},
+  {AX5043_REG_0xF23,          0x84,common},
+  {AX5043_REG_0xF26,          0x98,common},
+  {AX5043_REG_0xF34,          0x28,common},
+  {AX5043_REG_0xF35,          0x11,common},
+  {AX5043_REG_0xF44,          0x25,common},
+  {AX5043_REG_PINFUNCIRQ,     0x03,common},
+  {AX5043_REG_PKTSTOREFLAGS,  0x14,common},
+  {AX5043_REG_PLLLOOP,        0x09,tx},
+  {AX5043_REG_PLLCPI,         0x02,tx},
+  {AX5043_REG_PLLVCODIV,      0x24,tx},
+  {AX5043_REG_XTALCAP,        0x00,tx},
+  {AX5043_REG_0xF00,          0x0F,tx},
+  {AX5043_REG_0xF18,          0x06,tx},
+  {AX5043_REG_PLLLOOP,        0x09,rx},
+  {AX5043_REG_PLLCPI,         0x01,rx},
+  {AX5043_REG_PLLVCODIV,      0x25,rx},
+  {AX5043_REG_XTALCAP,        0x00,rx},
+  {AX5043_REG_0xF00,          0x0F,rx},
+  {AX5043_REG_0xF18,          0x02,rx},
+  {AX5043_REG_TMGRXAGC,       0x00,rx_cont},
+  {AX5043_REG_TMGRXPREAMBLE1, 0x00,rx_cont},
+  {AX5043_REG_PKTMISCFLAGS,   0x00,rx_cont}
+};
 
 /*
  * Serial Driver Configuration
@@ -170,7 +314,7 @@ static void app_init(void)
 static void main_loop(void)
 {
     chThdSleepMilliseconds(500);
-
+    
 
 	while (true)
     {
@@ -191,12 +335,6 @@ int main(void)
     chSysInit();
     app_init();
 
-    // Enabling events on both edges of the button line.*/
-    //palEnableLineEvent(GPIOC_SX_DIO3, PAL_EVENT_MODE_RISING_EDGES);
-
-	//chThdCreateStatic(waThread_sx1236_rx,      sizeof(waThread_sx1236_rx),   NORMALPRIO, Thread_sx1236_rx, NULL);
-    //chThdSleepMilliseconds(500);
-    //chThdCreateStatic(waThread_sx1236_tx,      sizeof(waThread_sx1236_tx),   NORMALPRIO, Thread_sx1236_tx, NULL);
     chThdSleepMilliseconds(500);
 
     main_loop();
