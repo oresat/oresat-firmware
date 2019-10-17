@@ -393,6 +393,8 @@
 #define AX5043_REG_0xF72                0xF72
 #define AX5043_REG_XTALDIV              0xF35
 
+/* Not a real register. Indicator of end of registers.*/
+#define AX5043_REG_END                  0xFFF
 /** @} */
 
 /**
@@ -798,18 +800,12 @@ typedef struct{
      * @brief SPI driver associated with this AX5043.
      */
     SPIDriver *spip;
-    /**
-     * @brief SPI configuration associated with this AX5043.
-     */
-    const SPIConfig *spicfg;
+
 #endif /* AX5043_USE_SPI */
     ioline_t irq;
     ax5043_regval_t *reg_values;
     /* TODO: probably move these to an implementation of the driver */
     mailbox_t *mb;
-    uint8_t *remoteaddr;
-    uint8_t *localaddr;
-    uint8_t *localadr_mask;
 } AX5043Config;
 
 /**
@@ -841,7 +837,6 @@ struct AX5043VMT {
     ax5043_state_t              state;                                      \
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
-    ax5043_trxstate_t           trx_state;                                  \
 
 /**
  * @brief AX5043 Radio class.
@@ -857,16 +852,9 @@ struct AX5043Driver {
 /*===========================================================================*/
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-void ax5043_shutdown(SPIDriver * spip);
-void ax5043_standby(SPIDriver * spip);
-void ax5043_fifo_en(SPIDriver * spip);
-void ax5043_full_rx(SPIDriver * spip);
-void ax5043_synth_tx(SPIDriver * spip);
-void ax5043_full_tx(SPIDriver * spip);
+void ax5043_set_pwrmode(SPIDriver * spip, uint8_t reg_value);
 void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
 void ax5043_reset(SPIDriver * spip);
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
 
@@ -882,17 +870,15 @@ uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t le
 #ifdef __cplusplus
 extern "C" {
 #endif
+void ax5043ObjectInit(AX5043Driver *devp);
+void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 
-void ax5043_set_regs(SPIDriver * spip);
-void ax5043_set_regs_tx(SPIDriver * spip);
-void ax5043_set_regs_rx(SPIDriver * spip);
-void ax5043_set_regs_rxcont(SPIDriver * spip);
-void ax5043_set_regs_rxcont_singleparamset(SPIDriver * spip);
-void ax5043_prepare_tx(SPIDriver * spip);
-void ax5043_prepare_rx(SPIDriver * spip);
+void ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
+void ax5043_prepare_tx(AX5043Driver *devp);
+void ax5043_prepare_rx(AX5043Driver *devp);
 void ax5043_init_registers_common(SPIDriver * spip);
 uint8_t axradio_get_pllvcoi(SPIDriver * spip);
-void ax5043_init(SPIDriver * spip);
+void ax5043_init(AX5043Driver *devp);
 void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
 uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]);

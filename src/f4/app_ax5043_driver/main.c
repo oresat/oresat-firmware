@@ -191,7 +191,8 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_0xF18,          0x02,rx},
   {AX5043_REG_TMGRXAGC,       0x00,rx_cont},
   {AX5043_REG_TMGRXPREAMBLE1, 0x00,rx_cont},
-  {AX5043_REG_PKTMISCFLAGS,   0x00,rx_cont}
+  {AX5043_REG_PKTMISCFLAGS,   0x00,rx_cont},
+  {AX5043_REG_END,            0x00,common}
 };
 
 /*
@@ -241,6 +242,22 @@ static const SPIConfig spicfg_tx =
     0, // SPI_CR2_SSOE,
 };
 
+//mailboxes to receive the radio packets
+#define NUM_BUFFERS 16
+static msg_t radio1_rx_queue[NUM_BUFFERS];
+static mailbox_t radio1_rx_mb;
+
+
+//Radio driver configurations
+
+static AX5043Config axcfg1 =
+{
+  &SPID2,
+  LINE_SX_INT0,
+  reg_values,
+  &radio1_rx_mb,
+};
+AX5043Driver axd1;
 
 /*
  * Initialize the SPI drivers and configure the adf7030 chips
@@ -272,19 +289,18 @@ static void app_init(void)
     chThdSleepMilliseconds(1000);
 
 
-
-    //uint16_t reg=0;
-    //uint8_t value=0;
-    //uint8_t value1=0x55;
-    //uint8_t ret_value[3]={0,0,0};
-    //int i;
-
-
+    // Creating the mailboxes.
+    chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);
+    
+    //initiating radio driver
+    ax5043ObjectInit(&axd1);
+    ax5043Start(&axd1, &axcfg1);
+    
     chprintf(DEBUG_CHP, "Configuring AX5043\r\n");
     chThdSleepMilliseconds(50);
-    ax5043_init(&SPID2);
+    ax5043_init(&axd1);
     ax5043_set_addr(&SPID2, localaddr_tx);
-    ax5043_prepare_tx(&SPID2);
+    ax5043_prepare_tx(&axd1);
     chprintf(DEBUG_CHP, "done reseting AX5043\r\n");
 
 
