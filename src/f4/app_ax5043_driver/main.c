@@ -195,6 +195,57 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_END,            0x00,common}
 };
 
+
+ax5043_confval_t conf_values[]={
+  {AXRADIO_PHY_PN9                     ,0},
+  {AXRADIO_PHY_NRCHANNELS              ,1},
+  {AXRADIO_PHY_CHANFREQ                ,0X0912AAAB },
+  {AXRADIO_PHY_CHANPLLRNGINIT          ,0X0A },
+  {AXRADIO_PHY_CHANVCOIINIT            ,0X98},
+  {AXRADIO_PHY_CHANPLLRNG              ,0},
+  {AXRADIO_PHY_CHANVCOI                ,0},
+  {AXRADIO_PHY_VCOCALIB                ,0},
+  {AXRADIO_PHY_MAXFREQOFFSET           ,913},
+  {AXRADIO_PHY_RSSIOFFSET              ,64},
+  {AXRADIO_PHY_RSSIREFERENCE           ,313},
+  {AXRADIO_PHY_CHANNELBUSY             ,-23},
+  {AXRADIO_PHY_CS_PERIOD               ,7}, 
+  {AXRADIO_PHY_CS_ENABLED              ,0},
+  {AXRADIO_PHY_LBT_RETRIES             ,0},
+  {AXRADIO_PHY_LBT_FORCETX             ,0},
+  {AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    ,23}, 
+  {AXRADIO_PHY_PREAMBLE_WOR_LEN        ,184},
+  {AXRADIO_PHY_PREAMBLE_LONGLEN        ,0},
+  {AXRADIO_PHY_PREAMBLE_LEN            ,72},
+  {AXRADIO_PHY_PREAMBLE_BYTE           ,0X7E},
+  {AXRADIO_PHY_PREAMBLE_FLAGS          ,0X38},
+  {AXRADIO_PHY_PREAMBLE_APPENDBITS     ,0},
+  {AXRADIO_PHY_PREAMBLE_APPENDPATTERN  ,0X00},
+  {AXRADIO_FRAMING_MACLEN              ,3},
+  {AXRADIO_FRAMING_ADDRLEN             ,1},
+  {AXRADIO_FRAMING_DESTADDRPOS         ,0},
+  {AXRADIO_FRAMING_SOURCEADDRPOS       ,0XFF},
+  {AXRADIO_FRAMING_LENPOS              ,2},
+  {AXRADIO_FRAMING_LENOFFS             ,0},
+  {AXRADIO_FRAMING_LENMASK             ,0XFF},
+  {AXRADIO_FRAMING_SWCRCLEN            ,0},
+  {AXRADIO_FRAMING_SYNCLEN             ,32},
+  {AXRADIO_FRAMING_SYNCWORD0           ,0XCC},
+  {AXRADIO_FRAMING_SYNCWORD1           ,0XAA},
+  {AXRADIO_FRAMING_SYNCWORD2           ,0XCC},
+  {AXRADIO_FRAMING_SYNCWORD3           ,0XAA},
+  {AXRADIO_FRAMING_SYNCFLAGS           ,0X38},
+  {AXRADIO_FRAMING_ENABLE_SFDCALLBACK  ,0},
+  {AXRADIO_FRAMING_ACK_TIMEOUT         ,8}, 
+  {AXRADIO_FRAMING_ACK_DELAY           ,313}, 
+  {AXRADIO_FRAMING_ACK_RETRANSMISSIONS ,0},
+  {AXRADIO_FRAMING_ACK_SEQNRPOS        ,0XFF},
+  {AXRADIO_FRAMING_MINPAYLOADLEN       ,0}, 
+  {AXRADIO_WOR_PERIOD                  ,128},
+  {AXRADIO_PHY_INNERFREQLOOP           ,0},
+  {AXRADIO_PHY_END                     ,0}
+};
+
 /*
  * Serial Driver Configuration
  */
@@ -255,6 +306,7 @@ static AX5043Config axcfg1 =
   &SPID2,
   LINE_SX_INT0,
   reg_values,
+  conf_values,
   &radio1_rx_mb,
 };
 AX5043Driver axd1;

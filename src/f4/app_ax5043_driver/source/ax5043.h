@@ -571,6 +571,60 @@
 #define	EXIT_FAILURE	1	// Failing exit status.  
 #define	EXIT_SUCCESS	0	// Successful exit status. 
 
+
+
+/**
+ * @brief  PHY and Framing details
+ */
+#define AXRADIO_PHY_PN9                     0
+#define AXRADIO_PHY_NRCHANNELS              1
+#define AXRADIO_PHY_CHANFREQ                2
+#define AXRADIO_PHY_CHANPLLRNGINIT          3
+#define AXRADIO_PHY_CHANVCOIINIT            4
+#define AXRADIO_PHY_CHANPLLRNG              5
+#define AXRADIO_PHY_CHANVCOI                6
+#define AXRADIO_PHY_VCOCALIB                7
+#define AXRADIO_PHY_MAXFREQOFFSET           8
+#define AXRADIO_PHY_RSSIOFFSET              9
+#define AXRADIO_PHY_RSSIREFERENCE           10
+#define AXRADIO_PHY_CHANNELBUSY             11
+#define AXRADIO_PHY_CS_PERIOD               12
+#define AXRADIO_PHY_CS_ENABLED              13
+#define AXRADIO_PHY_LBT_RETRIES             14
+#define AXRADIO_PHY_LBT_FORCETX             15
+#define AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    16
+#define AXRADIO_PHY_PREAMBLE_WOR_LEN        17
+#define AXRADIO_PHY_PREAMBLE_LONGLEN        18
+#define AXRADIO_PHY_PREAMBLE_LEN            19
+#define AXRADIO_PHY_PREAMBLE_BYTE           20
+#define AXRADIO_PHY_PREAMBLE_FLAGS          21
+#define AXRADIO_PHY_PREAMBLE_APPENDBITS     22
+#define AXRADIO_PHY_PREAMBLE_APPENDPATTERN  23
+#define AXRADIO_FRAMING_MACLEN              24
+#define AXRADIO_FRAMING_ADDRLEN             25
+#define AXRADIO_FRAMING_DESTADDRPOS         26
+#define AXRADIO_FRAMING_SOURCEADDRPOS       27
+#define AXRADIO_FRAMING_LENPOS              28
+#define AXRADIO_FRAMING_LENOFFS             29
+#define AXRADIO_FRAMING_LENMASK             30
+#define AXRADIO_FRAMING_SWCRCLEN            31
+#define AXRADIO_FRAMING_SYNCLEN             32
+#define AXRADIO_FRAMING_SYNCWORD0           33
+#define AXRADIO_FRAMING_SYNCWORD1           34
+#define AXRADIO_FRAMING_SYNCWORD2           35
+#define AXRADIO_FRAMING_SYNCWORD3           36
+#define AXRADIO_FRAMING_SYNCFLAGS           37
+#define AXRADIO_FRAMING_ENABLE_SFDCALLBACK  38
+#define AXRADIO_FRAMING_ACK_TIMEOUT         39
+#define AXRADIO_FRAMING_ACK_DELAY           40
+#define AXRADIO_FRAMING_ACK_RETRANSMISSIONS 41
+#define AXRADIO_FRAMING_ACK_SEQNRPOS        42
+#define AXRADIO_FRAMING_MINPAYLOADLEN       43
+#define AXRADIO_WOR_PERIOD                  44
+#define AXRADIO_PHY_INNERFREQLOOP           45
+#define AXRADIO_PHY_END                     200
+
+
 /**
  * @brief  Frequency mode A or B actually selects at which registers
  *         the frequency configuration should be written.
@@ -727,6 +781,15 @@ typedef struct {
     ax5043_reg_group_t group;
 } ax5043_regval_t;
 
+
+/**
+ * @brief   TODO: Brief
+ */
+typedef struct {
+    uint8_t conf_name;
+    uint32_t val;
+} ax5043_confval_t;
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -804,6 +867,7 @@ typedef struct{
 #endif /* AX5043_USE_SPI */
     ioline_t irq;
     ax5043_regval_t *reg_values;
+    ax5043_confval_t *conf_values;
     /* TODO: probably move these to an implementation of the driver */
     mailbox_t *mb;
 } AX5043Config;
@@ -874,6 +938,8 @@ void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 
 void ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
+uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
+void ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 void ax5043_prepare_tx(AX5043Driver *devp);
 void ax5043_prepare_rx(AX5043Driver *devp);
 void ax5043_init_registers_common(SPIDriver * spip);
