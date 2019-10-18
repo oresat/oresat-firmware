@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 
+/*
 // physical layer from config.c file generated from radiolab
 const uint8_t axradio_phy_pn9 = 0;
 const uint8_t axradio_phy_nrchannels = 1;
@@ -76,7 +77,7 @@ const uint8_t axradio_framing_minpayloadlen = 0; // must be set to 1 if the payl
 //WOR
 const uint16_t axradio_wor_period = 128;
 const uint8_t axradio_phy_innerfreqloop = 0;
-
+*/
 
 /**
  * writes  to an AX5043 register.
@@ -355,7 +356,7 @@ void ax5043_prepare_tx(AX5043Driver *devp)
   ax5043_set_pwrmode(spip, AX5043_FIFO_ENABLED);
   //ax5043_set_regs_tx(spip);
   ax5043_set_regs_group(devp,tx);
-  ax5043_init_registers_common(spip);
+  ax5043_init_registers_common(devp);
 
   ax5043_write_reg(spip, AX5043_REG_FIFOTHRESH1, (uint8_t)0x00, ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFOTHRESH0, (uint8_t)0x80, ret_value);
@@ -395,12 +396,12 @@ void ax5043_prepare_rx(AX5043Driver *devp)
 
   //ax5043_set_regs_rx(spip);
   ax5043_set_regs_group(devp,rx);
-  ax5043_init_registers_common(spip);
+  ax5043_init_registers_common(devp);
 
   
   //follows code from function ax5043_receiver_on_continuous() in easyax5043.c from radiolab
-
-  ax5043_write_reg(spip, AX5043_REG_RSSIREFERENCE, axradio_phy_rssireference, ret_value);
+  uint8_t rssireference = ax5043_get_conf_val(devp, AXRADIO_PHY_RSSIREFERENCE) ;
+  ax5043_write_reg(spip, AX5043_REG_RSSIREFERENCE, rssireference, ret_value);
   //ax5043_set_regs_rxcont(spip);
   ax5043_set_regs_group(devp,rx_cont);
   
@@ -423,13 +424,18 @@ void ax5043_prepare_rx(AX5043Driver *devp)
 
  
 
-uint8_t axradio_get_pllvcoi(SPIDriver * spip)
+uint8_t axradio_get_pllvcoi(AX5043Driver *devp)
 {
     uint8_t ret_value[3]={0,0,0};
-    uint8_t x = axradio_phy_chanvcoiinit[0];
+    SPIDriver *spip = devp->config->spip;
+    
+    //uint8_t x = axradio_phy_chanvcoiinit[0];
+    uint8_t x = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANVCOIINIT) ;
+    uint8_t pll_init_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNGINIT);
+    uint8_t pll_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
     if (x & 0x80) {
-      if (!(axradio_phy_chanpllrnginit[0] & 0xF0)) {
-        x += (axradio_phy_chanpllrng[0] & 0x0F) - (axradio_phy_chanpllrnginit[0] & 0x0F);
+      if (!(pll_init_val & 0xF0)) {
+        x += (pll_val & 0x0F) - (pll_init_val & 0x0F);
        x &= 0x3f;
         x |= 0x80;
       }
@@ -441,10 +447,13 @@ uint8_t axradio_get_pllvcoi(SPIDriver * spip)
 
 
 
-void ax5043_init_registers_common(SPIDriver * spip)
+void ax5043_init_registers_common(AX5043Driver *devp)
 {
     uint8_t ret_value[3]={0,0,0};
-    uint8_t rng = axradio_phy_chanpllrng[0];
+    SPIDriver *spip = devp->config->spip;
+    
+    //uint8_t rng = axradio_phy_chanpllrng[0];
+    uint8_t rng = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
     if (rng & 0x20)
         chprintf(DEBUG_CHP, "\r\r ERROR at ax5043_init_registers_common --\r\n");
     if ( ax5043_read_reg(spip, AX5043_REG_PLLLOOP, (uint8_t)0x00, ret_value) & 0x80) {
@@ -452,7 +461,7 @@ void ax5043_init_registers_common(SPIDriver * spip)
     } else {
        ax5043_write_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(rng & 0x0F), ret_value);
     }
-    rng = axradio_get_pllvcoi(spip);
+    rng = axradio_get_pllvcoi(devp);
    if (rng & 0x80)
         ax5043_write_reg(spip, AX5043_REG_PLLVCOI, (uint8_t)(rng), ret_value);
 }
@@ -526,8 +535,10 @@ void ax5043_init(AX5043Driver *devp)
   {
     chThdSleepMilliseconds(1);
   }
-  axradio_phy_chanpllrng[0] = ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, ret_value); 
-  chprintf(DEBUG_CHP, "\r\r PLL ranging done. 0x%x --\r\n", axradio_phy_chanpllrng[0]);
+  //axradio_phy_chanpllrng[0] = ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, ret_value); //To be taken off
+  int8_t value = ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, ret_value);
+  ax5043_set_conf_val(devp, AXRADIO_PHY_CHANPLLRNG, value);
+  chprintf(DEBUG_CHP, "\r\r PLL ranging done. 0x%x --\r\n", value);
 
 
   //VCOI calibration
@@ -580,8 +591,11 @@ void ax5043_init(AX5043Driver *devp)
   //ax5043_set_regs_rx(spip);
   ax5043_set_regs_group(devp,rx);
 
-  ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(axradio_phy_chanpllrng[0] & 0x0F), ret_value);
-  f = axradio_phy_chanfreq[0];
+  uint8_t pll_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
+  //ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(axradio_phy_chanpllrng[0] & 0x0F), ret_value);
+  ax5043_read_reg(spip, AX5043_REG_PLLRANGINGA, (pll_val & 0x0F), ret_value);
+  //f = axradio_phy_chanfreq[0];
+  f = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANFREQ);
   ax5043_write_reg(spip, AX5043_REG_FREQA0, (uint8_t)f, ret_value);  
   ax5043_write_reg(spip, AX5043_REG_FREQA1, (uint8_t)(f >> 8), ret_value); 
   ax5043_write_reg(spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), ret_value); 
@@ -600,9 +614,12 @@ void ax5043_init(AX5043Driver *devp)
  * 
  */
 
-void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt)
+void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt)
 {
     uint8_t ret_value[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
+    
+    uint8_t synclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCLEN);
 
     for (;;) {
         uint8_t cnt = ax5043_read_reg(spip,AX5043_REG_FIFOFREE0, (uint8_t)0x00, ret_value);
@@ -614,7 +631,8 @@ void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_
         case trxstate_tx_longpreamble:
             if (!axradio_txbuffer_cnt) {
                 axradio_trxstate = trxstate_tx_shortpreamble;
-                axradio_txbuffer_cnt = axradio_phy_preamble_len;
+                //axradio_txbuffer_cnt = axradio_phy_preamble_len;
+                axradio_txbuffer_cnt = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_LEN);
                 goto shortpreamble;
             }
             if (cnt < 4) {
@@ -628,9 +646,11 @@ void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_
             axradio_txbuffer_cnt -= cnt;
             cnt <<= 5;
             ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), ret_value);
-            ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_flags, ret_value);
+            //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_flags, ret_value);
+            ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), ret_value);
             ax5043_write_reg(spip,AX5043_REG_FIFODATA, cnt, ret_value);
-            ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_byte, ret_value);
+            //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_byte, ret_value);
+            ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE), ret_value);
             break;
 
         case trxstate_tx_shortpreamble:
@@ -641,34 +661,46 @@ void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_
                     chThdSleepMilliseconds(1);
                     continue;
                 }
-                if (axradio_phy_preamble_appendbits) {
+                
+                //if (axradio_phy_preamble_appendbits) {
+                uint8_t preamble_appendbits = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_APPENDBITS);
+                if (preamble_appendbits) {
                     uint8_t byte;
                     ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (2 << 5), ret_value);
                     ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x1C, ret_value);
-                    byte = axradio_phy_preamble_appendpattern;
+                    //byte = axradio_phy_preamble_appendpattern;
+                    byte = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_APPENDPATTERN);
                     if (ax5043_read_reg(spip,AX5043_REG_PKTADDRCFG, (uint8_t)0x00, ret_value) & 0x80) {
                         // msb first -> stop bit below
-                        byte &= 0xFF << (8-axradio_phy_preamble_appendbits);
-                        byte |= 0x80 >> axradio_phy_preamble_appendbits;
+                        byte &= 0xFF << (8-preamble_appendbits);
+                        byte |= 0x80 >> preamble_appendbits;
                     } else {
                          // lsb first -> stop bit above
-                        byte &= 0xFF >> (8-axradio_phy_preamble_appendbits);
-                        byte |= 0x01 << axradio_phy_preamble_appendbits;
+                        byte &= 0xFF >> (8-preamble_appendbits);
+                        byte |= 0x01 << preamble_appendbits;
                     }
                     ax5043_write_reg(spip,AX5043_REG_FIFODATA, byte, ret_value);
                 }
-                if ((ax5043_read_reg(spip,AX5043_REG_FRAMING, (uint8_t)0x00, ret_value) & 0x0E) == 0x06 && axradio_framing_synclen) {
+                if ((ax5043_read_reg(spip,AX5043_REG_FRAMING, (uint8_t)0x00, ret_value) & 0x0E) == 0x06 && synclen) {
                     // write SYNC word if framing mode is raw_patternmatch, might use SYNCLEN > 0 as a criterion, but need to make sure SYNCLEN=0 for WMBUS (chip automatically sends SYNCWORD but matching in RX works via MATCH0PAT)
-                    uint8_t len_byte = axradio_framing_synclen;
+                    //uint8_t len_byte = axradio_framing_synclen;
+                    int8_t len_byte = synclen;
                     uint8_t i = (len_byte & 0x07) ? 0x04 : 0;
                     // SYNCLEN in bytes, rather than bits. Ceiled to next integer e.g. fractional bits are counted as full bits;v
                     len_byte += 7;
                     len_byte >>= 3;
                     ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | ((len_byte + 1) << 5), ret_value);
-                    ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_framing_syncflags | i, ret_value);
+                    //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_framing_syncflags | i, ret_value);
+                    ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCFLAGS) | i, ret_value);
+                    
+                    uint8_t syncword[4] = {ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD0),
+                                           ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD1),
+                                           ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD2),
+                                           ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD3)};
                     for (i = 0; i < len_byte; ++i) {
                         // better put a brace, it might prevent SDCC from optimizing away the assignement...
-                        ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_framing_syncword[i], ret_value);
+                        //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_framing_syncword[i], ret_value);
+                        ax5043_write_reg(spip,AX5043_REG_FIFODATA, syncword[i], ret_value);
                     }
                 }
                 axradio_trxstate = trxstate_tx_packet;
@@ -685,13 +717,16 @@ void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_
             if (cnt) {
                 axradio_txbuffer_cnt -= ((uint16_t)cnt) << 3;
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), ret_value);
-                ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_flags, ret_value);
+                //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_flags, ret_value);
+                ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), ret_value);
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, cnt, ret_value);
-                ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_byte, ret_value);
+                //ax5043_write_reg(spip,AX5043_REG_FIFODATA, axradio_phy_preamble_byte, ret_value);
+                ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE), ret_value);
                 continue;
             }
             {
-                uint8_t byte = axradio_phy_preamble_byte;
+                //uint8_t byte = axradio_phy_preamble_byte;
+                uint8_t byte = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE) ;
                 cnt = axradio_txbuffer_cnt;
                 axradio_txbuffer_cnt = 0;
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (2 << 5), ret_value);
@@ -761,27 +796,36 @@ pktend:
  * 
  */
 
-uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) 
+uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) 
 {
     uint8_t ret_value[3]={0,0,0};
-	ax5043_trxstate_t axradio_trxstate;
-	uint16_t axradio_txbuffer_len;
-	uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
-	struct axradio_address_mask axradio_localaddr;
-	uint16_t axradio_txbuffer_cnt = 0;
+    SPIDriver *spip = devp->config->spip;
+    ax5043_trxstate_t axradio_trxstate;
+    uint16_t axradio_txbuffer_len;
+    uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
+    struct axradio_address_mask axradio_localaddr;
+    uint16_t axradio_txbuffer_cnt = 0;
+	
+    uint8_t maclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_MACLEN);
+    uint8_t destaddrpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_DESTADDRPOS);
+    uint8_t addrlen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_ADDRLEN);
+    uint8_t sourceaddrpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_SOURCEADDRPOS);
+    uint8_t lenmask = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENMASK);
+    uint8_t lenoffs = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENOFFS);
+    uint8_t lenpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENPOS);
 
-    axradio_txbuffer_len = pktlen + axradio_framing_maclen;
+    axradio_txbuffer_len = pktlen + maclen;
     if (axradio_txbuffer_len > sizeof(axradio_txbuffer))
         return AXRADIO_ERR_INVALID;
-    memset(axradio_txbuffer, 0, axradio_framing_maclen);
-    memcpy(&axradio_txbuffer[axradio_framing_maclen], pkt, pktlen);
-    if (axradio_framing_destaddrpos != 0xff)
-        memcpy(&axradio_txbuffer[axradio_framing_destaddrpos], &addr->addr, axradio_framing_addrlen);
-    if (axradio_framing_sourceaddrpos != 0xff)
-        memcpy(&axradio_txbuffer[axradio_framing_sourceaddrpos], &axradio_localaddr.addr, axradio_framing_addrlen);
-    if (axradio_framing_lenmask) {
-        uint8_t len_byte = (uint8_t)(axradio_txbuffer_len - axradio_framing_lenoffs) & axradio_framing_lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
-        axradio_txbuffer[axradio_framing_lenpos] = (axradio_txbuffer[axradio_framing_lenpos] & (uint8_t)~axradio_framing_lenmask) | len_byte;
+    memset(axradio_txbuffer, 0, maclen);
+    memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
+    if (destaddrpos != 0xff)
+        memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
+    if (sourceaddrpos != 0xff)
+        memcpy(&axradio_txbuffer[sourceaddrpos], &axradio_localaddr.addr, addrlen);
+    if (lenmask) {
+        uint8_t len_byte = (uint8_t)(axradio_txbuffer_len - lenoffs) & lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
+        axradio_txbuffer[lenpos] = (axradio_txbuffer[lenpos] & (uint8_t)~lenmask) | len_byte;
     }
 /*
     if (axradio_framing_swcrclen)
@@ -802,7 +846,7 @@ uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, co
         ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x01, ret_value);  // flag PKTSTART -> dibit sync
         ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x11, ret_value); // dummy byte for forcing dibit sync
     }
-    transmit_loop(spip, axradio_trxstate, axradio_txbuffer_len, axradio_txbuffer, axradio_txbuffer_cnt);
+    transmit_loop(devp, axradio_trxstate, axradio_txbuffer_len, axradio_txbuffer, axradio_txbuffer_cnt);
     //ax5043_write_reg(spip,AX5043_REG_PWRMODE, AX5043_FULL_TX, ret_value);
     ax5043_set_pwrmode(spip, AX5043_FULL_TX);
 
@@ -822,8 +866,10 @@ uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, co
 
  
 
-uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]) {
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
     uint8_t ret_value[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
+    
     uint8_t fifo_cmd;
     uint8_t i;
     uint8_t b0;
@@ -833,6 +879,7 @@ uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]) {
     uint8_t len = ax5043_read_reg(spip, AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, ret_value); // clear request so interrupt does not fire again. sync_rx enables interrupt on radio state changed in order to wake up on SDF detected
 
     uint8_t bytesRead = 0;
+    uint8_t innerfreqloop = ax5043_get_conf_val(devp, AXRADIO_PHY_INNERFREQLOOP) ;
 
  
     chprintf(DEBUG_CHP,"INFO: Waiting for a packet\r\n");
@@ -852,7 +899,7 @@ uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]) {
                break;
 
         case AX5043_FIFOCMD_RFFREQOFFS:
-            if (axradio_phy_innerfreqloop || len != 3)
+            if (innerfreqloop || len != 3)
                 goto dropchunk;
             i = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
             i &= 0x0F;
@@ -866,7 +913,7 @@ uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]) {
             break;
 
         case AX5043_FIFOCMD_FREQOFFS:
-             if (!axradio_phy_innerfreqloop || len != 2)
+             if (!innerfreqloop || len != 2)
                  goto dropchunk;
              b1 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
              b0 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);

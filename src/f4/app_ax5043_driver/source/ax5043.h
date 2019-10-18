@@ -942,12 +942,12 @@ uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 void ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 void ax5043_prepare_tx(AX5043Driver *devp);
 void ax5043_prepare_rx(AX5043Driver *devp);
-void ax5043_init_registers_common(SPIDriver * spip);
-uint8_t axradio_get_pllvcoi(SPIDriver * spip);
+void ax5043_init_registers_common(AX5043Driver *devp);
+uint8_t axradio_get_pllvcoi(AX5043Driver *devp);
 void ax5043_init(AX5043Driver *devp);
-void transmit_loop(SPIDriver * spip, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
-uint8_t transmit_packet(SPIDriver * spip, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
-uint8_t receive_loop(SPIDriver * spip, uint8_t axradio_rxbuffer[]);
+void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
+uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
 
 #ifdef __cplusplus
 }

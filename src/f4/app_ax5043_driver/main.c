@@ -368,7 +368,7 @@ static void app_init(void)
 	    }
 
 		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		transmit_packet(&SPID2, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
+		transmit_packet(&axd1, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
 
         chThdSleepMilliseconds(3000);
 	}
