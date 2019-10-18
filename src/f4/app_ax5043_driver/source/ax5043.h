@@ -818,10 +818,6 @@ typedef struct {
 #error "AX5043_USE_SPI requires HAL_USE_SPI"
 #endif
 
-#if AX5043_SHARED_SPI && !SPI_USE_MUTUAL_EXCLUSION
-#error "AX5043_SHARED_SPI requires SPI_USE_MUTUAL_EXCLUSION"
-#endif
-
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
