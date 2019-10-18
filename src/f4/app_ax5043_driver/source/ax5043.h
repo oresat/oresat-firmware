@@ -752,7 +752,7 @@ typedef enum {
   tx,
   rx,
   rx_cont,
-  singleparamset
+  local_address
 } ax5043_reg_group_t;
 
 /**
@@ -760,14 +760,6 @@ typedef enum {
  */
 struct axradio_address {
     uint8_t addr[4]; 
-};
-
-/**
- * @brief   Structure containing a four byte receiver X.25 address and its mask
- */
-struct axradio_address_mask {
-    uint8_t addr[4];
-    uint8_t mask[4];
 };
 
 
@@ -917,7 +909,6 @@ struct AX5043Driver {
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 void ax5043_set_pwrmode(SPIDriver * spip, uint8_t reg_value);
-void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr);
 void ax5043_reset(SPIDriver * spip);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
@@ -938,6 +929,7 @@ void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 
 void ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
+uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name);
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 void ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 void ax5043_prepare_tx(AX5043Driver *devp);

@@ -24,60 +24,6 @@
 #include <stdint.h>
 
 
-/*
-// physical layer from config.c file generated from radiolab
-const uint8_t axradio_phy_pn9 = 0;
-const uint8_t axradio_phy_nrchannels = 1;
-const uint32_t axradio_phy_chanfreq[1] = { 0x0912aaab };
-const uint8_t axradio_phy_chanpllrnginit[1] = { 0x0a };
-const uint8_t axradio_phy_chanvcoiinit[1] = { 0x98 };
-uint8_t axradio_phy_chanpllrng[1];
-uint8_t axradio_phy_chanvcoi[1];
-const uint8_t axradio_phy_vcocalib = 0;
-const int32_t axradio_phy_maxfreqoffset = 913;
-const int8_t axradio_phy_rssioffset = 64;
-// axradio_phy_rssioffset is added to AX5043_RSSIREFERENCE and subtracted from chip RSSI value to prevent overflows (8bit RSSI only goes down to -128)
-// axradio_phy_rssioffset is also added to AX5043_RSSIABSTHR
-const int8_t axradio_phy_rssireference = (int8_t)(0xF9 + 64);
-const int8_t axradio_phy_channelbusy = -87 + 64;
-const uint16_t axradio_phy_cs_period = 7; // timer0 units, 10ms
-const uint8_t axradio_phy_cs_enabled = 0;
-const uint8_t axradio_phy_lbt_retries = 0;
-const uint8_t axradio_phy_lbt_forcetx = 0;
-const uint16_t axradio_phy_preamble_wor_longlen = 23; // wor_longlen + wor_len totals to 240.0ms plus 112bits
-const uint16_t axradio_phy_preamble_wor_len = 184;
-const uint16_t axradio_phy_preamble_longlen = 0;
-const uint16_t axradio_phy_preamble_len = 72;
-const uint8_t axradio_phy_preamble_byte = 0x7e;
-const uint8_t axradio_phy_preamble_flags = 0x38;
-const uint8_t axradio_phy_preamble_appendbits = 0;
-const uint8_t axradio_phy_preamble_appendpattern = 0x00;
-
-//framing variables generated from radiolab
-const uint8_t axradio_framing_maclen = 3;
-const uint8_t axradio_framing_addrlen = 1;
-const uint8_t axradio_framing_destaddrpos = 0;
-const uint8_t axradio_framing_sourceaddrpos = 0xff;
-const uint8_t axradio_framing_lenpos = 2;
-const uint8_t axradio_framing_lenoffs = 0;
-const uint8_t axradio_framing_lenmask = 0xff;
-const uint8_t axradio_framing_swcrclen = 0;
-
-const uint8_t axradio_framing_synclen = 32;
-const uint8_t axradio_framing_syncword[] = { 0xcc, 0xaa, 0xcc, 0xaa};
-const uint8_t axradio_framing_syncflags = 0x38;
-const uint8_t axradio_framing_enable_sfdcallback = 0;
-
-const uint32_t axradio_framing_ack_timeout = 8; // 98.9ms in wtimer0 units (640Hz)
-const uint32_t axradio_framing_ack_delay = 313; // 1.0ms in wtimer1 units (20MHz/64)
-const uint8_t axradio_framing_ack_retransmissions = 0;
-const uint8_t axradio_framing_ack_seqnrpos = 0xff;
-
-const uint8_t axradio_framing_minpayloadlen = 0; // must be set to 1 if the payload directly follows the destination address, and a CRC is configured
-//WOR
-const uint16_t axradio_wor_period = 128;
-const uint8_t axradio_phy_innerfreqloop = 0;
-*/
 
 /**
  * writes  to an AX5043 register.
@@ -163,27 +109,6 @@ void ax5043_set_pwrmode(SPIDriver * spip, uint8_t reg_value)
   ax5043_write_reg(spip, AX5043_REG_PWRMODE, value, ret_value);
 }
 
-
-/**
- * sets AX5043 address registers
- * @param spip: SPI Configuration.
- * @return void 
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_set_addr(SPIDriver * spip, const struct axradio_address_mask local_addr)
-{
-  uint8_t ret_value[3]={0,0,0};
-  //set address values
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR0, (uint8_t)local_addr.addr[0], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR1, (uint8_t)local_addr.addr[1], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR2, (uint8_t)local_addr.addr[2], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDR3, (uint8_t)local_addr.addr[3], ret_value);
-  //set address mask
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)local_addr.mask[0], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)local_addr.mask[1], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)local_addr.mask[2], ret_value);
-  ax5043_write_reg(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)local_addr.mask[3], ret_value);
-}
 
 /**
  * Resets the AX5043
@@ -294,6 +219,25 @@ void ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group) {
       }
       i++;
     }
+}
+
+
+/**
+ * Gets AX5043 register values from the AX5043 driver structure.
+ * @param devp: AX5043 driver; conf_name: configuration name
+ * @return void 
+ * TODO Need to handle conditions here the conf_name is not present
+ */
+uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name) {
+    int i = 0;
+    ax5043_regval_t* entry = devp->config->reg_values;
+    while (entry[i].reg != AX5043_REG_END) {
+      if (entry[i].reg == reg_name){
+        return entry[i].val;
+      }
+      i++;
+    }
+    return 0;
 }
 
 
@@ -601,6 +545,7 @@ void ax5043_init(AX5043Driver *devp)
   ax5043_write_reg(spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), ret_value); 
   ax5043_write_reg(spip, AX5043_REG_FREQA3, (uint8_t)(f >> 24), ret_value); 
 
+  ax5043_set_regs_group(devp,local_address);
 
 }
 
@@ -803,7 +748,8 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     ax5043_trxstate_t axradio_trxstate;
     uint16_t axradio_txbuffer_len;
     uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
-    struct axradio_address_mask axradio_localaddr;
+    //struct axradio_address_mask axradio_localaddr;
+    uint8_t axradio_localaddr[4];
     uint16_t axradio_txbuffer_cnt = 0;
 	
     uint8_t maclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_MACLEN);
@@ -813,6 +759,11 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     uint8_t lenmask = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENMASK);
     uint8_t lenoffs = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENOFFS);
     uint8_t lenpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENPOS);
+    
+    axradio_localaddr[0] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR0);
+    axradio_localaddr[1] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR1);
+    axradio_localaddr[2] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR2);
+    axradio_localaddr[3] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR3);
 
     axradio_txbuffer_len = pktlen + maclen;
     if (axradio_txbuffer_len > sizeof(axradio_txbuffer))
@@ -822,7 +773,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     if (destaddrpos != 0xff)
         memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
     if (sourceaddrpos != 0xff)
-        memcpy(&axradio_txbuffer[sourceaddrpos], &axradio_localaddr.addr, addrlen);
+        memcpy(&axradio_txbuffer[sourceaddrpos], axradio_localaddr, addrlen);
     if (lenmask) {
         uint8_t len_byte = (uint8_t)(axradio_txbuffer_len - lenoffs) & lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
         axradio_txbuffer[lenpos] = (axradio_txbuffer[lenpos] & (uint8_t)~lenmask) | len_byte;
