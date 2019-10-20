@@ -567,6 +567,8 @@
 #define AXRADIO_ERR_RESYNC                      0x09
 #define AXRADIO_ERR_RESYNCTIMEOUT               0x0a
 #define AXRADIO_ERR_RECEIVESTART                0x0b
+#define AXRADIO_ERR_FIFO_CHUNK                  0x0c
+#define AXRADIO_ERR_FIFO_CMD                    0x0d
 
 #define	EXIT_FAILURE	1	// Failing exit status.  
 #define	EXIT_SUCCESS	0	// Successful exit status. 
@@ -724,8 +726,15 @@ typedef struct
  * @brief   TODO: Brief
  */
 typedef enum {
+    AX5043_UNINIT,                  /**< Not initialized.                 */
+    AX5043_STOP,                    /**< Stopped.                         */
+    AX5043_READY,                   /**< Ready.                           */
+    AX5043_BUSY,                    /**< Busy.                            */
+    AX5043_IDLE,                    /**< Idle.                            */
     trxstate_off,
     trxstate_rx,
+    trxstate_rx_start,
+    trxstate_rx_complete,
     trxstate_rxwor,
     trxstate_wait_xtal,
     trxstate_xtal_ready,
@@ -765,7 +774,7 @@ struct axradio_address {
 
 
 /**
- * @brief   TODO: Brief
+ * @brief  Ax5043 Register values
  */
 typedef struct {
     uint16_t reg;
@@ -775,12 +784,25 @@ typedef struct {
 
 
 /**
- * @brief   TODO: Brief
+ * @brief   Other configuration values
  */
 typedef struct {
     uint8_t conf_name;
     uint32_t val;
 } ax5043_confval_t;
+
+
+/**
+ * @brief   Values returned while 
+ */
+typedef struct {
+    uint8_t rf_freq_off1;
+    uint8_t rf_freq_off2;
+    uint8_t rf_freq_off3;
+    uint8_t rssi;
+    uint8_t *dropped;
+    uint8_t status_code;
+} ax5043_returned_t;
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -831,16 +853,6 @@ typedef struct {
  */
 typedef struct AX5043Driver AX5043Driver;
 
-/**
- * @brief   Driver state machine possible states.
- */
-typedef enum {
-    AX5043_UNINIT = 0,                  /**< Not initialized.                 */
-    AX5043_STOP = 1,                    /**< Stopped.                         */
-    AX5043_READY = 2,                   /**< Ready.                           */
-    AX5043_BUSY = 3,                    /**< Busy.                            */
-    AX5043_IDLE = 4,                    /**< Idle.                            */
-} ax5043_state_t;
 
 /**
  * @brief   AX5043 configuration structure.
@@ -886,9 +898,16 @@ struct AX5043VMT {
 #define _ax5043_data                                                        \
     _base_object_data                                                       \
     /* Driver state.*/                                                      \
-    ax5043_state_t              state;                                      \
+    ax5043_trxstate_t     state;                                      \
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
+    /* Ax5043 returned values.*/                                            \
+    uint8_t rf_freq_off1;                                                   \
+    uint8_t rf_freq_off2;                                                   \
+    uint8_t rf_freq_off3;                                                   \
+    uint8_t rssi;                                                           \
+    uint8_t dropped[250];                                                   \
+    uint8_t status_code;                                                    \
 
 /**
  * @brief AX5043 Radio class.

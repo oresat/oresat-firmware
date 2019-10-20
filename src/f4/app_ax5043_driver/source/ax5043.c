@@ -102,12 +102,7 @@ uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t r
 }
 
 
-/**
- * Sets powermode register of AX5043
- * @param spip: SPI Configuration, reg_value:register value
- * @return void 
- * TODO return a -ve return code if there are any errors
- */
+
 /**
  * @brief   Sets powermode register of AX5043.
  *
@@ -128,12 +123,6 @@ void ax5043_set_pwrmode(SPIDriver * spip, uint8_t reg_value)
 }
 
 
-/**
- * Resets the AX5043
- * @param spip: SPI Configuration.
- * @return void 
- * TODO return a -ve return code if there are any errors
- */
 /**
  * @brief   Resets the AX5043.
  *
@@ -184,16 +173,6 @@ void ax5043_reset(SPIDriver * spip)
 }
 
 
-
-
-
-/**
- * writes to FIFO
- * Takn from Bradenburg library which seems to be taken from onSemi's code
- * @param conf the AX5043 configuration handler
- * @return void 
- * 
- */
 /**
  * @brief   Writes to AX5043 FIFO
  *
@@ -806,81 +785,75 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
     
     uint8_t fifo_cmd;
     uint8_t i;
-    uint8_t b0;
-    uint8_t b1;
-    uint8_t b2;
-    uint8_t b3;
-    uint8_t len = ax5043_read_reg(spip, AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, ret_value); // clear request so interrupt does not fire again. sync_rx enables interrupt on radio state changed in order to wake up on SDF detected
+    
+    // clear interrupt.
+    uint8_t chunk_len = ax5043_read_reg(spip, AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, ret_value);  
 
     uint8_t bytesRead = 0;
-    uint8_t innerfreqloop = ax5043_get_conf_val(devp, AXRADIO_PHY_INNERFREQLOOP) ;
-
- 
-    chprintf(DEBUG_CHP,"INFO: Waiting for a packet\r\n");
+    devp->state = trxstate_rx_start;
     while ((ax5043_read_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x00, ret_value) & 0x01) != 1) { // FIFO not empty
+        
         fifo_cmd = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); // read command
-        len = (fifo_cmd & 0xE0) >> 5; // top 3 bits encode payload len
-        if (len == 7)
-            len = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); // 7 means variable length, -> get length byte
+        chunk_len = (fifo_cmd & 0xE0) >> 5; // top 3 bits encode payload len
+        if (chunk_len == 7) // 7 means variable length, -> get length byte
+            chunk_len = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); 
         fifo_cmd &= 0x1F;
         switch (fifo_cmd) {
         case AX5043_FIFOCMD_DATA:
-            if (!len)
-                break;
-            ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); // Discard the flags
-            --len;
-            bytesRead = ax5043_readfifo(spip, axradio_rxbuffer, len);
-               break;
+            if (chunk_len!=0){
+              ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); // Discard the flags
+              chunk_len = chunk_len - 1;
+              bytesRead = ax5043_readfifo(spip, axradio_rxbuffer, chunk_len);
+            }
+            break;
 
         case AX5043_FIFOCMD_RFFREQOFFS:
-            if (innerfreqloop || len != 3)
-                goto dropchunk;
-            i = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-            i &= 0x0F;
-            i |= 1 + (uint8_t)~(i & 0x08);
-            b3 = ((int8_t)i) >> 8;
-            b2 = i;
-            b1 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-            b0 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-
-            chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x%02x\r\n", b3, b2, b1, b0);
+            if (chunk_len == 3){
+              devp->rf_freq_off3 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+              devp->rf_freq_off2 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+              devp->rf_freq_off1 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+            }
+            else{
+              for(i=0;i<chunk_len;i++){
+                devp->dropped[i] = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+                devp->status_code = AXRADIO_ERR_FIFO_CHUNK;
+              }
+            } 
             break;
 
         case AX5043_FIFOCMD_FREQOFFS:
-             if (!innerfreqloop || len != 2)
-                 goto dropchunk;
-             b1 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-             b0 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-
-             chprintf(DEBUG_CHP,"INFO: Frequency offset: 0x%02x%02x\r\n", b1, b2);
-             break;
+             if (chunk_len == 2){
+              devp->rf_freq_off3 = 0;
+              devp->rf_freq_off2 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+              devp->rf_freq_off1 = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+            }
+            else{
+              for(i=0;i<chunk_len;i++){
+                devp->dropped[i] = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+                devp->status_code = AXRADIO_ERR_FIFO_CHUNK;
+              }
+            } 
+            break;
 
         case AX5043_FIFOCMD_RSSI:
-            if (len != 1)
-                goto dropchunk;
-            {
-                int8_t r;
-                r = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
-
-                chprintf(DEBUG_CHP,"INFO: RSSI %d\r\n", (int)r);
+            if (chunk_len == 1){
+                devp->rssi = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
             }
+            else{
+              for(i=0;i<chunk_len;i++){
+                devp->dropped[i] = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+                devp->status_code = AXRADIO_ERR_FIFO_CHUNK;
+              }
+            } 
             break;
 
         default:
-               chprintf(DEBUG_CHP, "ERROR: Unknown FIFO cmd %x \r\n", fifo_cmd);
-               dropchunk:
-                 chprintf(DEBUG_CHP, "WARNING: Discarding chunk in FIFO\r\n");
-            if (!len)
-                break;
-            i = len;
-            do {
-                int8_t data;
-                data = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);// purge FIFO
-                chprintf(DEBUG_CHP,"Unknown: %x \r\n", data);
+            devp->status_code = AXRADIO_ERR_FIFO_CMD;
+            for(i=0;i<chunk_len;i++){
+                devp->dropped[i] = ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
             }
-            while (--i);
-               break;
         }
+        devp->state = trxstate_rx_complete;
     }
 
     return bytesRead;
@@ -932,8 +905,12 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     osalDbgAssert((devp->state == AX5043_STOP) ||
             (devp->state == AX5043_READY),
             "ax5043Start(), invalid state");
-
+    
     devp->config = config;
+    devp->rf_freq_off3 = 0;
+    devp->rf_freq_off2 = 0;
+    devp->rf_freq_off1 = 0;
+    devp->rssi = 0;
 }
 
 //!@
