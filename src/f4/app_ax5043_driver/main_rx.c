@@ -385,7 +385,7 @@ static void main_loop(void)
 {
   chThdSleepMilliseconds(500);
   uint8_t packet_len=0;
-  uint8_t ret_value[3]={0,0,0};
+  //uint8_t ret_value[3]={0,0,0};
 
   /* Enabling events on both edges of the button line.*/
   //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
@@ -401,13 +401,13 @@ static void main_loop(void)
     palWaitLineTimeout(LINE_SX_INT0, TIME_MS2I(5000));
 
     if (palReadLine(LINE_SX_INT0))
-      chprintf(DEBUG_CHP, "\r\r int line is HIGH ** \r\n");
+      chprintf(DEBUG_CHP, "\r\r INFO: interrupt happened ** \r\n");
     else
-      chprintf(DEBUG_CHP, "\r\r int line is LOW ** \r\n");
+      chprintf(DEBUG_CHP, "\r\r INFO: interrupt timeout** \r\n");
     
     packet_len=receive_loop(&axd1, axradio_rxbuffer);
-    chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x\r\n", axd1.returned_values->rf_freq_off3, axd1.returned_values->rf_freq_off2, axd1.returned_values->rf_freq_off1);
-    chprintf(DEBUG_CHP,"INFO1: RSSI %d\r\n", (int)axd1.returned_values->rf_freq_off1);
+    //chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x\r\n", axd1.rf_freq_off3, axd1.rf_freq_off2, axd1.rf_freq_off1);
+    //chprintf(DEBUG_CHP,"INFO: RSSI %d\r\n", (int)axd1.rssi);
     if(packet_len > 0)
       chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
   }

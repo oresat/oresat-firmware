@@ -24,6 +24,8 @@
  * Include Files
  */
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
@@ -31,23 +33,22 @@
 #include "util_numbers.h"
 #include "ax5043.h"
 
+
 //#include "adf7030.h"
 
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
 
-
 const struct axradio_address remoteaddr_tx = {
-	{ 0x32, 0x34, 0x00, 0x00}
+	{ 0x33, 0x34, 0x00, 0x00}
 };
 
-/*
-const struct axradio_address_mask localaddr_tx = {
-	{ 0x33, 0x34, 0x00, 0x00},
-	{ 0xFF, 0x00, 0x00, 0x00}
-};
-*/
+const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3A, 0x43, 0x51, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3A, 0x54, 0x65, 0x73, 0x74, 0x7B, 0x30, 0x30, 0x30, 0x30, 0x31 };
+const uint8_t framing_insert_counter = 1;
+const uint8_t framing_counter_pos = 0;
 
+// TX: fcarrier=435.500MHz dev= 12.500kHz br= 50.000kBit/s pwr= 10.0dBm
+// RX: fcarrier=435.500MHz bw= 75.000kHz br= 50.000kBit/s
 ax5043_regval_t reg_values[] = {
   {AX5043_REG_MODULATION,     0x08,common},
   {AX5043_REG_ENCODING,       0x00,common},
@@ -188,14 +189,14 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_TMGRXAGC,       0x00,rx_cont},
   {AX5043_REG_TMGRXPREAMBLE1, 0x00,rx_cont},
   {AX5043_REG_PKTMISCFLAGS,   0x00,rx_cont},
-  {AX5043_REG_PKTADDR0,       0x33,local_address},
+  {AX5043_REG_PKTADDR0,       0x32,local_address},
   {AX5043_REG_PKTADDR1,       0x34,local_address},
   {AX5043_REG_PKTADDR2,       0x00,local_address},
   {AX5043_REG_PKTADDR3,       0x00,local_address},
   {AX5043_REG_PKTADDRMASK0,   0xFF,local_address},
   {AX5043_REG_PKTADDRMASK1,   0x00,local_address},
   {AX5043_REG_PKTADDRMASK2,   0x00,local_address},
-  {AX5043_REG_PKTADDRMASK3,   0x00,local_address},
+  {AX5043_REG_PKTADDRMASK3,   0x00,local_address},    
   {AX5043_REG_END,            0x00,common}
 };
 
@@ -250,9 +251,6 @@ ax5043_confval_t conf_values[]={
   {AXRADIO_PHY_END                     ,0}
 };
 
-
-uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
-
 /*
  * Serial Driver Configuration
  */
@@ -297,7 +295,7 @@ static const SPIConfig spicfg_tx =
     SPI_CR1_BR_1    |
     SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
     SPI_CR1_SSM,
-    0
+    0, // SPI_CR2_SSOE,
 };
 
 //mailboxes to receive the radio packets
@@ -314,19 +312,20 @@ static AX5043Config axcfg1 =
   LINE_SX_INT0,
   reg_values,
   conf_values,
-  &radio1_rx_mb
+  &radio1_rx_mb,
 };
 AX5043Driver axd1;
 
-
 /*
- * Initialize the SPI drivers and configure the ax5043 chips
+ * Initialize the SPI drivers and configure the adf7030 chips
  */
 static void app_init(void)
 {
+
+    uint16_t pkt_counter = 0;
+
     // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
-
     set_util_fwversion(&version_info);
     set_util_hwversion(&version_info);
 
@@ -340,10 +339,11 @@ static void app_init(void)
              , version_info.hardware.id_low
             );
 
-
+    chThdSleepMilliseconds(1000);
     spiStart(&SPID1, &spicfg_rx);
     spiStart(&SPID2, &spicfg_tx);
 	//spiSelect(&SPID2);
+    chThdSleepMilliseconds(1000);
 
 
     // Creating the mailboxes.
@@ -352,28 +352,31 @@ static void app_init(void)
     //initiating radio driver
     ax5043ObjectInit(&axd1);
     ax5043Start(&axd1, &axcfg1);
-
-
-    //uint16_t reg=0;
-    //uint8_t value=0;
-    //uint8_t value1=0x55;
-    //uint8_t ret_value[3]={0,0,0};
-    //int i;
-
     
-
     chprintf(DEBUG_CHP, "Configuring AX5043\r\n");
     chThdSleepMilliseconds(50);
     ax5043_init(&axd1);
     //ax5043_set_addr(&axd1);
+    ax5043_prepare_tx(&axd1);
     chprintf(DEBUG_CHP, "done reseting AX5043\r\n");
 
 
+	for (;;) {
+	    static uint8_t demo_packet_[sizeof(demo_packet)];
+	    //uint16_t pkt_counter = 0;
 
-     ax5043_prepare_rx(&axd1);
-  
+	    ++pkt_counter;
+	    memcpy(demo_packet_, demo_packet, sizeof(demo_packet));
+	    if (framing_insert_counter) {
+	        demo_packet_[framing_counter_pos] = (uint8_t)(pkt_counter & 0xFF);
+	        demo_packet_[framing_counter_pos+1] = (uint8_t)((pkt_counter>>8) & 0xFF);
+	    }
 
+		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
+		transmit_packet(&axd1, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
 
+        chThdSleepMilliseconds(3000);
+	}
 
 }
 
@@ -383,34 +386,15 @@ static void app_init(void)
  */
 static void main_loop(void)
 {
-  chThdSleepMilliseconds(500);
-  uint8_t packet_len=0;
-  //uint8_t ret_value[3]={0,0,0};
-
-  /* Enabling events on both edges of the button line.*/
-  //palEnableLineEvent(LINE_BUTTON, PAL_EVENT_MODE_RISING_EDGE);
-  palEnableLineEvent(LINE_SX_INT0, PAL_EVENT_MODE_RISING_EDGE);
-
-
-  while(true)
-  {
-    //palWaitLineTimeout(LINE_BUTTON, TIME_INFINITE);
-    //palWaitLineTimeout(LINE_ARD_A5, TIME_INFINITE);
-    //palWaitLineTimeout(LINE_ARD_A5, TIME_MS2I(5000));
-
-    palWaitLineTimeout(LINE_SX_INT0, TIME_MS2I(5000));
-
-    if (palReadLine(LINE_SX_INT0))
-      chprintf(DEBUG_CHP, "\r\r INFO: interrupt happened ** \r\n");
-    else
-      chprintf(DEBUG_CHP, "\r\r INFO: interrupt timeout** \r\n");
+    chThdSleepMilliseconds(500);
     
-    packet_len=receive_loop(&axd1, axradio_rxbuffer);
-    //chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x\r\n", axd1.rf_freq_off3, axd1.rf_freq_off2, axd1.rf_freq_off1);
-    //chprintf(DEBUG_CHP,"INFO: RSSI %d\r\n", (int)axd1.rssi);
-    if(packet_len > 0)
-      chprintf(DEBUG_CHP,"INFO: Received packet %d\r\n",axradio_rxbuffer[3]);
-  }
+
+	while (true)
+    {
+        chThdSleepMilliseconds(500);
+        chprintf(DEBUG_CHP, ".");
+		palTogglePad(GPIOA, GPIOA_SX_TESTOUT);
+    }
 
 }
 
@@ -424,12 +408,6 @@ int main(void)
     chSysInit();
     app_init();
 
-    // Enabling events on both edges of the button line.*/
-    //palEnableLineEvent(GPIOC_SX_DIO3, PAL_EVENT_MODE_RISING_EDGES);
-
-	//chThdCreateStatic(waThread_sx1236_rx,      sizeof(waThread_sx1236_rx),   NORMALPRIO, Thread_sx1236_rx, NULL);
-    //chThdSleepMilliseconds(500);
-    //chThdCreateStatic(waThread_sx1236_tx,      sizeof(waThread_sx1236_tx),   NORMALPRIO, Thread_sx1236_tx, NULL);
     chThdSleepMilliseconds(500);
 
     main_loop();
