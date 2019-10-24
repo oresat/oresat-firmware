@@ -523,47 +523,49 @@ void ax5043_init(AX5043Driver *devp)
  *
  * @param[in]  devp               pointer to the @p AX5043Driver object.
  * @param[in]  axradio_trxstate   Radio State. 
- * @param[in]  axradio_txbuffer_len Complete packet length including mac. 
+ * @param[in]  packet_len         Complete packet length including mac. 
  * @param[in]  axradio_txbuffer   pointer to packet. 
- * @param[in]  axradio_txbuffer_cnt length before the packet. 
+ * @param[in]  packet_bytes_sent length before the packet. 
  *
  * @api
- * TODO Standardize the error handling, remove axradio_txbuffer_cnt, simplify the code.
+ * TODO Standardize the error handling, remove packet_bytes_sent, simplify the code.
  */
 
-void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt)
+void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t packet_len,uint8_t axradio_txbuffer[])
 {
     uint8_t ret_value[3]={0,0,0};
     SPIDriver *spip = devp->config->spip;
     
     uint8_t free_fifo_bytes;
+    uint8_t packet_end_indicator = 0;
+    uint16_t packet_bytes_sent = 0;
     
     uint8_t synclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCLEN);
-    chprintf(DEBUG_CHP, "VALUE: axradio_txbuffer_cnt = %d \r\n",axradio_txbuffer_cnt);
-
-    for (;;) {
+    
+    while (packet_end_indicator == 0) {
 
         if (ax5043_read_reg(spip,AX5043_REG_FIFOFREE1, (uint8_t)0x00, ret_value))
             free_fifo_bytes = 0xff;
         else
             free_fifo_bytes = ax5043_read_reg(spip,AX5043_REG_FIFOFREE0, (uint8_t)0x00, ret_value);
+        
+        if (free_fifo_bytes < 19) {  // Make sure sixteen bytes in FIFO are free. However, We can do with minimum 4 bytes free
+            ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
+            continue;
+        }
 
         switch (axradio_trxstate) {
         case trxstate_tx_longpreamble:
-            if (!axradio_txbuffer_cnt) {
+            if (!packet_bytes_sent) {
                 axradio_trxstate = trxstate_tx_shortpreamble;
-                axradio_txbuffer_cnt = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_LEN);
-                goto shortpreamble;
+                packet_bytes_sent = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_LEN);
+                break;
             }
-            if (free_fifo_bytes < 4) {
-                ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
-                chThdSleepMilliseconds(1);
-                continue;
-            }
+
             free_fifo_bytes = 7;
-            if (axradio_txbuffer_cnt < 7)
-                free_fifo_bytes = axradio_txbuffer_cnt;
-            axradio_txbuffer_cnt -= free_fifo_bytes;
+            if (packet_bytes_sent < 7)
+                free_fifo_bytes = packet_bytes_sent;
+            packet_bytes_sent -= free_fifo_bytes;
             free_fifo_bytes <<= 5;
             ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), ret_value);
             ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), ret_value);
@@ -572,15 +574,8 @@ void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint1
             break;
 
         case trxstate_tx_shortpreamble:
-        shortpreamble:
-            if (!axradio_txbuffer_cnt) {
-                if (free_fifo_bytes < 15) {
-                    ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
-                    chThdSleepMilliseconds(1);
-                    continue;
-                }
+            if (!packet_bytes_sent) {
                 
-                //if (axradio_phy_preamble_appendbits) {
                 uint8_t preamble_appendbits = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_APPENDBITS);
                 if (preamble_appendbits) {
                     uint8_t byte;
@@ -619,16 +614,11 @@ void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint1
                 axradio_trxstate = trxstate_tx_packet;
                 continue;
             }
-            if (free_fifo_bytes < 4) {
-                ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
-                chThdSleepMilliseconds(1);
-                continue;
-            }
             free_fifo_bytes = 255;
-            if (axradio_txbuffer_cnt < 255*8)
-                free_fifo_bytes = axradio_txbuffer_cnt >> 3;
+            if (packet_bytes_sent < 255*8)
+                free_fifo_bytes = packet_bytes_sent >> 3;
             if (free_fifo_bytes) {
-                axradio_txbuffer_cnt -= ((uint16_t)free_fifo_bytes) << 3;
+                packet_bytes_sent -= ((uint16_t)free_fifo_bytes) << 3;
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), ret_value);
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), ret_value);
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, free_fifo_bytes, ret_value);
@@ -637,8 +627,8 @@ void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint1
             }
             {
                 uint8_t byte = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE) ;
-                free_fifo_bytes = axradio_txbuffer_cnt;
-                axradio_txbuffer_cnt = 0;
+                free_fifo_bytes = packet_bytes_sent;
+                packet_bytes_sent = 0;
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (2 << 5), ret_value);
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x1C, ret_value);
                 if (ax5043_read_reg(spip,AX5043_REG_PKTADDRCFG, (uint8_t)0x00, ret_value) & 0x80) {
@@ -655,43 +645,41 @@ void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint1
             continue;
 
         case trxstate_tx_packet:
-            if (free_fifo_bytes < 11) {
-                ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
-                chThdSleepMilliseconds(1);
-                continue;
-            }
             {
                 uint8_t flags = 0;
-                if (!axradio_txbuffer_cnt)
+                uint16_t packet_len_to_be_sent = 0;
+                if (!packet_bytes_sent)
                     flags |= 0x01; // flag byte: pkt_start
-                {
-                    uint16_t len = axradio_txbuffer_len - axradio_txbuffer_cnt;
-                    free_fifo_bytes -= 3;
-                    if (free_fifo_bytes >= len) {
-                        free_fifo_bytes = len;
-                        flags |= 0x02; // flag byte: pkt_end
-                    }
+                    
+                packet_len_to_be_sent = packet_len - packet_bytes_sent;
+                if (free_fifo_bytes >= packet_len_to_be_sent + 3) {  // 3 bytes of FIFO commands before payload can be written to FIFO
+                    flags |= 0x02;
                 }
-                if (!free_fifo_bytes)
-                    goto pktend;
+                else{
+                    packet_len_to_be_sent = free_fifo_bytes - 3;
+                }
+                
+                
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (7 << 5), ret_value);
-                ax5043_write_reg(spip,AX5043_REG_FIFODATA, free_fifo_bytes + 1, ret_value); // write FIFO chunk length byte (length includes the flag byte, thus the +1)
+                ax5043_write_reg(spip,AX5043_REG_FIFODATA, packet_len_to_be_sent + 1, ret_value); // write FIFO chunk length byte (length includes the flag byte, thus the +1)
                 ax5043_write_reg(spip,AX5043_REG_FIFODATA, flags, ret_value);
-                ax5043_writefifo(spip,&axradio_txbuffer[axradio_txbuffer_cnt], free_fifo_bytes);
-                axradio_txbuffer_cnt += free_fifo_bytes;
-                if (flags & 0x02)
-                    goto pktend;
+                ax5043_writefifo(spip,&axradio_txbuffer[packet_bytes_sent], packet_len_to_be_sent);
+                packet_bytes_sent += packet_len_to_be_sent;
+                if (flags & 0x02){
+                    packet_end_indicator = 1;
+                    ax5043_write_reg(spip,AX5043_REG_RADIOEVENTMASK0, 0x01, ret_value); // enable REVRDONE event
+                    ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
+                }
             }
             break;
 
         default:
+            packet_end_indicator = 1;
+            devp->status_code = AXRADIO_ERR_UNEXPECTED_STATE;
             chprintf(DEBUG_CHP, "ERROR: Unexpected state found in transmit \r\n");
         }
     }
 
-pktend:
-    ax5043_write_reg(spip,AX5043_REG_RADIOEVENTMASK0, 0x01, ret_value); // enable REVRDONE event
-    ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
 }
 
 
@@ -713,10 +701,10 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     uint8_t ret_value[3]={0,0,0};
     SPIDriver *spip = devp->config->spip;
     ax5043_trxstate_t axradio_trxstate;
-    uint16_t axradio_txbuffer_len;
+    uint16_t packet_len;
     uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
     uint8_t axradio_localaddr[4];
-    uint16_t axradio_txbuffer_cnt = 0;
+    
 	
     uint8_t maclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_MACLEN);
     uint8_t destaddrpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_DESTADDRPOS);
@@ -731,8 +719,8 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     axradio_localaddr[2] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR2);
     axradio_localaddr[3] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR3);
 
-    axradio_txbuffer_len = pktlen + maclen;
-    if (axradio_txbuffer_len > sizeof(axradio_txbuffer))
+    packet_len = pktlen + maclen;
+    if (packet_len > sizeof(axradio_txbuffer))
         return AXRADIO_ERR_INVALID;
     memset(axradio_txbuffer, 0, maclen);
     memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
@@ -741,7 +729,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     if (sourceaddrpos != 0xff)
         memcpy(&axradio_txbuffer[sourceaddrpos], axradio_localaddr, addrlen);
     if (lenmask) {
-        uint8_t len_byte = (uint8_t)(axradio_txbuffer_len - lenoffs) & lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
+        uint8_t len_byte = (uint8_t)(packet_len - lenoffs) & lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
         axradio_txbuffer[lenpos] = (axradio_txbuffer[lenpos] & (uint8_t)~lenmask) | len_byte;
     }
 
@@ -756,7 +744,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
         ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x01, ret_value);  // flag PKTSTART -> dibit sync
         ax5043_write_reg(spip,AX5043_REG_FIFODATA, 0x11, ret_value); // dummy byte for forcing dibit sync
     }
-    transmit_loop(devp, axradio_trxstate, axradio_txbuffer_len, axradio_txbuffer, axradio_txbuffer_cnt);
+    transmit_loop(devp, axradio_trxstate, packet_len, axradio_txbuffer);
     ax5043_set_pwrmode(spip, AX5043_FULL_TX);
 
     ax5043_read_reg(spip,AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, ret_value);
@@ -765,6 +753,8 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     }
 
     ax5043_write_reg(spip,AX5043_REG_RADIOEVENTMASK0, 0x00, ret_value);
+    
+    devp->status_code = AXRADIO_ERR_NOERROR;
 
     return AXRADIO_ERR_NOERROR;
 }

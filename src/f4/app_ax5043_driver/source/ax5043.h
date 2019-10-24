@@ -569,6 +569,7 @@
 #define AXRADIO_ERR_RECEIVESTART                0x0b
 #define AXRADIO_ERR_FIFO_CHUNK                  0x0c
 #define AXRADIO_ERR_FIFO_CMD                    0x0d
+#define AXRADIO_ERR_UNEXPECTED_STATE            0x0e
 
 #define	EXIT_FAILURE	1	// Failing exit status.  
 #define	EXIT_SUCCESS	0	// Successful exit status. 
@@ -952,7 +953,7 @@ void ax5043_prepare_rx(AX5043Driver *devp);
 void ax5043_init_registers_common(AX5043Driver *devp);
 uint8_t axradio_get_pllvcoi(AX5043Driver *devp);
 void ax5043_init(AX5043Driver *devp);
-void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[], uint16_t axradio_txbuffer_cnt);
+void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
 
