@@ -570,6 +570,9 @@
 #define AXRADIO_ERR_FIFO_CHUNK                  0x0c
 #define AXRADIO_ERR_FIFO_CMD                    0x0d
 #define AXRADIO_ERR_UNEXPECTED_STATE            0x0e
+#define AXRADIO_ERR_NOT_CONNECTED               0x0f
+#define AXRADIO_ERR_REG_NOT_IN_CONF             0x10
+#define AXRADIO_ERR_VAL_NOT_IN_CONF             0x11
 
 #define	EXIT_FAILURE	1	// Failing exit status.  
 #define	EXIT_SUCCESS	0	// Successful exit status. 
@@ -732,6 +735,8 @@ typedef enum {
     AX5043_READY,                   /**< Ready.                           */
     AX5043_BUSY,                    /**< Busy.                            */
     AX5043_IDLE,                    /**< Idle.                            */
+    AX5043_RX,                    /**< Idle.                            */
+    AX5043_TX, 
     trxstate_off,
     trxstate_rx,
     trxstate_rx_start,
@@ -908,6 +913,7 @@ struct AX5043VMT {
     uint8_t rf_freq_off3;                                                   \
     uint8_t rssi;                                                           \
     uint8_t dropped[250];                                                   \
+    uint8_t error_code;                                                     \
     uint8_t status_code;                                                    \
 
 /**
@@ -924,8 +930,8 @@ struct AX5043Driver {
 /*===========================================================================*/
 uint8_t ax5043_write_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
 uint8_t ax5043_read_reg(SPIDriver * spip, uint16_t reg, uint8_t value, uint8_t ret_value[]);
-void ax5043_set_pwrmode(SPIDriver * spip, uint8_t reg_value);
-void ax5043_reset(SPIDriver * spip);
+uint8_t ax5043_set_pwrmode(AX5043Driver *devp, uint8_t reg_value);
+uint8_t ax5043_reset(AX5043Driver *devp);
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len);
 uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) ;
 
@@ -944,10 +950,10 @@ extern "C" {
 void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 
-void ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
+uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
 uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name);
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
-void ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
+uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 void ax5043_prepare_tx(AX5043Driver *devp);
 void ax5043_prepare_rx(AX5043Driver *devp);
 void ax5043_init_registers_common(AX5043Driver *devp);
