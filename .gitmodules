@@ -3,4 +3,5 @@
 	url = https://github.com/ChibiOS/ChibiOS.git
 [submodule "common/CANopenNode"]
 	path = common/CANopenNode
-	url = git@github.com:heliochronix/CANopenNode.git
+	url = https://github.com/heliochronix/CANopenNode.git
+	branch = master
