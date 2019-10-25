@@ -573,6 +573,7 @@
 #define AXRADIO_ERR_NOT_CONNECTED               0x0f
 #define AXRADIO_ERR_REG_NOT_IN_CONF             0x10
 #define AXRADIO_ERR_VAL_NOT_IN_CONF             0x11
+#define AXRADIO_ERR_PLLRNG_VAL                  0x12
 
 #define	EXIT_FAILURE	1	// Failing exit status.  
 #define	EXIT_SUCCESS	0	// Successful exit status. 
@@ -730,33 +731,20 @@ typedef struct
  * @brief   TODO: Brief
  */
 typedef enum {
-    AX5043_UNINIT,                  /**< Not initialized.                 */
-    AX5043_STOP,                    /**< Stopped.                         */
-    AX5043_READY,                   /**< Ready.                           */
-    AX5043_BUSY,                    /**< Busy.                            */
-    AX5043_IDLE,                    /**< Idle.                            */
-    AX5043_RX,                    /**< Idle.                            */
-    AX5043_TX, 
-    trxstate_off,
-    trxstate_rx,
-    trxstate_rx_start,
-    trxstate_rx_complete,
-    trxstate_rxwor,
-    trxstate_wait_xtal,
-    trxstate_xtal_ready,
-    trxstate_pll_ranging,
-    trxstate_pll_ranging_done,
-    trxstate_pll_settling,
-    trxstate_pll_settled,
-    trxstate_tx_xtalwait,
-    trxstate_tx_longpreamble,
-    trxstate_tx_shortpreamble,
-    trxstate_tx_packet,
-    trxstate_tx_waitdone,
-    trxstate_txcw_xtalwait,
-    trxstate_txstream_xtalwait,
-    trxstate_txstream
-} ax5043_trxstate_t;
+    AX5043_UNINIT,                  /**< Not initialized.                  */
+    AX5043_STOP,                    /**< Stopped.                          */
+    AX5043_READY,                   /**< Ready.                            */
+    AX5043_BUSY,                    /**< Busy.                             */
+    AX5043_IDLE,                    /**< Idle.                             */
+    AX5043_RX,
+    AX5043_RX_LOOP,                 /**< In the middle of receiving packet.*/    
+    AX5043_TX,
+    AX5043_PLL_RANGE_DONE,
+    AX5043_OFF,
+    AX5043_TX_LONGPREAMBLE,
+    AX5043_TX_SHORTPREAMBLE,
+    AX5043_TX_PACKET,
+} ax5043_state_t;
 
 
 /**
@@ -904,7 +892,7 @@ struct AX5043VMT {
 #define _ax5043_data                                                        \
     _base_object_data                                                       \
     /* Driver state.*/                                                      \
-    ax5043_trxstate_t     state;                                      \
+    ax5043_state_t     state;                                      \
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
     /* Ax5043 returned values.*/                                            \
@@ -959,7 +947,7 @@ void ax5043_prepare_rx(AX5043Driver *devp);
 void ax5043_init_registers_common(AX5043Driver *devp);
 uint8_t axradio_get_pllvcoi(AX5043Driver *devp);
 void ax5043_init(AX5043Driver *devp);
-void transmit_loop(AX5043Driver *devp, ax5043_trxstate_t axradio_trxstate, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
+void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
 
