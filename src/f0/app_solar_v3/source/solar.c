@@ -38,10 +38,17 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
-uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
+uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
 {
-    static int32_t perturb = STEP_SIZE; /* Stores the the last perturbation of the VI curve */
-    static uint32_t prev_pwr = 0;       /* The power being drawn from the previous iteration of the loop */
+    /* Stores the the last perturbation of the VI curve */
+    static int32_t perturb = STEP_SIZE;
+    /* The values from the previous iteration of the loop */
+    static uint32_t prev_pwr = 0;
+    static uint32_t prev_volt = 0;
+    static int32_t  prev_curr = 0;
+    uint32_t delta_pwr  = pwr  - prev_pwr;
+    uint32_t delta_volt = volt - prev_volt;
+    int32_t  delta_curr = curr - prev_curr;
 
     /* If the power decreased, flip perturb direction */
     if (pwr < prev_pwr) {
@@ -49,7 +56,10 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t iadj_v)
     }
 
     iadj_v += perturb;
-    prev_pwr = pwr;
+
+    prev_pwr  = pwr;
+    prev_volt = volt;
+    prev_curr = curr;
     return iadj_v;
 }
 
@@ -59,7 +69,8 @@ THD_FUNCTION(solar, arg)
 {
     (void)arg;
     static uint32_t iadj_v = 15000;
-    uint32_t pwr;
+    uint32_t pwr, volt;
+    int32_t curr;
 
     /* Start up drivers for I2C devices */
     ina226Start(&ina226dev, &ina226config);
@@ -69,15 +80,17 @@ THD_FUNCTION(solar, arg)
     max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
     while (!chThdShouldTerminateX()) {
         /* Get current values for power */
-        if (ina226ReadVBUS(&ina226dev) < 450000) {
+        if (ina226ReadVBUS(&ina226dev) < 400000) {
             palClearLine(LINE_OUTPUT_EN);
         } else {
             palSetLine(LINE_OUTPUT_EN);
         }
         pwr = ina226ReadPower(&ina226dev);
+        volt = ina226ReadVBUS(&ina226dev);
+        curr = ina226ReadCurrent(&ina226dev);
 
         /* Calculate perterbation of iadj */
-        iadj_v = calc_iadj(pwr, iadj_v);
+        iadj_v = calc_iadj(pwr, volt, curr, iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
