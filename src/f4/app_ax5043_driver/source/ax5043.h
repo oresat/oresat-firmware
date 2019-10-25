@@ -744,6 +744,7 @@ typedef enum {
     AX5043_TX_LONGPREAMBLE,
     AX5043_TX_SHORTPREAMBLE,
     AX5043_TX_PACKET,
+    AX5043_CW
 } ax5043_state_t;
 
 
@@ -785,18 +786,15 @@ typedef struct {
     uint32_t val;
 } ax5043_confval_t;
 
-
 /**
- * @brief   Values returned while 
+ * @brief   Other configuration values
  */
-typedef struct {
-    uint8_t rf_freq_off1;
-    uint8_t rf_freq_off2;
-    uint8_t rf_freq_off3;
-    uint8_t rssi;
-    uint8_t *dropped;
-    uint8_t status_code;
-} ax5043_returned_t;
+typedef enum {
+    AX5043_MODE_RX,
+    AX5043_MODE_TX,
+    AX5043_MODE_CW,
+    AX5043_MODE_OFF,
+} ax5043_mode_t;
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -862,6 +860,7 @@ typedef struct{
     ioline_t irq;
     ax5043_regval_t *reg_values;
     ax5043_confval_t *conf_values;
+    ax5043_mode_t ax5043_mode;
     /* TODO: probably move these to an implementation of the driver */
     mailbox_t *mb;
 } AX5043Config;
@@ -892,7 +891,7 @@ struct AX5043VMT {
 #define _ax5043_data                                                        \
     _base_object_data                                                       \
     /* Driver state.*/                                                      \
-    ax5043_state_t     state;                                      \
+    ax5043_state_t     state;                                               \
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
     /* Ax5043 returned values.*/                                            \
@@ -937,6 +936,7 @@ extern "C" {
 #endif
 void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
+void ax5043Stop(AX5043Driver *devp);
 
 uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
 uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name);

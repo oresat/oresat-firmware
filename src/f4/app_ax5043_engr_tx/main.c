@@ -31,7 +31,8 @@
 #include "chprintf.h"
 #include "util_version.h"
 #include "util_numbers.h"
-#include "ax5043.h"
+#include "ax5043_common.h"
+#include "ax5043_engr.h"
 
 
 //#include "adf7030.h"

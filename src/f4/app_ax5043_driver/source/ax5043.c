@@ -470,7 +470,7 @@ void ax5043_init(AX5043Driver *devp){
 }
 
  /**
- * @brief   Transmits a packet.
+ * @brief   Transmit loop to transmit bytes of a packet.
  *
  * @param[in]  devp               pointer to the @p AX5043Driver object.
  * @param[in]  packet_len         Complete packet length including mac. 
@@ -712,7 +712,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
 }
 
 /**
- * @brief   Configures and activates the AX5043 Radio Driver.
+ * @brief   Receive loop to recieve bytes from FIFO.
  *
  * @param[in]  devp               pointer to the @p AX5043Driver object.
  * @param[out] axradio_rxbuffer[] Pointer to array where the packet will be kept. 
@@ -804,6 +804,36 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
   return bytesRead;
 }
 
+/**
+ * @brief   Prepare for CW mode
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @return                        Length of packet received.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
+ */
+uint8_t ax5043_prepare_cw(AX5043Driver *devp){
+  uint8_t ret_value[3]={0,0,0};
+  SPIDriver *spip = devp->config->spip;
+  ax5043_set_pwrmode(devp, AX5043_FULL_TX);
+
+/* This is not mentioned in datasheet or programming manual but is required.
+ * Removing this will make the transmission to transmit in low power for a few seconds
+ * before it reaches peak power.*/    
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_FIFOCMD_REPEATDATA|0x60), ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xff, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
+    
+  ax5043_set_pwrmode(devp, AX5043_STANDBY);
+  devp->state = AX5043_CW;
+  return 0; 
+}
+
 /*==========================================================================*/
 /* Interface implementation.                                                */
 /*==========================================================================*/
@@ -817,7 +847,7 @@ static const struct AX5043VMT vmt_device = {
 /*===========================================================================*/
 
 /**
- * @brief   Initializes an instance.
+ * @brief   Initializes an instance. Radio is still uninitialized.
  *
  * @param[out] devp     pointer to the @p AX5043Driver object
  *
@@ -828,7 +858,7 @@ void ax5043ObjectInit(AX5043Driver *devp) {
 
   devp->config = NULL;
 
-  devp->state = AX5043_STOP;
+  devp->state = AX5043_UNINIT;
 }
 
 /**
@@ -836,24 +866,50 @@ void ax5043ObjectInit(AX5043Driver *devp) {
  *
  * @param[in] devp      pointer to the @p AX5043Driver object
  * @param[in] config    pointer to the @p AX5043Config object
- *
- * @api
- * TODO return a -ve return code if there are any errors
  */
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
-
-    osalDbgCheck((devp != NULL) && (config != NULL));
-    osalDbgAssert((devp->state == AX5043_STOP) ||
-            (devp->state == AX5043_READY),
-            "ax5043Start(), invalid state");
+  osalDbgCheck((devp != NULL) && (config != NULL));
+  osalDbgAssert((devp->state == AX5043_UNINIT) ||
+          (devp->state == AX5043_READY),
+          "ax5043Start(), invalid state");
     
-    devp->config = config;
-    devp->rf_freq_off3 = 0;
-    devp->rf_freq_off2 = 0;
-    devp->rf_freq_off1 = 0;
-    devp->rssi = 0;
-    devp->error_code = 0;
-    devp->status_code = 0;
+  devp->config = config;
+  devp->rf_freq_off3 = 0;
+  devp->rf_freq_off2 = 0;
+  devp->rf_freq_off1 = 0;
+  devp->rssi = 0;
+  devp->error_code = 0;
+  devp->status_code = 0;
+    
+  ax5043_init(devp);
+  switch(config->ax5043_mode) {
+  case AX5043_MODE_RX:
+    ax5043_prepare_rx(devp);
+    break;
+  case AX5043_MODE_TX:
+    ax5043_prepare_tx(devp);
+    break;
+  case AX5043_MODE_CW:
+    ax5043_prepare_cw(devp);
+    break;
+  case AX5043_MODE_OFF:
+    ax5043_set_pwrmode(devp, AX5043_POWERDOWN);
+    break;
+  default:  
+    ax5043_prepare_rx(devp);
+  } 
+}
+
+/**
+ * @brief   Stops the AX5043 Radio Driver.
+ *
+ * @param[in] devp      pointer to the @p AX5043Driver object
+ */
+void ax5043Stop(AX5043Driver *devp) {
+    ax5043_set_pwrmode(devp, AX5043_POWERDOWN);
+    devp->state = AX5043_OFF;
+    /* TODO: verify if additional driver things needs to be done.*/
+    devp->state = AX5043_STOP;
 }
 
 //!@
