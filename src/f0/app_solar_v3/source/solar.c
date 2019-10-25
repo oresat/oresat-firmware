@@ -46,16 +46,13 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     static uint32_t prev_pwr = 0;
     static uint32_t prev_volt = 0;
     static int32_t  prev_curr = 0;
-    uint32_t delta_pwr  = pwr  - prev_pwr;
-    uint32_t delta_volt = volt - prev_volt;
-    int32_t  delta_curr = curr - prev_curr;
+    uint32_t delta_p = pwr  - prev_pwr;
+    uint32_t delta_v = volt - prev_volt;
+    int32_t  delta_i = curr - prev_curr;
 
-    /* If the power decreased, flip perturb direction */
-    if (pwr < prev_pwr) {
-        perturb *= -1;
-    }
+    /* Start IC MPPT Algorithm */
 
-    iadj_v += perturb;
+    /* End IC MPPT Algorithm */
 
     prev_pwr  = pwr;
     prev_volt = volt;
