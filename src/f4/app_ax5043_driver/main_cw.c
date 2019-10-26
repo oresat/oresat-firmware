@@ -32,6 +32,7 @@
 #include "util_version.h"
 #include "util_numbers.h"
 #include "ax5043.h"
+#include "morse.h"
 
 
 //#include "adf7030.h"
@@ -43,58 +44,54 @@ const struct axradio_address remoteaddr_tx = {
 	{ 0x33, 0x34, 0x00, 0x00}
 };
 
-const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3E, 0x54, 0x65, 0x73, 0x74 };
-const uint8_t framing_insert_counter = 0;
+const uint8_t demo_packet[] =  { 0x86, 0xA2, 0x40, 0x40, 0x40, 0x40, 0x60, 0x96, 0x8E, 0x6E, 0xB4, 0xAC, 0xAC, 0x61, 0x3F, 0xF0, 0x3A, 0x43, 0x51, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3A, 0x54, 0x65, 0x73, 0x74, 0x7B, 0x30, 0x30, 0x30, 0x30, 0x31 };
+const uint8_t framing_insert_counter = 1;
 const uint8_t framing_counter_pos = 0;
 
-// TX: fcarrier=435.500MHz dev=  3.200kHz br=  9.600kBit/s pwr= 10.0dBm
-// RX: fcarrier=435.500MHz bw= 14.400kHz br=  9.600kBit/s
+// TX: fcarrier=435.500MHz dev= 12.500kHz br= 50.000kBit/s pwr= 10.0dBm
+// RX: fcarrier=435.500MHz bw= 75.000kHz br= 50.000kBit/s
 ax5043_regval_t reg_values[] = {
   {AX5043_REG_MODULATION,     0x08,common},
-  {AX5043_REG_ENCODING,       0x07,common},
-  {AX5043_REG_FRAMING,        0x14,common},
-  {AX5043_REG_CRCINIT3,       0x00,common},
-  {AX5043_REG_CRCINIT2,       0x00,common},
-  {AX5043_REG_CRCINIT1,       0xFF,common},
-  {AX5043_REG_CRCINIT0,       0xFF,common},
+  {AX5043_REG_ENCODING,       0x00,common},
+  {AX5043_REG_FRAMING,        0x24,common},
   {AX5043_REG_PINFUNCSYSCLK,  0x01,common},
   {AX5043_REG_PINFUNCDCLK,    0x01,common},
   {AX5043_REG_PINFUNCDATA,    0x01,common},
   {AX5043_REG_PINFUNCANTSEL,  0x01,common},
   {AX5043_REG_PINFUNCPWRAMP,  0x07,common},
   {AX5043_REG_WAKEUPXOEARLY,  0x01,common},
-  {AX5043_REG_IFFREQ1,        0x02,common},
-  {AX5043_REG_IFFREQ0,        0x0C,common},
-  {AX5043_REG_DECIMATION,     0x14,common},
+  {AX5043_REG_IFFREQ1,        0x0B,common},
+  {AX5043_REG_IFFREQ0,        0x09,common},
+  {AX5043_REG_DECIMATION,     0x02,common},
   {AX5043_REG_RXDATARATE2,    0x00,common},
-  {AX5043_REG_RXDATARATE1,    0x3E,common},
-  {AX5043_REG_RXDATARATE0,    0x80,common},
+  {AX5043_REG_RXDATARATE1,    0x3C,common},
+  {AX5043_REG_RXDATARATE0,    0x00,common},
   {AX5043_REG_MAXDROFFSET2,   0x00,common},
   {AX5043_REG_MAXDROFFSET1,   0x00,common},
   {AX5043_REG_MAXDROFFSET0,   0x00,common},
   {AX5043_REG_MAXRFOFFSET2,   0x80,common},
   {AX5043_REG_MAXRFOFFSET1,   0x01,common},
-  {AX5043_REG_MAXRFOFFSET0,   0x2F,common},
+  {AX5043_REG_MAXRFOFFSET0,   0x30,common},
   {AX5043_REG_FSKDMAX1,       0x00,common},
   {AX5043_REG_FSKDMAX0,       0xA6,common},
   {AX5043_REG_FSKDMIN1,       0xFF,common},
   {AX5043_REG_FSKDMIN0,       0x5A,common},
   {AX5043_REG_AMPLFILTER,     0x00,common},
   {AX5043_REG_RXPARAMSETS,    0xF4,common},
-  {AX5043_REG_AGCGAIN0,       0xC5,common},
+  {AX5043_REG_AGCGAIN0,       0x83,common},
   {AX5043_REG_AGCTARGET0,     0x84,common},
   {AX5043_REG_TIMEGAIN0,      0xF8,common},
   {AX5043_REG_DRGAIN0,        0xF2,common},
   {AX5043_REG_PHASEGAIN0,     0xC3,common},
   {AX5043_REG_FREQUENCYGAINA0,0x0F,common},
   {AX5043_REG_FREQUENCYGAINB0,0x1F,common},
-  {AX5043_REG_FREQUENCYGAINC0,0x0A,common},
-  {AX5043_REG_FREQUENCYGAIND0,0x0A,common},
+  {AX5043_REG_FREQUENCYGAINC0,0x05,common},
+  {AX5043_REG_FREQUENCYGAIND0,0x05,common},
   {AX5043_REG_AMPLITUDEGAIN0, 0x06,common},
   {AX5043_REG_FREQDEV10,      0x00,common},
   {AX5043_REG_FREQDEV00,      0x00,common},
   {AX5043_REG_BBOFFSRES0,     0x00,common},
-  {AX5043_REG_AGCGAIN1,       0xC5,common},
+  {AX5043_REG_AGCGAIN1,       0x83,common},
   {AX5043_REG_AGCTARGET1,     0x84,common},
   {AX5043_REG_AGCAHYST1,      0x00,common},
   {AX5043_REG_AGCMINMAX1,     0x00,common},
@@ -103,13 +100,13 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_PHASEGAIN1,     0xC3,common},
   {AX5043_REG_FREQUENCYGAINA1,0x0F,common},
   {AX5043_REG_FREQUENCYGAINB1,0x1F,common},
-  {AX5043_REG_FREQUENCYGAINC1,0x0A,common},
-  {AX5043_REG_FREQUENCYGAIND1,0x0A,common},
+  {AX5043_REG_FREQUENCYGAINC1,0x05,common},
+  {AX5043_REG_FREQUENCYGAIND1,0x05,common},
   {AX5043_REG_AMPLITUDEGAIN1, 0x06,common},
   {AX5043_REG_FREQDEV11,      0x00,common},
-  {AX5043_REG_FREQDEV01,      0x25,common},
+  {AX5043_REG_FREQDEV01,      0x1C,common},
   {AX5043_REG_FOURFSK1,       0x16,common},
-  {AX5043_REG_BBOFFSRES1,     0x00,common}, 
+  {AX5043_REG_BBOFFSRES1,     0x00,common},
   {AX5043_REG_AGCGAIN3,       0xFF,common},
   {AX5043_REG_AGCTARGET3,     0x84,common},
   {AX5043_REG_AGCAHYST3,      0x00,common},
@@ -119,38 +116,42 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_PHASEGAIN3,     0xC3,common},
   {AX5043_REG_FREQUENCYGAINA3,0x0F,common},
   {AX5043_REG_FREQUENCYGAINB3,0x1F,common},
-  {AX5043_REG_FREQUENCYGAINC3,0x0D,common},
-  {AX5043_REG_FREQUENCYGAIND3,0x0D,common},
+  {AX5043_REG_FREQUENCYGAINC3,0x09,common},
+  {AX5043_REG_FREQUENCYGAIND3,0x09,common},
   {AX5043_REG_AMPLITUDEGAIN3, 0x06,common},
   {AX5043_REG_FREQDEV13,      0x00,common},
-  {AX5043_REG_FREQDEV03,      0x25,common},
+  {AX5043_REG_FREQDEV03,      0x1C,common},
   {AX5043_REG_FOURFSK3,       0x16,common},
   {AX5043_REG_BBOFFSRES3,     0x00,common},
   {AX5043_REG_MODCFGF,        0x02,common},
   {AX5043_REG_FSKDEV2,        0x00,common},
-  {AX5043_REG_FSKDEV1,        0x04,common},
-  {AX5043_REG_FSKDEV0,        0x5E,common},
+//  {AX5043_REG_FSKDEV1,        0x22,common},
+//  {AX5043_REG_FSKDEV0,        0x22,common},
+  {AX5043_REG_FSKDEV1,        0x00,common},
+  {AX5043_REG_FSKDEV0,        0x00,common},
   {AX5043_REG_MODCFGA,        0x05,common},
   {AX5043_REG_TXRATE2,        0x00,common},
-  {AX5043_REG_TXRATE1,        0x0D,common},
-  {AX5043_REG_TXRATE0,        0x1B,common},
+//  {AX5043_REG_TXRATE1,        0x88,common},
+//  {AX5043_REG_TXRATE0,        0x89,common},
+  {AX5043_REG_TXRATE1,        0x00,common},
+  {AX5043_REG_TXRATE0,        0x01,common},
   {AX5043_REG_TXPWRCOEFFB1,   0x07,common},
   {AX5043_REG_TXPWRCOEFFB0,   0x00,common},
-  {AX5043_REG_PLLVCOI,        0x99,common},
+  {AX5043_REG_PLLVCOI,        0x98,common},
   {AX5043_REG_PLLRNGCLK,      0x05,common},
-  {AX5043_REG_BBTUNE,         0x0F,common},
+  {AX5043_REG_BBTUNE,         0x03,common},
   {AX5043_REG_BBOFFSCAP,      0x77,common},
   {AX5043_REG_PKTADDRCFG,     0x00,common},
-  {AX5043_REG_PKTLENCFG,      0x00,common},
-  {AX5043_REG_PKTLENOFFSET,   0x15,common},
-  {AX5043_REG_PKTMAXLEN,      0xF0,common},
+  {AX5043_REG_PKTLENCFG,      0x82,common},
+  {AX5043_REG_PKTLENOFFSET,   0x00,common},
+  {AX5043_REG_PKTMAXLEN,      0xC8,common},
   {AX5043_REG_MATCH0PAT3,     0xAA,common},
   {AX5043_REG_MATCH0PAT2,     0xCC,common},
   {AX5043_REG_MATCH0PAT1,     0xAA,common},
   {AX5043_REG_MATCH0PAT0,     0xCC,common},
   {AX5043_REG_MATCH1PAT1,     0x55,common},
   {AX5043_REG_MATCH1PAT0,     0x55,common},
-  {AX5043_REG_MATCH1LEN,      0x0A,common},
+  {AX5043_REG_MATCH1LEN,      0x8A,common},
   {AX5043_REG_MATCH1MAX,      0x0A,common},
   {AX5043_REG_TMGTXBOOST,     0x5B,common},
   {AX5043_REG_TMGTXSETTLE,    0x3E,common},
@@ -158,10 +159,10 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_TMGRXCOARSEAGC, 0x9C,common},
   {AX5043_REG_TMGRXRSSI,      0x03,common},
   {AX5043_REG_TMGRXPREAMBLE2, 0x17,common},
-  {AX5043_REG_RSSIABSTHR,     0xE3,common},
+  {AX5043_REG_RSSIABSTHR,     0xEB,common},
   {AX5043_REG_BGNDRSSITHR,    0x00,common},
   {AX5043_REG_PKTCHUNKSIZE,   0x0D,common},
-  {AX5043_REG_PKTACCEPTFLAGS, 0x39,common},
+  {AX5043_REG_PKTACCEPTFLAGS, 0x20,common},
   {AX5043_REG_DACVALUE1,      0x00,common},
   {AX5043_REG_DACVALUE0,      0x00,common},
   {AX5043_REG_DACCONFIG,      0x00,common},
@@ -184,8 +185,8 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_XTALCAP,        0x00,tx},
   {AX5043_REG_0xF00,          0x0F,tx},
   {AX5043_REG_0xF18,          0x06,tx},
-  {AX5043_REG_PLLLOOP,        0x0B,rx},
-  {AX5043_REG_PLLCPI,         0x10,rx},
+  {AX5043_REG_PLLLOOP,        0x09,rx},
+  {AX5043_REG_PLLCPI,         0x01,rx},
   {AX5043_REG_PLLVCODIV,      0x25,rx},
   {AX5043_REG_XTALCAP,        0x00,rx},
   {AX5043_REG_0xF00,          0x0F,rx},
@@ -193,11 +194,11 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_TMGRXAGC,       0x00,rx_cont},
   {AX5043_REG_TMGRXPREAMBLE1, 0x00,rx_cont},
   {AX5043_REG_PKTMISCFLAGS,   0x00,rx_cont},
-  {AX5043_REG_PKTADDR0,       0x00,local_address},
-  {AX5043_REG_PKTADDR1,       0x00,local_address},
+  {AX5043_REG_PKTADDR0,       0x32,local_address},
+  {AX5043_REG_PKTADDR1,       0x34,local_address},
   {AX5043_REG_PKTADDR2,       0x00,local_address},
   {AX5043_REG_PKTADDR3,       0x00,local_address},
-  {AX5043_REG_PKTADDRMASK0,   0x00,local_address},
+  {AX5043_REG_PKTADDRMASK0,   0xFF,local_address},
   {AX5043_REG_PKTADDRMASK1,   0x00,local_address},
   {AX5043_REG_PKTADDRMASK2,   0x00,local_address},
   {AX5043_REG_PKTADDRMASK3,   0x00,local_address},    
@@ -222,28 +223,28 @@ ax5043_confval_t conf_values[]={
   {AXRADIO_PHY_CS_ENABLED              ,0},
   {AXRADIO_PHY_LBT_RETRIES             ,0},
   {AXRADIO_PHY_LBT_FORCETX             ,0},
-  {AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    ,9}, 
-  {AXRADIO_PHY_PREAMBLE_WOR_LEN        ,40},
+  {AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    ,23}, 
+  {AXRADIO_PHY_PREAMBLE_WOR_LEN        ,184},
   {AXRADIO_PHY_PREAMBLE_LONGLEN        ,0},
-  {AXRADIO_PHY_PREAMBLE_LEN            ,40},
+  {AXRADIO_PHY_PREAMBLE_LEN            ,72},
   {AXRADIO_PHY_PREAMBLE_BYTE           ,0X7E},
-  {AXRADIO_PHY_PREAMBLE_FLAGS          ,0X18},
+  {AXRADIO_PHY_PREAMBLE_FLAGS          ,0X38},
   {AXRADIO_PHY_PREAMBLE_APPENDBITS     ,0},
   {AXRADIO_PHY_PREAMBLE_APPENDPATTERN  ,0X00},
-  {AXRADIO_FRAMING_MACLEN              ,0},
-  {AXRADIO_FRAMING_ADDRLEN             ,0},
+  {AXRADIO_FRAMING_MACLEN              ,3},
+  {AXRADIO_FRAMING_ADDRLEN             ,1},
   {AXRADIO_FRAMING_DESTADDRPOS         ,0},
   {AXRADIO_FRAMING_SOURCEADDRPOS       ,0XFF},
-  {AXRADIO_FRAMING_LENPOS              ,0},
-  {AXRADIO_FRAMING_LENOFFS             ,21},
-  {AXRADIO_FRAMING_LENMASK             ,0X00},
+  {AXRADIO_FRAMING_LENPOS              ,2},
+  {AXRADIO_FRAMING_LENOFFS             ,0},
+  {AXRADIO_FRAMING_LENMASK             ,0XFF},
   {AXRADIO_FRAMING_SWCRCLEN            ,0},
   {AXRADIO_FRAMING_SYNCLEN             ,32},
   {AXRADIO_FRAMING_SYNCWORD0           ,0XCC},
   {AXRADIO_FRAMING_SYNCWORD1           ,0XAA},
   {AXRADIO_FRAMING_SYNCWORD2           ,0XCC},
   {AXRADIO_FRAMING_SYNCWORD3           ,0XAA},
-  {AXRADIO_FRAMING_SYNCFLAGS           ,0X18},
+  {AXRADIO_FRAMING_SYNCFLAGS           ,0X38},
   {AXRADIO_FRAMING_ENABLE_SFDCALLBACK  ,0},
   {AXRADIO_FRAMING_ACK_TIMEOUT         ,8}, 
   {AXRADIO_FRAMING_ACK_DELAY           ,313}, 
@@ -316,7 +317,7 @@ static AX5043Config axcfg1 =
   LINE_SX_INT0,
   reg_values,
   conf_values,
-  AX5043_MODE_TX,
+  AX5043_MODE_CW,
   &radio1_rx_mb,
 };
 AX5043Driver axd1;
@@ -360,22 +361,17 @@ static void app_init(void)
 
 
 
-	for (;;) {
-	    static uint8_t demo_packet_[sizeof(demo_packet)];
-	    //uint16_t pkt_counter = 0;
+  // This is for CW
 
-	    ++pkt_counter;
-	    memcpy(demo_packet_, demo_packet, sizeof(demo_packet));
-	    if (framing_insert_counter) {
-	        demo_packet_[framing_counter_pos] = (uint8_t)(pkt_counter & 0xFF);
-	        demo_packet_[framing_counter_pos+1] = (uint8_t)((pkt_counter>>8) & 0xFF);
-	    }
+  char cw_message[] = "KG7ZVV Malay Das testing AX5043";
+  int wpm = 22;
+  for (;;) {
+    chprintf(DEBUG_CHP,"INFO: Sending CW %d\r\n", sizeof(cw_message));
 
-		chprintf(DEBUG_CHP,"INFO: Sending packet %d\r\n",pkt_counter);
-		transmit_packet(&axd1, &remoteaddr_tx, demo_packet_, sizeof(demo_packet));
-
-        chThdSleepMilliseconds(5000);
-	}
+    ax5043_send_cw(&axd1, wpm, cw_message, sizeof(cw_message));
+    
+    chThdSleepMilliseconds(500);
+  }  
 
 }
 
