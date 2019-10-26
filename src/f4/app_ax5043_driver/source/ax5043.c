@@ -9,18 +9,63 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include "ch.h"
 #include "hal.h"
 //#include "chprintf.h"
 #include "ax5043.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 //#define DEBUG_SERIAL  SD2
 //#define DEBUG_CHP     ((BaseSequentialStream *) &DEBUG_SERIAL)
 
 /**
- * @brief   Writes  to an AX5043 register..
+ * @brief   Morse code for alphabets and numbers.
+ */
+static const char *alpha[] = {
+    ".-",   //A
+    "-...", //B
+    "-.-.", //C
+    "-..",  //D
+    ".",    //E
+    "..-.", //F
+    "--.",  //G
+    "....", //H
+    "..",   //I
+    ".---", //J
+    "-.-",  //K
+    ".-..", //L
+    "--",   //M
+    "-.",   //N
+    "---",  //O
+    ".--.", //P
+    "--.-", //Q
+    ".-.",  //R
+    "...",  //S
+    "-",    //T
+    "..-",  //U
+    "...-", //V
+    ".--",  //W
+    "-..-", //X
+    "-.--", //Y
+    "--..", //Z
+};
+
+static const char *num[] = {
+    "-----", //0
+    ".----", //1
+    "..---", //2
+    "...--", //3
+    "....-", //4
+    ".....", //5
+    "-....", //6
+    "--...", //7
+    "---..", //8
+    "----.", //9
+};
+
+
+/**
+ * @brief   Writes  to an AX5043 register.
  *
  * @param[in]  spip               pointer to the @p SPIDriver object.
  * @param[in]  reg                AX5043 register address. 
@@ -817,23 +862,128 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
 uint8_t ax5043_prepare_cw(AX5043Driver *devp){
   uint8_t ret_value[3]={0,0,0};
   SPIDriver *spip = devp->config->spip;
+  
+  ax5043_write_reg(spip, AX5043_REG_FSKDEV2, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FSKDEV1, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FSKDEV0, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_TXRATE2, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_TXRATE1, (uint8_t)0x00, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_TXRATE0, (uint8_t)0x01, ret_value);
+  
   ax5043_set_pwrmode(devp, AX5043_FULL_TX);
 
-/* This is not mentioned in datasheet or programming manual but is required.
- * Removing this will make the transmission to transmit in low power for a few seconds
- * before it reaches peak power.*/    
-  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);//FIFO reset
+  /* This is not mentioned in datasheet or programming manual but is required.
+   * Removing this will make the transmission to transmit in low power for a few seconds
+   * before it reaches peak power.*/
+  /* FIFO reset.*/   
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_FIFOCMD_REPEATDATA|0x60), ret_value);
-  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);//preamble flag
+  /* Preamble flag.*/
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);
   ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xff, ret_value);
-  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);//preamble
-  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);//FIFO Commit  
+  /* Preamble.*/
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x55, ret_value);
+  /* FIFO Commit.*/ 
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value); 
     
   ax5043_set_pwrmode(devp, AX5043_STANDBY);
   devp->state = AX5043_CW;
   return 0; 
 }
 
+/**
+ * @brief   Send Morse dot and dash over the air
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  dot_dash_time      time in milliseconds for transmiter to be on.
+ */
+void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time){
+
+  uint8_t ret_value[3]={0,0,0};
+  SPIDriver *spip = devp->config->spip;
+
+  ax5043_set_pwrmode(devp, AX5043_FULL_TX);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_FIFOCMD_REPEATDATA|0x60), ret_value);
+  /* Preamble flag.*/
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, ret_value);
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, ret_value);
+  /* Preamble.*/
+  ax5043_write_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value);
+  /* FIFO Commit.*/
+  ax5043_write_reg(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, ret_value);
+  chThdSleepMilliseconds(dot_dash_time);
+  ax5043_set_pwrmode(devp, AX5043_STANDBY);
+
+}
+
+/**
+ * @brief   Convert an alphabet or number to morse dot and dash
+ *
+ * @param[in]  letter             An alphabet or number.
+ *
+ * @return                        Length of packet received.
+ */
+const char *ax5043_ascii_to_morse(char letter){
+  letter = tolower(letter);
+
+  if (isalpha(letter)){
+    return alpha[letter-'a'];
+  }
+  else if (isdigit(letter)){
+    return num[letter-'0'];
+  }
+
+  return SPACE;
+}
+
+/**
+ * @brief   Convert a message to morse code and transmit it.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  wpm                words per minute.
+ * @param[in]  beaconMessage      Message to be transmitted.
+ * @param[in]  pktlen             Length of packet/beacon message.
+ */
+void ax5043_send_cw(AX5043Driver *devp, int wpm, char beaconMessage[], uint16_t pktlen ){
+  int element;
+  int index = 0;
+  const char *morse;
+    
+  uint16_t ditLength = 1200/wpm;
+  uint16_t letter_space = ditLength*3;
+  uint16_t word_space = ditLength*7;
+  uint16_t element_space = ditLength;
+  uint16_t dash = ditLength*3;
+    
+  while (index < pktlen){
+    morse = ax5043_ascii_to_morse(beaconMessage[index]);
+
+    element = 0;
+    while (morse[element] != '\0'){
+      switch(morse[element]){
+      case '-':
+        ax5043_morse_dot_dash(devp, dash);
+        break;
+      case '.':
+        ax5043_morse_dot_dash(devp, ditLength);
+        break;
+      }
+
+      if (morse[element] == ' '){
+        chThdSleepMilliseconds(word_space);
+      }
+      else if (morse[element+1] != '\0'){
+        chThdSleepMilliseconds(element_space);
+      }
+      else if (morse[element+1] == '\0'){
+        chThdSleepMilliseconds(letter_space);
+      }
+      element++;
+    }
+
+    index++;
+  }
+}
 /*==========================================================================*/
 /* Interface implementation.                                                */
 /*==========================================================================*/

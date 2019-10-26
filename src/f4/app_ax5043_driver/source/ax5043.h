@@ -505,6 +505,8 @@
 #define AXRADIO_PHY_INNERFREQLOOP           45
 #define AXRADIO_PHY_END                     200
 
+#define SPACE                               " "
+
 /**
  * @brief   AX5043 states.
  */
@@ -722,6 +724,10 @@ void ax5043_init(AX5043Driver *devp);
 void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
 uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
+
+void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time);
+const char *ax5043_ascii_to_morse(char letter);
+void ax5043_send_cw(AX5043Driver *devp, int wpm, char beaconMessage[], uint16_t pktlen );
 
 #ifdef __cplusplus
 }
