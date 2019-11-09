@@ -4,16 +4,16 @@
 #include "mmc.h"
 #include "chprintf.h"
 
-#define SDC_BURST_SIZE      2
+#define MMC_BURST_SIZE      2
 
 extern MMCDriver MMCD1;
 
 /* Buffer for block read/write operations, note that extra bytes are
    allocated in order to support unaligned operations.*/
-static uint8_t buf[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE + 4];
+static uint8_t buf[MMCSD_BLOCK_SIZE * MMC_BURST_SIZE + 4];
 
 /* Additional buffer for sdcErase() test */
-static uint8_t buf2[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE ];
+static uint8_t buf2[MMCSD_BLOCK_SIZE * MMC_BURST_SIZE ];
 
 /*===========================================================================*/
 /* SD Card Control                                                           */
@@ -73,15 +73,14 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&MMCD1, startblk, buf, SDC_BURST_SIZE)) {
+            if (blkRead(&MMCD1, startblk, buf, MMC_BURST_SIZE)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
-            n += SDC_BURST_SIZE;
+            n += MMC_BURST_SIZE;
         } while (chVTIsSystemTimeWithin(start, end));
         chprintf(chp, "%D blocks/S, %D bytes/S\r\n", n, n * MMCSD_BLOCK_SIZE);
 
-#if STM32_SDC_SDIO_UNALIGNED_SUPPORT
         /* Single block read performance, unaligned.*/
         chprintf(chp, "Single block unaligned read performance:         ");
         start = chVTGetSystemTime();
@@ -102,14 +101,13 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&MMCD1, startblk, buf + 1, SDC_BURST_SIZE)) {
+            if (blkRead(&MMCD1, startblk, buf + 1, MMC_BURST_SIZE)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
-            n += SDC_BURST_SIZE;
+            n += MMC_BURST_SIZE;
         } while (chVTIsSystemTimeWithin(start, end));
         chprintf(chp, "%D blocks/S, %D bytes/S\r\n", n, n * MMCSD_BLOCK_SIZE);
-#endif /* STM32_SDC_SDIO_UNALIGNED_SUPPORT */
     }
 
     if ((strcmp(argv[0], "write") == 0) ||
@@ -162,7 +160,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
          *      3.2. Second block should NOT be equal too the data written (i.e. erased).
          *   4. Erase both first and second block
          *      4.1 Both blocks should not be equal to the data initially written
-         * Precondition: SDC_BURST_SIZE >= 2
+         * Precondition: MMC_BURST_SIZE >= 2
          */
         memset(buf, 0, MMCSD_BLOCK_SIZE * 2);
         memset(buf2, 0, MMCSD_BLOCK_SIZE * 2);
