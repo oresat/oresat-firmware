@@ -165,7 +165,7 @@ static const ShellCommand commands[] = {
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
-    {"sdc", cmd_sdc},
+    {"mmc", cmd_mmc},
     {NULL, NULL}
 };
 

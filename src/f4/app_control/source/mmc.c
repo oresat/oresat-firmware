@@ -6,6 +6,8 @@
 
 #define SDC_BURST_SIZE      2
 
+extern MMCDriver MMCD1;
+
 /* Buffer for block read/write operations, note that extra bytes are
    allocated in order to support unaligned operations.*/
 static uint8_t buf[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE + 4];
@@ -16,39 +18,37 @@ static uint8_t buf2[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE ];
 /*===========================================================================*/
 /* SD Card Control                                                           */
 /*===========================================================================*/
-void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
-    static const char *mode[] = {"SDV11", "SDV20", "MMC", NULL};
+void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     systime_t start, end;
     uint32_t n, startblk;
 
     if (argc != 1) {
-        chprintf(chp, "Usage: sdc read|write|erase|all\r\n");
+        chprintf(chp, "Usage: mmc read|write|erase|all\r\n");
         return;
     }
 
     /* Card presence check.*/
-    if (!blkIsInserted(&SDCD1)) {
+    if (!blkIsInserted(&MMCD1)) {
         chprintf(chp, "Card not inserted, aborting.\r\n");
         return;
     }
 
     /* Connection to the card.*/
     chprintf(chp, "Connecting... ");
-    if (sdcConnect(&SDCD1)) {
+    if (mmcConnect(&MMCD1)) {
         chprintf(chp, "failed\r\n");
         return;
     }
 
     chprintf(chp, "OK\r\n\r\nCard Info\r\n");
     chprintf(chp, "CSD      : %08X %8X %08X %08X \r\n",
-            SDCD1.csd[3], SDCD1.csd[2], SDCD1.csd[1], SDCD1.csd[0]);
+            MMCD1.csd[3], MMCD1.csd[2], MMCD1.csd[1], MMCD1.csd[0]);
     chprintf(chp, "CID      : %08X %8X %08X %08X \r\n",
-            SDCD1.cid[3], SDCD1.cid[2], SDCD1.cid[1], SDCD1.cid[0]);
-    chprintf(chp, "Mode     : %s\r\n", mode[SDCD1.cardmode & 3U]);
-    chprintf(chp, "Capacity : %DMB\r\n", SDCD1.capacity / 2048);
+            MMCD1.cid[3], MMCD1.cid[2], MMCD1.cid[1], MMCD1.cid[0]);
+    chprintf(chp, "Capacity : %DMB\r\n", MMCD1.capacity / 2048);
 
     /* The test is performed in the middle of the flash area.*/
-    startblk = (SDCD1.capacity / MMCSD_BLOCK_SIZE) / 2;
+    startblk = (MMCD1.capacity / MMCSD_BLOCK_SIZE) / 2;
 
     if ((strcmp(argv[0], "read") == 0) ||
             (strcmp(argv[0], "all") == 0)) {
@@ -59,7 +59,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&SDCD1, startblk, buf, 1)) {
+            if (blkRead(&MMCD1, startblk, buf, 1)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
@@ -73,7 +73,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&SDCD1, startblk, buf, SDC_BURST_SIZE)) {
+            if (blkRead(&MMCD1, startblk, buf, SDC_BURST_SIZE)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
@@ -88,7 +88,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&SDCD1, startblk, buf + 1, 1)) {
+            if (blkRead(&MMCD1, startblk, buf + 1, 1)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
@@ -102,7 +102,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
         end = chTimeAddX(start, TIME_MS2I(1000));
         n = 0;
         do {
-            if (blkRead(&SDCD1, startblk, buf + 1, SDC_BURST_SIZE)) {
+            if (blkRead(&MMCD1, startblk, buf + 1, SDC_BURST_SIZE)) {
                 chprintf(chp, "failed\r\n");
                 goto exittest;
             }
@@ -118,7 +118,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         memset(buf, 0xAA, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Writing...");
-        if(sdcWrite(&SDCD1, startblk, buf, 2)) {
+        if(blkWrite(&MMCD1, startblk, buf, 2)) {
             chprintf(chp, "failed\r\n");
             goto exittest;
         }
@@ -126,7 +126,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         memset(buf, 0x55, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Reading...");
-        if (blkRead(&SDCD1, startblk, buf, 1)) {
+        if (blkRead(&MMCD1, startblk, buf, 1)) {
             chprintf(chp, "failed\r\n");
             goto exittest;
         }
@@ -135,7 +135,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
         for (i = 0; i < MMCSD_BLOCK_SIZE; i++)
             buf[i] = i + 8;
         chprintf(chp, "Writing...");
-        if(sdcWrite(&SDCD1, startblk, buf, 2)) {
+        if(blkWrite(&MMCD1, startblk, buf, 2)) {
             chprintf(chp, "failed\r\n");
             goto exittest;
         }
@@ -143,7 +143,7 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         memset(buf, 0, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Reading...");
-        if (blkRead(&SDCD1, startblk, buf, 1)) {
+        if (blkRead(&MMCD1, startblk, buf, 1)) {
             chprintf(chp, "failed\r\n");
             goto exittest;
         }
@@ -172,58 +172,53 @@ void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]) {
             buf[i] = (i + 7) % 'T'; //Ensure block 1/2 are not equal
         }
         /* 2. */
-        if(sdcWrite(&SDCD1, startblk, buf, 2)) {
-            chprintf(chp, "sdcErase() test write failed\r\n");
+        if(blkWrite(&MMCD1, startblk, buf, 2)) {
+            chprintf(chp, "mmcErase() test write failed\r\n");
             goto exittest;
         }
         /* 3. (erase) */
-        if(sdcErase(&SDCD1, startblk + 1, startblk + 2)) {
-            chprintf(chp, "sdcErase() failed\r\n");
+        if(mmcErase(&MMCD1, startblk + 1, startblk + 2)) {
+            chprintf(chp, "mmcErase() failed\r\n");
             goto exittest;
         }
-        sdcflags_t errflags = sdcGetAndClearErrors(&SDCD1);
-        if(errflags) {
-            chprintf(chp, "sdcErase() yielded error flags: %d\r\n", errflags);
-            goto exittest;
-        }
-        if(sdcRead(&SDCD1, startblk, buf2, 2)) {
-            chprintf(chp, "single-block sdcErase() failed\r\n");
+        if(blkRead(&MMCD1, startblk, buf2, 2)) {
+            chprintf(chp, "single-block mmcErase() failed\r\n");
             goto exittest;
         }
         /* 3.1. */
         if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) != 0) {
-            chprintf(chp, "sdcErase() non-erased block compare failed\r\n");
+            chprintf(chp, "mmcErase() non-erased block compare failed\r\n");
             goto exittest;
         }
         /* 3.2. */
         if(memcmp(buf + MMCSD_BLOCK_SIZE,
                     buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "sdcErase() erased block compare failed\r\n");
+            chprintf(chp, "mmcErase() erased block compare failed\r\n");
             goto exittest;
         }
         /* 4. */
-        if(sdcErase(&SDCD1, startblk, startblk + 2)) {
-            chprintf(chp, "multi-block sdcErase() failed\r\n");
+        if(mmcErase(&MMCD1, startblk, startblk + 2)) {
+            chprintf(chp, "multi-block mmcErase() failed\r\n");
             goto exittest;
         }
-        if(sdcRead(&SDCD1, startblk, buf2, 2)) {
-            chprintf(chp, "single-block sdcErase() failed\r\n");
+        if(blkRead(&MMCD1, startblk, buf2, 2)) {
+            chprintf(chp, "single-block mmcErase() failed\r\n");
             goto exittest;
         }
         /* 4.1 */
         if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
+            chprintf(chp, "multi-block mmcErase() erased block compare failed\r\n");
             goto exittest;
         }
         if(memcmp(buf + MMCSD_BLOCK_SIZE,
                     buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
+            chprintf(chp, "multi-block mmcErase() erased block compare failed\r\n");
             goto exittest;
         }
-        /* END of sdcErase() test */
+        /* END of mmcErase() test */
     }
 
     /* Card disconnect and command end.*/
 exittest:
-    sdcDisconnect(&SDCD1);
+    mmcDisconnect(&MMCD1);
 }

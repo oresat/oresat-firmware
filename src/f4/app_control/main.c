@@ -29,18 +29,32 @@
  */
 static worker_t shell_worker;
 
-/*
- * Working area for driver.
- */
-static uint8_t sd_scratchpad[512];
+static SPIConfig hs_spicfg = {
+    false,
+    NULL,
+    LINE_MMC_CS,
+    0,
+    0
+};
+
+static SPIConfig ls_spicfg = {
+    false,
+    NULL,
+    LINE_MMC_CS,
+    SPI_CR1_BR_2 | SPI_CR1_BR_1,
+    0
+};
 
 /*
- * SDIO configuration.
+ * MMC configuration.
  */
-static const SDCConfig sdccfg = {
-  sd_scratchpad,
-  SDC_MODE_4BIT
+static MMCConfig mmccfg = {
+    &SPID2,
+    &ls_spicfg,
+    &hs_spicfg
 };
+
+MMCDriver MMCD1;
 
 /**
  * @brief App Initialization
@@ -59,8 +73,9 @@ static void app_init(void)
     shellInit();
     sdStart(&SD2, NULL);
 
-    /* Initializes SDIO drivers */
-    sdcStart(&SDCD1, &sdccfg);
+    /* Initializes MMC SPI driver */
+    mmcObjectInit(&MMCD1);
+    mmcStart(&MMCD1, &mmccfg);
 }
 
 /**
