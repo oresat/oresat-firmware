@@ -123,7 +123,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Received %u bytes of data.\r\n", data_len);
         } else {
             const errorstr_t *err;
-            for (err = &errors[0]; err->code == 0 || err->code == abrt_code; err++);
+            for (err = &errors[0]; err->code != 0 && err->code != abrt_code; err++);
             chprintf(chp, "Received abort code: (%08X) %s\r\n", abrt_code, err->desc);
         }
     } else if (!strcmp(argv[0], "write")) {
