@@ -35,7 +35,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
     /* Connection to the card.*/
     chprintf(chp, "Connecting... ");
-    if (mmcConnect(&MMCD1)) {
+    if (blkConnect(&MMCD1)) {
         chprintf(chp, "failed\r\n");
         return;
     }
@@ -218,5 +218,5 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
     /* Card disconnect and command end.*/
 exittest:
-    mmcDisconnect(&MMCD1);
+    blkDisconnect(&MMCD1);
 }
