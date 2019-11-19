@@ -20,9 +20,7 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "blink.h"
-
-static worker_t worker1;
+#include "wdt.h"
 
 /**
  * @brief App Initialization
@@ -30,8 +28,7 @@ static worker_t worker1;
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL);
-    reg_worker(&worker1);
+    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
