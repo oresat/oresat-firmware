@@ -98,18 +98,19 @@ static void si41xx_init(void)
   
   si_write_reg(SI41XX_REG_MAIN_CONFIG, 0b000011000000000100);
   si_write_reg(SI41XX_REG_PHASE_GAIN,  0b000000000000000000);
+  si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000000);
 
   // RF1 and IF default for 1265 / 436.5 MHz w/ 500 kHz
-  si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000011);
   si_write_reg(SI41XX_REG_RF1_NDIV,    0b000000100111100010);
   si_write_reg(SI41XX_REG_RF1_RDIV,    0b000000000000100000);
   si_write_reg(SI41XX_REG_IF_NDIV,     0b000000001101101001);
   si_write_reg(SI41XX_REG_IF_RDIV,     0b000000000000100000);
+  si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000011);
   
   // IF default for 808 MHz w/ 500 kHz
-  //si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000010);
-  //si_write_reg(SI41XX_REG_IF_NDIV,     0b000000011001010000);
-  //si_write_reg(SI41XX_REG_IF_RDIV,     0b000000000000100000);
+  // si_write_reg(SI41XX_REG_IF_NDIV,     0b000000011001010000);
+  // si_write_reg(SI41XX_REG_IF_RDIV,     0b000000000000100000);
+  // si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000010);
 
   palSetLine(LINE_SI_SENB);
   palSetLine(LINE_SI_SDATA);
