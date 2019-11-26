@@ -50,6 +50,14 @@
 #define STM32_HSECLK                16000000U
 #endif
 
+#define STM32_HSE_BYPASS
+
+/*
+ * Board voltages.
+ * Required for performance limits calculation.
+ */
+#define STM32_VDD                   300U
+
 /* #define STM32_HSE_BYPASS */
 
 /*

@@ -6,13 +6,11 @@ THD_FUNCTION(wdt, arg)
 {
     (void)arg;
 
-    palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
-
     while (!chThdShouldTerminateX()) {
-        palToggleLine(LINE_LED_GREEN);
+        palToggleLine(LINE_WDT);
         chThdSleepMilliseconds(250);
     }
 
-    palClearLine(LINE_LED_GREEN);
+    palClearLine(LINE_WDT);
     chThdExit(MSG_OK);
 }
