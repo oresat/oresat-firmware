@@ -58,6 +58,7 @@ extern "C" {
 #include "hal.h"
 
 #define CO_USE_GLOBALS
+#define CO_SDO_BUFFER_SIZE           889    /* Override default SDO buffer size. */
 
 /**
  * @defgroup CO_driver Driver
