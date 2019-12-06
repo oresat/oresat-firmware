@@ -51,10 +51,10 @@
 #include "can_hw.h"
 
 /******************************************************************************/
-void CO_CANsetConfigurationMode(int32_t CANbaseAddress)
+void CO_CANsetConfigurationMode(void *CANbaseAddress)
 {
     /* Put CAN module in configuration mode */
-    canStop((CANDriver *)CANbaseAddress);
+    canStop(CANbaseAddress);
 }
 
 /******************************************************************************/
@@ -79,7 +79,7 @@ void CO_CANsetFilters(CO_CANmodule_t *CANmodule)
 /******************************************************************************/
 CO_ReturnError_t CO_CANmodule_init(
         CO_CANmodule_t         *CANmodule,
-        int32_t                 CANbaseAddress,
+        void                   *CANbaseAddress,
         CO_CANrx_t              rxArray[],
         uint16_t                rxSize,
         CO_CANtx_t              txArray[],
@@ -95,7 +95,7 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANbaseAddress = CANbaseAddress;
-    CANmodule->cand = (CANDriver *)CANbaseAddress;
+    CANmodule->cand = CANbaseAddress;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
