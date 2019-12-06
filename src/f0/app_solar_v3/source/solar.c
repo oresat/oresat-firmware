@@ -38,7 +38,7 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
-int vi_sense(vi_adj)
+int vi_sense(float vi_adj)
 {
     return ((1.263 - (0.8*vi_adj))/25);
 }
@@ -65,9 +65,9 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     } else {
         if (delta_p/delta_v != 0) {
             if ((delta_p/delta_v ) >0) {
-                iadj_v =  vi_sense(delta_p/delta_v);
+                iadj_v =  vi_sense((float)delta_p/delta_v);
             } else {
-                iadj_v =  vi_sense(delta_p/delta_v);
+                iadj_v =  vi_sense((float)delta_p/delta_v);
             }
         }
     }
