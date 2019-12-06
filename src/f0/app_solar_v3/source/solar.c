@@ -38,10 +38,13 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
+int vi_sense(vi_adj)
+{
+    return ((1.263 - (0.8*vi_adj))/25);
+}
+
 uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
 {
-    /* Stores the the last perturbation of the VI curve */
-    static int32_t perturb = STEP_SIZE;
     /* The values from the previous iteration of the loop */
     static uint32_t prev_pwr = 0;
     static uint32_t prev_volt = 0;
@@ -51,7 +54,23 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     int32_t  delta_i = curr - prev_curr;
 
     /* Start IC MPPT Algorithm */
-
+    if (delta_v == 0) {
+        if (delta_i != 0) {
+            if (delta_i > 0) {
+                iadj_v =  vi_sense(delta_i);
+            } else {
+                iadj_v =  vi_sense(delta_i);
+            }
+        }
+    } else {
+        if (delta_p/delta_v != 0) {
+            if ((delta_p/delta_v ) >0) {
+                iadj_v =  vi_sense(delta_p/delta_v);
+            } else {
+                iadj_v =  vi_sense(delta_p/delta_v);
+            }
+        }
+    }
     /* End IC MPPT Algorithm */
 
     prev_pwr  = pwr;
