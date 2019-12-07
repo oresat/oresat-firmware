@@ -50,7 +50,9 @@ void opd_init(void)
 
 void opd_start(void)
 {
+#ifdef LINE_OPD_ENABLE
     palClearLine(LINE_OPD_ENABLE);
+#endif /* LINE_OPD_ENABLE */
     i2cStart(&I2CD1, &i2cconfig);
     opd_discover();
     for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
@@ -65,7 +67,9 @@ void opd_stop(void)
         max7310Stop(&opd_dev[i].dev);
     }
     i2cStop(&I2CD1);
+#ifdef LINE_OPD_ENABLE
     palSetLine(LINE_OPD_ENABLE);
+#endif /* LINE_OPD_ENABLE */
 }
 
 void opd_enable(opd_addr_t opd_addr)
