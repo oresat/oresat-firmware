@@ -46,12 +46,13 @@ void opd_init(void)
         opd_dev[i].config = defconfig;
         opd_dev[i].config.saddr = i;
     }
-    i2cStart(&I2CD1, &i2cconfig);
-    opd_discover();
 }
 
 void opd_start(void)
 {
+    palClearLine(LINE_OPD_ENABLE);
+    i2cStart(&I2CD1, &i2cconfig);
+    opd_discover();
     for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
         if (opd_dev[i].valid)
             max7310Start(&opd_dev[i].dev, &opd_dev[i].config);
@@ -64,6 +65,7 @@ void opd_stop(void)
         max7310Stop(&opd_dev[i].dev);
     }
     i2cStop(&I2CD1);
+    palSetLine(LINE_OPD_ENABLE);
 }
 
 void opd_enable(opd_addr_t opd_addr)
@@ -88,6 +90,8 @@ void opd_disable(opd_addr_t opd_addr)
 
 void opd_reset(opd_addr_t opd_addr)
 {
+    if (opd_dev[opd_addr].valid != true)
+        return;
     uint8_t regval;
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval |= MAX7310_PIN_MASK(OPD_CB_RESET);

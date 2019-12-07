@@ -172,7 +172,6 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "reinit")) {
         chprintf(chp, "Reinitializing OPD\r\n", opd_addr);
         opd_stop();
-        opd_init();
         opd_start();
     } else if (!strcmp(argv[0], "status")) {
         chprintf(chp, "Status of board 0x%02X: ", opd_addr);

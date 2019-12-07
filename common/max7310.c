@@ -43,7 +43,7 @@ msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
         uint8_t* rxbuf, size_t n) {
 
     return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+            TIME_MS2I(10));
 }
 
 /**
@@ -62,7 +62,7 @@ msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
 msg_t max7310I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n + 1, NULL, 0,
-            TIME_INFINITE);
+            TIME_MS2I(10));
 }
 #endif /* MAX7310_USE_I2C */
 
@@ -120,20 +120,16 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
     i2cStart(config->i2cp, config->i2ccfg);
     cr[0] = MAX7310_AD_ODR;
     cr[1] = config->odr;
-    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
     cr[0] = MAX7310_AD_POL;
     cr[1] = config->pol;
-    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
     cr[0] = MAX7310_AD_MODE;
     cr[1] = config->iomode;
-    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
     cr[0] = MAX7310_AD_TIMEOUT;
     cr[1] = config->timeout;
-    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -167,26 +163,22 @@ void max7310Stop(MAX7310Driver *devp) {
         /* Reset to input.*/
         cr[0] = MAX7310_AD_MODE;
         cr[1] = 0xFF;
-        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
 
         /* Reset output reg to 0.*/
         cr[0] = MAX7310_AD_ODR;
         cr[1] = 0;
-        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
 
         /* Reset polarity.*/
         cr[0] = MAX7310_AD_POL;
         cr[1] = 0xF0;
-        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
 
         /* Reset timeout.*/
         cr[0] = MAX7310_AD_TIMEOUT;
         cr[1] = MAX7310_TIMEOUT_ENABLED;
-        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+        max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
 
         i2cStop(devp->config->i2cp);
 #if MAX7310_SHARED_I2C
