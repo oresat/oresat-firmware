@@ -72,7 +72,7 @@ void oresat_start(CANDriver *cand)
         CO_ReturnError_t err;
 
         /* Initialize CAN Subsystem */
-        err = CO_init((uint32_t)cand, OD_CANNodeID, OD_CANBitRate);
+        err = CO_init(cand, OD_CANNodeID, OD_CANBitRate);
         if (err != CO_ERROR_NO) {
             CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
         }
@@ -119,7 +119,7 @@ void oresat_start(CANDriver *cand)
     }
 
     /* Deinitialize CO stack */
-    CO_delete((uint32_t)cand);
+    CO_delete(cand);
 
     /* Initiate System Reset */
     NVIC_SystemReset();

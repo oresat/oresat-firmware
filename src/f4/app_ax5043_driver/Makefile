@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_c3_v1
+PROJECT   = app_ax45043_driver
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_C3_V1
+BOARD     = ST_NUCLEO64_F446RE
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -123,9 +123,9 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/lib/test.mk
-#include $(CHIBIOS)/test/rt/rt_test.mk
-#include $(CHIBIOS)/test/oslib/oslib_test.mk
+include $(CHIBIOS)/test/lib/test.mk
+include $(CHIBIOS)/test/rt/rt_test.mk
+include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
@@ -165,7 +165,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DAX5043_SHARED_SPI
 
 # Define ASM defines here
 UADEFS =
