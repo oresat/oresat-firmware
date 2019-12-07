@@ -17,10 +17,40 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "shell.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "wdt.h"
+#include "opd.h"
+#include "command.h"
+
+static SPIConfig hs_spicfg = {
+    false,
+    NULL,
+    LINE_MMC_CS,
+    0,
+    0
+};
+
+static SPIConfig ls_spicfg = {
+    false,
+    NULL,
+    LINE_MMC_CS,
+    SPI_CR1_BR_2 | SPI_CR1_BR_1,
+    0
+};
+
+/*
+ * MMC configuration.
+ */
+static MMCConfig mmccfg = {
+    &SPID2,
+    &ls_spicfg,
+    &hs_spicfg
+};
+
+MMCDriver MMCD1;
 
 /**
  * @brief App Initialization
@@ -29,9 +59,21 @@ static void app_init(void)
 {
     /* App initialization */
     chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
+    chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 
-    /* Start up debug output */
+    palSetLine(LINE_OPD_ENABLE);
+
+    /* Initialize OPD */
+    opd_init();
+    opd_start();
+
+    /* Initialize shell and start serial interface */
+    shellInit();
     sdStart(&SD2, NULL);
+
+    /* Initializes MMC SPI driver */
+    mmcObjectInit(&MMCD1);
+    mmcStart(&MMCD1, &mmccfg);
 }
 
 /**
@@ -40,7 +82,7 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
+    oresat_init(0x01, ORESAT_DEFAULT_BITRATE);
     app_init();
     oresat_start(&CAND1);
     return 0;

@@ -86,7 +86,7 @@
  * @brief   Enables the I2C subsystem.
  */
 #if !defined(HAL_USE_I2C) || defined(__DOXYGEN__)
-#define HAL_USE_I2C                         FALSE
+#define HAL_USE_I2C                         TRUE
 #endif
 
 /**
@@ -114,7 +114,7 @@
  * @brief   Enables the MMC_SPI subsystem.
  */
 #if !defined(HAL_USE_MMC_SPI) || defined(__DOXYGEN__)
-#define HAL_USE_MMC_SPI                     FALSE
+#define HAL_USE_MMC_SPI                     TRUE
 #endif
 
 /**
@@ -163,7 +163,7 @@
  * @brief   Enables the SPI subsystem.
  */
 #if !defined(HAL_USE_SPI) || defined(__DOXYGEN__)
-#define HAL_USE_SPI                         FALSE
+#define HAL_USE_SPI                         TRUE
 #endif
 
 /**
@@ -471,7 +471,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(SPI_SELECT_MODE) || defined(__DOXYGEN__)
-#define SPI_SELECT_MODE                     SPI_SELECT_MODE_PAD
+#define SPI_SELECT_MODE                     SPI_SELECT_MODE_LINE
 #endif
 
 /*===========================================================================*/

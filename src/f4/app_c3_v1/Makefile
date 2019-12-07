@@ -107,6 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/opd.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -123,10 +124,11 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/lib/test.mk
-#include $(CHIBIOS)/test/rt/rt_test.mk
-#include $(CHIBIOS)/test/oslib/oslib_test.mk
+include $(CHIBIOS)/test/lib/test.mk
+include $(CHIBIOS)/test/rt/rt_test.mk
+include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
@@ -165,7 +167,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C
 
 # Define ASM defines here
 UADEFS =
