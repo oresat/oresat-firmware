@@ -95,7 +95,7 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANbaseAddress = CANbaseAddress;
-    CANmodule->cand = (CANDriver *)CANbaseAddress;
+    CANmodule->cand = CANbaseAddress;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
