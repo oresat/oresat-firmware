@@ -61,7 +61,7 @@ static void app_init(void)
     chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 
-    palSetLine(LINE_OPD_ENABLE);
+    palClearLine(LINE_OPD_ENABLE);
 
     /* Initialize OPD */
     opd_init();

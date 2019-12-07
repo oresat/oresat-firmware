@@ -91,10 +91,10 @@
 #define GPIOA_SWCLK                 14U
 #define GPIOA_PIN15                 15U
 
-#define GPIOB_OPD_ISET              0U
-#define GPIOB_OPD_ENABLE            1U
-#define GPIOB_OPD_FAULT             2U
-#define GPIOB_PIN3                  3U
+#define GPIOB_CB_IOUT               0U
+#define GPIOB_OPD_ISET              1U
+#define GPIOB_OPD_ENABLE            2U
+#define GPIOB_OPD_FAULT             3U
 #define GPIOB_CAN2_SHDN             4U
 #define GPIOB_CAN2_RX               5U
 #define GPIOB_CAN2_TX               6U
@@ -399,10 +399,10 @@
 /*
  * GPIOB setup:
  *
- * PB0  - OPD_ISET                  (analog).
- * PB1  - OPD_ENABLE                (output pushpull maximum).
- * PB2  - OPD_FAULT                 (input pullup).
- * PB3  - PIN3                      (input pullup).
+ * PB0  - CB_IOUT                   (analog).
+ * PB1  - OPD_ISET                  (analog).
+ * PB2  - OPD_ENABLE                (output pushpull maximum).
+ * PB3  - OPD_FAULT                 (input pullup).
  * PB4  - CAN2_SHDN                 (output pushpull maximum).
  * PB5  - CAN2_RX                   (alternate 9).
  * PB6  - CAN2_TX                   (alternate 9).
@@ -416,10 +416,10 @@
  * PB14 - SPI2_MISO                 (alternate 5).
  * PB15 - SPI2_MOSI                 (alternate 5).
  */
-#define VAL_GPIOB_MODER             (PIN_MODE_ANALOG(GPIOB_OPD_ISET) |      \
+#define VAL_GPIOB_MODER             (PIN_MODE_ANALOG(GPIOB_CB_IOUT) |       \
+                                     PIN_MODE_ANALOG(GPIOB_OPD_ISET) |      \
                                      PIN_MODE_OUTPUT(GPIOB_OPD_ENABLE) |    \
                                      PIN_MODE_INPUT(GPIOB_OPD_FAULT) |      \
-                                     PIN_MODE_INPUT(GPIOB_PIN3) |           \
                                      PIN_MODE_OUTPUT(GPIOB_CAN2_SHDN) |     \
                                      PIN_MODE_ALTERNATE(GPIOB_CAN2_RX) |    \
                                      PIN_MODE_ALTERNATE(GPIOB_CAN2_TX) |    \
@@ -432,10 +432,10 @@
                                      PIN_MODE_ALTERNATE(GPIOB_SPI2_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOB_SPI2_MISO) |  \
                                      PIN_MODE_ALTERNATE(GPIOB_SPI2_MOSI))
-#define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_OPD_ISET) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_OPD_ENABLE) | \
+#define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_CB_IOUT) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_OPD_ISET) |   \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_OPD_ENABLE) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_OPD_FAULT) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_PIN3) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN2_SHDN) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN2_RX) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOB_CAN2_TX) |    \
@@ -448,10 +448,10 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI2_SCK) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI2_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_SPI2_MOSI))
-#define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_OPD_ISET) |      \
+#define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_CB_IOUT) |       \
+                                     PIN_OSPEED_HIGH(GPIOB_OPD_ISET) |      \
                                      PIN_OSPEED_HIGH(GPIOB_OPD_ENABLE) |    \
                                      PIN_OSPEED_HIGH(GPIOB_OPD_FAULT) |     \
-                                     PIN_OSPEED_HIGH(GPIOB_PIN3) |          \
                                      PIN_OSPEED_HIGH(GPIOB_CAN2_SHDN) |     \
                                      PIN_OSPEED_HIGH(GPIOB_CAN2_RX) |       \
                                      PIN_OSPEED_HIGH(GPIOB_CAN2_TX) |       \
@@ -464,10 +464,10 @@
                                      PIN_OSPEED_HIGH(GPIOB_SPI2_SCK) |      \
                                      PIN_OSPEED_HIGH(GPIOB_SPI2_MISO) |     \
                                      PIN_OSPEED_HIGH(GPIOB_SPI2_MOSI))
-#define VAL_GPIOB_PUPDR             (PIN_PUPDR_FLOATING(GPIOB_OPD_ISET) |   \
+#define VAL_GPIOB_PUPDR             (PIN_PUPDR_FLOATING(GPIOB_CB_IOUT) |    \
+                                     PIN_PUPDR_FLOATING(GPIOB_OPD_ISET) |   \
                                      PIN_PUPDR_PULLUP(GPIOB_OPD_ENABLE) |   \
                                      PIN_PUPDR_PULLUP(GPIOB_OPD_FAULT) |    \
-                                     PIN_PUPDR_PULLUP(GPIOB_PIN3) |         \
                                      PIN_PUPDR_PULLUP(GPIOB_CAN2_SHDN) |    \
                                      PIN_PUPDR_PULLUP(GPIOB_CAN2_RX) |      \
                                      PIN_PUPDR_PULLUP(GPIOB_CAN2_TX) |      \
@@ -480,10 +480,10 @@
                                      PIN_PUPDR_PULLUP(GPIOB_SPI2_SCK) |     \
                                      PIN_PUPDR_PULLUP(GPIOB_SPI2_MISO) |    \
                                      PIN_PUPDR_PULLUP(GPIOB_SPI2_MOSI))
-#define VAL_GPIOB_ODR               (PIN_ODR_HIGH(GPIOB_OPD_ISET) |         \
+#define VAL_GPIOB_ODR               (PIN_ODR_HIGH(GPIOB_CB_IOUT) |          \
+                                     PIN_ODR_HIGH(GPIOB_OPD_ISET) |         \
                                      PIN_ODR_HIGH(GPIOB_OPD_ENABLE) |       \
                                      PIN_ODR_HIGH(GPIOB_OPD_FAULT) |        \
-                                     PIN_ODR_HIGH(GPIOB_PIN3) |             \
                                      PIN_ODR_HIGH(GPIOB_CAN2_SHDN) |        \
                                      PIN_ODR_HIGH(GPIOB_CAN2_RX) |          \
                                      PIN_ODR_HIGH(GPIOB_CAN2_TX) |          \
@@ -496,10 +496,10 @@
                                      PIN_ODR_HIGH(GPIOB_SPI2_SCK) |         \
                                      PIN_ODR_HIGH(GPIOB_SPI2_MISO) |        \
                                      PIN_ODR_HIGH(GPIOB_SPI2_MOSI))
-#define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_OPD_ISET, 0U) |      \
+#define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_CB_IOUT, 0U) |       \
+                                     PIN_AFIO_AF(GPIOB_OPD_ISET, 0U) |      \
                                      PIN_AFIO_AF(GPIOB_OPD_ENABLE, 0U) |    \
                                      PIN_AFIO_AF(GPIOB_OPD_FAULT, 0U) |     \
-                                     PIN_AFIO_AF(GPIOB_PIN3, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_CAN2_SHDN, 0U) |     \
                                      PIN_AFIO_AF(GPIOB_CAN2_RX, 9U) |       \
                                      PIN_AFIO_AF(GPIOB_CAN2_TX, 9U) |       \
