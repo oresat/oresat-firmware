@@ -354,8 +354,8 @@
                                      PIN_PUPDR_PULLUP(GPIOA_SPI1_MISO) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_SPI1_MOSI) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_RADIO2_IRQ) |   \
-                                     PIN_PUPDR_PULLUP(GPIOA_CAN1_SILENT) |  \
-                                     PIN_PUPDR_PULLUP(GPIOA_CAN1_SHDN) |    \
+                                     PIN_PUPDR_PULLDOWN(GPIOA_CAN1_SILENT) |\
+                                     PIN_PUPDR_PULLDOWN(GPIOA_CAN1_SHDN) |  \
                                      PIN_PUPDR_PULLUP(GPIOA_CAN1_RX) |      \
                                      PIN_PUPDR_PULLUP(GPIOA_CAN1_TX) |      \
                                      PIN_PUPDR_PULLUP(GPIOA_SWDIO) |        \
@@ -370,8 +370,8 @@
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MOSI) |        \
                                      PIN_ODR_HIGH(GPIOA_RADIO2_IRQ) |       \
-                                     PIN_ODR_HIGH(GPIOA_CAN1_SILENT) |      \
-                                     PIN_ODR_HIGH(GPIOA_CAN1_SHDN) |        \
+                                     PIN_ODR_LOW(GPIOA_CAN1_SILENT) |       \
+                                     PIN_ODR_LOW(GPIOA_CAN1_SHDN) |         \
                                      PIN_ODR_HIGH(GPIOA_CAN1_RX) |          \
                                      PIN_ODR_HIGH(GPIOA_CAN1_TX) |          \
                                      PIN_ODR_HIGH(GPIOA_SWDIO) |            \
@@ -466,10 +466,10 @@
                                      PIN_PUPDR_FLOATING(GPIOB_OPD_ISET) |   \
                                      PIN_PUPDR_PULLUP(GPIOB_OPD_ENABLE) |   \
                                      PIN_PUPDR_PULLUP(GPIOB_OPD_FAULT) |    \
-                                     PIN_PUPDR_PULLUP(GPIOB_CAN2_SHDN) |    \
+                                     PIN_PUPDR_PULLDOWN(GPIOB_CAN2_SHDN) |  \
                                      PIN_PUPDR_PULLUP(GPIOB_CAN2_RX) |      \
                                      PIN_PUPDR_PULLUP(GPIOB_CAN2_TX) |      \
-                                     PIN_PUPDR_PULLUP(GPIOB_CAN2_SILENT) |  \
+                                     PIN_PUPDR_PULLDOWN(GPIOB_CAN2_SILENT) |\
                                      PIN_PUPDR_PULLUP(GPIOB_I2C1_SCL) |     \
                                      PIN_PUPDR_PULLUP(GPIOB_I2C1_SDA) |     \
                                      PIN_PUPDR_PULLUP(GPIOB_PIN10) |        \
@@ -482,10 +482,10 @@
                                      PIN_ODR_HIGH(GPIOB_OPD_ISET) |         \
                                      PIN_ODR_HIGH(GPIOB_OPD_ENABLE) |       \
                                      PIN_ODR_HIGH(GPIOB_OPD_FAULT) |        \
-                                     PIN_ODR_HIGH(GPIOB_CAN2_SHDN) |        \
+                                     PIN_ODR_LOW(GPIOB_CAN2_SHDN) |         \
                                      PIN_ODR_HIGH(GPIOB_CAN2_RX) |          \
                                      PIN_ODR_HIGH(GPIOB_CAN2_TX) |          \
-                                     PIN_ODR_HIGH(GPIOB_CAN2_SILENT) |      \
+                                     PIN_ODR_LOW(GPIOB_CAN2_SILENT) |       \
                                      PIN_ODR_HIGH(GPIOB_I2C1_SCL) |         \
                                      PIN_ODR_HIGH(GPIOB_I2C1_SDA) |         \
                                      PIN_ODR_HIGH(GPIOB_PIN10) |            \
