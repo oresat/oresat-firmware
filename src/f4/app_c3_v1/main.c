@@ -59,7 +59,6 @@ static void app_init(void)
 {
     /* App initialization */
     chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
-    chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 
     /* Initialize OPD */
     opd_init();
@@ -72,6 +71,7 @@ static void app_init(void)
     /* Initializes MMC SPI driver */
     mmcObjectInit(&MMCD1);
     mmcStart(&MMCD1, &mmccfg);
+    chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 }
 
 /**
