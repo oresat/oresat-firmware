@@ -45,7 +45,7 @@ static SPIConfig ls_spicfg = {
  * MMC configuration.
  */
 static MMCConfig mmccfg = {
-    &SPID2,
+    &SPID3,
     &ls_spicfg,
     &hs_spicfg
 };
@@ -69,6 +69,7 @@ static void app_init(void)
     sdStart(&SD2, NULL);
 
     /* Initializes MMC SPI driver */
+    palClearLine(LINE_MMC_PWR);
     mmcObjectInit(&MMCD1);
     mmcStart(&MMCD1, &mmccfg);
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
