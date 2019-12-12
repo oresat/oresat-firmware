@@ -52,6 +52,7 @@ void opd_start(void)
 {
 #ifdef LINE_OPD_ENABLE
     palClearLine(LINE_OPD_ENABLE);
+    chThdSleepMilliseconds(10);
 #endif /* LINE_OPD_ENABLE */
     i2cStart(&I2CD1, &i2cconfig);
     opd_discover();
