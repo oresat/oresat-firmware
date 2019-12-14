@@ -3,6 +3,8 @@
 #include "ch.h"
 #include "hal.h"
 #include "shell.h"
+//#include "stdio.h"
+#include "string.h"
 
 /**
  *	@brief ACS initialization function
@@ -10,6 +12,8 @@
 extern EXIT_STATUS acs_init(ACS *acs)
 {
 	// need to initialize things
+  acs->pacsthread = NULL;
+  memcpy(acs->teststring,"Good!\0",6);
   bldcInit(&acs->motor);
 //  mtqrInit(&acs->mtqr);
 	return STATUS_SUCCESS;
@@ -403,7 +407,6 @@ static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status
 static EXIT_STATUS receiveCommand(ACS *acs)
 {
 	(void)acs;
-  chprintf(DEBUG_CHP, "CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0]);
   /// ******critical section*******
 //*
 	chSysLock();
@@ -426,12 +429,9 @@ EXIT_STATUS handleEvent(ACS *acs)
 	EXIT_STATUS status = STATUS_SUCCESS;
 
   /// block until there is an event from CAN
-  chprintf(DEBUG_CHP, "waiting\n\r");
-  chEvtWaitAny(ALL_EVENTS);	
-  chprintf(DEBUG_CHP, "got event\n\r");
+  eventmask_t evt = chEvtWaitAny(ALL_EVENTS);	
+  
   receiveCommand(acs); // should probably rename to be more descriptive
-
-  //dbgSerialOut("CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0], 1000);
 
   switch(acs->cmd[CAN_CMD_0])
   {
@@ -478,38 +478,6 @@ THD_FUNCTION(ACS_Thread,acs)
 {
   chRegSetThreadName("acs_thread");
 
- /*
-  chEvtRegisterMask(
-    &acs->ses,
-    &acs->sel,
-    EVENT_MASK(CMD_CHANGE_STATE)
-  );
-//*/
-
-//*
-  chEvtRegister(
-//  chEvtRegisterMask(
-    &((ACS *)acs)->ses,
-    &((ACS *)acs)->sel,
-    CMD_CHANGE_STATE
-    //EVENT_MASK(0)
-  );
-//*/
-
-  //*
-  chThdCreateStatic(
-    //"Command Shell",
-    cmd_wa,
-    sizeof(cmd_wa),
-    NORMALPRIO,
-    cmd,
-    (void *)acs
-  );
-  //*/
-
- // chEvtRegister(&rpdo_event,&el,0);
-  //chEvtRegister(&rpdo_event,&sel,0);
-
-	acs_statemachine(acs);
+  acs_statemachine(acs);
 }
 

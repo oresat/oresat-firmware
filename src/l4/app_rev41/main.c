@@ -45,33 +45,7 @@ static void app_init(void)
 
 static void app_main(void)
 {
-  
-  /* App initialization */
-  /*
-  //reg_worker(
-  chThdCreateStatic(
-    //"Example thread",
-    waThread1,
-    sizeof(waThread1),
-    NORMALPRIO,
-    Thread1,
-    NULL
-  );
-  //*/
-
-  //reg_worker(
-  /*
-  chThdCreateStatic(
-    //"Command Shell",
-    cmd_wa,
-    sizeof(cmd_wa),
-    NORMALPRIO,
-    cmd,
-    NULL
-  );
-  //*/
-
-//*
+ 
 	thread_t *pacsthread = chThdCreateStatic( /// Create ACS thread
 		waACS_Thread,
 		sizeof(waACS_Thread),
@@ -81,10 +55,19 @@ static void app_main(void)
 	);
 
   acs.pacsthread = pacsthread;
-//*/
+  
+  chThdCreateStatic(
+    //"Command Shell",
+    cmd_wa,
+    sizeof(cmd_wa),
+    NORMALPRIO,
+    cmd,
+    &acs
+  );
 
   while(true)
-  { /// main loop
+  { 
+    /// main loop
 		chThdSleepMilliseconds(1000);
 	}
 }

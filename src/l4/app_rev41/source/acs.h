@@ -108,7 +108,7 @@ struct ACS
   //static event_listener_t el;
   event_listener_t sel; // serial event listener
   event_source_t ses;
-
+  char teststring[6];
  // MTQR mtqr;
 };
 
