@@ -12,6 +12,7 @@ extern THD_FUNCTION(cmd, arg);
 extern void cmd_dbgon(BaseSequentialStream *chp, int argc, char *argv[]);
 extern void cmd_dbgoff(BaseSequentialStream *chp, int argc, char *argv[]);
 extern void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[]);
+extern void cmd_checkStatus(BaseSequentialStream *chp, int argc, char *argv[]);
 extern void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[]);
 extern void cmd_magnetorquerCtrl(BaseSequentialStream *chp, int argc, char *argv[]);
 

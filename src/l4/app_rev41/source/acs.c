@@ -33,7 +33,7 @@ inline static EXIT_STATUS entry_helper(ACS *acs, ACS_VALID_STATE next_state)
 //*/
 /// ******end critical section*******
   
-  dbgSerialOut("entry_helper: %u \n\r", next_state, 500);
+//  dbgSerialOut("entry_helper: %u \n\r", next_state, 500);
 	
   return STATUS_SUCCESS;
 }
@@ -45,7 +45,7 @@ inline static EXIT_STATUS entry_helper(ACS *acs, ACS_VALID_STATE next_state)
  */
 inline static EXIT_STATUS exit_helper(ACS *acs)
 {
-  dbgSerialOut("exit_helper: %u \n\r", acs->can_buf.status[CAN_SM_STATE], 500);
+ // dbgSerialOut("exit_helper: %u \n\r", acs->can_buf.status[CAN_SM_STATE], 500);
 
 /// ******critical section***********
 //*
@@ -91,9 +91,9 @@ static ACS_VALID_STATE entry_rw(ACS *acs)
 {
   entry_helper(acs, ST_RW);
 //  eventmask_t events = 0;
-  chSysLockFromISR();
-  chEvtSignalI((thread_t *)ACS_Thread, (eventmask_t)ST_RW);
-  chSysUnlockFromISR();
+//  chSysLockFromISR();
+//  chEvtSignalI((thread_t *)ACS_Thread, (eventmask_t)ST_RW);
+//  chSysUnlockFromISR();
   return ST_RW;
 }
 
@@ -147,7 +147,7 @@ static ACS_VALID_STATE entry_max_pwr(ACS *acs)
 {
   entry_helper(acs, ST_MAX_PWR);
 
-  chprintf(DEBUG_CHP, "Max power!\n\r");
+  //chprintf(DEBUG_CHP, "Max power!\n\r");
 	
   return ST_MAX_PWR;
 }
@@ -340,7 +340,7 @@ static EXIT_STATUS requestFunction(ACS *acs)
 
 	if(function <= FN_NOP || function >= FN_END)
   {
-    dbgSerialOut("error, invalid function call: %%u\n\r", function, 1000);
+ //   dbgSerialOut("error, invalid function call: %%u\n\r", function, 1000);
 		return STATUS_FAILURE; 
 	}
   //dbgSerialOut("function request received\n: %%u\n\r", function, 1000);
@@ -357,12 +357,9 @@ static EXIT_STATUS transitionState(ACS *acs)
 {
 	ACS_VALID_STATE state = acs->cmd[CAN_CMD_ARG];
 
-//  dbgSerialOut("StateRequest: %u\n\r", state, 500);
-  chprintf(DEBUG_CHP, "StateRequest: %u\n\r", state);
-	
   if(state <= ST_NOP || state >= ST_END)
   {
-    dbgSerialOut("InvalidState: %u \n\r", state, 500);
+//    dbgSerialOut("InvalidState: %u \n\r", state, 500);
 		return STATUS_INVALID_STATE; 
 	}
 
@@ -428,11 +425,11 @@ EXIT_STATUS handleEvent(ACS *acs)
 {
 	EXIT_STATUS status = STATUS_SUCCESS;
 
-  /// block until there is an event from CAN
+  /// block until there is an event
   eventmask_t evt = chEvtWaitAny(ALL_EVENTS);	
-  
+//*
   receiveCommand(acs); // should probably rename to be more descriptive
-
+//*
   switch(acs->cmd[CAN_CMD_0])
   {
     case CMD_NOP:
@@ -447,7 +444,7 @@ EXIT_STATUS handleEvent(ACS *acs)
 		default:
 			return STATUS_INVALID_CMD;
 	}
-
+//*/
 	return status;
 }
 
@@ -459,7 +456,7 @@ static EXIT_STATUS acs_statemachine(ACS *acs)
 	acs->state.current = entry_rdy(acs);
 	acs->fn_exit = exit_rdy;
 
-  dbgSerialOut("Entering acs_statemachine...\n\r", 0, 500);
+ // dbgSerialOut("Entering acs_statemachine...\n\r", 0, 500);
 
   while(!chThdShouldTerminateX())
   {
