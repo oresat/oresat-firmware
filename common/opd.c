@@ -66,6 +66,7 @@ void opd_stop(void)
 {
     for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
         max7310Stop(&opd_dev[i].dev);
+        opd_dev[i].valid = false;
     }
     i2cStop(&I2CD1);
 #ifdef LINE_OPD_ENABLE
@@ -73,30 +74,32 @@ void opd_stop(void)
 #endif /* LINE_OPD_ENABLE */
 }
 
-void opd_enable(opd_addr_t opd_addr)
+int opd_enable(opd_addr_t opd_addr)
 {
     if (opd_dev[opd_addr].valid != true)
-        return;
+        return -1;
     uint8_t regval;
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval |= MAX7310_PIN_MASK(OPD_LED);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
+    return 0;
 }
 
-void opd_disable(opd_addr_t opd_addr)
+int opd_disable(opd_addr_t opd_addr)
 {
     if (opd_dev[opd_addr].valid != true)
-        return;
+        return -1;
     uint8_t regval;
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval &= ~MAX7310_PIN_MASK(OPD_LED);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
+    return 0;
 }
 
-void opd_reset(opd_addr_t opd_addr)
+int opd_reset(opd_addr_t opd_addr)
 {
     if (opd_dev[opd_addr].valid != true)
-        return;
+        return -1;
     uint8_t regval;
     regval = max7310ReadRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR);
     regval |= MAX7310_PIN_MASK(OPD_CB_RESET);
@@ -104,6 +107,7 @@ void opd_reset(opd_addr_t opd_addr)
     chThdSleepMilliseconds(10);
     regval &= ~MAX7310_PIN_MASK(OPD_CB_RESET);
     max7310WriteRaw(&opd_dev[opd_addr].dev, MAX7310_AD_ODR, regval);
+    return 0;
 }
 
 int opd_status(opd_addr_t opd_addr, opd_status_t *status)

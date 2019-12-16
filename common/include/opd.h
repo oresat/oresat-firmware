@@ -54,8 +54,8 @@ typedef struct {
 void opd_init(void);
 void opd_start(void);
 void opd_stop(void);
-void opd_enable(opd_addr_t opd_addr);
-void opd_disable(opd_addr_t opd_addr);
-void opd_reset(opd_addr_t opd_addr);
+int opd_enable(opd_addr_t opd_addr);
+int opd_disable(opd_addr_t opd_addr);
+int opd_reset(opd_addr_t opd_addr);
 int  opd_status(opd_addr_t opd_addr, opd_status_t *status);
 #endif
