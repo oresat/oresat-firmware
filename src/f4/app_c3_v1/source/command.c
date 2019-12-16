@@ -140,7 +140,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 void opd_usage(BaseSequentialStream *chp)
 {
-    chprintf(chp, "Usage: opd enable|disable|reset|sysenable|sysdisable|sysrestart|status <opd_addr>\r\n");
+    chprintf(chp, "Usage: opd sysenable|sysdisable|sysrestart|enable|disable|reset|probe|status <opd_addr>\r\n");
 }
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
@@ -190,6 +190,13 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Resetting board 0x%02X: ", opd_addr);
             if (!opd_reset(opd_addr)) {
                 chprintf(chp, "RESET\r\n");
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "probe")) {
+            chprintf(chp, "Probing board 0x%02X: ", opd_addr);
+            if (opd_probe(opd_addr)) {
+                chprintf(chp, "CONNECTED\r\n");
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
