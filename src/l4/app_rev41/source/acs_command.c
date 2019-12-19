@@ -43,8 +43,6 @@ void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
   {
     pacs->can_buf.cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
     pacs->can_buf.cmd[CAN_CMD_ARG] = ST_MAX_PWR;
-   // pacs->cmd[CAN_CMD_0] = CMD_CHANGE_STATE;
-   // pacs->cmd[CAN_CMD_ARG] = ST_MAX_PWR;
   }
   else if(!strcmp(argv[0],"passive"))
   {
@@ -58,14 +56,12 @@ void cmd_changeState(BaseSequentialStream *chp, int argc, char *argv[])
   }
 
   chprintf(chp, "sending signal for state change to %s\n\r", argv[0]);
-
+  
+  // TODO: chSysLock keeps the signaled thread from responding...
+  // This should be locking wtf
   //chSysLock();
   chEvtSignal(pacs->pacsthread, CMD_CHANGE_STATE);
   //chSysUnlock();
- /* 
-  chprintf(chp, "CAN_CMD_0 %d\n\r", pacs->can_buf.cmd[CAN_CMD_0]);
-  chprintf(chp, "CAN_CMD_ARG %d\n\r", pacs->can_buf.cmd[CAN_CMD_ARG]);
- //*/
 }
 
 void cmd_checkStatus(BaseSequentialStream *chp, int argc, char *argv[])
@@ -88,22 +84,25 @@ void cmd_reactionWheelCtrl(BaseSequentialStream *chp, int argc, char *argv[])
   (void)argv;
   (void)chp;
   
+  
   if(!strcmp(argv[0],"on"))
   {
-//    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
-//    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_START;
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_START;
   }
   else if(!strcmp(argv[0],"off"))
   {
-//    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
-//    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_STOP;
+    pacs->can_buf.cmd[CAN_CMD_0] = CMD_CALL_FUNCTION;
+    pacs->can_buf.cmd[CAN_CMD_ARG] = FN_RW_STOP;
   }
   else
   {
     chprintf(chp, "Invalid option: %s\n\r", argv[1]);
     return;
   }
-  handleEvent(pacs);
+  
+  chprintf(chp, "reaction wheel %s\n\r", argv[0]);
+  chEvtSignal(pacs->pacsthread,CMD_CALL_FUNCTION);
 }
 
 void cmd_magnetorquerCtrl(BaseSequentialStream *chp, int argc, char *argv[])

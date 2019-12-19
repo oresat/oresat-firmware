@@ -25,7 +25,6 @@
 #include "oresat.h"
 #include "acs_common.h"
 #include "acs_command.h"
-//#include "thread1.h"
 
 ACS acs = { }; /// Global ACS struct
 
