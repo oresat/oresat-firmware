@@ -44,7 +44,7 @@ THD_FUNCTION(spiThread,arg)
     pMotor->normalPosition = normalizePosition(position);
     chSysUnlock();  
     /// ******end critical section***********
-    //chprintf(DEBUG_CHP, "%f\n\r",pMotor->normalPosition);
+    chprintf(DEBUG_CHP, "%d\n\r",pMotor->normalPosition);
   }
 
 	spiReleaseBus(&SPID1);    // Release ownership of bus.

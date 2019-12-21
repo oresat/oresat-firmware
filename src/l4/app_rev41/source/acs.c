@@ -253,7 +253,9 @@ static acs_function_rule func[] =
 	{ST_MTQR, 		FN_MTQR_START,	&fn_mtqr_start},
 	{ST_MTQR, 		FN_MTQR_STOP,	  &fn_mtqr_stop},
 	{ST_MAX_PWR, 	FN_RW_SETDC,		&fn_rw_setdc},
-	{ST_MAX_PWR, 	FN_MTQR_SETDC,	&fn_mtqr_setdc}
+	{ST_MAX_PWR, 	FN_MTQR_SETDC,	&fn_mtqr_setdc},
+	{ST_MAX_PWR, 	FN_RW_START,		&fn_rw_start},
+	{ST_MAX_PWR, 	FN_RW_STOP, 		&fn_rw_stop}
 };
 
 #define FUNC_COUNT (int)(sizeof(func)/sizeof(acs_function_rule))
@@ -277,7 +279,11 @@ static EXIT_STATUS callFunction(ACS *acs)
         {
           // TODO: do something useful here other than output to 
           // shell
-  //        dbgSerialOut("funcionCallError: %u \n\r", status, 300);
+          chprintf(
+            (BaseSequentialStream *)&LPSD1, 
+            "funcioncallerror: %u \n\r",
+            status
+          );
 				}
 				break;
 			}

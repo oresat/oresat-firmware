@@ -361,7 +361,7 @@
                                      PIN_AFIO_AF(GPIOA_BLDC_CURR_FDB, 0U) | \
                                      PIN_AFIO_AF(GPIOA_LPUART1_TX, 8U) |    \
                                      PIN_AFIO_AF(GPIOA_LPUART1_RX, 8U) |    \
-                                     PIN_AFIO_AF(GPIOA_SPI1_CS, 0U) |       \
+                                     PIN_AFIO_AF(GPIOA_SPI1_CS, 5U) |       \
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
                                      PIN_AFIO_AF(GPIOA_PIN7, 0U))

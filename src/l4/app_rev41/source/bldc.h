@@ -74,7 +74,8 @@ static const SPIConfig spicfg = {
 	GPIOA,             // Chip select line.
 	GPIOA_SPI1_CS,    // Chip select port.
 //	GPIOA_SPI1_NSS,    // Chip select port.
-  SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
+  0,
+  //SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
   //SPI_CR1_DFF|SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
 	0
 };
