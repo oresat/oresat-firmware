@@ -38,7 +38,7 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
-int vi_sense(float vi_adj)
+uint32_t vi_sense(uint32_t vi_adj)
 {
     return ((1.263 - (0.8*vi_adj))/25);
 }
@@ -49,26 +49,18 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     static uint32_t prev_pwr = 0;
     static uint32_t prev_volt = 0;
     static int32_t  prev_curr = 0;
-    uint32_t delta_p = pwr  - prev_pwr;
-    uint32_t delta_v = volt - prev_volt;
-    int32_t  delta_i = curr - prev_curr;
+    int32_t delta_p = pwr  - prev_pwr;
+    int32_t delta_v = volt - prev_volt;
+    int32_t delta_i = curr - prev_curr;
 
     /* Start IC MPPT Algorithm */
     if (delta_v == 0) {
         if (delta_i != 0) {
-            if (delta_i > 0) {
-                iadj_v =  vi_sense(delta_i);
-            } else {
-                iadj_v =  vi_sense(delta_i);
-            }
+            iadj_v += vi_sense(delta_i);
         }
     } else {
         if (delta_p/delta_v != 0) {
-            if ((delta_p/delta_v ) >0) {
-                iadj_v =  vi_sense((float)delta_p/delta_v);
-            } else {
-                iadj_v =  vi_sense((float)delta_p/delta_v);
-            }
+            iadj_v += vi_sense(delta_p/delta_v);
         }
     }
     /* End IC MPPT Algorithm */
@@ -94,24 +86,24 @@ THD_FUNCTION(solar, arg)
     palSetLine(LINE_LED_GREEN);
 
     max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
+    palSetLine(LINE_OUTPUT_EN);
     while (!chThdShouldTerminateX()) {
+        chThdSleepMilliseconds(SLEEP_MS);
         /* Get current values for power */
-        if (ina226ReadVBUS(&ina226dev) < 400000) {
-            palClearLine(LINE_OUTPUT_EN);
-        } else {
-            palSetLine(LINE_OUTPUT_EN);
-        }
+        /*if (ina226ReadVBUS(&ina226dev) < 400000) {*/
+            /*palClearLine(LINE_OUTPUT_EN);*/
+        /*} else {*/
+            /*palSetLine(LINE_OUTPUT_EN);*/
+        /*}*/
         pwr = ina226ReadPower(&ina226dev);
         volt = ina226ReadVBUS(&ina226dev);
         curr = ina226ReadCurrent(&ina226dev);
 
-        /* Calculate perterbation of iadj */
+        /* Calculate iadj */
         iadj_v = calc_iadj(pwr, volt, curr, iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
-
-        chThdSleepMilliseconds(SLEEP_MS);
     }
 
     /* Stop drivers for I2C devices */
