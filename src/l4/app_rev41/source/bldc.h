@@ -50,7 +50,7 @@ typedef struct{
  	binary_semaphore_t *pBldc_bsem;
   bool isStarted;
 
-  // spy things	
+  // spi things	
   uint16_t spiRxBuffer[SPI_BUF_SIZE]; // receive buffer
 	thread_t *pSpiThread;
 	thread_t *pCommutationThread;
@@ -72,12 +72,9 @@ static const SPIConfig spicfg = {
 	false,             // circular buffer.
 	NULL,              // operation complete callback callback pointer
 	GPIOA,             // Chip select line.
-	GPIOA_SPI1_CS,    // Chip select port.
-//	GPIOA_SPI1_NSS,    // Chip select port.
-  0,
-  //SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
-  //SPI_CR1_DFF|SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
-	0
+	GPIOA_SPI1_NSS,    // Chip select port.
+  SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
+  0
 };
 //*/
 

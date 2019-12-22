@@ -64,7 +64,7 @@
 #define GPIOA_BLDC_CURR_FDB         1U
 #define GPIOA_LPUART1_TX            2U
 #define GPIOA_LPUART1_RX            3U
-#define GPIOA_SPI1_CS               4U
+#define GPIOA_SPI1_NSS              4U
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
 #define GPIOA_PIN7                  7U
@@ -281,7 +281,7 @@
                                      PIN_MODE_ANALOG(GPIOA_BLDC_CURR_FDB) | \
                                      PIN_MODE_ALTERNATE(GPIOA_LPUART1_TX) | \
                                      PIN_MODE_ALTERNATE(GPIOA_LPUART1_RX) | \
-                                     PIN_MODE_OUTPUT(GPIOA_SPI1_CS) |       \
+                                     PIN_MODE_OUTPUT(GPIOA_SPI1_NSS) |       \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
                                      PIN_MODE_ANALOG(GPIOA_PIN7) |          \
@@ -297,7 +297,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_BLDC_CURR_FDB) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_LPUART1_TX) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_LPUART1_RX) | \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_SPI1_CS) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_SPI1_NSS) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN7) |       \
@@ -313,7 +313,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_BLDC_CURR_FDB) | \
                                      PIN_OSPEED_HIGH(GPIOA_LPUART1_TX) |    \
                                      PIN_OSPEED_HIGH(GPIOA_LPUART1_RX) |    \
-                                     PIN_OSPEED_HIGH(GPIOA_SPI1_CS) |       \
+                                     PIN_OSPEED_HIGH(GPIOA_SPI1_NSS) |       \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_SCK) |      \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MISO) |     \
                                      PIN_OSPEED_HIGH(GPIOA_PIN7) |          \
@@ -329,15 +329,15 @@
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_CURR_FDB) | \
                                      PIN_PUPDR_FLOATING(GPIOA_LPUART1_TX) | \
                                      PIN_PUPDR_FLOATING(GPIOA_LPUART1_RX) | \
-                                     PIN_PUPDR_FLOATING(GPIOA_SPI1_CS) |    \
-                                     PIN_PUPDR_FLOATING(GPIOA_SPI1_SCK) |   \
-                                     PIN_PUPDR_FLOATING(GPIOA_SPI1_MISO) |  \
+                                     PIN_PUPDR_PULLUP(GPIOA_SPI1_NSS) |    \
+                                     PIN_PUPDR_PULLUP(GPIOA_SPI1_SCK) |   \
+                                     PIN_PUPDR_PULLUP(GPIOA_SPI1_MISO) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN7) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_INUL) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_INVL) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_INWL) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_BLDC_FAULT) | \
-                                     PIN_PUPDR_FLOATING(GPIOA_BLDC_EN) |    \
+                                     PIN_PUPDR_PULLUP(GPIOA_BLDC_EN) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_SWDIO) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_MAG_PWM))
@@ -345,7 +345,7 @@
                                      PIN_ODR_HIGH(GPIOA_BLDC_CURR_FDB) |    \
                                      PIN_ODR_HIGH(GPIOA_LPUART1_TX) |       \
                                      PIN_ODR_HIGH(GPIOA_LPUART1_RX) |       \
-                                     PIN_ODR_LOW(GPIOA_SPI1_CS) |           \
+                                     PIN_ODR_HIGH(GPIOA_SPI1_NSS) |           \
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_PIN7) |             \
@@ -353,7 +353,7 @@
                                      PIN_ODR_HIGH(GPIOA_BLDC_INVL) |        \
                                      PIN_ODR_HIGH(GPIOA_BLDC_INWL) |        \
                                      PIN_ODR_HIGH(GPIOA_BLDC_FAULT) |       \
-                                     PIN_ODR_LOW(GPIOA_BLDC_EN) |           \
+                                     PIN_ODR_HIGH(GPIOA_BLDC_EN) |           \
                                      PIN_ODR_HIGH(GPIOA_SWDIO) |            \
                                      PIN_ODR_HIGH(GPIOA_SWCLK) |            \
                                      PIN_ODR_HIGH(GPIOA_MAG_PWM))
@@ -361,7 +361,7 @@
                                      PIN_AFIO_AF(GPIOA_BLDC_CURR_FDB, 0U) | \
                                      PIN_AFIO_AF(GPIOA_LPUART1_TX, 8U) |    \
                                      PIN_AFIO_AF(GPIOA_LPUART1_RX, 8U) |    \
-                                     PIN_AFIO_AF(GPIOA_SPI1_CS, 5U) |       \
+                                     PIN_AFIO_AF(GPIOA_SPI1_NSS, 5U) |       \
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
                                      PIN_AFIO_AF(GPIOA_PIN7, 0U))
@@ -377,7 +377,7 @@
                                      PIN_ASCR_DISABLED(GPIOA_BLDC_CURR_FDB) |  \
                                      PIN_ASCR_DISABLED(GPIOA_LPUART1_TX) |  \
                                      PIN_ASCR_DISABLED(GPIOA_LPUART1_RX) |  \
-                                     PIN_ASCR_DISABLED(GPIOA_SPI1_CS) |     \
+                                     PIN_ASCR_DISABLED(GPIOA_SPI1_NSS) |     \
                                      PIN_ASCR_DISABLED(GPIOA_SPI1_SCK) |    \
                                      PIN_ASCR_DISABLED(GPIOA_SPI1_MISO) |   \
                                      PIN_ASCR_DISABLED(GPIOA_PIN7) |        \
@@ -393,7 +393,7 @@
                                      PIN_LOCKR_DISABLED(GPIOA_BLDC_CURR_FDB) | \
                                      PIN_LOCKR_DISABLED(GPIOA_LPUART1_TX) | \
                                      PIN_LOCKR_DISABLED(GPIOA_LPUART1_RX) | \
-                                     PIN_LOCKR_DISABLED(GPIOA_SPI1_CS) |    \
+                                     PIN_LOCKR_DISABLED(GPIOA_SPI1_NSS) |    \
                                      PIN_LOCKR_DISABLED(GPIOA_SPI1_SCK) |   \
                                      PIN_LOCKR_DISABLED(GPIOA_SPI1_MISO) |  \
                                      PIN_LOCKR_DISABLED(GPIOA_PIN7) |       \
