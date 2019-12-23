@@ -33,7 +33,7 @@
 #define SI41XX_REG_RF2_RDIV                0x7
 #define SI41XX_REG_IF_RDIV                 0x8
 
-#define SI41XX_FREF                        16
+// #define SI41XX_FREF                        16
 
 
 
