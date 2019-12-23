@@ -1,0 +1,4 @@
+// PINFUNCIRQ & PKTSTOREFLAGS not in RadioLab config.c, calculated in easyax5043.c
+
+  {AX5043_REG_PINFUNCIRQ,     0x03,common},
+  {AX5043_REG_PKTSTOREFLAGS,  0x14,common},

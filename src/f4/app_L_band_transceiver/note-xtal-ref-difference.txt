@@ -1,0 +1,39 @@
+// TCXO Reference value registers affected
+
+// TX: fcarrier=457.000MHz dev=  2.500kHz br= 10.000kBit/s pwr=-10.0dBm
+// RX: fcarrier=457.000MHz bw= 15.000kHz br= 10.000kBit/s
+// TCXO precision:  1ppm
+
+// Register Name                16MHz   48MHz   Location
+AX5043_REG_IFFREQ1              0x03    0x02    common
+AX5043_REG_IFFREQ0              0x33    0x22    common
+AX5043_REG_DECIMATION           0x0D    0x14    common
+AX5043_REG_RXDATARATE1          0x3D    0x3C    common
+AX5043_REG_RXDATARATE0          0x89    0x00    common
+AX5043_REG_MAXRFOFFSET1         0x03    0x01    common
+AX5043_REG_MAXRFOFFSET0         0xBE    0x3F    common
+AX5043_REG_AGCGAIN0             0xB4    0xC5    common
+AX5043_REG_FREQUENCYGAINC0      0x09    0x0A    common
+AX5043_REG_FREQUENCYGAIND0      0x09    0x0A    common
+AX5043_REG_AGCGAIN1             0xB4    0xC5    common
+AX5043_REG_FREQUENCYGAINC1      0x09    0x0A    common
+AX5043_REG_FREQUENCYGAIND1      0x09    0x0A    common
+AX5043_REG_FSKDEV1              0x0A    0x03    common
+AX5043_REG_FSKDEV0              0x3D    0x6A    common
+AX5043_REG_TXRATE1              0x28    0x0D    common
+AX5043_REG_TXRATE0              0xF6    0xA7    common
+AX5043_REG_PLLRNGCLK            0x03    0x05    common
+AX5043_REG_TMGTXBOOST           0x32    0x5B    common
+AX5043_REG_TMGTXSETTLE          0x14    0x3E    common
+AX5043_REG_TMGRXBOOST           0x32    0x5B    common
+AX5043_REG_TMGRXSETTLE          0x14    0x3E    common
+AX5043_REG_TMGRXCOARSEAGC       0x73    0x9C    common
+AX5043_REG_0xF35                0x10    0x11    common
+AX5043_REG_PLLVCODIV            0x24    0x25    rx,tx
+AX5043_REG_TMGRXAGC             0x35    0x31    rx_wor
+AX5043_REG_AGCGAIN3             0xD6    0xE7    rx_cont
+
+// Variable Name
+axradio_phy_chanfreq         0x1c900001    0x09855555
+axradio_phy_maxfreqoffset          2875           958
+axradio_phy_rssireference     0xFA + 64     0xF7 + 64
