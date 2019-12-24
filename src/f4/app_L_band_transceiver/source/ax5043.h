@@ -429,7 +429,7 @@
 #define AX5043_FIFO_NOCRC               (1 << 3)
 #define AX5043_FIFO_RAW                 (1 << 4)
 
-#define PKTDATA_BUFLEN 260
+#define PKTDATA_BUFLEN 296
 
 /**
  * @brief  Error codes
