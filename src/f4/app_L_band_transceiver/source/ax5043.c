@@ -210,10 +210,15 @@ uint8_t ax5043_reset(AX5043Driver *devp){
  */ 
 void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len){
   uint8_t ret_value[3]={0,0,0};
+  uint8_t fifo_status = 0;
   if (!len)
     return;
   do {
-    ax5043_write_reg(spip, AX5043_REG_FIFODATA, *ptr++, ret_value);
+    while ((fifo_status & 0x06) > 0){
+      fifo_status=ax5043_read_reg(spip, AX5043_REG_RADIOSTATE, (uint8_t)0x00, ret_value);
+    }
+    fifo_status=ax5043_write_reg(spip, AX5043_REG_FIFODATA, *ptr++, ret_value);
+
   } while (--len);
 }
 
@@ -530,6 +535,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
   SPIDriver *spip = devp->config->spip;
     
   uint8_t free_fifo_bytes;
+  uint8_t fifo_status = 0;
   uint8_t packet_end_indicator = 0;
   uint16_t packet_bytes_sent = 0;
   uint8_t flags = 0;
@@ -597,10 +603,10 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
           ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | ((len_byte + 1) << 5), ret_value);
           ax5043_write_reg(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCFLAGS) | i, ret_value);
           
-          uint8_t syncword[4] = {ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD0),
-                                 ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD1),
+          uint8_t syncword[4] = {ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD3),
                                  ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD2),
-                                 ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD3)};
+                                 ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD1),
+                                 ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD0)};
           for (i = 0; i < len_byte; ++i) {
             ax5043_write_reg(spip,AX5043_REG_FIFODATA, syncword[i], ret_value);
           }
@@ -655,7 +661,11 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
         packet_len_to_be_sent = free_fifo_bytes - 3;
       }
       
-      
+      //ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
+      while ((fifo_status & 0x06) > 0){
+        fifo_status=ax5043_read_reg(spip, AX5043_REG_RADIOSTATE, (uint8_t)0x00, ret_value);
+        ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
+      }
       ax5043_write_reg(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (7 << 5), ret_value);
       /* Write FIFO chunk length byte. Length includes the flag byte, thus the +1.*/
       ax5043_write_reg(spip,AX5043_REG_FIFODATA, packet_len_to_be_sent + 1, ret_value); 
@@ -668,6 +678,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
         ax5043_write_reg(spip,AX5043_REG_RADIOEVENTMASK0, 0x01, ret_value); 
         ax5043_write_reg(spip,AX5043_REG_FIFOSTAT, 4, ret_value); // commit
       }
+      
       break;
 
     default:
@@ -767,11 +778,12 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
  * @api
  * TODO return a -ve return code if there are any errors
  */
-uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[], uint8_t axradio_rxbuffer1[]) {
   uint8_t ret_value[3]={0,0,0};
   SPIDriver *spip = devp->config->spip;
   uint8_t fifo_cmd;
   uint8_t i;
+  uint8_t repeat=0;
   uint8_t chunk_len;
   uint8_t bytesRead = 0;
     
@@ -794,7 +806,13 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
         /* Discard the flag.*/
         ax5043_read_reg(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, ret_value); 
         chunk_len = chunk_len - 1;
-        bytesRead = ax5043_readfifo(spip, axradio_rxbuffer, chunk_len);
+        if(repeat==0){
+          bytesRead = ax5043_readfifo(spip, axradio_rxbuffer, chunk_len);
+          repeat = 1;
+        }
+        else{
+          bytesRead = ax5043_readfifo(spip, axradio_rxbuffer1, chunk_len);
+        }
       }
       break;
 

@@ -429,7 +429,7 @@
 #define AX5043_FIFO_NOCRC               (1 << 3)
 #define AX5043_FIFO_RAW                 (1 << 4)
 
-#define PKTDATA_BUFLEN 296
+#define PKTDATA_BUFLEN 300
 
 /**
  * @brief  Error codes
@@ -490,10 +490,10 @@
 #define AXRADIO_FRAMING_LENMASK             30
 #define AXRADIO_FRAMING_SWCRCLEN            31
 #define AXRADIO_FRAMING_SYNCLEN             32
-#define AXRADIO_FRAMING_SYNCWORD0           33
-#define AXRADIO_FRAMING_SYNCWORD1           34
-#define AXRADIO_FRAMING_SYNCWORD2           35
-#define AXRADIO_FRAMING_SYNCWORD3           36
+#define AXRADIO_FRAMING_SYNCWORD3           33
+#define AXRADIO_FRAMING_SYNCWORD2           34
+#define AXRADIO_FRAMING_SYNCWORD1           35
+#define AXRADIO_FRAMING_SYNCWORD0           36
 #define AXRADIO_FRAMING_SYNCFLAGS           37
 #define AXRADIO_FRAMING_ENABLE_SFDCALLBACK  38
 #define AXRADIO_FRAMING_ACK_TIMEOUT         39
@@ -723,7 +723,7 @@ uint8_t axradio_get_pllvcoi(AX5043Driver *devp);
 void ax5043_init(AX5043Driver *devp);
 void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
-uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[], uint8_t axradio_rxbuffer1[]);
 
 void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time);
 const char *ax5043_ascii_to_morse(char letter);
