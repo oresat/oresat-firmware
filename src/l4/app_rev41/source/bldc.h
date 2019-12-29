@@ -71,10 +71,10 @@ static const SPIConfig spicfg;
 static const SPIConfig spicfg = {
 	false,             // circular buffer.
 	NULL,              // operation complete callback callback pointer
-	GPIOA,             // Chip select line.
-	GPIOA_SPI1_NSS,    // Chip select port.
-  SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,
-  0
+	GPIOA,             // Chip select port.
+	GPIOA_SPI1_NSS,    // Chip select line.
+  SPI_CR1_BR_2|SPI_CR1_BR_1|SPI_CR1_BR_0|SPI_CR1_CPHA|SPI_CR1_MSTR,
+  SPI_CR2_DS_3|SPI_CR2_DS_2|SPI_CR2_DS_1|SPI_CR2_DS_0
 };
 //*/
 

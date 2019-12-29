@@ -15,6 +15,44 @@ float normalizePosition(uint16_t encoderValue)
  *
  */
 //*
+static uint8_t txbuf[SPI_BUF_SIZE];
+
+THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
+THD_FUNCTION(spiThread,arg)
+{
+  chRegSetThreadName("spiThread");
+  
+  BLDCMotor *pMotor = (BLDCMotor *)arg;
+  uint16_t position = 0;
+  
+  while(true) 
+  {
+    spiAcquireBus(&SPID1);              /* Acquire ownership of the bus.    */
+    spiStart(&SPID1, &spicfg);          /* Setup transfer parameters.       */
+    spiSelect(&SPID1);                  /* Slave Select assertion.          */
+    spiExchange(&SPID1, SPI_BUF_SIZE,
+                txbuf, pMotor->spiRxBuffer); /* Atomic transfer operations.  */
+   	position = 0x3FFF & pMotor->spiRxBuffer[0];
+   	//position = pMotor->spiRxBuffer[0];
+    /// ******critical section***********
+    chSysLock();  
+    //pMotor->normalPosition = position;
+    pMotor->normalPosition = normalizePosition(position);
+    chSysUnlock();  
+    /// ******end critical section***********
+    //chprintf(DEBUG_CHP, "%d\n\r",position);
+    chprintf(DEBUG_CHP, "%f\n\r",pMotor->normalPosition);
+
+    spiUnselect(&SPID1);                /* Slave Select de-assertion.       */
+    spiReleaseBus(&SPID1);              /* Ownership release.               */
+  }
+  
+  
+//  spiStop(&SPID1);          // Stop driver.
+  chThdExit((msg_t)0);
+}
+//*/
+/*
 THD_WORKING_AREA(wa_spiThread,THREAD_SIZE);
 THD_FUNCTION(spiThread,arg)
 {
@@ -27,13 +65,13 @@ THD_FUNCTION(spiThread,arg)
   while(!chThdShouldTerminateX()) 
   {
 //		pMotor->spiRxBuffer[0] = 0;
-		spiSelect(&SPID1);                  // Select slave.
 
 		while(SPID1.state != SPI_READY) 
     { 
       // do nothing 
     }   
 		
+		spiSelect(&SPID1);                  // Select slave.
     spiReceive(&SPID1, 1, pMotor->spiRxBuffer); // Receive 1 frame (16 bits).
 		spiUnselect(&SPID1);                // Unselect slave.
 
