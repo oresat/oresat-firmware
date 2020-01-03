@@ -3,8 +3,10 @@
 #include "max580x.h"
 #include "CANopen.h"
 
-#define SLEEP_MS 1
-#define STEP_SIZE 5
+#define CURR_LSB    10  /* 10uA/bit */
+#define RSENSE      100 /* 0.1 ohm  */
+#define SLEEP_MS    1
+#define STEP_SIZE   5
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -21,8 +23,8 @@ static const INA226Config ina226config = {
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
     INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
     INA226_CONFIG_AVG_1,
-    5120,       /* 10uA/bit with 0.1mOhm shunt */
-    10          /* 10uA/bit */
+    (5120000/(RSENSE*CURR_LSB),
+    CURR_LSB
 };
 
 static const MAX580XConfig max580xconfig = {
@@ -38,12 +40,12 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
-uint32_t vi_sense(uint32_t vi_adj)
+uint32_t calc_iadj(uint32_t i_out)
 {
-    return ((1.263 - (0.8*vi_adj))/25);
+    return ((50520000-i_out*RSENSE)/3200);
 }
 
-uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
+uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
 {
     /* The values from the previous iteration of the loop */
     static uint32_t prev_pwr = 0;
@@ -56,11 +58,11 @@ uint32_t calc_iadj(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     /* Start IC MPPT Algorithm */
     if (delta_v == 0) {
         if (delta_i != 0) {
-            iadj_v += vi_sense(delta_i);
+            iadj_v += calc_iadj(delta_i);
         }
     } else {
         if (delta_p/delta_v != 0) {
-            iadj_v += vi_sense(delta_p/delta_v);
+            iadj_v += calc_iadj(delta_p/delta_v);
         }
     }
     /* End IC MPPT Algorithm */
@@ -100,7 +102,7 @@ THD_FUNCTION(solar, arg)
         curr = ina226ReadCurrent(&ina226dev);
 
         /* Calculate iadj */
-        iadj_v = calc_iadj(pwr, volt, curr, iadj_v);
+        iadj_v = calc_mppt(pwr, volt, curr, iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
