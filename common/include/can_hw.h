@@ -66,13 +66,7 @@ typedef union {
             uint16_t IDE    :1 ;
             uint16_t RTR    :1 ;
             uint16_t STID   :11;
-        } id;
-        struct {
-            uint16_t EXIT   :3 ;
-            uint16_t IDE    :1 ;
-            uint16_t RTR    :1 ;
-            uint16_t STID   :11;
-        } mask_id;
+        } id_mask[2];
     } scale16;
     uint32_t raw;
 } flt_reg_t;

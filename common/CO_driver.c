@@ -102,7 +102,7 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->txArray = txArray;
     CANmodule->txSize = txSize;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = (rxSize <= STM32_CAN_MAX_FILTERS ? rxSize : 0);
+    CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? rxSize : 0);
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
@@ -138,13 +138,13 @@ CO_ReturnError_t CO_CANmodule_init(
         /* CO_CANrxBufferInit() functions, called by separate CANopen */
         /* init functions. */
         /* Configure all masks so that received message must match filter */
-        for (i = 0U; i < rxSize; i++) {
+        for (i = 0U; i < rxSize / 4; i++) {
             CANmodule->canFilters[i].filter = i;
-            CANmodule->canFilters[i].mode = 0;                  /* Mask Mode */
-            CANmodule->canFilters[i].scale = 1;                 /* 32bit scale (easy but inefficient) */
+            CANmodule->canFilters[i].mode = 1;                  /* List Mode */
+            CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
             CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
-            CANmodule->canFilters[i].register1 = 0;             /* Clear out the ID */
-            CANmodule->canFilters[i].register2 = 0xFFFFFFFFU;   /* Initialize masks */
+            CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
+            CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
         }
     }
 
@@ -196,11 +196,16 @@ CO_ReturnError_t CO_CANrxBufferInit(
 
         /* Set CAN hardware module filter and mask. */
         if (CANmodule->useCANrxFilters) {
-            flt_reg_t filter;
-            filter.raw = 0;
-            filter.scale32.STID = ident;
-            filter.scale32.RTR = rtr;
-            CANmodule->canFilters[index].register1 = filter.raw;
+            flt_reg_t *filter;
+
+            if ((index % 4) < 2) {
+                filter = (flt_reg_t*)(&CANmodule->canFilters[index / 4].register1);
+            } else {
+                filter = (flt_reg_t*)(&CANmodule->canFilters[index / 4].register2);
+            }
+            filter->scale16.id_mask[index % 2].STID = ident;
+            filter->scale16.id_mask[index % 2].RTR = rtr;
+
             if (CANmodule->CANnormal) {
                 CO_CANsetFilters(CANmodule);
             }
