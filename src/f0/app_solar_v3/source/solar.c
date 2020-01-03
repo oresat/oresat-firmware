@@ -40,6 +40,11 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
+uint32_t calc_iadj(uint32_t i_out)
+{
+    return ((50520000 - i_out * RSENSE) / 3200);
+}
+
 uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr)
 {
     /* The values from the previous iteration of the loop */
@@ -73,7 +78,7 @@ uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr)
     }
     /* End IC MPPT Algorithm */
 
-    return ((50520000 - curr * RSENSE) / 3200);
+    return calc_iadj(curr);
 }
 
 /* Main solar management thread */
@@ -81,7 +86,7 @@ THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    static uint32_t iadj_v = 15000;
+    static uint32_t iadj_v = calc_iadj(1000);
     uint32_t pwr, volt;
     int32_t curr;
 
