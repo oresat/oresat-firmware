@@ -86,7 +86,7 @@ THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    uint32_t iadj_v = calc_iadj(1000);
+    uint32_t iadj_v = calc_iadj(0);
     uint32_t pwr, volt;
     int32_t curr;
 
