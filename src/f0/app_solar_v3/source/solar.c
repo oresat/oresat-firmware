@@ -23,7 +23,7 @@ static const INA226Config ina226config = {
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
     INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
     INA226_CONFIG_AVG_1,
-    (5120000/(RSENSE*CURR_LSB),
+    (5120000/(RSENSE*CURR_LSB)),
     CURR_LSB
 };
 
@@ -86,7 +86,7 @@ THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    static uint32_t iadj_v = calc_iadj(1000);
+    uint32_t iadj_v = calc_iadj(1000);
     uint32_t pwr, volt;
     int32_t curr;
 
