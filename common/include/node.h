@@ -17,9 +17,11 @@ typedef enum {
 } node_state_t;
 
 typedef struct node {
+    CO_HBconsumer_t *hb_cons;
     node_state_t state;
     opd_addr_t opd_addr;
     uint8_t node_id;
+    uint8_t retries;
 } node_t;
 
 void init_node(node_t *node, opd_addr_t opd_addr, uint8_t node_id);
