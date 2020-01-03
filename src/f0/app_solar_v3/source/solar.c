@@ -40,12 +40,7 @@ static const MAX580XConfig max580xconfig = {
 static MAX580XDriver max580xdev;
 static INA226Driver ina226dev;
 
-uint32_t calc_iadj(uint32_t i_out)
-{
-    return ((50520000-i_out*RSENSE)/3200);
-}
-
-uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
+uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr)
 {
     /* The values from the previous iteration of the loop */
     static uint32_t prev_pwr = 0;
@@ -54,23 +49,31 @@ uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t iadj_v)
     int32_t delta_p = pwr  - prev_pwr;
     int32_t delta_v = volt - prev_volt;
     int32_t delta_i = curr - prev_curr;
+    prev_pwr  = pwr;
+    prev_volt = volt;
+    prev_curr = curr;
 
     /* Start IC MPPT Algorithm */
     if (delta_v == 0) {
         if (delta_i != 0) {
-            iadj_v += calc_iadj(delta_i);
+            if (delta_i > 0) {
+                curr += STEP_SIZE;
+            } else {
+                curr -= STEP_SIZE;
+            }
         }
     } else {
         if (delta_p/delta_v != 0) {
-            iadj_v += calc_iadj(delta_p/delta_v);
+            if (delta_p/delta_v > 0) {
+                curr += STEP_SIZE;
+            } else {
+                curr -= STEP_SIZE;
+            }
         }
     }
     /* End IC MPPT Algorithm */
 
-    prev_pwr  = pwr;
-    prev_volt = volt;
-    prev_curr = curr;
-    return iadj_v;
+    return ((50520000 - curr * RSENSE) / 3200);
 }
 
 /* Main solar management thread */
@@ -102,7 +105,7 @@ THD_FUNCTION(solar, arg)
         curr = ina226ReadCurrent(&ina226dev);
 
         /* Calculate iadj */
-        iadj_v = calc_mppt(pwr, volt, curr, iadj_v);
+        iadj_v = calc_mppt(pwr, volt, curr);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
