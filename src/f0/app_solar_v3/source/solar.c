@@ -45,7 +45,7 @@ uint32_t calc_iadj(uint32_t i_out)
     return ((50520000 - i_out * RSENSE) / 3200);
 }
 
-uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr)
+uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr, uint32_t *iadj_v)
 {
     /* The values from the previous iteration of the loop */
     static uint32_t prev_pwr = 0;
@@ -62,23 +62,23 @@ uint32_t calc_mppt(uint32_t pwr, uint32_t volt, int32_t curr)
     if (delta_v == 0) {
         if (delta_i != 0) {
             if (delta_i > 0) {
-                curr += STEP_SIZE;
+                *iadj_v += STEP_SIZE;
             } else {
-                curr -= STEP_SIZE;
+                *iadj_v -= STEP_SIZE;
             }
         }
     } else {
         if (delta_p/delta_v != 0) {
             if (delta_p/delta_v > 0) {
-                curr += STEP_SIZE;
+                *iadj_v += STEP_SIZE;
             } else {
-                curr -= STEP_SIZE;
+                *iadj_v -= STEP_SIZE;
             }
         }
     }
     /* End IC MPPT Algorithm */
 
-    return calc_iadj(curr);
+    return *iadj_v;
 }
 
 /* Main solar management thread */
@@ -86,7 +86,7 @@ THD_WORKING_AREA(solar_wa, 0x100);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    uint32_t iadj_v = calc_iadj(0);
+    uint32_t iadj_v = 15000;
     uint32_t pwr, volt;
     int32_t curr;
 
@@ -99,18 +99,14 @@ THD_FUNCTION(solar, arg)
     palSetLine(LINE_OUTPUT_EN);
     while (!chThdShouldTerminateX()) {
         chThdSleepMilliseconds(SLEEP_MS);
-        /* Get current values for power */
-        /*if (ina226ReadVBUS(&ina226dev) < 400000) {*/
-            /*palClearLine(LINE_OUTPUT_EN);*/
-        /*} else {*/
-            /*palSetLine(LINE_OUTPUT_EN);*/
-        /*}*/
+
+        /* Get present values */
         pwr = ina226ReadPower(&ina226dev);
         volt = ina226ReadVBUS(&ina226dev);
         curr = ina226ReadCurrent(&ina226dev);
 
         /* Calculate iadj */
-        iadj_v = calc_mppt(pwr, volt, curr);
+        calc_mppt(pwr, volt, curr, &iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
