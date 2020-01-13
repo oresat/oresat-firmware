@@ -41,7 +41,7 @@ THD_FUNCTION(spiThread,arg)
     chSysUnlock();  
     /// ******end critical section***********
     //chprintf(DEBUG_CHP, "%d\n\r",position);
-    chprintf(DEBUG_CHP, "%f\n\r",pMotor->normalPosition);
+    //chprintf(DEBUG_CHP, "%f\n\r",pMotor->normalPosition);
 
     spiUnselect(&SPID1);                /* Slave Select de-assertion.       */
     spiReleaseBus(&SPID1);              /* Ownership release.               */

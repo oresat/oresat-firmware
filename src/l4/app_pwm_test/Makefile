@@ -66,8 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = hard
-#  USE_FPU = no
+  USE_FPU = no
 endif
 
 # FPU-related options.
@@ -84,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_rev41
+PROJECT   = app_template
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_ACS_V4
+BOARD     = ST_NUCLEO64_L452RE_P
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -124,11 +123,10 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-include $(CHIBIOS)/test/lib/test.mk
-include $(CHIBIOS)/test/rt/rt_test.mk
-include $(CHIBIOS)/test/oslib/oslib_test.mk
+#include $(CHIBIOS)/test/lib/test.mk
+#include $(CHIBIOS)/test/rt/rt_test.mk
+#include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
-include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32L452xE.ld
@@ -167,7 +165,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DCHPRINTF_USE_FLOAT=TRUE
+UDEFS =
 
 # Define ASM defines here
 UADEFS =
@@ -179,7 +177,7 @@ UINCDIR = $(PROJ_INC)
 ULIBDIR = $(PROJ_SRC)
 
 # List all user libraries here
-ULIBS = -lm
+ULIBS =
 
 #
 # End of user section
