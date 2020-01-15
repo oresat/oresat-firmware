@@ -205,7 +205,7 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             if (!opd_status(opd_addr, &status)) {
                 chprintf(chp, "CONNECTED\r\n");
                 chprintf(chp, "State: %s-%s\r\n",
-                        (status.odr & MAX7310_PIN_MASK(OPD_LED) ? "ENABLED" : "DISABLED"),
+                        (status.odr & MAX7310_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
                         (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
                 chprintf(chp, "Raw register values:\r\n");
                 chprintf(chp, "Input:       %02X\r\n", status.input);

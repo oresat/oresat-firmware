@@ -99,7 +99,9 @@ int opd_enable(opd_addr_t addr)
         return -1;
 
     regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
-    regval |= MAX7310_PIN_MASK(OPD_LED);
+    regval |= MAX7310_PIN_MASK(OPD_CB_EN);
+    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    regval |= MAX7310_PIN_MASK(OPD_EN);
     max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
     return 0;
 }
@@ -113,7 +115,9 @@ int opd_disable(opd_addr_t addr)
         return -1;
 
     regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
-    regval &= ~MAX7310_PIN_MASK(OPD_LED);
+    regval &= ~MAX7310_PIN_MASK(OPD_EN);
+    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    regval &= ~MAX7310_PIN_MASK(OPD_CB_EN);
     max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
     return 0;
 }
@@ -129,7 +133,7 @@ int opd_reset(opd_addr_t addr)
     regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
     regval |= MAX7310_PIN_MASK(OPD_CB_RESET);
     max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
-    chThdSleepMilliseconds(10);
+    chThdSleepMilliseconds(100);
     regval &= ~MAX7310_PIN_MASK(OPD_CB_RESET);
     max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
     return 0;
