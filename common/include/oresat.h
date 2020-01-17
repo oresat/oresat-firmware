@@ -14,9 +14,15 @@ extern "C" {
 
 extern event_source_t cos_event;
 
+typedef struct {
+    CANDriver *cand;
+    uint8_t node_id;
+    uint16_t bitrate;
+} oresat_config_t;
+
 /* OreSat initialization and main process */
-void oresat_init(uint8_t node_id, uint16_t bitrate);
-void oresat_start(CANDriver *cand);
+void oresat_init(void);
+void oresat_start(oresat_config_t *config);
 
 #ifdef __cplusplus
 }
