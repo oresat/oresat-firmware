@@ -2,7 +2,7 @@
 #include $(PROJ_SRC)/library.mk
 
 # List of all the time subsystem source files
-TIMESRC := $(PROJ_SRC)/time.c
+TIMESRC := $(PROJ_SRC)/time_sync.c
 
 # Required include directories
 TIMEINC := $(PROJ_SRC)/include
