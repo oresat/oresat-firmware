@@ -1,60 +1,17 @@
-/*
- * CANopen Object Dictionary.
- *
- * This file was automatically generated with CANopenNode Object
- * Dictionary Editor. DON'T EDIT THIS FILE MANUALLY !!!!
- * Object Dictionary Editor is currently an older, but functional web
- * application. For more info see See 'Object_Dictionary_Editor/about.html' in
- * <http://sourceforge.net/p/canopennode/code_complete/ci/master/tree/>
- * For more information on CANopen Object Dictionary see <CO_SDO.h>.
- *
- * @file        CO_OD.c/CO_OD.h
- * @author      Janez Paternoster
- * @copyright   2010 - 2016 Janez Paternoster
- *
- * This file is part of CANopenNode, an opensource CANopen Stack.
- * Project home page is <https://github.com/CANopenNode/CANopenNode>.
- * For more information on CANopen see <http://www.can-cia.org/>.
- *
- * CANopenNode is free and open source software: you can redistribute
- * it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * Following clarification and special exception to the GNU General Public
- * License is included to the distribution terms of CANopenNode:
- *
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library. Thus, the terms and
- * conditions of the GNU General Public License cover the whole combination.
- *
- * As a special exception, the copyright holders of this library give
- * you permission to link this library with independent modules to
- * produce an executable, regardless of the license terms of these
- * independent modules, and to copy and distribute the resulting
- * executable under terms of your choice, provided that you also meet,
- * for each linked independent module, the terms and conditions of the
- * license of that module. An independent module is a module which is
- * not derived from or based on this library. If you modify this
- * library, you may extend this exception to your version of the
- * library, but you are not obliged to do so. If you do not wish
- * to do so, delete this exception statement from your version.
- * Dictionary Editor v0.7-12-g6a8ebda * DON'T EDIT THIS FILE MANUALLY !!!!
- */
+// clang-format off
+/*******************************************************************************
+
+   File - CO_OD.c/CO_OD.h
+   CANopen Object Dictionary.
+
+   This file was automatically generated with libedssharp Object
+   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+*******************************************************************************/
 
 
 #include "CO_driver.h"
 #include "CO_OD.h"
 #include "CO_SDO.h"
-
 
 /*******************************************************************************
    DEFINITION AND INITIALIZATION OF OBJECT DICTIONARY VARIABLES
@@ -70,7 +27,7 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1006*/ 0x0000L,
 /*1007*/ 0x0000L,
 /*1008*/ {'O', 'r', 'e', 'S', 'a', 't', ' ', 'P', 'r', 'o', 't', 'o', 'c', 'a', 'r', 'd'},
-/*1009*/ {'3', '.', '2'},
+/*1009*/ {'3', '.', '3'},
 /*100A*/ {'0', '.', '1', '.', '0'},
 /*1014*/ 0x0080L,
 /*1015*/ 0x64,
@@ -114,13 +71,14 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*1003*/ {0, 0, 0, 0, 0, 0, 0, 0},
 /*1010*/ {0x00000003},
 /*1011*/ {0x00000001},
+/*2010*/ {0x2L, 0x0000L, 0x00},
+/*2011*/ {0x3L, 0x00, 0x0000L, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*2103*/ 0x00,
 /*2104*/ 0x00,
 /*2107*/ {0x00, 0x00, 0x00},
 /*2108*/ {0x00},
 /*2109*/ {0x00},
-/*2130*/ {0x3L, {'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 0x00000000L, 0x0000L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -316,11 +274,17 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_ROM.TPDOMappingParameter[3].mappedObject8, 0x8D, 0x4 },
 };
 
-/*0x2130*/ const CO_OD_entryRecord_t OD_record2130[4] = {
-           {(void*)&CO_OD_RAM.time.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.time.string, 0x06, 0x1E },
-           {(void*)&CO_OD_RAM.time.epochTimeBaseMs, 0x8E, 0x8 },
-           {(void*)&CO_OD_RAM.time.epochTimeOffsetMs, 0xBE, 0x4 },
+/*0x2010*/ const CO_OD_entryRecord_t OD_record2010[3] = {
+           {(void*)&CO_OD_RAM.SCET.maxSubIndex, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.SCET.coarse, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.SCET.fine, 0xBE, 0x2 },
+};
+
+/*0x2011*/ const CO_OD_entryRecord_t OD_record2011[4] = {
+           {(void*)&CO_OD_RAM.UTC.maxSubIndex, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.UTC.day, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.UTC.ms, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.UTC.us, 0xBE, 0x2 },
 };
 
 /*******************************************************************************
@@ -364,6 +328,8 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1A02, 0x08, 0x00,  0, (void*)&OD_record1A02},
 {0x1A03, 0x08, 0x00,  0, (void*)&OD_record1A03},
 {0x1F80, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.NMTStartup},
+{0x2010, 0x02, 0x00,  1, (void*)&OD_record2010},
+{0x2011, 0x03, 0x00,  1, (void*)&OD_record2011},
 {0x2100, 0x00, 0x26, 10, (void*)&CO_OD_RAM.errorStatusBits},
 {0x2101, 0x00, 0x0D,  1, (void*)&CO_OD_ROM.CANNodeID},
 {0x2102, 0x00, 0x8D,  2, (void*)&CO_OD_ROM.CANBitRate},
@@ -373,5 +339,5 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2107, 0x03, 0xA6,  2, (void*)&CO_OD_RAM.sensors[0]},
 {0x2108, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.temperature[0]},
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
-{0x2130, 0x03, 0x00,  0, (void*)&OD_record2130},
 };
+// clang-format on
