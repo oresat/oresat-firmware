@@ -7,9 +7,10 @@ extern "C" {
 
 #include "ch.h"
 #include "hal.h"
+#include "CANopen.h"
 
-
-
+CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg);
+CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg);
 
 #ifdef __cplusplus
 }
