@@ -152,7 +152,7 @@
 /*2010      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                UNSIGNED32     coarse;
-               UNSIGNED24     fine;
+               UNSIGNED16     fine;
                }              OD_SCET_t;
 /*2011      */ typedef struct {
                UNSIGNED8      maxSubIndex;

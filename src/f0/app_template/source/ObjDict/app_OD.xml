@@ -815,7 +815,7 @@ bit 7-31: reserved, set to 0</description>
       <CANopenSubObject subIndex="01" name="Coarse" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description>Coarse time portion of CUC time code, in seconds</description>
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="Fine" objectType="VAR" dataType="0x16" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="Fine" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description>Fine time portion of CUC time code, in 2^-24 second increments</description>
       </CANopenSubObject>
       <accessFunctionPreCode />

@@ -71,7 +71,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*1003*/ {0, 0, 0, 0, 0, 0, 0, 0},
 /*1010*/ {0x00000003},
 /*1011*/ {0x00000001},
-/*2010*/ {0x2L, 0x0000L, 0x0000L},
+/*2010*/ {0x2L, 0x0000L, 0x00},
 /*2011*/ {0x3L, 0x00, 0x0000L, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*2103*/ 0x00,
@@ -277,7 +277,7 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 /*0x2010*/ const CO_OD_entryRecord_t OD_record2010[3] = {
            {(void*)&CO_OD_RAM.SCET.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.SCET.coarse, 0xBE, 0x4 },
-           {(void*)&CO_OD_RAM.SCET.fine, 0xBE, 0x3 },
+           {(void*)&CO_OD_RAM.SCET.fine, 0xBE, 0x2 },
 };
 
 /*0x2011*/ const CO_OD_entryRecord_t OD_record2011[4] = {
