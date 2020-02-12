@@ -9,6 +9,9 @@ extern "C" {
 #include "hal.h"
 #include "CANopen.h"
 
+time_t get_time_unix(void);
+void set_time_unix(time_t unix_time);
+
 CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg);
 CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg);
 

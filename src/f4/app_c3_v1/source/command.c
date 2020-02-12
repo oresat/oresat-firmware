@@ -4,6 +4,7 @@
 #include "command.h"
 #include "CO_master.h"
 #include "opd.h"
+#include "time_sync.h"
 #include "max7310.h"
 #include "mmc.h"
 #include "chprintf.h"
@@ -224,6 +225,32 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 }
 
 /*===========================================================================*/
+/* Time                                                                      */
+/*===========================================================================*/
+void time_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: time set|get <UNIX Time>\r\n");
+}
+
+void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    time_t unix_time;
+    if (argc < 1) {
+        time_usage(chp);
+        return;
+    }
+    if (!strcmp(argv[0], "get")) {
+        unix_time = get_time_unix();
+        chprintf(chp, "UNIX Time: %s\r\n", ctime(&unix_time));
+    } else if (!strcmp(argv[0], "set") && argc > 1) {
+        set_time_unix(strtoul(argv[1], NULL, 0));
+    } else {
+        time_usage(chp);
+        return;
+    }
+}
+
+/*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
@@ -231,6 +258,7 @@ static const ShellCommand commands[] = {
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
+    {"time", cmd_time},
     {NULL, NULL}
 };
 

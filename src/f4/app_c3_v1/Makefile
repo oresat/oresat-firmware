@@ -108,6 +108,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/opd.mk
+include $(PROJ_SRC)/time_sync.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -137,6 +138,7 @@ LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
+       $(CHIBIOS)/os/various/syscalls.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
