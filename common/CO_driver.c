@@ -32,11 +32,15 @@
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
+/* Interrupt callback prototypes*/
+void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
+void CO_CANtx_cb(CANDriver *canp, uint32_t flags);
+
 /******************************************************************************/
 void CO_CANsetConfigurationMode(void *CANptr)
 {
     /* Put CAN module in configuration mode */
-    canStop(CANptr->cand);
+    canStop(((oresat_config_t*)CANptr)->cand);
 }
 
 /******************************************************************************/
@@ -77,7 +81,9 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANptr = CANptr;
-    CANmodule->cand = CANptr->cand;
+    CANmodule->cand = ((oresat_config_t*)CANptr)->cand;
+    CANmodule->cand->rxfull_cb = CO_CANrx_cb;
+    CANmodule->cand->txempty_cb = CO_CANtx_cb;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;

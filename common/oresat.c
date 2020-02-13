@@ -90,9 +90,7 @@ void oresat_start(oresat_config_t *config)
         reg_event(&event_registry, ORESAT_NMT_OPERATIONAL, nmt_handler);
         reg_event(&event_registry, ORESAT_NMT_NONOPERATIONAL, nmt_handler);
 
-        /* Register CAN interrupt callbacks */
-        config->cand->rxfull_cb = CO_CANrx_cb;
-        config->cand->txempty_cb = CO_CANtx_cb;
+        /* Register CAN callbacks */
         CO_NMT_initCallback(CO->NMT, CO_NMT_cb);
 
         /* Enter normal operating mode */

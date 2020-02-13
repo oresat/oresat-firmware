@@ -33,6 +33,7 @@
 /* Include processor header file */
 #include "ch.h"
 #include "hal.h"
+#include "oresat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,7 +126,7 @@ typedef struct {
 
 /* CAN module object */
 typedef struct {
-    void *CANptr;
+    void               *CANptr;
     CANDriver          *cand;           /* CANDriver for ChibiOS */
     CANConfig           cancfg;         /* CANConfig for ChibiOS */
     event_source_t      rx_event;       /* Receive event */
