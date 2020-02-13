@@ -15,8 +15,8 @@ CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                 \
                $(CANOPEN_SRC)/301/CO_TIME.c            \
                $(CANOPEN_SRC)/301/CO_SDOclient.c       \
                $(CANOPEN_SRC)/301/crc16-ccitt.c        \
-               $(CANOPEN_SRC)/305/CO_LSSmaster.c       \
-               $(CANOPEN_SRC)/305/CO_LSSslave.c        \
+               #$(CANOPEN_SRC)/305/CO_LSSmaster.c       \
+               #$(CANOPEN_SRC)/305/CO_LSSslave.c        \
                $(CANOPEN_SRC)/extra/CO_trace.c         \
                $(CANOPEN_SRC)/CANopen.c
 

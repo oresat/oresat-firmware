@@ -18,14 +18,14 @@ int sdo_upload(
 
         if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
             return 1;
-        if (CO_SDOclientUploadInitiate(SDOclient, index, subindex, data, max_len, block) != CO_SDOcli_ok_communicationEnd)
+        if (CO_SDOclientUploadInitiate(SDOclient, index, subindex, data, max_len, timeout, block) != CO_SDOcli_ok_communicationEnd)
             return 1;
 
         prev_time = chVTGetSystemTimeX();
         do {
             diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
             prev_time = cur_time;
-            ret = CO_SDOclientUpload(SDOclient, chTimeI2MS(diff_time), timeout, ret_len, abrt_code);
+            ret = CO_SDOclientUpload(SDOclient, chTimeI2MS(diff_time), ret_len, abrt_code, NULL);
             chThdSleepMilliseconds(10);
         } while (ret > 0);
         CO_SDOclientClose(SDOclient);
@@ -49,14 +49,14 @@ int sdo_download(
 
     if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
         return 1;
-    if (CO_SDOclientDownloadInitiate(SDOclient, index, subindex, data, len, block) != CO_SDOcli_ok_communicationEnd)
+    if (CO_SDOclientDownloadInitiate(SDOclient, index, subindex, data, len, timeout, block) != CO_SDOcli_ok_communicationEnd)
         return 1;
 
     prev_time = chVTGetSystemTimeX();
     do {
         diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
         prev_time = cur_time;
-        ret = CO_SDOclientDownload(SDOclient, chTimeI2MS(diff_time), timeout, abrt_code);
+        ret = CO_SDOclientDownload(SDOclient, chTimeI2US(diff_time), abrt_code, NULL);
         chThdSleepMilliseconds(5);
     } while (ret > 0);
     CO_SDOclientClose(SDOclient);

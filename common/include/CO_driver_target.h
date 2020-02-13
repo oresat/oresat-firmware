@@ -30,9 +30,9 @@
  * It is included from CO_driver.h, which contains documentation
  * for definitions below. */
 
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
+/* Include processor header file */
+#include "ch.h"
+#include "hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,7 @@ extern "C" {
 
 /* Basic definitions */
 #define CO_LITTLE_ENDIAN
-#define CO_USE_LEDS
+#define CO_SDO_BUFFER_SIZE           889    /* Override default SDO buffer size. */
 /* NULL is defined in stddef.h */
 /* true and false are defined in stdbool.h */
 /* int8_t to uint64_t are defined in stdint.h */
@@ -53,9 +53,38 @@ typedef unsigned char           domain_t;
 
 
 /* Access to received CAN message */
-#define CO_CANrxMsg_readIdent(msg) ((uint16_t)0)
-#define CO_CANrxMsg_readDLC(msg)   ((uint8_t)0)
-#define CO_CANrxMsg_readData(msg)  ((uint8_t *)NULL)
+#define CO_CANrxMsg_readIdent(msg) ((uint16_t)((CO_CANrxMsg_t*)msg)->SID)
+#define CO_CANrxMsg_readDLC(msg)   ((uint8_t)((CO_CANrxMsg_t*)msg)->DLC)
+#define CO_CANrxMsg_readData(msg)  ((uint8_t *)((CO_CANrxMsg_t*)msg)->data)
+
+/* Received message frame */
+typedef struct {
+    /** CAN identifier. It must be read through CO_CANrxMsg_readIdent() function. */
+    union {
+        CANRxFrame              rxFrame;
+        struct {
+            uint8_t             FMI;            /**< Filter id.          */
+            uint16_t            TIME;           /**< Time stamp.         */
+            uint8_t             DLC:4;          /**< Data length.        */
+            uint8_t             RTR:1;          /**< Frame type.         */
+            uint8_t             IDE:1;          /**< Identifier type.    */
+            union {
+                struct {
+                    uint32_t    SID:11;         /**< Standard identifier.*/
+                };
+                struct {
+                    uint32_t    EID:29;         /**< Extended identifier.*/
+                };
+            };
+            union {
+                uint8_t         data[8];        /**< Frame data.         */
+                uint16_t        data16[4];      /**< Frame data.         */
+                uint32_t        data32[2];      /**< Frame data.         */
+                uint64_t        data64[1];      /**< Frame data.         */
+            };
+        };
+    };
+} CO_CANrxMsg_t;
 
 /* Received message object */
 typedef struct {
@@ -67,41 +96,75 @@ typedef struct {
 
 /* Transmit message object */
 typedef struct {
-    uint32_t ident;
-    uint8_t DLC;
-    uint8_t data[8];
-    volatile bool_t bufferFull;
-    volatile bool_t syncFlag;
+    union {
+        CANTxFrame              txFrame;        /* ChibiOS CANTxFrame  */
+        struct {
+            uint8_t             DLC:4;          /* Data length.        */
+            uint8_t             RTR:1;          /* Frame type.         */
+            uint8_t             IDE:1;          /* Identifier type.    */
+            union {
+                struct {
+                    uint32_t    SID:11;         /* Standard identifier.*/
+                };
+                struct {
+                    uint32_t    EID:29;         /* Extended identifier.*/
+                };
+            };
+            union {
+                uint8_t         data[8];        /* Frame data.         */
+                uint16_t        data16[4];      /* Frame data.         */
+                uint32_t        data32[2];      /* Frame data.         */
+                uint64_t        data64[1];      /* Frame data.         */
+            };
+        };
+    };
+    volatile bool_t     bufferFull;             /* True if previous message is still in buffer */
+    /* Synchronous PDO messages has this flag set. It prevents them to be sent outside the synchronous window */
+    volatile bool_t     syncFlag;
 } CO_CANtx_t;
 
 /* CAN module object */
 typedef struct {
     void *CANptr;
-    CO_CANrx_t *rxArray;
-    uint16_t rxSize;
-    CO_CANtx_t *txArray;
-    uint16_t txSize;
-    volatile bool_t CANnormal;
-    volatile bool_t useCANrxFilters;
-    volatile bool_t bufferInhibitFlag;
-    volatile bool_t firstCANtxMessage;
-    volatile uint16_t CANtxCount;
-    uint32_t errOld;
-    void *em;
+    CANDriver          *cand;           /* CANDriver for ChibiOS */
+    CANConfig           cancfg;         /* CANConfig for ChibiOS */
+    event_source_t      rx_event;       /* Receive event */
+    CO_CANrx_t         *rxArray;        /* From CO_CANmodule_init() */
+    uint16_t            rxSize;         /* From CO_CANmodule_init() */
+    CO_CANtx_t         *txArray;        /* From CO_CANmodule_init() */
+    uint16_t            txSize;         /* From CO_CANmodule_init() */
+    volatile bool_t     CANnormal;      /* CAN module is in normal mode */
+    /* Value different than zero indicates, that CAN module hardware filters
+     * are used for CAN reception. If there is not enough hardware filters,
+     * they won't be used. In this case will be *all* received CAN messages
+     * processed by software. */
+    CANFilter  canFilters[STM32_CAN_MAX_FILTERS];
+    volatile uint32_t   useCANrxFilters;
+    /* If flag is true, then message in transmitt buffer is synchronous PDO
+     * message, which will be aborted, if CO_clearPendingSyncPDOs() function
+     * will be called by application. This may be necessary if Synchronous
+     * window time was expired. */
+    volatile bool_t     bufferInhibitFlag;
+    /* Equal to 1, when the first transmitted message (bootup message) is in CAN TX buffers */
+    volatile bool_t     firstCANtxMessage;
+    /* Number of messages in transmit buffer, which are waiting to be copied to the CAN module */
+    volatile uint16_t   CANtxCount;
+    uint32_t            errOld;         /**< Previous state of CAN errors */
+    void               *em;             /**< Emergency object */
 } CO_CANmodule_t;
 
 
 /* (un)lock critical section in CO_CANsend() */
-#define CO_LOCK_CAN_SEND()
-#define CO_UNLOCK_CAN_SEND()
+#define CO_LOCK_CAN_SEND()      chSysLock()     /* Lock critical section in CO_CANsend() */
+#define CO_UNLOCK_CAN_SEND()    chSysUnlock()   /* Unlock critical section in CO_CANsend() */
 
 /* (un)lock critical section in CO_errorReport() or CO_errorReset() */
-#define CO_LOCK_EMCY()
-#define CO_UNLOCK_EMCY()
+#define CO_LOCK_EMCY()          chSysLock()     /* Lock critical section in CO_errorReport() or CO_errorReset() */
+#define CO_UNLOCK_EMCY()        chSysUnlock()   /* Unlock critical section in CO_errorReport() or CO_errorReset() */
 
 /* (un)lock critical section when accessing Object Dictionary */
-#define CO_LOCK_OD()
-#define CO_UNLOCK_OD()
+#define CO_LOCK_OD()            chSysLock()     /* Lock critical section when accessing Object Dictionary */
+#define CO_UNLOCK_OD()          chSysUnlock()   /* Unock critical section when accessing Object Dictionary */
 
 /* Synchronization between CAN receive and message processing threads. */
 #define CO_MemoryBarrier()
