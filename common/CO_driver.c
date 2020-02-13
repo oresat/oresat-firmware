@@ -36,7 +36,7 @@
 void CO_CANsetConfigurationMode(void *CANptr)
 {
     /* Put CAN module in configuration mode */
-    canStop(CANptr);
+    canStop(CANptr->cand);
 }
 
 /******************************************************************************/
@@ -77,7 +77,7 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANptr = CANptr;
-    CANmodule->cand = CANptr;
+    CANmodule->cand = CANptr->cand;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
