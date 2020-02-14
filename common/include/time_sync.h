@@ -34,7 +34,7 @@ typedef union {
 } time_utc_t;
 
 time_t get_time_unix(uint32_t *msec);
-void set_time_unix(time_t unix_time, uint32_t *msec);
+void set_time_unix(time_t unix_time, uint32_t msec);
 void get_time_scet(time_scet_t *scet);
 void set_time_scet(const time_scet_t *scet);
 void get_time_utc(time_utc_t *utc);
