@@ -12,7 +12,7 @@ time_t get_time_unix(uint32_t *msec)
     return mktime(&tim);
 }
 
-void set_time_unix(time_t unix_time, uint32_t *msec)
+void set_time_unix(time_t unix_time, uint32_t msec)
 {
     RTCDateTime timespec;
     struct tm tim;
@@ -24,7 +24,9 @@ void set_time_unix(time_t unix_time, uint32_t *msec)
 
 void get_time_scet(time_scet_t *scet)
 {
-    scet->coarse = get_time_unix(&scet->fine) + EPOCH_CONV_SEC;
+    uint32_t fine;
+    scet->coarse = get_time_unix(&fine) + EPOCH_CONV_SEC;
+    scet->fine = fine & 0xFFFFFFU;
 }
 
 void set_time_scet(const time_scet_t *scet)
