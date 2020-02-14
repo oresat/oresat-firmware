@@ -9,6 +9,11 @@ extern "C" {
 #include "hal.h"
 #include "CANopen.h"
 
+#define TIME_UNIX_EPOCH     1970U   /* UNIX Time Epoch */
+#define TIME_TAI_EPOCH      1958U   /* CCSDS Level 1 Time Code Epoch (TAI) */
+#define TIME_CUC_PREAMBLE   0x1E    /* CCSDS Unsegmented Time Code (CUC) Preamble */
+#define TIME_CDS_PREAMBLE   0x41    /* CCSDS Day Segmented Time Code (CDS) Preamble */
+
 /* CCSDS Unsegmented Time Code (CUC) data type */
 typedef union {
     uint64_t raw;
