@@ -131,7 +131,7 @@ void oresat_start(oresat_config_t *config)
     }
 
     /* Deinitialize CO stack */
-    CO_delete(config);
+    /*CO_delete(config);*/
 
     /* Initiate System Reset */
     NVIC_SystemReset();
