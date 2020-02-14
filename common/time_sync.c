@@ -32,7 +32,7 @@ void set_time_unix(time_t unix_time, uint32_t msec)
     struct tm tim;
 
     localtime_r(&unix_time, &tim);
-    set_time_tm(&tim);
+    set_time_tm(&tim, msec);
 }
 
 void get_time_scet(time_scet_t *scet)
@@ -71,9 +71,9 @@ CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg)
 CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg)
 {
     if (ODF_arg->reading) {
-        get_time_utf((time_utf_t*)ODF_arg->data);
+        get_time_utc((time_utc_t*)ODF_arg->data);
     } else {
-        set_time_utf((time_utf_t*)ODF_arg->data);
+        set_time_utc((time_utc_t*)ODF_arg->data);
     }
 
     return CO_SDO_AB_NONE;
