@@ -149,17 +149,6 @@
                UNSIGNED32     mappedObject7;
                UNSIGNED32     mappedObject8;
                }              OD_TPDOMappingParameter_t;
-/*2010      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     coarse;
-               UNSIGNED16     fine;
-               }              OD_SCET_t;
-/*2011      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED16     day;
-               UNSIGNED32     ms;
-               UNSIGNED16     us;
-               }              OD_UTC_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -1252,17 +1241,8 @@
 /*2010 */
         #define OD_2010_SCET                                        0x2010
 
-        #define OD_2010_0_SCET_maxSubIndex                          0
-        #define OD_2010_1_SCET_coarse                               1
-        #define OD_2010_2_SCET_fine                                 2
-
 /*2011 */
         #define OD_2011_UTC                                         0x2011
-
-        #define OD_2011_0_UTC_maxSubIndex                           0
-        #define OD_2011_1_UTC_day                                   1
-        #define OD_2011_2_UTC_ms                                    2
-        #define OD_2011_3_UTC_us                                    3
 
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
@@ -1356,8 +1336,8 @@ struct sCO_OD_RAM{
 /*1F81      */ UNSIGNED32      slaveAssignment[127];
 /*1F82      */ UNSIGNED8       requestNMT[127];
 /*1F89      */ UNSIGNED32     bootTime;
-/*2010      */ OD_SCET_t       SCET;
-/*2011      */ OD_UTC_t        UTC;
+/*2010      */ UNSIGNED64     SCET;
+/*2011      */ UNSIGNED64     UTC;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
@@ -1495,10 +1475,10 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*1F89, Data Type: UNSIGNED32 */
         #define OD_bootTime                                         CO_OD_RAM.bootTime
 
-/*2010, Data Type: SCET_t */
+/*2010, Data Type: UNSIGNED64 */
         #define OD_SCET                                             CO_OD_RAM.SCET
 
-/*2011, Data Type: UTC_t */
+/*2011, Data Type: UNSIGNED64 */
         #define OD_UTC                                              CO_OD_RAM.UTC
 
 /*2100, Data Type: OCTET_STRING */

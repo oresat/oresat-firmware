@@ -807,33 +807,12 @@ bit 5: 0(1) - flying master process not (yes) supported
 bit 6: 0(1) - use bit 4 (ignore bit 4, stop all nodes)
 bit 7-31: reserved, set to 0</description>
     </CANopenObject>
-    <CANopenObject index="2010" name="SCET" objectType="REC" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="" highValue="" lowValue="" subNumber="3" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="2010" name="SCET" objectType="VAR" memoryType="RAM" dataType="0x1b" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" subNumber="0" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
       <description>CCSDS Unsegmented Time Code (CUC) object for Spacecraft Elapsed Time (SCET) get/set methods</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description />
-      </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="Coarse" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description>Coarse time portion of CUC time code, in seconds</description>
-      </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="Fine" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description>Fine time portion of CUC time code, in 2^-24 second increments</description>
-      </CANopenSubObject>
       <accessFunctionPreCode />
     </CANopenObject>
-    <CANopenObject index="2011" name="UTC" objectType="REC" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="" highValue="" lowValue="" subNumber="4" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+    <CANopenObject index="2011" name="UTC" objectType="VAR" memoryType="RAM" dataType="0x1b" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" subNumber="0" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
       <description>CCSDS Day Segmented Time Code (CDS) object for UTC time get/set methods</description>
-      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="3" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description />
-      </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="Day" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description>Day portion of CDS time code</description>
-      </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="ms" objectType="VAR" dataType="0x07" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description>Milliseconds of day portion of CDS time code</description>
-      </CANopenSubObject>
-      <CANopenSubObject subIndex="03" name="us" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
-        <description>Submilliseconds (us) of ms portion of CDS time code</description>
-      </CANopenSubObject>
       <accessFunctionPreCode />
     </CANopenObject>
     <CANopenObject index="2100" name="Error status bits" objectType="VAR" memoryType="RAM" dataType="0x0a" accessType="ro" PDOmapping="optional" defaultValue="00 00 00 00 00 00 00 00 00 00" subNumber="0" disabled="false" TPDOdetectCOS="false">
@@ -980,6 +959,22 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="01" name="MCU VDDA" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="0" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
+    </CANopenObject>
+    <CANopenObject index="2110" name="Solar Panel" objectType="REC" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="" highValue="" lowValue="" subNumber="4" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+      <description />
+      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="3" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="01" name="Voltage" objectType="VAR" dataType="0x07" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="02" name="Current" objectType="VAR" dataType="0x04" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="03" name="Power" objectType="VAR" dataType="0x07" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <accessFunctionPreCode />
     </CANopenObject>
   </CANopenObjectList>
   <other>
