@@ -322,7 +322,7 @@ void max580xWriteVoltage(MAX580XDriver *devp, max580x_reg_t reg, uint32_t voltag
 
     /* TODO: Clean this up, it's terrible */
     /* TODO: Bounds checking */
-    voltage = voltage - (voltage % 5);
+    voltage -= (voltage % 5);
     voltage *= devp->range;
     switch (devp->config->ref & 3U) {
         case MAX580X_REF_2500:

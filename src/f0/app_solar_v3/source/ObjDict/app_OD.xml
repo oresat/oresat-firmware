@@ -960,6 +960,22 @@ Valid values are in [kbps]:
         <description />
       </CANopenSubObject>
     </CANopenObject>
+    <CANopenObject index="2110" name="Solar Panel" objectType="REC" memoryType="RAM" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="" highValue="" lowValue="" subNumber="4" accessFunctionName="" disabled="false" TPDOdetectCOS="false">
+      <description />
+      <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="3" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="01" name="Voltage" objectType="VAR" dataType="0x07" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="02" name="Current" objectType="VAR" dataType="0x04" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <CANopenSubObject subIndex="03" name="Power" objectType="VAR" dataType="0x07" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+        <description />
+      </CANopenSubObject>
+      <accessFunctionPreCode />
+    </CANopenObject>
   </CANopenObjectList>
   <other>
     <file fileName="app_OD.xml" fileCreator="Miles Simpson" fileCreationDate="08-12-2019" fileCreationTime="2:51PM" fileModifedBy="" fileMotifcationDate="09-10-2019" fileModificationTime="9:12AM" fileVersion="0" fileRevision="0" exportFolder="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_solar_v3/source/ObjDict" EdsFile="/home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_solar_v3/source/ObjDict/app_OD.eds" />
