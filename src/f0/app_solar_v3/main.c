@@ -22,7 +22,7 @@
 #include "oresat.h"
 #include "solar.h"
 
-static worker_t worker1;
+/*static worker_t worker1;*/
 
 static oresat_config_t oresat_conf = {
     &CAND1,

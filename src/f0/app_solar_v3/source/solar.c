@@ -87,8 +87,6 @@ THD_FUNCTION(solar, arg)
 {
     (void)arg;
     uint32_t iadj_v = 15000;
-    uint32_t pwr, volt;
-    int32_t curr;
 
     /* Start up drivers for I2C devices */
     ina226Start(&ina226dev, &ina226config);
@@ -101,12 +99,12 @@ THD_FUNCTION(solar, arg)
         chThdSleepMilliseconds(SLEEP_MS);
 
         /* Get present values */
-        pwr = ina226ReadPower(&ina226dev);
-        volt = ina226ReadVBUS(&ina226dev);
-        curr = ina226ReadCurrent(&ina226dev);
+        OD_solarPanel.power = ina226ReadPower(&ina226dev);
+        OD_solarPanel.voltage = ina226ReadVBUS(&ina226dev);
+        OD_solarPanel.current = ina226ReadCurrent(&ina226dev);
 
         /* Calculate iadj */
-        calc_mppt(pwr, volt, curr, &iadj_v);
+        calc_mppt(OD_solarPanel.power, OD_solarPanel.voltage, OD_solarPanel.current, &iadj_v);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
