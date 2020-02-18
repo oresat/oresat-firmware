@@ -143,11 +143,11 @@
 #define MAX17205_CONFIG_VS_Pos              (12U)
 #define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_VS_Pos)
 #define MAX17205_CONFIG_VS                  MAX17205_CONFIG_VS_Msk
-#define MAX17205_CONFIG_VS_Pos              (13U)
-#define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_TS_Pos)
+#define MAX17205_CONFIG_TS_Pos              (13U)
+#define MAX17205_CONFIG_TS_Msk              (0x1U << MAX17205_CONFIG_TS_Pos)
 #define MAX17205_CONFIG_TS                  MAX17205_CONFIG_TS_Msk
-#define MAX17205_CONFIG_VS_Pos              (14U)
-#define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_SS_Pos)
+#define MAX17205_CONFIG_SS_Pos              (14U)
+#define MAX17205_CONFIG_SS_Msk              (0x1U << MAX17205_CONFIG_SS_Pos)
 #define MAX17205_CONFIG_SS                  MAX17205_CONFIG_SS_Msk
 /** @} */
 
