@@ -326,7 +326,7 @@ typedef struct {
  * CAN module object. It may be different in different microcontrollers.
  */
 typedef struct {
-    int32_t             CANbaseAddress; /**< From CO_CANmodule_init() */
+    void               *CANbaseAddress; /**< From CO_CANmodule_init() */
     CANDriver          *cand;           /**< CANDriver for ChibiOS */
     CANConfig           cancfg;         /**< CANConfig for ChibiOS */
     event_source_t      rx_event;       /**< Receive event */
@@ -369,7 +369,7 @@ typedef struct {
  *
  * @param CANbaseAddress CAN module base address.
  */
-void CO_CANsetConfigurationMode(int32_t CANbaseAddress);
+void CO_CANsetConfigurationMode(void *CANbaseAddress);
 
 
 /**
@@ -405,7 +405,7 @@ void CO_CANsetFilters(CO_CANmodule_t *CANmodule);
  */
 CO_ReturnError_t CO_CANmodule_init(
         CO_CANmodule_t         *CANmodule,
-        int32_t                 CANbaseAddress,
+        void                   *CANbaseAddress,
         CO_CANrx_t              rxArray[],
         uint16_t                rxSize,
         CO_CANtx_t              txArray[],

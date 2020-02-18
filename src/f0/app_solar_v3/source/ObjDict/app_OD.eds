@@ -1662,17 +1662,37 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=10
-1=0x2100
-2=0x2101
-3=0x2102
-4=0x2103
-5=0x2104
-6=0x2106
-7=0x2107
-8=0x2108
-9=0x2109
-10=0x2130
+SupportedObjects=12
+1=0x2010
+2=0x2011
+3=0x2100
+4=0x2101
+5=0x2102
+6=0x2103
+7=0x2104
+8=0x2106
+9=0x2107
+10=0x2108
+11=0x2109
+12=0x2110
+
+[2010]
+ParameterName=SCET
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=
+PDOMapping=1
+
+[2011]
+ParameterName=UTC
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=
+PDOMapping=1
 
 [2100]
 ParameterName=Error status bits
@@ -1851,13 +1871,13 @@ AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
-[2130]
-ParameterName=Time
+[2110]
+ParameterName=Solar Panel
 ObjectType=0x9
 ;StorageLocation=RAM
 SubNumber=0x4
 
-[2130sub0]
+[2110sub0]
 ParameterName=max sub-index
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1866,30 +1886,30 @@ AccessType=ro
 DefaultValue=3
 PDOMapping=0
 
-[2130sub1]
-ParameterName=String
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0009
-AccessType=ro
-DefaultValue=-                             
-PDOMapping=0
-
-[2130sub2]
-ParameterName=Epoch time base ms
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x001B
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[2130sub3]
-ParameterName=Epoch time offset ms
+[2110sub1]
+ParameterName=Voltage
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
-AccessType=rw
-DefaultValue=0
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[2110sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0004
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[2110sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=
 PDOMapping=1
 

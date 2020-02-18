@@ -4,18 +4,18 @@ FileVersion=0
 FileRevision=0
 LastEDS=
 EDSVersion=4.0
-Description=OreSat Master Node Object Dictionary
+Description=OreSat C3 Master Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=9:43AM
-ModificationDate=09-10-2019
+ModificationTime=10:11AM
+ModificationDate=02-11-2020
 ModifiedBy=
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat Master Template
+ProductName=OreSat C3
 ProductNumber=0
 RevisionNumber=0
 BaudRate_10=1
@@ -342,7 +342,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=OreSat Master Node
+DefaultValue=OreSat C3 Master Node
 PDOMapping=0
 
 [1009]
@@ -351,7 +351,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=0.0
+DefaultValue=1.0
 PDOMapping=0
 
 [100A]
@@ -360,7 +360,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0009
 AccessType=const
-DefaultValue=0.0.0
+DefaultValue=0.1.0
 PDOMapping=0
 
 [1010]
@@ -7393,17 +7393,36 @@ DefaultValue=
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=10
-1=0x2100
-2=0x2101
-3=0x2102
-4=0x2103
-5=0x2104
-6=0x2106
-7=0x2107
-8=0x2108
-9=0x2109
-10=0x2130
+SupportedObjects=11
+1=0x2010
+2=0x2011
+3=0x2100
+4=0x2101
+5=0x2102
+6=0x2103
+7=0x2104
+8=0x2106
+9=0x2107
+10=0x2108
+11=0x2109
+
+[2010]
+ParameterName=SCET
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=
+PDOMapping=1
+
+[2011]
+ParameterName=UTC
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=
+PDOMapping=1
 
 [2100]
 ParameterName=Error status bits
@@ -7579,48 +7598,6 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
 AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[2130]
-ParameterName=Time
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x4
-
-[2130sub0]
-ParameterName=max sub-index
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=3
-PDOMapping=0
-
-[2130sub1]
-ParameterName=String
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0009
-AccessType=ro
-DefaultValue=-                             
-PDOMapping=0
-
-[2130sub2]
-ParameterName=Epoch time base ms
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x001B
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[2130sub3]
-ParameterName=Epoch time offset ms
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0007
-AccessType=rw
 DefaultValue=0
 PDOMapping=1
 
