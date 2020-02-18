@@ -1,57 +1,16 @@
-/*
- * CANopen Object Dictionary.
- *
- * This file was automatically generated with CANopenNode Object
- * Dictionary Editor. DON'T EDIT THIS FILE MANUALLY !!!!
- * Object Dictionary Editor is currently an older, but functional web
- * application. For more info see See 'Object_Dictionary_Editor/about.html' in
- * <http://sourceforge.net/p/canopennode/code_complete/ci/master/tree/>
- * For more information on CANopen Object Dictionary see <CO_SDO.h>.
- *
- * @file        CO_OD.c/CO_OD.h
- * @author      Janez Paternoster
- * @copyright   2010 - 2016 Janez Paternoster
- *
- * This file is part of CANopenNode, an opensource CANopen Stack.
- * Project home page is <https://github.com/CANopenNode/CANopenNode>.
- * For more information on CANopen see <http://www.can-cia.org/>.
- *
- * CANopenNode is free and open source software: you can redistribute
- * it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * Following clarification and special exception to the GNU General Public
- * License is included to the distribution terms of CANopenNode:
- *
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library. Thus, the terms and
- * conditions of the GNU General Public License cover the whole combination.
- *
- * As a special exception, the copyright holders of this library give
- * you permission to link this library with independent modules to
- * produce an executable, regardless of the license terms of these
- * independent modules, and to copy and distribute the resulting
- * executable under terms of your choice, provided that you also meet,
- * for each linked independent module, the terms and conditions of the
- * license of that module. An independent module is a module which is
- * not derived from or based on this library. If you modify this
- * library, you may extend this exception to your version of the
- * library, but you are not obliged to do so. If you do not wish
- * to do so, delete this exception statement from your version.
- * Dictionary Editor v0.7-12-g6a8ebda * DON'T EDIT THIS FILE MANUALLY !!!!
- */
+// clang-format off
+/*******************************************************************************
+
+   File - CO_OD.c/CO_OD.h
+   CANopen Object Dictionary.
+
+   This file was automatically generated with libedssharp Object
+   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+*******************************************************************************/
 
 
-#pragma once
+#ifndef CO_OD_H_
+#define CO_OD_H_
 
 /*******************************************************************************
    CANopen DATA TYPES
@@ -106,7 +65,7 @@
    DEVICE INFO:
       VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    OreSat Master Template
+      ProductName:    OreSat C3
       ProductNumber:  0
 *******************************************************************************/
 
@@ -116,6 +75,7 @@
 *******************************************************************************/
   #define CO_NO_SYNC                     1   //Associated objects: 1005-1007
   #define CO_NO_EMERGENCY                1   //Associated objects: 1014, 1015
+  #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
   #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               1   //Associated objects: 1280-12FF
   #define CO_NO_LSS_SERVER               0   //LSS Slave
@@ -129,7 +89,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             99
+   #define CO_OD_NoOfElements             100
 
 
 /*******************************************************************************
@@ -189,12 +149,6 @@
                UNSIGNED32     mappedObject7;
                UNSIGNED32     mappedObject8;
                }              OD_TPDOMappingParameter_t;
-/*2130      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               VISIBLE_STRING string[30];
-               UNSIGNED64     epochTimeBaseMs;
-               UNSIGNED32     epochTimeOffsetMs;
-               }              OD_time_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -1284,6 +1238,12 @@
 /*1F89 */
         #define OD_1F89_bootTime                                    0x1F89
 
+/*2010 */
+        #define OD_2010_SCET                                        0x2010
+
+/*2011 */
+        #define OD_2011_UTC                                         0x2011
+
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
 
@@ -1327,14 +1287,6 @@
         #define OD_2109_0_voltage_maxSubIndex                       0
         #define OD_2109_1_voltage_MCU_VDDA                          1
 
-/*2130 */
-        #define OD_2130_time                                        0x2130
-
-        #define OD_2130_0_time_maxSubIndex                          0
-        #define OD_2130_1_time_string                               1
-        #define OD_2130_2_time_epochTimeBaseMs                      2
-        #define OD_2130_3_time_epochTimeOffsetMs                    3
-
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -1348,7 +1300,7 @@ struct sCO_OD_ROM{
 /*1005      */ UNSIGNED32     COB_ID_SYNCMessage;
 /*1006      */ UNSIGNED32     communicationCyclePeriod;
 /*1007      */ UNSIGNED32     synchronousWindowLength;
-/*1008      */ VISIBLE_STRING manufacturerDeviceName[18];
+/*1008      */ VISIBLE_STRING manufacturerDeviceName[21];
 /*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
 /*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
 /*1014      */ UNSIGNED32     COB_ID_EMCY;
@@ -1384,13 +1336,14 @@ struct sCO_OD_RAM{
 /*1F81      */ UNSIGNED32      slaveAssignment[127];
 /*1F82      */ UNSIGNED8       requestNMT[127];
 /*1F89      */ UNSIGNED32     bootTime;
+/*2010      */ UNSIGNED64     SCET;
+/*2011      */ UNSIGNED64     UTC;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
 /*2107      */ UNSIGNED16      sensors[3];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
-/*2130      */ OD_time_t       time;
 
                UNSIGNED32     LastWord;
 };
@@ -1438,7 +1391,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*1008, Data Type: VISIBLE_STRING */
         #define OD_manufacturerDeviceName                           CO_OD_ROM.manufacturerDeviceName
-        #define ODL_manufacturerDeviceName_stringLength             18
+        #define ODL_manufacturerDeviceName_stringLength             21
 
 /*1009, Data Type: VISIBLE_STRING */
         #define OD_manufacturerHardwareVersion                      CO_OD_ROM.manufacturerHardwareVersion
@@ -1522,6 +1475,12 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*1F89, Data Type: UNSIGNED32 */
         #define OD_bootTime                                         CO_OD_RAM.bootTime
 
+/*2010, Data Type: UNSIGNED64 */
+        #define OD_SCET                                             CO_OD_RAM.SCET
+
+/*2011, Data Type: UNSIGNED64 */
+        #define OD_UTC                                              CO_OD_RAM.UTC
+
 /*2100, Data Type: OCTET_STRING */
         #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
         #define ODL_errorStatusBits_stringLength                    10
@@ -1562,6 +1521,5 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
         #define ODL_voltage_arrayLength                             1
         #define ODA_voltage_MCU_VDDA                                0
 
-/*2130, Data Type: time_t */
-        #define OD_time                                             CO_OD_RAM.time
-
+#endif
+// clang-format on

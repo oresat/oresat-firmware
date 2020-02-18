@@ -24,6 +24,12 @@
 
 static worker_t worker1;
 
+static oresat_config_t oresat_conf = {
+    &CAND1,
+    0x06,
+    ORESAT_DEFAULT_BITRATE
+};
+
 /**
  * @brief App Initialization
  */
@@ -44,8 +50,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init(0x06, ORESAT_DEFAULT_BITRATE);
+    oresat_init();
     app_init();
-    oresat_start(&CAND1);
+    oresat_start(&oresat_conf);
     return 0;
 }
