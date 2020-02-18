@@ -43,12 +43,13 @@
  * TODO: Enumerate remaining register addresses
  * @{
  */
-#define MAX17205_AD_STATUS                  0x000U
-#define MAX17205_AD_COMMAND                 0x060U
-#define MAX17205_AD_CONFIG2                 0x0BBU
+#define MAX17205_AD_STATUS                  0x0000U
+#define MAX17205_AD_COMMAND                 0x0060U
+#define MAX17205_AD_CONFIG                  0x001DU
+#define MAX17205_AD_CONFIG2                 0x00BBU
 /** @} */
 
-/* TODO: Define fields and values for remaining registers */
+/* TODO: Define fields and values for all registers */
 /**
  * @name    MAX17205 Status register fields
  * @{
@@ -96,19 +97,73 @@
 
 /**
  * @name    MAX17205 Command register values
+ * TODO: Enumerate remaining commands
  * @{
  */
 #define MAX17205_COMMAND_RST                0x000FU
 /** @} */
 
 /**
+ * @name    MAX17205 Config register fields
+ * @{
+ */
+#define MAX17205_CONFIG_BER_Pos             (0U)
+#define MAX17205_CONFIG_BER_Msk             (0x1U << MAX17205_CONFIG_BER_Pos)
+#define MAX17205_CONFIG_BER                 MAX17205_CONFIG_BER_Msk
+#define MAX17205_CONFIG_BEI_Pos             (1U)
+#define MAX17205_CONFIG_BEI_Msk             (0x1U << MAX17205_CONFIG_BEI_Pos)
+#define MAX17205_CONFIG_BEI                 MAX17205_CONFIG_BEI_Msk
+#define MAX17205_CONFIG_AEN_Pos             (2U)
+#define MAX17205_CONFIG_AEN_Msk             (0x1U << MAX17205_CONFIG_AEN_Pos)
+#define MAX17205_CONFIG_AEN                 MAX17205_CONFIG_AEN_Msk
+#define MAX17205_CONFIG_FTHRM_Pos           (3U)
+#define MAX17205_CONFIG_FTHRM_Msk           (0x1U << MAX17205_CONFIG_FTHRM_Pos)
+#define MAX17205_CONFIG_FTHRM               MAX17205_CONFIG_FTHRM_Msk
+#define MAX17205_CONFIG_ETHRM_Pos           (4U)
+#define MAX17205_CONFIG_ETHRM_Msk           (0x1U << MAX17205_CONFIG_ETHRM_Pos)
+#define MAX17205_CONFIG_ETHRM               MAX17205_CONFIG_ETHRM_Msk
+#define MAX17205_CONFIG_COMMSH_Pos          (6U)
+#define MAX17205_CONFIG_COMMSH_Msk          (0x1U << MAX17205_CONFIG_COMMSH_Pos)
+#define MAX17205_CONFIG_COMMSH              MAX17205_CONFIG_COMMSH_Msk
+#define MAX17205_CONFIG_SHDN_Pos            (7U)
+#define MAX17205_CONFIG_SHDN_Msk            (0x1U << MAX17205_CONFIG_SHDN_Pos)
+#define MAX17205_CONFIG_SHDN                MAX17205_CONFIG_SHDN_Msk
+#define MAX17205_CONFIG_TEX_Pos             (8U)
+#define MAX17205_CONFIG_TEX_Msk             (0x1U << MAX17205_CONFIG_TEX_Pos)
+#define MAX17205_CONFIG_TEX                 MAX17205_CONFIG_TEX_Msk
+#define MAX17205_CONFIG_TEN_Pos             (9U)
+#define MAX17205_CONFIG_TEN_Msk             (0x1U << MAX17205_CONFIG_TEN_Pos)
+#define MAX17205_CONFIG_TEN                 MAX17205_CONFIG_TEN_Msk
+#define MAX17205_CONFIG_AINSH_Pos           (10U)
+#define MAX17205_CONFIG_AINSH_Msk           (0x1U << MAX17205_CONFIG_AINSH_Pos)
+#define MAX17205_CONFIG_AINSH               MAX17205_CONFIG_AINSH_Msk
+#define MAX17205_CONFIG_ALRTP_Pos           (11U)
+#define MAX17205_CONFIG_ALRTP_Msk           (0x1U << MAX17205_CONFIG_ALRTP_Pos)
+#define MAX17205_CONFIG_ALRTP               MAX17205_CONFIG_ALRTP_Msk
+#define MAX17205_CONFIG_VS_Pos              (12U)
+#define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_VS_Pos)
+#define MAX17205_CONFIG_VS                  MAX17205_CONFIG_VS_Msk
+#define MAX17205_CONFIG_VS_Pos              (13U)
+#define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_TS_Pos)
+#define MAX17205_CONFIG_TS                  MAX17205_CONFIG_TS_Msk
+#define MAX17205_CONFIG_VS_Pos              (14U)
+#define MAX17205_CONFIG_VS_Msk              (0x1U << MAX17205_CONFIG_SS_Pos)
+#define MAX17205_CONFIG_SS                  MAX17205_CONFIG_SS_Msk
+/** @} */
+
+/**
  * @name    MAX17205 Config2 register fields
- * TODO: Finish these fields
  * @{
  */
 #define MAX17205_CONFIG2_POR_CMD_Pos        (0U)
 #define MAX17205_CONFIG2_POR_CMD_Msk        (0x1U << MAX17205_CONFIG2_POR_CMD_Pos)
 #define MAX17205_CONFIG2_POR_CMD            MAX17205_CONFIG2_POR_CMD_Msk
+#define MAX17205_CONFIG2_TALRTEN_Pos        (6U)
+#define MAX17205_CONFIG2_TALRTEN_Msk        (0x1U << MAX17205_CONFIG2_TALRTEN_Pos)
+#define MAX17205_CONFIG2_TALRTEN            MAX17205_CONFIG2_TALRTEN_Msk
+#define MAX17205_CONFIG2_DSOCEN_Pos         (7U)
+#define MAX17205_CONFIG2_DSOCEN_Msk         (0x1U << MAX17205_CONFIG2_DSOCEN_Pos)
+#define MAX17205_CONFIG2_DSOCEN             MAX17205_CONFIG2_DSOCEN_Msk
 /** @} */
 
 /*===========================================================================*/
@@ -191,10 +246,6 @@ typedef struct {
      */
     i2caddr_t                   saddr;
 #endif /* MAX17205_USE_I2C */
-    /**
-     * @brief MAX17205 TODO
-     */
-    uint16_t                    todo;
 } MAX17205Config;
 
 /**

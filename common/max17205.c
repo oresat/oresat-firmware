@@ -136,7 +136,6 @@ void max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
     buf.reg = MAX17205_AD_CONFIG2;
     buf.value = __REVSH(MAX17205_CONFIG2_POR_CMD);
     max17205I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-    /* TODO: Remaining initialization process */
 
 #if MAX17205_SHARED_I2C
     i2cReleaseBus(config->i2cp);
