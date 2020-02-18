@@ -243,7 +243,7 @@
  * GPIOA setup:
  *
  * PA0  - LED_GREEN                 (output pushpull).
- * PA1  - ALERT                     (analog).
+ * PA1  - ALERT                     (input).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - PIN4                      (analog).
@@ -260,14 +260,14 @@
  * PA15 - PIN15                     (analog).
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_OUTPUT(GPIOA_LED_GREEN) |     \
-                                     PIN_MODE_ANALOG(GPIOA_ALERT) |         \
+                                     PIN_MODE_INPUT(GPIOA_ALERT) |          \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_ANALOG(GPIOA_PIN4) |          \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |  \
-                                     PIN_MODE_INPUT(GPIOA_PIN8) |           \
+                                     PIN_MODE_ANALOG(GPIOA_PIN8) |          \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SILENT) |    \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SHDN) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_CAN_RX) |     \
