@@ -1662,7 +1662,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=11
+SupportedObjects=12
 1=0x2010
 2=0x2011
 3=0x2100
@@ -1674,6 +1674,7 @@ SupportedObjects=11
 9=0x2107
 10=0x2108
 11=0x2109
+12=0x2110
 
 [2010]
 ParameterName=SCET
@@ -1868,5 +1869,47 @@ ObjectType=0x7
 DataType=0x0003
 AccessType=ro
 DefaultValue=0
+PDOMapping=1
+
+[2110]
+ParameterName=Solar Panel
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x4
+
+[2110sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=3
+PDOMapping=0
+
+[2110sub1]
+ParameterName=Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[2110sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0004
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[2110sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=
 PDOMapping=1
 

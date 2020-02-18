@@ -79,6 +79,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2107*/ {0x00, 0x00, 0x00},
 /*2108*/ {0x00},
 /*2109*/ {0x00},
+/*2110*/ {0x3L, 0x0000L, 0x0000L, 0x0000L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -274,6 +275,13 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_ROM.TPDOMappingParameter[3].mappedObject8, 0x8D, 0x4 },
 };
 
+/*0x2110*/ const CO_OD_entryRecord_t OD_record2110[4] = {
+           {(void*)&CO_OD_RAM.solarPanel.maxSubIndex, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel.voltage, 0xA6, 0x4 },
+           {(void*)&CO_OD_RAM.solarPanel.current, 0xA6, 0x4 },
+           {(void*)&CO_OD_RAM.solarPanel.power, 0xA6, 0x4 },
+};
+
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
@@ -326,5 +334,6 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2107, 0x03, 0xA6,  2, (void*)&CO_OD_RAM.sensors[0]},
 {0x2108, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.temperature[0]},
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
+{0x2110, 0x03, 0x00,  1, (void*)&OD_record2110},
 };
 // clang-format on

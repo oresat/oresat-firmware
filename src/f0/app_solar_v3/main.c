@@ -22,11 +22,11 @@
 #include "oresat.h"
 #include "solar.h"
 
-static worker_t worker1;
+/*static worker_t worker1;*/
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-    ORESAT_DEFAULT_ID,
+    0x06,
     ORESAT_DEFAULT_BITRATE
 };
 
@@ -36,8 +36,9 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);
-    reg_worker(&worker1);
+    /*init_worker(&worker1, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);*/
+    /*reg_worker(&worker1);*/
+    chThdCreateStatic(solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
