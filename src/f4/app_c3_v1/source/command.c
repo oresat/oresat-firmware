@@ -242,7 +242,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "get")) {
         unix_time = get_time_unix(&msec);
-        chprintf(chp, "UNIX Time: %s.%u\r\n", ctime(&unix_time), msec);
+        chprintf(chp, "UNIX Time: %s\r\n", ctime(&unix_time));
     } else if (!strcmp(argv[0], "set") && argc > 1) {
         set_time_unix(strtoul(argv[1], NULL, 0), 0);
     } else {

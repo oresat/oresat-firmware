@@ -173,12 +173,12 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         }
         /* 2. */
         if(sdcWrite(&SDCD1, startblk, buf, 2)) {
-            chprintf(chp, "mmcErase() test write failed\r\n");
+            chprintf(chp, "sdcErase() test write failed\r\n");
             goto exittest;
         }
         /* 3. (erase) */
         if(sdcErase(&SDCD1, startblk + 1, startblk + 2)) {
-            chprintf(chp, "mmcErase() failed\r\n");
+            chprintf(chp, "sdcErase() failed\r\n");
             goto exittest;
         }
         sdcflags_t errflags = sdcGetAndClearErrors(&SDCD1);
@@ -192,35 +192,35 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         }
         /* 3.1. */
         if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) != 0) {
-            chprintf(chp, "mmcErase() non-erased block compare failed\r\n");
+            chprintf(chp, "sdcErase() non-erased block compare failed\r\n");
             goto exittest;
         }
         /* 3.2. */
         if(memcmp(buf + MMCSD_BLOCK_SIZE,
                     buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "mmcErase() erased block compare failed\r\n");
+            chprintf(chp, "sdcErase() erased block compare failed\r\n");
             goto exittest;
         }
         /* 4. */
         if(sdcErase(&SDCD1, startblk, startblk + 2)) {
-            chprintf(chp, "multi-block mmcErase() failed\r\n");
+            chprintf(chp, "multi-block sdcErase() failed\r\n");
             goto exittest;
         }
         if(sdcRead(&SDCD1, startblk, buf2, 2)) {
-            chprintf(chp, "single-block mmcErase() failed\r\n");
+            chprintf(chp, "single-block sdcErase() failed\r\n");
             goto exittest;
         }
         /* 4.1 */
         if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block mmcErase() erased block compare failed\r\n");
+            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
             goto exittest;
         }
         if(memcmp(buf + MMCSD_BLOCK_SIZE,
                   buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block mmcErase() erased block compare failed\r\n");
+            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
             goto exittest;
         }
-        /* END of mmcErase() test */
+        /* END of sdcErase() test */
     }
 
     /* Card disconnect and command end.*/
