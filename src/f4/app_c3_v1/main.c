@@ -44,32 +44,19 @@ static const oresat_node_t nodes[] = {
 };
 */
 
-static SPIConfig hs_spicfg = {
-    false,
-    NULL,
-    LINE_MMC_CS,
-    0,
-    0
-};
-
-static SPIConfig ls_spicfg = {
-    false,
-    NULL,
-    LINE_MMC_CS,
-    SPI_CR1_BR_2 | SPI_CR1_BR_1,
-    0
-};
+/*
+ * Working area for driver.
+ */
+static uint8_t sd_scratchpad[512];
 
 /*
- * MMC configuration.
+ * SDIO configuration.
  */
-static MMCConfig mmccfg = {
-    &SPID3,
-    &ls_spicfg,
-    &hs_spicfg
+static const SDCConfig sdccfg = {
+  sd_scratchpad,
+  SDC_MODE_4BIT
 };
 
-MMCDriver MMCD1;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -93,10 +80,11 @@ static void app_init(void)
     shellInit();
     sdStart(&SD2, NULL);
 
-    /* Initializes MMC SPI driver */
+    /* Initializes MMC SDC interface */
     palClearLine(LINE_MMC_PWR);
-    mmcObjectInit(&MMCD1);
-    mmcStart(&MMCD1, &mmccfg);
+    sdcStart(&SDCD1, &sdccfg);
+
+    /* Start up the shell */
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 }
 
