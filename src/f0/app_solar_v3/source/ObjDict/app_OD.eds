@@ -8,8 +8,8 @@ Description=OreSat Solar Board Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=9:12AM
-ModificationDate=09-10-2019
+ModificationTime=3:31PM
+ModificationDate=02-27-2020
 ModifiedBy=
 
 [DeviceInfo]
@@ -1049,7 +1049,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x180
+DefaultValue=0x00000180+$NODEID
 PDOMapping=0
 
 [1800sub2]
@@ -1118,7 +1118,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x280
+DefaultValue=0x00000280+$NODEID
 PDOMapping=0
 
 [1801sub2]
@@ -1154,7 +1154,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1801sub6]
@@ -1187,7 +1187,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x380
+DefaultValue=0x00000380+$NODEID
 PDOMapping=0
 
 [1802sub2]
@@ -1223,7 +1223,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1802sub6]
@@ -1403,7 +1403,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1A01sub1]
@@ -1412,7 +1412,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x21100120
 PDOMapping=0
 
 [1A01sub2]
@@ -1421,7 +1421,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x21100220
 PDOMapping=0
 
 [1A01sub3]
@@ -1490,7 +1490,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=1
 PDOMapping=0
 
 [1A02sub1]
@@ -1499,7 +1499,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x21100320
 PDOMapping=0
 
 [1A02sub2]
