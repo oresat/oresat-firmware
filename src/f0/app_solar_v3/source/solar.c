@@ -103,6 +103,12 @@ THD_FUNCTION(solar, arg)
         OD_solarPanel.current = ina226ReadCurrent(&ina226dev);
         OD_solarPanel.power = ina226ReadPower(&ina226dev);
 
+        if (OD_solarPanel.voltage >= 45000) {
+            palClearLine(LINE_CAN_SILENT);
+        } else {
+            palSetLine(LINE_CAN_SILENT);
+        }
+
         /* Calculate iadj */
         calc_mppt(OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power, &iadj_v);
 

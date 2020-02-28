@@ -202,6 +202,8 @@
 #define LINE_LED_GREEN              PAL_LINE(GPIOA, 4U)
 #define LINE_DEBUG                  PAL_LINE(GPIOA, 4U)
 #define LINE_OUTPUT_EN              PAL_LINE(GPIOA, 5U)
+#define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
+#define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -334,7 +336,7 @@
                                      PIN_ODR_HIGH(GPIOA_ALERT) |            \
                                      PIN_ODR_HIGH(GPIOA_TP11) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN8) |             \
-                                     PIN_ODR_LOW(GPIOA_CAN_SILENT) |        \
+                                     PIN_ODR_HIGH(GPIOA_CAN_SILENT) |       \
                                      PIN_ODR_LOW(GPIOA_CAN_SHDN) |          \
                                      PIN_ODR_HIGH(GPIOA_CAN_RX) |           \
                                      PIN_ODR_HIGH(GPIOA_CAN_TX) |           \
