@@ -919,62 +919,62 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 
 /*0x4002*/ const CO_OD_entryRecord_t OD_record4002[3] = {
            {(void*)&CO_OD_RAM.battery1.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.battery1.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery1.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4003*/ const CO_OD_entryRecord_t OD_record4003[3] = {
            {(void*)&CO_OD_RAM.battery2.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.battery2.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery2.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4004*/ const CO_OD_entryRecord_t OD_record4004[3] = {
            {(void*)&CO_OD_RAM.solarPanel1.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel1.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel1.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel1.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel1.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4005*/ const CO_OD_entryRecord_t OD_record4005[3] = {
            {(void*)&CO_OD_RAM.solarPanel2.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel2.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel2.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel2.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel2.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4006*/ const CO_OD_entryRecord_t OD_record4006[3] = {
            {(void*)&CO_OD_RAM.solarPanel3.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel3.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel3.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel3.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel3.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4007*/ const CO_OD_entryRecord_t OD_record4007[3] = {
            {(void*)&CO_OD_RAM.solarPanel4.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel4.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel4.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel4.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel4.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4008*/ const CO_OD_entryRecord_t OD_record4008[3] = {
            {(void*)&CO_OD_RAM.solarPanel5.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel5.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel5.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel5.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel5.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4009*/ const CO_OD_entryRecord_t OD_record4009[3] = {
            {(void*)&CO_OD_RAM.solarPanel6.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel6.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel6.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel6.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel6.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x400A*/ const CO_OD_entryRecord_t OD_record400A[3] = {
            {(void*)&CO_OD_RAM.solarPanel7.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel7.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel7.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel7.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel7.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x400B*/ const CO_OD_entryRecord_t OD_record400B[3] = {
            {(void*)&CO_OD_RAM.solarPanel8.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel8.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel8.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel8.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel8.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4011*/ const CO_OD_entryRecord_t OD_record4011[1] = {
@@ -987,44 +987,44 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 
 /*0x4013*/ const CO_OD_entryRecord_t OD_record4013[3] = {
            {(void*)&CO_OD_RAM.IMU.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.IMU.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.IMU.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.IMU.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.IMU.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4014*/ const CO_OD_entryRecord_t OD_record4014[3] = {
            {(void*)&CO_OD_RAM.magnetometer1.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.magnetometer1.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.magnetometer1.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.magnetometer1.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.magnetometer1.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4015*/ const CO_OD_entryRecord_t OD_record4015[3] = {
            {(void*)&CO_OD_RAM.magnetometer2.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.magnetometer2.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.magnetometer2.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.magnetometer2.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.magnetometer2.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4016*/ const CO_OD_entryRecord_t OD_record4016[3] = {
            {(void*)&CO_OD_RAM.RW_MT1.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.RW_MT1.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.RW_MT1.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT1.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT1.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4017*/ const CO_OD_entryRecord_t OD_record4017[3] = {
            {(void*)&CO_OD_RAM.RW_MT2.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.RW_MT2.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.RW_MT2.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT2.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT2.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4018*/ const CO_OD_entryRecord_t OD_record4018[3] = {
            {(void*)&CO_OD_RAM.RW_MT3.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.RW_MT3.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.RW_MT3.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT3.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.RW_MT3.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4019*/ const CO_OD_entryRecord_t OD_record4019[3] = {
            {(void*)&CO_OD_RAM.RW4.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.RW4.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.RW4.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.RW4.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.RW4.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4021*/ const CO_OD_entryRecord_t OD_record4021[1] = {
@@ -1037,20 +1037,20 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 
 /*0x4031*/ const CO_OD_entryRecord_t OD_record4031[3] = {
            {(void*)&CO_OD_RAM.protocard1.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.protocard1.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.protocard1.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.protocard1.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.protocard1.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4032*/ const CO_OD_entryRecord_t OD_record4032[3] = {
            {(void*)&CO_OD_RAM.protocard2.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.protocard2.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.protocard2.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.protocard2.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.protocard2.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*0x4033*/ const CO_OD_entryRecord_t OD_record4033[3] = {
            {(void*)&CO_OD_RAM.protocard3.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.protocard3.MCU_Temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.protocard3.MCU_Voltage, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.protocard3.MCU_Temperature, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.protocard3.MCU_Voltage, 0x9E, 0x2 },
 };
 
 /*******************************************************************************

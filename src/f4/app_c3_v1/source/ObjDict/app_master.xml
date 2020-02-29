@@ -3053,10 +3053,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3066,10 +3066,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3079,10 +3079,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3092,10 +3092,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3105,10 +3105,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3118,10 +3118,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3131,10 +3131,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3144,10 +3144,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3157,10 +3157,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3170,10 +3170,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3197,10 +3197,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3210,10 +3210,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3223,10 +3223,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3236,10 +3236,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3249,10 +3249,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3262,10 +3262,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3275,10 +3275,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3302,10 +3302,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3315,10 +3315,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
@@ -3328,10 +3328,10 @@ Valid values are in [kbps]:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="2" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="MCU Temperature" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="ro" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="MCU Voltage" objectType="VAR" dataType="0x03" accessType="rww" PDOmapping="optional" defaultValue="" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <accessFunctionPreCode />
