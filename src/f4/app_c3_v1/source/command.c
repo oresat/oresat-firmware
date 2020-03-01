@@ -15,11 +15,92 @@
 #endif
 
 typedef struct {
+    uint16_t code;
+    char *desc;
+} em_codestr_t;
+
+typedef struct {
+    uint8_t bits;
+    char *desc;
+} em_bitstr_t;
+
+typedef struct {
     uint32_t code;
     char *desc;
-} errorstr_t;
+} sdo_errstr_t;
 
-static const errorstr_t errors[] = {
+static const em_codestr_t em_codes[] = {
+    {0x0000U, "Error Reset or No Error"},
+    {0x1000U, "Generic Error"},
+    {0x2000U, "Current"},
+    {0x2100U, "Current, device input side"},
+    {0x2200U, "Current inside the device"},
+    {0x2300U, "Current, device output side"},
+    {0x3000U, "Voltage"},
+    {0x3100U, "Mains Voltage"},
+    {0x3200U, "Voltage inside the device"},
+    {0x3300U, "Output Voltage"},
+    {0x4000U, "Temperature"},
+    {0x4100U, "Ambient Temperature"},
+    {0x4200U, "Device Temperature"},
+    {0x5000U, "Device Hardware"},
+    {0x6000U, "Device Software"},
+    {0x6100U, "Internal Software"},
+    {0x6200U, "User Software"},
+    {0x6300U, "Data Set"},
+    {0x7000U, "Additional Modules"},
+    {0x8000U, "Monitoring"},
+    {0x8100U, "Communication"},
+    {0x8110U, "CAN Overrun (Objects lost)"},
+    {0x8120U, "CAN in Error Passive Mode"},
+    {0x8130U, "Life Guard Error or Heartbeat Error"},
+    {0x8140U, "recovered from bus off"},
+    {0x8150U, "CAN-ID collision"},
+    {0x8200U, "Protocol Error"},
+    {0x8210U, "PDO not processed due to length error"},
+    {0x8220U, "PDO length exceeded"},
+    {0x8230U, "DAM MPDO not processed, destination object not available"},
+    {0x8240U, "Unexpected SYNC data length"},
+    {0x8250U, "RPDO timeout"},
+    {0x9000U, "External Error"},
+    {0xF000U, "Additional Functions"},
+    {0xFF00U, "Device specific"},
+    {0xFFFFU, "Unknown error"} /* TODO: Better termination */
+};
+
+static const em_bitstr_t em_bits[] = {
+    {0x00U, "Error Reset or No Error"},
+    {0x01U, "communication, info, CAN bus warning limit reached"},
+    {0x02U, "communication, info, Wrong data length of the received CAN message"},
+    {0x03U, "communication, info, Previous received CAN message wasn't processed yet"},
+    {0x04U, "communication, info, Wrong data length of received PDO"},
+    {0x05U, "communication, info, Previous received PDO wasn't processed yet"},
+    {0x06U, "communication, info, CAN receive bus is passive"},
+    {0x07U, "communication, info, CAN transmit bus is passive"},
+    {0x08U, "communication, info, Wrong NMT command received"},
+    {0x12U, "communication, critical, CAN transmit bus is off"},
+    {0x13U, "communication, critical, CAN module receive buffer has overflowed"},
+    {0x14U, "communication, critical, CAN transmit buffer has overflowed"},
+    {0x15U, "communication, critical, TPDO is outside SYNC window"},
+    {0x18U, "communication, critical, SYNC message timeout"},
+    {0x19U, "communication, critical, Unexpected SYNC data length"},
+    {0x1AU, "communication, critical, Error with PDO mapping"},
+    {0x1BU, "communication, critical, Heartbeat consumer timeout"},
+    {0x1CU, "communication, critical, Heartbeat consumer detected remote node reset"},
+    {0x20U, "generic, info, Emergency buffer is full, Emergency message wasn't sent"},
+    {0x22U, "generic, info, Microcontroller has just started"},
+    {0x28U, "generic, critical, Wrong parameters to CO_errorReport() function"},
+    {0x29U, "generic, critical, Timer task has overflowed"},
+    {0x2AU, "generic, critical, Unable to allocate memory for objects"},
+    {0x2BU, "generic, critical, Generic error, test usage"},
+    {0x2CU, "generic, critical, Software error"},
+    {0x2DU, "generic, critical, Object dictionary does not match the software"},
+    {0x2EU, "generic, critical, Error in calculation of device parameters"},
+    {0x2FU, "generic, critical, Error with access to non volatile device memory"},
+    {0xFFU, "Unknown bits"}
+};
+
+static const sdo_errstr_t sdo_errors[] = {
         {0x05030000, "Toggle bit not altered."},
         {0x05040000, "SDO protocol timed out."},
         {0x05040001, "Command specifier not valid or unknown."},
@@ -55,6 +136,94 @@ static const errorstr_t errors[] = {
 };
 
 static uint8_t data[BUF_SIZE];
+
+/*===========================================================================*/
+/* Support functions                                                         */
+/*===========================================================================*/
+void print_data(BaseSequentialStream *chp, char *format, void *data, size_t len)
+{
+    char str[100];
+
+    if (!strcmp(format, "u8")) {
+        chprintf(chp, "%u\r\n", *((uint8_t*)data));
+    } else if (!strcmp(format, "u16")) {
+        chprintf(chp, "%u\r\n", *((uint16_t*)data));
+    } else if (!strcmp(format, "u32")) {
+        chprintf(chp, "%u\r\n", *((uint32_t*)data));
+    } else if (!strcmp(format, "s8")) {
+        chprintf(chp, "%d\r\n", *((int8_t*)data));
+    } else if (!strcmp(format, "s16")) {
+        chprintf(chp, "%d\r\n", *((int16_t*)data));
+    } else if (!strcmp(format, "s32")) {
+        chprintf(chp, "%d\r\n", *((int32_t*)data));
+    } else if (!strcmp(format, "vs")) {
+        strncpy(str, data, 99);
+        str[(len<100?len:100)] = '\0';
+        chprintf(chp, "%s\r\n", str);
+    } else {
+        chprintf(chp, "Unknown format\r\n");
+    }
+}
+
+/*===========================================================================*/
+/* CAN Object Dictionary                                                     */
+/*===========================================================================*/
+void od_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: od get|set <index> <subindex> <format>\r\n");
+}
+
+void cmd_od(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    uint16_t index, entry, len;
+    uint8_t subindex;
+    void *data;
+    if (argc < 4) {
+        od_usage(chp);
+        return;
+    }
+    index = strtoul(argv[1], NULL, 0);
+    subindex = strtoul(argv[2], NULL, 0);
+
+    if (!strcmp(argv[0], "get")) {
+        entry = CO_OD_find(CO->SDO[0], index);
+        len = CO_OD_getLength(CO->SDO[0], entry, subindex);
+        data = CO_OD_getDataPointer(CO->SDO[0], entry, subindex);
+        print_data(chp, argv[3], data, len);
+    } else if (!strcmp(argv[0], "set")) {
+        chprintf(chp, "Function disabled\r\n");
+    } else {
+        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
+        od_usage(chp);
+        return;
+    }
+}
+
+/*===========================================================================*/
+/* CAN Emergency Messages                                                    */
+/*===========================================================================*/
+void em_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: em \r\n");
+}
+
+void cmd_em(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        em_usage(chp);
+        return;
+    }
+
+    if (!strcmp(argv[0], "test1")) {
+        chprintf(chp, "Placeholder\r\n");
+    } else if (!strcmp(argv[0], "test2")) {
+        chprintf(chp, "Placeholder\r\n");
+    } else {
+        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
+        em_usage(chp);
+        return;
+    }
+}
 
 /*===========================================================================*/
 /* CAN Network Management                                                    */
@@ -95,7 +264,7 @@ void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 void sdo_usage(BaseSequentialStream *chp)
 {
-    chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [blockmode]\r\n");
+    chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> <format> [blockmode]\r\n");
 }
 
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
@@ -107,7 +276,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
     uint8_t subindex = 0;
     bool block = false;
 
-    if (argc < 4) {
+    if (argc < 5) {
         sdo_usage(chp);
         return;
     }
@@ -115,20 +284,21 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
     node_id = strtoul(argv[1], NULL, 0);
     index = strtoul(argv[2], NULL, 0);
     subindex = strtoul(argv[3], NULL, 0);
-    if (argc == 5)
-        block = !strcmp(argv[4], "true");
+    if (argc == 6)
+        block = !strcmp(argv[5], "true");
 
     if (!strcmp(argv[0], "read")) {
         sdo_upload(CO->SDOclient[0], node_id, index, subindex, data, sizeof(data), &data_len, &abrt_code, 1000, block);
         if (abrt_code == CO_SDO_AB_NONE) {
             chprintf(chp, "Received %u bytes of data.\r\n", data_len);
+            print_data(chp, argv[4], data, data_len);
         } else {
-            const errorstr_t *err;
-            for (err = &errors[0]; err->code != 0 && err->code != abrt_code; err++);
+            const sdo_errstr_t *err;
+            for (err = &sdo_errors[0]; err->code != 0 && err->code != abrt_code; err++);
             chprintf(chp, "Received abort code: (%08X) %s\r\n", abrt_code, err->desc);
         }
     } else if (!strcmp(argv[0], "write")) {
-        chprintf(chp, "Disabled for now\r\n");
+        chprintf(chp, "Function disabled\r\n");
         /*sdo_download(CO->SDOclient[0], node_id, index, subindex, data, data_len, &abrt_code, 1000, block);*/
     } else {
         sdo_usage(chp);
@@ -255,6 +425,8 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
+    {"od",  cmd_od},
+    {"em",  cmd_em},
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
