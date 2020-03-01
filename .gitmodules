@@ -3,5 +3,5 @@
 	url = https://github.com/ChibiOS/ChibiOS.git
 [submodule "common/CANopenNode"]
 	path = common/CANopenNode
-	url = https://github.com/heliochronix/CANopenNode.git
-	branch = master
+	url = https://github.com/CANopenNode/CANopenNode.git
+	branch = split-driver
