@@ -166,66 +166,6 @@ void print_data(BaseSequentialStream *chp, char *format, void *data, size_t len)
 }
 
 /*===========================================================================*/
-/* CAN Object Dictionary                                                     */
-/*===========================================================================*/
-void od_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: od get|set <index> <subindex> <format>\r\n");
-}
-
-void cmd_od(BaseSequentialStream *chp, int argc, char *argv[])
-{
-    uint16_t index, entry, len;
-    uint8_t subindex;
-    void *data;
-    if (argc < 4) {
-        od_usage(chp);
-        return;
-    }
-    index = strtoul(argv[1], NULL, 0);
-    subindex = strtoul(argv[2], NULL, 0);
-
-    if (!strcmp(argv[0], "get")) {
-        entry = CO_OD_find(CO->SDO[0], index);
-        len = CO_OD_getLength(CO->SDO[0], entry, subindex);
-        data = CO_OD_getDataPointer(CO->SDO[0], entry, subindex);
-        print_data(chp, argv[3], data, len);
-    } else if (!strcmp(argv[0], "set")) {
-        chprintf(chp, "Function disabled\r\n");
-    } else {
-        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
-        od_usage(chp);
-        return;
-    }
-}
-
-/*===========================================================================*/
-/* CAN Emergency Messages                                                    */
-/*===========================================================================*/
-void em_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: em \r\n");
-}
-
-void cmd_em(BaseSequentialStream *chp, int argc, char *argv[])
-{
-    if (argc < 1) {
-        em_usage(chp);
-        return;
-    }
-
-    if (!strcmp(argv[0], "test1")) {
-        chprintf(chp, "Placeholder\r\n");
-    } else if (!strcmp(argv[0], "test2")) {
-        chprintf(chp, "Placeholder\r\n");
-    } else {
-        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
-        em_usage(chp);
-        return;
-    }
-}
-
-/*===========================================================================*/
 /* CAN Network Management                                                    */
 /*===========================================================================*/
 void nmt_usage(BaseSequentialStream *chp)
@@ -302,6 +242,32 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
         /*sdo_download(CO->SDOclient[0], node_id, index, subindex, data, data_len, &abrt_code, 1000, block);*/
     } else {
         sdo_usage(chp);
+        return;
+    }
+}
+
+/*===========================================================================*/
+/* CAN Emergency Messages                                                    */
+/*===========================================================================*/
+void em_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: em \r\n");
+}
+
+void cmd_em(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        em_usage(chp);
+        return;
+    }
+
+    if (!strcmp(argv[0], "test1")) {
+        chprintf(chp, "Placeholder\r\n");
+    } else if (!strcmp(argv[0], "test2")) {
+        chprintf(chp, "Placeholder\r\n");
+    } else {
+        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
+        em_usage(chp);
         return;
     }
 }
@@ -425,10 +391,9 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
-    {"od",  cmd_od},
-    {"em",  cmd_em},
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
+    {"em",  cmd_em},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
