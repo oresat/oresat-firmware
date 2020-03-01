@@ -181,22 +181,22 @@ Value definition for all subindexes:
       <CANopenSubObject subIndex="00" name="max sub-index" objectType="VAR" dataType="0x05" accessType="ro" PDOmapping="no" defaultValue="6" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="01" name="Communication" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x00" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="01" name="Communication" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="02" name="Communication other" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x00" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="02" name="Communication other" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <CANopenSubObject subIndex="03" name="Communication passive" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="04" name="Generic" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x00" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="04" name="Generic" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="05" name="Device profile" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x00" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="05" name="Device profile" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="06" name="Manufacturer specific" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x00" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="06" name="Manufacturer specific" objectType="VAR" dataType="0x00" accessType="rw" PDOmapping="no" defaultValue="0x01" highValue="" lowValue="" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
     </CANopenObject>
