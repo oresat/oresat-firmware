@@ -125,8 +125,8 @@ CO_ReturnError_t CO_CANmodule_init(
         /* CAN module filters are used, they will be configured with */
         /* CO_CANrxBufferInit() functions, called by separate CANopen */
         /* init functions. */
-        /* Configure all masks so that received message must match filter */
-        for (i = 0U; i < rxSize / 4; i++) {
+        /* Initialize all filter entries */
+        for (i = 0U; i < STM32_CAN_MAX_FILTERS; i++) {
             CANmodule->canFilters[i].filter = i;
             CANmodule->canFilters[i].mode = 1;                  /* List Mode */
             CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */

@@ -139,7 +139,7 @@ typedef struct {
      * are used for CAN reception. If there is not enough hardware filters,
      * they won't be used. In this case will be *all* received CAN messages
      * processed by software. */
-    CANFilter  canFilters[STM32_CAN_MAX_FILTERS];
+    CANFilter           canFilters[STM32_CAN_MAX_FILTERS];
     volatile uint32_t   useCANrxFilters;
     /* If flag is true, then message in transmitt buffer is synchronous PDO
      * message, which will be aborted, if CO_clearPendingSyncPDOs() function
