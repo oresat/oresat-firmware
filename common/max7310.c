@@ -211,7 +211,7 @@ void max7310Stop(MAX7310Driver *devp) {
  * @api
  */
 uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
-    uint8_t retval;
+    uint8_t value;
 
     osalDbgCheck(devp != NULL);
 
@@ -224,13 +224,13 @@ uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MAX7310_SHARED_I2C */
 
-    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &retval, sizeof(retval));
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &value, sizeof(value));
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX7310_SHARED_I2C */
 #endif /* MAX7310_USE_I2C */
-    return retval;
+    return value;
 }
 
 /**
@@ -258,6 +258,105 @@ void max7310WriteRaw(MAX7310Driver *devp, uint8_t reg, uint8_t value) {
 
     buf.reg = reg;
     buf.data = value;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Sets MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to set
+ *
+ * @api
+ */
+void max7310SetPin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data |= MAX7310_PIN_MASK(pin);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Clear MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to clear
+ *
+ * @api
+ */
+void max7310ClearPin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data &= ~MAX7310_PIN_MASK(pin);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Toggle MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to toggle
+ *
+ * @api
+ */
+void max7310TogglePin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data ^= MAX7310_PIN_MASK(pin);
     max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
 
 #if MAX7310_SHARED_I2C
