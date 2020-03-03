@@ -92,50 +92,35 @@ bool opd_probe(opd_addr_t addr)
 
 int opd_enable(opd_addr_t addr)
 {
-    uint8_t regval;
-
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
         return -1;
 
-    regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
-    regval |= MAX7310_PIN_MASK(OPD_CB_EN);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
-    regval |= MAX7310_PIN_MASK(OPD_EN);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    max7310SetPin(&opd_dev[addr].dev, OPD_CB_EN);
+    max7310SetPin(&opd_dev[addr].dev, OPD_EN);
     return 0;
 }
 
 int opd_disable(opd_addr_t addr)
 {
-    uint8_t regval;
-
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
         return -1;
 
-    regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
-    regval &= ~MAX7310_PIN_MASK(OPD_EN);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
-    regval &= ~MAX7310_PIN_MASK(OPD_CB_EN);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    max7310ClearPin(&opd_dev[addr].dev, OPD_EN);
+    max7310ClearPin(&opd_dev[addr].dev, OPD_CB_EN);
     return 0;
 }
 
 int opd_reset(opd_addr_t addr)
 {
-    uint8_t regval;
-
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
         return -1;
 
-    regval = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
-    regval |= MAX7310_PIN_MASK(OPD_CB_RESET);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    max7310SetPin(&opd_dev[addr].dev, OPD_CB_RESET);
     chThdSleepMilliseconds(100);
-    regval &= ~MAX7310_PIN_MASK(OPD_CB_RESET);
-    max7310WriteRaw(&opd_dev[addr].dev, MAX7310_AD_ODR, regval);
+    max7310ClearPin(&opd_dev[addr].dev, OPD_CB_RESET);
     return 0;
 }
 
