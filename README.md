@@ -15,6 +15,11 @@ To initialize the submodules, or to resync after submodule references are update
 
 This project requires `make`, `arm-none-eabi-gcc`, `arm-none-eabi-gdb`, and `openocd` to build/write/debug. Refer to your OS documentation or package installation tool to determine how to install these tools.
 
+To test that your build system works correctly, it's recommended that you build one of the `app_blinky` applications and write it to a dev board successfully. Here are the links for the various versions of the app with further documentation:
+* [NUCLEO32 STM32F042K6](src/f0/app_blinky)
+* [NUCLEO64 STM32F446RE](src/f4/app_blinky)
+* [NUCLEO64 STM32L452RE](src/l4/app_blinky)
+
 ### Creating an app
 Once you have a working toolchain in place, the next step is to copy an existing app_template for your microcontroller to a new app_projectname. The currently supported MCUs for OreSat are listed below, and link to the relevant folders and READMEs.
 
