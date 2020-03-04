@@ -39,11 +39,16 @@
 /** @} */
 
 /**
- * @brief   MAX17205 Slave Addresses
+ * @brief   MAX17205 Slave Addresses and Conversion
  */
-#define MAX17205_SA_MG_M5                   0x6CU
+#define MAX17205_SA_MG                      0x6CU
 #define MAX17205_SA_SBS_NV                  0x16U
-/** @} */
+#define MAX17205_SA(reg)                    (reg & 0x100U ? MAX17205_SA_SBS_NV : MAX17205_SA_MG)
+
+/**
+ * @brief   MAX17205 Register Address Conversion
+ */
+#define MAX17205_AD(reg)                    (reg & 0xFFU)
 
 /**
  * @name    MAX17205 Register Addresses
@@ -532,6 +537,8 @@ extern "C" {
 void max17205ObjectInit(MAX17205Driver *devp);
 void max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
+uint16_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg);
+void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value);
 #ifdef __cplusplus
 }
 #endif

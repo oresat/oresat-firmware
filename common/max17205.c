@@ -126,16 +126,16 @@ void max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
 #endif /* MAX17205_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    buf.reg = MAX17205_AD_COMMAND;
+    buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
     buf.value = __REVSH(MAX17205_COMMAND_RST);
-    max17205I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+    max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
     do {
-        max17205I2CReadRegister(config->i2cp, config->saddr, MAX17205_AD_STATUS,
+        max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_STATUS),
                                                 buf.data, sizeof(buf.data));
     } while (!(buf.data[0] & MAX17205_STATUS_POR)); /* While still resetting */
-    buf.reg = MAX17205_AD_CONFIG2;
+    buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
     buf.value = __REVSH(MAX17205_CONFIG2_POR_CMD);
-    max17205I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+    max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
 
 #if MAX17205_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -166,12 +166,12 @@ void max17205Stop(MAX17205Driver *devp) {
 #endif /* MAX17205_SHARED_I2C */
 
         /* Reset to input.*/
-        buf.reg = MAX17205_AD_COMMAND;
+        buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
         buf.value = __REVSH(MAX17205_COMMAND_RST);
-        max17205I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-        buf.reg = MAX17205_AD_CONFIG2;
+        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
+        buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
         buf.value = __REVSH(MAX17205_CONFIG2_POR_CMD);
-        max17205I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
 
         i2cStop(devp->config->i2cp);
 #if MAX17205_SHARED_I2C
@@ -181,5 +181,70 @@ void max17205Stop(MAX17205Driver *devp) {
     }
     devp->state = MAX17205_STOP;
 }
+
+/**
+ * @brief   Reads MAX17205 register as raw value.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read
+ *
+ * @api
+ */
+uint16_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg) {
+    uint16_t value;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX17205_READY,
+            "max17205ReadRaw(), invalid state");
+
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX17205_SHARED_I2C */
+
+    max17205I2CReadRegister(devp->config->i2cp, MAX17205_SA(reg), MAX17205_AD(reg), &value, sizeof(value));
+
+#if MAX17205_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+    return __REVSH(value);
+}
+
+/**
+ * @brief   Writes MAX17205 register as raw value.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to write to
+ * @param[in] value      the value to write
+ *
+ * @api
+ */
+void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX17205_READY,
+            "max17205WriteRaw(), invalid state");
+
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX17205_SHARED_I2C */
+
+    buf.reg = MAX17205_AD(reg);
+    buf.data = __REVSH(value);
+    max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(reg), buf.buf, sizeof(buf));
+
+#if MAX17205_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+}
+
 
 /** @} */
