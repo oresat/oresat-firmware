@@ -226,7 +226,7 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
  * @api
  */
 uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
-    uint8_t value[2];
+    uint16_t value;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == INA226_READY,
@@ -238,13 +238,13 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* INA226_SHARED_I2C */
 
-    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, value, sizeof(value));
+    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &value, sizeof(value));
 
 #if INA226_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* INA226_SHARED_I2C */
 #endif /* INA226_USE_I2C */
-    return __REVSH(*(uint16_t*)value);
+    return __REVSH(value);
 }
 
 /**
@@ -255,8 +255,8 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
  *
  * @api
  */
-int32_t ina226ReadShunt(INA226Driver *devp) {
-    int32_t voltage;
+int16_t ina226ReadShunt(INA226Driver *devp) {
+    int16_t voltage;
 
     osalDbgCheck(devp != NULL);
 
@@ -273,8 +273,8 @@ int32_t ina226ReadShunt(INA226Driver *devp) {
  *
  * @api
  */
-uint32_t ina226ReadVBUS(INA226Driver *devp) {
-    uint32_t voltage;
+uint16_t ina226ReadVBUS(INA226Driver *devp) {
+    uint16_t voltage;
 
     osalDbgCheck(devp != NULL);
 
@@ -292,8 +292,8 @@ uint32_t ina226ReadVBUS(INA226Driver *devp) {
  *
  * @api
  */
-int32_t ina226ReadCurrent(INA226Driver *devp) {
-    int32_t current;
+int16_t ina226ReadCurrent(INA226Driver *devp) {
+    int16_t current;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
@@ -313,8 +313,8 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  *
  * @api
  */
-uint32_t ina226ReadPower(INA226Driver *devp) {
-    uint32_t power;
+uint16_t ina226ReadPower(INA226Driver *devp) {
+    uint16_t power;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,

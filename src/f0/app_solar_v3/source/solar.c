@@ -45,15 +45,15 @@ uint32_t calc_iadj(uint32_t i_out)
     return ((50520000 - i_out * RSENSE) / 3200);
 }
 
-uint32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr, uint32_t *iadj_v)
+uint32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr, uint32_t *iadj_v)
 {
     /* The values from the previous iteration of the loop */
-    static uint32_t prev_volt = 0;
-    static int32_t  prev_curr = 0;
-    static uint32_t prev_pwr = 0;
-    int32_t delta_v = volt - prev_volt;
-    int32_t delta_i = curr - prev_curr;
-    int32_t delta_p = pwr  - prev_pwr;
+    static uint16_t prev_volt = 0;
+    static int16_t  prev_curr = 0;
+    static uint16_t prev_pwr = 0;
+    int16_t delta_v = volt - prev_volt;
+    int16_t delta_i = curr - prev_curr;
+    int16_t delta_p = pwr  - prev_pwr;
     prev_volt = volt;
     prev_curr = curr;
     prev_pwr  = pwr;

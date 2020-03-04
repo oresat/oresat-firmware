@@ -151,9 +151,9 @@
                }              OD_TPDOMappingParameter_t;
 /*2110      */ typedef struct {
                UNSIGNED8      maxSubIndex;
-               UNSIGNED32     voltage;
-               INTEGER32      current;
-               UNSIGNED32     power;
+               UNSIGNED16     voltage;
+               INTEGER16      current;
+               UNSIGNED16     power;
                }              OD_solarPanel_t;
 
 /*******************************************************************************
