@@ -61,7 +61,7 @@ msg_t ina226I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  *
  * @param[in] i2cp       pointer to the I2C interface
  * @param[in] sad        slave address without R bit
- * @param[in] txbuf      buffer containing command in first byte and high
+ * @param[in] txbuf      buffer containing reg in first byte and high
  *                       and low data bytes
  * @param[in] n          size of txbuf
  * @return               the operation status.
