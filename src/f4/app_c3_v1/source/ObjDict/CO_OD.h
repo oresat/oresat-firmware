@@ -80,7 +80,7 @@
   #define CO_NO_SDO_CLIENT               1   //Associated objects: 1280-12FF
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
-  #define CO_NO_RPDO                     20   //Associated objects: 14xx, 16xx
+  #define CO_NO_RPDO                     28   //Associated objects: 14xx, 16xx
   #define CO_NO_TPDO                     16   //Associated objects: 18xx, 1Axx
   #define CO_NO_NMT_MASTER               1
   #define CO_NO_TRACE                    0
@@ -89,7 +89,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             132
+   #define CO_OD_NoOfElements             148
 
 
 /*******************************************************************************
@@ -163,41 +163,65 @@
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel1_t;
 /*4005      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel2_t;
 /*4006      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel3_t;
 /*4007      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel4_t;
 /*4008      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel5_t;
 /*4009      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel6_t;
 /*400A      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel7_t;
 /*400B      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                INTEGER16      MCU_Temperature;
                INTEGER16      MCU_Voltage;
+               UNSIGNED16     PV_Voltage;
+               INTEGER16      PV_Current;
+               UNSIGNED16     PV_Power;
                }              OD_solarPanel8_t;
 /*4011      */ typedef struct {
                UNSIGNED8      maxSubIndex;
@@ -516,6 +540,62 @@
         #define OD_1413_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
         #define OD_1413_2_RPDOCommunicationParameter_transmissionType 2
 
+/*1414 */
+        #define OD_1414_RPDOCommunicationParameter                  0x1414
+
+        #define OD_1414_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1414_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1414_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1415 */
+        #define OD_1415_RPDOCommunicationParameter                  0x1415
+
+        #define OD_1415_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1415_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1415_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1416 */
+        #define OD_1416_RPDOCommunicationParameter                  0x1416
+
+        #define OD_1416_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1416_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1416_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1417 */
+        #define OD_1417_RPDOCommunicationParameter                  0x1417
+
+        #define OD_1417_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1417_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1417_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1418 */
+        #define OD_1418_RPDOCommunicationParameter                  0x1418
+
+        #define OD_1418_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1418_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1418_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1419 */
+        #define OD_1419_RPDOCommunicationParameter                  0x1419
+
+        #define OD_1419_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1419_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1419_2_RPDOCommunicationParameter_transmissionType 2
+
+/*141A */
+        #define OD_141A_RPDOCommunicationParameter                  0x141A
+
+        #define OD_141A_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141A_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141A_2_RPDOCommunicationParameter_transmissionType 2
+
+/*141B */
+        #define OD_141B_RPDOCommunicationParameter                  0x141B
+
+        #define OD_141B_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141B_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141B_2_RPDOCommunicationParameter_transmissionType 2
+
 /*1600 */
         #define OD_1600_RPDOMappingParameter                        0x1600
 
@@ -775,6 +855,110 @@
         #define OD_1613_6_RPDOMappingParameter_mappedObject6        6
         #define OD_1613_7_RPDOMappingParameter_mappedObject7        7
         #define OD_1613_8_RPDOMappingParameter_mappedObject8        8
+
+/*1614 */
+        #define OD_1614_RPDOMappingParameter                        0x1614
+
+        #define OD_1614_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1614_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1614_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1614_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1614_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1614_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1614_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1614_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1614_8_RPDOMappingParameter_mappedObject8        8
+
+/*1615 */
+        #define OD_1615_RPDOMappingParameter                        0x1615
+
+        #define OD_1615_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1615_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1615_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1615_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1615_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1615_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1615_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1615_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1615_8_RPDOMappingParameter_mappedObject8        8
+
+/*1616 */
+        #define OD_1616_RPDOMappingParameter                        0x1616
+
+        #define OD_1616_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1616_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1616_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1616_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1616_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1616_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1616_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1616_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1616_8_RPDOMappingParameter_mappedObject8        8
+
+/*1617 */
+        #define OD_1617_RPDOMappingParameter                        0x1617
+
+        #define OD_1617_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1617_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1617_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1617_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1617_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1617_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1617_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1617_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1617_8_RPDOMappingParameter_mappedObject8        8
+
+/*1618 */
+        #define OD_1618_RPDOMappingParameter                        0x1618
+
+        #define OD_1618_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1618_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1618_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1618_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1618_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1618_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1618_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1618_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1618_8_RPDOMappingParameter_mappedObject8        8
+
+/*1619 */
+        #define OD_1619_RPDOMappingParameter                        0x1619
+
+        #define OD_1619_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1619_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_1619_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_1619_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_1619_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_1619_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_1619_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_1619_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_1619_8_RPDOMappingParameter_mappedObject8        8
+
+/*161A */
+        #define OD_161A_RPDOMappingParameter                        0x161A
+
+        #define OD_161A_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161A_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_161A_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_161A_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_161A_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_161A_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_161A_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_161A_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_161A_8_RPDOMappingParameter_mappedObject8        8
+
+/*161B */
+        #define OD_161B_RPDOMappingParameter                        0x161B
+
+        #define OD_161B_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161B_1_RPDOMappingParameter_mappedObject1        1
+        #define OD_161B_2_RPDOMappingParameter_mappedObject2        2
+        #define OD_161B_3_RPDOMappingParameter_mappedObject3        3
+        #define OD_161B_4_RPDOMappingParameter_mappedObject4        4
+        #define OD_161B_5_RPDOMappingParameter_mappedObject5        5
+        #define OD_161B_6_RPDOMappingParameter_mappedObject6        6
+        #define OD_161B_7_RPDOMappingParameter_mappedObject7        7
+        #define OD_161B_8_RPDOMappingParameter_mappedObject8        8
 
 /*1800 */
         #define OD_1800_TPDOCommunicationParameter                  0x1800
@@ -1499,6 +1683,9 @@
         #define OD_4004_0_solarPanel1_maxSubIndex                   0
         #define OD_4004_1_solarPanel1_MCU_Temperature               1
         #define OD_4004_2_solarPanel1_MCU_Voltage                   2
+        #define OD_4004_3_solarPanel1_PV_Voltage                    3
+        #define OD_4004_4_solarPanel1_PV_Current                    4
+        #define OD_4004_5_solarPanel1_PV_Power                      5
 
 /*4005 */
         #define OD_4005_solarPanel2                                 0x4005
@@ -1506,6 +1693,9 @@
         #define OD_4005_0_solarPanel2_maxSubIndex                   0
         #define OD_4005_1_solarPanel2_MCU_Temperature               1
         #define OD_4005_2_solarPanel2_MCU_Voltage                   2
+        #define OD_4005_3_solarPanel2_PV_Voltage                    3
+        #define OD_4005_4_solarPanel2_PV_Current                    4
+        #define OD_4005_5_solarPanel2_PV_Power                      5
 
 /*4006 */
         #define OD_4006_solarPanel3                                 0x4006
@@ -1513,6 +1703,9 @@
         #define OD_4006_0_solarPanel3_maxSubIndex                   0
         #define OD_4006_1_solarPanel3_MCU_Temperature               1
         #define OD_4006_2_solarPanel3_MCU_Voltage                   2
+        #define OD_4006_3_solarPanel3_PV_Voltage                    3
+        #define OD_4006_4_solarPanel3_PV_Current                    4
+        #define OD_4006_5_solarPanel3_PV_Power                      5
 
 /*4007 */
         #define OD_4007_solarPanel4                                 0x4007
@@ -1520,6 +1713,9 @@
         #define OD_4007_0_solarPanel4_maxSubIndex                   0
         #define OD_4007_1_solarPanel4_MCU_Temperature               1
         #define OD_4007_2_solarPanel4_MCU_Voltage                   2
+        #define OD_4007_3_solarPanel4_PV_Voltage                    3
+        #define OD_4007_4_solarPanel4_PV_Current                    4
+        #define OD_4007_5_solarPanel4_PV_Power                      5
 
 /*4008 */
         #define OD_4008_solarPanel5                                 0x4008
@@ -1527,6 +1723,9 @@
         #define OD_4008_0_solarPanel5_maxSubIndex                   0
         #define OD_4008_1_solarPanel5_MCU_Temperature               1
         #define OD_4008_2_solarPanel5_MCU_Voltage                   2
+        #define OD_4008_3_solarPanel5_PV_Voltage                    3
+        #define OD_4008_4_solarPanel5_PV_Current                    4
+        #define OD_4008_5_solarPanel5_PV_Power                      5
 
 /*4009 */
         #define OD_4009_solarPanel6                                 0x4009
@@ -1534,6 +1733,9 @@
         #define OD_4009_0_solarPanel6_maxSubIndex                   0
         #define OD_4009_1_solarPanel6_MCU_Temperature               1
         #define OD_4009_2_solarPanel6_MCU_Voltage                   2
+        #define OD_4009_3_solarPanel6_PV_Voltage                    3
+        #define OD_4009_4_solarPanel6_PV_Current                    4
+        #define OD_4009_5_solarPanel6_PV_Power                      5
 
 /*400A */
         #define OD_400A_solarPanel7                                 0x400A
@@ -1541,6 +1743,9 @@
         #define OD_400A_0_solarPanel7_maxSubIndex                   0
         #define OD_400A_1_solarPanel7_MCU_Temperature               1
         #define OD_400A_2_solarPanel7_MCU_Voltage                   2
+        #define OD_400A_3_solarPanel7_PV_Voltage                    3
+        #define OD_400A_4_solarPanel7_PV_Current                    4
+        #define OD_400A_5_solarPanel7_PV_Power                      5
 
 /*400B */
         #define OD_400B_solarPanel8                                 0x400B
@@ -1548,6 +1753,9 @@
         #define OD_400B_0_solarPanel8_maxSubIndex                   0
         #define OD_400B_1_solarPanel8_MCU_Temperature               1
         #define OD_400B_2_solarPanel8_MCU_Voltage                   2
+        #define OD_400B_3_solarPanel8_PV_Voltage                    3
+        #define OD_400B_4_solarPanel8_PV_Current                    4
+        #define OD_400B_5_solarPanel8_PV_Power                      5
 
 /*4011 */
         #define OD_4011_starTracker                                 0x4011
@@ -1663,8 +1871,8 @@ struct sCO_OD_ROM{
 /*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
 /*1029      */ UNSIGNED8       errorBehavior[6];
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
-/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[20];
-/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[20];
+/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[28];
+/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[28];
 /*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[16];
 /*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[16];
 /*1F80      */ UNSIGNED32     NMTStartup;

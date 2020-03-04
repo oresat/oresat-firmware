@@ -56,7 +56,15 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1410*/ {0x2L, 0x0199L, 0xFEL},
 /*1411*/ {0x2L, 0x01B1L, 0xFEL},
 /*1412*/ {0x2L, 0x01B2L, 0xFEL},
-/*1413*/ {0x2L, 0x01B3L, 0xFEL}},
+/*1413*/ {0x2L, 0x01B3L, 0xFEL},
+/*1414*/ {0x2L, 0x0284L, 0xFEL},
+/*1415*/ {0x2L, 0x0285L, 0xFEL},
+/*1416*/ {0x2L, 0x0286L, 0xFEL},
+/*1417*/ {0x2L, 0x0287L, 0xFEL},
+/*1418*/ {0x2L, 0x0288L, 0xFEL},
+/*1419*/ {0x2L, 0x0289L, 0xFEL},
+/*141A*/ {0x2L, 0x028AL, 0xFEL},
+/*141B*/ {0x2L, 0x028BL, 0xFEL}},
 /*1600*/ {{0x2L, 0x40020110L, 0x40020210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1601*/ {0x2L, 0x40030110L, 0x40030210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1602*/ {0x2L, 0x40040110L, 0x40040210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
@@ -76,7 +84,15 @@ struct sCO_OD_ROM CO_OD_ROM = {
 /*1610*/ {0x2L, 0x40190110L, 0x40190210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1611*/ {0x2L, 0x40310110L, 0x40310210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1612*/ {0x2L, 0x40320110L, 0x40320210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1613*/ {0x2L, 0x40330110L, 0x40330210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
+/*1613*/ {0x2L, 0x40330110L, 0x40330210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1614*/ {0x3L, 0x40040310L, 0x40040410L, 0x40040510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1615*/ {0x0L, 0x40050310L, 0x40050410L, 0x40050510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1616*/ {0x0L, 0x40060310L, 0x40060410L, 0x40060510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1617*/ {0x0L, 0x40070310L, 0x40070410L, 0x40070510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1618*/ {0x0L, 0x40080310L, 0x40080410L, 0x40080510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1619*/ {0x0L, 0x40090310L, 0x40090410L, 0x40090510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161A*/ {0x0L, 0x400A0310L, 0x400A0410L, 0x400A0510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161B*/ {0x0L, 0x400B0310L, 0x400B0410L, 0x400B0510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1800*/ {{0x6L, 0x0180L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*1801*/ {0x6L, 0x0280L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*1802*/ {0x6L, 0x0380L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
@@ -141,14 +157,14 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2109*/ {0x00},
 /*4002*/ {0x2L, 0x00, 0x00},
 /*4003*/ {0x2L, 0x00, 0x00},
-/*4004*/ {0x2L, 0x00, 0x00},
-/*4005*/ {0x2L, 0x00, 0x00},
-/*4006*/ {0x2L, 0x00, 0x00},
-/*4007*/ {0x2L, 0x00, 0x00},
-/*4008*/ {0x2L, 0x00, 0x00},
-/*4009*/ {0x2L, 0x00, 0x00},
-/*400A*/ {0x2L, 0x00, 0x00},
-/*400B*/ {0x2L, 0x00, 0x00},
+/*4004*/ {0x5L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*4005*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*4006*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*4007*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*4008*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*4009*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*400A*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*400B*/ {0x2L, 0x00, 0x00, 0x00, 0x00, 0x00},
 /*4011*/ {0x0L},
 /*4012*/ {0x0L},
 /*4013*/ {0x2L, 0x00, 0x00},
@@ -323,6 +339,54 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_ROM.RPDOCommunicationParameter[19].maxSubIndex, 0x05, 0x1 },
            {(void*)&CO_OD_ROM.RPDOCommunicationParameter[19].COB_IDUsedByRPDO, 0x8D, 0x4 },
            {(void*)&CO_OD_ROM.RPDOCommunicationParameter[19].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1414*/ const CO_OD_entryRecord_t OD_record1414[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[20].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[20].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[20].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1415*/ const CO_OD_entryRecord_t OD_record1415[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[21].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[21].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[21].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1416*/ const CO_OD_entryRecord_t OD_record1416[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[22].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[22].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[22].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1417*/ const CO_OD_entryRecord_t OD_record1417[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[23].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[23].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[23].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1418*/ const CO_OD_entryRecord_t OD_record1418[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[24].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[24].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[24].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x1419*/ const CO_OD_entryRecord_t OD_record1419[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[25].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[25].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[25].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x141A*/ const CO_OD_entryRecord_t OD_record141A[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[26].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[26].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[26].transmissionType, 0x0D, 0x1 },
+};
+
+/*0x141B*/ const CO_OD_entryRecord_t OD_record141B[3] = {
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[27].maxSubIndex, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[27].COB_IDUsedByRPDO, 0x8D, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOCommunicationParameter[27].transmissionType, 0x0D, 0x1 },
 };
 
 /*0x1600*/ const CO_OD_entryRecord_t OD_record1600[9] = {
@@ -563,6 +627,102 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_ROM.RPDOMappingParameter[19].mappedObject6, 0x85, 0x4 },
            {(void*)&CO_OD_ROM.RPDOMappingParameter[19].mappedObject7, 0x85, 0x4 },
            {(void*)&CO_OD_ROM.RPDOMappingParameter[19].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1614*/ const CO_OD_entryRecord_t OD_record1614[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[20].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1615*/ const CO_OD_entryRecord_t OD_record1615[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[21].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1616*/ const CO_OD_entryRecord_t OD_record1616[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[22].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1617*/ const CO_OD_entryRecord_t OD_record1617[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[23].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1618*/ const CO_OD_entryRecord_t OD_record1618[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[24].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x1619*/ const CO_OD_entryRecord_t OD_record1619[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[25].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x161A*/ const CO_OD_entryRecord_t OD_record161A[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[26].mappedObject8, 0x85, 0x4 },
+};
+
+/*0x161B*/ const CO_OD_entryRecord_t OD_record161B[9] = {
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].numberOfMappedObjects, 0x05, 0x1 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject1, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject2, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject3, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject4, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject5, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject6, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject7, 0x85, 0x4 },
+           {(void*)&CO_OD_ROM.RPDOMappingParameter[27].mappedObject8, 0x85, 0x4 },
 };
 
 /*0x1800*/ const CO_OD_entryRecord_t OD_record1800[7] = {
@@ -929,52 +1089,76 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_RAM.battery2.MCU_Voltage, 0x9E, 0x2 },
 };
 
-/*0x4004*/ const CO_OD_entryRecord_t OD_record4004[3] = {
+/*0x4004*/ const CO_OD_entryRecord_t OD_record4004[6] = {
            {(void*)&CO_OD_RAM.solarPanel1.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel1.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel1.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel1.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel1.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel1.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x4005*/ const CO_OD_entryRecord_t OD_record4005[3] = {
+/*0x4005*/ const CO_OD_entryRecord_t OD_record4005[6] = {
            {(void*)&CO_OD_RAM.solarPanel2.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel2.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel2.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel2.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel2.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel2.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x4006*/ const CO_OD_entryRecord_t OD_record4006[3] = {
+/*0x4006*/ const CO_OD_entryRecord_t OD_record4006[6] = {
            {(void*)&CO_OD_RAM.solarPanel3.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel3.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel3.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel3.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel3.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel3.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x4007*/ const CO_OD_entryRecord_t OD_record4007[3] = {
+/*0x4007*/ const CO_OD_entryRecord_t OD_record4007[6] = {
            {(void*)&CO_OD_RAM.solarPanel4.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel4.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel4.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel4.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel4.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel4.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x4008*/ const CO_OD_entryRecord_t OD_record4008[3] = {
+/*0x4008*/ const CO_OD_entryRecord_t OD_record4008[6] = {
            {(void*)&CO_OD_RAM.solarPanel5.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel5.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel5.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel5.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel5.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel5.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x4009*/ const CO_OD_entryRecord_t OD_record4009[3] = {
+/*0x4009*/ const CO_OD_entryRecord_t OD_record4009[6] = {
            {(void*)&CO_OD_RAM.solarPanel6.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel6.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel6.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel6.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel6.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel6.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x400A*/ const CO_OD_entryRecord_t OD_record400A[3] = {
+/*0x400A*/ const CO_OD_entryRecord_t OD_record400A[6] = {
            {(void*)&CO_OD_RAM.solarPanel7.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel7.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel7.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel7.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel7.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel7.PV_Power, 0x9E, 0x2 },
 };
 
-/*0x400B*/ const CO_OD_entryRecord_t OD_record400B[3] = {
+/*0x400B*/ const CO_OD_entryRecord_t OD_record400B[6] = {
            {(void*)&CO_OD_RAM.solarPanel8.maxSubIndex, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.solarPanel8.MCU_Temperature, 0x9E, 0x2 },
            {(void*)&CO_OD_RAM.solarPanel8.MCU_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel8.PV_Voltage, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel8.PV_Current, 0x9E, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel8.PV_Power, 0x9E, 0x2 },
 };
 
 /*0x4011*/ const CO_OD_entryRecord_t OD_record4011[1] = {
@@ -1098,6 +1282,14 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1411, 0x02, 0x00,  0, (void*)&OD_record1411},
 {0x1412, 0x02, 0x00,  0, (void*)&OD_record1412},
 {0x1413, 0x02, 0x00,  0, (void*)&OD_record1413},
+{0x1414, 0x02, 0x00,  0, (void*)&OD_record1414},
+{0x1415, 0x02, 0x00,  0, (void*)&OD_record1415},
+{0x1416, 0x02, 0x00,  0, (void*)&OD_record1416},
+{0x1417, 0x02, 0x00,  0, (void*)&OD_record1417},
+{0x1418, 0x02, 0x00,  0, (void*)&OD_record1418},
+{0x1419, 0x02, 0x00,  0, (void*)&OD_record1419},
+{0x141A, 0x02, 0x00,  0, (void*)&OD_record141A},
+{0x141B, 0x02, 0x00,  0, (void*)&OD_record141B},
 {0x1600, 0x08, 0x00,  0, (void*)&OD_record1600},
 {0x1601, 0x08, 0x00,  0, (void*)&OD_record1601},
 {0x1602, 0x08, 0x00,  0, (void*)&OD_record1602},
@@ -1118,6 +1310,14 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1611, 0x08, 0x00,  0, (void*)&OD_record1611},
 {0x1612, 0x08, 0x00,  0, (void*)&OD_record1612},
 {0x1613, 0x08, 0x00,  0, (void*)&OD_record1613},
+{0x1614, 0x08, 0x00,  0, (void*)&OD_record1614},
+{0x1615, 0x08, 0x00,  0, (void*)&OD_record1615},
+{0x1616, 0x08, 0x00,  0, (void*)&OD_record1616},
+{0x1617, 0x08, 0x00,  0, (void*)&OD_record1617},
+{0x1618, 0x08, 0x00,  0, (void*)&OD_record1618},
+{0x1619, 0x08, 0x00,  0, (void*)&OD_record1619},
+{0x161A, 0x08, 0x00,  0, (void*)&OD_record161A},
+{0x161B, 0x08, 0x00,  0, (void*)&OD_record161B},
 {0x1800, 0x06, 0x00,  0, (void*)&OD_record1800},
 {0x1801, 0x06, 0x00,  0, (void*)&OD_record1801},
 {0x1802, 0x06, 0x00,  0, (void*)&OD_record1802},
@@ -1167,14 +1367,14 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2109, 0x01, 0xA6,  2, (void*)&CO_OD_RAM.voltage[0]},
 {0x4002, 0x02, 0x00,  1, (void*)&OD_record4002},
 {0x4003, 0x02, 0x00,  1, (void*)&OD_record4003},
-{0x4004, 0x02, 0x00,  1, (void*)&OD_record4004},
-{0x4005, 0x02, 0x00,  1, (void*)&OD_record4005},
-{0x4006, 0x02, 0x00,  1, (void*)&OD_record4006},
-{0x4007, 0x02, 0x00,  1, (void*)&OD_record4007},
-{0x4008, 0x02, 0x00,  1, (void*)&OD_record4008},
-{0x4009, 0x02, 0x00,  1, (void*)&OD_record4009},
-{0x400A, 0x02, 0x00,  1, (void*)&OD_record400A},
-{0x400B, 0x02, 0x00,  1, (void*)&OD_record400B},
+{0x4004, 0x05, 0x00,  1, (void*)&OD_record4004},
+{0x4005, 0x05, 0x00,  1, (void*)&OD_record4005},
+{0x4006, 0x05, 0x00,  1, (void*)&OD_record4006},
+{0x4007, 0x05, 0x00,  1, (void*)&OD_record4007},
+{0x4008, 0x05, 0x00,  1, (void*)&OD_record4008},
+{0x4009, 0x05, 0x00,  1, (void*)&OD_record4009},
+{0x400A, 0x05, 0x00,  1, (void*)&OD_record400A},
+{0x400B, 0x05, 0x00,  1, (void*)&OD_record400B},
 {0x4011, 0x00, 0x00,  1, (void*)&OD_record4011},
 {0x4012, 0x00, 0x00,  1, (void*)&OD_record4012},
 {0x4013, 0x02, 0x00,  1, (void*)&OD_record4013},
