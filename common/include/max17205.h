@@ -126,7 +126,6 @@
 #define MAX17205_AD_VRIPPLE                 0x0BCU
 #define MAX17205_AD_PACKCFG                 0x0BDU  /* TODO: Define fields */
 #define MAX17205_AD_TIMERH                  0x0BEU
-#define MAX17205_AD_ATAVSOC                 0x0CEU
 #define MAX17205_AD_AVGCELL4                0x0D1U
 #define MAX17205_AD_AVGCELL3                0x0D2U
 #define MAX17205_AD_AVGCELL2                0x0D3U
