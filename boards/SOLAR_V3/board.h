@@ -336,7 +336,7 @@
                                      PIN_ODR_HIGH(GPIOA_ALERT) |            \
                                      PIN_ODR_HIGH(GPIOA_TP11) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN8) |             \
-                                     PIN_ODR_HIGH(GPIOA_CAN_SILENT) |       \
+                                     PIN_ODR_LOW(GPIOA_CAN_SILENT) |       \
                                      PIN_ODR_LOW(GPIOA_CAN_SHDN) |          \
                                      PIN_ODR_HIGH(GPIOA_CAN_RX) |           \
                                      PIN_ODR_HIGH(GPIOA_CAN_TX) |           \
