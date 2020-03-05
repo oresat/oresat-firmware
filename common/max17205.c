@@ -136,7 +136,7 @@ void max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
                                                 buf.data, sizeof(buf.data));
     } while (!(buf.data[0] & MAX17205_STATUS_POR)); /* While still resetting */
     buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
-    buf.value = __REVSH(MAX17205_CONFIG2_POR_CMD);
+    buf.value = __REVSH(MAX17205_CONFIG2_PERM_BITS(MAX17205_CONFIG2_POR_CMD));
     max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
 
 #if MAX17205_SHARED_I2C
@@ -172,7 +172,7 @@ void max17205Stop(MAX17205Driver *devp) {
         buf.value = __REVSH(MAX17205_COMMAND_RST);
         max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
         buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
-        buf.value = __REVSH(MAX17205_CONFIG2_POR_CMD);
+        buf.value = __REVSH(MAX17205_CONFIG2_PERM_BITS(MAX17205_CONFIG2_POR_CMD));
         max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
 
         i2cStop(devp->config->i2cp);

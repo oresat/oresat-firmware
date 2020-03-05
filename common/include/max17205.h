@@ -92,7 +92,7 @@
 #define MAX17205_AD_QRTABLE10               0x022U
 #define MAX17205_AD_FULLCAPNOM              0x023U
 #define MAX17205_AD_AIN0                    0x027U
-#define MAX17205_AD_LEARNCFG                0x028U  /* TODO: Check fields */
+#define MAX17205_AD_LEARNCFG                0x028U
 #define MAX17205_AD_FILTERCFG               0x029U
 #define MAX17205_AD_RELAXCFG                0x02AU
 #define MAX17205_AD_MISCCFG                 0x02BU
@@ -105,18 +105,18 @@
 #define MAX17205_AD_IAVGEMPTY               0x036U
 #define MAX17205_AD_RCOMP0                  0x038U
 #define MAX17205_AD_TEMPCO                  0x039U
-#define MAX17205_AD_VEMPTY                  0x03AU  /* TODO: Define fields */
-#define MAX17205_AD_FSTAT                   0x03DU  /* TODO: Define fields */
+#define MAX17205_AD_VEMPTY                  0x03AU
+#define MAX17205_AD_FSTAT                   0x03DU
 #define MAX17205_AD_TIMER                   0x03EU
-#define MAX17205_AD_SHDNTIMER               0x03FU  /* TODO: Define fields */
+#define MAX17205_AD_SHDNTIMER               0x03FU
 #define MAX17205_AD_QRTABLE30               0x042U
 #define MAX17205_AD_DQACC                   0x045U
 #define MAX17205_AD_DPACC                   0x046U
 #define MAX17205_AD_VFREMCAP                0x04AU
 #define MAX17205_AD_QH                      0x04DU
-#define MAX17205_AD_COMMAND                 0x060U  /* TODO: Define commands */
-#define MAX17205_AD_COMMSTAT                0x061U  /* TODO: Define fields */
-#define MAX17205_AD_LOCK                    0x07FU  /* TODO: Define fields */
+#define MAX17205_AD_COMMAND                 0x060U
+#define MAX17205_AD_COMMSTAT                0x061U
+#define MAX17205_AD_LOCK                    0x07FU
 #define MAX17205_AD_STATUS2                 0x0B0U
 #define MAX17205_AD_IALRTTH                 0x0B4U  /* TODO: Define fields */
 #define MAX17205_AD_VSHDNCFG                0x0B8U
@@ -124,7 +124,7 @@
 #define MAX17205_AD_HIBCFG                  0x0BAU  /* TODO: Define fields */
 #define MAX17205_AD_CONFIG2                 0x0BBU
 #define MAX17205_AD_VRIPPLE                 0x0BCU
-#define MAX17205_AD_PACKCFG                 0x0BDU  /* TODO: Define fields */
+#define MAX17205_AD_PACKCFG                 0x0BDU
 #define MAX17205_AD_TIMERH                  0x0BEU
 #define MAX17205_AD_AVGCELL4                0x0D1U
 #define MAX17205_AD_AVGCELL3                0x0D2U
@@ -180,7 +180,7 @@
 #define MAX17205_AD_NOCVTABLE10             0x19AU
 #define MAX17205_AD_NOCVTABLE11             0x19BU
 #define MAX17205_AD_NICHGTERM               0x19CU
-#define MAX17205_AD_NFILTERCFG              0x19DU  /* TODO: Define fields */
+#define MAX17205_AD_NFILTERCFG              0x19DU
 #define MAX17205_AD_NVEMPTY                 0x19EU  /* TODO: Define fields */
 #define MAX17205_AD_NLEARNCFG               0x19FU
 #define MAX17205_AD_NQRTABLE00              0x1A0U
@@ -194,9 +194,9 @@
 #define MAX17205_AD_NIAVGEMPTY              0x1A8U
 #define MAX17205_AD_NFULLCAPREP             0x1A9U
 #define MAX17205_AD_NVOLTTEMP               0x1AAU
-#define MAX17205_AD_NMAXMINCURR             0x1ABU  /* TODO: Define fields */
-#define MAX17205_AD_NMAXMINVOLT             0x1ACU  /* TODO: Define fields */
-#define MAX17205_AD_NMAXMINTEMP             0x1ADU  /* TODO: Define fields */
+#define MAX17205_AD_NMAXMINCURR             0x1ABU
+#define MAX17205_AD_NMAXMINVOLT             0x1ACU
+#define MAX17205_AD_NMAXMINTEMP             0x1ADU
 #define MAX17205_AD_NSOC                    0x1AEU
 #define MAX17205_AD_NTIMERH                 0x1AFU
 #define MAX17205_AD_NCONFIG                 0x1B0U  /* TODO: Define fields */
@@ -204,12 +204,12 @@
 #define MAX17205_AD_NMISCCFG                0x1B2U  /* TODO: Define fields */
 #define MAX17205_AD_NDESIGNCAP              0x1B3U
 #define MAX17205_AD_NHIBCFG                 0x1B4U  /* TODO: Define fields */
-#define MAX17205_AD_NPACKCFG                0x1B5U  /* TODO: Define fields */
+#define MAX17205_AD_NPACKCFG                0x1B5U
 #define MAX17205_AD_NRELAXCFG               0x1B6U  /* TODO: Define fields */
 #define MAX17205_AD_NCONVGCFG               0x1B7U  /* TODO: Define fields */
-#define MAX17205_AD_NNVCFG0                 0x1B8U  /* TODO: Define fields */
-#define MAX17205_AD_NNVCFG1                 0x1B9U  /* TODO: Define fields */
-#define MAX17205_AD_NNVCFG2                 0x1BAU  /* TODO: Define fields */
+#define MAX17205_AD_NNVCFG0                 0x1B8U
+#define MAX17205_AD_NNVCFG1                 0x1B9U
+#define MAX17205_AD_NNVCFG2                 0x1BAU
 #define MAX17205_AD_NSBSCFG                 0x1BBU  /* TODO: Define fields */
 #define MAX17205_AD_NROMID0                 0x1BCU
 #define MAX17205_AD_NROMID1                 0x1BDU
@@ -321,94 +321,33 @@
 /** @} */
 
 /**
- * @name    MAX17205 MaxMinTemp register (01Ah) fields
+ * @name    MAX17205 (n)MaxMinTemp register (01Ah/1ABh) fields
  * TODO: Enumerate fields
  * @{
  */
 /** @} */
 
 /**
- * @name    MAX17205 MaxMinVolt register (01Bh) fields
+ * @name    MAX17205 (n)MaxMinVolt register (01Bh/1ACh) fields
  * TODO: Enumerate fields
  * @{
  */
 /** @} */
 
 /**
- * @name    MAX17205 MaxMinCurr register (01Ch) fields
+ * @name    MAX17205 (n)MaxMinCurr register (01Ch/1ADh) fields
  * TODO: Enumerate fields
  * @{
  */
 /** @} */
 
 /**
- * @name    MAX17205 DevName register (021h) fields
- * TODO: Enumerate fields
+ * @name    MAX17205 Config register (01Dh) fields
  * @{
  */
-/** @} */
-
-/**
- * @name    MAX17205 FilterCfg register (029h) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 RelaxCfg register (02Ah) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 MiscCfg register (02Bh) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 TGain register (02Ch) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 TOff register (02Dh) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 CGain register (02Eh) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 COff register (02Fh) fields
- * TODO: Enumerate fields
- * @{
- */
-/** @} */
-
-/**
- * @name    MAX17205 Command register (060h) values
- * TODO: Enumerate remaining commands
- * @{
- */
-#define MAX17205_COMMAND_RST                0x000FU
-/** @} */
-
-/**
- * @name    MAX17205 Config register fields
- * @{
- */
+#define MAX17205_CONFIG_PERM_BITS_Pos       (0U)
+#define MAX17205_CONFIG_PERM_BITS_Msk       (0x8020U << MAX17205_CONFIG_PERM_BITS_Pos)
+#define MAX17205_CONFIG_PERM_BITS(n)        (n & ~MAX17205_CONFIG_PERM_BITS_Msk)
 #define MAX17205_CONFIG_BER_Pos             (0U)
 #define MAX17205_CONFIG_BER_Msk             (0x1U << MAX17205_CONFIG_BER_Pos)
 #define MAX17205_CONFIG_BER                 MAX17205_CONFIG_BER_Msk
@@ -454,9 +393,123 @@
 /** @} */
 
 /**
- * @name    MAX17205 Config2 register fields
+ * @name    MAX17205 DevName register (021h) fields
+ * TODO: Enumerate fields
  * @{
  */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)LearnCfg register (028h/19Fh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)FilterCfg register (029h/19Dh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)RelaxCfg register (02Ah/1B6h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)MiscCfg register (02Bh/1B2h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)TGain register (02Ch/1CAh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 (n)TOff register (02Dh/1CBh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 CGain register (02Eh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 COff register (02Fh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 VEmpty register (03Ah) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 FStat register (03Dh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 ShdnTimer register (03Fh) fields
+ * @{
+ */
+#define MAX17205_SHDNTIMER_CTR_Pos          (0U)
+#define MAX17205_SHDNTIMER_CTR_Msk          (0x1FFFU << MAX17205_SHDNTIMER_CTR_Pos)
+#define MAX17205_SHDNTIMER_CTR              MAX17205_SHDNTIMER_CTR_Msk
+#define MAX17205_SHDNTIMER_THR_Pos          (13U)
+#define MAX17205_SHDNTIMER_THR_Msk          (0xEU << MAX17205_SHDNTIMER_THR_Pos)
+#define MAX17205_SHDNTIMER_THR              MAX17205_SHDNTIMER_THR_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 Command register (060h) values
+ * TODO: Enumerate remaining commands
+ * @{
+ */
+#define MAX17205_COMMAND_RST                0x000FU
+/** @} */
+
+/**
+ * @name    MAX17205 CommStat register (061h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 Lock register (07Fh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 Config2 (0BBh) register fields
+ * @{
+ */
+#define MAX17205_CONFIG2_PERM_BITS_Pos      (0U)
+#define MAX17205_CONFIG2_PERM_BITS_Msk      (0xFF3EU << MAX17205_CONFIG2_PERM_BITS_Pos)
+#define MAX17205_CONFIG2_PERM_BITS(n)       (n & ~MAX17205_CONFIG2_PERM_BITS_Msk | 0x0010U)
 #define MAX17205_CONFIG2_POR_CMD_Pos        (0U)
 #define MAX17205_CONFIG2_POR_CMD_Msk        (0x1U << MAX17205_CONFIG2_POR_CMD_Pos)
 #define MAX17205_CONFIG2_POR_CMD            MAX17205_CONFIG2_POR_CMD_Msk
@@ -469,19 +522,43 @@
 /** @} */
 
 /**
- * @name    MAX17205 nSOC register fields
+ * @name    MAX17205 (n)PackCfg (0BDh/1B5h) register fields
  * @{
  */
-#define MAX17205_NSOC_VFSOC_UPPER_Pos       (0U)
-#define MAX17205_NSOC_VFSOC_UPPER_Msk       (0xFFU << MAX17205_NSOC_VFSOC_UPPER_Pos)
-#define MAX17205_NSOC_VFSOC_UPPER           MAX17205_NSOC_VFSOC_UPPER_Msk
-#define MAX17205_NSOC_MIXSOC_UPPER_Pos      (8U)
-#define MAX17205_NSOC_MIXSOC_UPPER_Msk      (0xFFU << MAX17205_NSOC_MIXSOC_UPPER_Pos)
-#define MAX17205_NSOC_MIXSOC_UPPER          MAX17205_NSOC_MIXSOC_UPPER_Msk
+#define MAX17205_PACKCFG_PERM_BITS_Pos      (0U)
+#define MAX17205_PACKCFG_PERM_BITS_Msk      (0x4010U << MAX17205_PACKCFG_PERM_BITS_Pos)
+#define MAX17205_PACKCFG_PERM_BITS(n)       (n & ~MAX17205_PACKCFG_PERM_BITS_Msk)
+#define MAX17205_PACKCFG_NCELLS_Pos         (0U)
+#define MAX17205_PACKCFG_NCELLS_Msk         (0xFU << MAX17205_PACKCFG_NCELLS_Pos)
+#define MAX17205_PACKCFG_NCELLS             MAX17205_PACKCFG_NCELLS_Msk
+#define MAX17205_PACKCFG_BALCFG_Pos         (5U)
+#define MAX17205_PACKCFG_BALCFG_Msk         (0x7U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG             MAX17205_PACKCFG_BALCFG_Msk
+#define MAX17205_PACKCFG_CXEN_Pos           (8U)
+#define MAX17205_PACKCFG_CXEN_Msk           (0x1U << MAX17205_PACKCFG_CXEN_Pos)
+#define MAX17205_PACKCFG_CXEN               MAX17205_PACKCFG_CXEN_Msk
+#define MAX17205_PACKCFG_BTEN_Pos           (9U)
+#define MAX17205_PACKCFG_BTEN_Msk           (0x1U << MAX17205_PACKCFG_BTEN_Pos)
+#define MAX17205_PACKCFG_BTEN               MAX17205_PACKCFG_BTEN_Msk
+#define MAX17205_PACKCFG_CHEN_Pos           (10U)
+#define MAX17205_PACKCFG_CHEN_Msk           (0x1U << MAX17205_PACKCFG_CHEN_Pos)
+#define MAX17205_PACKCFG_CHEN               MAX17205_PACKCFG_CHEN_Msk
+#define MAX17205_PACKCFG_TDEN_Pos           (11U)
+#define MAX17205_PACKCFG_TDEN_Msk           (0x1U << MAX17205_PACKCFG_TDEN_Pos)
+#define MAX17205_PACKCFG_TDEN               MAX17205_PACKCFG_TDEN_Msk
+#define MAX17205_PACKCFG_A1EN_Pos           (12U)
+#define MAX17205_PACKCFG_A1EN_Msk           (0x1U << MAX17205_PACKCFG_A1EN_Pos)
+#define MAX17205_PACKCFG_A1EN               MAX17205_PACKCFG_A1EN_Msk
+#define MAX17205_PACKCFG_A2EN_Pos           (13U)
+#define MAX17205_PACKCFG_A2EN_Msk           (0x1U << MAX17205_PACKCFG_A2EN_Pos)
+#define MAX17205_PACKCFG_A2EN               MAX17205_PACKCFG_A2EN_Msk
+#define MAX17205_PACKCFG_FGT_Pos            (15U)
+#define MAX17205_PACKCFG_FGT_Msk            (0x1U << MAX17205_PACKCFG_FGT_Pos)
+#define MAX17205_PACKCFG_FGT                MAX17205_PACKCFG_FGT_Msk
 /** @} */
 
 /**
- * @name    MAX17205 nVoltTemp register fields
+ * @name    MAX17205 nVoltTemp (1AAh) register fields
  * @{
  */
 #define MAX17205_NVOLTTEMP_AVGTA_UPPER_Pos  (0U)
@@ -493,13 +570,198 @@
 /** @} */
 
 /**
- * @name    MAX17205 nAgeFcCfg register fields
+ * @name    MAX17205 nSOC (1AEh) register fields
  * @{
  */
-#define MAX17205_NAGEFCCFG_SETBITS_Pos      (0U)
-#define MAX17205_NAGEFCCFG_SETBITS_Msk      (0x1FU << MAX17205_NAGEFCCFG_SETBITS_Pos)
-#define MAX17205_NAGEFCCFG_SETBITS          MAX17205_NAGEFCCFG_SETBITS_Msk
-#define MAX17205_NAGEFCCFG_SETBITS_VAL      (0x03U)
+#define MAX17205_NSOC_VFSOC_UPPER_Pos       (0U)
+#define MAX17205_NSOC_VFSOC_UPPER_Msk       (0xFFU << MAX17205_NSOC_VFSOC_UPPER_Pos)
+#define MAX17205_NSOC_VFSOC_UPPER           MAX17205_NSOC_VFSOC_UPPER_Msk
+#define MAX17205_NSOC_MIXSOC_UPPER_Pos      (8U)
+#define MAX17205_NSOC_MIXSOC_UPPER_Msk      (0xFFU << MAX17205_NSOC_MIXSOC_UPPER_Pos)
+#define MAX17205_NSOC_MIXSOC_UPPER          MAX17205_NSOC_MIXSOC_UPPER_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 nConfig (1B0h) register fields
+ * @{
+ */
+#define MAX17205_NCONFIG_PERM_BITS_Pos      (0U)
+#define MAX17205_NCONFIG_PERM_BITS_Msk      (0x8010U << MAX17205_NCONFIG_PERM_BITS_Pos)
+#define MAX17205_NCONFIG_PERM_BITS(n)       (n & ~MAX17205_NCONFIG_PERM_BITS_Msk | 0x0010U)
+#define MAX17205_NCONFIG_TALRTEN_Pos        (0U)
+#define MAX17205_NCONFIG_TALRTEN_Msk        (0x1U << MAX17205_NCONFIG_TALRTEN_Pos)
+#define MAX17205_NCONFIG_TALRTEN            MAX17205_NCONFIG_TALRTEN_Msk
+#define MAX17205_NCONFIG_DSOCEN_Pos         (1U)
+#define MAX17205_NCONFIG_DSOCEN_Msk         (0x1U << MAX17205_NCONFIG_DSOCEN_Pos)
+#define MAX17205_NCONFIG_DSOCEN             MAX17205_NCONFIG_DSOCEN_Msk
+#define MAX17205_NCONFIG_AEN_Pos            (2U)
+#define MAX17205_NCONFIG_AEN_Msk            (0x1U << MAX17205_NCONFIG_AEN_Pos)
+#define MAX17205_NCONFIG_AEN                MAX17205_NCONFIG_AEN_Msk
+#define MAX17205_NCONFIG_FTHRM_Pos          (3U)
+#define MAX17205_NCONFIG_FTHRM_Msk          (0x1U << MAX17205_NCONFIG_FTHRM_Pos)
+#define MAX17205_NCONFIG_FTHRM              MAX17205_NCONFIG_FTHRM_Msk
+#define MAX17205_NCONFIG_ALSH_Pos           (5U)
+#define MAX17205_NCONFIG_ALSH_Msk           (0x1U << MAX17205_NCONFIG_ALSH_Pos)
+#define MAX17205_NCONFIG_ALSH               MAX17205_NCONFIG_ALSH_Msk
+#define MAX17205_NCONFIG_COMMSH_Pos         (6U)
+#define MAX17205_NCONFIG_COMMSH_Msk         (0x1U << MAX17205_NCONFIG_COMMSH_Pos)
+#define MAX17205_NCONFIG_COMMSH             MAX17205_NCONFIG_COMMSH_Msk
+#define MAX17205_NCONFIG_SHDN_Pos           (7U)
+#define MAX17205_NCONFIG_SHDN_Msk           (0x1U << MAX17205_NCONFIG_SHDN_Pos)
+#define MAX17205_NCONFIG_SHDN               MAX17205_NCONFIG_SHDN_Msk
+#define MAX17205_NCONFIG_TEX_Pos            (8U)
+#define MAX17205_NCONFIG_TEX_Msk            (0x1U << MAX17205_NCONFIG_TEX_Pos)
+#define MAX17205_NCONFIG_TEX                MAX17205_NCONFIG_TEX_Msk
+#define MAX17205_NCONFIG_TEN_Pos            (9U)
+#define MAX17205_NCONFIG_TEN_Msk            (0x1U << MAX17205_NCONFIG_TEN_Pos)
+#define MAX17205_NCONFIG_TEN                MAX17205_NCONFIG_TEN_Msk
+#define MAX17205_NCONFIG_AINSH_Pos          (10U)
+#define MAX17205_NCONFIG_AINSH_Msk          (0x1U << MAX17205_NCONFIG_AINSH_Pos)
+#define MAX17205_NCONFIG_AINSH              MAX17205_NCONFIG_AINSH_Msk
+#define MAX17205_NCONFIG_ALRTP_Pos          (11U)
+#define MAX17205_NCONFIG_ALRTP_Msk          (0x1U << MAX17205_NCONFIG_ALRTP_Pos)
+#define MAX17205_NCONFIG_ALRTP              MAX17205_NCONFIG_ALRTP_Msk
+#define MAX17205_NCONFIG_VS_Pos             (12U)
+#define MAX17205_NCONFIG_VS_Msk             (0x1U << MAX17205_NCONFIG_VS_Pos)
+#define MAX17205_NCONFIG_VS                 MAX17205_NCONFIG_VS_Msk
+#define MAX17205_NCONFIG_TS_Pos             (13U)
+#define MAX17205_NCONFIG_TS_Msk             (0x1U << MAX17205_NCONFIG_TS_Pos)
+#define MAX17205_NCONFIG_TS                 MAX17205_NCONFIG_TS_Msk
+#define MAX17205_NCONFIG_SS_Pos             (14U)
+#define MAX17205_NCONFIG_SS_Msk             (0x1U << MAX17205_NCONFIG_SS_Pos)
+#define MAX17205_NCONFIG_SS                 MAX17205_NCONFIG_SS_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 nNVCfg0 (1B8h) register fields
+ * @{
+ */
+#define MAX17205_NNVCFG0_PERM_BITS_Pos      (0U)
+#define MAX17205_NNVCFG0_PERM_BITS_Msk      (0x3000U << MAX17205_NNVCFG0_PERM_BITS_Pos)
+#define MAX17205_NNVCFG0_PERM_BITS(n)       (n & ~MAX17205_NNVCFG0_PERM_BITS_Msk)
+#define MAX17205_NNVCFG0_ENSBS_Pos          (0U)
+#define MAX17205_NNVCFG0_ENSBS_Msk          (0x1U << MAX17205_NNVCFG0_ENSBS_Pos)
+#define MAX17205_NNVCFG0_ENSBS              MAX17205_NNVCFG0_ENSBS_Msk
+#define MAX17205_NNVCFG0_ENHCFG_Pos         (1U)
+#define MAX17205_NNVCFG0_ENHCFG_Msk         (0x1U << MAX17205_NNVCFG0_ENHCFG_Pos)
+#define MAX17205_NNVCFG0_ENHCFG             MAX17205_NNVCFG0_ENHCFG_Msk
+#define MAX17205_NNVCFG0_ENAF_Pos           (2U)
+#define MAX17205_NNVCFG0_ENAF_Msk           (0x1U << MAX17205_NNVCFG0_ENAF_Pos)
+#define MAX17205_NNVCFG0_ENAF               MAX17205_NNVCFG0_ENAF_Msk
+#define MAX17205_NNVCFG0_ENMC_Pos           (3U)
+#define MAX17205_NNVCFG0_ENMC_Msk           (0x1U << MAX17205_NNVCFG0_ENMC_Pos)
+#define MAX17205_NNVCFG0_ENMC               MAX17205_NNVCFG0_ENMC_Msk
+#define MAX17205_NNVCFG0_ENDC_Pos           (4U)
+#define MAX17205_NNVCFG0_ENDC_Msk           (0x1U << MAX17205_NNVCFG0_ENDC_Pos)
+#define MAX17205_NNVCFG0_ENDC               MAX17205_NNVCFG0_ENDC_Msk
+#define MAX17205_NNVCFG0_ENVE_Pos           (5U)
+#define MAX17205_NNVCFG0_ENVE_Msk           (0x1U << MAX17205_NNVCFG0_ENVE_Pos)
+#define MAX17205_NNVCFG0_ENVE               MAX17205_NNVCFG0_ENVE_Msk
+#define MAX17205_NNVCFG0_ENCG_Pos           (6U)
+#define MAX17205_NNVCFG0_ENCG_Msk           (0x1U << MAX17205_NNVCFG0_ENCG_Pos)
+#define MAX17205_NNVCFG0_ENCG               MAX17205_NNVCFG0_ENCG_Msk
+#define MAX17205_NNVCFG0_ENICT_Pos          (7U)
+#define MAX17205_NNVCFG0_ENICT_Msk          (0x1U << MAX17205_NNVCFG0_ENICT_Pos)
+#define MAX17205_NNVCFG0_ENICT              MAX17205_NNVCFG0_ENICT_Msk
+#define MAX17205_NNVCFG0_ENLCFG_Pos         (8U)
+#define MAX17205_NNVCFG0_ENLCFG_Msk         (0x1U << MAX17205_NNVCFG0_ENLCFG_Pos)
+#define MAX17205_NNVCFG0_ENLCFG             MAX17205_NNVCFG0_ENLCFG_Msk
+#define MAX17205_NNVCFG0_ENRCFG_Pos         (9U)
+#define MAX17205_NNVCFG0_ENRCFG_Msk         (0x1U << MAX17205_NNVCFG0_ENRCFG_Pos)
+#define MAX17205_NNVCFG0_ENRCFG             MAX17205_NNVCFG0_ENRCFG_Msk
+#define MAX17205_NNVCFG0_ENFCFG_Pos         (10U)
+#define MAX17205_NNVCFG0_ENFCFG_Msk         (0x1U << MAX17205_NNVCFG0_ENFCFG_Pos)
+#define MAX17205_NNVCFG0_ENFCFG             MAX17205_NNVCFG0_ENFCFG_Msk
+#define MAX17205_NNVCFG0_ENCFG_Pos          (11U)
+#define MAX17205_NNVCFG0_ENCFG_Msk          (0x1U << MAX17205_NNVCFG0_ENCFG_Pos)
+#define MAX17205_NNVCFG0_ENCFG              MAX17205_NNVCFG0_ENCFG_Msk
+#define MAX17205_NNVCFG0_ENX_Pos            (14U)
+#define MAX17205_NNVCFG0_ENX_Msk            (0x1U << MAX17205_NNVCFG0_ENX_Pos)
+#define MAX17205_NNVCFG0_ENX                MAX17205_NNVCFG0_ENX_Msk
+#define MAX17205_NNVCFG0_ENOCV_Pos          (15U)
+#define MAX17205_NNVCFG0_ENOCV_Msk          (0x1U << MAX17205_NNVCFG0_ENOCV_Pos)
+#define MAX17205_NNVCFG0_ENOCV              MAX17205_NNVCFG0_ENOCV_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 nNVCfg1 (1B9h) register fields
+ * @{
+ */
+#define MAX17205_NNVCFG1_PERM_BITS_Pos      (0U)
+#define MAX17205_NNVCFG1_PERM_BITS_Msk      (0x07E1U << MAX17205_NNVCFG1_PERM_BITS_Pos)
+#define MAX17205_NNVCFG1_PERM_BITS(n)       (n & ~MAX17205_NNVCFG1_PERM_BITS_Msk)
+#define MAX17205_NNVCFG1_ENCTE_Pos          (1U)
+#define MAX17205_NNVCFG1_ENCTE_Msk          (0x1U << MAX17205_NNVCFG1_ENCTE_Pos)
+#define MAX17205_NNVCFG1_ENCTE              MAX17205_NNVCFG1_ENCTE_Msk
+#define MAX17205_NNVCFG1_ENCRV_Pos          (2U)
+#define MAX17205_NNVCFG1_ENCRV_Msk          (0x1U << MAX17205_NNVCFG1_ENCRV_Pos)
+#define MAX17205_NNVCFG1_ENCRV              MAX17205_NNVCFG1_ENCRV_Msk
+#define MAX17205_NNVCFG1_ENAT_Pos           (3U)
+#define MAX17205_NNVCFG1_ENAT_Msk           (0x1U << MAX17205_NNVCFG1_ENAT_Pos)
+#define MAX17205_NNVCFG1_ENAT               MAX17205_NNVCFG1_ENAT_Msk
+#define MAX17205_NNVCFG1_ENTTF_Pos          (4U)
+#define MAX17205_NNVCFG1_ENTTF_Msk          (0x1U << MAX17205_NNVCFG1_ENTTF_Pos)
+#define MAX17205_NNVCFG1_ENTTF              MAX17205_NNVCFG1_ENTTF_Msk
+#define MAX17205_NNVCFG1_ENODSC_Pos         (11U)
+#define MAX17205_NNVCFG1_ENODSC_Msk         (0x1U << MAX17205_NNVCFG1_ENODSC_Pos)
+#define MAX17205_NNVCFG1_ENODSC             MAX17205_NNVCFG1_ENODSC_Msk
+#define MAX17205_NNVCFG1_ENRFVSH_Pos        (12U)
+#define MAX17205_NNVCFG1_ENRFVSH_Msk        (0x1U << MAX17205_NNVCFG1_ENRFVSH_Pos)
+#define MAX17205_NNVCFG1_ENRFVSH            MAX17205_NNVCFG1_ENRFVSH_Msk
+#define MAX17205_NNVCFG1_ENFTH_Pos          (13U)
+#define MAX17205_NNVCFG1_ENFTH_Msk          (0x1U << MAX17205_NNVCFG1_ENFTH_Pos)
+#define MAX17205_NNVCFG1_ENFTH              MAX17205_NNVCFG1_ENFTH_Msk
+#define MAX17205_NNVCFG1_ENMTL_Pos          (14U)
+#define MAX17205_NNVCFG1_ENMTL_Msk          (0x1U << MAX17205_NNVCFG1_ENMTL_Pos)
+#define MAX17205_NNVCFG1_ENMTL              MAX17205_NNVCFG1_ENMTL_Msk
+#define MAX17205_NNVCFG1_ENTGO_Pos          (15U)
+#define MAX17205_NNVCFG1_ENTGO_Msk          (0x1U << MAX17205_NNVCFG1_ENTGO_Pos)
+#define MAX17205_NNVCFG1_ENTGO              MAX17205_NNVCFG1_ENTGO_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 nNVCfg2 (1BAh) register fields
+ * @{
+ */
+#define MAX17205_NNVCFG2_CYCLESPSAVE_Pos    (0U)
+#define MAX17205_NNVCFG2_CYCLESPSAVE_Msk    (0x3FU << MAX17205_NNVCFG2_CYCLESPSAVE_Pos)
+#define MAX17205_NNVCFG2_CYCLESPSAVE        MAX17205_NNVCFG2_CYCLESPSAVE_Msk
+#define MAX17205_NNVCFG2_ENMET_Pos          (7U)
+#define MAX17205_NNVCFG2_ENMET_Msk          (0x1U << MAX17205_NNVCFG2_ENMET_Pos)
+#define MAX17205_NNVCFG2_ENMET              MAX17205_NNVCFG2_ENMET_Msk
+#define MAX17205_NNVCFG2_ENIAVG_Pos         (8U)
+#define MAX17205_NNVCFG2_ENIAVG_Msk         (0x1U << MAX17205_NNVCFG2_ENIAVG_Pos)
+#define MAX17205_NNVCFG2_ENIAVG             MAX17205_NNVCFG2_ENIAVG_Msk
+#define MAX17205_NNVCFG2_ENFC_Pos           (9U)
+#define MAX17205_NNVCFG2_ENFC_Msk           (0x1U << MAX17205_NNVCFG2_ENFC_Pos)
+#define MAX17205_NNVCFG2_ENFC               MAX17205_NNVCFG2_ENFC_Msk
+#define MAX17205_NNVCFG2_ENVT_Pos           (10U)
+#define MAX17205_NNVCFG2_ENVT_Msk           (0x1U << MAX17205_NNVCFG2_ENVT_Pos)
+#define MAX17205_NNVCFG2_ENVT               MAX17205_NNVCFG2_ENVT_Msk
+#define MAX17205_NNVCFG2_ENMMC_Pos          (11U)
+#define MAX17205_NNVCFG2_ENMMC_Msk          (0x1U << MAX17205_NNVCFG2_ENMMC_Pos)
+#define MAX17205_NNVCFG2_ENMMC              MAX17205_NNVCFG2_ENMMC_Msk
+#define MAX17205_NNVCFG2_ENMMV_Pos          (12U)
+#define MAX17205_NNVCFG2_ENMMV_Msk          (0x1U << MAX17205_NNVCFG2_ENMMV_Pos)
+#define MAX17205_NNVCFG2_ENMMV              MAX17205_NNVCFG2_ENMMV_Msk
+#define MAX17205_NNVCFG2_ENMMT_Pos          (13U)
+#define MAX17205_NNVCFG2_ENMMT_Msk          (0x1U << MAX17205_NNVCFG2_ENMMT_Pos)
+#define MAX17205_NNVCFG2_ENMMT              MAX17205_NNVCFG2_ENMMT_Msk
+#define MAX17205_NNVCFG2_ENSOC_Pos          (14U)
+#define MAX17205_NNVCFG2_ENSOC_Msk          (0x1U << MAX17205_NNVCFG2_ENSOC_Pos)
+#define MAX17205_NNVCFG2_ENSOC              MAX17205_NNVCFG2_ENSOC_Msk
+#define MAX17205_NNVCFG2_ENT_Pos            (15U)
+#define MAX17205_NNVCFG2_ENT_Msk            (0x1U << MAX17205_NNVCFG2_ENT_Pos)
+#define MAX17205_NNVCFG2_ENT                MAX17205_NNVCFG2_ENT_Msk
+/** @} */
+
+/**
+ * @name    MAX17205 nAgeFcCfg (1D2h) register fields
+ * @{
+ */
+#define MAX17205_NAGEFCCFG_PERM_BITS_Pos    (0U)
+#define MAX17205_NAGEFCCFG_PERM_BITS_Msk    (0x1FU << MAX17205_NAGEFCCFG_PERM_BITS_Pos)
+#define MAX17205_NAGEFCCFG_PERM_BITS(n)     (n & ~MAX17205_NAGEFCCFG_PERM_BITS_Msk | 0x03U)
 #define MAX17205_NAGEFCCFG_CYCLESTART_Pos   (5U)
 #define MAX17205_NAGEFCCFG_CYCLESTART_Msk   (0x7FU << MAX17205_NAGEFCCFG_CYCLESTART_Pos)
 #define MAX17205_NAGEFCCFG_CYCLESTART       MAX17205_NAGEFCCFG_CYCLESTART_Msk
