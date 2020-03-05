@@ -56,9 +56,9 @@
  * @{
  */
 #define MAX17205_AD_STATUS                  0x000U
-#define MAX17205_AD_VALRTTH                 0x001U  /* TODO: Define fields */
-#define MAX17205_AD_TALRTTH                 0x002U  /* TODO: Define fields */
-#define MAX17205_AD_SALRTTH                 0x003U  /* TODO: Define fields */
+#define MAX17205_AD_VALRTTH                 0x001U
+#define MAX17205_AD_TALRTTH                 0x002U
+#define MAX17205_AD_SALRTTH                 0x003U
 #define MAX17205_AD_ATRATE                  0x004U
 #define MAX17205_AD_REPCAP                  0x005U
 #define MAX17205_AD_REPSOC                  0x006U
@@ -74,32 +74,32 @@
 #define MAX17205_AD_FULLCAP                 0x010U
 #define MAX17205_AD_TTE                     0x011U
 #define MAX17205_AD_QRTABLE00               0x012U
-#define MAX17205_AD_FULLSOCTHR              0x013U  /* TODO: Define fields */
+#define MAX17205_AD_FULLSOCTHR              0x013U
 #define MAX17205_AD_RCELL                   0x014U
 #define MAX17205_AD_RFAST                   0x015U
 #define MAX17205_AD_AVGTA                   0x016U
 #define MAX17205_AD_CYCLES                  0x017U
 #define MAX17205_AD_DESIGNCAP               0x018U
 #define MAX17205_AD_AVGVCELL                0x019U
-#define MAX17205_AD_MAXMINTEMP              0x01AU  /* TODO: Define fields */
-#define MAX17205_AD_MAXMINVOLT              0x01BU  /* TODO: Define fields */
-#define MAX17205_AD_MAXMINCURR              0x01CU  /* TODO: Define fields */
+#define MAX17205_AD_MAXMINTEMP              0x01AU
+#define MAX17205_AD_MAXMINVOLT              0x01BU
+#define MAX17205_AD_MAXMINCURR              0x01CU
 #define MAX17205_AD_CONFIG                  0x01DU
 #define MAX17205_AD_ICHGTERM                0x01EU
 #define MAX17205_AD_AVCAP                   0x01FU
 #define MAX17205_AD_TTF                     0x020U
-#define MAX17205_AD_DEVNAME                 0x021U  /* TODO: Define fields */
+#define MAX17205_AD_DEVNAME                 0x021U
 #define MAX17205_AD_QRTABLE10               0x022U
 #define MAX17205_AD_FULLCAPNOM              0x023U
 #define MAX17205_AD_AIN0                    0x027U
-#define MAX17205_AD_LEARNCFG                0x028U
-#define MAX17205_AD_FILTERCFG               0x029U  /* TODO: Define fields */
-#define MAX17205_AD_RELAXCFG                0x02AU  /* TODO: Define fields */
-#define MAX17205_AD_MISCCFG                 0x02BU  /* TODO: Define fields */
-#define MAX17205_AD_TGAIN                   0x02CU  /* TODO: Define fields */
-#define MAX17205_AD_TOFF                    0x02DU  /* TODO: Define fields */
-#define MAX17205_AD_CGAIN                   0x02EU  /* TODO: Define fields */
-#define MAX17205_AD_COFF                    0x02FU  /* TODO: Define fields */
+#define MAX17205_AD_LEARNCFG                0x028U  /* TODO: Check fields */
+#define MAX17205_AD_FILTERCFG               0x029U
+#define MAX17205_AD_RELAXCFG                0x02AU
+#define MAX17205_AD_MISCCFG                 0x02BU
+#define MAX17205_AD_TGAIN                   0x02CU
+#define MAX17205_AD_TOFF                    0x02DU
+#define MAX17205_AD_CGAIN                   0x02EU
+#define MAX17205_AD_COFF                    0x02FU
 #define MAX17205_AD_QRTABLE20               0x032U
 #define MAX17205_AD_FULLCAPREP              0x035U
 #define MAX17205_AD_IAVGEMPTY               0x036U
@@ -248,7 +248,7 @@
 /** @} */
 
 /**
- * @name    MAX17205 Status register fields
+ * @name    MAX17205 Status register (000h) fields
  * @{
  */
 #define MAX17205_STATUS_POR_Pos             (1U)
@@ -293,7 +293,112 @@
 /** @} */
 
 /**
- * @name    MAX17205 Command register values
+ * @name    MAX17205 VAlrtTh register (001h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 TAlrtTh register (002h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 SAlrtTh register (003h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 FullSocThr register (013h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 MaxMinTemp register (01Ah) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 MaxMinVolt register (01Bh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 MaxMinCurr register (01Ch) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 DevName register (021h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 FilterCfg register (029h) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 RelaxCfg register (02Ah) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 MiscCfg register (02Bh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 TGain register (02Ch) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 TOff register (02Dh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 CGain register (02Eh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 COff register (02Fh) fields
+ * TODO: Enumerate fields
+ * @{
+ */
+/** @} */
+
+/**
+ * @name    MAX17205 Command register (060h) values
  * TODO: Enumerate remaining commands
  * @{
  */
