@@ -22,7 +22,7 @@
 #include "oresat.h"
 #include "batt.h"
 
-static worker_t battery_worker;
+/*static worker_t battery_worker;*/
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -36,8 +36,9 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&battery_worker, "Battery monitoring thread", batt_wa, sizeof(batt_wa), NORMALPRIO, batt, NULL);
-    reg_worker(&battery_worker);
+    /*init_worker(&battery_worker, "Battery monitoring thread", batt_wa, sizeof(batt_wa), NORMALPRIO, batt, NULL);*/
+    /*reg_worker(&battery_worker);*/
+    chThdCreateStatic(batt_wa, sizeof(batt_wa), NORMALPRIO, batt, NULL);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
