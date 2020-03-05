@@ -560,7 +560,7 @@ value = 1-240:   The SYNC message with the counter value equal to this value sha
       <CANopenSubObject subIndex="04" name="compatibility entry" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
-      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="10000" TPDOdetectCOS="false">
+      <CANopenSubObject subIndex="05" name="event timer" objectType="VAR" dataType="0x06" accessType="rw" PDOmapping="no" defaultValue="1000" TPDOdetectCOS="false">
         <description />
       </CANopenSubObject>
       <CANopenSubObject subIndex="06" name="SYNC start value" objectType="VAR" dataType="0x05" accessType="rw" PDOmapping="no" defaultValue="0" TPDOdetectCOS="false">
