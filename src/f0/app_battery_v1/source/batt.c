@@ -1,5 +1,6 @@
 #include "batt.h"
 #include "max17205.h"
+#include "CANopen.h"
 
 #define NCELLS          2U  /* Number of cells */
 
@@ -34,7 +35,10 @@ THD_FUNCTION(batt, arg)
 
     while (!chThdShouldTerminateX()) {
         palToggleLine(LINE_LED_GREEN);
-        chThdSleepMilliseconds(500);
+        chThdSleepMilliseconds(1000);
+        OD_battery.VCell = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGVCELL);
+        OD_battery.cell1 = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL1);
+        OD_battery.cell2 = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL2);
     }
 
     max17205Stop(&max17205dev);

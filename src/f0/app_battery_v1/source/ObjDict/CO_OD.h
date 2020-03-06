@@ -89,7 +89,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             48
+   #define CO_OD_NoOfElements             49
 
 
 /*******************************************************************************
@@ -149,6 +149,12 @@
                UNSIGNED32     mappedObject7;
                UNSIGNED32     mappedObject8;
                }              OD_TPDOMappingParameter_t;
+/*2110      */ typedef struct {
+               UNSIGNED8      maxSubIndex;
+               UNSIGNED16     VCell;
+               UNSIGNED16     cell1;
+               UNSIGNED16     cell2;
+               }              OD_battery_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -484,6 +490,14 @@
         #define OD_2109_0_voltage_maxSubIndex                       0
         #define OD_2109_1_voltage_MCU_VDDA                          1
 
+/*2110 */
+        #define OD_2110_battery                                     0x2110
+
+        #define OD_2110_0_battery_maxSubIndex                       0
+        #define OD_2110_1_battery_VCell                             1
+        #define OD_2110_2_battery_cell1                             2
+        #define OD_2110_3_battery_cell2                             3
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -537,6 +551,7 @@ struct sCO_OD_RAM{
 /*2107      */ UNSIGNED16      sensors[3];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
+/*2110      */ OD_battery_t    battery;
 
                UNSIGNED32     LastWord;
 };
@@ -697,6 +712,9 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
         #define OD_voltage                                          CO_OD_RAM.voltage
         #define ODL_voltage_arrayLength                             1
         #define ODA_voltage_MCU_VDDA                                0
+
+/*2110, Data Type: battery_t */
+        #define OD_battery                                          CO_OD_RAM.battery
 
 #endif
 // clang-format on
