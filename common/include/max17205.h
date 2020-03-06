@@ -51,6 +51,11 @@
 #define MAX17205_AD(reg)                    (reg & 0xFFU)
 
 /**
+ * @brief   MAX17205 Register Value Verification
+ */
+#define MAX17205_SETVAL(reg, val)           (((uint16_t)(val) & ~ (reg ## _PermMsk)) | reg ## _PermSet)
+
+/**
  * @name    MAX17205 Register Addresses
  * TODO: Enumerate remaining register addresses
  * @{
@@ -345,9 +350,8 @@
  * @name    MAX17205 Config register (01Dh) fields
  * @{
  */
-#define MAX17205_CONFIG_PERM_BITS_Pos       (0U)
-#define MAX17205_CONFIG_PERM_BITS_Msk       (0x8020U << MAX17205_CONFIG_PERM_BITS_Pos)
-#define MAX17205_CONFIG_PERM_BITS(n)        (((n) & ~MAX17205_CONFIG_PERM_BITS_Msk) | 0x0000)
+#define MAX17205_AD_CONFIG_PermMsk          (0x8020U)
+#define MAX17205_AD_CONFIG_PermSet          (0x0000U)
 #define MAX17205_CONFIG_BER_Pos             (0U)
 #define MAX17205_CONFIG_BER_Msk             (0x1U << MAX17205_CONFIG_BER_Pos)
 #define MAX17205_CONFIG_BER                 MAX17205_CONFIG_BER_Msk
@@ -507,9 +511,8 @@
  * @name    MAX17205 Config2 (0BBh) register fields
  * @{
  */
-#define MAX17205_CONFIG2_PERM_BITS_Pos      (0U)
-#define MAX17205_CONFIG2_PERM_BITS_Msk      (0xFF3EU << MAX17205_CONFIG2_PERM_BITS_Pos)
-#define MAX17205_CONFIG2_PERM_BITS(n)       (((n) & ~MAX17205_CONFIG2_PERM_BITS_Msk) | 0x0010U)
+#define MAX17205_AD_CONFIG2_PermMsk         (0xFF3EU)
+#define MAX17205_AD_CONFIG2_PermSet         (0x0010U)
 #define MAX17205_CONFIG2_POR_CMD_Pos        (0U)
 #define MAX17205_CONFIG2_POR_CMD_Msk        (0x1U << MAX17205_CONFIG2_POR_CMD_Pos)
 #define MAX17205_CONFIG2_POR_CMD            MAX17205_CONFIG2_POR_CMD_Msk
@@ -525,15 +528,21 @@
  * @name    MAX17205 (n)PackCfg (0BDh/1B5h) register fields
  * @{
  */
-#define MAX17205_PACKCFG_PERM_BITS_Pos      (0U)
-#define MAX17205_PACKCFG_PERM_BITS_Msk      (0x4010U << MAX17205_PACKCFG_PERM_BITS_Pos)
-#define MAX17205_PACKCFG_PERM_BITS(n)       (((n) & ~MAX17205_PACKCFG_PERM_BITS_Msk) | 0x0000)
+#define MAX17205_AD_PACKCFG_PermMsk         (0x4010U)
+#define MAX17205_AD_PACKCFG_PermSet         (0x0000U)
 #define MAX17205_PACKCFG_NCELLS_Pos         (0U)
 #define MAX17205_PACKCFG_NCELLS_Msk         (0xFU << MAX17205_PACKCFG_NCELLS_Pos)
 #define MAX17205_PACKCFG_NCELLS             MAX17205_PACKCFG_NCELLS_Msk
 #define MAX17205_PACKCFG_BALCFG_Pos         (5U)
 #define MAX17205_PACKCFG_BALCFG_Msk         (0x7U << MAX17205_PACKCFG_BALCFG_Pos)
 #define MAX17205_PACKCFG_BALCFG             MAX17205_PACKCFG_BALCFG_Msk
+#define MAX17205_PACKCFG_BALCFG_2_5         (0x1U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_5           (0x2U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_10          (0x3U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_20          (0x4U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_40          (0x5U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_80          (0x6U << MAX17205_PACKCFG_BALCFG_Pos)
+#define MAX17205_PACKCFG_BALCFG_160         (0x7U << MAX17205_PACKCFG_BALCFG_Pos)
 #define MAX17205_PACKCFG_CXEN_Pos           (8U)
 #define MAX17205_PACKCFG_CXEN_Msk           (0x1U << MAX17205_PACKCFG_CXEN_Pos)
 #define MAX17205_PACKCFG_CXEN               MAX17205_PACKCFG_CXEN_Msk
@@ -585,9 +594,8 @@
  * @name    MAX17205 nConfig (1B0h) register fields
  * @{
  */
-#define MAX17205_NCONFIG_PERM_BITS_Pos      (0U)
-#define MAX17205_NCONFIG_PERM_BITS_Msk      (0x8010U << MAX17205_NCONFIG_PERM_BITS_Pos)
-#define MAX17205_NCONFIG_PERM_BITS(n)       (((n) & ~MAX17205_NCONFIG_PERM_BITS_Msk) | 0x0010U)
+#define MAX17205_AD_NCONFIG_PermMsk         (0x8010U)
+#define MAX17205_AD_NCONFIG_PermSet         (0x0010U)
 #define MAX17205_NCONFIG_TALRTEN_Pos        (0U)
 #define MAX17205_NCONFIG_TALRTEN_Msk        (0x1U << MAX17205_NCONFIG_TALRTEN_Pos)
 #define MAX17205_NCONFIG_TALRTEN            MAX17205_NCONFIG_TALRTEN_Msk
@@ -636,9 +644,8 @@
  * @name    MAX17205 nNVCfg0 (1B8h) register fields
  * @{
  */
-#define MAX17205_NNVCFG0_PERM_BITS_Pos      (0U)
-#define MAX17205_NNVCFG0_PERM_BITS_Msk      (0x3000U << MAX17205_NNVCFG0_PERM_BITS_Pos)
-#define MAX17205_NNVCFG0_PERM_BITS(n)       (((n) & ~MAX17205_NNVCFG0_PERM_BITS_Msk) | 0x0000)
+#define MAX17205_AD_NNVCFG0_PermMsk         (0x3000U)
+#define MAX17205_AD_NNVCFG0_PermSet         (0x0000U)
 #define MAX17205_NNVCFG0_ENSBS_Pos          (0U)
 #define MAX17205_NNVCFG0_ENSBS_Msk          (0x1U << MAX17205_NNVCFG0_ENSBS_Pos)
 #define MAX17205_NNVCFG0_ENSBS              MAX17205_NNVCFG0_ENSBS_Msk
@@ -687,9 +694,8 @@
  * @name    MAX17205 nNVCfg1 (1B9h) register fields
  * @{
  */
-#define MAX17205_NNVCFG1_PERM_BITS_Pos      (0U)
-#define MAX17205_NNVCFG1_PERM_BITS_Msk      (0x07E1U << MAX17205_NNVCFG1_PERM_BITS_Pos)
-#define MAX17205_NNVCFG1_PERM_BITS(n)       (((n) & ~MAX17205_NNVCFG1_PERM_BITS_Msk) | 0x0000)
+#define MAX17205_AD_NNVCFG1_PermMsk         (0x07E1U)
+#define MAX17205_AD_NNVCFG1_PermSet         (0x0000U)
 #define MAX17205_NNVCFG1_ENCTE_Pos          (1U)
 #define MAX17205_NNVCFG1_ENCTE_Msk          (0x1U << MAX17205_NNVCFG1_ENCTE_Pos)
 #define MAX17205_NNVCFG1_ENCTE              MAX17205_NNVCFG1_ENCTE_Msk
@@ -759,9 +765,8 @@
  * @name    MAX17205 nAgeFcCfg (1D2h) register fields
  * @{
  */
-#define MAX17205_NAGEFCCFG_PERM_BITS_Pos    (0U)
-#define MAX17205_NAGEFCCFG_PERM_BITS_Msk    (0x1FU << MAX17205_NAGEFCCFG_PERM_BITS_Pos)
-#define MAX17205_NAGEFCCFG_PERM_BITS(n)     (((n) & ~MAX17205_NAGEFCCFG_PERM_BITS_Msk) | 0x0003U)
+#define MAX17205_AD_NAGEFCCFG_PermMsk       (0x001FU)
+#define MAX17205_AD_NAGEFCCFG_PermSet       (0x0003U)
 #define MAX17205_NAGEFCCFG_CYCLESTART_Pos   (5U)
 #define MAX17205_NAGEFCCFG_CYCLESTART_Msk   (0x7FU << MAX17205_NAGEFCCFG_CYCLESTART_Pos)
 #define MAX17205_NAGEFCCFG_CYCLESTART       MAX17205_NAGEFCCFG_CYCLESTART_Msk
@@ -833,6 +838,14 @@ typedef enum {
 } max17205_state_t;
 
 /**
+ * @brief   Structure to store register:value pairs for configuration
+ */
+typedef struct {
+    uint16_t reg;
+    uint16_t value;
+} max17205_regval_t;
+
+/**
  * @brief   MAX17205 configuration structure.
  */
 typedef struct {
@@ -846,6 +859,10 @@ typedef struct {
      */
     const I2CConfig             *i2ccfg;
 #endif /* MAX17205_USE_I2C */
+    /**
+     * @brief Array of reg:value pairs used to configure the IC.
+     */
+    const max17205_regval_t     *regcfg;
 } MAX17205Config;
 
 /**
