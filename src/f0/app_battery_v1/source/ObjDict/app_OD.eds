@@ -1875,7 +1875,7 @@ PDOMapping=1
 ParameterName=Battery
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x4
+SubNumber=0x5
 
 [2110sub0]
 ParameterName=max sub-index
@@ -1883,10 +1883,19 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=3
+DefaultValue=4
 PDOMapping=0
 
 [2110sub1]
+ParameterName=VBUS
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=8200
+PDOMapping=1
+
+[2110sub2]
 ParameterName=VCell
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1895,7 +1904,7 @@ AccessType=ro
 DefaultValue=
 PDOMapping=1
 
-[2110sub2]
+[2110sub3]
 ParameterName=Cell1
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -1904,7 +1913,7 @@ AccessType=ro
 DefaultValue=
 PDOMapping=1
 
-[2110sub3]
+[2110sub4]
 ParameterName=Cell2
 ObjectType=0x7
 ;StorageLocation=RAM

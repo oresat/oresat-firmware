@@ -151,6 +151,7 @@
                }              OD_TPDOMappingParameter_t;
 /*2110      */ typedef struct {
                UNSIGNED8      maxSubIndex;
+               UNSIGNED16     VBUS;
                UNSIGNED16     VCell;
                UNSIGNED16     cell1;
                UNSIGNED16     cell2;
@@ -494,9 +495,10 @@
         #define OD_2110_battery                                     0x2110
 
         #define OD_2110_0_battery_maxSubIndex                       0
-        #define OD_2110_1_battery_VCell                             1
-        #define OD_2110_2_battery_cell1                             2
-        #define OD_2110_3_battery_cell2                             3
+        #define OD_2110_1_battery_VBUS                              1
+        #define OD_2110_2_battery_VCell                             2
+        #define OD_2110_3_battery_cell1                             3
+        #define OD_2110_4_battery_cell2                             4
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS

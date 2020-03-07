@@ -2,7 +2,9 @@
 #include "max17205.h"
 #include "CANopen.h"
 
-#define NCELLS          2U  /* Number of cells */
+#define NCELLS          2U          /* Number of cells */
+#define FASTCHG_THRSH   250U        /* Threshold below VBUS to enable Fast Charge (mV) */
+#define SLOWCHG_THRSH   500U        /* Threshold below VBUS to enable Slow Charge (mV) */
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -34,11 +36,23 @@ THD_FUNCTION(batt, arg)
     max17205Start(&max17205dev, &max17205config);
 
     while (!chThdShouldTerminateX()) {
-        palToggleLine(LINE_LED_GREEN);
         chThdSleepMilliseconds(1000);
-        OD_battery.VCell = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGVCELL);
-        OD_battery.cell1 = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL1);
-        OD_battery.cell2 = max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL2);
+
+        /* Record pack and cell voltages to object dictionary */
+        OD_battery.cell1 = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL1) * 78125) / 1000;
+        OD_battery.cell2 = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL2)* 78125) / 1000;
+        OD_battery.VCell = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGVCELL)* 78125) / 1000;
+
+        if (OD_battery.VCell >= OD_battery.VBUS - FASTCHG_THRSH) {
+            /*palSetLine(LINE_FASTCHG);*/
+        } else if (OD_battery.VCell >= OD_battery.VBUS - SLOWCHG_THRSH) {
+            /*palClearLine(LINE_FASTCHG);*/
+        } else {
+            /*palClearLine(LINE_FASTCHG);*/
+        }
+
+        /* Toggle LED */
+        palToggleLine(LINE_LED_GREEN);
     }
 
     max17205Stop(&max17205dev);
