@@ -53,6 +53,7 @@ void oresat_init(void)
 
 void oresat_start(oresat_config_t *config)
 {
+    CO_ReturnError_t err;
     event_listener_t can_el, cos_el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
@@ -69,20 +70,18 @@ void oresat_start(oresat_config_t *config)
 
     OD_CANBitRate = config->bitrate;
 
-
     oresat_tp = chThdGetSelfX();
 
+    err = CO_new(NULL);
+    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
+
     while (reset != CO_RESET_APP) {
-        CO_ReturnError_t err;
 
         /* Initialize CANopen Subsystem */
         err = CO_CANinit(config, OD_CANBitRate);
-        if (err == CO_ERROR_NO) {
-            err = CO_CANopenInit(OD_CANNodeID);
-        }
-        if (err != CO_ERROR_NO) {
-            CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
-        }
+        chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
+        err = CO_CANopenInit(OD_CANNodeID);
+        chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInit failed");
 
         /* Register events */
         chEvtRegister(&CO->CANmodule[0]->rx_event, &can_el, ORESAT_RX_EVENT);
@@ -91,14 +90,13 @@ void oresat_start(oresat_config_t *config)
         reg_event(&event_registry, ORESAT_NMT_NONOPERATIONAL, nmt_handler);
 
         /* Register CAN callbacks */
-        CO_NMT_initCallback(CO->NMT, CO_NMT_cb);
+        CO_NMT_initCallbackChanged(CO->NMT, CO_NMT_cb);
 
         /* Enter normal operating mode */
         CO_CANsetNormalMode(CO->CANmodule[0]);
 
         reset = CO_RESET_NOT;
         prev_time = chVTGetSystemTime();
-
         while (reset == CO_RESET_NOT) {
             bool_t syncWas;
             uint32_t timeout = ((typeof(timeout))-1);
@@ -131,7 +129,7 @@ void oresat_start(oresat_config_t *config)
     }
 
     /* Deinitialize CO stack */
-    /*CO_delete(config);*/
+    CO_delete(config);
 
     /* Initiate System Reset */
     NVIC_SystemReset();

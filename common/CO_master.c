@@ -18,7 +18,7 @@ int sdo_upload(
 
         if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
             return 1;
-        if (CO_SDOclientUploadInitiate(SDOclient, index, subindex, data, max_len, timeout, block) != CO_SDOcli_ok_communicationEnd)
+        if (CO_SDOclientUploadInitiate(SDOclient, index, subindex, data, max_len, timeout, block, NULL) != CO_SDOcli_ok_communicationEnd)
             return 1;
 
         prev_time = chVTGetSystemTimeX();
@@ -49,7 +49,7 @@ int sdo_download(
 
     if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
         return 1;
-    if (CO_SDOclientDownloadInitiate(SDOclient, index, subindex, data, len, timeout, block) != CO_SDOcli_ok_communicationEnd)
+    if (CO_SDOclientDownloadInitiate(SDOclient, index, subindex, data, len, timeout, block, NULL) != CO_SDOcli_ok_communicationEnd)
         return 1;
 
     prev_time = chVTGetSystemTimeX();
