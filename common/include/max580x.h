@@ -39,23 +39,23 @@
 /** @} */
 
 /**
- * @name    MAX580X Commands
+ * @name    MAX580X Registers
  * @{
  */
-#define MAX580X_CMD_NOP                     (0U << 4)
-#define MAX580X_CMD_REF                     (2U << 4)
-#define MAX580X_CMD_SOFTWARE                (3U << 4)
-#define MAX580X_CMD_POWER                   (4U << 4)
-#define MAX580X_CMD_CONFIG                  (5U << 4)
-#define MAX580X_CMD_DEFAULT                 (6U << 4)
-#define MAX580X_CMD_RETURN                  (7U << 4)
-#define MAX580X_CMD_CODE                    (8U << 4)
-#define MAX580X_CMD_LOAD                    (9U << 4)
-#define MAX580X_CMD_CODE_LOAD               (10U << 4)
+#define MAX580X_AD_NOP                      (0U << 4)
+#define MAX580X_AD_REF                      (2U << 4)
+#define MAX580X_AD_SOFTWARE                 (3U << 4)
+#define MAX580X_AD_POWER                    (4U << 4)
+#define MAX580X_AD_CONFIG                   (5U << 4)
+#define MAX580X_AD_DEFAULT                  (6U << 4)
+#define MAX580X_AD_RETURN                   (7U << 4)
+#define MAX580X_AD_CODE                     (8U << 4)
+#define MAX580X_AD_LOAD                     (9U << 4)
+#define MAX580X_AD_CODE_LOAD                (10U << 4)
 /** @} */
 
 /**
- * @name    MAX580X REF Command fields
+ * @name    MAX580X REF Register fields
  * @{
  */
 #define MAX580X_REF_EXT                     (0U << 0)
@@ -67,7 +67,7 @@
 /** @} */
 
 /**
- * @name    MAX580X SOFTWARE Command fields
+ * @name    MAX580X SOFTWARE Register fields
  * @{
  */
 #define MAX580X_SOFTWARE_END                (0U << 0)
@@ -77,7 +77,7 @@
 /** @} */
 
 /**
- * @name    MAX580X POWER Command fields
+ * @name    MAX580X POWER Register fields
  * @{
  */
 #define MAX580X_POWER_NORMAL                (0U << 6)
@@ -87,7 +87,7 @@
 /** @} */
 
 /**
- * @name    MAX580X CONFIG Command fields
+ * @name    MAX580X CONFIG Register fields
  * @{
  */
 #define MAX580X_CONFIG_AUX_GATE             (3U << 3)
@@ -96,7 +96,7 @@
 /** @} */
 
 /**
- * @name    MAX580X DEFAULT Command Fields
+ * @name    MAX580X DEFAULT Register Fields
  * @{
  */
 #define MAX580X_DEFAULT_POR                 (0U << 5)
@@ -189,9 +189,9 @@ typedef enum {
  * @name    MAX580X DAC Registers
  */
 typedef enum {
-    MAX580X_RETURN = MAX580X_CMD_RETURN,
-    MAX580X_CODE = MAX580X_CMD_CODE,
-    MAX580X_CODE_LOAD = MAX580X_CMD_CODE_LOAD,
+    MAX580X_RETURN = MAX580X_AD_RETURN,
+    MAX580X_CODE = MAX580X_AD_CODE,
+    MAX580X_CODE_LOAD = MAX580X_AD_CODE_LOAD,
 } max580x_reg_t;
 
 /**

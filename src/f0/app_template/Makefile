@@ -55,18 +55,18 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x100
+  USE_PROCESS_STACKSIZE = 0x200
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x100
+  USE_EXCEPTIONS_STACKSIZE = 0x200
 endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = softfp
+  USE_FPU = no
 endif
 
 # FPU-related options.
@@ -87,7 +87,7 @@ PROJECT   = app_template
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = ST_NUCLEO32_F042K6
+BOARD     = ST_NUCLEO64_F091RC
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -123,13 +123,13 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/lib/test.mk
-#include $(CHIBIOS)/test/rt/rt_test.mk
-#include $(CHIBIOS)/test/oslib/oslib_test.mk
+include $(CHIBIOS)/test/lib/test.mk
+include $(CHIBIOS)/test/rt/rt_test.mk
+include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
