@@ -6,6 +6,10 @@ This device contains an ARM Cortex-M0, and is also known as an M0 or F0.
 This MCU typically implements low power OreSat subsystems,
 such as solar panels, batteries, and some sensors.
 
+Note that the development boards use an STM32F091RC, but that OreSat boards
+use the STM32F091CC. The only difference between these two packages is the
+number of available pins.
+
 ## Testing the toolchain
 After having installed the required toolchain components as described in
 the Prerequesites section of the main README, it is good to test that
