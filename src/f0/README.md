@@ -1,6 +1,6 @@
-# STM32F042K6
+# STM32F091xC
 
-This is the source directory for all STM32F042K6 applications.
+This is the source directory for all STM32F091xC applications.
 This device contains an ARM Cortex-M0, and is also known as an M0 or F0.
 
 This MCU typically implements low power OreSat subsystems,
