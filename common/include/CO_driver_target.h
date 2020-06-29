@@ -30,7 +30,6 @@
  * It is included from CO_driver.h, which contains documentation
  * for definitions below. */
 
-/* Include processor header file */
 #include "ch.h"
 #include "hal.h"
 #include "oresat.h"
@@ -78,12 +77,16 @@ extern "C" {
 #endif
 
 #ifndef CO_CONFIG_PDO
-#define CO_CONFIG_PDO (CO_CONFIG_FLAG_TIMERNEXT | \
-                       CO_CONFIG_PDO_SYNC_ENABLE)
+#define CO_CONFIG_PDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_FLAG_TIMERNEXT | \
+                       CO_CONFIG_PDO_SYNC_ENABLE | \
+                       CO_CONFIG_RPDO_CALLS_EXTENSION | \
+                       CO_CONFIG_TPDO_CALLS_EXTENSION)
 #endif
 
 #ifndef CO_CONFIG_SYNC
-#define CO_CONFIG_SYNC (CO_CONFIG_FLAG_TIMERNEXT)
+#define CO_CONFIG_SYNC (CO_CONFIG_FLAG_CALLBACK_PRE | \
+                        CO_CONFIG_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_SDO_CLI
@@ -98,26 +101,35 @@ extern "C" {
 #define CO_CONFIG_SDO_CLI_BUFFER_SIZE 1000
 #endif
 
+#ifndef CO_CONFIG_TIME
+#define CO_CONFIG_TIME (CO_CONFIG_FLAG_CALLBACK_PRE)
+#endif
+
 #ifndef CO_CONFIG_LSS_MST
 #define CO_CONFIG_LSS_MST (CO_CONFIG_FLAG_CALLBACK_PRE)
 #endif
 
 #ifndef CO_CONFIG_GTW
-#define CO_CONFIG_GTW (CO_CONFIG_GTW_MULTI_NET | \
-                       CO_CONFIG_GTW_ASCII)
+#define CO_CONFIG_GTW (CO_CONFIG_GTW_ASCII | \
+                       CO_CONFIG_GTW_ASCII_ERROR_DESC | \
+                       CO_CONFIG_GTW_ASCII_PRINT_HELP)
+#define CO_CONFIG_GTW_BLOCK_DL_LOOP 1
 #define CO_CONFIG_GTWA_COMM_BUF_SIZE 2000
 #endif
 
 
-/* Basic definitions */
+/* Basic definitions. If big endian, CO_SWAP_xx macros must swap bytes. */
 #define CO_USE_GLOBALS
 #define CO_LITTLE_ENDIAN
+#define CO_SWAP_16(x) x
+#define CO_SWAP_32(x) x
+#define CO_SWAP_64(x) x
 /* NULL is defined in stddef.h */
 /* true and false are defined in stdbool.h */
 /* int8_t to uint64_t are defined in stdint.h */
 typedef unsigned char           bool_t;
 typedef float                   float32_t;
-typedef long double             float64_t;
+typedef double                  float64_t;
 typedef char                    char_t;
 typedef unsigned char           oChar_t;
 typedef unsigned char           domain_t;
