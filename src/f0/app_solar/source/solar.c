@@ -91,10 +91,9 @@ THD_FUNCTION(solar, arg)
     /* Start up drivers for I2C devices */
     ina226Start(&ina226dev, &ina226config);
     max580xStart(&max580xdev, &max580xconfig);
-    palSetLine(LINE_LED_GREEN);
+    palSetLine(LINE_LED);
 
     max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
-    palSetLine(LINE_OUTPUT_EN);
     while (!chThdShouldTerminateX()) {
         chThdSleepMilliseconds(SLEEP_MS);
 
@@ -114,6 +113,6 @@ THD_FUNCTION(solar, arg)
     max580xStop(&max580xdev);
     ina226Stop(&ina226dev);
 
-    palClearLine(LINE_LED_GREEN);
+    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }

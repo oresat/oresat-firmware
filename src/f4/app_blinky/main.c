@@ -30,13 +30,13 @@ int main(void)
     halInit();
     chSysInit();
 
-    palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
+    palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
 
     while (true)
     {
-        palClearLine(LINE_LED_GREEN);
+        palClearLine(LINE_LED);
         chThdSleepMilliseconds(500);
-        palSetLine(LINE_LED_GREEN);
+        palSetLine(LINE_LED);
         chThdSleepMilliseconds(500);
     }
 
