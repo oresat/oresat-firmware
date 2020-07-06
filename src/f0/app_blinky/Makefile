@@ -87,7 +87,7 @@ PROJECT   = app_blinky
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = ST_NUCLEO32_F042K6
+BOARD     = ST_NUCLEO64_F091RC
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -125,7 +125,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 #include $(CHIBIOS)/test/oslib/oslib_test.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

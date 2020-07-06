@@ -1,10 +1,14 @@
-# STM32F042K6
+# STM32F091xC
 
-This is the source directory for all STM32F042K6 applications.
+This is the source directory for all STM32F091xC applications.
 This device contains an ARM Cortex-M0, and is also known as an M0 or F0.
 
 This MCU typically implements low power OreSat subsystems,
 such as solar panels, batteries, and some sensors.
+
+Note that the development boards use an STM32F091RC, but that OreSat boards
+use the STM32F091CC. The only difference between these two packages is the
+number of available pins.
 
 ## Testing the toolchain
 After having installed the required toolchain components as described in

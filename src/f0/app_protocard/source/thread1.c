@@ -7,12 +7,10 @@ THD_FUNCTION(Thread1, arg)
     (void)arg;
 
     while (!chThdShouldTerminateX()) {
-        palClearLine(LINE_LED_GREEN);
-        chThdSleepMilliseconds(500);
-        palSetLine(LINE_LED_GREEN);
+        palToggleLine(LINE_LED);
         chThdSleepMilliseconds(500);
     }
 
-    palClearLine(LINE_LED_GREEN);
+    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }

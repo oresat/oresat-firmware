@@ -32,9 +32,9 @@ int main(void)
 
     while (true)
     {
-        palClearLine(LINE_LED_GREEN);
+        palClearLine(LINE_LED);
         chThdSleepMilliseconds(500);
-        palSetLine(LINE_LED_GREEN);
+        palSetLine(LINE_LED);
         chThdSleepMilliseconds(500);
     }
 

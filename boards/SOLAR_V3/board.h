@@ -199,7 +199,7 @@
 /*
  * IO lines assignments.
  */
-#define LINE_LED_GREEN              PAL_LINE(GPIOA, 4U)
+#define LINE_LED                    PAL_LINE(GPIOA, 4U)
 #define LINE_DEBUG                  PAL_LINE(GPIOA, 4U)
 #define LINE_OUTPUT_EN              PAL_LINE(GPIOA, 5U)
 #define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
