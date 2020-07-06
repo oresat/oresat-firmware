@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard_v3
+PROJECT   = app_protocard
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = PROTOCARD_V3
+BOARD     = PROTOCARD_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -129,7 +129,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
