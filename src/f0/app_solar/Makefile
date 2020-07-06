@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = softfp
+  USE_FPU = no
 endif
 
 # FPU-related options.
@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard_v3
+PROJECT   = app_solar
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = PROTOCARD_V3
+BOARD     = SOLAR_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -107,6 +107,8 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/max580x.mk
+include $(PROJ_SRC)/ina226.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -128,8 +130,8 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 #include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
-# Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+# Define linker scr4pt file here
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

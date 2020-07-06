@@ -26,7 +26,7 @@
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-    0x06,
+    0x04,
     ORESAT_DEFAULT_BITRATE
 };
 
