@@ -6,13 +6,13 @@ THD_FUNCTION(blink, arg)
 {
     (void)arg;
 
-    palSetLineMode(LINE_LED_GREEN,PAL_MODE_OUTPUT_PUSHPULL);
+    palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
 
     while (!chThdShouldTerminateX()) {
-        palToggleLine(LINE_LED_GREEN);
+        palToggleLine(LINE_LED);
         chThdSleepMilliseconds(500);
     }
 
-    palClearLine(LINE_LED_GREEN);
+    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }
