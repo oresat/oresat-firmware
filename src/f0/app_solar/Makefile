@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_solar_v3
+PROJECT   = app_solar
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = SOLAR_V3
+BOARD     = SOLAR_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -130,8 +130,8 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 #include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
-# Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+# Define linker scr4pt file here
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

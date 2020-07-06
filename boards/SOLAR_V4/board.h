@@ -248,7 +248,7 @@
  * PA1  - SHDN_STM                  (output pushpull maximum).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
- * PA4  - PIN4                      (analog).
+ * PA4  - IADJ                      (analog).
  * PA5  - PIN5                      (analog).
  * PA6  - PIN6                      (analog).
  * PA7  - PIN7                      (analog).
@@ -265,7 +265,7 @@
                                      PIN_MODE_OUTPUT(GPIOA_SHDN_STM) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
-                                     PIN_MODE_ANALOG(GPIOA_PIN4) |          \
+                                     PIN_MODE_ANALOG(GPIOA_IADJ) |          \
                                      PIN_MODE_ANALOG(GPIOA_PIN5) |          \
                                      PIN_MODE_ANALOG(GPIOA_PIN6) |          \
                                      PIN_MODE_ANALOG(GPIOA_PIN7) |          \
@@ -281,7 +281,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SHDN_STM) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_PIN4) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_IADJ) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN5) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN6) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN7) |       \
@@ -297,7 +297,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SHDN_STM) |      \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
-                                     PIN_OSPEED_HIGH(GPIOA_PIN4) |          \
+                                     PIN_OSPEED_HIGH(GPIOA_IADJ) |          \
                                      PIN_OSPEED_HIGH(GPIOA_PIN5) |          \
                                      PIN_OSPEED_HIGH(GPIOA_PIN6) |          \
                                      PIN_OSPEED_HIGH(GPIOA_PIN7) |          \
@@ -313,7 +313,7 @@
                                      PIN_PUPDR_FLOATING(GPIOA_SHDN_STM) |   \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
-                                     PIN_PUPDR_FLOATING(GPIOA_PIN4) |       \
+                                     PIN_PUPDR_FLOATING(GPIOA_IADJ) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN5) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN6) |       \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN7) |       \
@@ -329,7 +329,7 @@
                                      PIN_ODR_HIGH(GPIOA_SHDN_STM) |         \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
-                                     PIN_ODR_HIGH(GPIOA_PIN4) |             \
+                                     PIN_ODR_HIGH(GPIOA_IADJ) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN5) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN6) |             \
                                      PIN_ODR_HIGH(GPIOA_PIN7) |             \
@@ -345,7 +345,7 @@
                                      PIN_AFIO_AF(GPIOA_SHDN_STM, 0U) |      \
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 1U) |     \
-                                     PIN_AFIO_AF(GPIOA_PIN4, 0U) |          \
+                                     PIN_AFIO_AF(GPIOA_IADJ, 0U) |          \
                                      PIN_AFIO_AF(GPIOA_PIN5, 0U) |          \
                                      PIN_AFIO_AF(GPIOA_PIN6, 0U) |          \
                                      PIN_AFIO_AF(GPIOA_PIN7, 0U))
