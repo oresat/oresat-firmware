@@ -53,6 +53,7 @@ void oresat_init(void)
 
 void oresat_start(oresat_config_t *config)
 {
+    CO_ReturnError_t err;
     event_listener_t can_el, cos_el;
     eventmask_t events;
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
@@ -69,17 +70,18 @@ void oresat_start(oresat_config_t *config)
 
     OD_CANBitRate = config->bitrate;
 
-
     oresat_tp = chThdGetSelfX();
 
-    while (reset != CO_RESET_APP) {
-        CO_ReturnError_t err;
+    err = CO_new(NULL);
+    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
 
-        /* Initialize CAN Subsystem */
-        err = CO_init(config->cand, OD_CANNodeID, OD_CANBitRate);
-        if (err != CO_ERROR_NO) {
-            CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err);
-        }
+    while (reset != CO_RESET_APP) {
+
+        /* Initialize CANopen Subsystem */
+        err = CO_CANinit(config, OD_CANBitRate);
+        chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
+        err = CO_CANopenInit(OD_CANNodeID);
+        chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInit failed");
 
         /* Register events */
         chEvtRegister(&CO->CANmodule[0]->rx_event, &can_el, ORESAT_RX_EVENT);
@@ -87,10 +89,8 @@ void oresat_start(oresat_config_t *config)
         reg_event(&event_registry, ORESAT_NMT_OPERATIONAL, nmt_handler);
         reg_event(&event_registry, ORESAT_NMT_NONOPERATIONAL, nmt_handler);
 
-        /* Register CAN interrupt callbacks */
-        config->cand->rxfull_cb = CO_CANrx_cb;
-        config->cand->txempty_cb = CO_CANtx_cb;
-        CO_NMT_initCallback(CO->NMT, CO_NMT_cb);
+        /* Register CAN callbacks */
+        CO_NMT_initCallbackChanged(CO->NMT, CO_NMT_cb);
 
         /* Enter normal operating mode */
         CO_CANsetNormalMode(CO->CANmodule[0]);
@@ -98,19 +98,25 @@ void oresat_start(oresat_config_t *config)
         reset = CO_RESET_NOT;
         prev_time = chVTGetSystemTime();
         while (reset == CO_RESET_NOT) {
+            bool_t syncWas;
             uint32_t timeout = ((typeof(timeout))-1);
-            uint16_t timeout_ms = ((typeof(timeout_ms))-1);
 
             /* Process all CO objects */
+            /* Trigger sensors */
             sensors_trig();
-            reset = CO_process(CO, TIME_I2MS(chVTTimeElapsedSinceX(prev_time)), &timeout_ms);
+            /* CANopen process */
+            reset = CO_process(CO, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
             if (reset != CO_RESET_NOT)
                 continue;
-            CO_process_SYNC_PDO(CO, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+            /* Process SYNC */
+            syncWas = CO_process_SYNC(CO, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+            /* Read inputs */
+            CO_process_RPDO(CO, syncWas);
+            /* Write outputs */
+            CO_process_TPDO(CO, syncWas, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
             /* Wait for an event or timeout if no pending actions, whichever comes first */
             prev_time = chVTGetSystemTime();
-            if ((timeout_ms * 1000) < timeout) timeout = timeout_ms * 1000;
             events = chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
             if (events) event_dispatch(&event_registry, events);
         }
@@ -123,7 +129,7 @@ void oresat_start(oresat_config_t *config)
     }
 
     /* Deinitialize CO stack */
-    CO_delete(config->cand);
+    CO_delete(config);
 
     /* Initiate System Reset */
     NVIC_SystemReset();
