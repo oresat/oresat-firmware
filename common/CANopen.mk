@@ -5,15 +5,12 @@ CANOPEN_SRC  = $(PROJ_SRC)/CANopenNode
 
 # List of all CANopen sources
 CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                  \
-               $(PROJ_SRC)/CO_master.c                  \
                $(CANOPEN_SRC)/301/CO_SDOserver.c        \
                $(CANOPEN_SRC)/301/CO_Emergency.c        \
                $(CANOPEN_SRC)/301/CO_NMT_Heartbeat.c    \
                $(CANOPEN_SRC)/301/CO_HBconsumer.c       \
                $(CANOPEN_SRC)/301/CO_SYNC.c             \
                $(CANOPEN_SRC)/301/CO_PDO.c              \
-               $(CANOPEN_SRC)/301/CO_TIME.c             \
-               $(CANOPEN_SRC)/301/CO_SDOclient.c        \
                $(CANOPEN_SRC)/301/crc16-ccitt.c         \
                $(CANOPEN_SRC)/CANopen.c
 
