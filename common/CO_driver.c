@@ -90,7 +90,7 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->txSize = txSize;
     CANmodule->CANerrorStatus = 0;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? rxSize / 4 : 0);
+    CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? (rxSize / 4) + 1 : 0);
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
@@ -120,19 +120,17 @@ CO_ReturnError_t CO_CANmodule_init(
             CAN_BTR(CANbitRate));   //Calculate BTR value and set
 
     /* Configure CAN module hardware filters */
-    if (CANmodule->useCANrxFilters) {
-        /* CAN module filters are used, they will be configured with */
-        /* CO_CANrxBufferInit() functions, called by separate CANopen */
-        /* init functions. */
-        /* Initialize all filter entries */
-        for (i = 0U; i < STM32_CAN_MAX_FILTERS; i++) {
-            CANmodule->canFilters[i].filter = i;
-            CANmodule->canFilters[i].mode = 1;                  /* List Mode */
-            CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
-            CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
-            CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
-            CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
-        }
+    /* CAN module filters are used, they will be configured with */
+    /* CO_CANrxBufferInit() functions, called by separate CANopen */
+    /* init functions. */
+    /* Initialize all filter entries */
+    for (i = 0U; i < CANmodule->useCANrxFilters; i++) {
+        CANmodule->canFilters[i].filter = i;
+        CANmodule->canFilters[i].mode = 1;                  /* List Mode */
+        CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
+        CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
+        CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
+        CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
     }
 
     return CO_ERROR_NO;
