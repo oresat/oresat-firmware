@@ -76,6 +76,23 @@ extern "C" {
                            CO_CONFIG_HB_CONS_QUERY_FUNCT)
 #endif
 
+#ifndef CO_CONFIG_GFC
+#define CO_CONFIG_GFC (CO_CONFIG_GFC_CONSUMER | \
+                       CO_CONFIG_GFC_PRODUCER)
+#endif
+
+#ifndef CO_CONFIG_SRDO
+#define CO_CONFIG_SRDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_FLAG_TIMERNEXT | \
+                       CO_CONFIG_SRDO_CHECK_TX | \
+                       CO_CONFIG_RSRDO_CALLS_EXTENSION | \
+                       CO_CONFIG_TSRDO_CALLS_EXTENSION)
+#endif
+
+#ifndef CO_CONFIG_SRDO_MINIMUM_DELAY
+#define CO_CONFIG_SRDO_MINIMUM_DELAY 0
+#endif
+
 #ifndef CO_CONFIG_PDO
 #define CO_CONFIG_PDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
                        CO_CONFIG_FLAG_TIMERNEXT | \
@@ -102,24 +119,26 @@ extern "C" {
 #endif
 
 #ifndef CO_CONFIG_TIME
-#define CO_CONFIG_TIME (CO_CONFIG_FLAG_CALLBACK_PRE)
+#define CO_CONFIG_TIME 0
 #endif
 
-#ifndef CO_CONFIG_LSS_MST
-#define CO_CONFIG_LSS_MST (CO_CONFIG_FLAG_CALLBACK_PRE)
+#ifndef CO_CONFIG_LEDS
+#define CO_CONFIG_LEDS 0
+#endif
+
+#ifndef CO_CONFIG_LSS
+#define CO_CONFIG_LSS 0
 #endif
 
 #ifndef CO_CONFIG_GTW
-#define CO_CONFIG_GTW (CO_CONFIG_GTW_ASCII | \
-                       CO_CONFIG_GTW_ASCII_ERROR_DESC | \
-                       CO_CONFIG_GTW_ASCII_PRINT_HELP)
+#define CO_CONFIG_GTW 0
 #define CO_CONFIG_GTW_BLOCK_DL_LOOP 1
 #define CO_CONFIG_GTWA_COMM_BUF_SIZE 2000
+#define CO_CONFIG_GTWA_LOG_BUF_SIZE 2000
 #endif
 
 
 /* Basic definitions. If big endian, CO_SWAP_xx macros must swap bytes. */
-#define CO_USE_GLOBALS
 #define CO_LITTLE_ENDIAN
 #define CO_SWAP_16(x) x
 #define CO_SWAP_32(x) x
@@ -216,6 +235,7 @@ typedef struct {
     uint16_t            rxSize;         /* From CO_CANmodule_init() */
     CO_CANtx_t         *txArray;        /* From CO_CANmodule_init() */
     uint16_t            txSize;         /* From CO_CANmodule_init() */
+    uint16_t            CANerrorStatus; /* Error Status */
     volatile bool_t     CANnormal;      /* CAN module is in normal mode */
     /* Value different than zero indicates, that CAN module hardware filters
      * are used for CAN reception. If there is not enough hardware filters,
@@ -233,10 +253,10 @@ typedef struct {
     /* Number of messages in transmit buffer, which are waiting to be copied to the CAN module */
     volatile uint16_t   CANtxCount;
     uint32_t            errOld;         /**< Previous state of CAN errors */
-    void               *em;             /**< Emergency object */
 } CO_CANmodule_t;
 
 
+/* TODO: Implement a means of locking data without locking the entire system */
 /* (un)lock critical section in CO_CANsend() */
 #define CO_LOCK_CAN_SEND()      chSysLock()     /* Lock critical section in CO_CANsend() */
 #define CO_UNLOCK_CAN_SEND()    chSysUnlock()   /* Unlock critical section in CO_CANsend() */

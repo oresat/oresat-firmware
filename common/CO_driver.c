@@ -27,7 +27,6 @@
 
 
 #include "301/CO_driver.h"
-#include "301/CO_Emergency.h"
 #include "can_hw.h"
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
@@ -89,13 +88,13 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->rxSize = rxSize;
     CANmodule->txArray = txArray;
     CANmodule->txSize = txSize;
+    CANmodule->CANerrorStatus = 0;
     CANmodule->CANnormal = false;
     CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? rxSize / 4 : 0);
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
     CANmodule->errOld = 0U;
-    CANmodule->em = NULL;
 
     for (i=0U; i<rxSize; i++) {
         rxArray[i].ident = 0U;
@@ -237,7 +236,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
     if (buffer->bufferFull) {
         if (!CANmodule->firstCANtxMessage) {
             /* Don't set error, if bootup message is still on buffers */
-            CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_CAN_TX_OVERFLOW, CO_EMC_CAN_OVERRUN, buffer->SID);
+            CANmodule->CANerrorStatus |= CO_CAN_ERRTX_OVERFLOW;
         }
         err = CO_ERROR_TX_OVERFLOW;
     }
@@ -291,59 +290,68 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 
 
     if (tpdoDeleted != 0U) {
-        CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_TPDO_OUTSIDE_WINDOW, CO_EMC_COMMUNICATION, tpdoDeleted);
+        CANmodule->CANerrorStatus |= CO_CAN_ERRTX_PDO_LATE;
     }
 }
 
 
 /******************************************************************************/
-void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
+/* Get error counters from the module. If necessary, function may use
+    * different way to determine errors. */
+
+void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 {
-    CO_EM_t *em = (CO_EM_t*)CANmodule->em;
     CAN_TypeDef *canp = CANmodule->cand->can;
     uint32_t err;
+    uint8_t rxErrors, txErrors;
 
     /* Get ESR and FOVRx values */
     err = (canp->ESR | ((canp->RF0R & CAN_RF0R_FOVR0_Msk) << 4) | ((canp->RF1R & CAN_RF1R_FOVR1_Msk) << 5));
+    rxErrors = _FLD2VAL(CAN_ESR_REC, err);
+    txErrors = _FLD2VAL(CAN_ESR_TEC, err);
 
     if (CANmodule->errOld != err) {
+        uint16_t status = CANmodule->CANerrorStatus;
+
         CANmodule->errOld = err;
 
-        if (err & CAN_ESR_BOFF) {                           /* bus off */
-            CO_errorReport(em, CO_EM_CAN_TX_BUS_OFF, CO_EMC_BUS_OFF_RECOVERED, err);
-        } else {                                            /* not bus off */
-            CO_errorReset(em, CO_EM_CAN_TX_BUS_OFF, err);
+        if (err & CAN_ESR_BOFF) {
+            /* bus off */
+            status |= CO_CAN_ERRTX_BUS_OFF;
+        } else {
+            /* not bus off */
+            /* recalculate CANerrorStatus, first clear some flags */
+            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF |
+                                CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE |
+                                CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE);
 
-            if (err & CAN_ESR_EWGF) {                       /* bus warning */
-                CO_errorReport(em, CO_EM_CAN_BUS_WARNING, CO_EMC_NO_ERROR, err);
-            } else {
-                CO_errorReset(em, CO_EM_CAN_BUS_WARNING, err);
+            /* rx bus warning or passive */
+            if (rxErrors >= 128) {
+                status |= CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE;
+            } else if (rxErrors >= 96) {
+                status |= CO_CAN_ERRRX_WARNING;
             }
 
-            if (err & CAN_ESR_EPVF) {
-                if (_FLD2VAL(CAN_ESR_REC, err) >= 128U) {   /* RX bus passive */
-                    CO_errorReport(em, CO_EM_CAN_RX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
-                } else {
-                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
-                }
-                if (_FLD2VAL(CAN_ESR_TEC, err) >= 128U) {   /* TX bus passive */
-                    if (!CANmodule->firstCANtxMessage) {
-                        CO_errorReport(em, CO_EM_CAN_TX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
-                    }
-                } else {
-                    CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
-                }
-            } else {
-                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
+            /* tx bus warning or passive */
+            if (txErrors >= 128) {
+                status |= CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE;
+            } else if (rxErrors >= 96) {
+                status |= CO_CAN_ERRTX_WARNING;
+            }
+
+            /* if not tx passive clear also overflow */
+            if ((status & CO_CAN_ERRTX_PASSIVE) == 0) {
+                status &= 0xFFFF ^ CO_CAN_ERRTX_OVERFLOW;
             }
         }
 
-        if (err & 0xFF00) {                                 /* CAN RX bus overflow */
-            CO_errorReport(em, CO_EM_CAN_RXB_OVERFLOW, CO_EMC_CAN_OVERRUN, err);
+        /* Check for overflow of RX FIFOs */
+        if ((canp->RF0R & CAN_RF0R_FOVR0_Msk) | (canp->RF1R & CAN_RF1R_FOVR1_Msk)) {
+            /* CAN RX bus overflow */
+            status |= CO_CAN_ERRRX_OVERFLOW;
         }
+
+        CANmodule->CANerrorStatus = status;
     }
 }
 
