@@ -15,6 +15,9 @@ extern "C" {
                        CO_CONFIG_GTW_ASCII_LOG | \
                        CO_CONFIG_GTW_ASCII_ERROR_DESC | \
                        CO_CONFIG_GTW_ASCII_PRINT_HELP)
+#define CO_CONFIG_GTW_BLOCK_DL_LOOP 1
+#define CO_CONFIG_GTWA_COMM_BUF_SIZE 2000
+#define CO_CONFIG_GTWA_LOG_BUF_SIZE 2000
 
 #ifdef __cplusplus
 }
