@@ -15,8 +15,11 @@ CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                  \
                $(CANOPEN_SRC)/CANopen.c
 
 # Optional sources
-#CANOPENSRC  += $(CANOPEN_SRC)/305/CO_LSSmaster.c        \
+#CANOPENSRC  += $(CANOPEN_SRC)/303/CO_LEDs.c             \
+               #$(CANOPEN_SRC)/304/CO_GFC.c              \
+               #$(CANOPEN_SRC)/304/CO_SRDO.c             \
                #$(CANOPEN_SRC)/305/CO_LSSslave.c         \
+               #$(CANOPEN_SRC)/305/CO_LSSmaster.c        \
                #$(CANOPEN_SRC)/extra/CO_trace.c
 
 # Required include directories
