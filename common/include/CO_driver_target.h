@@ -77,16 +77,11 @@ extern "C" {
 #endif
 
 #ifndef CO_CONFIG_GFC
-#define CO_CONFIG_GFC (CO_CONFIG_GFC_CONSUMER | \
-                       CO_CONFIG_GFC_PRODUCER)
+#define CO_CONFIG_GFC 0
 #endif
 
 #ifndef CO_CONFIG_SRDO
-#define CO_CONFIG_SRDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT | \
-                       CO_CONFIG_SRDO_CHECK_TX | \
-                       CO_CONFIG_RSRDO_CALLS_EXTENSION | \
-                       CO_CONFIG_TSRDO_CALLS_EXTENSION)
+#define CO_CONFIG_SRDO 0
 #endif
 
 #ifndef CO_CONFIG_SRDO_MINIMUM_DELAY
