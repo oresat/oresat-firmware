@@ -12,12 +12,12 @@ OpenOCD must be built from source however. This can be done via the AUR
 package `openocd-git`. Either use a AUR helper like `yay` or acquire the
 PKGBUILD and build it manually:
 
-AUR Helper example using yay:
+### AUR Helper example using yay:
 ```
 yay -S openocd-git
 ```
 
-Manual build:
+### Manual build:
 ```
 username@hostname:~/Projects
 ➜ curl -O

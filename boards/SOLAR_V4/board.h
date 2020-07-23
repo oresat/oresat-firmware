@@ -27,7 +27,7 @@
 /*===========================================================================*/
 
 /*
- * Setup for Oresat Solar V3 STM32F042K6 board.
+ * Oresat Solar V4 STM32F091CC board.
  * PART: STM32F091CC
  * PACKAGE: LQFP32
  */
@@ -199,7 +199,7 @@
 /*
  * IO lines assignments.
  */
-#define LINE_LED                    PAL_LINE(GPIOA, 4U)
+#define LINE_LED                    PAL_LINE(GPIOA, 0U)
 #define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
 #define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 
@@ -244,8 +244,8 @@
 /*
  * GPIOA setup:
  *
- * PA0  - LED                       (output pushpull maximum).
- * PA1  - SHDN_STM                  (output pushpull maximum).
+ * PA0  - LED                       (output pushpull).
+ * PA1  - SHDN_STM                  (output pushpull).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - IADJ                      (analog).
@@ -253,8 +253,8 @@
  * PA6  - PIN6                      (analog).
  * PA7  - PIN7                      (analog).
  * PA8  - PIN8                      (analog).
- * PA9  - CAN_SILENT                (output pushpull maximum).
- * PA10 - CAN_SHDN                  (output pushpull maximum).
+ * PA9  - CAN_SILENT                (output pulldown).
+ * PA10 - CAN_SHDN                  (output pulldown).
  * PA11 - CAN_RX                    (alternate 4).
  * PA12 - CAN_TX                    (alternate 4).
  * PA13 - SWDIO                     (alternate 0).
@@ -309,7 +309,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWDIO) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
-#define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_LED) |        \
+#define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
                                      PIN_PUPDR_FLOATING(GPIOA_SHDN_STM) |   \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
@@ -367,7 +367,7 @@
  * PB3  - PIN3                      (analog).
  * PB4  - PIN4                      (analog).
  * PB5  - PIN5                      (analog).
- * PB6  - I2C1_SCL                  (alternate 1)
+ * PB6  - I2C1_SCL                  (alternate 1).
  * PB7  - I2C1_SDA                  (alternate 1).
  * PB8  - PIN8                      (analog).
  * PB9  - PIN9                      (analog).
