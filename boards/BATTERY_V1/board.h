@@ -204,6 +204,8 @@
 #define LINE_PKDIS                  PAL_LINE(GPIOA, 5U)
 #define LINE_CDIS                   PAL_LINE(GPIOA, 6U)
 #define LINE_DDIS                   PAL_LINE(GPIOA, 7U)
+#define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
+#define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -369,7 +371,7 @@
  * PB3  - PIN3                      (analog).
  * PB4  - PIN4                      (analog).
  * PB5  - PIN5                      (analog).
- * PB6  - I2C1_SCL                  (alternate 1)
+ * PB6  - I2C1_SCL                  (alternate 1).
  * PB7  - I2C1_SDA                  (alternate 1).
  * PB8  - BOOT0                     (analog).
  * PB9  - PIN9                      (analog).

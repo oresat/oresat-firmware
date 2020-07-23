@@ -200,6 +200,8 @@
  * IO lines assignments.
  */
 #define LINE_LED                    PAL_LINE(GPIOA, 0U)
+#define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
+#define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -267,7 +269,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |  \
-                                     PIN_MODE_INPUT(GPIOA_PIN8) |           \
+                                     PIN_MODE_ANALOG(GPIOA_PIN8) |          \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SILENT) |    \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SHDN) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_CAN_RX) |     \
@@ -361,11 +363,11 @@
  *
  * PB0  - PIN0                      (analog).
  * PB1  - PIN1                      (analog).
- * PB2  - NC                        (analog).
+ * PB2  - PIN2                      (analog).
  * PB3  - PIN3                      (analog).
  * PB4  - PIN4                      (analog).
  * PB5  - PIN5                      (analog).
- * PB6  - I2C1_SCL                  (alternate 1)
+ * PB6  - I2C1_SCL                  (alternate 1).
  * PB7  - I2C1_SDA                  (alternate 1).
  * PB8  - PIN8                      (analog).
  * PB9  - PIN9                      (analog).
