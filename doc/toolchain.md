@@ -175,3 +175,9 @@ Debian's packages are named as follows:
 ```
 apt install gcc-arm-none-eabi gdb-arm-none-eabi
 ```
+
+OpenOCD must be built with the following options:
+```
+./configure --enable-maintainer-mode --disable-werror --enable-stlink
+make
+```
