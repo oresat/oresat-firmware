@@ -21,40 +21,40 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "wdt.h"
 #include "opd.h"
 #include "command.h"
 
 /*
- * Workers
- */
-static worker_t shell_worker;
-
-static SPIConfig hs_spicfg = {
-    false,
-    NULL,
-    LINE_MMC_CS,
-    0,
-    0
+static const oresat_node_t nodes[] = {
+    {0x02, 0x00, 2000, "Battery 1"},
+    {0x03, 0x00, 2000, "Battery 2"},
+    {0x04, 0x00, 2000, "Solar Panel 1"},
+    {0x05, 0x00, 2000, "Solar Panel 2"},
+    {0x06, 0x00, 2000, "Solar Panel 3"},
+    {0x07, 0x00, 2000, "Solar Panel 4"},
+    {0x08, 0x00, 2000, "Solar Panel 5"},
+    {0x09, 0x00, 2000, "Solar Panel 6"},
+    {0x0A, 0x00, 2000, "Solar Panel 7"},
+    {0x0B, 0x00, 2000, "Solar Panel 8"},
+    {0x31, 0x18, 2000, "Protocard 1"},
+    {0x32, 0x19, 2000, "Protocard 2"},
+    {0x33, 0x1A, 2000, "Protocard 3"},
+    {0x11, 0x1D, 2000, "Star Tracker"}
 };
-
-static SPIConfig ls_spicfg = {
-    false,
-    NULL,
-    LINE_MMC_CS,
-    SPI_CR1_BR_2 | SPI_CR1_BR_1,
-    0
-};
+*/
 
 /*
- * MMC configuration.
+ * Working area for driver.
  */
-static MMCConfig mmccfg = {
-    &SPID2,
-    &ls_spicfg,
-    &hs_spicfg
+
+/*
+ * SDIO configuration.
+ */
+static const SDCConfig sdccfg = {
+  SDC_MODE_4BIT
 };
 
-MMCDriver MMCD1;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -68,8 +68,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&shell_worker, "Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    reg_worker(&shell_worker);
+    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
 
     /* Initialize OPD */
     opd_init();
@@ -79,9 +78,12 @@ static void app_init(void)
     shellInit();
     sdStart(&SD2, NULL);
 
-    /* Initializes MMC SPI driver */
-    mmcObjectInit(&MMCD1);
-    mmcStart(&MMCD1, &mmccfg);
+    /* Initializes MMC SDC interface */
+    palClearLine(LINE_MMC_PWR);
+    sdcStart(&SDCD1, &sdccfg);
+
+    /* Start up the shell */
+    chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
 }
 
 /**

@@ -44,17 +44,17 @@
 #define STM32_CLOCK48_REQUIRED              TRUE
 #define STM32_SW                            STM32_SW_PLL
 #define STM32_PLLSRC                        STM32_PLLSRC_HSE
-#define STM32_PLLM_VALUE                    8
+#define STM32_PLLM_VALUE                    16
 #define STM32_PLLN_VALUE                    360
 #define STM32_PLLP_VALUE                    2
 #define STM32_PLLQ_VALUE                    7
 #define STM32_PLLI2SN_VALUE                 192
-#define STM32_PLLI2SM_VALUE                 4
+#define STM32_PLLI2SM_VALUE                 8
 #define STM32_PLLI2SR_VALUE                 4
 #define STM32_PLLI2SP_VALUE                 4
 #define STM32_PLLI2SQ_VALUE                 4
 #define STM32_PLLSAIN_VALUE                 192
-#define STM32_PLLSAIM_VALUE                 4
+#define STM32_PLLSAIM_VALUE                 8
 #define STM32_PLLSAIP_VALUE                 8
 #define STM32_PLLSAIQ_VALUE                 8
 #define STM32_HPRE                          STM32_HPRE_DIV1
@@ -62,9 +62,9 @@
 #define STM32_PPRE2                         STM32_PPRE2_DIV2
 #define STM32_RTCSEL                        STM32_RTCSEL_LSI
 #define STM32_RTCPRE_VALUE                  8
-#define STM32_MCO1SEL                       STM32_MCO1SEL_HSI
+#define STM32_MCO1SEL                       STM32_MCO1SEL_HSE
 #define STM32_MCO1PRE                       STM32_MCO1PRE_DIV1
-#define STM32_MCO2SEL                       STM32_MCO2SEL_PLLI2S
+#define STM32_MCO2SEL                       STM32_MCO2SEL_SYSCLK
 #define STM32_MCO2PRE                       STM32_MCO2PRE_DIV1
 #define STM32_I2SSRC                        STM32_I2SSRC_PLLI2S
 #define STM32_SAI1SEL                       STM32_SAI2SEL_PLLR
@@ -278,14 +278,14 @@
  * SPI driver system settings.
  */
 #define STM32_SPI_USE_SPI1                  TRUE
-#define STM32_SPI_USE_SPI2                  TRUE
-#define STM32_SPI_USE_SPI3                  FALSE
+#define STM32_SPI_USE_SPI2                  FALSE
+#define STM32_SPI_USE_SPI3                  TRUE
 #define STM32_SPI_USE_SPI4                  FALSE
 #define STM32_SPI_SPI1_RX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 0)
 #define STM32_SPI_SPI1_TX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 3)
 #define STM32_SPI_SPI2_RX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 3)
 #define STM32_SPI_SPI2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
-#define STM32_SPI_SPI3_RX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 0)
+#define STM32_SPI_SPI3_RX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 2)
 #define STM32_SPI_SPI3_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 7)
 #define STM32_SPI_SPI4_RX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 0)
 #define STM32_SPI_SPI4_TX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 1)
