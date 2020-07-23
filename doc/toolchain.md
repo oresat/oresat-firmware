@@ -171,4 +171,7 @@ username@hostname:openocd-git on  master [!?]
 ```
 
 ## Debian
-
+Debian's packages are named as follows:
+```
+apt install gcc-arm-none-eabi gdb-arm-none-eabi
+```
