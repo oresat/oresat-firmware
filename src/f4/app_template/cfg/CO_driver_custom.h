@@ -16,6 +16,12 @@ extern "C" {
                        CO_CONFIG_GTW_ASCII_ERROR_DESC | \
                        CO_CONFIG_GTW_ASCII_PRINT_HELP)
 
+#define CO_CONFIG_SDO_CLI (CO_CONFIG_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_FLAG_TIMERNEXT | \
+                           CO_CONFIG_SDO_CLI_SEGMENTED | \
+                           CO_CONFIG_SDO_CLI_BLOCK | \
+                           CO_CONFIG_SDO_CLI_LOCAL)
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -102,11 +102,7 @@ extern "C" {
 #endif
 
 #ifndef CO_CONFIG_SDO_CLI
-#define CO_CONFIG_SDO_CLI (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_FLAG_TIMERNEXT | \
-                           CO_CONFIG_SDO_CLI_SEGMENTED | \
-                           CO_CONFIG_SDO_CLI_BLOCK | \
-                           CO_CONFIG_SDO_CLI_LOCAL)
+#define CO_CONFIG_SDO_CLI 0
 #endif
 
 #ifndef CO_CONFIG_SDO_CLI_BUFFER_SIZE
@@ -127,9 +123,6 @@ extern "C" {
 
 #ifndef CO_CONFIG_GTW
 #define CO_CONFIG_GTW 0
-#define CO_CONFIG_GTW_BLOCK_DL_LOOP 1
-#define CO_CONFIG_GTWA_COMM_BUF_SIZE 2000
-#define CO_CONFIG_GTWA_LOG_BUF_SIZE 2000
 #endif
 
 
