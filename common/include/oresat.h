@@ -1,16 +1,18 @@
 #ifndef _ORESAT_H_
 #define _ORESAT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "ch.h"
 #include "hal.h"
 #include "worker.h"
 
+#define CO_USE_GLOBALS
+#define CO_DRIVER_CUSTOM
 #define ORESAT_DEFAULT_ID 0
 #define ORESAT_DEFAULT_BITRATE 1000
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern event_source_t cos_event;
 

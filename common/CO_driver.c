@@ -6,55 +6,40 @@
  * @file        CO_driver.c
  * @ingroup     CO_driver
  * @author      Janez Paternoster
- * @copyright   2004 - 2015 Janez Paternoster
+ * @copyright   2004 - 2020 Janez Paternoster
  *
  * This file is part of CANopenNode, an opensource CANopen Stack.
  * Project home page is <https://github.com/CANopenNode/CANopenNode>.
  * For more information on CANopen see <http://www.can-cia.org/>.
  *
- * CANopenNode is free and open source software: you can redistribute
- * it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 2 of the
- * License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * Following clarification and special exception to the GNU General Public
- * License is included to the distribution terms of CANopenNode:
- *
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library. Thus, the terms and
- * conditions of the GNU General Public License cover the whole combination.
- *
- * As a special exception, the copyright holders of this library give
- * you permission to link this library with independent modules to
- * produce an executable, regardless of the license terms of these
- * independent modules, and to copy and distribute the resulting
- * executable under terms of your choice, provided that you also meet,
- * for each linked independent module, the terms and conditions of the
- * license of that module. An independent module is a module which is
- * not derived from or based on this library. If you modify this
- * library, you may extend this exception to your version of the
- * library, but you are not obliged to do so. If you do not wish
- * to do so, delete this exception statement from your version.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 
-#include "CO_driver.h"
-#include "CO_Emergency.h"
+#include "301/CO_driver.h"
 #include "can_hw.h"
 
+#define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
+
+/* Interrupt callback prototypes*/
+void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
+void CO_CANtx_cb(CANDriver *canp, uint32_t flags);
+
 /******************************************************************************/
-void CO_CANsetConfigurationMode(void *CANbaseAddress)
+void CO_CANsetConfigurationMode(void *CANptr)
 {
     /* Put CAN module in configuration mode */
-    canStop(CANbaseAddress);
+    canStop(((oresat_config_t*)CANptr)->cand);
 }
 
 /******************************************************************************/
@@ -79,7 +64,7 @@ void CO_CANsetFilters(CO_CANmodule_t *CANmodule)
 /******************************************************************************/
 CO_ReturnError_t CO_CANmodule_init(
         CO_CANmodule_t         *CANmodule,
-        void                   *CANbaseAddress,
+        void                   *CANptr,
         CO_CANrx_t              rxArray[],
         uint16_t                rxSize,
         CO_CANtx_t              txArray[],
@@ -94,26 +79,28 @@ CO_ReturnError_t CO_CANmodule_init(
     }
 
     /* Configure object variables */
-    CANmodule->CANbaseAddress = CANbaseAddress;
-    CANmodule->cand = CANbaseAddress;
+    CANmodule->CANptr = CANptr;
+    CANmodule->cand = ((oresat_config_t*)CANptr)->cand;
+    CANmodule->cand->rxfull_cb = CO_CANrx_cb;
+    CANmodule->cand->txempty_cb = CO_CANtx_cb;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
     CANmodule->txArray = txArray;
     CANmodule->txSize = txSize;
+    CANmodule->CANerrorStatus = 0;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = (rxSize <= STM32_CAN_MAX_FILTERS ? rxSize : 0);
+    CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? (rxSize / 4) + 1 : 0);
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
     CANmodule->errOld = 0U;
-    CANmodule->em = NULL;
 
     for (i=0U; i<rxSize; i++) {
         rxArray[i].ident = 0U;
         rxArray[i].mask = 0xFFFFU;
         rxArray[i].object = NULL;
-        rxArray[i].pFunct = NULL;
+        rxArray[i].CANrx_callback = NULL;
     }
     for (i=0U; i<txSize; i++) {
         txArray[i].bufferFull = false;
@@ -133,19 +120,17 @@ CO_ReturnError_t CO_CANmodule_init(
             CAN_BTR(CANbitRate));   //Calculate BTR value and set
 
     /* Configure CAN module hardware filters */
-    if (CANmodule->useCANrxFilters) {
-        /* CAN module filters are used, they will be configured with */
-        /* CO_CANrxBufferInit() functions, called by separate CANopen */
-        /* init functions. */
-        /* Configure all masks so that received message must match filter */
-        for (i = 0U; i < rxSize; i++) {
-            CANmodule->canFilters[i].filter = i;
-            CANmodule->canFilters[i].mode = 0;                  /* Mask Mode */
-            CANmodule->canFilters[i].scale = 1;                 /* 32bit scale (easy but inefficient) */
-            CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
-            CANmodule->canFilters[i].register1 = 0;             /* Clear out the ID */
-            CANmodule->canFilters[i].register2 = 0xFFFFFFFFU;   /* Initialize masks */
-        }
+    /* CAN module filters are used, they will be configured with */
+    /* CO_CANrxBufferInit() functions, called by separate CANopen */
+    /* init functions. */
+    /* Initialize all filter entries */
+    for (i = 0U; i < CANmodule->useCANrxFilters; i++) {
+        CANmodule->canFilters[i].filter = i;
+        CANmodule->canFilters[i].mode = 1;                  /* List Mode */
+        CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
+        CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
+        CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
+        CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
     }
 
     return CO_ERROR_NO;
@@ -161,13 +146,6 @@ void CO_CANmodule_disable(CO_CANmodule_t *CANmodule)
 
 
 /******************************************************************************/
-uint16_t CO_CANrxMsg_readIdent(const CO_CANrxMsg_t *rxMsg)
-{
-    return (uint16_t) rxMsg->SID;
-}
-
-
-/******************************************************************************/
 CO_ReturnError_t CO_CANrxBufferInit(
         CO_CANmodule_t         *CANmodule,
         uint16_t                index,
@@ -175,17 +153,17 @@ CO_ReturnError_t CO_CANrxBufferInit(
         uint16_t                mask,
         bool_t                  rtr,
         void                   *object,
-        void                  (*pFunct)(void *object, const CO_CANrxMsg_t *message))
+        void                  (*CANrx_callback)(void *object, void *message))
 {
     CO_ReturnError_t ret = CO_ERROR_NO;
 
-    if ((CANmodule != NULL) && (object != NULL) && (pFunct != NULL) && (index < CANmodule->rxSize)) {
+    if ((CANmodule != NULL) && (object != NULL) && (CANrx_callback != NULL) && (index < CANmodule->rxSize)) {
         /* buffer, which will be configured */
         CO_CANrx_t *buffer = &CANmodule->rxArray[index];
 
         /* Configure object variables */
         buffer->object = object;
-        buffer->pFunct = pFunct;
+        buffer->CANrx_callback = CANrx_callback;
 
         /* CAN identifier and CAN mask */
         buffer->ident = ident & 0x07FFU;
@@ -196,11 +174,16 @@ CO_ReturnError_t CO_CANrxBufferInit(
 
         /* Set CAN hardware module filter and mask. */
         if (CANmodule->useCANrxFilters) {
-            flt_reg_t filter;
-            filter.raw = 0;
-            filter.scale32.STID = ident;
-            filter.scale32.RTR = rtr;
-            CANmodule->canFilters[index].register1 = filter.raw;
+            flt_reg_t *filter;
+
+            if ((index % 4) < 2) {
+                filter = (flt_reg_t*)(&CANmodule->canFilters[index / 4].register1);
+            } else {
+                filter = (flt_reg_t*)(&CANmodule->canFilters[index / 4].register2);
+            }
+            filter->scale16.id_mask[index % 2].STID = ident;
+            filter->scale16.id_mask[index % 2].RTR = rtr;
+
             if (CANmodule->CANnormal) {
                 CO_CANsetFilters(CANmodule);
             }
@@ -251,7 +234,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
     if (buffer->bufferFull) {
         if (!CANmodule->firstCANtxMessage) {
             /* Don't set error, if bootup message is still on buffers */
-            CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_CAN_TX_OVERFLOW, CO_EMC_CAN_OVERRUN, buffer->SID);
+            CANmodule->CANerrorStatus |= CO_CAN_ERRTX_OVERFLOW;
         }
         err = CO_ERROR_TX_OVERFLOW;
     }
@@ -305,59 +288,68 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 
 
     if (tpdoDeleted != 0U) {
-        CO_errorReport((CO_EM_t*)CANmodule->em, CO_EM_TPDO_OUTSIDE_WINDOW, CO_EMC_COMMUNICATION, tpdoDeleted);
+        CANmodule->CANerrorStatus |= CO_CAN_ERRTX_PDO_LATE;
     }
 }
 
 
 /******************************************************************************/
-void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
+/* Get error counters from the module. If necessary, function may use
+    * different way to determine errors. */
+
+void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 {
-    CO_EM_t *em = (CO_EM_t*)CANmodule->em;
     CAN_TypeDef *canp = CANmodule->cand->can;
     uint32_t err;
+    uint8_t rxErrors, txErrors;
 
     /* Get ESR and FOVRx values */
     err = (canp->ESR | ((canp->RF0R & CAN_RF0R_FOVR0_Msk) << 4) | ((canp->RF1R & CAN_RF1R_FOVR1_Msk) << 5));
+    rxErrors = _FLD2VAL(CAN_ESR_REC, err);
+    txErrors = _FLD2VAL(CAN_ESR_TEC, err);
 
     if (CANmodule->errOld != err) {
+        uint16_t status = CANmodule->CANerrorStatus;
+
         CANmodule->errOld = err;
 
-        if (err & CAN_ESR_BOFF) {                           /* bus off */
-            CO_errorReport(em, CO_EM_CAN_TX_BUS_OFF, CO_EMC_BUS_OFF_RECOVERED, err);
-        } else {                                            /* not bus off */
-            CO_errorReset(em, CO_EM_CAN_TX_BUS_OFF, err);
+        if (err & CAN_ESR_BOFF) {
+            /* bus off */
+            status |= CO_CAN_ERRTX_BUS_OFF;
+        } else {
+            /* not bus off */
+            /* recalculate CANerrorStatus, first clear some flags */
+            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF |
+                                CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE |
+                                CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE);
 
-            if (err & CAN_ESR_EWGF) {                       /* bus warning */
-                CO_errorReport(em, CO_EM_CAN_BUS_WARNING, CO_EMC_NO_ERROR, err);
-            } else {
-                CO_errorReset(em, CO_EM_CAN_BUS_WARNING, err);
+            /* rx bus warning or passive */
+            if (rxErrors >= 128) {
+                status |= CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE;
+            } else if (rxErrors >= 96) {
+                status |= CO_CAN_ERRRX_WARNING;
             }
 
-            if (err & CAN_ESR_EPVF) {
-                if (_FLD2VAL(CAN_ESR_REC, err) >= 128U) {   /* RX bus passive */
-                    CO_errorReport(em, CO_EM_CAN_RX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
-                } else {
-                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
-                }
-                if (_FLD2VAL(CAN_ESR_TEC, err) >= 128U) {   /* TX bus passive */
-                    if (!CANmodule->firstCANtxMessage) {
-                        CO_errorReport(em, CO_EM_CAN_TX_BUS_PASSIVE, CO_EMC_CAN_PASSIVE, err);
-                    }
-                } else {
-                    CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
-                }
-            } else {
-                    CO_errorReset(em, CO_EM_CAN_RX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_BUS_PASSIVE, err);
-                    CO_errorReset(em, CO_EM_CAN_TX_OVERFLOW, err);
+            /* tx bus warning or passive */
+            if (txErrors >= 128) {
+                status |= CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE;
+            } else if (rxErrors >= 96) {
+                status |= CO_CAN_ERRTX_WARNING;
+            }
+
+            /* if not tx passive clear also overflow */
+            if ((status & CO_CAN_ERRTX_PASSIVE) == 0) {
+                status &= 0xFFFF ^ CO_CAN_ERRTX_OVERFLOW;
             }
         }
 
-        if (err & 0xFF00) {                                 /* CAN RX bus overflow */
-            CO_errorReport(em, CO_EM_CAN_RXB_OVERFLOW, CO_EMC_CAN_OVERRUN, err);
+        /* Check for overflow of RX FIFOs */
+        if ((canp->RF0R & CAN_RF0R_FOVR0_Msk) | (canp->RF1R & CAN_RF1R_FOVR1_Msk)) {
+            /* CAN RX bus overflow */
+            status |= CO_CAN_ERRRX_OVERFLOW;
         }
+
+        CANmodule->CANerrorStatus = status;
     }
 }
 
@@ -402,8 +394,8 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
     }
 
     /* Call specific function, which will process the message */
-    if (msgMatched && (buffer != NULL) && (buffer->pFunct != NULL)) {
-        buffer->pFunct(buffer->object, &rcvMsg);
+    if (msgMatched && (buffer != NULL) && (buffer->CANrx_callback != NULL)) {
+        buffer->CANrx_callback(buffer->object, &rcvMsg);
     }
     chEvtBroadcastI(&CANmodule->rx_event);
     chSysUnlockFromISR();
