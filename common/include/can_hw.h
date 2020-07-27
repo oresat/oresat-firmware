@@ -12,14 +12,6 @@ extern "C" {
 #include "ch.h"
 #include "hal.h"
 
-//Definitions
-#define INIT 0x01
-#define CERR 0x02
-#define ERPA 0x04
-#define RXOR 0x08
-#define TXOR 0x10
-#define BOFF 0x80
-
 /*
  * CAN Register configuration
  * Timing calculator:
@@ -39,19 +31,6 @@ extern "C" {
 #error "No CAN Config for this MCU"
 #endif
 
-typedef struct {
-    CANDriver *candev;
-    CANConfig cancfg;
-} candev_t;
-
-typedef struct {
-    uint32_t stdid   :11 ;
-    uint32_t extid   :18 ;
-    uint32_t rtr     :1  ;
-    uint32_t ide     :1  ;
-    uint32_t fifo    :1  ;
-} can_flt_t;
-
 typedef union {
     struct {
         uint32_t            :1 ;
@@ -66,13 +45,7 @@ typedef union {
             uint16_t IDE    :1 ;
             uint16_t RTR    :1 ;
             uint16_t STID   :11;
-        } id;
-        struct {
-            uint16_t EXIT   :3 ;
-            uint16_t IDE    :1 ;
-            uint16_t RTR    :1 ;
-            uint16_t STID   :11;
-        } mask_id;
+        } id_mask[2];
     } scale16;
     uint32_t raw;
 } flt_reg_t;

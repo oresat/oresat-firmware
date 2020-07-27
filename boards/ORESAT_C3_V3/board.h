@@ -73,7 +73,7 @@
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
 #define GPIOA_SPI1_MOSI             7U
-#define GPIOA_RADIO2_IRQ            8U
+#define GPIOA_UHF_IRQ               8U
 #define GPIOA_CAN1_SILENT           9U
 #define GPIOA_CAN1_SHDN             10U
 #define GPIOA_CAN1_RX               11U
@@ -82,50 +82,50 @@
 #define GPIOA_SWCLK                 14U
 #define GPIOA_PIN15                 15U
 
-#define GPIOB_SDIO_D1                  0U
-#define GPIOB_SDIO_D2                 1U
-#define GPIOB_SDIO_CK                  2U
-#define GPIOB_SWO                  3U
-#define GPIOB_CAN2_SHDN                  4U
-#define GPIOB_CAN2_RX                  5U
-#define GPIOB_CAN2_TX                  6U
-#define GPIOB_CAN2_SILENT                  7U
-#define GPIOB_I2C1_SCL                  8U
-#define GPIOB_I2C1_SDA                  9U
-#define GPIOB_USART3_TX                 10U
+#define GPIOB_SDIO_D1               0U
+#define GPIOB_SDIO_D2               1U
+#define GPIOB_SDIO_CK               2U
+#define GPIOB_SWO                   3U
+#define GPIOB_CAN2_SHDN             4U
+#define GPIOB_CAN2_RX               5U
+#define GPIOB_CAN2_TX               6U
+#define GPIOB_CAN2_SILENT           7U
+#define GPIOB_I2C1_SCL              8U
+#define GPIOB_I2C1_SDA              9U
+#define GPIOB_USART3_TX             10U
 #define GPIOB_PIN11                 11U
-#define GPIOB_LO_SEN                 12U
-#define GPIOB_LO_SCLK                 13U
-#define GPIOB_LO_SDATA                 14U
-#define GPIOB_LO_PLL                 15U
+#define GPIOB_LO_SEN                12U
+#define GPIOB_LO_SCLK               13U
+#define GPIOB_LO_SDATA              14U
+#define GPIOB_LO_PLL                15U
 
-#define GPIOC_VERIFY_TURN                  0U
-#define GPIOC_VERIFY_HELI                 1U
-#define GPIOC_CB_IOUT                  2U
-#define GPIOC_OPD_ISET                  3U
-#define GPIOC_PA_FWD                  4U
-#define GPIOC_PA_REV                  5U
-#define GPIOC_RADIO1_CS                  6U
-#define GPIOC_RADIO2_CS                  7U
-#define GPIOC_SDIO_D0                  8U
+#define GPIOC_VERIFY_TURN           0U
+#define GPIOC_VERIFY_HELI           1U
+#define GPIOC_CB_IOUT               2U
+#define GPIOC_OPD_ISET              3U
+#define GPIOC_PA_FWD                4U
+#define GPIOC_PA_REV                5U
+#define GPIOC_LBAND_CS              6U
+#define GPIOC_UHF_CS                7U
+#define GPIOC_SDIO_D0               8U
 #define GPIOC_PIN9                  9U
-#define GPIOC_OPD_FAULT                 10U
-#define GPIOC_SDIO_D3                 11U
-#define GPIOC_TEST_TURN                 12U
+#define GPIOC_OPD_FAULT             10U
+#define GPIOC_SDIO_D3               11U
+#define GPIOC_TEST_TURN             12U
 #define GPIOC_PIN13                 13U
 #define GPIOC_OSC32_IN              14U
 #define GPIOC_OSC32_OUT             15U
 
-#define GPIOD_FIRE_HELI_1                  0U
-#define GPIOD_FIRE_TURN_1                 1U
-#define GPIOD_SDIO_CMD                  2U
-#define GPIOD_TEST_HELI                  3U
-#define GPIOD_UHF_EN                  4U
-#define GPIOD_OPD_EN                  5U
+#define GPIOD_FIRE_HELI_1           0U
+#define GPIOD_FIRE_TURN_1           1U
+#define GPIOD_SDIO_CMD              2U
+#define GPIOD_TEST_HELI             3U
+#define GPIOD_UHF_EN                4U
+#define GPIOD_OPD_EN                5U
 #define GPIOD_PIN6                  6U
 #define GPIOD_PIN7                  7U
-#define GPIOD_RADIO1_IRQ                  8U
-#define GPIOD_USART3_RX                  9U
+#define GPIOD_LBAND_IRQ             8U
+#define GPIOD_USART3_RX             9U
 #define GPIOD_PIN10                 10U
 #define GPIOD_PIN11                 11U
 #define GPIOD_PIN12                 12U
@@ -134,13 +134,13 @@
 #define GPIOD_PIN15                 15U
 
 #define GPIOE_PIN0                  0U
-#define GPIOE_WDT                 1U
-#define GPIOE_FIRE_TURN_2                  2U
-#define GPIOE_FIRE_HELI_2                  3U
+#define GPIOE_WDT                   1U
+#define GPIOE_FIRE_TURN_2           2U
+#define GPIOE_FIRE_HELI_2           3U
 #define GPIOE_PIN4                  4U
 #define GPIOE_PIN5                  5U
 #define GPIOE_PIN6                  6U
-#define GPIOE_MMC_PWR                  7U
+#define GPIOE_MMC_PWR               7U
 #define GPIOE_PIN8                  8U
 #define GPIOE_PIN9                  9U
 #define GPIOE_PIN10                 10U
@@ -204,7 +204,23 @@
 /*
  * IO lines assignments.
  */
-//#define LINE_PIN0                 PAL_LINE(GPIOA, 0U)
+#define LINE_CAN1_SILENT            PAL_LINE(GPIOA, 9U)
+#define LINE_CAN1_SHDN              PAL_LINE(GPIOA, 10U)
+#define LINE_CAN2_SHDN              PAL_LINE(GPIOB, 4U)
+#define LINE_CAN2_SILENT            PAL_LINE(GPIOB, 7U)
+#define LINE_LO_SEN                 PAL_LINE(GPIOB, 12U)
+#define LINE_LO_SCLK                PAL_LINE(GPIOB, 13U)
+#define LINE_LO_SDATA               PAL_LINE(GPIOB, 14U)
+#define LINE_LBAND_CS               PAL_LINE(GPIOC, 6U)
+#define LINE_UHF_CS                 PAL_LINE(GPIOC, 7U)
+#define LINE_FIRE_HELI_1            PAL_LINE(GPIOD, 0U)
+#define LINE_FIRE_TURN_1            PAL_LINE(GPIOD, 1U)
+#define LINE_UHF_EN                 PAL_LINE(GPIOD, 4U)
+#define LINE_OPD_EN                 PAL_LINE(GPIOD, 5U)
+#define LINE_WDT                    PAL_LINE(GPIOE, 1U)
+#define LINE_FIRE_TURN_2            PAL_LINE(GPIOE, 2U)
+#define LINE_FIRE_HELI_2            PAL_LINE(GPIOE, 3U)
+#define LINE_MMC_PWR                PAL_LINE(GPIOE, 7U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -255,7 +271,7 @@
  * PA5  - SPI1_SCK                  (alternate 5).
  * PA6  - SPI1_MISO                 (alternate 5).
  * PA7  - SPI1_MOSI                 (alternate 5).
- * PA8  - RADIO2_IRQ                (input).
+ * PA8  - UHF_IRQ                   (input).
  * PA9  - CAN1_SILENT               (output pushpull).
  * PA10 - CAN1_SHDN                 (output pushpull).
  * PA11 - CAN1_RX                   (alternate 9).
@@ -272,7 +288,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |  \
-                                     PIN_MODE_INPUT(GPIOA_RADIO2_IRQ) |     \
+                                     PIN_MODE_INPUT(GPIOA_UHF_IRQ) |        \
                                      PIN_MODE_OUTPUT(GPIOA_CAN1_SILENT) |   \
                                      PIN_MODE_OUTPUT(GPIOA_CAN1_SHDN) |     \
                                      PIN_MODE_ALTERNATE(GPIOA_CAN1_RX) |    \
@@ -288,7 +304,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MOSI) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_RADIO2_IRQ) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_UHF_IRQ) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_SILENT) |\
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_SHDN) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_RX) |    \
@@ -304,7 +320,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_SCK) |      \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MISO) |     \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MOSI) |     \
-                                     PIN_OSPEED_HIGH(GPIOA_RADIO2_IRQ) |    \
+                                     PIN_OSPEED_HIGH(GPIOA_UHF_IRQ) |       \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_SILENT) |   \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_SHDN) |     \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_RX) |       \
@@ -320,7 +336,7 @@
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_SCK) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_MISO) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_MOSI) |  \
-                                     PIN_PUPDR_FLOATING(GPIOA_RADIO2_IRQ) | \
+                                     PIN_PUPDR_FLOATING(GPIOA_UHF_IRQ) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_SILENT) |\
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_SHDN) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_RX) |    \
@@ -336,7 +352,7 @@
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MOSI) |        \
-                                     PIN_ODR_HIGH(GPIOA_RADIO2_IRQ) |       \
+                                     PIN_ODR_HIGH(GPIOA_UHF_IRQ) |          \
                                      PIN_ODR_LOW(GPIOA_CAN1_SILENT) |       \
                                      PIN_ODR_LOW(GPIOA_CAN1_SHDN) |         \
                                      PIN_ODR_HIGH(GPIOA_CAN1_RX) |          \
@@ -352,7 +368,7 @@
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
                                      PIN_AFIO_AF(GPIOA_SPI1_MOSI, 5U))
-#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_RADIO2_IRQ, 0U) |    \
+#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_UHF_IRQ, 0U) |       \
                                      PIN_AFIO_AF(GPIOA_CAN1_SILENT, 0U) |   \
                                      PIN_AFIO_AF(GPIOA_CAN1_SHDN, 0U) |     \
                                      PIN_AFIO_AF(GPIOA_CAN1_RX, 9U) |       \
@@ -487,8 +503,8 @@
  * PC3  - OPD_ISET                  (analog).
  * PC4  - PA_FWD                    (analog).
  * PC5  - PA_REV                    (analog).
- * PC6  - RADIO1_CS                 (output pushpull).
- * PC7  - RADIO2_CS                 (output pushpull).
+ * PC6  - LBAND_CS                  (output pushpull).
+ * PC7  - UHF_CS                    (output pushpull).
  * PC8  - SDIO_D0                   (alternate 12).
  * PC9  - PIN9                      (analog).
  * PC10 - OPD_FAULT                 (input).
@@ -504,8 +520,8 @@
                                      PIN_MODE_ANALOG(GPIOC_OPD_ISET) |      \
                                      PIN_MODE_ANALOG(GPIOC_PA_FWD) |        \
                                      PIN_MODE_ANALOG(GPIOC_PA_REV) |        \
-                                     PIN_MODE_OUTPUT(GPIOC_RADIO1_CS) |     \
-                                     PIN_MODE_OUTPUT(GPIOC_RADIO2_CS) |     \
+                                     PIN_MODE_OUTPUT(GPIOC_LBAND_CS) |      \
+                                     PIN_MODE_OUTPUT(GPIOC_UHF_CS) |        \
                                      PIN_MODE_ALTERNATE(GPIOC_SDIO_D0) |    \
                                      PIN_MODE_ANALOG(GPIOC_PIN9) |          \
                                      PIN_MODE_INPUT(GPIOC_OPD_FAULT) |      \
@@ -520,8 +536,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOC_OPD_ISET) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PA_FWD) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PA_REV) |     \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_RADIO1_CS) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_RADIO2_CS) |  \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_LBAND_CS) |   \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_UHF_CS) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOC_SDIO_D0) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_OPD_FAULT) |  \
@@ -536,8 +552,8 @@
                                      PIN_OSPEED_HIGH(GPIOC_OPD_ISET) |      \
                                      PIN_OSPEED_HIGH(GPIOC_PA_FWD) |        \
                                      PIN_OSPEED_HIGH(GPIOC_PA_REV) |        \
-                                     PIN_OSPEED_HIGH(GPIOC_RADIO1_CS) |     \
-                                     PIN_OSPEED_HIGH(GPIOC_RADIO2_CS) |     \
+                                     PIN_OSPEED_HIGH(GPIOC_LBAND_CS) |      \
+                                     PIN_OSPEED_HIGH(GPIOC_UHF_CS) |        \
                                      PIN_OSPEED_HIGH(GPIOC_SDIO_D0) |       \
                                      PIN_OSPEED_HIGH(GPIOC_PIN9) |          \
                                      PIN_OSPEED_HIGH(GPIOC_OPD_FAULT) |     \
@@ -552,8 +568,8 @@
                                      PIN_PUPDR_FLOATING(GPIOC_OPD_ISET) |   \
                                      PIN_PUPDR_FLOATING(GPIOC_PA_FWD) |     \
                                      PIN_PUPDR_FLOATING(GPIOC_PA_REV) |     \
-                                     PIN_PUPDR_FLOATING(GPIOC_RADIO1_CS) |  \
-                                     PIN_PUPDR_FLOATING(GPIOC_RADIO2_CS) |  \
+                                     PIN_PUPDR_FLOATING(GPIOC_LBAND_CS) |   \
+                                     PIN_PUPDR_FLOATING(GPIOC_UHF_CS) |     \
                                      PIN_PUPDR_FLOATING(GPIOC_SDIO_D0) |    \
                                      PIN_PUPDR_FLOATING(GPIOC_PIN9) |       \
                                      PIN_PUPDR_FLOATING(GPIOC_OPD_FAULT) |  \
@@ -568,8 +584,8 @@
                                      PIN_ODR_HIGH(GPIOC_OPD_ISET) |         \
                                      PIN_ODR_HIGH(GPIOC_PA_FWD) |           \
                                      PIN_ODR_HIGH(GPIOC_PA_REV) |           \
-                                     PIN_ODR_HIGH(GPIOC_RADIO1_CS) |        \
-                                     PIN_ODR_HIGH(GPIOC_RADIO2_CS) |        \
+                                     PIN_ODR_HIGH(GPIOC_LBAND_CS) |         \
+                                     PIN_ODR_HIGH(GPIOC_UHF_CS) |           \
                                      PIN_ODR_HIGH(GPIOC_SDIO_D0) |          \
                                      PIN_ODR_HIGH(GPIOC_PIN9) |             \
                                      PIN_ODR_HIGH(GPIOC_OPD_FAULT) |        \
@@ -584,8 +600,8 @@
                                      PIN_AFIO_AF(GPIOC_OPD_ISET, 0U) |      \
                                      PIN_AFIO_AF(GPIOC_PA_FWD, 0U) |        \
                                      PIN_AFIO_AF(GPIOC_PA_REV, 0U) |        \
-                                     PIN_AFIO_AF(GPIOC_RADIO1_CS, 0U) |     \
-                                     PIN_AFIO_AF(GPIOC_RADIO2_CS, 0U))
+                                     PIN_AFIO_AF(GPIOC_LBAND_CS, 0U) |      \
+                                     PIN_AFIO_AF(GPIOC_UHF_CS, 0U))
 #define VAL_GPIOC_AFRH              (PIN_AFIO_AF(GPIOC_SDIO_D0, 12U) |      \
                                      PIN_AFIO_AF(GPIOC_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOC_OPD_FAULT, 0U) |     \
@@ -606,7 +622,7 @@
  * PD5  - OPD_EN                    (output pushpull).
  * PD6  - PIN6                      (analog).
  * PD7  - PIN7                      (analog).
- * PD8  - RADIO1_IRQ                (input).
+ * PD8  - LBAND_IRQ                 (input).
  * PD9  - USART3_RX                 (alternate 7).
  * PD10 - PIN10                     (analog).
  * PD11 - PIN11                     (analog).
@@ -623,7 +639,7 @@
                                      PIN_MODE_OUTPUT(GPIOD_OPD_EN) |        \
                                      PIN_MODE_ANALOG(GPIOD_PIN6) |          \
                                      PIN_MODE_ANALOG(GPIOD_PIN7) |          \
-                                     PIN_MODE_INPUT(GPIOD_RADIO1_IRQ) |     \
+                                     PIN_MODE_INPUT(GPIOD_LBAND_IRQ) |      \
                                      PIN_MODE_ALTERNATE(GPIOD_USART3_RX) |  \
                                      PIN_MODE_ANALOG(GPIOD_PIN10) |         \
                                      PIN_MODE_ANALOG(GPIOD_PIN11) |         \
@@ -639,7 +655,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOD_OPD_EN) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN6) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN7) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOD_RADIO1_IRQ) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOD_LBAND_IRQ) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOD_USART3_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN10) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN11) |      \
@@ -655,7 +671,7 @@
                                      PIN_OSPEED_HIGH(GPIOD_OPD_EN) |        \
                                      PIN_OSPEED_HIGH(GPIOD_PIN6) |          \
                                      PIN_OSPEED_HIGH(GPIOD_PIN7) |          \
-                                     PIN_OSPEED_HIGH(GPIOD_RADIO1_IRQ) |    \
+                                     PIN_OSPEED_HIGH(GPIOD_LBAND_IRQ) |     \
                                      PIN_OSPEED_HIGH(GPIOD_USART3_RX) |     \
                                      PIN_OSPEED_HIGH(GPIOD_PIN10) |         \
                                      PIN_OSPEED_HIGH(GPIOD_PIN11) |         \
@@ -671,7 +687,7 @@
                                      PIN_PUPDR_FLOATING(GPIOD_OPD_EN) |     \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN6) |       \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN7) |       \
-                                     PIN_PUPDR_FLOATING(GPIOD_RADIO1_IRQ) | \
+                                     PIN_PUPDR_FLOATING(GPIOD_LBAND_IRQ) |  \
                                      PIN_PUPDR_FLOATING(GPIOD_USART3_RX) |  \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN10) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN11) |      \
@@ -687,7 +703,7 @@
                                      PIN_ODR_HIGH(GPIOD_OPD_EN) |           \
                                      PIN_ODR_HIGH(GPIOD_PIN6) |             \
                                      PIN_ODR_HIGH(GPIOD_PIN7) |             \
-                                     PIN_ODR_HIGH(GPIOD_RADIO1_IRQ) |       \
+                                     PIN_ODR_HIGH(GPIOD_LBAND_IRQ) |        \
                                      PIN_ODR_HIGH(GPIOD_USART3_RX) |        \
                                      PIN_ODR_HIGH(GPIOD_PIN10) |            \
                                      PIN_ODR_HIGH(GPIOD_PIN11) |            \
@@ -703,7 +719,7 @@
                                      PIN_AFIO_AF(GPIOD_OPD_EN, 0U) |        \
                                      PIN_AFIO_AF(GPIOD_PIN6, 0U) |          \
                                      PIN_AFIO_AF(GPIOD_PIN7, 0U))
-#define VAL_GPIOD_AFRH              (PIN_AFIO_AF(GPIOD_RADIO1_IRQ, 0U) |    \
+#define VAL_GPIOD_AFRH              (PIN_AFIO_AF(GPIOD_LBAND_IRQ, 0U) |     \
                                      PIN_AFIO_AF(GPIOD_USART3_RX, 7U) |     \
                                      PIN_AFIO_AF(GPIOD_PIN10, 0U) |         \
                                      PIN_AFIO_AF(GPIOD_PIN11, 0U) |         \
