@@ -1,32 +1,21 @@
-OPENOCD_DIR = $(TOOLCHAIN)/openocd
-
-OPENOCD_HEXFILE = $(BUILDDIR)/$(PROJECT).hex
+APP_HEXFILE = $(BUILDDIR)/$(PROJECT).hex
 GDB_ELF = $(BUILDDIR)/$(PROJECT).elf
 OOCD_CFG = oocd.cfg
-GDB_CFG = gdboocd.cmd
+GDB_OOCD_CFG = gdboocd.cmd
+GDB_STL_CFG = gdbstl.cmd
 
-write: $(OPENOCD_HEXFILE) write_stl
+write: $(APP_HEXFILE) write_stl
 
-write_base:
-	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "program $(OPENOCD_HEXFILE) verify reset exit"
+write_ocd:
+	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "program $(APP_HEXFILE) verify reset exit"
 
-#write_stl: OOCD_CFG = stlinkv2-1_stm32.cfg
-write_stl: write_base
+write_stl:
+	st-flash $(ARGS) --reset --format ihex write $(APP_HEXFILE)
 
-gdb: $(GDB_ELF) gdb_ocd
+gdb: $(GDB_ELF) gdb_stl
 
-gdb_base:
-	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -x $(GDB_CFG)
+gdb_ocd:
+	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -x $(GDB_OOCD_CFG)
 
-cgdb_base:
-	cgdb -d $(TRGT)gdb -q $(GDB_ELF) -x $(GDB_CFG)
-
-#gdb_ocd: GDB_CFG = $(OPENOCD_DIR)/gdboocd_ocd.cmd
-gdb_ocd: gdb_base
-
-gdb_stl: GDB_CFG = $(OPENOCD_DIR)/gdboocd_stl.cmd
-gdb_stl: gdb_base
-
-cgdb_stl: GDB_CFG = $(OPENOCD_DIR)/gdboocd_stl.cmd
-cgdb_stl: cgdb_base
-
+gdb_stl:
+	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(TOOLCHAIN) -x ./$(GDB_STL_CFG)
