@@ -12,7 +12,7 @@ write_ocd:
 write_stl:
 	st-flash $(ARGS) --reset --format ihex write $(APP_HEXFILE)
 
-gdb: $(GDB_ELF) gdb_stl
+gdb: $(GDB_ELF) gdb_ocd
 
 gdb_ocd:
 	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -x $(GDB_OOCD_CFG)
