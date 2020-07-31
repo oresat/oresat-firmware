@@ -74,16 +74,17 @@ This project requires the following set of tools to build/write/debug firmware.
 Please refer to your OS documentation or package installation tool to determine
 how to install these tools, as it varies between systems.
 
-PLEASE NOTE: The latest "official" release of OpenOCD in package
-managers is several years old. You MUST build it from source for it to
-work with our boards, as there have been over 1000 commits since the
-last official release and several of our boards were added since then.
-
 Tools required:
 * make
 * arm-none-eabi-gcc
 * arm-none-eabi-gdb   (may require a symlink to gdb-multiarch on Debian systems)
-* openocd             (MUST be built from source)
+* stlink              (Preferred method of programming/debugging)
+* openocd             (Optional, not required if stlink tools installed)
+
+PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
+package managers is several years old. You MUST build it from source for it
+to work with our boards, as there have been over 1000 commits since the
+last official release and several of our boards were added since then.
 
 Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.

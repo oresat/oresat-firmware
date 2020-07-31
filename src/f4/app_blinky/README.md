@@ -71,31 +71,17 @@ Creating build/app_blinky.list
 Done
 
 ➜ make write
-openocd -s ../../../boards/ST_NUCLEO32_F042K6 -f oocd.cfg -c "program ./build/app_blinky.hex verify reset exit"
-Open On-Chip Debugger 0.10.0+dev-00924-g16496488d (2019-08-08-08:23)
-Licensed under GNU GPL v2
-For bug reports, read
-	http://openocd.org/doc/doxygen/bugs.html
-Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
-Info : clock speed 1000 kHz
-Info : STLINK V2J25M14 (API v2) VID:PID 0483:374B
-Info : Target voltage: 3.238896
-Info : stm32f0x.cpu: hardware has 4 breakpoints, 2 watchpoints
-Info : Listening on port 3333 for gdb connections
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
-target halted due to debug-request, current mode: Thread 
-xPSR: 0xc1000000 pc: 0x08000190 msp: 0x20000100
-Info : Unable to match requested speed 8000 kHz, using 4000 kHz
-Info : Unable to match requested speed 8000 kHz, using 4000 kHz
-** Programming Started **
-Info : device id = 0x10006445
-Info : flash size = 32kbytes
-** Programming Finished **
-** Verify Started **
-** Verified OK **
-** Resetting Target **
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
-Info : Unable to match requested speed 1000 kHz, using 950 kHz
-shutdown command invoked
+st-flash  --reset --format ihex write ./build/app_blinky.hex
+st-flash 1.6.1
+2020-07-30T13:29:22 INFO common.c: F09X: 32 KiB SRAM, 256 KiB flash in at least 2 KiB pages.
+2020-07-30T13:29:22 INFO common.c: Attempting to write 5192 (0x1448) bytes to stm32 address: 134217728 (0x8000000)
+2020-07-30T13:29:22 INFO common.c: Flash page at addr: 0x08000000 erased
+2020-07-30T13:29:22 INFO common.c: Flash page at addr: 0x08000800 erased
+2020-07-30T13:29:22 INFO common.c: Flash page at addr: 0x08001000 erased
+2020-07-30T13:29:22 INFO common.c: Finished erasing 3 pages of 2048 (0x800) bytes
+2020-07-30T13:29:22 INFO common.c: Starting Flash write for VL/F0/F3/F1_XL core id
+2020-07-30T13:29:22 INFO flash_loader.c: Successfully loaded flash loader in sram
+  3/3 pages written
+2020-07-30T13:29:22 INFO common.c: Starting verification of write complete
+2020-07-30T13:29:22 INFO common.c: Flash written and verified! jolly good!
 ```
