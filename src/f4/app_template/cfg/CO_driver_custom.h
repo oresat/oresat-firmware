@@ -9,13 +9,6 @@ extern "C" {
 #define CO_NO_GFC 0
 #define CO_NO_SRDO 0
 
-#define CO_CONFIG_GTW (CO_CONFIG_GTW_ASCII | \
-                       CO_CONFIG_GTW_ASCII_SDO | \
-                       CO_CONFIG_GTW_ASCII_NMT | \
-                       CO_CONFIG_GTW_ASCII_LOG | \
-                       CO_CONFIG_GTW_ASCII_ERROR_DESC | \
-                       CO_CONFIG_GTW_ASCII_PRINT_HELP)
-
 #define CO_CONFIG_SDO_CLI (CO_CONFIG_FLAG_CALLBACK_PRE | \
                            CO_CONFIG_FLAG_TIMERNEXT | \
                            CO_CONFIG_SDO_CLI_SEGMENTED | \
