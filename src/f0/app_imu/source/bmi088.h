@@ -42,15 +42,23 @@
  * @name    BMI088 Register Addresses
  * @{
  */
-#define BMI088_AD_ACC_SOFT_RESET            0x7EU
+#define BMI088_AD_ACC_SOFTRESET             0x7EU
 #define BMI088_AD_ACC_PWR_CTRL              0x7DU
 #define BMI088_AD_ACC_PWR_CONF              0x7CU
 #define BMI088_AD_ACC_SELF_TEST             0x6DU
 #define BMI088_AD_INT_MAP_DATA              0x58U
 #define BMI088_AD_INT2_IO_CTRL              0x54U
 #define BMI088_AD_INT1_IO_CTRL              0x53U
+#define BMI088_AD_FIFO_CONFIG_1             0x49U
+#define BMI088_AD_FIFO_CONFIG_0             0x48U
+#define BMI088_AD_FIFO_WTM_1                0x47U
+#define BMI088_AD_FIFO_WTM_0                0x46U
+#define BMI088_AD_FIFO_DOWNS                0x45U 
 #define BMI088_AD_ACC_RANGE                 0x41U
 #define BMI088_AD_ACC_CONF                  0x40U
+#define BMI088_AD_FIFO_DATA                 0x26U
+#define BMI088_AD_FIFO_LENGTH_1             0x25U
+#define BMI088_AD_FIFO_LENGTH_1             0x24U
 #define BMI088_AD_TEMP_LSB                  0x23U
 #define BMI088_AD_TEMP_MSB                  0x22U
 #define BMI088_AD_ACC_INT_STAT_1            0x1DU
@@ -69,46 +77,87 @@
 /** @} */
 
 /**
- * @name    BMI088 Configuration register fields
+ * @name    BMI088 ACC Soft Reset register fields
  * @{
  */
-#define BMI088_CONFIG_SOFTRESET_Pos         (0x7EU)
-#define BMI088_ACC_SOFTRESET_Msk            (0x07U << BMI088_ACC_SOFTRESET_Pos)
+#define BMI088_ACC_SOFTRESET_Pos            (0U)
+#define BMI088_ACC_SFOTRESET_Msk            (0xFFU << BMI088_ACC_SOFT_RESET_Pos)
 #define BMI088_ACC_SOFTRESET                BMI088_ACC_SOFTRESET_Msk
-#define BMI088_ACC_POWER_CONTROL_Pos        (0x07D)
-#define BMI088_ACC_POWER_CONTROL_Msk        (0x07U << BMI_ACC_POWER_CONTROL_Pos)
-#define BMI088_ACC_POWER_CONTROL            BMI088_ACC_POWER_CONTROL_Msk
-#define BMI088_ACC_POWER_CONTROL_EN_OFF     (0x00U << BMI_ACC_POWER_CONTROL_Pos)
-#define BMI088_ACC_POWER_CONTROL_EN_ON      (0x04U << BMI_ACC_POWER_CONTROL_Pos)
-#define BMI088_ACC_POWER_CONF_Pos           (0x7CU)
-#define BMI088_ACC_POWER_CONF_Msk           (0x07U << BMI_ACC_POWER_CONF_Pos)
-#define BMI088_ACC_POWER_CONF               BMI088_POWER_CONF_Msk
-#define BMI088_ACC_POWER_CONF_SAVE_SUSPEND  (0x03U << BMI_ACC_POWER_CONF_Pos)
-#define BMI088_ACC_POWER_CONF_SAVE_ACTIVE   (0x00U << BMI088_ACC_POWER_CONF_Pos)
-#define BMI088_ACC_SELF_TEST_Pos            (0x6DU)
-#define BMI088_ACC_SELF_TEST_Msk            (0x07U << BMI088_ACC_SELF_TEST_Pos)
-#define BMI088_ACC_SELF_TEST                BMI088_ACC_SELF_TEST_Msk
-#define BMI088_ACC_SELF_TEST_OFF            (0x00U << BMI088_ACC_SELF_TEST_Pos)
-#define BMI088_ACC_SELF_TEST_EN_POS_ST_SIG  (0x0DU << BMI088_ACC_SELF_TEST_Pos)
-#define BMI088_ACC_SELF_TEST_EN_NEG_ST_SIG  (0x09U << BMI088_ACC_SELF_TEST_Pos)	
-#define BMI088_ACC_INT_MAP_DATA_Pos        (0x58U)
-#define BMI088_ACC_INT_MAP_DATA_Msk        (0x07U << BMI088_ACC_INT_MAP_DATA_Pos)
-#define BMI088_ACC_INT_MAP_DATA            BMI088_ACC_INT_MAP_DATA_Msk
-#define BMI088_ACC_INT_MAP_DATA_INT1_DRDY  (0x00U << BMI088_ACC_INT_MAP_DATA_Pos)
-#define BMI088_ACC_INT_MAP_DATA_INT2_DRDY  (0x00U << BMI088_ACC_INT_MAP_DATA_Pos)
-#define BMI088_ACC_INT1_IO_CONF_Pos        (0x53U)
-#define BMI088_ACC_INT1_IO_CONF_Msk         ()
-#define BMI088_ACC_INT1_IO_CONF             BMI088_ACC_INT1_IO_CONF_Msk 
-#define BMI088_ACC_INT2_IO_CONF_Pos         ()
-#define BMI088_ACC_INT2_IO_CONF_Msk         ()
-#define BMI088_ACC_INT2_IO_CONF             BMI088_ACC_INT2_Msk
-#define BMI088_ACC_RANGE_Pos                ()
-#define BMI088_ACC_RANGE_Msk                ()
-#define BMI088_ACC_RANGE                    BMI088_ACC_RANGE_Msk
-#define BMI088_ACC_CONF_Pos                 () 
-#define BMI088_ACC_CONF_Msk                 ()
-#define BMI088_ACC_CONF                     BMI088_ACC_CONF
- /**
+#define BMI088_ACC_SOFTRESET_CMD            (0xB6U)
+/**@} */
+
+/**
+ * @name    BMI088 ACC Power Control register fields
+ * @{
+ */
+#define BMI088_ACC_PWR_CTRL_Pos             (0U)
+#define BMI088_ACC_PWR_CTRL_Msk             (0xFFU << BMI088_ACC_PWR_CTRL_Pos)
+#define BMI088_ACC_PWR_CTRL                 BMI088_ACC_PWR_CTRL_Msk
+#define BMI088_ACC_PWR_CTRL_EN_ON           (0x00U)
+#define BMI088_ACC_PWR_CTRL_EN_OFF          (0x04U)      
+/**
+ * @name    BMI088 ACC Power Configuration register fields
+ * @{
+ */
+#define BMI088_ACC_PWR_CONF_Pos             (0U)
+#define BMI088_ACC_PWR_CONF_Msk             (0xFFU << BMI088_ACC_PWR_CONF_Pos)
+#define BMI088_ACC_PWR_CONF                 BMI088_ACC_PWR_CONF_Msk
+#define BMI088_ACC_PWR_CONF_PWR_SAVE_SSPND  (0x03U)
+#define BMI088_ACC_PWR_CONF_PWR_SAVE_ACTIVE (0x00U)
+/**@}*/
+
+/**
+ * @name    BMI088 ACC Self Test register fields
+ * @{
+ */
+#define BMI088_ACC_SELF_TEST_Pos            (0U)
+#define BMI088_ACC_SELF_TEST_Msk            (0xFFU << BMI088_ACC_SELF_TEST_Pos)
+#define BMI088_ACC_SELF_TEST                BMI088_ACC_SELF_TEST_Msk 
+#define BMI088_ACC_SELF_TEST_OFF            (0x00U)
+#define BMI088_ACC_SELF_TEST_POS_SIG        (0x0DU)
+#define BMI088_ACC_SELF_TEST_NEG_SIG        (0x09U)
+/**@}*/
+
+/**
+ * @name    BMI088 ACC Int Map Data register fields
+ * @{
+ */
+#define BMI088_ACC_INT1_MAP_DATA_FFULL_Pos  (0U)
+#define BMI088_ACC_INT1_MAP_DATA_FFULL_Msk  (0x0U << BMI088_ACC_INT1_MAP_DATA_FFULL_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_FFULL      BMI088_ACC_INT1_MAP_DATA_FFULL_Msk
+#define BMI088_ACC_INT1_MAP_DATA_FWM_Pos    (1U)
+#define BMI088_ACC_INT1_MAP_DATA_FWM_Msk    (0x0U << BMI088_ACC_INT1_MAP_DATA_FWM_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_FWM        BMI088_ACC_INT1_MAP_DATA_FWM_Msk
+#define BMI088_ACC_INT1_MAP_DATA_DRDY_Pos   (2U)
+#define BMI088_ACC_INT1_MAP_DATA_DRDY_Msk   (0x0U << BMI088_ACC_INT1_MAP_DATA_DRDY_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_DRDY       BMI088_ACC_INT1_MAP_DATA_DRDY_Msk
+#define BMI088_ACC_INT2_MAP_DATA_FFUL_Po    (4U)
+#define BMI088_ACC_INT2_MAP_DATA_FFULL_M    (0x0U << BMI088_ACC_INT2_MAP_DATA_FFULL_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_FFULL      BMI088_ACC_INT2_MAP_DATA_FFULL_Msk 
+#define BMI088_ACC_INT2_MAP_DATA_FWM_Pos    (5U)
+#define BMI088_ACC_INT2_MAP_DATA_FWM_Msk    (0x0U BMI088_ACC_INT2_MAP_DATA_FWM_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_FWM        BMI088_ACC_INT2_MAP_DATA_FWM_Msk  
+#define BMI088_ACC_INT2_MAP_DATA_DRDY_Pos   (6U)
+#define BMI088_ACC_INT2_MAP_DATA_DRDY_Msk   (0x0U << BMI088_ACC_INT2_MAP_DATA_DRDY_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_DRDY       BMI088_ACC_INT2_MAP_DATA_DRDY_Msk  
+/**@}*/
+
+/**
+ * @name    BMI088 ACC Int2 IO Configure register fields
+ * @{
+ */
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CONF
+/**@}*/
+
+ /*
  * @name    BMI088 Shunt Voltage register fields
  * @{
  */
