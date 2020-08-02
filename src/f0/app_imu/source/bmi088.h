@@ -113,9 +113,9 @@
 #define BMI088_ACC_SELF_TEST_Pos            (0U)
 #define BMI088_ACC_SELF_TEST_Msk            (0xFFU << BMI088_ACC_SELF_TEST_Pos)
 #define BMI088_ACC_SELF_TEST                BMI088_ACC_SELF_TEST_Msk 
-#define BMI088_ACC_SELF_TEST_OFF            (0x00U)
-#define BMI088_ACC_SELF_TEST_POS_SIG        (0x0DU)
-#define BMI088_ACC_SELF_TEST_NEG_SIG        (0x09U)
+#define BMI088_ACC_SELF_TEST_OFF            (0x0U)
+#define BMI088_ACC_SELF_TEST_POS_SIG        (0xDU)
+#define BMI088_ACC_SELF_TEST_NEG_SIG        (0x9U)
 /**@}*/
 
 /**
@@ -123,152 +123,303 @@
  * @{
  */
 #define BMI088_ACC_INT1_MAP_DATA_FFULL_Pos  (0U)
-#define BMI088_ACC_INT1_MAP_DATA_FFULL_Msk  (0x0U << BMI088_ACC_INT1_MAP_DATA_FFULL_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_FFULL_Msk  (0x1U << BMI088_ACC_INT1_MAP_DATA_FFULL_Pos)
 #define BMI088_ACC_INT1_MAP_DATA_FFULL      BMI088_ACC_INT1_MAP_DATA_FFULL_Msk
 #define BMI088_ACC_INT1_MAP_DATA_FWM_Pos    (1U)
-#define BMI088_ACC_INT1_MAP_DATA_FWM_Msk    (0x0U << BMI088_ACC_INT1_MAP_DATA_FWM_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_FWM_Msk    (0x1U << BMI088_ACC_INT1_MAP_DATA_FWM_Pos)
 #define BMI088_ACC_INT1_MAP_DATA_FWM        BMI088_ACC_INT1_MAP_DATA_FWM_Msk
 #define BMI088_ACC_INT1_MAP_DATA_DRDY_Pos   (2U)
-#define BMI088_ACC_INT1_MAP_DATA_DRDY_Msk   (0x0U << BMI088_ACC_INT1_MAP_DATA_DRDY_Pos)
+#define BMI088_ACC_INT1_MAP_DATA_DRDY_Msk   (0x1U << BMI088_ACC_INT1_MAP_DATA_DRDY_Pos)
 #define BMI088_ACC_INT1_MAP_DATA_DRDY       BMI088_ACC_INT1_MAP_DATA_DRDY_Msk
 #define BMI088_ACC_INT2_MAP_DATA_FFUL_Po    (4U)
-#define BMI088_ACC_INT2_MAP_DATA_FFULL_M    (0x0U << BMI088_ACC_INT2_MAP_DATA_FFULL_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_FFULL_M    (0x1U << BMI088_ACC_INT2_MAP_DATA_FFULL_Pos)
 #define BMI088_ACC_INT2_MAP_DATA_FFULL      BMI088_ACC_INT2_MAP_DATA_FFULL_Msk 
 #define BMI088_ACC_INT2_MAP_DATA_FWM_Pos    (5U)
-#define BMI088_ACC_INT2_MAP_DATA_FWM_Msk    (0x0U BMI088_ACC_INT2_MAP_DATA_FWM_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_FWM_Msk    (0x1U BMI088_ACC_INT2_MAP_DATA_FWM_Pos)
 #define BMI088_ACC_INT2_MAP_DATA_FWM        BMI088_ACC_INT2_MAP_DATA_FWM_Msk  
 #define BMI088_ACC_INT2_MAP_DATA_DRDY_Pos   (6U)
-#define BMI088_ACC_INT2_MAP_DATA_DRDY_Msk   (0x0U << BMI088_ACC_INT2_MAP_DATA_DRDY_Pos)
+#define BMI088_ACC_INT2_MAP_DATA_DRDY_Msk   (0x1U << BMI088_ACC_INT2_MAP_DATA_DRDY_Pos)
 #define BMI088_ACC_INT2_MAP_DATA_DRDY       BMI088_ACC_INT2_MAP_DATA_DRDY_Msk  
 /**@}*/
 
 /**
- * @name    BMI088 ACC Int2 IO Configure register fields
+ * @name    BMI088 ACC Int2 IO Control Configuration register fields
  * @{
  */
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
-#define BMI088_ACC_INT2_IO_CONF
+#define BMI088_ACC_INT2_IO_CTRL_Pos         (1U)
+#define BMI088_ACC_INT2_IO_CTRL_Msk         (0x1EU << BMI088_ACC_INT2_IO_CTRL_Pos)
+#define BMI088_ACC_INT2_IO_CTRL             BMI088_ACC_INT2_IO_CTRL_Msk
+#define BMI088_ACC_INT2_IO_CTRL_LVL         (0x1U BMI088_ACC_INT2_IO_CTRL_Pos)
+#define BMI088_ACC_INT2_IO_CTRL_OD          (0x2U BMI088_ACC_INT2_IO_CTRL_Pos)
+#define BMI088_ACC_INT2_IO_CTRL_OUT         (0x3U BMI088_ACC_INT2_IO_CTRL_Pos)
+#define BMI088_ACC_INT2_IO_CTRL_IN          (0x4U BMI088_ACC_INT2_IO_CTRL_Pos) 
 /**@}*/
 
+/**
+ * @name    BMI088 ACC Int1 IO Configuration register fields
+ * @{
+ */
+#define BMI088_ACC_INT1_IO_CTRL_Pos         (1U)
+#define BMI088_ACC_INT1_IO_CTRL_Msk         (0x1EU << BMI088_ACC_INT1_IO_CTRL_Pos)
+#define BMI088_ACC_INT1_IO_CTRL             BMI088_ACC_INT1_IO_CTRL_Msk
+#define BMI088_ACC_INT1_IO_CTRL_LVL         (0x1U <<  BMI088_ACC_INT1_IO_CTRL_Pos)
+#define BMI088_ACC_INT1_IO_CTRL_OD          (0x2U <<  BMI088_ACC_INT1_IO_CTRL_Pos)
+#define BMI088_ACC_INT1_IO_CTRL_OUT         (0x3U <<  BMI088_ACC_INT1_IO_CTRL_Pos)
+#define BMI088_ACC_INT1_IO_CTRL_IN          (0x4U <<  BMI088_ACC_INT1_IO_CTRL_Pos)
+/**@}*/
+
+
  /*
- * @name    BMI088 Shunt Voltage register fields
+ * @name    BMI088 ACC FIFO configuration 1 register fields
  * @{
  */
-#define BMI088_                             (0U)
-#define BMI088_                    (0xFFFFU << BMI088_SHUNT_Pos)
-#define BMI088_
+#define BMI088_ACC_FIFO_CONFIG_1_Pos        (2U)
+#define BMI088_ACC_FIFO_CONFIG_1_Msk        (0x13U << BMI088_ACC_FIFO_CONFIG_1_Pos)
+#define BMI088_ACC_FIFO_CONFIG_1            BMI088_ACC_FIFO_CONFIG_1_Msk
+#define BMI088_ACC_FIFO_CONFIG_1_INT2_EN    (0x01U << BMI088_ACC_FIFO_CONFIG_1_Pos)
+#define BMI088_ACC_FIFO_CONFIG_1_INT1_EN    (0x02U << BMI088_ACC_FIFO_CONFIG_1_Pos)
+#define BMI088_ACC_FIFO_CONFIG_1_ACC_EN     (0x10U << BMI088_ACC_FIFO_CONFIG_1_Pos)
 /** @} */
 
 /**
- * @name    BMI088 VBUS Voltage register fields
+ * @name    BMI088 ACC FIFO Configuration 0 register fields
  * @{
  */
-#define BMI088_VBUS_Pos                     (0U)
-#define BMI088_VBUS_Msk                     (0x7FFFU << BMI088_VBUS_Pos)
-#define BMI088_VBUS                         BMI088_VBUS_Msk
+#define BMI088_ACC_FIFO_CONFIG_0_Pos        (0U)
+#define BMI088_ACC_FIFO_CONFIG_0_Msk        (0x1U << BMI088_ACC_FIFO_CONFIG_0_Pos)
+#define BMI088_ACC_FIFO_CONFIG_0            BMI088_ACC_FIFO_CONFIG_0_Msk
+#define BMI088_ACC_FIFO_CONFIG_0_STREAM     (0x0U << BMI088_ACC_FIFI_CONFIG_0_Pos) 
+#define BMI088_ACC_FIFO_CONFIG_0_FIFO       (0x1U << BMI088_ACC_FIFI_CONFIG_0_Pos)
 /** @} */
 
 /**
- * @name    BMI088 Power register fields
+ * @name    BMI088 ACC FIFO Watermark 1 register fields
  * @{
  */
-#define BMI088_POWER_Pos                    (0U)
-#define BMI088_POWER_Msk                    (0xFFFFU << BMI088_POWER_Pos)
-#define BMI088_POWER                        BMI088_POWER_Msk
+#define BMI088_ACC_FIFO_WTM_1_Pos           (0U) 
+#define BMI088_ACC_FIFO_WTM_1_Msk           (0x1FU << BMI088_ACC_FIFO_WTM_1_Pos) 
+#define BMI088_ACC_FIFO_WTM_1               BMI088_ACC_FIFO_WTM_1_Msk
 /** @} */
 
 /**
- * @name    BMI088 Current register fields
+ * @name    BMI088 ACC FIFO Watermark 0 register fields
  * @{
  */
-#define BMI088_CURRENT_Pos                  (0U)
-#define BMI088_CURRENT_Msk                  (0xFFFFU << BMI088_CURRENT_Pos)
-#define BMI088_CURRENT                      BMI088_CURRENT_Msk
+#define BMI088_ACC_FIFO_WTM_0_Pos          (0U) 
+#define BMI088_ACC_FIFO_WTM_0_Msk          (0xFFU << BMI088_ACC_FIFO_WTM_1_Pos) 
+#define BMI088_ACC_FIFO_WTM_0              BMI088_ACC_FIFO_WTM_0_Msk
 /** @} */
 
 /**
- * @name    BMI088 Calibration register fields
+ * @name    BMI088 ACC FIFO DOWNS register fields
  * @{
  */
-#define BMI088_CAL_Pos                      (0U)
-#define BMI088_CAL_Msk                      (0x7FFFU << BMI088_CAL_Pos)
-#define BMI088_CAL                          BMI088_CAL_Msk
+#define BMI088_ACC_FIFO_DOWNS_Pos           (5U) 
+#define BMI088_ACC_FIFO_DOWNS_Msk           (0x7U << BMI088_ACC_FIFO_DOWNS_Pos) 
+#define BMI088_ACC_FIFO_DOWNS               BMI088_ACC_FIFO_DOWNS_Msk      
 /** @} */
 
 /**
- * @name    BMI088 Alert Mask/Enable register fields
+ * @name    BMI088 ACC Range register fields
  * @{
  */
-#define BMI088_ME_LEN_Pos                   (0U)
-#define BMI088_ME_LEN_Msk                   (0x1U << BMI088_ME_LEN_Pos)
-#define BMI088_ME_LEN                       BMI088_ME_LEN_Msk
-#define BMI088_ME_APOL_Pos                  (1U)
-#define BMI088_ME_APOL_Msk                  (0x1U << BMI088_ME_APOL_Pos)
-#define BMI088_ME_APOL                      BMI088_ME_APOL_Msk
-#define BMI088_ME_OVF_Pos                   (2U)
-#define BMI088_ME_OVF_Msk                   (0x1U << BMI088_ME_OVF_Pos)
-#define BMI088_ME_OVF                       BMI088_ME_OVF_Msk
-#define BMI088_ME_CVRF_Pos                  (3U)
-#define BMI088_ME_CVRF_Msk                  (0x1U << BMI088_ME_CVRF_Pos)
-#define BMI088_ME_CVRF                      BMI088_ME_CVRF_Msk
-#define BMI088_ME_AFF_Pos                   (4U)
-#define BMI088_ME_AFF_Msk                   (0x1U << BMI088_ME_AFF_Pos)
-#define BMI088_ME_AFF                       BMI088_ME_AFF_Msk
-#define BMI088_ME_CNVR_Pos                  (10U)
-#define BMI088_ME_CNVR_Msk                  (0x1U << BMI088_ME_CNVR_Pos)
-#define BMI088_ME_CNVR                      BMI088_ME_CNVR_Msk
-#define BMI088_ME_POL_Pos                   (11U)
-#define BMI088_ME_POL_Msk                   (0x1U << BMI088_ME_POL_Pos)
-#define BMI088_ME_POL                       BMI088_ME_POL_Msk
-#define BMI088_ME_BUL_Pos                   (12U)
-#define BMI088_ME_BUL_Msk                   (0x1U << BMI088_ME_BUL_Pos)
-#define BMI088_ME_BUL                       BMI088_ME_BUL_Msk
-#define BMI088_ME_BOL_Pos                   (13U)
-#define BMI088_ME_BOL_Msk                   (0x1U << BMI088_ME_BOL_Pos)
-#define BMI088_ME_BOL                       BMI088_ME_BOL_Msk
-#define BMI088_ME_SUL_Pos                   (14U)
-#define BMI088_ME_SUL_Msk                   (0x1U << BMI088_ME_SUL_Pos)
-#define BMI088_ME_SUL                       BMI088_ME_SUL_Msk
-#define BMI088_ME_SOL_Pos                   (15U)
-#define BMI088_ME_SOL_Msk                   (0x1U << BMI088_ME_SOL_Pos)
-#define BMI088_ME_SOL                       BMI088_ME_SOL_Msk
+#define BMI088_ACC_RANGE_Pos                (0U)
+#define BMI088_ACC_RANGE_Msk                (0x3U << BMI088_ACC_RANGE_Pos)
+#define BMI088_ACC_RANGE                    BMI088_ACC_RANGE_Msk
+#define BMI088_ACC_RANGE_3g                 (0x0U << BMI088_ACC_RANGE_Pos)
+#define BMI088_ACC_RANGE_6g                 (0x1U << BMI088_ACC_RANGE_Pos)
+#define BMI088_ACC_RANGE_12g                (0x2U << BMI088_ACC_RANGE_Pos)
+#define BMI088_ACC_RANGE_24g                (0x3U << BMI088_ACC_RANGE_Pos)
 /** @} */
 
 /**
- * @name    BMI088 Alert Limit register fields
+ * @name    BMI088 ACC configure register fields
  * @{
  */
-#define BMI088_LIM_Pos                      (0U)
-#define BMI088_LIM_Msk                      (0xFFFFU << BMI088_LIM_Pos)
-#define BMI088_LIM                          BMI088_LIM_Msk
+#define BMI088_ACC_CONF_ODR_Pos             (0U)
+#define BMI088_ACC_CONF_ODR_Msk             (0xFU << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR                 BMI088_ACC_CONF_Msk
+#define BMI088_ACC_CONF_ODR_12_5_HZ         (0x5U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_25_HZ           (0x6U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_50_HZ           (0x7U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_100_HZ          (0x8U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_200_HZ          (0x9U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_400_HZ          (0xAU << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_800_HZ          (0x0U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_ODR_1600_HZ         (0x8U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_BWP_Pos             (4U)
+#define BMI088_ACC_CONF_BWP_Msk             (0xFU << BMI088_ACC_CONF_BWP_Pos)
+#define BMI088_ACC_CONF_BWP                 BMI088_ACC_CONF_BWP_Msk
+#define BMI088_ACC_CONF_BWP_OSR4            (0x8U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_BWP_OSR2            (0x9U << BMI088_ACC_CONF_Pos)
+#define BMI088_ACC_CONF_BWP_NORMAL          (0xAU << BMI088_ACC_CONF_Pos)
 /** @} */
 
 /**
- * @name    BMI088 Manufacturer ID register fields
+ * @name    BMI088 ACC FIFO Data register fields
  * @{
  */
-#define BMI088_MFG_ID_Pos                   (0U)
-#define BMI088_MFG_ID_Msk                   (0xFFFFU << BMI088_MFG_ID_Pos)
-#define BMI088_MFG_ID                       BMI088_MFG_ID_Msk
+#define BMI088_ACC_FIFO_DATA_Pos            (0U)
+#define BMI088_ACC_FIFO_DATA_Msk            (0xFFU << BMI088_ACC_FIFO_DATA_Pos)         
+#define BMI088_ACC_FIFO_DATA                BMI088_ACC_FIFO_DATA_Msk        
 /** @} */
 
 /**
- * @name    BMI088 Die ID register fields
+ * @name    BMI088 ACC FIFO Length 0 register fields
  * @{
  */
-#define BMI088_DIE_ID_RID_Pos               (0U)
-#define BMI088_DIE_ID_RID_Msk               (0xFU << BMI088_DIE_ID_RID_Pos)
-#define BMI088_DIE_ID_RID                   BMI088_DIE_ID_RID_Msk
-#define BMI088_DIE_ID_DID_Pos               (4U)
-#define BMI088_DIE_ID_DID_Msk               (0xFFFU << BMI088_DIE_ID_DID_Pos)
-#define BMI088_DIE_ID_DID                   BMI088_DIE_ID_DID_Msk
+#define BMI088_ACC_FIFO_LENGTH_0_Pos        (0U)
+#define BMI088_ACC_FIFO_LENGTH_0_Msk        (0xFFU << BMI088_ACC_LENGTH_0_Pos)
+#define BMI088_ACC_FIFO_LENGTH_0            BMI088_ACC_FIFO_LENGTH_0_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC FIFO Length 0 register fields
+ * @{
+ */
+#define BMI088_ACC_FIFO_LENGTH_1_Pos        (0U)
+#define BMI088_ACC_FIFO_LENGTH_1_Msk        (0x3FU << BMI088_ACC_LENGTH_1_Pos)
+#define BMI088_ACC_FIFO_LENGTH_1            BMI088_ACC_FIFO_LENGTH_1_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Temp LSB register fields
+ * @{
+ */
+#define BMI088_ACC_TEMP_LSB_Pos             (5U)
+#define BMI088_ACC_TEMP_LSB_Msk             (0x7U << BMI088_ACC_TEMP_LSB_Pos)
+#define BMI088_ACC_TEMP_LSB                 BMI088_ACC_TEMP_LSB_Msk
+/** @} *//**
+
+ * @name    BMI088 ACC Temp MSB register fields
+ * @{
+ */
+#define BMI088_ACC_TEMP_MSB_Pos             (0U)
+#define BMI088_ACC_TEMP_MSB_Msk             (0xFFU << BMI088_ACC_TEMP_MSB_Pos)
+#define BMI088_ACC_TEMP_MSB                 BMI088_ACC_TEMP_MSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Int Stat 1 register fields
+ * @{
+ */
+#define BMI088_ACC_INT_STAT_1_Pos           (7U)
+#define BMI088_ACC_INT_STAT_1_Msk           (0x1U << BMI088_ACC_INT_STAT_1_Pos)
+#define BMI088_ACC_INT_STAT_1               BMI088_ACC_INT_STAT_1_Msk
+#define BMI088_ACC_INT_STAT_1_DRDY          (0x1U << BMI088_ACC_INT_STAT_1_Pos)
+/** @} */
+
+/**
+ * @name    BMI088 ACC Sensor Time 0 register fields
+ * @{
+ */
+#define BMI088_ACC_SENSOR_TIME_0_Pos        (0U)
+#define BMI088_ACC_SENSOR_TIME_0_Msk        (0xFFU << BMI088_ACC_SENSOR_TIME_0_Pos)
+#define BMI088_ACC_SENSOR_TIME_0            BMI088_ACC_SENSOR_TIME_0_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Sensor Time 1 register fields
+ * @{
+ */
+#define BMI088_ACC_SENSOR_TIME_1_Pos        (7U)
+#define BMI088_ACC_SENSOR_TIME_1_Msk        (0xFFU << BMI088_ACC_SENSOR_TIME_1_Pos)
+#define BMI088_ACC_SENSOR_TIME_1            BMI088_ACC_SENSOR_TIME_1_Msk
+/** @} */
+/** @} */
+
+/**
+ * @name    BMI088 ACC Sensor Time 2 register fields
+ * @{
+ */
+#define BMI088_ACC_SENSOR_TIME_2_Pos        (7U)
+#define BMI088_ACC_SENSOR_TIME_2_Msk        (0xFFU << BMI088_ACC_SENSOR_TIME_2_Pos)
+#define BMI088_ACC_SENSOR_TIME_2            BMI088_ACC_SENSOR_TIME_2_Msk
+/** @} */
+/** @} */
+
+/**
+ * @name    BMI088 ACC Z MSB register fields
+ * @{
+ */
+#define BMI088_ACC_Z_MSB_Pos                (0U)
+#define BMI088_ACC_Z_MSB_MsK                (0XFFU << BMI088_ACC_Z_MSB_Pos )
+#define BMI088_ACC_Z_MSB                    BMI088_ACC_Z_MSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Z LSB register fields
+ * @{
+ */
+#define BMI088_ACC_Z_LSB_Pos                (0U)
+#define BMI088_ACC_Z_LSB_Msk                (0xFFU << BMI088_ACC_Z_LSB_Pos)
+#define BMI088_ACC_Z_LSB                    BMI088_ACC_Z_LSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Y MSB register fields
+ * @{
+ */
+#define BMI088_ACC_Y_MSB_Pos                (0U)
+#define BMI088_ACC_Y_MSB_MsK                (0xFFU << BMI088_ACC_Y_MSB_Pos)
+#define BMI088_ACC_Y_MSB                    BMI088_ACC_Y_MSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Y LSB register fields
+ * @{
+ */
+#define BMI088_ACC_Y_LSB_Pos                (0U)
+#define BMI088_ACC_Y_LSB_Msk                (0xFFU << BMI088_ACC_Y_LSB_Pos)
+#define BMI088_ACC_Y_LSB                    BMI088_ACC_Y_LSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC X MSB register fields
+ * @{
+ */
+#define BMI088_ACC_X_MSB_Pos                (0U)
+#define BMI088_ACC_X_MSB_Msk                (0xFFU << BMI088_ACC_X_MSB_Pos)
+#define BMI088_ACC_X_MSB                    BMI088_ACC_X_MSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC X LSB register fields
+ * @{
+ */
+#define BMI088_ACC_X_LSB_Pos                (0U)
+#define BMI088_ACC_X_LSB_Msk                (0xFFU << BMI088_ACC_X_LSB_Pos)
+#define BMI088_ACC_X_LSB                    BMI088_ACC_x_LSB_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Status register fields
+ * @{
+ */
+#define BMI088_ACC_STATUS_Pos               (7U)
+#define BMI088_ACC_STATUS_Msk               (0x1U << BMI088_ACC_STATUS_Pos)
+#define BMI088_ACC_STATUS                   BMI088_ACC_STATUS_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Error register fields
+ * @{
+ */
+#define BMI088_ACC_ERR_FATAL_Pos            (0U)
+#define BMI088_ACC_ERR_FATAL_Msk            (0x1U << BMI088_ACC_ERR_FATAL_Pos)
+#define BMI088_ACC_ERR_FATAL                BMI088_ACC_ERR_FATAL_Msk
+#define BMI088_ACC_ERR_CODE_Pos             (2U)
+#define BMI088_ACC_ERR_CODE_Msk             (0x7U << BMI088_ACC_ERR_CODE_Pos)
+#define BMI088_ACC_ERR_CODE                 BMI088_ACC_ERR_CODE_Msk
+/** @} */
+
+/**
+ * @name    BMI088 ACC Chip ID register fields
+ * @{
+ */
+#define BMI088_ACC_CHIP_ID_Pos              (0U)
+#define BMI088_ACC_CHIP_ID_Msk              (0xFFU << BMI088_ACC_CHIP_ID_Pos)
+#define BMI088_ACC_CHIP_ID                  BMI088_ACC_CHIP_ID_Msk
 /** @} */
 
 /*===========================================================================*/
