@@ -1,6 +1,6 @@
 /*
  * @file    bmi088.h
- * @brief   BMI088 Power Monitor.
+ * @brief   BMI088 IMU.
  *
  * @addtogroup BMI088
  * @ingroup ORESAT
@@ -831,18 +831,6 @@ typedef struct {
      */
     i2caddr_t                   saddr;
 #endif /* BMI088_USE_I2C */
-    /**
-     * @brief BMI088 configuration reg value
-     */
-    uint16_t                    cfg;
-    /**
-     * @brief BMI088 calibration reg value
-     */
-    uint16_t                    cal;
-    /**
-     * @brief Optional Current LSB value for use in calculations
-     */
-    uint16_t                    curr_lsb;
 } BMI088Config;
 
 /**
@@ -900,12 +888,6 @@ extern "C" {
 void bmi088ObjectInit(BMI088Driver *devp);
 void bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
-void bmi088SetAlert(BMI088Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg);
-int16_t bmi088ReadShunt(BMI088Driver *devp);
-uint16_t bmi088ReadVBUS(BMI088Driver *devp);
-int16_t bmi088ReadCurrent(BMI088Driver *devp);
-uint16_t bmi088ReadPower(BMI088Driver *devp);
 #ifdef __cplusplus
 }
 #endif

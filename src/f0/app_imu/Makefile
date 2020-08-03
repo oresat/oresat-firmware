@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template
+PROJECT   = app_imu
 
 # Target settings.
 MCU       = cortex-m0

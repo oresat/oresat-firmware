@@ -1,6 +1,6 @@
 /**
  * @file    bmi088.c
- * @brief   BMI088 Digital to Analog Converter.
+ * @brief   BMI088 6DoF inertial measurement unit.
  *
  * @addtogroup BMI088
  * @ingrup ORESAT
@@ -191,31 +191,6 @@ void bmi088Stop(BMI088Driver *devp) {
  *
  * @api
  */
-void bmi088SetAlert(BMI088Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == BMI088_READY,
-            "bmi088SetAlert(), invalid state");
-
-#if BMI088_USE_I2C
-#if BMI088_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* BMI088_SHARED_I2C */
-
-    buf.reg = BMI088_AD_LIM;
-    buf.value = __REVSH(alert_lim);
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-    buf.reg = BMI088_AD_ME;
-    buf.value = __REVSH(alert_me);
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-
-#if BMI088_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* BMI088_SHARED_I2C */
-#endif /* BMI088_USE_I2C */
-}
 
 /**
  * @brief   Reads BMI088 Register as raw value.
@@ -256,15 +231,6 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
  *
  * @api
  */
-int16_t bmi088ReadShunt(BMI088Driver *devp) {
-    int16_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = bmi088ReadRaw(devp, BMI088_AD_SHUNT) * 25;
-
-    return voltage;
-}
 
 /**
  * @brief   Reads BMI088 VBUS voltage.
@@ -274,15 +240,6 @@ int16_t bmi088ReadShunt(BMI088Driver *devp) {
  *
  * @api
  */
-uint16_t bmi088ReadVBUS(BMI088Driver *devp) {
-    uint16_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = bmi088ReadRaw(devp, BMI088_AD_VBUS) * 125;
-
-    return voltage;
-}
 
 /**
  * @brief   Reads BMI088 Current.
@@ -293,17 +250,6 @@ uint16_t bmi088ReadVBUS(BMI088Driver *devp) {
  *
  * @api
  */
-int16_t bmi088ReadCurrent(BMI088Driver *devp) {
-    int16_t current;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "bmi088ReadCurrent(): invalid curr_lsb value");
-
-    current = bmi088ReadRaw(devp, BMI088_AD_CURRENT) * devp->config->curr_lsb;
-
-    return current;
-}
 
 /**
  * @brief   Reads BMI088 Power.
@@ -314,16 +260,5 @@ int16_t bmi088ReadCurrent(BMI088Driver *devp) {
  *
  * @api
  */
-uint16_t bmi088ReadPower(BMI088Driver *devp) {
-    uint16_t power;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "bmi088ReadCurrent(): invalid curr_lsb value");
-
-    power = bmi088ReadRaw(devp, BMI088_AD_POWER) * devp->config->curr_lsb * 25;
-
-    return power;
-}
 
 /** @} */
