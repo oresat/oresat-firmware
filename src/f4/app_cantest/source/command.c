@@ -6,14 +6,20 @@
 #include "chprintf.h"
 #include "shell.h"
 
+static thread_t *shell_tp;
+
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
-size_t read_cb(void *chp, const char *buf, size_t count)
+size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
 {
-    chprintf(chp, "%s\r\n", buf);
+    size_t written;
 
-    return count;
+    written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
+
+    chEvtSignal(shell_tp, (eventmask_t)1);
+
+    return written;
 }
 
 /*===========================================================================*/
@@ -21,6 +27,27 @@ size_t read_cb(void *chp, const char *buf, size_t count)
 /*===========================================================================*/
 void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    char cmd[CO_CONFIG_GTWA_COMM_BUF_SIZE];
+    size_t space;
+    (void)chp;
+
+    if (argc < 1) {
+        strncpy(cmd, "[0] help\r\n", CO_CONFIG_GTWA_COMM_BUF_SIZE);
+    } else {
+        strncpy(cmd, argv[0], CO_CONFIG_GTWA_COMM_BUF_SIZE);
+        space = CO_CONFIG_GTWA_COMM_BUF_SIZE - strlen(argv[0]);
+        for (int i = 1; i < argc; i++) {
+            strncat(cmd, " ", space);
+            strncat(cmd, argv[i], space - 1);
+            space -= strlen(argv[i]) + 1;
+        }
+    }
+    strncat(cmd, "\r\n", space);
+
+    /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
+
+    CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
+    chEvtWaitAny((eventmask_t)1);
 
 }
 /*===========================================================================*/
@@ -68,14 +95,18 @@ static const ShellConfig shell_cfg = {
     sizeof(histbuf),
 };
 
-THD_WORKING_AREA(shell_wa, 0x200);
+THD_WORKING_AREA(shell_wa, 0x1000);
 THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
 
+    /* Initialize ASCII Gateway callback to print returned text */
+    CO_GTWA_initRead(CO->gtwa, gtwa_read_cb, shell_cfg.sc_channel);
+
+    /* Start a shell */
     while (!chThdShouldTerminateX()) {
-        thread_t *shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);
+        shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);
         chThdWait(shell_tp);
         chThdSleepMilliseconds(500);
     }
