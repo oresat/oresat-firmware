@@ -50,7 +50,7 @@
 #define MMC5883MA_AD_INTRNLCTRL1               0x09
 #define MMC5883MA_AD_INTRNLCTRL0               0x08
 #define MMC5883MA_AD_STATUS                    0x07
-#define MMC5883MA_AD_TEMPERATURE               0x06
+#define MMC5883MA_AD_TEMPERATURE_OUT           0x06
 #define MMC5883MA_AD_ZOUT_HIGH                 0x05
 #define MMC5883MA_AD_ZOUT_LOW                  0x04
 #define MMC5883MA_AD_YOUT_HIGH                 0x03
@@ -133,100 +133,144 @@
  * @name    MMC5883MA Internal Control_1 register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_INTRNLCTRL1_BW_Pos           (0U)
+#define MMC5883MA_INTRNLCTRL1_BW_Msk           (0x3U << MMC5883MA_INTRNLCTRL1_BW_Pos)
+#define MMC5883MA_INTRNLCTRL1_BW               MMC5883MA_INTRNLCTRL1_BW_Msk 
+#define MMC5883MA_INTRNLCTRL1_BW_ODR_100Hz     (0x0U << MMC5883MA_INTRNLCTRL1_BW_Pos)
+#define MMC5883MA_INTRNLCTRL1_BW_ODR_200Hz     (0x1U << MMC5883MA_INTRNLCTRL1_BW_Pos)
+#define MMC5883MA_INTRNLCTRL1_BW_ODR_400Hz     (0x2U << MMC5883MA_INTRNLCTRL1_BW_Pos)
+#define MMC5883MA_INTRNLCTRL1_BW_ODR_600Hz     (0x3U << MMC5883MA_INTRNLCTRL1_BW_Pos)
+#define MMC5883MA_INTRNLCTRL1_INH_Pos          (2U)
+#define MMC5883MA_INTRNLCTRL1_INH_Msk          (0x7U <<  MMC5883MA_INTRNLCTRL_INH_Pos)
+#define MMC5883MA_INTRNLCTRL1_INH              MMC5883MA_INTRNLCTRZ_INH_Msk
+#define MMC5883MA_INTRNLCTRL1_INH_X            (0x1U << MMC5883MA_INTRNLCTRL_INH_Pos)
+#define MMC5883MA_INTRNLCTRL1_INH_Y            (0x2U << MMC5883MA_INTRNLCTRL_INH_Pos)
+#define MMC5883MA_INTRNLCTRL1_INH_Z            (0x4U << MMC5883MA_INTRNLCTRL_INH_Pos)
+#define MMC5883MA_INTRNLCTRL1_SW_RST_Pos       (7U)  
+#define MMC5883MA_INTRNLCTRL1_SW_RST_Msk       (0x1U << MMC5883MA_INTRNLCTRL_SW_RST_Pos) 
+#define MMC5883MA_INTRNLCTRL1_SW_RST           MMC5883MA_INTRNLCTRL_SW_RST_Msk
+#define MMC5883MA_INTRNLCTRL1_SW_RST_CMD       (0x1U << MMC5883MA_INTRNLCTRL_SW_RST_Pos)
 /** @} */
 
 /**
  * @name    MMC5883MA Internal Control_0 register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_INTRNLCTRL0_TM_M_Pos         (0U)
+#define MMC5883MA_INTRNLCTRL0_TM_M_Msk         (0x1U << MMC5883MA_INTRNLCTRL0_TM_M_Pos)
+#define MMC5883MA_INTRNLCTRL0_TM_M             MMC5883MA_INTRNLCTRL0_TM_M_Msk
+#define MMC5883MA_INTRNLCTRL0_TM_M_INIT        (0x1U << MMC5883MA_INTRNLCTRL0_TM_M_Pos)
+#define MMC5883MA_INTRNLCTRL0_TM_T_Pos         (1U)
+#define MMC5883MA_INTRNLCTRL0_TM_T_Msk         (0x1U << MMC5883MA_INTRNLCTRL0_TM_T_Pos)
+#define MMC5883MA_INTRNLCTRL0_TM_T             MMC5883MA_INTRNLCTRL0_TM_T_Msk
+#define MMC5883MA_INTRNLCTRL0_TM_T_INIT        (0x1U << MMC5883MA_INTRNLCTRL0_TM_T_Pos)
+#define MMC5883MA_INTRNLCTRL0_STRT_MDT_Pos     (2U)
+#define MMC5883MA_INTRNLCTRL0_STRT_MDT_Msk     (0x1U << MMC5883MA_INTRNLCTRL0_STRT_MDT_Pos)
+#define MMC5883MA_INTRNLCTRL0_STRT_MDT         MMC5883MA_INTRNLCTRL0_STRT_MDT_Msk 
+#define MMC5883MA_INTRNLCTRL0_STRT_MDT_CMD     (0x1U << MMC5883MA_INTRNLCTRL0_STRT_MDT_Pos)
+#define MMC5883MA_INTRNLCTRL0_SET_Pos          (3U)
+#define MMC5883MA_INTRNLCTRL0_SET_Msk          (0x1U << MMC5883MA_INTRNLCTRL0_SET_Pos) 
+#define MMC5883MA_INTRNLCTRL0_SET              MMC5883MA_INTRNLCTRL0_SET_Msk     
+#define MMC5883MA_INTRNLCTRL0_SET_CMD          (0x1U << MMC5883MA_INTRNLCTRL0_SET_Pos) 
+#define MMC5883MA_INTRNLCTRL0_RST_Pos          (4U) 
+#define MMC5883MA_INTRNLCTRL0_RST_Msk          (0x1U << MMC5883MA_INTRNLCTRL0_RST_Pos) 
+#define MMC5883MA_INTRNLCTRL0_RST              MMC5883MA_INTRNLCTRL0_RST_Msk     
+#define MMC5883MA_INTRNLCTRL0_RST_CMD          (0x1U << MMC5883MA_INTRNLCTRL0_RST_Pos)   
+#define MMC5883MA_INTRNLCTRL0_OTP_Pos          (6U) 
+#define MMC5883MA_INTRNLCTRL0_OTP_Msk          (0x1U << MMC5883MA_INTRNLCTRL0_OTP_Pos) 
+#define MMC5883MA_INTRNLCTRL0_OTP              MMC5883MA_INTRNLCTRL0_OTP_Msk     
+#define MMC5883MA_INTRNLCTRL0_OTP_READ         (0x1U << MMC5883MA_INTRNLCTRL0_OTP_Pos) 
+#define MMC5883MA_INTRNLCTRL0_TST_PIN_Pos      (7U)
+#define MMC5883MA_INTRNLCTRL0_TST_PIN_Msk      (0x1U << MMC5883MA_INTRNLCTRL0_TST_PIN_Pos)
+#define MMC5883MA_INTRNLCTRL0_TST_PIN          MMC5883MA_INTRNLCTRL0_TST_PIN_Msk 
+#define MMC5883MA_INTRNLCTRL0_TST_PIN_SLCT     (0x1U << MMC5883MA_INTRNLCTRL0_TST_PIN_Pos)
 /** @} */
 
 /**
  * @name    MMC5883MA Status register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_STATUS_MEAS_M_DONE_Pos       (0U)
+#define MMC5883MA_STATUS_MEAS_M_DONE_Msk       (0x1U << MMC5883MA_STATUS_MEAS_M_DONE_Pos)
+#define MMC5883MA_STATUS_MEAS_M_DONE           MMC5883MA_STATUS_MEAS_M_DONE_Msk   
+#define MMC5883MA_STATUS_MEAS_M_DONE_CLR       (0x1U << MMC5883MA_STATUS_MEAS_M_DONE_Pos)       
+#define MMC5883MA_STATUS_MEAS_T_DONE_Pos       (1U)       
+#define MMC5883MA_STATUS_MEAS_T_DONE_Msk       (0x1U << MMC5883MA_STATUS_MEAS_T_DONE_Pos)       
+#define MMC5883MA_STATUS_MEAS_T_DONE           MMC5883MA_STATUS_MEAS_T_DONE_Msk   
+#define MMC5883MA_STATUS_MEAS_T_DONE_CLR       (0x1U << MMC5883MA_STATUS_MEAS_T_DONE_Pos)       
+#define MMC5883MA_STATUS_MD_Pos                (2U)     
+#define MMC5883MA_STATUS_MD_Msk                (0x1U << MMC5883MA_STATUS_MD_Pos)     
+#define MMC5883MA_STATUS_MD                    MMC5883MA_STATUS_MD_Msk        
+#define MMC5883MA_STATUS_MD_CLR                (0x1U << MMC5883MA_STATUS_MD_Pos)            
+#define MMC5883MA_STATUS_PUMP_ON_Pos           (3U)   
+#define MMC5883MA_STATUS_PUMP_ON_Msk           (0x1U << MMC5883MA_STATUS_PUMP_ON_Pos)   
+#define MMC5883MA_STATUS_PUMP_ON               MMC5883MA_STATUS_PUMP_ON_Msk   
+#define MMC5883MA_STATUS_OTP_RD_DONE_Pos       (4U)       
+#define MMC5883MA_STATUS_OTP_RD_DONE_Msk       (0x1U << MMC5883MA_STATUS_OTP_RD_DONE_Pos)       
+#define MMC5883MA_STATUS_OTP_RD_DONE           MMC5883MA_STATUS_OTP_RD_DONE_Msk               
 /** @} */
 
 /**
- * @name    MMC5883MA Temperature register fields
+ * @name    MMC5883MA Temperature Out register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_TEMPERATURE_OUT_Pos          (0U)
+#define MMC5883MA_TEMPERATURE_OUT_Msk          (0xFFU << MMC5883MA_TEMPERATURE_Pos)
+#define MMC5883MA_TEMPERATURE_OUT              MMC5883MA_TEMPERATURE_Msk
 /** @} */
 
 /**
  * @name    MMC5883MA Zout High register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_ZOUT_H_Pos                   (0U)
+#define MMC5883MA_ZOUT_H_Msk                   (0xFFU << MMC5883MA_ZOUT_H_Pos)
+#define MMC5883MA_ZOUT_H                       MMC5883MA_ZOUT_H_Msk               
 /** @} */
 
 /**
  * @name    MMC5883MA Zout Low register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_ZOUT_L_Pos                   (0U)
+#define MMC5883MA_ZOUT_L_Msk                   (0xFFU << MMC5883MA_ZOUT_L_Pos)
+#define MMC5883MA_ZOUT_L                       MMC5883MA_ZOUT_L_Msk               
 /** @} */
 
 /**
  * @name    MMC5883MA Yout High register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_YOUT_H_Pos                   (0U)              
+#define MMC5883MA_YOUT_H_Msk                   (0xFFU << MMC5883MA_YOUT_H_Pos)
+#define MMC5883MA_YOUT_H_Msk                   MMC5883MA_YOUT_H_Msk
 /** @} */
 
 /**
  * @name    MMC5883MA Yout Low register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_YOUT_L_Pos                   (0U)
+#define MMC5883MA_YOUT_L_Msk                   (0xFFU << MMC5883MA_YOUT_L_Pos)
+#define MMC5883MA_YOUT_L                       MMC5883MA_YOUT_L_Msk               
 /** @} */
 
 /**
  * @name    MMC5883MA Xout High register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_XOUT_H_Pos                   (0U)
+#define MMC5883MA_XOUT_H_Msk                   (0xFFU << MMC5883MA_XOUT_H_Pos)
+#define MMC5883MA_XOUT_H                       MMC5883MA_XOUT_H_Msk               
 /** @} */
 
 /**
  * @name    MMC5883MA Xout Low register fields
  * @{
  */
-#define MMC5883MA_
-#define MMC5883MA_
-#define MMC5883MA_
-
+#define MMC5883MA_XOUT_L_Pos                   (0U)
+#define MMC5883MA_XOUT_L_Msk                   (0xFFU << MMC5883MA_XOUT_L_Pos)
+#define MMC5883MA_XOUT_L                       MMC5883MA_XOUT_L_Msk               
 /** @} */
 
 /*===========================================================================*/
