@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "command.h"
 #include "time_sync.h"
@@ -55,22 +56,58 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 void time_usage(BaseSequentialStream *chp)
 {
-    chprintf(chp, "Usage: time set|get <UNIX Time>\r\n");
+    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
 }
 
 void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    RTCDateTime timespec;
     time_t unix_time;
     uint32_t msec;
+    time_scet_t scet;
+    time_utc_t utc;
     if (argc < 1) {
         time_usage(chp);
         return;
     }
-    if (!strcmp(argv[0], "get")) {
-        unix_time = get_time_unix(&msec);
-        chprintf(chp, "UNIX Time: %s\r\n", ctime(&unix_time));
-    } else if (!strcmp(argv[0], "set") && argc > 1) {
-        set_time_unix(strtoul(argv[1], NULL, 0), 0);
+    if (!strcmp(argv[0], "unix")) {
+        if (!strcmp(argv[1], "get")) {
+            unix_time = get_time_unix(&msec);
+            chprintf(chp, "UNIX Time: %s\r\n", ctime(&unix_time));
+        } else if (!strcmp(argv[1], "set") && argc > 2) {
+            set_time_unix(strtoul(argv[2], NULL, 0), 0);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "scet")) {
+        if (!strcmp(argv[1], "get")) {
+            get_time_scet(&scet);
+            chprintf(chp, "SCET Time: %u.%u\r\n", scet.coarse, scet.fine);
+        } else if (!strcmp(argv[1], "set") && argc > 3) {
+            scet.coarse = strtoul(argv[2], NULL, 0);
+            scet.fine = strtoul(argv[3], NULL, 0);
+            set_time_scet(&scet);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "utc")) {
+        if (!strcmp(argv[1], "get")) {
+            get_time_utc(&utc);
+            chprintf(chp, "UTC Time: Day: %u ms: %u us: %u\r\n", utc.day, utc.ms, utc.us);
+        } else if (!strcmp(argv[1], "set") && argc > 4) {
+            utc.day = strtoul(argv[2], NULL, 0);
+            utc.ms = strtoul(argv[3], NULL, 0);
+            utc.us = strtoul(argv[4], NULL, 0);
+            set_time_utc(&utc);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "raw")) {
+        rtcGetTime(&RTCD1, &timespec);
+        chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
     } else {
         time_usage(chp);
         return;
