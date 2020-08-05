@@ -29,7 +29,7 @@ void set_time_unix(time_t unix_time, uint32_t msec)
 {
     struct tm tim;
 
-    localtime_r(&unix_time, &tim);
+    gmtime_r(&unix_time, &tim);
     set_time_tm(&tim, msec);
 }
 
