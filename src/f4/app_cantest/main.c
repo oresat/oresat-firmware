@@ -22,6 +22,7 @@
 /* Project header files */
 #include "oresat.h"
 #include "command.h"
+#include "time_sync.h"
 
 /*
 static const oresat_node_t nodes[] = {
@@ -59,6 +60,9 @@ static void app_init(void)
 
     /* Start up the shell */
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
+
+    /* Configure SCET time object */
+    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
 }
 
 /**
