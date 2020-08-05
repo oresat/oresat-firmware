@@ -1,7 +1,6 @@
 #include "oresat.h"
 #include "events.h"
 #include "sensors.h"
-#include "time_sync.h"
 #include "CANopen.h"
 
 typedef enum {
@@ -92,8 +91,6 @@ void oresat_start(oresat_config_t *config)
 
         /* Register CAN callbacks */
         CO_NMT_initCallbackChanged(CO->NMT, CO_NMT_cb);
-
-        CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
 
         /* Enter normal operating mode */
         CO_CANsetNormalMode(CO->CANmodule[0]);
