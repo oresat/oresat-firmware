@@ -5,7 +5,7 @@
    CANopen Object Dictionary.
 
    This file was automatically generated with libedssharp Object
-   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+   Dictionary Editor v0.8-78-g7c49b15   DON'T EDIT THIS FILE MANUALLY !!!!
 *******************************************************************************/
 
 
@@ -78,6 +78,8 @@
   #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
   #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               1   //Associated objects: 1280-12FF
+  #define CO_NO_GFC                      0   //Associated objects: 1300
+  #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     28   //Associated objects: 14xx, 16xx
