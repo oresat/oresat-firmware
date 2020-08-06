@@ -14,8 +14,6 @@
 extern "C" {
 #endif
 
-extern event_source_t cos_event;
-
 typedef struct {
     CANDriver *cand;
     uint8_t node_id;
