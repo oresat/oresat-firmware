@@ -176,7 +176,13 @@ void oresat_init(void)
      */
     halInit();
     chSysInit();
+
+    /* Init sensors */
     sensors_init();
+
+    /* Setup CANopen subsystem */
+    CO_ReturnError_t err = CO_new(NULL);
+    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
 
     return;
 }
@@ -206,10 +212,6 @@ void oresat_start(oresat_config_t *config)
 
     /* Set bitrate from provided config */
     OD_CANBitRate = config->bitrate;
-
-    /* Setup CANopen subsystem */
-    err = CO_new(NULL);
-    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
 
     /* Get thread ID for main thread and set priority to max */
     oresat_tp = chThdGetSelfX();
