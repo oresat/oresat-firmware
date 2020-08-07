@@ -61,29 +61,6 @@ THD_FUNCTION(sdo_server, SDO)
     chThdExit(MSG_OK);
 }
 
-#if CO_NO_SDO_CLIENT > 0
-/* CANopen SDO client thread */
-THD_FUNCTION(sdo_client, SDO_C)
-{
-    systime_t prev_time;
-
-    /* Register the callback function to wake up thread when message received */
-    CO_SDOclient_initCallbackPre((CO_SDOclient_t *)SDO_C, chThdGetSelfX(), process_cb);
-
-    prev_time = chVTGetSystemTime();
-    while (!chThdShouldTerminateX()) {
-        uint32_t timeout = ((typeof(timeout))-1);
-
-        /* TODO: Implement client functionality */
-
-        prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
-    }
-    CO_SDOclient_initCallbackPre((CO_SDOclient_t *)SDO_C, NULL, NULL);
-    chThdExit(MSG_OK);
-}
-#endif
-
 /* CANopen Emergency thread */
 THD_FUNCTION(em_worker, emPr)
 {
@@ -194,9 +171,6 @@ void oresat_start(oresat_config_t *config)
     systime_t prev_time;
     eventmask_t events;
     thread_t *sdo_tp[CO_NO_SDO_SERVER];
-#if CO_NO_SDO_CLIENT > 0
-    thread_t *sdoclient_tp[CO_NO_SDO_CLIENT];
-#endif
     thread_t *em_tp;
     thread_t *pdo_sync_tp;
     thread_t *hbcons_tp;
@@ -237,11 +211,6 @@ void oresat_start(oresat_config_t *config)
         for (int i = 0; i < CO_NO_SDO_SERVER; i++) {
             sdo_tp[i] = chThdCreateFromHeap(NULL, 0x1000, "SDO Server", HIGHPRIO-1, sdo_server, CO->SDO[i]);
         }
-#if CO_NO_SDO_CLIENT > 0
-        for (int i = 0; i < CO_NO_SDO_CLIENT; i++) {
-            sdoclient_tp[i] = chThdCreateFromHeap(NULL, 0x1000, "SDO Client", HIGHPRIO-1, sdo_client, CO->SDOclient[i]);
-        }
-#endif
         em_tp = chThdCreateFromHeap(NULL, 0x200, "Emergency", HIGHPRIO-2, em_worker, CO->emPr);
         pdo_sync_tp = chThdCreateFromHeap(NULL, 0x200, "PDO SYNC", HIGHPRIO-2, pdo_sync_worker, CO);
         hbcons_tp = chThdCreateFromHeap(NULL, 0x200, "HB Consumer", HIGHPRIO-3, hb_cons, CO->HBcons);
@@ -275,12 +244,6 @@ void oresat_start(oresat_config_t *config)
             chThdTerminate(sdo_tp[i]);
             chEvtSignal(sdo_tp[i], (eventmask_t)1);
         }
-#if CO_NO_SDO_CLIENT > 0
-        for (int i = 0; i < CO_NO_SDO_CLIENT; i++) {
-            chThdTerminate(sdoclient_tp[i]);
-            chEvtSignal(sdoclient_tp[i], (eventmask_t)1);
-        }
-#endif
         chThdTerminate(em_tp);
         chEvtSignal(em_tp, (eventmask_t)1);
         chThdTerminate(pdo_sync_tp);
@@ -292,11 +255,6 @@ void oresat_start(oresat_config_t *config)
         for (int i = 0; i < CO_NO_SDO_SERVER; i++) {
             chThdWait(sdo_tp[i]);
         }
-#if CO_NO_SDO_CLIENT > 0
-        for (int i = 0; i < CO_NO_SDO_CLIENT; i++) {
-            chThdWait(sdoclient_tp[i]);
-        }
-#endif
         chThdWait(em_tp);
         chThdWait(pdo_sync_tp);
         chThdWait(hbcons_tp);
