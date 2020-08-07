@@ -20,6 +20,9 @@ typedef struct {
     uint16_t bitrate;
 } oresat_config_t;
 
+/* General purpose CANopen callback to wake up data processing threads */
+void process_cb(void *thread);
+
 /* OreSat initialization and main process */
 void oresat_init(void);
 void oresat_start(oresat_config_t *config);
