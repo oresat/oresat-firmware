@@ -74,6 +74,7 @@ bool opd_probe(opd_addr_t addr)
 
     /* Probe the device */
     i2cAcquireBus(&I2CD1);
+    i2cStart(&I2CD1);
     result = i2cMasterReceiveTimeout(&I2CD1, addr, &temp, 1, TIME_MS2I(10));
     i2cReleaseBus(&I2CD1);
     if (result == MSG_OK) {
