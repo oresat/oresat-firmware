@@ -21,8 +21,6 @@ size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
 
     written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
 
-    chEvtSignal(shell_tp, (eventmask_t)1);
-
     return written;
 }
 
@@ -51,7 +49,6 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
 
     CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
-    chEvtWaitAny((eventmask_t)1);
 
 }
 
@@ -60,12 +57,21 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 void opd_usage(BaseSequentialStream *chp)
 {
-    chprintf(chp, "Usage: opd sysenable|sysdisable|sysrestart|enable|disable|reset|probe|status <opd_addr>\r\n");
+    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
+                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
+                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
+                  "    sysrestart: Cycle power on OPD subsystem\r\n"
+                  "    enable:     Enable an OPD attached card\r\n"
+                  "    disable:    Disable an OPD attached card\r\n"
+                  "    reset:      Reset the circuit breaker of a card\r\n"
+                  "    probe:      Probe an address to see if a card responds\r\n"
+                  "    status:     Report the status of a card\r\n"
+                  "    bootstrap:  Attempt to bootstrap a card\r\n");
 }
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    static opd_addr_t opd_addr = 0;
+    static uint8_t opd_addr = 0;
     opd_status_t status = {0};
 
     if (argc < 1) {
@@ -120,7 +126,7 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
-        }  else if (!strcmp(argv[0], "status")) {
+        } else if (!strcmp(argv[0], "status")) {
             chprintf(chp, "Status of board 0x%02X: ", opd_addr);
             if (!opd_status(opd_addr, &status)) {
                 chprintf(chp, "CONNECTED\r\n");
@@ -136,6 +142,9 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
+        } else if (!strcmp(argv[0], "bootstrap")) {
+            int retval = opd_boot(opd_addr);
+            chprintf(chp, "Bootstrap returned 0x%02X\r\n", retval);
         } else {
             opd_usage(chp);
             return;
