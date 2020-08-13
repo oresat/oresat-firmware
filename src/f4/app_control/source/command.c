@@ -66,7 +66,7 @@ void opd_usage(BaseSequentialStream *chp)
                   "    reset:      Reset the circuit breaker of a card\r\n"
                   "    probe:      Probe an address to see if a card responds\r\n"
                   "    status:     Report the status of a card\r\n"
-                  "    bootstrap:  Attempt to bootstrap a card\r\n");
+                  "    boot:       Attempt to bootstrap a card\r\n");
 }
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
@@ -142,9 +142,9 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
-        } else if (!strcmp(argv[0], "bootstrap")) {
+        } else if (!strcmp(argv[0], "boot")) {
             int retval = opd_boot(opd_addr);
-            chprintf(chp, "Bootstrap returned 0x%02X\r\n", retval);
+            chprintf(chp, "Boot returned 0x%02X\r\n", retval);
         } else {
             opd_usage(chp);
             return;

@@ -190,7 +190,7 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
             reg = max7310ReadRaw(devp, MAX7310_AD_MODE);
 
             /* Set SDA based on MSB of byte */
-            reg = (reg & ~MAX7310_PIN_MASK(OPD_SDA)) | ((byte & 0x8) ? MAX7310_PIN_MASK(OPD_SDA) : 0);
+            reg = (reg & ~MAX7310_PIN_MASK(OPD_SDA)) | ((byte & 0x80) ? MAX7310_PIN_MASK(OPD_SDA) : 0);
             max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
 
             /* Cycle SCL */
@@ -221,7 +221,6 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
         uint8_t byte = 0;
 
         for (int j = 0; j < 8; j++) {
-
             /* Cycle SCL while reading pin */
             reg |= MAX7310_PIN_MASK(OPD_SCL);
             max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
@@ -231,9 +230,9 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
             byte <<= 1;
         }
 
-        reg |= MAX7310_PIN_MASK(OPD_SCL);
-        max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         reg &= ~MAX7310_PIN_MASK(OPD_SDA);
+        max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
+        reg |= MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         reg &= ~MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
@@ -244,6 +243,8 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
     }
 
 opd_i2c_fail:
+    reg &= ~(MAX7310_PIN_MASK(OPD_SCL) | MAX7310_PIN_MASK(OPD_SDA));
+    max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
     opd_i2c_stop(devp);
     return;
 }
@@ -271,14 +272,14 @@ int opd_boot(uint8_t addr)
     txbuf[0] = 0x83U;
     opd_i2c_transmit(addr, txbuf, 1, rxbuf, 1);
     if (rxbuf[0] != 0x79)
-        return -2;
+        return rxbuf[0];
 
     opd_i2c_transmit(addr, txbuf, 1, rxbuf, 1);
     retval = rxbuf[0];
 
     opd_i2c_transmit(addr, txbuf, 1, rxbuf, 1);
     if (rxbuf[0] != 0x79)
-        return -2;
+        return rxbuf[0];
 
     max7310ClearPin(devp, OPD_BOOT0);
 
