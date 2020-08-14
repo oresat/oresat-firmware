@@ -211,7 +211,7 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         while (!(max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SDA)) && tries)
             tries--;
-        reg &= ~MAX7310_PIN_MASK(OPD_SCL);
+        reg &= ~(MAX7310_PIN_MASK(OPD_SCL) | MAX7310_PIN_MASK(OPD_SDA));
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         if (tries == 0)
             goto opd_i2c_fail;
@@ -220,6 +220,8 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
     for (size_t i = 0; i < rxsize; i++) {
         uint8_t byte = 0;
 
+        reg |= MAX7310_PIN_MASK(OPD_SDA);
+        max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         for (int j = 0; j < 8; j++) {
             /* Cycle SCL while reading pin */
             reg |= MAX7310_PIN_MASK(OPD_SCL);
@@ -236,15 +238,11 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         reg &= ~MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
-        reg |= MAX7310_PIN_MASK(OPD_SDA);
-        max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
 
         rxbuf[i] = byte;
     }
 
 opd_i2c_fail:
-    reg &= ~(MAX7310_PIN_MASK(OPD_SCL) | MAX7310_PIN_MASK(OPD_SDA));
-    max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
     opd_i2c_stop(devp);
     return;
 }
@@ -263,6 +261,7 @@ int opd_boot(uint8_t addr)
     max7310ClearPin(devp, OPD_EN);
     max7310SetPin(devp, OPD_BOOT0);
     max7310SetPin(devp, OPD_EN);
+    chThdSleepMilliseconds(2);
 
     txbuf[0] = 0x82U;
     txbuf[1] = 0x01U;
