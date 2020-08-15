@@ -72,7 +72,7 @@ void opd_stop(void)
 #endif /* LINE_OPD_ENABLE */
 }
 
-bool opd_probe(uint8_t addr)
+bool opd_probe(i2caddr_t addr)
 {
     msg_t result;
     uint8_t temp;
@@ -96,7 +96,7 @@ bool opd_probe(uint8_t addr)
     return opd_dev[addr].valid;
 }
 
-int opd_enable(uint8_t addr)
+int opd_enable(i2caddr_t addr)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
@@ -106,7 +106,7 @@ int opd_enable(uint8_t addr)
     return 0;
 }
 
-int opd_disable(uint8_t addr)
+int opd_disable(i2caddr_t addr)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
@@ -116,7 +116,7 @@ int opd_disable(uint8_t addr)
     return 0;
 }
 
-int opd_reset(uint8_t addr)
+int opd_reset(i2caddr_t addr)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
@@ -128,7 +128,7 @@ int opd_reset(uint8_t addr)
     return 0;
 }
 
-int opd_status(uint8_t addr, opd_status_t *status)
+int opd_status(i2caddr_t addr, opd_status_t *status)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true)
@@ -161,13 +161,15 @@ void opd_i2c_stop(MAX7310Driver *devp)
     uint8_t reg;
 
     reg = max7310ReadRaw(devp, MAX7310_AD_MODE);
+    reg &= ~(MAX7310_PIN_MASK(OPD_SCL) | MAX7310_PIN_MASK(OPD_SDA));
+    max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
     reg |= MAX7310_PIN_MASK(OPD_SCL);
     max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
     reg |= MAX7310_PIN_MASK(OPD_SDA);
     max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
 }
 
-void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbuf, size_t rxsize)
+void opd_i2c_transmit(i2caddr_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbuf, size_t rxsize)
 {
     MAX7310Driver *devp;
     uint8_t tries;
@@ -209,7 +211,8 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
         reg |= MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
-        while (!(max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SDA)) && tries)
+        while (!(max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SCL)));
+        while ((max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SDA)) && tries)
             tries--;
         reg &= ~(MAX7310_PIN_MASK(OPD_SCL) | MAX7310_PIN_MASK(OPD_SDA));
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
@@ -226,16 +229,18 @@ void opd_i2c_transmit(uint8_t addr, uint8_t *txbuf, size_t txsize, uint8_t *rxbu
             /* Cycle SCL while reading pin */
             reg |= MAX7310_PIN_MASK(OPD_SCL);
             max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
-            byte |= !!(max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SDA));
+            byte = ((byte << 1) | (max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SDA) ? 1 : 0));
             reg &= ~MAX7310_PIN_MASK(OPD_SCL);
             max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
-            byte <<= 1;
         }
 
-        reg &= ~MAX7310_PIN_MASK(OPD_SDA);
-        max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
+        if (i < rxsize - 1) {
+            reg &= ~MAX7310_PIN_MASK(OPD_SDA);
+            max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
+        }
         reg |= MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
+        while (!(max7310ReadRaw(devp, MAX7310_AD_INPUT) & MAX7310_PIN_MASK(OPD_SCL)));
         reg &= ~MAX7310_PIN_MASK(OPD_SCL);
         max7310WriteRaw(devp, MAX7310_AD_MODE, reg);
 
@@ -247,7 +252,7 @@ opd_i2c_fail:
     return;
 }
 
-int opd_boot(uint8_t addr)
+int opd_boot(i2caddr_t addr)
 {
     MAX7310Driver *devp;
     uint8_t txbuf[10];
