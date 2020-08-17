@@ -831,6 +831,18 @@ typedef struct {
      */
     i2caddr_t                   saddr;
 #endif /* BMI088_USE_I2C */
+/**
+* @brief BMI088 configuration register value
+*/
+uint16_t                        cfg;
+/**
+* @brief BMI088 configuration register value
+*/
+uint16_t                        cal;
+/**
+* @brief BMI088 Current LSB value for use in calculations
+*/
+uint16_t                        curr_lsb;
 } BMI088Config;
 
 /**
@@ -888,6 +900,15 @@ extern "C" {
 void bmi088ObjectInit(BMI088Driver *devp);
 void bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
+uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg);
+uint8_t bmi088ReadChipId(BMI088Driver *devp);
+uint8_t bmi088ReadErrCode(BMI088Driver *devp);
+uint8_t bmi088ReadErrFatal(BMI088driver *devp);
+uint8_t bmi088ReadAccStatus(BMI088Driver *devp);
+uint8_t bmi088ReadAccInX(BMI088Driver *devp);
+uint8_t bmi088ReadAccInY(BMI088Driver *devp);
+uint8_t bmi088ReadAccInZ(BMI088Driver *devp);
+uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
 #ifdef __cplusplus
 }
 #endif

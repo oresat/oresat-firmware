@@ -224,41 +224,179 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
 }
 
 /**
- * @brief   Reads BMI088 Shunt voltage.
+ * @brief   Reads BMI088 Chip ID.
  *
  * @param[in] devp       Pointer to the @p BMI088Driver object
- * @return               Shunt voltage in 0.1uV increments
+ * @return               
  *
  * @api
  */
+uint8_t bmi088ReadChipId(BMI088Driver *devp){
+    uint8_t chipId;
+
+    osalDbgCheck(devp != NULL);
+
+    chipId = bmi088ReadRaw(devp, BMI088_AD_ACC_CHIP_ID)*1;
+
+    return chipId;    
+}
 
 /**
- * @brief   Reads BMI088 VBUS voltage.
+ * @brief   Reads BMI088  Error Code Register.
  *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               VBUS voltage in 0.01mV increments
- *
+ * @return               0x00: No Error
+ *                       0x01: Error Occurred in Accelerometer configuration
  * @api
  */
+uint8_t bmi088ReadErrCode(BMI088Driver *devp){
+     uint8_t errCode;
+
+     osalDbgCheck( devp != NULL);
+     
+     errCode = bmi088ReadRaw(devp, BMI088_ACC_ERR_CODE);
+
+     return errCode;   
+}
 
 /**
- * @brief   Reads BMI088 Current.
- * @note    Requires curr_lsb to be set in config
- *
+ * @brief   Reads BMI088 Error Fatal Register.
+ * 
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               Current in increments of @p curr_lsb
+ * @return               Flag: fatal Error; cleared by power-on-reset or soft-reset 
  *
  * @api
  */
+uint8_t bmi088ReadErrFatal(BMI088Driver *devp){
+    uint8_t errFatal;
+
+    osalDbgCheck(devp != NULL);
+
+    errFatal = bmi088ReadRaw(devp, BMI088_ACC_ERR_FATAL);
+
+    return errFatal;
+}
 
 /**
- * @brief   Reads BMI088 Power.
- * @note    Requires curr_lsb to be set in config
+ * @brief   Reads BMI088 ACC Status Register.
  *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               Power in increments of @p curr_lsb * 25V
+ * @return               Data ready for accelerometer. Reset when one acceleration data register is read out.
  *
  * @api
  */
+uint8_t bmi088ReadAccStatus(){
+    uint8_t stat;
 
+    osalDbgCheck(devp != NULL);
+
+    stat = bmi088ReadRaw(devp, BMI088_ACC_STATUS);
+
+    return status;
+}
+
+/**
+ * @brief   Reads BMI088 ACC X Register.
+ * @note    16 bit 2's compliment. Converted from LSB to mg. 
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @Return               Acceleration in X in mg.
+ *
+ * @api
+ */
+int16_t bmi088ReadAccInX(BMI088Driver, *devp){
+    int16_t accXInMG;
+    int16_t accXInt16;
+    int8_t  accXLsb;
+    int8_t  accXMsb;
+
+    osalDbgCheck(devp != NULL);
+
+    accXLsb     = bmi088ReadRaw(devp, BMI088_ACC_X_LSB);
+    accXMsb     = bmi088ReadRaw(devp, BMI088_ACC_X_MSB);
+    accXInt16   = (accXMsb*256 + accXLsb);
+    accXInMG    = accXInt16/32768*1000*2^(<0x41> + 1)*1.5;
+
+    return accXInMG;
+}
+/**
+ * @brief   Reads BMI088 ACC Y Register.
+ * @note    16 bit 2's compliment. Converted from LSB to mg. 
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @Return               Acceleration in Y in mg.
+ *
+ * @api
+ */
+int16_t bmi088ReadAccInY(BMI088Driver, *devp){
+    int16_t accYInMG;
+    int16_t accYInt16;
+    int8_t  accYLsb;
+    int8_t  accYMsb;
+
+    osalDbgCheck(devp != NULL);
+
+    accYLsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_LSB);
+    accYMsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_MSB);
+    accYInt16   = (accYMsb*256 + accYLsb);
+    accYInMG    = accYInt16/32768*1000*2^(<0x41> + 1)*1.5;
+
+    return accYInMG;
+}
+/**
+ * @brief   Reads BMI088 ACC Z Register.
+ * @note    16 bit 2's compliment. Converted from LSB to mg. 
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @Return               Acceleration in Z in mg.
+ *
+ * @api
+ */
+int16_t bmi088ReadAccInZ(BMI088Driver, *devp){
+    int16_t accZInMG;
+    int16_t accZInt16;
+    int8_t  accZLsb;
+    int8_t  accZMsb;
+
+    osalDbgCheck(devp != NULL);
+
+    accZLsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_LSB);
+    accZMsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_MSB);
+    accZInt16   = (accZMsb*256 + accZLsb);
+    accZInMG    = accZInt16/32768*1000*2^(<0x41> + 1)*1.5;
+
+    return accZInMG;
+}
+/**
+ * @brief   Reads BMI088 Sensortime Data register.
+ * @note    Sensor time data stored in 3 consecutive 8 bit registers with sensor time 0 containing the LSB.
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @return               24 bit count value. 
+ *
+ * @api
+ */
+uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp){
+    uint8_t  sensorTime0;
+    uint8_t  sensorTime1;
+    uint8_t  sensorTime2;
+    uint32_t  sensorTime;
+
+    osalDbgCheck(devp != NULL);
+
+    sensorTime0 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_0)
+    sensorTime1 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_1)
+    sensorTime2 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_2)
+    sensorTime  = (sensorTime2 << 16) | (sensorTime1 << 8) | sensorTime0;
+
+    return sensorTime;
+}
+/**
+ * @brief   Reads BMI088 ACC Status Register.
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @return               Data ready for accelerometer. Reset when one acceleration data register is read out.
+ *
+ * @api
+ */
 /** @} */
