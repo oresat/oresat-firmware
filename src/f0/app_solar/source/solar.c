@@ -45,8 +45,11 @@ uint32_t calc_iadj(uint32_t i_out)
     return ((50520000 - i_out * RSENSE) / 3200);
 }
 
-uint32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr, uint32_t *iadj_v)
+int32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr)
 {
+    /* Amount to adjust iadj_v */
+    int32_t adjust;
+
     /* The values from the previous iteration of the loop */
     static uint16_t prev_volt = 0;
     static int16_t  prev_curr = 0;
@@ -59,26 +62,10 @@ uint32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr, uint32_t *iadj_v)
     prev_pwr  = pwr;
 
     /* Start IC MPPT Algorithm */
-    if (delta_v == 0) {
-        if (delta_i != 0) {
-            if (delta_i > 0) {
-                *iadj_v += STEP_SIZE;
-            } else {
-                *iadj_v -= STEP_SIZE;
-            }
-        }
-    } else {
-        if (delta_p/delta_v != 0) {
-            if (delta_p/delta_v > 0) {
-                *iadj_v += STEP_SIZE;
-            } else {
-                *iadj_v -= STEP_SIZE;
-            }
-        }
-    }
+
     /* End IC MPPT Algorithm */
 
-    return *iadj_v;
+    return adjust;
 }
 
 /* Main solar management thread */
@@ -103,7 +90,7 @@ THD_FUNCTION(solar, arg)
         OD_solarPanel.power = ina226ReadPower(&ina226dev);
 
         /* Calculate iadj */
-        calc_mppt(OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power, &iadj_v);
+        iadj_v += calc_mppt(OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power);
 
         /* Write new iadj value */
         max580xWriteVoltage(&max580xdev, MAX580X_CODE_LOAD, iadj_v);
