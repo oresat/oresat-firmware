@@ -31,9 +31,13 @@
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
+MUTEX_DECL(emcy_mutex);
+MUTEX_DECL(od_mutex);
+
 /* Interrupt callback prototypes*/
 void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
 void CO_CANtx_cb(CANDriver *canp, uint32_t flags);
+void CO_CANerr_cb(CANDriver *canp, uint32_t flags);
 
 /******************************************************************************/
 void CO_CANsetConfigurationMode(void *CANptr)
@@ -83,6 +87,7 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->cand = ((oresat_config_t*)CANptr)->cand;
     CANmodule->cand->rxfull_cb = CO_CANrx_cb;
     CANmodule->cand->txempty_cb = CO_CANtx_cb;
+    CANmodule->cand->error_cb = CO_CANerr_cb;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
@@ -299,12 +304,12 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 
 void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 {
-    CAN_TypeDef *canp = CANmodule->cand->can;
+    CAN_TypeDef *can = CANmodule->cand->can;
     uint32_t err;
     uint8_t rxErrors, txErrors;
 
     /* Get ESR and FOVRx values */
-    err = (canp->ESR | ((canp->RF0R & CAN_RF0R_FOVR0_Msk) << 4) | ((canp->RF1R & CAN_RF1R_FOVR1_Msk) << 5));
+    err = (can->ESR | ((can->RF0R & CAN_RF0R_FOVR0_Msk) << 4) | ((can->RF1R & CAN_RF1R_FOVR1_Msk) << 5));
     rxErrors = _FLD2VAL(CAN_ESR_REC, err);
     txErrors = _FLD2VAL(CAN_ESR_TEC, err);
 
@@ -344,7 +349,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
         }
 
         /* Check for overflow of RX FIFOs */
-        if ((canp->RF0R & CAN_RF0R_FOVR0_Msk) | (canp->RF1R & CAN_RF1R_FOVR1_Msk)) {
+        if ((can->RF0R & CAN_RF0R_FOVR0_Msk) | (can->RF1R & CAN_RF1R_FOVR1_Msk)) {
             /* CAN RX bus overflow */
             status |= CO_CAN_ERRRX_OVERFLOW;
         }
@@ -355,6 +360,20 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 
 
 /******************************************************************************/
+/* TODO: Switch to error callback */
+void CO_CANerr_cb(CANDriver *canp, uint32_t flags)
+{
+    CO_CANmodule_t      *CANmodule;
+    CAN_TypeDef         *can;
+    uint16_t            status;
+
+    CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
+    can = CANmodule->cand->can;
+    status = CANmodule->CANerrorStatus;
+
+    CANmodule->CANerrorStatus = status;
+}
+
 void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
 {
     CO_CANmodule_t      *CANmodule;

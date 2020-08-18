@@ -8,7 +8,7 @@ Description=OreSat C3 Master Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:11AM
+ModificationTime=10:38AM
 ModificationDate=02-11-2020
 ModifiedBy=
 
@@ -32,7 +32,7 @@ Granularity=0
 DynamicChannelsSupported=0
 CompactPDO=0
 GroupMessaging=0
-NrOfRXPDO=16
+NrOfRXPDO=28
 NrOfTXPDO=16
 LSS_Supported=0
 ;LSS_Type=Server
@@ -125,7 +125,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=86
+SupportedObjects=110
 1=0x1002
 2=0x1003
 3=0x1005
@@ -160,58 +160,82 @@ SupportedObjects=86
 32=0x140D
 33=0x140E
 34=0x140F
-35=0x1600
-36=0x1601
-37=0x1602
-38=0x1603
-39=0x1604
-40=0x1605
-41=0x1606
-42=0x1607
-43=0x1608
-44=0x1609
-45=0x160A
-46=0x160B
-47=0x160C
-48=0x160D
-49=0x160E
-50=0x160F
-51=0x1800
-52=0x1801
-53=0x1802
-54=0x1803
-55=0x1804
-56=0x1805
-57=0x1806
-58=0x1807
-59=0x1808
-60=0x1809
-61=0x180A
-62=0x180B
-63=0x180C
-64=0x180D
-65=0x180E
-66=0x180F
-67=0x1A00
-68=0x1A01
-69=0x1A02
-70=0x1A03
-71=0x1A04
-72=0x1A05
-73=0x1A06
-74=0x1A07
-75=0x1A08
-76=0x1A09
-77=0x1A0A
-78=0x1A0B
-79=0x1A0C
-80=0x1A0D
-81=0x1A0E
-82=0x1A0F
-83=0x1F80
-84=0x1F81
-85=0x1F82
-86=0x1F89
+35=0x1410
+36=0x1411
+37=0x1412
+38=0x1413
+39=0x1414
+40=0x1415
+41=0x1416
+42=0x1417
+43=0x1418
+44=0x1419
+45=0x141A
+46=0x141B
+47=0x1600
+48=0x1601
+49=0x1602
+50=0x1603
+51=0x1604
+52=0x1605
+53=0x1606
+54=0x1607
+55=0x1608
+56=0x1609
+57=0x160A
+58=0x160B
+59=0x160C
+60=0x160D
+61=0x160E
+62=0x160F
+63=0x1610
+64=0x1611
+65=0x1612
+66=0x1613
+67=0x1614
+68=0x1615
+69=0x1616
+70=0x1617
+71=0x1618
+72=0x1619
+73=0x161A
+74=0x161B
+75=0x1800
+76=0x1801
+77=0x1802
+78=0x1803
+79=0x1804
+80=0x1805
+81=0x1806
+82=0x1807
+83=0x1808
+84=0x1809
+85=0x180A
+86=0x180B
+87=0x180C
+88=0x180D
+89=0x180E
+90=0x180F
+91=0x1A00
+92=0x1A01
+93=0x1A02
+94=0x1A03
+95=0x1A04
+96=0x1A05
+97=0x1A06
+98=0x1A07
+99=0x1A08
+100=0x1A09
+101=0x1A0A
+102=0x1A0B
+103=0x1A0C
+104=0x1A0D
+105=0x1A0E
+106=0x1A0F
+107=0x1F80
+108=0x1F81
+109=0x1F82
+110=0x1F89
 
 [1002]
 ParameterName=Manufacturer status register
@@ -519,7 +543,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub2]
@@ -528,7 +552,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub3]
@@ -546,7 +570,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub5]
@@ -555,7 +579,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub6]
@@ -564,7 +588,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1200]
@@ -663,7 +687,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x200
+DefaultValue=0x00000182
 PDOMapping=0
 
 [1400sub2]
@@ -696,7 +720,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x300
+DefaultValue=0x00000183
 PDOMapping=0
 
 [1401sub2]
@@ -729,7 +753,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x400
+DefaultValue=0x00000184
 PDOMapping=0
 
 [1402sub2]
@@ -762,7 +786,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x500
+DefaultValue=0x00000185
 PDOMapping=0
 
 [1403sub2]
@@ -795,7 +819,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000186
 PDOMapping=0
 
 [1404sub2]
@@ -828,7 +852,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000187
 PDOMapping=0
 
 [1405sub2]
@@ -861,7 +885,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000188
 PDOMapping=0
 
 [1406sub2]
@@ -894,7 +918,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000189
 PDOMapping=0
 
 [1407sub2]
@@ -927,7 +951,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x0000018a
 PDOMapping=0
 
 [1408sub2]
@@ -960,7 +984,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x0000018b
 PDOMapping=0
 
 [1409sub2]
@@ -993,7 +1017,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000193
 PDOMapping=0
 
 [140Asub2]
@@ -1026,7 +1050,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000194
 PDOMapping=0
 
 [140Bsub2]
@@ -1059,7 +1083,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000195
 PDOMapping=0
 
 [140Csub2]
@@ -1092,7 +1116,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000196
 PDOMapping=0
 
 [140Dsub2]
@@ -1125,7 +1149,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000197
 PDOMapping=0
 
 [140Esub2]
@@ -1158,10 +1182,406 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x80000000
+DefaultValue=0x00000198
 PDOMapping=0
 
 [140Fsub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1410]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1410sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1410sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000199
+PDOMapping=0
+
+[1410sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1411]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1411sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1411sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000001b1
+PDOMapping=0
+
+[1411sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1412]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1412sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1412sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000001b2
+PDOMapping=0
+
+[1412sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1413]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1413sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1413sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000001b3
+PDOMapping=0
+
+[1413sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1414]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1414sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1414sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000284
+PDOMapping=0
+
+[1414sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1415]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1415sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1415sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000285
+PDOMapping=0
+
+[1415sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1416]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1416sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1416sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000286
+PDOMapping=0
+
+[1416sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1417]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1417sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1417sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000287
+PDOMapping=0
+
+[1417sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1418]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1418sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1418sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000288
+PDOMapping=0
+
+[1418sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1419]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[1419sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1419sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000289
+PDOMapping=0
+
+[1419sub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[141A]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[141Asub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[141Asub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x0000028a
+PDOMapping=0
+
+[141Asub2]
+ParameterName=transmission type
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[141B]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x3
+
+[141Bsub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[141Bsub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x0000028b
+PDOMapping=0
+
+[141Bsub2]
 ParameterName=transmission type
 ObjectType=0x7
 ;StorageLocation=ROM
@@ -1182,7 +1602,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1600sub1]
@@ -1191,7 +1611,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40020110
 PDOMapping=0
 
 [1600sub2]
@@ -1200,7 +1620,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40020210
 PDOMapping=0
 
 [1600sub3]
@@ -1269,7 +1689,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1601sub1]
@@ -1278,7 +1698,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40030110
 PDOMapping=0
 
 [1601sub2]
@@ -1287,7 +1707,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40030210
 PDOMapping=0
 
 [1601sub3]
@@ -1356,7 +1776,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1602sub1]
@@ -1365,7 +1785,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40040110
 PDOMapping=0
 
 [1602sub2]
@@ -1374,7 +1794,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40040210
 PDOMapping=0
 
 [1602sub3]
@@ -1443,7 +1863,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1603sub1]
@@ -1452,7 +1872,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40050110
 PDOMapping=0
 
 [1603sub2]
@@ -1461,7 +1881,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40050210
 PDOMapping=0
 
 [1603sub3]
@@ -1530,7 +1950,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1604sub1]
@@ -1539,7 +1959,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40060110
 PDOMapping=0
 
 [1604sub2]
@@ -1548,7 +1968,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40060210
 PDOMapping=0
 
 [1604sub3]
@@ -1617,7 +2037,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1605sub1]
@@ -1626,7 +2046,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40070110
 PDOMapping=0
 
 [1605sub2]
@@ -1635,7 +2055,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40070210
 PDOMapping=0
 
 [1605sub3]
@@ -1704,7 +2124,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1606sub1]
@@ -1713,7 +2133,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40080110
 PDOMapping=0
 
 [1606sub2]
@@ -1722,7 +2142,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40080210
 PDOMapping=0
 
 [1606sub3]
@@ -1791,7 +2211,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1607sub1]
@@ -1800,7 +2220,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40090110
 PDOMapping=0
 
 [1607sub2]
@@ -1809,7 +2229,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40090210
 PDOMapping=0
 
 [1607sub3]
@@ -1878,7 +2298,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1608sub1]
@@ -1887,7 +2307,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x400a0110
 PDOMapping=0
 
 [1608sub2]
@@ -1896,7 +2316,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x400a0210
 PDOMapping=0
 
 [1608sub3]
@@ -1965,7 +2385,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [1609sub1]
@@ -1974,7 +2394,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x400b0110
 PDOMapping=0
 
 [1609sub2]
@@ -1983,7 +2403,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x400b0210
 PDOMapping=0
 
 [1609sub3]
@@ -2052,7 +2472,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Asub1]
@@ -2061,7 +2481,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40130110
 PDOMapping=0
 
 [160Asub2]
@@ -2070,7 +2490,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40130210
 PDOMapping=0
 
 [160Asub3]
@@ -2139,7 +2559,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Bsub1]
@@ -2148,7 +2568,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40140110
 PDOMapping=0
 
 [160Bsub2]
@@ -2157,7 +2577,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40140210
 PDOMapping=0
 
 [160Bsub3]
@@ -2226,7 +2646,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Csub1]
@@ -2235,7 +2655,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40150110
 PDOMapping=0
 
 [160Csub2]
@@ -2244,7 +2664,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40150210
 PDOMapping=0
 
 [160Csub3]
@@ -2313,7 +2733,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Dsub1]
@@ -2322,7 +2742,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40160110
 PDOMapping=0
 
 [160Dsub2]
@@ -2331,7 +2751,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40160210
 PDOMapping=0
 
 [160Dsub3]
@@ -2400,7 +2820,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Esub1]
@@ -2409,7 +2829,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40170110
 PDOMapping=0
 
 [160Esub2]
@@ -2418,7 +2838,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40170210
 PDOMapping=0
 
 [160Esub3]
@@ -2487,7 +2907,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=2
 PDOMapping=0
 
 [160Fsub1]
@@ -2496,7 +2916,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40180110
 PDOMapping=0
 
 [160Fsub2]
@@ -2505,7 +2925,7 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x40180210
 PDOMapping=0
 
 [160Fsub3]
@@ -2559,6 +2979,1050 @@ ObjectType=0x7
 ;StorageLocation=ROM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1610sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1610sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40190110
+PDOMapping=0
+
+[1610sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40190210
+PDOMapping=0
+
+[1610sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1610sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1611sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1611sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40310110
+PDOMapping=0
+
+[1611sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40310210
+PDOMapping=0
+
+[1611sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1611sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1612sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1612sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40320110
+PDOMapping=0
+
+[1612sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40320210
+PDOMapping=0
+
+[1612sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1612sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1613sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[1613sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40330110
+PDOMapping=0
+
+[1613sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40330210
+PDOMapping=0
+
+[1613sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1613sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1614]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1614sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=3
+PDOMapping=0
+
+[1614sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40040310
+PDOMapping=0
+
+[1614sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40040410
+PDOMapping=0
+
+[1614sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40040510
+PDOMapping=0
+
+[1614sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1614sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1614sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1614sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1614sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1615]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1615sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[1615sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40050310
+PDOMapping=0
+
+[1615sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40050410
+PDOMapping=0
+
+[1615sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40050510
+PDOMapping=0
+
+[1615sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1615sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1615sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1615sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1615sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1616]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1616sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[1616sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40060310
+PDOMapping=0
+
+[1616sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40060410
+PDOMapping=0
+
+[1616sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40060510
+PDOMapping=0
+
+[1616sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1616sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1616sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1616sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1616sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1617]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1617sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[1617sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40070310
+PDOMapping=0
+
+[1617sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40070410
+PDOMapping=0
+
+[1617sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40070510
+PDOMapping=0
+
+[1617sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1617sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1617sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1617sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1617sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1618]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1618sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[1618sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40080310
+PDOMapping=0
+
+[1618sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40080410
+PDOMapping=0
+
+[1618sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40080510
+PDOMapping=0
+
+[1618sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1618sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1618sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1618sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1618sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1619]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[1619sub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[1619sub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40090310
+PDOMapping=0
+
+[1619sub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40090410
+PDOMapping=0
+
+[1619sub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x40090510
+PDOMapping=0
+
+[1619sub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1619sub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1619sub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1619sub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1619sub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161A]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[161Asub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[161Asub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400a0310
+PDOMapping=0
+
+[161Asub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400a0410
+PDOMapping=0
+
+[161Asub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400a0510
+PDOMapping=0
+
+[161Asub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Asub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Asub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Asub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Asub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161B]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=ROM
+SubNumber=0x9
+
+[161Bsub0]
+ParameterName=Number of mapped objects
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[161Bsub1]
+ParameterName=mapped object 1
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400b0310
+PDOMapping=0
+
+[161Bsub2]
+ParameterName=mapped object 2
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400b0410
+PDOMapping=0
+
+[161Bsub3]
+ParameterName=mapped object 3
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x400b0510
+PDOMapping=0
+
+[161Bsub4]
+ParameterName=mapped object 4
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Bsub5]
+ParameterName=mapped object 5
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Bsub6]
+ParameterName=mapped object 6
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Bsub7]
+ParameterName=mapped object 7
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+PDOMapping=0
+
+[161Bsub8]
+ParameterName=mapped object 8
+ObjectType=0x7
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
 DefaultValue=0x00000000
 PDOMapping=0
 
@@ -7393,7 +8857,7 @@ DefaultValue=
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=11
+SupportedObjects=35
 1=0x2010
 2=0x2011
 3=0x2100
@@ -7405,6 +8869,30 @@ SupportedObjects=11
 9=0x2107
 10=0x2108
 11=0x2109
+12=0x4002
+13=0x4003
+14=0x4004
+15=0x4005
+16=0x4006
+17=0x4007
+18=0x4008
+19=0x4009
+20=0x400A
+21=0x400B
+22=0x4011
+23=0x4012
+24=0x4013
+25=0x4014
+26=0x4015
+27=0x4016
+28=0x4017
+29=0x4018
+30=0x4019
+31=0x4021
+32=0x4022
+33=0x4031
+34=0x4032
+35=0x4033
 
 [2010]
 ParameterName=SCET
@@ -7599,5 +9087,941 @@ ObjectType=0x7
 DataType=0x0003
 AccessType=ro
 DefaultValue=0
+PDOMapping=1
+
+[4002]
+ParameterName=Battery 1
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4002sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4002sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4002sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4003]
+ParameterName=Battery 2
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4003sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4003sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4003sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4004]
+ParameterName=Solar Panel 1
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4004sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=5
+PDOMapping=0
+
+[4004sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4004sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4004sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4004sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4004sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4005]
+ParameterName=Solar Panel 2
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4005sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4005sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4005sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4005sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4005sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4005sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4006]
+ParameterName=Solar Panel 3
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4006sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4006sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4006sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4006sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4006sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4006sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4007]
+ParameterName=Solar Panel 4
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4007sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4007sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4007sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4007sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4007sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4007sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4008]
+ParameterName=Solar Panel 5
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4008sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4008sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4008sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4008sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4008sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4008sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4009]
+ParameterName=Solar Panel 6
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[4009sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4009sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4009sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4009sub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4009sub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4009sub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400A]
+ParameterName=Solar Panel 7
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[400Asub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[400Asub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Asub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Asub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Asub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Asub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400B]
+ParameterName=Solar Panel 8
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x6
+
+[400Bsub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[400Bsub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Bsub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Bsub3]
+ParameterName=PV Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Bsub4]
+ParameterName=PV Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[400Bsub5]
+ParameterName=PV Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4011]
+ParameterName=Star Tracker
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x1
+
+[4011sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[4012]
+ParameterName=GPS
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x1
+
+[4012sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[4013]
+ParameterName=IMU
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4013sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4013sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4013sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4014]
+ParameterName=Magnetometer 1
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4014sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4014sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4014sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4015]
+ParameterName=Magnetometer 2
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4015sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4015sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4015sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4016]
+ParameterName=RW_MT 1
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4016sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4016sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4016sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4017]
+ParameterName=RW_MT 2
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4017sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4017sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4017sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4018]
+ParameterName=RW_MT 3
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4018sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4018sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4018sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4019]
+ParameterName=RW 4
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4019sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4019sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4019sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4021]
+ParameterName=OreSat Live
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x1
+
+[4021sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[4022]
+ParameterName=CFC
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x1
+
+[4022sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[4031]
+ParameterName=Protocard 1
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4031sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4031sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4031sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4032]
+ParameterName=Protocard 2
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4032sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4032sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4032sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4033]
+ParameterName=Protocard 3
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[4033sub0]
+ParameterName=max sub-index
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[4033sub1]
+ParameterName=MCU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
+PDOMapping=1
+
+[4033sub2]
+ParameterName=MCU Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rww
+DefaultValue=
 PDOMapping=1
 

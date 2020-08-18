@@ -1,100 +1,55 @@
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "command.h"
-#include "CO_master.h"
 #include "opd.h"
+#include "time_sync.h"
 #include "max7310.h"
 #include "mmc.h"
 #include "chprintf.h"
 #include "shell.h"
 
-#ifndef BUF_SIZE
-#define BUF_SIZE 0x10000 /* 64k */
-#endif
-
-static uint8_t data[BUF_SIZE];
+static thread_t *shell_tp;
 
 /*===========================================================================*/
-/* CAN Network Management                                                    */
+/* Support functions                                                         */
 /*===========================================================================*/
-void nmt_usage(BaseSequentialStream *chp)
+size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
 {
-    chprintf(chp, "Usage: nmt start|stop|preop|resetcomm|resetnode <NodeID>\r\n");
+    size_t written;
+
+    written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
+
+    return written;
 }
 
-void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
+/*===========================================================================*/
+/* OreSat CAN Bus                                                            */
+/*===========================================================================*/
+void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    uint8_t node_id = 0;
-    if (argc < 2) {
-        nmt_usage(chp);
-        return;
-    }
-    node_id = strtoul(argv[1], NULL, 0);
+    char cmd[CO_CONFIG_GTWA_COMM_BUF_SIZE];
+    size_t space;
+    (void)chp;
 
-    if (!strcmp(argv[0], "start")) {
-        CO_sendNMTcommand(CO, CO_NMT_ENTER_OPERATIONAL, node_id);
-    } else if (!strcmp(argv[0], "stop")) {
-        CO_sendNMTcommand(CO, CO_NMT_ENTER_STOPPED, node_id);
-    } else if (!strcmp(argv[0], "preop")) {
-        CO_sendNMTcommand(CO, CO_NMT_ENTER_PRE_OPERATIONAL, node_id);
-    } else if (!strcmp(argv[0], "resetcomm")) {
-        CO_sendNMTcommand(CO, CO_NMT_RESET_COMMUNICATION, node_id);
-    } else if (!strcmp(argv[0], "resetnode")) {
-        CO_sendNMTcommand(CO, CO_NMT_RESET_NODE, node_id);
+    if (argc < 1) {
+        strncpy(cmd, "[0] help\r\n", CO_CONFIG_GTWA_COMM_BUF_SIZE);
     } else {
-        chprintf(chp, "Invalid command: %s\r\n", argv[0]);
-        nmt_usage(chp);
-        return;
-    }
-}
-
-/*===========================================================================*/
-/* CAN SDO Master                                                            */
-/*===========================================================================*/
-void sdo_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: sdo read|write <NodeID> <index> <subindex> [blockmode]\r\n");
-}
-
-void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
-{
-    uint32_t data_len = 0;
-    uint32_t abrt_code = 0;
-    uint8_t node_id = 0;
-    uint16_t index = 0;
-    uint8_t subindex = 0;
-    bool block = false;
-
-    if (argc < 4) {
-        sdo_usage(chp);
-        return;
-    }
-
-    node_id = strtoul(argv[1], NULL, 0);
-    index = strtoul(argv[2], NULL, 0);
-    subindex = strtoul(argv[3], NULL, 0);
-    if (argc == 5)
-        block = !strcmp(argv[4], "true");
-
-    if (!strcmp(argv[0], "read")) {
-        sdo_upload(CO->SDOclient[0], node_id, index, subindex, data, sizeof(data) - 1, &data_len, &abrt_code, 1000, block);
-        data[data_len] = '\0';
-        if (abrt_code == CO_SDO_AB_NONE) {
-            chprintf(chp, "Received %u bytes of data:", data_len);
-            for (uint32_t i = 0; i < data_len; i++)
-                chprintf(chp, " %02X", data[i]);
-            chprintf(chp, "\r\n");
-        } else {
-            chprintf(chp, "Received abort code: %x\r\n", abrt_code);
+        strncpy(cmd, argv[0], CO_CONFIG_GTWA_COMM_BUF_SIZE);
+        space = CO_CONFIG_GTWA_COMM_BUF_SIZE - strlen(argv[0]);
+        for (int i = 1; i < argc; i++) {
+            strncat(cmd, " ", space);
+            strncat(cmd, argv[i], space - 1);
+            space -= strlen(argv[i]) + 1;
         }
-    } else if (!strcmp(argv[0], "write")) {
-        chprintf(chp, "Disabled for now\r\n");
-        /*sdo_download(CO->SDOclient[0], node_id, index, subindex, data, data_len, &abrt_code, 1000, block);*/
-    } else {
-        sdo_usage(chp);
-        return;
     }
+    strncat(cmd, "\r\n", space);
+
+    /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
+
+    CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
+
 }
 
 /*===========================================================================*/
@@ -102,12 +57,21 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 void opd_usage(BaseSequentialStream *chp)
 {
-    chprintf(chp, "Usage: opd enable|disable|reset|reinit|status <opd_addr>\r\n");
+    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
+                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
+                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
+                  "    sysrestart: Cycle power on OPD subsystem\r\n"
+                  "    enable:     Enable an OPD attached card\r\n"
+                  "    disable:    Disable an OPD attached card\r\n"
+                  "    reset:      Reset the circuit breaker of a card\r\n"
+                  "    probe:      Probe an address to see if a card responds\r\n"
+                  "    status:     Report the status of a card\r\n"
+                  "    boot:       Attempt to bootstrap a card\r\n");
 }
 
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    static opd_addr_t opd_addr = 0;
+    static uint8_t opd_addr = 0;
     opd_status_t status = {0};
 
     if (argc < 1) {
@@ -116,44 +80,137 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (argc > 1) {
         opd_addr = strtoul(argv[1], NULL, 0);
         chprintf(chp, "Setting persistent board address to 0x%02X\r\n", opd_addr);
-    } else if (opd_addr == 0) {
-        chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
-        opd_usage(chp);
-        return;
     }
 
-    if (!strcmp(argv[0], "enable")) {
-        chprintf(chp, "Enabling board 0x%02X\r\n", opd_addr);
-        opd_enable(opd_addr);
-    } else if (!strcmp(argv[0], "disable")) {
-        chprintf(chp, "Disabling board 0x%02X\r\n", opd_addr);
-        opd_disable(opd_addr);
-    } else if (!strcmp(argv[0], "reset")) {
-        chprintf(chp, "Resetting board 0x%02X\r\n", opd_addr);
-        opd_reset(opd_addr);
-    } else if (!strcmp(argv[0], "reinit")) {
-        chprintf(chp, "Reinitializing OPD\r\n", opd_addr);
-        opd_stop();
-        opd_init();
+    if (!strcmp(argv[0], "sysenable")) {
+        chprintf(chp, "Enabling OPD subsystem\r\n");
         opd_start();
-    } else if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "Status of board 0x%02X: ", opd_addr);
-        if (!opd_status(opd_addr, &status)) {
-            chprintf(chp, "CONNECTED\r\n");
-            chprintf(chp, "State: %s-%s\r\n",
-                    (status.odr & MAX7310_PIN_MASK(OPD_LED) ? "ENABLED" : "DISABLED"),
-                    (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
-            chprintf(chp, "Raw register values:\r\n");
-            chprintf(chp, "Input:       %02X\r\n", status.input);
-            chprintf(chp, "Output:      %02X\r\n", status.odr);
-            chprintf(chp, "Polarity:    %02X\r\n", status.pol);
-            chprintf(chp, "Mode:        %02X\r\n", status.mode);
-            chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
-        } else {
-            chprintf(chp, "NOT CONNECTED\r\n");
-        }
+    } else if (!strcmp(argv[0], "sysdisable")) {
+        chprintf(chp, "Disabling OPD subsystem\r\n");
+        opd_stop();
+    } else if (!strcmp(argv[0], "sysrestart")) {
+        chprintf(chp, "Restarting OPD subsystem\r\n");
+        opd_stop();
+        opd_start();
     } else {
-        opd_usage(chp);
+        if (opd_addr == 0) {
+            chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
+            opd_usage(chp);
+            return;
+        }
+        if (!strcmp(argv[0], "enable")) {
+            chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
+            if (!opd_enable(opd_addr)) {
+                chprintf(chp, "ENABLED\r\n");
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "disable")) {
+            chprintf(chp, "Disabling board 0x%02X: ", opd_addr);
+            if (!opd_disable(opd_addr)) {
+                chprintf(chp, "DISABLED\r\n");
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "reset")) {
+            chprintf(chp, "Resetting board 0x%02X: ", opd_addr);
+            if (!opd_reset(opd_addr)) {
+                chprintf(chp, "RESET\r\n");
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "probe")) {
+            chprintf(chp, "Probing board 0x%02X: ", opd_addr);
+            if (opd_probe(opd_addr)) {
+                chprintf(chp, "CONNECTED\r\n");
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "status")) {
+            chprintf(chp, "Status of board 0x%02X: ", opd_addr);
+            if (!opd_status(opd_addr, &status)) {
+                chprintf(chp, "CONNECTED\r\n");
+                chprintf(chp, "State: %s-%s\r\n",
+                        (status.odr & MAX7310_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
+                        (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
+                chprintf(chp, "Raw register values:\r\n");
+                chprintf(chp, "Input:       %02X\r\n", status.input);
+                chprintf(chp, "Output:      %02X\r\n", status.odr);
+                chprintf(chp, "Polarity:    %02X\r\n", status.pol);
+                chprintf(chp, "Mode:        %02X\r\n", status.mode);
+                chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
+            } else {
+                chprintf(chp, "NOT CONNECTED\r\n");
+            }
+        } else if (!strcmp(argv[0], "boot")) {
+            int retval = opd_boot(opd_addr);
+            chprintf(chp, "Boot returned 0x%02X\r\n", retval);
+        } else {
+            opd_usage(chp);
+            return;
+        }
+    }
+}
+
+/*===========================================================================*/
+/* Time                                                                      */
+/*===========================================================================*/
+void time_usage(BaseSequentialStream *chp)
+{
+    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
+}
+
+void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    RTCDateTime timespec;
+    time_t unix_time;
+    uint32_t msec;
+    time_scet_t scet;
+    time_utc_t utc;
+    if (argc < 1) {
+        time_usage(chp);
+        return;
+    }
+    if (!strcmp(argv[0], "unix")) {
+        if (!strcmp(argv[1], "get")) {
+            unix_time = get_time_unix(&msec);
+            chprintf(chp, "UNIX Time: %s\r\n", ctime(&unix_time));
+        } else if (!strcmp(argv[1], "set") && argc > 2) {
+            set_time_unix(strtoul(argv[2], NULL, 0), 0);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "scet")) {
+        if (!strcmp(argv[1], "get")) {
+            get_time_scet(&scet);
+            chprintf(chp, "SCET Time: %u.%u\r\n", scet.coarse, scet.fine);
+        } else if (!strcmp(argv[1], "set") && argc > 3) {
+            scet.coarse = strtoul(argv[2], NULL, 0);
+            scet.fine = strtoul(argv[3], NULL, 0);
+            set_time_scet(&scet);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "utc")) {
+        if (!strcmp(argv[1], "get")) {
+            get_time_utc(&utc);
+            chprintf(chp, "UTC Time: Day: %u ms: %u us: %u\r\n", utc.day, utc.ms, utc.us);
+        } else if (!strcmp(argv[1], "set") && argc > 4) {
+            utc.day = strtoul(argv[2], NULL, 0);
+            utc.ms = strtoul(argv[3], NULL, 0);
+            utc.us = strtoul(argv[4], NULL, 0);
+            set_time_utc(&utc);
+        } else {
+            time_usage(chp);
+            return;
+        }
+    } else if (!strcmp(argv[0], "raw")) {
+        rtcGetTime(&RTCD1, &timespec);
+        chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
+    } else {
+        time_usage(chp);
         return;
     }
 }
@@ -162,10 +219,10 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
-    {"nmt", cmd_nmt},
-    {"sdo", cmd_sdo},
+    {"can", cmd_can},
     {"opd", cmd_opd},
-    {"sdc", cmd_sdc},
+    {"mmc", cmd_mmc},
+    {"time", cmd_time},
     {NULL, NULL}
 };
 
@@ -178,14 +235,18 @@ static const ShellConfig shell_cfg = {
     sizeof(histbuf),
 };
 
-THD_WORKING_AREA(shell_wa, 0x200);
+THD_WORKING_AREA(shell_wa, 0x1000);
 THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
 
+    /* Initialize ASCII Gateway callback to print returned text */
+    CO_GTWA_initRead(CO->gtwa, gtwa_read_cb, shell_cfg.sc_channel);
+
+    /* Start a shell */
     while (!chThdShouldTerminateX()) {
-        thread_t *shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);
+        shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);
         chThdWait(shell_tp);
         chThdSleepMilliseconds(500);
     }
