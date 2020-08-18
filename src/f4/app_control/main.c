@@ -49,13 +49,6 @@ static const oresat_node_t nodes[] = {
  * Working area for driver.
  */
 
-/*
- * SDIO configuration.
- */
-static const SDCConfig sdccfg = {
-  SDC_MODE_4BIT
-};
-
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -73,15 +66,11 @@ static void app_init(void)
 
     /* Initialize OPD */
     opd_init();
-    opd_start();
+    /*opd_start();*/
 
     /* Initialize shell and start serial interface */
     shellInit();
-    sdStart(&SD2, NULL);
-
-    /* Initializes MMC SDC interface */
-    palClearLine(LINE_MMC_PWR);
-    sdcStart(&SDCD1, &sdccfg);
+    sdStart(&SD3, NULL);
 
     /* Start up the shell */
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
