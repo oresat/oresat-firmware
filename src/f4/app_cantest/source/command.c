@@ -3,10 +3,7 @@
 #include <inttypes.h>
 
 #include "command.h"
-#include "opd.h"
 #include "time_sync.h"
-#include "max7310.h"
-#include "mmc.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -20,6 +17,8 @@ size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
     size_t written;
 
     written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
+
+    chEvtSignal(shell_tp, (eventmask_t)1);
 
     return written;
 }
@@ -49,109 +48,9 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
 
     CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
+    chEvtWaitAny((eventmask_t)1);
 
 }
-
-/*===========================================================================*/
-/* OreSat Power Domain Control                                               */
-/*===========================================================================*/
-void opd_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
-                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
-                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
-                  "    sysrestart: Cycle power on OPD subsystem\r\n"
-                  "    enable:     Enable an OPD attached card\r\n"
-                  "    disable:    Disable an OPD attached card\r\n"
-                  "    reset:      Reset the circuit breaker of a card\r\n"
-                  "    probe:      Probe an address to see if a card responds\r\n"
-                  "    status:     Report the status of a card\r\n"
-                  "    boot:       Attempt to bootstrap a card\r\n");
-}
-
-void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
-{
-    static uint8_t opd_addr = 0;
-    opd_status_t status = {0};
-
-    if (argc < 1) {
-        opd_usage(chp);
-        return;
-    } else if (argc > 1) {
-        opd_addr = strtoul(argv[1], NULL, 0);
-        chprintf(chp, "Setting persistent board address to 0x%02X\r\n", opd_addr);
-    }
-
-    if (!strcmp(argv[0], "sysenable")) {
-        chprintf(chp, "Enabling OPD subsystem\r\n");
-        opd_start();
-    } else if (!strcmp(argv[0], "sysdisable")) {
-        chprintf(chp, "Disabling OPD subsystem\r\n");
-        opd_stop();
-    } else if (!strcmp(argv[0], "sysrestart")) {
-        chprintf(chp, "Restarting OPD subsystem\r\n");
-        opd_stop();
-        opd_start();
-    } else {
-        if (opd_addr == 0) {
-            chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
-            opd_usage(chp);
-            return;
-        }
-        if (!strcmp(argv[0], "enable")) {
-            chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
-            if (!opd_enable(opd_addr)) {
-                chprintf(chp, "ENABLED\r\n");
-            } else {
-                chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "disable")) {
-            chprintf(chp, "Disabling board 0x%02X: ", opd_addr);
-            if (!opd_disable(opd_addr)) {
-                chprintf(chp, "DISABLED\r\n");
-            } else {
-                chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "reset")) {
-            chprintf(chp, "Resetting board 0x%02X: ", opd_addr);
-            if (!opd_reset(opd_addr)) {
-                chprintf(chp, "RESET\r\n");
-            } else {
-                chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "probe")) {
-            chprintf(chp, "Probing board 0x%02X: ", opd_addr);
-            if (opd_probe(opd_addr)) {
-                chprintf(chp, "CONNECTED\r\n");
-            } else {
-                chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "status")) {
-            chprintf(chp, "Status of board 0x%02X: ", opd_addr);
-            if (!opd_status(opd_addr, &status)) {
-                chprintf(chp, "CONNECTED\r\n");
-                chprintf(chp, "State: %s-%s\r\n",
-                        (status.odr & MAX7310_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
-                        (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
-                chprintf(chp, "Raw register values:\r\n");
-                chprintf(chp, "Input:       %02X\r\n", status.input);
-                chprintf(chp, "Output:      %02X\r\n", status.odr);
-                chprintf(chp, "Polarity:    %02X\r\n", status.pol);
-                chprintf(chp, "Mode:        %02X\r\n", status.mode);
-                chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
-            } else {
-                chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "boot")) {
-            int retval = opd_boot(opd_addr);
-            chprintf(chp, "Boot returned 0x%02X\r\n", retval);
-        } else {
-            opd_usage(chp);
-            return;
-        }
-    }
-}
-
 /*===========================================================================*/
 /* Time                                                                      */
 /*===========================================================================*/
@@ -220,8 +119,6 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 /*===========================================================================*/
 static const ShellCommand commands[] = {
     {"can", cmd_can},
-    {"opd", cmd_opd},
-    {"mmc", cmd_mmc},
     {"time", cmd_time},
     {NULL, NULL}
 };

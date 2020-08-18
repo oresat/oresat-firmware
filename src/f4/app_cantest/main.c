@@ -21,10 +21,8 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "wdt.h"
-#include "opd.h"
-#include "time_sync.h"
 #include "command.h"
+#include "time_sync.h"
 
 /*
 static const oresat_node_t nodes[] = {
@@ -45,18 +43,6 @@ static const oresat_node_t nodes[] = {
 };
 */
 
-/*
- * Working area for driver.
- */
-
-/*
- * SDIO configuration.
- */
-static const SDCConfig sdccfg = {
-  SDC_MODE_4BIT
-};
-
-
 static oresat_config_t oresat_conf = {
     &CAND1,
     0x01,
@@ -68,20 +54,9 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* App initialization */
-    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
-
-    /* Initialize OPD */
-    opd_init();
-    opd_start();
-
     /* Initialize shell and start serial interface */
     shellInit();
     sdStart(&SD2, NULL);
-
-    /* Initializes MMC SDC interface */
-    palClearLine(LINE_MMC_PWR);
-    sdcStart(&SDCD1, &sdccfg);
 
     /* Start up the shell */
     chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);

@@ -755,7 +755,7 @@
  * @brief   Enables the use of the WFI instruction in the idle thread loop.
  */
 #if !defined(CORTEX_ENABLE_WFI_IDLE)
-#define CORTEX_ENABLE_WFI_IDLE              FALSE
+#define CORTEX_ENABLE_WFI_IDLE              TRUE
 #endif
 
 #endif  /* CHCONF_H */

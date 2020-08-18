@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef TIME_SYNC_H
+#define TIME_SYNC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,10 +10,15 @@ extern "C" {
 #include "hal.h"
 #include "CANopen.h"
 
-#define TIME_UNIX_EPOCH     1970U   /* UNIX Time Epoch */
-#define TIME_TAI_EPOCH      1958U   /* CCSDS Level 1 Time Code Epoch (TAI) */
-#define TIME_CUC_PREAMBLE   0x1E    /* CCSDS Unsegmented Time Code (CUC) Preamble */
-#define TIME_CDS_PREAMBLE   0x41    /* CCSDS Day Segmented Time Code (CDS) Preamble */
+/* Preamble definitions
+ * While Level 1 Time Codes are generally preferred by CCSDS, we are using
+ * Level 2 Time Codes (meaning Agency Defined). In this case we are using
+ * the UNIX Epoch of Jan 1, 1970.
+ * Refer to CCSDS 301.0-B-4 for Time Code Formats.
+ * TODO: Verify that the bit order is correct for preambles
+ */
+#define TIME_CUC_PREAMBLE   0x2E    /* CCSDS Unsegmented Time Code (CUC) Preamble */
+#define TIME_CDS_PREAMBLE   0x49    /* CCSDS Day Segmented Time Code (CDS) Preamble */
 
 /* CCSDS Unsegmented Time Code (CUC) data type */
 typedef union {
@@ -47,4 +52,4 @@ CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg);
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
-#endif
+#endif /*TIME_SYNC_H*/

@@ -25,4 +25,4 @@ void stop_workers(void);
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
-#endif
+#endif /*_WORKER_H_*/
