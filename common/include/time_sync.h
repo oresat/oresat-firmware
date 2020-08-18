@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include <time.h>
 #include "ch.h"
 #include "hal.h"
 #include "CANopen.h"

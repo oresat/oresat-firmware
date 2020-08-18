@@ -107,7 +107,6 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/max580x.mk
 include $(PROJ_SRC)/ina226.mk
 
 # Licensing files.
