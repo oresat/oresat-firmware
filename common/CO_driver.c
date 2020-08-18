@@ -31,6 +31,9 @@
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
+MUTEX_DECL(emcy_mutex);
+MUTEX_DECL(od_mutex);
+
 /* Interrupt callback prototypes*/
 void CO_CANrx_cb(CANDriver *canp, uint32_t flags);
 void CO_CANtx_cb(CANDriver *canp, uint32_t flags);

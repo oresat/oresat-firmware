@@ -244,18 +244,19 @@ typedef struct {
 } CO_CANmodule_t;
 
 
-/* TODO: Implement a means of locking data without locking the entire system */
 /* (un)lock critical section in CO_CANsend() */
-#define CO_LOCK_CAN_SEND()      chSysLock()     /* Lock critical section in CO_CANsend() */
-#define CO_UNLOCK_CAN_SEND()    chSysUnlock()   /* Unlock critical section in CO_CANsend() */
+#define CO_LOCK_CAN_SEND()      chSysLock()             /* Lock critical section in CO_CANsend() */
+#define CO_UNLOCK_CAN_SEND()    chSysUnlock()           /* Unlock critical section in CO_CANsend() */
 
 /* (un)lock critical section in CO_errorReport() or CO_errorReset() */
-#define CO_LOCK_EMCY()          chSysLock()     /* Lock critical section in CO_errorReport() or CO_errorReset() */
-#define CO_UNLOCK_EMCY()        chSysUnlock()   /* Unlock critical section in CO_errorReport() or CO_errorReset() */
+extern mutex_t emcy_mutex;
+#define CO_LOCK_EMCY()          chMtxLock(&emcy_mutex)  /* Lock critical section in CO_errorReport() or CO_errorReset() */
+#define CO_UNLOCK_EMCY()        chMtxUnlock(&emcy_mutex)/* Unlock critical section in CO_errorReport() or CO_errorReset() */
 
 /* (un)lock critical section when accessing Object Dictionary */
-#define CO_LOCK_OD()            chSysLock()     /* Lock critical section when accessing Object Dictionary */
-#define CO_UNLOCK_OD()          chSysUnlock()   /* Unock critical section when accessing Object Dictionary */
+extern mutex_t od_mutex;
+#define CO_LOCK_OD()            chMtxLock(&od_mutex)    /* Lock critical section when accessing Object Dictionary */
+#define CO_UNLOCK_OD()          chMtxUnlock(&od_mutex)  /* Unock critical section when accessing Object Dictionary */
 
 /* Synchronization between CAN receive and message processing threads. */
 #define CO_MemoryBarrier()
