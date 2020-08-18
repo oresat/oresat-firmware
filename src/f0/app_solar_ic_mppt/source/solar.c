@@ -9,6 +9,11 @@
 #define STEP_SIZE   0.01
 #define DAC_VDDA_MV 3300 /* 3.3 mV */
 
+/* Need for algorithm 2 */
+#define CNT_FOR_AVG 4        /* Number of samples to be averaged */
+#define THRESHOLD_CURR  0.7  /* Threshold set as 70% of allowed current */
+#define PCT_MAX_CURR    0.8  /* Percentage of max current */
+
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
     STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
@@ -69,7 +74,7 @@ void dacPutMillivolts(DACDriver *dacp, dacchannel_t chan, uint32_t mv) {
  */    
 uint32_t calc_iadj(uint32_t i_out)
 {
-    return ((5052000 - i_out * RSENSE) / 3200);
+    return ((5052000 - i_out * RSENSE * 100000) / 3200);
 }
 
 /**
@@ -90,16 +95,14 @@ int32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr)
     static uint16_t prev_pwr = 0;
     /* programmed max current from previous iteration*/
     /* TODO: Update algorithm to use it to save from high to low illumination*/
-    static uint16_t i_in;
+    static int32_t i_in;
     
+    /* Simple IC MPPT Algorithm */
+    /* This should be run first to check step size and confirm other DAC and other working */
     int16_t delta_v = volt - prev_volt;
     int16_t delta_i = curr - prev_curr;
     int16_t delta_p = pwr  - prev_pwr;
-    prev_volt = volt;
-    prev_curr = curr;
-    prev_pwr  = pwr;
-
-    /* Start IC MPPT Algorithm */
+    
     if (delta_i == 0) {
         if (delta_i != 0) {
             if (delta_v > 0) {
@@ -116,9 +119,80 @@ int32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr)
                 i_in -= STEP_SIZE;
             }
         }
-    }
+    } 
+       
+    prev_volt = volt;
+    prev_curr = curr;
+    prev_pwr  = pwr;
     /* End IC MPPT Algorithm */
-
+    
+ 
+    /* Hybrid IC MPPT Algorithm */
+    /* Better noise handling and should work with changing illumination without reset*/
+    /* This should be run after previous algorithm runs successfully */
+    //static uint16_t count, sum_volt, sum_curr, sum_pwr;
+    //uint16_t avg_volt, avg_curr, avg_pwr, delta_v, delta_i, delta_p;
+    //
+    // /* We have lower current than allowed means lower illumination and chances of brownout */
+    //if (curr < THRESHOLD_CURR * i_in){
+    //  i_in = PCT_MAX_CURR*curr;
+    //  count = 0;
+    //  sum_volt = 0;
+    //  sum_curr = 0;
+    //  sum_pwr  = 0;   
+    //}  
+    //
+    //if ( count < CNT_FOR_AVG) {
+    //  count++;
+    //  sum_volt += volt;
+    //  sum_curr += curr;
+    //  sum_pwr  += pwr ;
+    //} else {
+    //  count = 0;
+    //  avg_volt = sum_volt/CNT_FOR_AVG;
+    //  avg_curr = sum_curr/CNT_FOR_AVG;
+    //  avg_pwr  = sum_pwr /CNT_FOR_AVG;
+    //  sum_volt = 0;
+    //  sum_curr = 0;
+    //  sum_pwr  = 0;
+    //  delta_v = avg_volt - prev_volt;
+    //  delta_i = avg_curr - prev_curr;
+    //  delta_p = avg_pwr  - prev_pwr; 
+    //       
+    //  if (delta_i == 0) {
+    //    if (delta_i != 0) {
+    //        if (delta_v > 0) {
+    //            i_in += STEP_SIZE;
+    //        } else {
+    //            i_in -= STEP_SIZE;
+    //        }
+    //    }
+    //  } else {
+    //    if (delta_p/delta_i != 0) {
+    //        if (delta_p/delta_i > 0) {
+    //            i_in += 4*STEP_SIZE;
+    //        } else {
+    //            i_in -= STEP_SIZE/2;
+    //        }
+    //    }
+    //  }
+    //}   
+    //
+    //prev_volt = avg_volt;
+    //prev_curr = avg_curr;
+    //prev_pwr  = avg_pwr; 
+    /* End Hybrid IC MPPT Algorithm */   
+    
+    
+    
+    
+    /* bounds checks for current */
+    if (i_in < 0) {
+      i_in = 0;
+    }
+    if (i_in > 0.5) {
+      i_in = 0.5;
+    } 
     return i_in;
 }
 
