@@ -20,8 +20,8 @@
                             MAX7310_PIN_ODR_LOW(OPD_BOOT0)          |   \
                             MAX7310_PIN_ODR_LOW(OPD_PIN6)           |   \
                             MAX7310_PIN_ODR_LOW(OPD_PIN7))
-#define OPD_POL_VAL        (MAX7310_PIN_POL_INV(OPD_SCL)            |   \
-                            MAX7310_PIN_POL_INV(OPD_SDA)            |   \
+#define OPD_POL_VAL        (MAX7310_PIN_POL_STD(OPD_SCL)            |   \
+                            MAX7310_PIN_POL_STD(OPD_SDA)            |   \
                             MAX7310_PIN_POL_INV(OPD_FAULT)          |   \
                             MAX7310_PIN_POL_STD(OPD_EN)             |   \
                             MAX7310_PIN_POL_STD(OPD_CB_RESET)       |   \
@@ -48,11 +48,11 @@ typedef struct {
 void opd_init(void);
 void opd_start(void);
 void opd_stop(void);
-bool opd_probe(uint8_t addr);
-int opd_enable(uint8_t addr);
-int opd_disable(uint8_t addr);
-int opd_reset(uint8_t addr);
-int opd_status(uint8_t addr, opd_status_t *status);
+bool opd_probe(i2caddr_t addr);
+int opd_enable(i2caddr_t addr);
+int opd_disable(i2caddr_t addr);
+int opd_reset(i2caddr_t addr);
+int opd_status(i2caddr_t addr, opd_status_t *status);
 
-int opd_boot(uint8_t addr);
+int opd_boot(i2caddr_t addr);
 #endif
