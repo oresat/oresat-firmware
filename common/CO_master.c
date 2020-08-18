@@ -1,65 +1,68 @@
-#include "ch.h"
+#include "oresat.h"
+#include "CANopen.h"
 #include "CO_master.h"
 
-int sdo_upload(
-        CO_SDOclient_t *SDOclient,
-        uint8_t         node_id,
-        uint16_t        index,
-        uint8_t         subindex,
-        void           *data,
-        uint32_t        max_len,
-        uint32_t       *ret_len,
-        uint32_t       *abrt_code,
-        uint16_t        timeout,
-        bool            block)
+typedef enum {
+    SDOCLI_ST_IDLE,
+    SDOCLI_ST_DOWNLOAD,
+    SDOCLI_ST_UPLOAD
+} sdocli_state_t;
+
+typedef struct {
+    thread_t           *tp;
+    CO_SDOclient_t     *sdo_c;
+    sdocli_state_t      state;
+} sdocli_t;
+
+SEMAPHORE_DECL(sdocli_sem, CO_NO_SDO_CLIENT);
+sdocli_t sdo_client[CO_NO_SDO_CLIENT];
+
+/* CANopen SDO client thread */
+THD_FUNCTION(sdo_client_thd, arg)
 {
-        CO_SDOclient_return_t ret;
-        systime_t prev_time, cur_time, diff_time;
+    sdocli_t *sdocli = arg;
+    systime_t prev_time;
 
-        if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
-            return 1;
-        if (CO_SDOclientUploadInitiate(SDOclient, index, subindex, data, max_len, timeout, block, NULL) != CO_SDOcli_ok_communicationEnd)
-            return 1;
+    /* Register the callback function to wake up thread when message received */
+    CO_SDOclient_initCallbackPre(sdocli->sdo_c, chThdGetSelfX(), process_cb);
 
-        prev_time = chVTGetSystemTimeX();
-        do {
-            diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
-            prev_time = cur_time;
-            ret = CO_SDOclientUpload(SDOclient, chTimeI2MS(diff_time), ret_len, abrt_code, NULL);
-            chThdSleepMilliseconds(10);
-        } while (ret > 0);
-        CO_SDOclientClose(SDOclient);
+    prev_time = chVTGetSystemTime();
+    while (!chThdShouldTerminateX()) {
+        uint32_t timeout = ((typeof(timeout))-1);
+        CO_SDO_return_t ret;
+        CO_SDO_abortCode_t abort_code;
+        size_t size_transferred, size_indicated;
+        bool_t abort = false;
 
-        return 0;
+        if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
+            ret = CO_SDOclientDownload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                    abort, &abort_code, &size_transferred, &timeout);
+        } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
+            ret = CO_SDOclientUpload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                    &abort_code, &size_transferred, &size_indicated, &timeout);
+        } else {
+            break;
+        }
+
+        prev_time = chVTGetSystemTime();
+        chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
+    }
+    CO_SDOclient_initCallbackPre(sdocli->sdo_c, NULL, NULL);
+    chThdExit(MSG_OK);
 }
 
-int sdo_download(
-        CO_SDOclient_t *SDOclient,
-        uint8_t         node_id,
-        uint16_t        index,
-        uint8_t         subindex,
-        void           *data,
-        uint32_t        len,
-        uint32_t       *abrt_code,
-        uint16_t        timeout,
-        bool            block)
+thread_t *sdo_transfer(void)
 {
-    CO_SDOclient_return_t ret;
-    systime_t prev_time, cur_time, diff_time;
+    int i;
 
-    if (CO_SDOclient_setup(SDOclient, 0, 0, node_id) != CO_SDOcli_ok_communicationEnd)
-        return 1;
-    if (CO_SDOclientDownloadInitiate(SDOclient, index, subindex, data, len, timeout, block, NULL) != CO_SDOcli_ok_communicationEnd)
-        return 1;
+    chSysLock();
+    if (chSemWaitS(&sdocli_sem) != MSG_OK) {
+        return NULL;
+    }
+    i = chSemGetCounterI(&sdocli_sem);
+    chSysUnlock();
 
-    prev_time = chVTGetSystemTimeX();
-    do {
-        diff_time = chTimeDiffX(prev_time, cur_time = chVTGetSystemTimeX());
-        prev_time = cur_time;
-        ret = CO_SDOclientDownload(SDOclient, chTimeI2US(diff_time), abrt_code, NULL);
-        chThdSleepMilliseconds(5);
-    } while (ret > 0);
-    CO_SDOclientClose(SDOclient);
+    sdo_client[i].tp = chThdCreateFromHeap(NULL, 0x1000, "SDO Client", HIGHPRIO-1, sdo_client_thd, &sdo_client[i]);
 
-    return 0;
+    return sdo_client[i].tp;
 }
