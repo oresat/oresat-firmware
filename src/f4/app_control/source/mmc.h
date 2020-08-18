@@ -8,7 +8,7 @@ extern "C" {
 #include "ch.h"
 #include "hal.h"
 
-void cmd_sdc(BaseSequentialStream *chp, int argc, char *argv[]);
+void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]);
 
 #ifdef __cplusplus
 }

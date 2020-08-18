@@ -271,6 +271,9 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config);
 void max7310Stop(MAX7310Driver *devp);
 uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg);
 void max7310WriteRaw(MAX7310Driver *devp, uint8_t reg, uint8_t value);
+void max7310SetPin(MAX7310Driver *devp, uint8_t pin);
+void max7310ClearPin(MAX7310Driver *devp, uint8_t pin);
+void max7310TogglePin(MAX7310Driver *devp, uint8_t pin);
 #ifdef __cplusplus
 }
 #endif

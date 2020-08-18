@@ -133,7 +133,7 @@
 #define GPIOB_PIN13                 13U
 #define GPIOB_ARD_D13               13U
 #define GPIOB_SPI2_SCK              13U
-#define GPIOB_LED_GREEN             13U
+#define GPIOB_LED                   13U
 #define GPIOB_PIN14                 14U
 #define GPIOB_ARD_D12               14U
 #define GPIOB_SPI2_MISO             14U
@@ -286,7 +286,7 @@
 #define LINE_ARD_D15                PAL_LINE(GPIOB, 8U)
 #define LINE_ARD_D6                 PAL_LINE(GPIOB, 10U)
 #define LINE_ARD_D13                PAL_LINE(GPIOB, 13U)
-#define LINE_LED_GREEN              PAL_LINE(GPIOB, 13U)
+#define LINE_LED                    PAL_LINE(GPIOB, 13U)
 #define LINE_ARD_D12                PAL_LINE(GPIOB, 14U)
 #define LINE_ARD_D11                PAL_LINE(GPIOB, 15U)
 #define LINE_ARD_A5                 PAL_LINE(GPIOC, 0U)
@@ -511,7 +511,7 @@
  * PB10 - PIN10                     (analog).
  * PB11 - PIN11                     (analog).
  * PB12 - PIN12                     (analog).
- * PB13 - PIN13 LED_GREEN           (output pushpull maximum).
+ * PB13 - PIN13 LED                 (output pushpull maximum).
  * PB14 - PIN14                     (analog).
  * PB15 - PIN15                     (analog).
  */

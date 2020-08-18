@@ -88,7 +88,7 @@
 #define GPIOB_TIM1_CH3N             1U
 #define GPIOB_PIN2                  2U
 #define GPIOB_ARD_D13               3U
-#define GPIOB_LED_GREEN             3U
+#define GPIOB_LED                   3U
 #define GPIOB_ARD_D12               4U
 #define GPIOB_SPI1_MISO             4U
 #define GPIOB_ARD_D11               5U
@@ -199,7 +199,7 @@
 #define LINE_ARD_D3                 PAL_LINE(GPIOB, 0U)
 #define LINE_ARD_D6                 PAL_LINE(GPIOB, 1U)
 #define LINE_ARD_D13                PAL_LINE(GPIOB, 3U)
-#define LINE_LED_GREEN              PAL_LINE(GPIOB, 3U)
+#define LINE_LED                    PAL_LINE(GPIOB, 3U)
 #define LINE_ARD_D12                PAL_LINE(GPIOB, 4U)
 #define LINE_ARD_D11                PAL_LINE(GPIOB, 5U)
 #define LINE_ARD_D5                 PAL_LINE(GPIOB, 6U)
@@ -370,7 +370,7 @@
  * PB0  - TIM1_CH2N                 (alternate 2).
  * PB1  - TIM1_CH3N                 (alternate 2).
  * PB2  - PIN2                      (input pullup).
- * PB3  - ARD_D13 LED_GREEN         (output pushpull maximum).
+ * PB3  - ARD_D13 LED               (output pushpull maximum).
  * PB4  - SPI1_MISO                 (alternate 0).
  * PB5  - SPI1_MOSI                 (alternate 0).
  * PB6  - I2C1_SCL                  (alternate 1)

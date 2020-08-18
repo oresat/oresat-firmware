@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = no
+  USE_FPU = hard
 endif
 
 # FPU-related options.
@@ -87,7 +87,7 @@ PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ORESAT_C3_V1
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -108,6 +108,8 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/opd.mk
+include $(PROJ_SRC)/time_sync.mk
+include $(PROJ_SRC)/CO_master.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -137,11 +139,13 @@ LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
+       $(CHIBIOS)/os/various/syscalls.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC = $(ALLCPPSRC)
+CPPSRC = $(ALLCPPSRC) \
+         $(CHIBIOS)/os/various/cpp_wrappers/syscalls_cpp.cpp
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)

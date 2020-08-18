@@ -69,7 +69,7 @@
 #define GPIOA_USART2_TX             2U
 #define GPIOA_USART2_RX             3U
 #define GPIOA_ARD_A2                4U
-#define GPIOA_LED_GREEN             5U
+#define GPIOA_LED                   5U
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
 #define GPIOA_SPI1_MOSI             7U
@@ -224,7 +224,7 @@
 #define LINE_AX1_IRQ                PAL_LINE(GPIOA, 0U)
 #define LINE_AX2_IRQ                PAL_LINE(GPIOA, 1U)
 #define LINE_ARD_A2                 PAL_LINE(GPIOA, 4U)
-#define LINE_LED_GREEN              PAL_LINE(GPIOA, 5U)
+#define LINE_LED                    PAL_LINE(GPIOA, 5U)
 #define LINE_AX1_CS                 PAL_LINE(GPIOA, 8U)
 #define LINE_AX2_CS                 PAL_LINE(GPIOA, 9U)
 #define LINE_ARD_D2                 PAL_LINE(GPIOA, 10U)

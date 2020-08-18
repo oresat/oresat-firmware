@@ -21,6 +21,13 @@
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
+typedef union {
+    struct __attribute__((packed)) {
+        uint8_t reg;
+        uint8_t data;
+    };
+    uint8_t buf[2];
+} i2cbuf_t;
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -41,9 +48,8 @@
  */
 msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
         uint8_t* rxbuf, size_t n) {
-
     return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+            TIME_MS2I(10));
 }
 
 /**
@@ -52,17 +58,16 @@ msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  *
  * @param[in] i2cp       pointer to the I2C interface
  * @param[in] sad        slave address without R bit
- * @param[in] txbuf      buffer containing sub-address value in first position
- *                       and values to write
- * @param[in] n          size of txbuf less one (not considering the first
- *                       element)
+ * @param[in] txbuf      buffer containing command in first byte and high
+ *                       and low data bytes
+ * @param[in] n          size of txbuf
  * @return               the operation status.
  * @notapi
  */
 msg_t max7310I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n + 1, NULL, 0,
-            TIME_INFINITE);
+    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
+            TIME_MS2I(10));
 }
 #endif /* MAX7310_USE_I2C */
 
@@ -102,7 +107,7 @@ void max7310ObjectInit(MAX7310Driver *devp) {
  * @api
  */
 void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
-    uint8_t cr[2];
+    i2cbuf_t buf;
     osalDbgCheck((devp != NULL) && (config != NULL));
 
     osalDbgAssert((devp->state == MAX7310_STOP) ||
@@ -118,22 +123,22 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
 #endif /* MAX7310_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    cr[0] = MAX7310_AD_ODR;
-    cr[1] = config->odr;
+    buf.reg = MAX7310_AD_ODR;
+    buf.data = config->odr;
     max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
-    cr[0] = MAX7310_AD_POL;
-    cr[1] = config->pol;
+            buf.buf, sizeof(buf));
+    buf.reg = MAX7310_AD_POL;
+    buf.data = config->pol;
     max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
-    cr[0] = MAX7310_AD_MODE;
-    cr[1] = config->iomode;
+            buf.buf, sizeof(buf));
+    buf.reg = MAX7310_AD_MODE;
+    buf.data = config->iomode;
     max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
-    cr[0] = MAX7310_AD_TIMEOUT;
-    cr[1] = config->timeout;
+            buf.buf, sizeof(buf));
+    buf.reg = MAX7310_AD_TIMEOUT;
+    buf.data = config->timeout;
     max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-            cr, 1);
+            buf.buf, sizeof(buf));
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -150,7 +155,7 @@ void max7310Start(MAX7310Driver *devp, const MAX7310Config *config) {
  * @api
  */
 void max7310Stop(MAX7310Driver *devp) {
-    uint8_t cr[2];
+    i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
 
@@ -165,28 +170,28 @@ void max7310Stop(MAX7310Driver *devp) {
 #endif /* MAX7310_SHARED_I2C */
 
         /* Reset to input.*/
-        cr[0] = MAX7310_AD_MODE;
-        cr[1] = 0xFF;
+        buf.reg = MAX7310_AD_MODE;
+        buf.data = 0xFF;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+                buf.buf, sizeof(buf));
 
         /* Reset output reg to 0.*/
-        cr[0] = MAX7310_AD_ODR;
-        cr[1] = 0;
+        buf.reg = MAX7310_AD_ODR;
+        buf.data = 0;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+                buf.buf, sizeof(buf));
 
         /* Reset polarity.*/
-        cr[0] = MAX7310_AD_POL;
-        cr[1] = 0xF0;
+        buf.reg = MAX7310_AD_POL;
+        buf.data = 0xF0;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+                buf.buf, sizeof(buf));
 
         /* Reset timeout.*/
-        cr[0] = MAX7310_AD_TIMEOUT;
-        cr[1] = MAX7310_TIMEOUT_ENABLED;
+        buf.reg = MAX7310_AD_TIMEOUT;
+        buf.data = MAX7310_TIMEOUT_ENABLED;
         max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr,
-                cr, 1);
+                buf.buf, sizeof(buf));
 
         i2cStop(devp->config->i2cp);
 #if MAX7310_SHARED_I2C
@@ -206,7 +211,7 @@ void max7310Stop(MAX7310Driver *devp) {
  * @api
  */
 uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
-    uint8_t retval;
+    uint8_t value;
 
     osalDbgCheck(devp != NULL);
 
@@ -219,13 +224,13 @@ uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MAX7310_SHARED_I2C */
 
-    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &retval, 1);
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, reg, &value, sizeof(value));
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX7310_SHARED_I2C */
 #endif /* MAX7310_USE_I2C */
-    return retval;
+    return value;
 }
 
 /**
@@ -238,7 +243,7 @@ uint8_t max7310ReadRaw(MAX7310Driver *devp, uint8_t reg) {
  * @api
  */
 void max7310WriteRaw(MAX7310Driver *devp, uint8_t reg, uint8_t value) {
-    uint8_t cr[2];
+    i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
 
@@ -251,9 +256,108 @@ void max7310WriteRaw(MAX7310Driver *devp, uint8_t reg, uint8_t value) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MAX7310_SHARED_I2C */
 
-    cr[0] = reg;
-    cr[1] = value;
-    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, cr, 1);
+    buf.reg = reg;
+    buf.data = value;
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Sets MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to set
+ *
+ * @api
+ */
+void max7310SetPin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data |= MAX7310_PIN_MASK(pin);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Clear MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to clear
+ *
+ * @api
+ */
+void max7310ClearPin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data &= ~MAX7310_PIN_MASK(pin);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+
+#if MAX7310_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX7310_SHARED_I2C */
+#endif /* MAX7310_USE_I2C */
+}
+
+/**
+ * @brief   Toggle MAX7310 pin
+ *
+ * @param[in] devp       pointer to the @p MAX7310Driver object
+ * @param[in] pin        pin to toggle
+ *
+ * @api
+ */
+void max7310TogglePin(MAX7310Driver *devp, uint8_t pin) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+
+    osalDbgAssert(devp->state == MAX7310_READY,
+            "max7310SetPin(), invalid state");
+
+#if MAX7310_USE_I2C
+#if MAX7310_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX7310_SHARED_I2C */
+
+    buf.reg = MAX7310_AD_ODR;
+    max7310I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, &buf.data, sizeof(buf.data));
+    buf.data ^= MAX7310_PIN_MASK(pin);
+    max7310I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
 
 #if MAX7310_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
