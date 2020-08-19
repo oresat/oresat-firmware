@@ -28,7 +28,7 @@ void nmt_handler(eventid_t eventid)
     if (eventid == ORESAT_NMT_OPERATIONAL) {
         start_workers();
     } else {
-        stop_workers();
+        stop_workers(false);
     }
 }
 
@@ -191,6 +191,9 @@ void oresat_start(oresat_config_t *config)
     oresat_tp = chThdGetSelfX();
     chThdSetPriority(HIGHPRIO);
 
+    /* Start critical worker threads */
+    start_crit_workers();
+
     while (reset != CO_RESET_APP) {
         /* Initialize CANopen Subsystem */
         err = CO_CANinit(config, OD_CANBitRate);
@@ -266,6 +269,9 @@ void oresat_start(oresat_config_t *config)
         /* Deregister all events */
         clear_evreg(&event_registry);
     }
+
+    /* Stop all workers, including critical ones  */
+    stop_workers(true);
 
     /* Deinitialize CO stack */
     CO_delete(config);
