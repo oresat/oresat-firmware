@@ -6,6 +6,13 @@
 
 #define SDC_BURST_SIZE      16
 
+/*
+ * SDIO configuration.
+ */
+static const SDCConfig sdccfg = {
+  SDC_MODE_4BIT
+};
+
 /* Buffer for block read/write operations, note that extra bytes are
    allocated in order to support unaligned operations.*/
 static uint8_t buf[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE + 4];
@@ -22,13 +29,23 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     uint32_t n, startblk;
 
     if (argc != 1) {
-        chprintf(chp, "Usage: mmc read|write|erase|all\r\n");
+        chprintf(chp, "Usage: mmc enable|disable|read|write|erase|all\r\n");
         return;
     }
 
-    /* Card presence check.*/
-    if (!blkIsInserted(&SDCD1)) {
-        chprintf(chp, "Card not inserted, aborting.\r\n");
+    if (strcmp(argv[0], "enable") == 0) {
+        /* Initializes MMC SDC interface */
+        palClearLine(LINE_MMC_PWR);
+        sdcStart(&SDCD1, &sdccfg);
+        return;
+    } else if (strcmp(argv[0], "disable") == 0) {
+        sdcStop(&SDCD1);
+        palSetLine(LINE_MMC_PWR);
+        return;
+    }
+
+    if (SDCD1.state != BLK_READY) {
+        chprintf(chp, "Please enable eMMC subsystem first\r\n");
         return;
     }
 

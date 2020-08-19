@@ -229,7 +229,7 @@ static const ShellCommand commands[] = {
 static char histbuf[SHELL_MAX_HIST_BUFF];
 
 static const ShellConfig shell_cfg = {
-    (BaseSequentialStream *)&SD2,
+    (BaseSequentialStream *)&SD3,
     commands,
     histbuf,
     sizeof(histbuf),
