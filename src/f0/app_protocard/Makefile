@@ -165,10 +165,10 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UDEFS =
 
 # Define ASM defines here
-UADEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UADEFS =
 
 # List all user directories here
 UINCDIR = $(PROJ_INC)
