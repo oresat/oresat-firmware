@@ -1,7 +1,7 @@
 # Required libraries for CANopen
 #include $(PROJ_SRC)/include.mk
 
-CANOPEN_SRC  = $(PROJ_SRC)/CANopenNode
+CANOPEN_SRC  = $(PROJ_ROOT)/ext/CANopenNode
 
 # List of all CANopen sources
 CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                  \
