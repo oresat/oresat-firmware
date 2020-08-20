@@ -110,6 +110,7 @@ include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/opd.mk
 include $(PROJ_SRC)/time_sync.mk
 include $(PROJ_SRC)/CO_master.mk
+include $(PROJ_SRC)/littlefs.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
