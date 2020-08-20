@@ -36,7 +36,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL);
+    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, false);
     reg_worker(&worker1);
 
     /* Start up debug output */

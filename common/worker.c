@@ -2,11 +2,12 @@
 
 static worker_t *workers = NULL;
 
-void init_worker(worker_t *worker, const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg)
+void init_worker(worker_t *worker, const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg, bool critical)
 {
     worker->tp = NULL;
     worker->next = NULL;
     worker->prev = NULL;
+    worker->critical = critical;
     worker->desc.name = name;
     worker->desc.wbase = THD_WORKING_AREA_BASE(wa);
     worker->desc.wend = THD_WORKING_AREA_END(wa + wa_size);
@@ -40,6 +41,15 @@ void unreg_worker(worker_t *worker)
     }
 }
 
+void start_crit_workers(void)
+{
+    for (worker_t *wp = workers; wp; wp = wp->next) {
+        if (wp->tp == NULL && wp->critical) {
+            wp->tp = chThdCreate(&wp->desc);
+        }
+    }
+}
+
 void start_workers(void)
 {
     for (worker_t *wp = workers; wp; wp = wp->next) {
@@ -49,14 +59,13 @@ void start_workers(void)
     }
 }
 
-void stop_workers(void)
+void stop_workers(bool stop_crit)
 {
     for (worker_t *wp = workers; wp; wp = wp->next) {
-        if (wp->tp) {
+        if (wp->tp && (!wp->critical || stop_crit)) {
             chThdTerminate(wp->tp);
             chThdWait(wp->tp);
             wp->tp = NULL;
         }
     }
-
 }

@@ -87,7 +87,7 @@ PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_C3_V1
+BOARD     = ORESAT_C3_V3
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -144,8 +144,7 @@ CSRC = $(ALLCSRC) \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC = $(ALLCPPSRC) \
-         $(CHIBIOS)/os/various/cpp_wrappers/syscalls_cpp.cpp
+CPPSRC = $(ALLCPPSRC)
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)

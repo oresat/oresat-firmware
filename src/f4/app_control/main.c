@@ -49,13 +49,9 @@ static const oresat_node_t nodes[] = {
  * Working area for driver.
  */
 
-/*
- * SDIO configuration.
- */
-static const SDCConfig sdccfg = {
-  SDC_MODE_4BIT
-};
 
+static worker_t wdt_worker;
+static worker_t cmd_worker;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -68,23 +64,21 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* App initialization */
-    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL);
+    /* Initialize WDT worker thread */
+    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
+    reg_worker(&wdt_worker);
+
+    /* Initialize shell worker thread */
+    init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
+    reg_worker(&cmd_worker);
 
     /* Initialize OPD */
     opd_init();
-    opd_start();
+    /*opd_start();*/
 
     /* Initialize shell and start serial interface */
     shellInit();
-    sdStart(&SD2, NULL);
-
-    /* Initializes MMC SDC interface */
-    palClearLine(LINE_MMC_PWR);
-    sdcStart(&SDCD1, &sdccfg);
-
-    /* Start up the shell */
-    chThdCreateStatic(cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
+    sdStart(&SD3, NULL);
 
     /* Configure SCET time object */
     CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
