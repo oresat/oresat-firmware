@@ -1,6 +1,6 @@
 [submodule "ChibiOS"]
-	path = ChibiOS
+	path = ext/ChibiOS
 	url = https://github.com/ChibiOS/ChibiOS.git
 [submodule "common/CANopenNode"]
-	path = common/CANopenNode
+	path = ext/CANopenNode
 	url = https://github.com/CANopenNode/CANopenNode.git
