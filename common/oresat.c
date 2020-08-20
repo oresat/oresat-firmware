@@ -35,8 +35,11 @@ void nmt_handler(eventid_t eventid)
 /* General purpose CANopen callback to wake up data processing threads */
 void process_cb(void *thread)
 {
+    syssts_t sts;
+    sts = chSysGetStatusAndLockX();
     /* Signal processing thread from critical section */
     chEvtSignalI((thread_t *)thread, (eventmask_t)1);
+    chSysRestoreStatusX(sts);
 }
 
 /* CANopen SDO server thread */

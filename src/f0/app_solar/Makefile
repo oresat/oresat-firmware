@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -166,10 +166,10 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UDEFS =
 
 # Define ASM defines here
-UADEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UADEFS =
 
 # List all user directories here
 UINCDIR = $(PROJ_INC)

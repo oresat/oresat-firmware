@@ -1,7 +1,7 @@
 # Required libraries for CANopen master nodes
 #include $(PROJ_SRC)/include.mk
 
-CANOPEN_SRC  = $(PROJ_SRC)/CANopenNode
+CANOPEN_SRC  = $(PROJ_ROOT)/ext/CANopenNode
 
 # List of all CANopen sources for master nodes
 CO_MST_SRC  := $(PROJ_SRC)/CO_master.c                  \
