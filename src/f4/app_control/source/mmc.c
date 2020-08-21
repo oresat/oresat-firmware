@@ -25,7 +25,7 @@ int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, voi
     /* Sanity checks */
     chDbgCheck(off % cfg->read_size == 0);
     chDbgCheck(size % cfg->read_size == 0);
-    chDbgCheck(off + size < cfg->block_size);
+    chDbgCheck(off + size <= cfg->block_size);
     chDbgCheck(block < cfg->block_count);
 
     /* Allocate buffer */
@@ -56,16 +56,19 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
     /* Sanity checks */
     chDbgCheck(off % cfg->read_size == 0);
     chDbgCheck(size % cfg->read_size == 0);
-    chDbgCheck(off + size < cfg->block_size);
+    chDbgCheck(off + size <= cfg->block_size);
     chDbgCheck(block < cfg->block_count);
 
     /* Allocate buffer */
-    buf = calloc(cfg->block_size, sizeof(uint8_t));
+    buf = malloc(cfg->block_size);
     if (buf == NULL) {
         return LFS_ERR_NOMEM;
     }
 
-    /* Copy data to temp buffer */
+    /* Read the current data from the block */
+    mmc_read(cfg, block, 0, buf, cfg->block_size);
+
+    /* Copy new data */
     memcpy(&buf[off], buffer, size);
 
     /* Write data to block */
@@ -81,9 +84,24 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
 
 int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
 {
-    (void)cfg;
-    (void)block;
-    /* eMMC handles erase internally */
+    SDCDriver *sdcp = cfg->context;
+    uint8_t *buf;
+
+    /* Sanity checks */
+    chDbgCheck(block < cfg->block_count);
+
+    /* Allocate buffer */
+    buf = malloc(cfg->block_size);
+    memset(buf, 0xFF, cfg->block_size);
+    if (buf == NULL) {
+        return LFS_ERR_NOMEM;
+    }
+
+    /* Write data to block */
+    if (blkWrite(sdcp, block, buf, 1) != HAL_SUCCESS) {
+        return LFS_ERR_IO;
+    }
+
     return LFS_ERR_OK;
 }
 
@@ -207,28 +225,31 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     if (!strcmp(argv[0], "mount")) {
         int err;
 
-        chprintf(chp, "Attempting to mount LFS... ");
+        chprintf(chp, "Attempting to mount LFS...\r\n");
         err = lfs_mount(&lfs, &lfscfg);
         if (err) {
             chprintf(chp, "Mount failed: %d\r\n", err);
+            return;
         }
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "unmount")) {
         int err;
 
-        chprintf(chp, "Attempting to unmount LFS... ");
+        chprintf(chp, "Attempting to unmount LFS...\r\n");
         err = lfs_unmount(&lfs);
         if (err) {
             chprintf(chp, "Unmount failed: %d\r\n", err);
+            return;
         }
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "format")) {
         int err;
 
-        chprintf(chp, "Attempting to format LFS... ");
+        chprintf(chp, "Attempting to format LFS...\r\n");
         err = lfs_format(&lfs, &lfscfg);
         if (err) {
             chprintf(chp, "Format failed: %d\r\n", err);
+            return;
         }
         chprintf(chp, "OK\r\n");
     }
