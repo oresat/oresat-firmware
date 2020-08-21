@@ -78,12 +78,7 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
 
 int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
 {
-    SDCDriver *sdcp = cfg->context;
-
-    if (sdcErase(sdcp, block, block) != HAL_SUCCESS) {
-        return LFS_ERR_IO;
-    }
-
+    /* eMMC handles erase internally */
     return LFS_ERR_OK;
 }
 
@@ -128,8 +123,9 @@ static uint8_t buf2[MMCSD_BLOCK_SIZE * SDC_BURST_SIZE ];
 /* SD Card Control                                                           */
 /*===========================================================================*/
 void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
-    static const char *mode[] = {"SDV11", "SDV20", "MMC", NULL};
     static BlockDeviceInfo bdinfo;
+    static unpacked_mmc_cid_t cid;
+    static unpacked_mmc_csd_t csd;
     systime_t start, end;
     uint32_t n, startblk;
 
@@ -140,7 +136,6 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
                       "\r\n"
                       "    testread:   Test read functionality\r\n"
                       "    testwrite:  Test write functionality\r\n"
-                      "    testerase:  Test erase functionality\r\n"
                       "    testall:    Test all functionality\r\n");
         return;
     }
@@ -164,19 +159,20 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         blkGetInfo(&SDCD1, &bdinfo);
         lfscfg.block_size = bdinfo.blk_size;
         lfscfg.block_count = bdinfo.blk_num;
+        _mmcsd_unpack_mmc_cid((MMCSDBlockDevice*)&SDCD1, &cid);
+        _mmcsd_unpack_csd_mmc((MMCSDBlockDevice*)&SDCD1, &csd);
 
-        chprintf(chp, "OK\r\n\r\nCard Info\r\n");
+        chprintf(chp, "OK\r\n\r\nDevice Info\r\n");
         chprintf(chp, "CSD      : %08X %8X %08X %08X \r\n",
                 SDCD1.csd[3], SDCD1.csd[2], SDCD1.csd[1], SDCD1.csd[0]);
         chprintf(chp, "CID      : %08X %8X %08X %08X \r\n",
                 SDCD1.cid[3], SDCD1.cid[2], SDCD1.cid[1], SDCD1.cid[0]);
-        chprintf(chp, "Mode     : %s\r\n", mode[SDCD1.cardmode & 3U]);
         chprintf(chp, "Capacity : %DMB\r\n", SDCD1.capacity / 2048);
         chprintf(chp, "BlockSize: %d\r\n", bdinfo.blk_size);
         chprintf(chp, "BlockCnt : %d\r\n", bdinfo.blk_num);
 
-
-        chprintf(chp, "done!\r\n");
+        /* Clear error flags from connecting */
+        sdcGetAndClearErrors(&SDCD1);
         return;
     } else if (strcmp(argv[0], "disable") == 0) {
         chprintf(chp, "Disabling eMMC... ");
@@ -190,7 +186,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         /* Disable power to eMMC */
         palSetLine(LINE_MMC_PWR);
 
-        chprintf(chp, "done!\r\n");
+        chprintf(chp, "OK\r\n");
         return;
     }
 
@@ -276,16 +272,24 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         }
         chprintf(chp, "OK\r\n");
 
-        memset(buf, 0x55, MMCSD_BLOCK_SIZE * 2);
+        memset(buf2, 0x55, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Reading...");
-        if (blkRead(&SDCD1, startblk, buf, 1)) {
+        if (blkRead(&SDCD1, startblk, buf2, 1)) {
             chprintf(chp, "failed\r\n");
             return;
         }
         chprintf(chp, "OK\r\n");
 
-        for (i = 0; i < MMCSD_BLOCK_SIZE; i++)
+        chprintf(chp, "Comparing...");
+        if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) != 0) {
+            chprintf(chp, "Compare failed\r\n");
+            return;
+        }
+        chprintf(chp, "OK\r\n");
+
+        for (i = 0; i < MMCSD_BLOCK_SIZE; i++) {
             buf[i] = i + 8;
+        }
         chprintf(chp, "Writing...");
         if(blkWrite(&SDCD1, startblk, buf, 2)) {
             chprintf(chp, "failed\r\n");
@@ -293,85 +297,19 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         }
         chprintf(chp, "OK\r\n");
 
-        memset(buf, 0, MMCSD_BLOCK_SIZE * 2);
+        memset(buf2, 0, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Reading...");
-        if (blkRead(&SDCD1, startblk, buf, 1)) {
+        if (blkRead(&SDCD1, startblk, buf2, 1)) {
             chprintf(chp, "failed\r\n");
             return;
         }
         chprintf(chp, "OK\r\n");
-    }
 
-    if ((strcmp(argv[0], "testerase") == 0) ||
-        (strcmp(argv[0], "testall") == 0)) {
-        /**
-         * Test sdcErase()
-         * Strategy:
-         *   1. Fill two blocks with non-constant data
-         *   2. Write two blocks starting at startblk
-         *   3. Erase the second of the two blocks
-         *      3.1. First block should be equal to the data written
-         *      3.2. Second block should NOT be equal too the data written (i.e. erased).
-         *   4. Erase both first and second block
-         *      4.1 Both blocks should not be equal to the data initially written
-         * Precondition: SDC_BURST_SIZE >= 2
-         */
-        memset(buf, 0, MMCSD_BLOCK_SIZE * 2);
-        memset(buf2, 0, MMCSD_BLOCK_SIZE * 2);
-        /* 1. */
-        unsigned int i = 0;
-        for (; i < MMCSD_BLOCK_SIZE * 2; ++i) {
-            buf[i] = (i + 7) % 'T'; //Ensure block 1/2 are not equal
-        }
-        /* 2. */
-        if(blkWrite(&SDCD1, startblk, buf, 2)) {
-            chprintf(chp, "sdcErase() test write failed\r\n");
-            return;
-        }
-        /* 3. (erase) */
-        if(sdcErase(&SDCD1, startblk + 1, startblk + 2)) {
-            chprintf(chp, "sdcErase() failed\r\n");
-            return;
-        }
-        sdcflags_t errflags = sdcGetAndClearErrors(&SDCD1);
-        if(errflags) {
-            chprintf(chp, "sdcErase() yielded error flags: %d\r\n", errflags);
-            return;
-        }
-        if(blkRead(&SDCD1, startblk, buf2, 2)) {
-            chprintf(chp, "single-block mmcErase() failed\r\n");
-            return;
-        }
-        /* 3.1. */
+        chprintf(chp, "Comparing...");
         if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) != 0) {
-            chprintf(chp, "sdcErase() non-erased block compare failed\r\n");
+            chprintf(chp, "Compare failed\r\n");
             return;
         }
-        /* 3.2. */
-        if(memcmp(buf + MMCSD_BLOCK_SIZE,
-                    buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "sdcErase() erased block compare failed\r\n");
-            return;
-        }
-        /* 4. */
-        if(sdcErase(&SDCD1, startblk, startblk + 2)) {
-            chprintf(chp, "multi-block sdcErase() failed\r\n");
-            return;
-        }
-        if(blkRead(&SDCD1, startblk, buf2, 2)) {
-            chprintf(chp, "single-block sdcErase() failed\r\n");
-            return;
-        }
-        /* 4.1 */
-        if(memcmp(buf, buf2, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
-            return;
-        }
-        if(memcmp(buf + MMCSD_BLOCK_SIZE,
-                  buf2 + MMCSD_BLOCK_SIZE, MMCSD_BLOCK_SIZE) == 0) {
-            chprintf(chp, "multi-block sdcErase() erased block compare failed\r\n");
-            return;
-        }
-        /* END of sdcErase() test */
+        chprintf(chp, "OK\r\n");
     }
 }
