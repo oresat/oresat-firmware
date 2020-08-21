@@ -152,18 +152,18 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     systime_t start, end;
     uint32_t n, startblk;
 
-    if (argc != 1) {
+    if (argc < 1) {
         chprintf(chp,  "Usage: mmc <command>\r\n"
-                       "    enable:     Enable eMMC subsystem\r\n"
-                       "    disable:    Disable eMMC subsystem\r\n"
+                       "    enable:             Enable eMMC subsystem\r\n"
+                       "    disable:            Disable eMMC subsystem\r\n"
                        "\r\n"
-                       "    mount:      Mount LFS\r\n"
-                       "    unmount:    Unmount LFS\r\n"
-                       "    format:     Format eMMC for LFS\r\n"
+                       "    mount:              Mount LFS\r\n"
+                       "    unmount:            Unmount LFS\r\n"
+                       "    format:             Format eMMC for LFS\r\n"
                        "\r\n"
-                       "    testread:   Test read functionality\r\n"
-                       "    testwrite:  Test write functionality\r\n"
-                       "    testall:    Test all functionality\r\n");
+                       "    testread:           Test read functionality\r\n"
+                       "    testwrite:          Test write functionality\r\n"
+                       "    testall:            Test all functionality\r\n");
         return;
     }
 
@@ -182,6 +182,9 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
             return;
         }
 
+        /* Clear error flags from connecting */
+        sdcGetAndClearErrors(&SDCD1);
+
         /* Fetch info about eMMC device */
         blkGetInfo(&SDCD1, &bdinfo);
         lfscfg.block_size = bdinfo.blk_size;
@@ -189,6 +192,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         _mmcsd_unpack_mmc_cid((MMCSDBlockDevice*)&SDCD1, &cid);
         _mmcsd_unpack_csd_mmc((MMCSDBlockDevice*)&SDCD1, &csd);
 
+        /* Print details of the device */
         chprintf(chp, "OK\r\n\r\nDevice Info\r\n");
         chprintf(chp, "CSD      : %08X %8X %08X %08X \r\n",
                 SDCD1.csd[3], SDCD1.csd[2], SDCD1.csd[1], SDCD1.csd[0]);
@@ -197,9 +201,8 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         chprintf(chp, "Capacity : %DMB\r\n", SDCD1.capacity / 2048);
         chprintf(chp, "BlockSize: %d\r\n", bdinfo.blk_size);
         chprintf(chp, "BlockCnt : %d\r\n", bdinfo.blk_num);
+        chprintf(chp, "\r\n");
 
-        /* Clear error flags from connecting */
-        sdcGetAndClearErrors(&SDCD1);
         return;
     } else if (strcmp(argv[0], "disable") == 0) {
         chprintf(chp, "Disabling eMMC... ");
@@ -227,7 +230,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         chprintf(chp, "Attempting to mount LFS...\r\n");
         err = lfs_mount(&lfs, &lfscfg);
-        if (err) {
+        if (err < 0) {
             chprintf(chp, "Mount failed: %d\r\n", err);
             return;
         }
@@ -237,7 +240,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         chprintf(chp, "Attempting to unmount LFS...\r\n");
         err = lfs_unmount(&lfs);
-        if (err) {
+        if (err < 0) {
             chprintf(chp, "Unmount failed: %d\r\n", err);
             return;
         }
@@ -247,7 +250,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         chprintf(chp, "Attempting to format LFS...\r\n");
         err = lfs_format(&lfs, &lfscfg);
-        if (err) {
+        if (err < 0) {
             chprintf(chp, "Format failed: %d\r\n", err);
             return;
         }
