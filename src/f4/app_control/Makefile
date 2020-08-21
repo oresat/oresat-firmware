@@ -171,7 +171,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C
+UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DLFS_CONFIG=lfsconf.h
 
 # Define ASM defines here
 UADEFS =

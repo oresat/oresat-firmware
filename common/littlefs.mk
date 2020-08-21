@@ -5,7 +5,7 @@ LITTLEFS_SRC = $(PROJ_ROOT)/ext/littlefs
 
 # List of all littlefs sources
 LITTLEFSSRC := $(LITTLEFS_SRC)/lfs.c                    \
-               $(LITTLEFS_SRC)/lfs_util.c
+               $(PROJ_SRC)/lfs_util.c
 
 # Required include directories
 LITTLEFSINC := $(LITTLEFS_SRC)
