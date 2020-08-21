@@ -14,6 +14,9 @@ static const SDCConfig sdccfg = {
   SDC_MODE_4BIT
 };
 
+static lfs_t lfs;
+static lfs_file_t file;
+
 int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
 {
     SDCDriver *sdcp = cfg->context;
@@ -78,6 +81,8 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
 
 int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
 {
+    (void)cfg;
+    (void)block;
     /* eMMC handles erase internally */
     return LFS_ERR_OK;
 }
@@ -130,13 +135,17 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     uint32_t n, startblk;
 
     if (argc != 1) {
-        chprintf(chp, "Usage: mmc <command>\r\n"
-                      "    enable:     Enable eMMC subsystem\r\n"
-                      "    disable:    Disable eMMC subsystem\r\n"
-                      "\r\n"
-                      "    testread:   Test read functionality\r\n"
-                      "    testwrite:  Test write functionality\r\n"
-                      "    testall:    Test all functionality\r\n");
+        chprintf(chp,  "Usage: mmc <command>\r\n"
+                       "    enable:     Enable eMMC subsystem\r\n"
+                       "    disable:    Disable eMMC subsystem\r\n"
+                       "\r\n"
+                       "    mount:      Mount LFS\r\n"
+                       "    unmount:    Unmount LFS\r\n"
+                       "    format:     Format eMMC for LFS\r\n"
+                       "\r\n"
+                       "    testread:   Test read functionality\r\n"
+                       "    testwrite:  Test write functionality\r\n"
+                       "    testall:    Test all functionality\r\n");
         return;
     }
 
@@ -195,9 +204,37 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         return;
     }
 
+    if (!strcmp(argv[0], "mount")) {
+        int err;
+
+        chprintf(chp, "Attempting to mount LFS... ");
+        err = lfs_mount(&lfs, &lfscfg);
+        if (err) {
+            chprintf(chp, "Mount failed: %d\r\n", err);
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "unmount")) {
+        int err;
+
+        chprintf(chp, "Attempting to unmount LFS... ");
+        err = lfs_unmount(&lfs);
+        if (err) {
+            chprintf(chp, "Unmount failed: %d\r\n", err);
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "format")) {
+        int err;
+
+        chprintf(chp, "Attempting to format LFS... ");
+        err = lfs_format(&lfs, &lfscfg);
+        if (err) {
+            chprintf(chp, "Format failed: %d\r\n", err);
+        }
+        chprintf(chp, "OK\r\n");
+    }
+
     /* The test is performed in the middle of the flash area.*/
     startblk = (SDCD1.capacity / MMCSD_BLOCK_SIZE) / 2;
-
     if ((strcmp(argv[0], "testread") == 0) ||
         (strcmp(argv[0], "testall") == 0)) {
 
@@ -262,7 +299,10 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
     if ((strcmp(argv[0], "testwrite") == 0) ||
         (strcmp(argv[0], "testall") == 0)) {
-        unsigned i;
+        uint8_t backup[MMCSD_BLOCK_SIZE * 2];
+
+        /* Backup data */
+        blkRead(&SDCD1, startblk, backup, 2);
 
         memset(buf, 0xAA, MMCSD_BLOCK_SIZE * 2);
         chprintf(chp, "Writing...");
@@ -287,7 +327,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         }
         chprintf(chp, "OK\r\n");
 
-        for (i = 0; i < MMCSD_BLOCK_SIZE; i++) {
+        for (unsigned int i = 0; i < MMCSD_BLOCK_SIZE; i++) {
             buf[i] = i + 8;
         }
         chprintf(chp, "Writing...");
@@ -311,5 +351,8 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
             return;
         }
         chprintf(chp, "OK\r\n");
+
+        /* Restore data */
+        blkWrite(&SDCD1, startblk, backup, 2);
     }
 }
