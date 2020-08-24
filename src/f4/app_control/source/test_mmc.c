@@ -2,13 +2,11 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "test_mmc.h"
 #include "chprintf.h"
 #include "mmc.h"
 
 #define SDC_BURST_SIZE      16
-
-extern lfs_t lfs;
-extern struct lfs_config lfscfg;
 
 /* Buffer for block read/write operations, note that extra bytes are
    allocated in order to support unaligned operations.*/
@@ -40,11 +38,18 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     }
 
     if (strcmp(argv[0], "enable") == 0) {
+        int err;
         chprintf(chp, "Enabling eMMC... ");
 
-        if (mmc_enable()) {
-            chprintf(chp, "failed\r\n");
-            return;
+        /* Attempt to enable eMMC subsystem */
+        err = mmc_enable();
+        if (err) {
+            if (SDC->state != BLK_STOP) {
+                chprintf(chp, "LFS mount failed: %d\r\n", err);
+            } else {
+                chprintf(chp, "failed\r\n");
+                return;
+            }
         }
 
         /* Print details of the device */
@@ -60,6 +65,7 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
     } else if (strcmp(argv[0], "disable") == 0) {
         chprintf(chp, "Disabling eMMC... ");
 
+        /* Disable eMMC subsystem */
         mmc_disable();
 
         chprintf(chp, "OK\r\n");

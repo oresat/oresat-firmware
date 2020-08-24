@@ -41,7 +41,6 @@ struct lfs_config lfscfg = {
 /*===========================================================================*/
 int mmc_enable(void)
 {
-    int err;
     BlockDeviceInfo bdinfo;
 
     /* Enable power to eMMC */
@@ -52,6 +51,8 @@ int mmc_enable(void)
 
     /* Connect to eMMC device */
     if (blkConnect(SDC)) {
+        sdcStop(SDC);
+        palSetLine(LINE_MMC_PWR);
         return LFS_ERR_IO;
     }
 
@@ -67,10 +68,8 @@ int mmc_enable(void)
     _mmcsd_unpack_mmc_cid((MMCSDBlockDevice*)SDC, &mmc_cid);
     _mmcsd_unpack_csd_mmc((MMCSDBlockDevice*)SDC, &mmc_csd);
 
-    /* Mount LFS file system */
-    err = lfs_mount(&lfs, &lfscfg);
-
-    return err;
+    /* Mount LFS file system and return status */
+    return lfs_mount(&lfs, &lfscfg);
 }
 
 void mmc_disable(void)
@@ -78,10 +77,8 @@ void mmc_disable(void)
     /* Unmount LFS file system */
     lfs_unmount(&lfs);
 
-    /* Disconnect from eMMC device */
+    /* Disconnect from eMMC device and stop interface */
     blkDisconnect(SDC);
-
-    /* Stop MMC SDC interface */
     sdcStop(SDC);
 
     /* Disable power to eMMC */

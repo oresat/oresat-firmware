@@ -9,6 +9,10 @@
 extern "C" {
 #endif
 
+/* LFS objects */
+extern lfs_t lfs;
+extern struct lfs_config lfscfg;
+
 /* eMMC support functions */
 int mmc_enable(void);
 void mmc_disable(void);
