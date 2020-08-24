@@ -1,14 +1,23 @@
 #ifndef _MMC_H_
 #define _MMC_H_
 
+#include "lfs.h"
+
+#define SDC (&SDCD1)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "ch.h"
-#include "hal.h"
+/* eMMC support functions */
+int mmc_enable(void);
+void mmc_disable(void);
 
-void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]);
+/* LFS support functions */
+int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size);
+int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size);
+int mmc_erase(const struct lfs_config *cfg, lfs_block_t block);
+int mmc_sync(const struct lfs_config *cfg);
 
 #ifdef __cplusplus
 }
