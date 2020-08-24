@@ -4,3 +4,6 @@
 [submodule "common/CANopenNode"]
 	path = ext/CANopenNode
 	url = https://github.com/CANopenNode/CANopenNode.git
+[submodule "ext/littlefs"]
+	path = ext/littlefs
+	url = git@github.com:ARMmbed/littlefs.git
