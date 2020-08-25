@@ -53,6 +53,9 @@ THD_FUNCTION(sdo_client_thd, arg)
             break;
         }
 
+        if (ret <= 0)
+            timeout = 0;
+
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
