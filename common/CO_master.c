@@ -11,11 +11,19 @@ typedef enum {
 } sdocli_state_t;
 
 typedef struct {
+    /* SDO client thread pointer */
     thread_t           *tp;
+    /* Semaphore for exclusive control of client object */
     semaphore_t         sem;
+    /* Pointer to SDO client object */
     CO_SDOclient_t     *sdo_c;
+    /* Client state tracking for thread */
     sdocli_state_t      state;
-    void (*buf_cb)(void *arg);
+    size_t              size_transferred;
+    size_t              size_indicated;
+    /* Buffer IO callback to fill/empty buffer, called by thread */
+    bool (*buf_cb)(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg);
+    /* Optional argument to Buffer IO callback */
     void *buf_cb_arg;
 } sdocli_t;
 
@@ -25,25 +33,46 @@ sdocli_t sdo_client[CO_NO_SDO_CLIENT];
 THD_FUNCTION(sdo_client_thd, arg)
 {
     sdocli_t *sdocli = arg;
+    CO_SDO_return_t ret = CO_SDO_RT_waitingResponse;
+    CO_SDO_abortCode_t abort_code = CO_SDO_AB_NONE;
     systime_t prev_time;
+
+    /* Sanity check on arguments */
+    chDbgCheck(sdocli != NULL && sdocli->sdo_c != NULL && sdocli->buf_cb != NULL);
 
     /* Register the callback function to wake up thread when message received */
     CO_SDOclient_initCallbackPre(sdocli->sdo_c, chThdGetSelfX(), process_cb);
 
     prev_time = chVTGetSystemTime();
-    while (!chThdShouldTerminateX()) {
+    while (!abort && ret > 0) {
         uint32_t timeout = ((typeof(timeout))-1);
-        CO_SDO_return_t ret;
-        CO_SDO_abortCode_t abort_code;
-        size_t size_transferred, size_indicated;
         bool_t abort = false;
 
+        /* Check if thread should terminate */
+        if (chThdShouldTerminateX()) {
+            abort = true;
+            abort_code = CO_SDO_AB_GENERAL;
+        }
+
         if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
-            ret = CO_SDOclientDownload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                    abort, &abort_code, &size_transferred, &timeout);
+            /* Download (write) operation */
+            /* Fill buffer */
+            abort = buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+
+            /* While we have transmit buffers available, fill them */
+            do {
+                ret = CO_SDOclientDownload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                        abort, &abort_code, &sdocli->size_transferred, &timeout);
+            } while (ret == CO_SDO_RT_blockDownldInProgress);
         } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
+            /* Upload (read) operation */
             ret = CO_SDOclientUpload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                    &abort_code, &size_transferred, &size_indicated, &timeout);
+                    &abort_code, &sdocli->size_transferred, &sdocli->size_indicated, &timeout);
+
+            /* Empty buffer if it is full */
+            if (ret == CO_SDO_RT_uploadDataBufferFull) {
+                buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+            }
         } else {
             break;
         }
@@ -52,9 +81,14 @@ THD_FUNCTION(sdo_client_thd, arg)
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
 
+    /* Final call to buffer callback */
+    buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+
     /* Clear the callbacks for the SDO client object, free the client, and terminate */
     CO_SDOclient_initCallbackPre(sdocli->sdo_c, NULL, NULL);
     sdocli->state = SDOCLI_ST_IDLE;
+    sdocli->size_transferred = 0;
+    sdocli->size_indicated = 0;
     sdocli->buf_cb = NULL;
     sdocli->buf_cb_arg = NULL;
     chSemSignal(&sdocli->sem);
@@ -68,12 +102,14 @@ void sdo_init(void)
         chSemObjectInit(&sdo_client[i].sem, 1);
         sdo_client[i].sdo_c = CO->SDOclient[i];
         sdo_client[i].state = SDOCLI_ST_IDLE;
+        sdo_client[i].size_transferred = 0;
+        sdo_client[i].size_indicated = 0;
         sdo_client[i].buf_cb = NULL;
         sdo_client[i].buf_cb_arg = NULL;
     }
 }
 
-thread_t *sdo_transfer(char type, uint8_t nodeid, uint16_t index, uint8_t subindex, void (*buf_cb)(void *arg), void *buf_cb_arg)
+thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subindex, size_t size, void (*buf_cb)(void *arg), void *buf_cb_arg)
 {
     int i;
 
@@ -88,11 +124,11 @@ thread_t *sdo_transfer(char type, uint8_t nodeid, uint16_t index, uint8_t subind
     }
 
     /* Set up SDO client object for transaction */
-    CO_SDOclient_setup(sdo_client[i].sdo_c, 0, 0, nodeid);
+    CO_SDOclient_setup(sdo_client[i].sdo_c, 0, 0, node_id);
 
     /* Type is either (w)rite (download) or (r)ead (upload). Set state accordingly */
     if (type == 'w') {
-        if (CO_SDOclientDownloadInitiate(sdo_client[i].sdo_c, index, subindex, 0, SDOCLI_TIMEOUT, true) != CO_SDO_RT_ok_communicationEnd) {
+        if (CO_SDOclientDownloadInitiate(sdo_client[i].sdo_c, index, subindex, size, SDOCLI_TIMEOUT, true) != CO_SDO_RT_ok_communicationEnd) {
             chSemSignal(&sdo_client[i].sem);
             return NULL;
         }
@@ -109,6 +145,7 @@ thread_t *sdo_transfer(char type, uint8_t nodeid, uint16_t index, uint8_t subind
         return NULL;
     }
 
+    sdo_client[i].size_indicated = size;
     sdo_client[i].buf_cb = buf_cb;
     sdo_client[i].buf_cb_arg = buf_cb_arg;
 
