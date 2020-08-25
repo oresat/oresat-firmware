@@ -52,9 +52,9 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
 }
 
 /*===========================================================================*/
-/* OreSat CAN Bus                                                            */
+/* OreSat CAN Bus SDO Client                                                 */
 /*===========================================================================*/
-void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
+void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 {
     struct cb_arg data;
     thread_t *tp;
@@ -64,7 +64,7 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     size_t size = 0;
 
     if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
-        goto can_usage;
+        goto sdo_usage;
     }
 
     /* Set variables from provided values */
@@ -75,7 +75,7 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     err = lfs_file_open(&lfs, &data.file, argv[4], LFS_O_RDWR | LFS_O_CREAT);
     if (err) {
         chprintf(chp, "Error in file open: %d\r\n", err);
-        goto can_usage;
+        goto sdo_usage;
     }
     if (argv[0][0] == 'w') {
         size = lfs_file_size(&lfs, &data.file);
@@ -86,8 +86,8 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     lfs_file_close(&lfs, &data.file);
     return;
 
-can_usage:
-    chprintf(chp, "Usage: can (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
+sdo_usage:
+    chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
     return;
 }
 
@@ -252,7 +252,7 @@ time_usage:
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
-    {"can", cmd_can},
+    {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
