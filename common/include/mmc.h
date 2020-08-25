@@ -2,6 +2,7 @@
 #define _MMC_H_
 
 #include "lfs.h"
+#include "lfs_util.h"
 
 #define SDC (&SDCD1)
 

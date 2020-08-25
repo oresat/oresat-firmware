@@ -1,31 +1,7 @@
 #include "oresat.h"
-#include "CANopen.h"
 #include "CO_master.h"
 
 #define SDOCLI_TIMEOUT 1000
-
-typedef enum {
-    SDOCLI_ST_IDLE,
-    SDOCLI_ST_DOWNLOAD,
-    SDOCLI_ST_UPLOAD
-} sdocli_state_t;
-
-typedef struct {
-    /* SDO client thread pointer */
-    thread_t           *tp;
-    /* Semaphore for exclusive control of client object */
-    semaphore_t         sem;
-    /* Pointer to SDO client object */
-    CO_SDOclient_t     *sdo_c;
-    /* Client state tracking for thread */
-    sdocli_state_t      state;
-    size_t              size_transferred;
-    size_t              size_indicated;
-    /* Buffer IO callback to fill/empty buffer, called by thread */
-    bool (*buf_cb)(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg);
-    /* Optional argument to Buffer IO callback */
-    void *buf_cb_arg;
-} sdocli_t;
 
 sdocli_t sdo_client[CO_NO_SDO_CLIENT];
 
@@ -36,6 +12,7 @@ THD_FUNCTION(sdo_client_thd, arg)
     CO_SDO_return_t ret = CO_SDO_RT_waitingResponse;
     CO_SDO_abortCode_t abort_code = CO_SDO_AB_NONE;
     systime_t prev_time;
+    bool_t abort = false;
 
     /* Sanity check on arguments */
     chDbgCheck(sdocli != NULL && sdocli->sdo_c != NULL && sdocli->buf_cb != NULL);
@@ -46,7 +23,6 @@ THD_FUNCTION(sdo_client_thd, arg)
     prev_time = chVTGetSystemTime();
     while (!abort && ret > 0) {
         uint32_t timeout = ((typeof(timeout))-1);
-        bool_t abort = false;
 
         /* Check if thread should terminate */
         if (chThdShouldTerminateX()) {
@@ -57,7 +33,7 @@ THD_FUNCTION(sdo_client_thd, arg)
         if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
             /* Download (write) operation */
             /* Fill buffer */
-            abort = buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+            abort = sdocli->buf_cb(sdocli, ret, &abort_code, sdocli->buf_cb_arg);
 
             /* While we have transmit buffers available, fill them */
             do {
@@ -71,7 +47,7 @@ THD_FUNCTION(sdo_client_thd, arg)
 
             /* Empty buffer if it is full */
             if (ret == CO_SDO_RT_uploadDataBufferFull) {
-                buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+                sdocli->buf_cb(sdocli, ret, &abort_code, sdocli->buf_cb_arg);
             }
         } else {
             break;
@@ -82,7 +58,7 @@ THD_FUNCTION(sdo_client_thd, arg)
     }
 
     /* Final call to buffer callback */
-    buf_cb(sdocli, ret, &abort_code, buf_cb_arg);
+    sdocli->buf_cb(sdocli, ret, &abort_code, sdocli->buf_cb_arg);
 
     /* Clear the callbacks for the SDO client object, free the client, and terminate */
     CO_SDOclient_initCallbackPre(sdocli->sdo_c, NULL, NULL);
@@ -109,7 +85,7 @@ void sdo_init(void)
     }
 }
 
-thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subindex, size_t size, void (*buf_cb)(void *arg), void *buf_cb_arg)
+thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subindex, size_t size, bool (*buf_cb)(struct sdocli *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg), void *buf_cb_arg)
 {
     int i;
 

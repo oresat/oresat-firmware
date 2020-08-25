@@ -7,23 +7,48 @@
 #include "CO_master.h"
 #include "time_sync.h"
 #include "max7310.h"
+#include "mmc.h"
 #include "test_mmc.h"
 #include "chprintf.h"
 #include "shell.h"
 
-#define BUF_SIZE 100
+#define BUF_SIZE 256
+
+struct cb_arg {
+    lfs_file_t file;
+    uint8_t buf[BUF_SIZE];
+};
 
 static thread_t *shell_tp;
 
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
-bool sdo_shell_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
-{
-}
-
 bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
 {
+    struct cb_arg *data = arg;
+    ssize_t size, space;
+
+    if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
+        space = CO_fifo_getSpace(&sdocli->sdo_c->bufFifo);
+        do {
+            size = lfs_file_read(&lfs, &data->file, data->buf, lfs_min(space, BUF_SIZE));
+            if (size <= 0) {
+                *abort_code = CO_SDO_AB_NO_DATA;
+                return true;
+            }
+            CO_SDOclientDownloadBufWrite(sdocli->sdo_c, data->buf, size);
+        } while (space -= size);
+    } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
+        if (ret == CO_SDO_RT_uploadDataBufferFull || ret == CO_SDO_RT_ok_communicationEnd) {
+            do {
+                size = CO_SDOclientUploadBufRead(sdocli->sdo_c, data->buf, BUF_SIZE);
+                lfs_file_write(&lfs, &data->file, data->buf, size);
+            } while (size);
+        }
+    }
+
+    return false;
 }
 
 /*===========================================================================*/
@@ -31,15 +56,12 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
 /*===========================================================================*/
 void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    struct cb_arg data;
     thread_t *tp;
     int err = 0;
     uint16_t index = 0;
     uint8_t node_id = 0, subindex = 0;
     size_t size = 0;
-    struct {
-        lfs_file_t file;
-        uint8_t buf[BUF_SIZE];
-    } cb_arg;
 
     if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
         goto can_usage;
@@ -50,28 +72,22 @@ void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
     index = strtoul(argv[2], NULL, 0);
     subindex = strtoul(argv[3], NULL, 0);
 
-    /* Determine type of transfer */
-    if (!strcmp(argv[4], "shell")) {
-        /* TODO: Implement shell types */
-    } else if (!strcmp(argv[4], "file")) {
-        err = lfs_file_open(&lfs, &cb_arg.file, argv[5], LFS_O_RDWR | LFS_O_CREAT);
-        if (err) {
-            chprintf(chp, "Error in file open: %d\r\n", err);
-            goto can_usage;
-        }
-        if (argv[0][0] == 'w') {
-            size = lfs_file_size(&lfs, &file);
-        }
-    } else {
+    err = lfs_file_open(&lfs, &data.file, argv[4], LFS_O_RDWR | LFS_O_CREAT);
+    if (err) {
+        chprintf(chp, "Error in file open: %d\r\n", err);
         goto can_usage;
     }
+    if (argv[0][0] == 'w') {
+        size = lfs_file_size(&lfs, &data.file);
+    }
 
-    tp = sdo_transfer(argv[0][0], node_id, index, subindex, size, (!strcmp(argv[4], "file") ? sdo_file_cb : sdo_shell_cb), cb_arg);
+    tp = sdo_transfer(argv[0][0], node_id, index, subindex, size, sdo_file_cb, &data);
     chThdWait(tp);
+    lfs_file_close(&lfs, &data.file);
     return;
 
 can_usage:
-    chprintf(chp, "Usage: can (r)ead|(w)rite <node_id> <index> <subindex> <type> [value]\r\n");
+    chprintf(chp, "Usage: can (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
     return;
 }
 
@@ -257,9 +273,6 @@ THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
-
-    /* Initialize ASCII Gateway callback to print returned text */
-    CO_GTWA_initRead(CO->gtwa, gtwa_read_cb, shell_cfg.sc_channel);
 
     /* Start a shell */
     while (!chThdShouldTerminateX()) {
