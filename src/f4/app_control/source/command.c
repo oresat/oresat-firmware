@@ -4,24 +4,26 @@
 
 #include "command.h"
 #include "opd.h"
+#include "CO_master.h"
 #include "time_sync.h"
 #include "max7310.h"
 #include "test_mmc.h"
 #include "chprintf.h"
 #include "shell.h"
 
+#define BUF_SIZE 100
+
 static thread_t *shell_tp;
 
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
-size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
+bool sdo_shell_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
 {
-    size_t written;
+}
 
-    written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
-
-    return written;
+bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
+{
 }
 
 /*===========================================================================*/
@@ -29,54 +31,60 @@ size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
 /*===========================================================================*/
 void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    char cmd[CO_CONFIG_GTWA_COMM_BUF_SIZE];
-    size_t space;
-    (void)chp;
+    thread_t *tp;
+    int err = 0;
+    uint16_t index = 0;
+    uint8_t node_id = 0, subindex = 0;
+    size_t size = 0;
+    struct {
+        lfs_file_t file;
+        uint8_t buf[BUF_SIZE];
+    } cb_arg;
 
-    if (argc < 1) {
-        strncpy(cmd, "[0] help\r\n", CO_CONFIG_GTWA_COMM_BUF_SIZE);
-    } else {
-        strncpy(cmd, argv[0], CO_CONFIG_GTWA_COMM_BUF_SIZE);
-        space = CO_CONFIG_GTWA_COMM_BUF_SIZE - strlen(argv[0]);
-        for (int i = 1; i < argc; i++) {
-            strncat(cmd, " ", space);
-            strncat(cmd, argv[i], space - 1);
-            space -= strlen(argv[i]) + 1;
-        }
+    if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
+        goto can_usage;
     }
-    strncat(cmd, "\r\n", space);
 
-    /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
+    /* Set variables from provided values */
+    node_id = strtoul(argv[1], NULL, 0);
+    index = strtoul(argv[2], NULL, 0);
+    subindex = strtoul(argv[3], NULL, 0);
 
-    CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
+    /* Determine type of transfer */
+    if (!strcmp(argv[4], "shell")) {
+        /* TODO: Implement shell types */
+    } else if (!strcmp(argv[4], "file")) {
+        err = lfs_file_open(&lfs, &cb_arg.file, argv[5], LFS_O_RDWR | LFS_O_CREAT);
+        if (err) {
+            chprintf(chp, "Error in file open: %d\r\n", err);
+            goto can_usage;
+        }
+        if (argv[0][0] == 'w') {
+            size = lfs_file_size(&lfs, &file);
+        }
+    } else {
+        goto can_usage;
+    }
 
+    tp = sdo_transfer(argv[0][0], node_id, index, subindex, size, (!strcmp(argv[4], "file") ? sdo_file_cb : sdo_shell_cb), cb_arg);
+    chThdWait(tp);
+    return;
+
+can_usage:
+    chprintf(chp, "Usage: can (r)ead|(w)rite <node_id> <index> <subindex> <type> [value]\r\n");
+    return;
 }
 
 /*===========================================================================*/
 /* OreSat Power Domain Control                                               */
 /*===========================================================================*/
-void opd_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
-                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
-                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
-                  "    sysrestart: Cycle power on OPD subsystem\r\n"
-                  "    enable:     Enable an OPD attached card\r\n"
-                  "    disable:    Disable an OPD attached card\r\n"
-                  "    reset:      Reset the circuit breaker of a card\r\n"
-                  "    probe:      Probe an address to see if a card responds\r\n"
-                  "    status:     Report the status of a card\r\n"
-                  "    boot:       Attempt to bootstrap a card\r\n");
-}
-
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
     static uint8_t opd_addr = 0;
     opd_status_t status = {0};
 
     if (argc < 1) {
-        opd_usage(chp);
-        return;
+        goto opd_usage;
     } else if (argc > 1) {
         opd_addr = strtoul(argv[1], NULL, 0);
         chprintf(chp, "Setting persistent board address to 0x%02X\r\n", opd_addr);
@@ -95,8 +103,7 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else {
         if (opd_addr == 0) {
             chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
-            opd_usage(chp);
-            return;
+            goto opd_usage;
         }
         if (!strcmp(argv[0], "enable")) {
             chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
@@ -146,20 +153,29 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             int retval = opd_boot(opd_addr);
             chprintf(chp, "Boot returned 0x%02X\r\n", retval);
         } else {
-            opd_usage(chp);
-            return;
+            goto opd_usage;
         }
     }
+
+    return;
+
+opd_usage:
+    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
+                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
+                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
+                  "    sysrestart: Cycle power on OPD subsystem\r\n"
+                  "    enable:     Enable an OPD attached card\r\n"
+                  "    disable:    Disable an OPD attached card\r\n"
+                  "    reset:      Reset the circuit breaker of a card\r\n"
+                  "    probe:      Probe an address to see if a card responds\r\n"
+                  "    status:     Report the status of a card\r\n"
+                  "    boot:       Attempt to bootstrap a card\r\n");
+    return;
 }
 
 /*===========================================================================*/
 /* Time                                                                      */
 /*===========================================================================*/
-void time_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
-}
-
 void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 {
     RTCDateTime timespec;
@@ -168,8 +184,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
     time_scet_t scet;
     time_utc_t utc;
     if (argc < 1) {
-        time_usage(chp);
-        return;
+        goto time_usage;
     }
     if (!strcmp(argv[0], "unix")) {
         if (!strcmp(argv[1], "get")) {
@@ -178,8 +193,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
         } else if (!strcmp(argv[1], "set") && argc > 2) {
             set_time_unix(strtoul(argv[2], NULL, 0), 0);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "scet")) {
         if (!strcmp(argv[1], "get")) {
@@ -190,8 +204,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             scet.fine = strtoul(argv[3], NULL, 0);
             set_time_scet(&scet);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "utc")) {
         if (!strcmp(argv[1], "get")) {
@@ -203,16 +216,20 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             utc.us = strtoul(argv[4], NULL, 0);
             set_time_utc(&utc);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "raw")) {
         rtcGetTime(&RTCD1, &timespec);
         chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
     } else {
-        time_usage(chp);
-        return;
+        goto time_usage;
     }
+
+    return;
+
+time_usage:
+    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
+    return;
 }
 
 /*===========================================================================*/
