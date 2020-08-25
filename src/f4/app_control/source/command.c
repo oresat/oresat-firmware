@@ -6,7 +6,7 @@
 #include "opd.h"
 #include "time_sync.h"
 #include "max7310.h"
-#include "mmc.h"
+#include "test_mmc.h"
 #include "chprintf.h"
 #include "shell.h"
 

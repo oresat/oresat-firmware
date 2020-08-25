@@ -90,10 +90,11 @@ THD_FUNCTION(solar, arg)
     (void)arg;
     uint32_t iadj_v = 1500;
 
+    ina226ObjectInit(&ina226dev);
+
     /* Start up drivers */
     dacStart(&DACD1, &dac1cfg);
     ina226Start(&ina226dev, &ina226config);
-    palSetLine(LINE_LED);
 
     dacPutMillivolts(&DACD1, 0, iadj_v) ;
     while (!chThdShouldTerminateX()) {
@@ -115,6 +116,5 @@ THD_FUNCTION(solar, arg)
     dacStop(&DACD1);
     ina226Stop(&ina226dev);
 
-    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }
