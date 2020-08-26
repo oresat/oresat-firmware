@@ -25,6 +25,7 @@
 #include "opd.h"
 #include "time_sync.h"
 #include "command.h"
+#include "CO_master.h"
 
 /*
 static const oresat_node_t nodes[] = {
@@ -75,6 +76,9 @@ static void app_init(void)
     /* Initialize OPD */
     opd_init();
     /*opd_start();*/
+
+    /* Initialize SDO client */
+    sdo_init();
 
     /* Initialize shell and start serial interface */
     shellInit();
