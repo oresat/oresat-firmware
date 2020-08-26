@@ -4,79 +4,118 @@
 
 #include "command.h"
 #include "opd.h"
+#include "CO_master.h"
 #include "time_sync.h"
 #include "max7310.h"
+#include "mmc.h"
 #include "test_mmc.h"
 #include "chprintf.h"
 #include "shell.h"
+
+#define BUF_SIZE 256
+
+struct cb_arg {
+    lfs_file_t file;
+    char buf[BUF_SIZE];
+};
 
 static thread_t *shell_tp;
 
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
-size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
+bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
 {
-    size_t written;
+    struct cb_arg *data = arg;
+    ssize_t size, space;
 
-    written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
+    if (ret < 0) {
+        chprintf((BaseSequentialStream*)&SD3, "Error in SDO transfer. Ret: %d Abort: %X", ret, *abort_code);
+        return true;
+    }
 
-    return written;
+    if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
+        space = CO_fifo_getSpace(&sdocli->sdo_c->bufFifo);
+        do {
+            size = lfs_file_read(&lfs, &data->file, data->buf, lfs_min(space, BUF_SIZE));
+            if (size <= 0) {
+                *abort_code = CO_SDO_AB_NO_DATA;
+                return true;
+            }
+            CO_SDOclientDownloadBufWrite(sdocli->sdo_c, data->buf, size);
+        } while (space -= size);
+    } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
+        if (ret == CO_SDO_RT_uploadDataBufferFull || ret == CO_SDO_RT_ok_communicationEnd) {
+            do {
+                size = CO_SDOclientUploadBufRead(sdocli->sdo_c, data->buf, BUF_SIZE);
+                lfs_file_write(&lfs, &data->file, data->buf, size);
+            } while (size);
+        }
+    }
+
+    return false;
 }
 
 /*===========================================================================*/
-/* OreSat CAN Bus                                                            */
+/* OreSat CAN Bus SDO Client                                                 */
 /*===========================================================================*/
-void cmd_can(BaseSequentialStream *chp, int argc, char *argv[])
+void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    char cmd[CO_CONFIG_GTWA_COMM_BUF_SIZE];
-    size_t space;
-    (void)chp;
+    struct cb_arg data;
+    thread_t *tp;
+    int err = 0;
+    uint16_t index = 0;
+    uint8_t node_id = 0, subindex = 0;
+    size_t size = 0;
 
-    if (argc < 1) {
-        strncpy(cmd, "[0] help\r\n", CO_CONFIG_GTWA_COMM_BUF_SIZE);
-    } else {
-        strncpy(cmd, argv[0], CO_CONFIG_GTWA_COMM_BUF_SIZE);
-        space = CO_CONFIG_GTWA_COMM_BUF_SIZE - strlen(argv[0]);
-        for (int i = 1; i < argc; i++) {
-            strncat(cmd, " ", space);
-            strncat(cmd, argv[i], space - 1);
-            space -= strlen(argv[i]) + 1;
-        }
+    if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
+        goto sdo_usage;
     }
-    strncat(cmd, "\r\n", space);
+    if (SDC->state != BLK_READY) {
+        chprintf(chp, "Error: Please enable eMMC first\r\n");
+        return;
+    }
 
-    /*space = CO_GTWA_write_getSpace(CO->gtwa);*/
+    /* Set variables from provided values */
+    node_id = strtoul(argv[1], NULL, 0);
+    index = strtoul(argv[2], NULL, 0);
+    subindex = strtoul(argv[3], NULL, 0);
 
-    CO_GTWA_write(CO->gtwa, cmd, strlen(cmd));
+    err = lfs_file_open(&lfs, &data.file, argv[4], LFS_O_RDWR | LFS_O_CREAT);
+    if (err) {
+        chprintf(chp, "Error in file open: %d\r\n", err);
+        goto sdo_usage;
+    }
+    if (argv[0][0] == 'w') {
+        size = lfs_file_size(&lfs, &data.file);
+    }
 
+    chprintf(chp, "Initiating transfer... ");
+    tp = sdo_transfer(argv[0][0], node_id, index, subindex, size, sdo_file_cb, &data);
+    if (tp == NULL) {
+        chprintf(chp, "Failed to initiate transfer\r\n");
+        return;
+    }
+    chThdWait(tp);
+    lfs_file_close(&lfs, &data.file);
+    chprintf(chp, "Done!\r\n");
+    return;
+
+sdo_usage:
+    chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
+    return;
 }
 
 /*===========================================================================*/
 /* OreSat Power Domain Control                                               */
 /*===========================================================================*/
-void opd_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
-                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
-                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
-                  "    sysrestart: Cycle power on OPD subsystem\r\n"
-                  "    enable:     Enable an OPD attached card\r\n"
-                  "    disable:    Disable an OPD attached card\r\n"
-                  "    reset:      Reset the circuit breaker of a card\r\n"
-                  "    probe:      Probe an address to see if a card responds\r\n"
-                  "    status:     Report the status of a card\r\n"
-                  "    boot:       Attempt to bootstrap a card\r\n");
-}
-
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
     static uint8_t opd_addr = 0;
     opd_status_t status = {0};
 
     if (argc < 1) {
-        opd_usage(chp);
-        return;
+        goto opd_usage;
     } else if (argc > 1) {
         opd_addr = strtoul(argv[1], NULL, 0);
         chprintf(chp, "Setting persistent board address to 0x%02X\r\n", opd_addr);
@@ -95,8 +134,7 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else {
         if (opd_addr == 0) {
             chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
-            opd_usage(chp);
-            return;
+            goto opd_usage;
         }
         if (!strcmp(argv[0], "enable")) {
             chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
@@ -146,20 +184,29 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             int retval = opd_boot(opd_addr);
             chprintf(chp, "Boot returned 0x%02X\r\n", retval);
         } else {
-            opd_usage(chp);
-            return;
+            goto opd_usage;
         }
     }
+
+    return;
+
+opd_usage:
+    chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
+                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
+                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
+                  "    sysrestart: Cycle power on OPD subsystem\r\n"
+                  "    enable:     Enable an OPD attached card\r\n"
+                  "    disable:    Disable an OPD attached card\r\n"
+                  "    reset:      Reset the circuit breaker of a card\r\n"
+                  "    probe:      Probe an address to see if a card responds\r\n"
+                  "    status:     Report the status of a card\r\n"
+                  "    boot:       Attempt to bootstrap a card\r\n");
+    return;
 }
 
 /*===========================================================================*/
 /* Time                                                                      */
 /*===========================================================================*/
-void time_usage(BaseSequentialStream *chp)
-{
-    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
-}
-
 void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 {
     RTCDateTime timespec;
@@ -168,8 +215,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
     time_scet_t scet;
     time_utc_t utc;
     if (argc < 1) {
-        time_usage(chp);
-        return;
+        goto time_usage;
     }
     if (!strcmp(argv[0], "unix")) {
         if (!strcmp(argv[1], "get")) {
@@ -178,8 +224,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
         } else if (!strcmp(argv[1], "set") && argc > 2) {
             set_time_unix(strtoul(argv[2], NULL, 0), 0);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "scet")) {
         if (!strcmp(argv[1], "get")) {
@@ -190,8 +235,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             scet.fine = strtoul(argv[3], NULL, 0);
             set_time_scet(&scet);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "utc")) {
         if (!strcmp(argv[1], "get")) {
@@ -203,26 +247,119 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             utc.us = strtoul(argv[4], NULL, 0);
             set_time_utc(&utc);
         } else {
-            time_usage(chp);
-            return;
+            goto time_usage;
         }
     } else if (!strcmp(argv[0], "raw")) {
         rtcGetTime(&RTCD1, &timespec);
         chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
     } else {
-        time_usage(chp);
+        goto time_usage;
+    }
+
+    return;
+
+time_usage:
+    chprintf(chp, "Usage: time unix|scet|utc|raw get|set <values>\r\n");
+    return;
+}
+
+/*===========================================================================*/
+/* OreSat CAN Bus SDO Client                                                 */
+/*===========================================================================*/
+void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    int err;
+    lfs_file_t file;
+    lfs_dir_t dir;
+    struct lfs_info info;
+    char buf[BUF_SIZE];
+
+    if (argc < 2) {
+        goto lfs_usage;
+    }
+    if (SDC->state != BLK_READY) {
+        chprintf(chp, "Error: Please enable eMMC first\r\n");
         return;
     }
+
+    if (!strcmp(argv[0], "ls")) {
+        err = lfs_dir_open(&lfs, &dir, argv[1]);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_dir_open: %d\r\n", err);
+            return;
+        }
+        do {
+            err = lfs_dir_read(&lfs, &dir, &info); 
+            if (err < 0) {
+                chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
+                return;
+            }
+            if (info.type == LFS_TYPE_REG) {
+                chprintf(chp, "reg  ");
+            } else if (info.type == LFS_TYPE_DIR) {
+                chprintf(chp, "dir  ");
+            } else {
+                chprintf(chp, "?    ");
+            }
+            chprintf(chp, "%s\r\n", info.name);
+        } while (err > 0);
+        err = lfs_dir_close(&lfs, &dir);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_dir_close: %d\r\n", err);
+            return;
+        }
+    } else if (!strcmp(argv[0], "mkdir")) {
+        err = lfs_mkdir(&lfs, argv[1]);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_mkdir: %d\r\n");
+            return;
+        }
+    } else if (!strcmp(argv[0], "rm")) {
+        err = lfs_remove(&lfs, argv[1]);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_remove: %d\r\n");
+            return;
+        }
+    } else if (!strcmp(argv[0], "cat")) {
+        err = lfs_file_open(&lfs, &file, argv[1], LFS_O_RDONLY);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_open: %d\r\n", err);
+            return;
+        }
+
+        err = lfs_file_read(&lfs, &file, buf, BUF_SIZE - 1);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_read: %d\r\n", err);
+            return;
+        }
+        buf[err] = '\0';
+        chprintf(chp, "%s\r\n", buf);
+
+        err = lfs_file_close(&lfs, &file);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_close: %d\r\n", err);
+            return;
+        }
+    } else {
+        goto lfs_usage;
+    }
+
+    return;
+
+lfs_usage:
+    chprintf(chp,  "Usage: lfs <command>\r\n");
+    return;
 }
 
 /*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
-    {"can", cmd_can},
+    {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
+    {"lfs", cmd_lfs},
     {NULL, NULL}
 };
 
@@ -240,9 +377,6 @@ THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
-
-    /* Initialize ASCII Gateway callback to print returned text */
-    CO_GTWA_initRead(CO->gtwa, gtwa_read_cb, shell_cfg.sc_channel);
 
     /* Start a shell */
     while (!chThdShouldTerminateX()) {
