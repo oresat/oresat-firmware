@@ -17,6 +17,9 @@ The code here refers to logic and snippets from Adam Parker - KD5OOL
 //char beaconMessage[MAX_MESSAGE_SIZE];
 uint16_t ditLength;
 
+/**
+ * @brief   Morse code for alphabet and numbers.
+ */
 static const char *alpha[] = {
     ".-",   //A
     "-...", //B

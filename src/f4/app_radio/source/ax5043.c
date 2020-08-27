@@ -1,11 +1,12 @@
-/*! \file ax5043.c */
-
-
-/*!
- * \addtogroup ax5043
- *  * @{
+/**
+ * @file    ax5043.c
+ * @brief   AX5043 Radio.
  *
+ * @addtogroup AX5043
+ * @ingrup ORESAT
+ * @{
  */
+
 #include <string.h>
 #include "ch.h"
 #include "hal.h"
@@ -14,6 +15,50 @@
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
+/**
+ * @brief   Morse code for alphabets and numbers.
+ */
+static const char *alpha[] = {
+    ".-",   //A
+    "-...", //B
+    "-.-.", //C
+    "-..",  //D
+    ".",    //E
+    "..-.", //F
+    "--.",  //G
+    "....", //H
+    "..",   //I
+    ".---", //J
+    "-.-",  //K
+    ".-..", //L
+    "--",   //M
+    "-.",   //N
+    "---",  //O
+    ".--.", //P
+    "--.-", //Q
+    ".-.",  //R
+    "...",  //S
+    "-",    //T
+    "..-",  //U
+    "...-", //V
+    ".--",  //W
+    "-..-", //X
+    "-.--", //Y
+    "--..", //Z
+};
+
+static const char *num[] = {
+    "-----", //0
+    ".----", //1
+    "..---", //2
+    "...--", //3
+    "....-", //4
+    ".....", //5
+    "-....", //6
+    "--...", //7
+    "---..", //8
+    "----.", //9
+};
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -22,60 +67,6 @@
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
-
-/* TODO: Sort through these variables */
-// physical layer from config.c file generated from radiolab
-const uint8_t ax5043_phy_pn9 = 0;
-const uint8_t ax5043_phy_nrchannels = 1;
-const uint32_t ax5043_phy_chanfreq[1] = { 0x090a2fc9 };
-const uint8_t ax5043_phy_chanpllrnginit[1] = { 0x0a };
-const uint8_t ax5043_phy_chanvcoiinit[1] = { 0x99 };
-uint8_t ax5043_phy_chanpllrng[1];
-uint8_t ax5043_phy_chanvcoi[1];
-const uint8_t ax5043_phy_vcocalib = 0;
-const int32_t ax5043_phy_maxfreqoffset = 910;
-const int8_t ax5043_phy_rssioffset = 64;
-// ax5043_phy_rssioffset is added to AX5043_RSSIREFERENCE and subtracted from chip RSSI value to prevent overflows (8bit RSSI only goes down to -128)
-// ax5043_phy_rssioffset is also added to AX5043_RSSIABSTHR
-const int8_t ax5043_phy_rssireference = (int8_t)(0xF7 + 64);
-const int8_t ax5043_phy_channelbusy = -93 + 64;
-const uint16_t ax5043_phy_cs_period = 7; // timer0 units, 10ms
-const uint8_t ax5043_phy_cs_enabled = 0;
-const uint8_t ax5043_phy_lbt_retries = 0;
-const uint8_t ax5043_phy_lbt_forcetx = 0;
-const uint16_t ax5043_phy_preamble_wor_longlen = 9; // wor_longlen + wor_len totals to 240.0ms plus 112bits
-const uint16_t ax5043_phy_preamble_wor_len = 40;
-const uint16_t ax5043_phy_preamble_longlen = 0;
-const uint16_t ax5043_phy_preamble_len = 40;
-const uint8_t ax5043_phy_preamble_byte = 0x55;
-const uint8_t ax5043_phy_preamble_flags = 0x18;
-const uint8_t ax5043_phy_preamble_appendbits = 4;
-const uint8_t ax5043_phy_preamble_appendpattern = 0x03;
-
-//framing variables generated from radiolab
-const uint8_t ax5043_framing_maclen = 0;
-const uint8_t ax5043_framing_addrlen = 0;
-const uint8_t ax5043_framing_destaddrpos = 0;
-const uint8_t ax5043_framing_sourceaddrpos = 0xff;
-const uint8_t ax5043_framing_lenpos = 0;
-const uint8_t ax5043_framing_lenoffs = 21;
-const uint8_t ax5043_framing_lenmask = 0x00;
-const uint8_t ax5043_framing_swcrclen = 0;
-
-const uint8_t ax5043_framing_synclen = 32;
-const uint8_t ax5043_framing_syncword[] = { 0xcc, 0xaa, 0xcc, 0xaa};
-const uint8_t ax5043_framing_syncflags = 0x18;
-const uint8_t ax5043_framing_enable_sfdcallback = 0;
-
-const uint32_t ax5043_framing_ack_timeout = 13; // 98.9ms in wtimer0 units (640Hz)
-const uint32_t ax5043_framing_ack_delay = 313; // 1.0ms in wtimer1 units (20MHz/64)
-const uint8_t ax5043_framing_ack_retransmissions = 0;
-const uint8_t ax5043_framing_ack_seqnrpos = 0xff;
-
-const uint8_t ax5043_framing_minpayloadlen = 0; // must be set to 1 if the payload directly follows the destination address, and a CRC is configured
-//WOR
-const uint16_t ax5043_wor_period = 128;
-const uint8_t ax5043_phy_innerfreqloop = 0;
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -152,14 +143,38 @@ uint8_t ax5043SPIWriteRegister(SPIDriver *spip, uint16_t reg, uint8_t value, uin
 /*===========================================================================*/
 
 /**
- * Resets the AX5043
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
+ * @brief   Sets powermode register of AX5043.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  reg_value          powermode register value.
+ *
+ * @return                        Most significant status bits from last SPI call.
  */
-void ax5043_reset(SPIDriver * spip)
+uint8_t ax5043_set_pwrmode(AX5043Driver *devp, uint8_t reg_value){
+    uint8_t rxbuf[3]={0,0,0};
+    uint8_t value;
+    SPIDriver *spip = devp->config->spip;
+
+    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
+    value = value & 0xF0;
+    value = value | reg_value;
+    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
+    devp->status_code = rxbuf[0];
+    /*Return last status from Ax5043 while writting the register.
+      Normal value is 0x80 0r 0x88*/
+    return rxbuf[0];
+}
+
+/**
+ * @brief   Resets the AX5043.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @return                        Most significant status bits from last SPI call.
+ */
+uint8_t ax5043_reset(AX5043Driver *devp)
 {
-    //uint8_t reg=0;
+    SPIDriver *spip = devp->config->spip;
     uint8_t value = 0;
     uint8_t rxbuf[3]={0,0,0};
 
@@ -170,200 +185,43 @@ void ax5043_reset(SPIDriver * spip)
     chThdSleepMicroseconds(5);
     spiSelect(spip);
     chThdSleepMicroseconds(5);
-    //spiUnselect(spip);
-    //chThdSleepMicroseconds(10);
 
-    //Reset the chip through powermode register
+    /* Reset the chip through powermode register.*/
     ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_RESET_BIT, rxbuf);
     chThdSleepMilliseconds(1);
-    //chThdSleepMicroseconds(5);
 
-    //read the powermode register
-    value=ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-    //write to powermode register for enabling XOEN and REFIN and shutdown mode
-    //page 33 in programming manual
-    //value = value | AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT;
+    /* Write to powermode register for enabling XOEN and REFIN and shutdown mode.
+       Page 33 in programming manual.*/
+    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
+    /* TODO: Why are we grabbing the register value if we overwrite it completely? */
     value = AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT | AX5043_POWERDOWN;
     ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
 
-    //ax5043SPIWriteRegister(spip, AX5043_REG_MODULATION, (uint8_t)0x00, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0xAA, rxbuf);
     value = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x00, rxbuf);
-    if (value != 0xAA)
-    {
-        /* TODO: Error reporting */
-        /*chprintf(DEBUG_CHP, "Scratch register does not match 0\r\n");*/
+    if (value != 0xAA) {
+        devp->error_code = AXRADIO_ERR_NOT_CONNECTED;
     }
     ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x55, rxbuf);
     value = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x00, rxbuf);
-    if (value != 0x55)
-    {
-        /* TODO: Error reporting */
-        /*chprintf(DEBUG_CHP, "Scratch register does not match 1\r\n");*/
+    if (value != 0x55) {
+        devp->error_code = AXRADIO_ERR_NOT_CONNECTED;
     }
-    //ax5043SPIWriteRegister(spip, AX5043_REG_PINFUNCIRQ, (uint8_t)0x02, rxbuf);
-    //chThdSleepMilliseconds(10);
-
-
+    /*Return last status from Ax5043 while writting the register.*/
+    return rxbuf[0];
 }
 
 /**
- * Shutdown after reset the AX5043
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_shutdown(SPIDriver *spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_POWERDOWN;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-/**
- * Standby the AX5043
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_standby(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    //ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT | AX5043_POWERDOWN, rxbuf);
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_STANDBY;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-/**
- * Enable FIFO in AX5043
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_fifo_en(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_FIFO_ENABLED;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-/**
- * put AX5043 in synthesizer RX mode
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_synth_rx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_SYNTH_RX;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-/**
- * changes AX5043 to full RX mode
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_full_rx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_FULL_RX;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-
-/**
- * put AX5043 in synthesizer TX mode
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_synth_tx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_SYNTH_TX;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-
-/**
- * changes AX5043 to full TX mode
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_full_tx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t value;
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | AX5043_FULL_TX;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-}
-
-
-/**
- * sets AX5043 address registers
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_set_addr(SPIDriver * spip, ax5043_address_mask_t *local_addr) {
-    uint8_t rxbuf[3]={0,0,0};
-    //set address values
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDR0, (uint8_t)local_addr->addr[0], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDR1, (uint8_t)local_addr->addr[1], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDR2, (uint8_t)local_addr->addr[2], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDR3, (uint8_t)local_addr->addr[3], rxbuf);
-    //set address mask
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDRMASK0, (uint8_t)local_addr->mask[0], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDRMASK1, (uint8_t)local_addr->mask[1], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDRMASK2, (uint8_t)local_addr->mask[2], rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTADDRMASK3, (uint8_t)local_addr->mask[3], rxbuf);
-}
-
-
-uint8_t ax5043_get_pllvcoi(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t x = ax5043_phy_chanvcoiinit[0];
-    if (x & 0x80) {
-        if (!(ax5043_phy_chanpllrnginit[0] & 0xF0)) {
-            x += (ax5043_phy_chanpllrng[0] & 0x0F) - (ax5043_phy_chanpllrnginit[0] & 0x0F);
-            x &= 0x3f;
-            x |= 0x80;
-        }
-        return x;
-    }
-    return ax5043SPIReadRegister(spip, AX5043_REG_PLLVCOI, (uint8_t)0x00, rxbuf);
-}
-
-
-
-
-/**
- * writes to FIFO
- * Takn from Bradenburg library which seems to be taken from onSemi's code
- * @param conf the AX5043 configuration handler
- * @return void
+ * @brief   Writes to AX5043 FIFO
  *
+ * @param[in]  spip               pointer to the @p SPIDriver object.
+ * @param[in]  ptr                Pointer to array to be written to FIFO.
+ * @param[in]  len                length of array to be written to FIFO.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
  */
-void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len) {
+void ax5043_writefifo(SPIDriver * spip, const uint8_t *ptr, uint8_t len){
     uint8_t rxbuf[3]={0,0,0};
     if (!len)
         return;
@@ -372,516 +230,772 @@ void ax5043_writefifo(SPIDriver * spip,const uint8_t *ptr, uint8_t len) {
     } while (--len);
 }
 
-
-
-uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t ax5043_rxbuffer[], uint8_t len) {
+/**
+ * @brief   Reads to AX5043 FIFO
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  axradio_rxbuffer[] Pointer to array where the packet will be kept.
+ * @param[in]  len                Maximum length of array to be read FIFO.
+ *
+ * @param[out]                    Bytes read from FIFO.
+ */
+uint8_t ax5043_readfifo(SPIDriver * spip, uint8_t axradio_rxbuffer[], uint8_t len) {
     uint8_t rxbuf[3]={0,0,0};
-    uint8_t loc = 0;
+    uint8_t bytes_read = 0;
     while (len--) {
-        ax5043_rxbuffer[loc] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-        loc++;
+        axradio_rxbuffer[bytes_read] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+        bytes_read++;
     }
-    return loc;
+    return bytes_read;
 }
 
-
 /**
- * Sets AX5043 registers. This is based on config file generated by radio lab.
- * @param devp: AX5043 Driver P
- * @return void
- * TODO return a -ve return code if there are any errors
+ * @brief   Sets AX5043 registers.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  group              register group that needs to be written.
+ *
+ * @return                        Most significant status bits from last SPI call.
  */
-// TX: fcarrier=433.910MHz dev=  3.200kHz br=  9.600kBit/s pwr= 10.0dBm
-// RX: fcarrier=433.910MHz bw= 14.400kHz br=  9.600kBit/s
-
-void ax5043_set_regs(AX5043Driver *devp) {
+uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group) {
     uint8_t rxbuf[3] = {0, 0, 0};
-    ax5043_regval_t *entry = devp->config->reg_values;
-    while (entry->reg) {
-        ax5043SPIWriteRegister(devp->config->spip, entry->reg, entry->val, rxbuf);
+    int i = 0;
+    ax5043_regval_t* entry = devp->config->reg_values;
+    while (entry[i].reg != AX5043_REG_END) {
+        if (entry[i].group == group){
+            ax5043SPIWriteRegister(devp->config->spip, entry[i].reg, entry[i].val, rxbuf);
+        }
+        i++;
     }
+    devp->status_code = rxbuf[0];
+    /*Return last status from Ax5043 while writting the register.*/
+    return rxbuf[0];
 }
-
 
 /**
- * Sets AX5043 registers for TX. This is based on config file generated by radio lab.
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
+ * @brief   Gets AX5043 register values from the AX5043 driver structure.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  reg_name           register name.
+ *
+ * @return                        register value.
  */
-void ax5043_set_regs_tx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLLOOP,        (uint8_t)0x09, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLCPI,         (uint8_t)0x02, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLVCODIV,      (uint8_t)0x24, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_XTALCAP,        (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_0xF00,          (uint8_t)0x0F, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_0xF18,          (uint8_t)0x06, rxbuf);
-}
-
-
-/**
- * Sets AX5043 registers for RX. This is based on config file generated by radio lab.
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_set_regs_rx(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLLOOP,        (uint8_t)0x0B, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLCPI,         (uint8_t)0x10, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PLLVCODIV,      (uint8_t)0x25, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_XTALCAP,        (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_0xF00,          (uint8_t)0x0F, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_0xF18,          (uint8_t)0x02, rxbuf);
-}
-
-
-/**
- * Sets AX5043 registers for RX continous. This is based on config file generated by radio lab.
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_set_regs_rxcont(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    ax5043SPIWriteRegister(spip, AX5043_REG_TMGRXAGC,       (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_TMGRXPREAMBLE1, (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_PKTMISCFLAGS,   (uint8_t)0x00, rxbuf);
-}
-
-
-/**
- * Sets AX5043 registers for TX. This is based on config file generated by radio lab.
- * @param spip: SPI Configuration.
- * @return void
- * TODO return a -ve return code if there are any errors
- */
-void ax5043_set_regs_rxcont_singleparamset(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    ax5043SPIWriteRegister(spip, AX5043_REG_RXPARAMSETS,    (uint8_t)0xFF, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_FREQDEV13,      (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_FREQDEV03,      (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(spip, AX5043_REG_AGCGAIN3,       (uint8_t)0xE7, rxbuf);
-}
-
-
-
-void ax5043_init_registers_common(SPIDriver * spip) {
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t rng = ax5043_phy_chanpllrng[0];
-    if (rng & 0x20) {
-        /* TODO: Error? */
-        /*chprintf(DEBUG_CHP, "\r\r ERROR at ax5043_init_registers_common --\r\n");*/
+uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name) {
+    int i = 0;
+    ax5043_regval_t* entry = devp->config->reg_values;
+    while (entry[i].reg != AX5043_REG_END) {
+        if (entry[i].reg == reg_name){
+            return entry[i].val;
+        }
+        i++;
     }
-    if ( ax5043SPIReadRegister(spip, AX5043_REG_PLLLOOP, (uint8_t)0x00, rxbuf) & 0x80) {
-        ax5043SPIWriteRegister(spip, AX5043_REG_PLLRANGINGB, (uint8_t)(rng & 0x0F), rxbuf);
-    } else {
-        ax5043SPIWriteRegister(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(rng & 0x0F), rxbuf);
-    }
-    rng = ax5043_get_pllvcoi(spip);
-    if (rng & 0x80)
-        ax5043SPIWriteRegister(spip, AX5043_REG_PLLVCOI, (uint8_t)(rng), rxbuf);
+    devp->error_code = AXRADIO_ERR_REG_NOT_IN_CONF;
+    return 0;
 }
 
-
-
-
-
 /**
- * prepare AX5043 for tx
- * @param spip: SPI Configuration.
- * @return void
+ * @brief   Gets AX5043 configuration values from the AX5043 driver structure.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  conf_name          configuration variable name.
+ *
+ * @retrun                        value in configuration variable.
+ *
+ * @api
  * TODO return a -ve return code if there are any errors
  */
-void ax5043_prepare_tx(SPIDriver * spip) {
+uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name) {
+    int i = 0;
+    ax5043_confval_t* entry = devp->config->conf_values;
+    while (entry[i].conf_name != AXRADIO_PHY_END) {
+        if (entry[i].conf_name == conf_name){
+            return entry[i].val;
+        }
+        i++;
+    }
+    devp->error_code = AXRADIO_ERR_VAL_NOT_IN_CONF;
+    return 0;
+}
 
-    //uint8_t reg=0;
-    //uint8_t value=0;
+/**
+ * @brief   Sets AX5043 configuration values from the AX5043 driver structure.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  conf_name          configuration variable name.
+ * @param[in]  value              value in configuration variable.
+ *
+ * @return                        0 if successful, else 0x11.
+ */
+uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value) {
+    int i = 0;
+    ax5043_confval_t* entry = devp->config->conf_values;
+    while (entry[i].conf_name != AXRADIO_PHY_END) {
+        if (entry[i].conf_name == conf_name){
+            entry[i].val = value;
+            return 0;
+        }
+        i++;
+    }
+    devp->error_code = AXRADIO_ERR_VAL_NOT_IN_CONF;
+    return AXRADIO_ERR_VAL_NOT_IN_CONF;
+}
+
+/**
+ * @brief   Prepare AX5043 for tx.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
+ */
+void ax5043_prepare_tx(AX5043Driver *devp){
     uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
 
-    ax5043_standby(spip);
-    ax5043_fifo_en(spip);
-    ax5043_set_regs_tx(spip);
-    ax5043_init_registers_common(spip);
+    ax5043_set_pwrmode(devp, AX5043_STANDBY);
+    ax5043_set_pwrmode(devp, AX5043_FIFO_ENABLED);
+    ax5043_set_regs_group(devp,tx);
+    ax5043_init_registers_common(devp);
 
+    /* Set FIFO threshold and interrupt mask.*/
     ax5043SPIWriteRegister(spip, AX5043_REG_FIFOTHRESH1, (uint8_t)0x00, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_FIFOTHRESH0, (uint8_t)0x80, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_IRQMASK0, (uint8_t)0x00, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_IRQMASK1, (uint8_t)0x01, rxbuf);
 
-
-    //set address values
-    //ax5043_set_local_addr(spip);
-
-    //wait for xtal
+    /* Wait for xtal.*/
     while ((ax5043SPIReadRegister(spip, AX5043_REG_XTALSTATUS, (uint8_t)0x00, rxbuf) & 0x01) == 0) {
         chThdSleepMilliseconds(1);
     }
-
-    //ax5043_full_tx(spip);
+    devp->status_code = rxbuf[0];
+    devp->state = AX5043_TX;
 }
 
-
 /**
- * prepare AX5043 for rx
- * @param spip: SPI Configuration.
- * @return void
+ * @brief   prepare AX5043 for rx.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @api
  * TODO return a -ve return code if there are any errors
  */
-void ax5043_prepare_rx(SPIDriver * spip) {
-
-    //uint8_t reg=0;
-    //int8_t value= (int8_t)(0xF9 + 64);
+void ax5043_prepare_rx(AX5043Driver *devp){
     uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
 
-    //ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_STANDBY, rxbuf);
-    //ax5043SPIWriteRegister(spip, AX5043_REG_LPOSCCONFIG, (uint8_t)0x00, rxbuf);
-    //ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_POWERDOWN, rxbuf);
+    ax5043_set_regs_group(devp,rx);
+    ax5043_init_registers_common(devp);
 
-    ax5043_set_regs_rx(spip);
-    ax5043_init_registers_common(spip);
-
-
-    //follows code from function ax5043_receiver_on_continuous() in easyax5043.c from radiolab
-
-    ax5043SPIWriteRegister(spip, AX5043_REG_RSSIREFERENCE, ax5043_phy_rssireference, rxbuf);
-    ax5043_set_regs_rxcont(spip);
-
-    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, rxbuf);//FIFO reset
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_FULL_RX, rxbuf);//Full RX
-
+    /* Updates RSSI reference value, Sets a group of RX registers.*/
+    uint8_t rssireference = ax5043_get_conf_val(devp, AXRADIO_PHY_RSSIREFERENCE) ;
+    ax5043SPIWriteRegister(spip, AX5043_REG_RSSIREFERENCE, rssireference, rxbuf);
+    ax5043_set_regs_group(devp,rx_cont);
+    /* Resets FIFO, changes powermode to FULL RX.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, rxbuf);
+    ax5043_set_pwrmode(devp, AX5043_FULL_RX);
+    /* Sets FIFO threshold and interrupt mask.*/
     ax5043SPIWriteRegister(spip, AX5043_REG_FIFOTHRESH1, (uint8_t)0x00, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_FIFOTHRESH0, (uint8_t)0x80, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_IRQMASK0, (uint8_t)0x01, rxbuf);
     ax5043SPIWriteRegister(spip, AX5043_REG_IRQMASK1, (uint8_t)0x00, rxbuf);
-
-    //set address values
-    //ax5043_set_local_addr(spip);
-
+    devp->status_code = rxbuf[0];
+    devp->state = AX5043_RX;
 }
 
+/**
+ * @brief   Does PLL ranging.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @returns                       PLLVCOI Register content.
+ * @api
+ * TODO return a -ve return code if there are any errors
+ */
+uint8_t axradio_get_pllvcoi(AX5043Driver *devp){
+    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
 
-
-
-
-
-
-
-
-
+    uint8_t x = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANVCOIINIT) ;
+    uint8_t pll_init_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNGINIT);
+    uint8_t pll_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
+    if (x & 0x80) {
+        if (!(pll_init_val & 0xF0)) {
+            x += (pll_val & 0x0F) - (pll_init_val & 0x0F);
+            x &= 0x3f;
+            x |= 0x80;
+        }
+        return x;
+    }
+    return ax5043SPIReadRegister(spip, AX5043_REG_PLLVCOI, (uint8_t)0x00, rxbuf);
+}
 
 /**
- * Transmits a packet
- * The logic is similar to transmit_isr()
- * @param conf the AX5043 configuration handler
- * @return void
+ * @brief   Initialized AX5043 registers common to RX and TX.
  *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
  */
+void ax5043_init_registers_common(AX5043Driver *devp){
+    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
 
-void transmit_loop(SPIDriver * spip, ax5043_trxstate_t ax5043_trxstate, uint16_t ax5043_txbuffer_len,uint8_t ax5043_txbuffer[], uint16_t ax5043_txbuffer_cnt) {
+    uint8_t rng = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
+    if (rng & 0x20)
+        devp->status_code = AXRADIO_ERR_PLLRNG_VAL;
+    if ( ax5043SPIReadRegister(spip, AX5043_REG_PLLLOOP, (uint8_t)0x00, rxbuf) & 0x80) {
+        ax5043SPIWriteRegister(spip, AX5043_REG_PLLRANGINGB, (uint8_t)(rng & 0x0F), rxbuf);
+    }
+    else {
+        ax5043SPIWriteRegister(spip, AX5043_REG_PLLRANGINGA, (uint8_t)(rng & 0x0F), rxbuf);
+    }
+    rng = axradio_get_pllvcoi(devp);
+    if (rng & 0x80)
+        ax5043SPIWriteRegister(spip, AX5043_REG_PLLVCOI, (uint8_t)(rng), rxbuf);
+}
+
+/**
+ * @brief   Initializes AX5043. This is written based on easyax5043.c generated from AX Radiolab.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @api
+ * TODO Standardize the error handling.
+ */
+void ax5043_init(AX5043Driver *devp){
+    SPIDriver *spip = devp->config->spip;
     uint8_t rxbuf[3]={0,0,0};
 
-    for (;;) {
-        uint8_t cnt = ax5043SPIReadRegister(spip,AX5043_REG_FIFOFREE0, (uint8_t)0x00, rxbuf);
+    ax5043_reset(devp);
 
+    ax5043_set_regs_group(devp,common);
+    ax5043_set_regs_group(devp,tx);
+
+    ax5043SPIWriteRegister(spip, AX5043_REG_PLLLOOP, (uint8_t)0x09, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_PLLCPI, (uint8_t)0x08, rxbuf);
+
+    ax5043_set_pwrmode(devp, AX5043_STANDBY);
+    ax5043SPIWriteRegister(spip, AX5043_REG_MODULATION, (uint8_t)0x08, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV2, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV1, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV0, (uint8_t)0x00, rxbuf);
+
+    /* Wait for Xtal.*/
+    while ((ax5043SPIReadRegister(spip, AX5043_REG_XTALSTATUS, (uint8_t)0x00, rxbuf) & 0x01) == 0){
+        chThdSleepMilliseconds(1);
+    }
+
+    /* Set frequency.*/
+    uint32_t f = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANFREQ);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA0, (uint8_t)f, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA1, (uint8_t)(f >> 8), rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA3, (uint8_t)(f >> 24), rxbuf);
+
+    /* PLL autoranging.*/
+    uint8_t r;
+    uint8_t pll_init_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNGINIT);
+    if( !(pll_init_val & 0xF0) ) { // start values for ranging available
+        r = pll_init_val | 0x10;
+    }
+    else {
+        r = 0x18;
+    }
+    ax5043SPIWriteRegister(spip, AX5043_REG_PLLRANGINGA, (uint8_t)r, rxbuf);
+    chThdSleepMilliseconds(1);
+    while ((ax5043SPIReadRegister(spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, rxbuf) & 0x10) != 0)
+    {
+        chThdSleepMilliseconds(1);
+    }
+    int8_t value = ax5043SPIReadRegister(spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, rxbuf);
+    ax5043_set_conf_val(devp, AXRADIO_PHY_CHANPLLRNG, value);
+    devp->state = AX5043_PLL_RANGE_DONE;
+
+    ax5043_set_pwrmode(devp, AX5043_POWERDOWN);
+    ax5043_set_regs_group(devp,common);
+    ax5043_set_regs_group(devp,rx);
+
+    uint8_t pll_val = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANPLLRNG);
+    ax5043SPIReadRegister(spip, AX5043_REG_PLLRANGINGA, (pll_val & 0x0F), rxbuf);
+    f = ax5043_get_conf_val(devp, AXRADIO_PHY_CHANFREQ);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA0, (uint8_t)f, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA1, (uint8_t)(f >> 8), rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FREQA3, (uint8_t)(f >> 24), rxbuf);
+
+    ax5043_set_regs_group(devp,local_address);
+}
+
+/**
+ * @brief   Transmit loop to transmit bytes of a packet.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  packet_len         Complete packet length including mac.
+ * @param[in]  axradio_txbuffer   pointer to packet.
+ * @param[in]  packet_bytes_sent length before the packet.
+ *
+ * @api
+ * TODO Standardize the error handling, remove packet_bytes_sent, simplify the code.
+ */
+void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuffer[]){
+    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
+
+    uint8_t free_fifo_bytes;
+    uint8_t packet_end_indicator = 0;
+    uint16_t packet_bytes_sent = 0;
+    uint8_t flags = 0;
+    uint16_t packet_len_to_be_sent = 0;
+    uint8_t synclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCLEN);
+
+    while (packet_end_indicator == 0) {
         if (ax5043SPIReadRegister(spip,AX5043_REG_FIFOFREE1, (uint8_t)0x00, rxbuf))
-            cnt = 0xff;
+            free_fifo_bytes = 0xff;
+        else
+            free_fifo_bytes = ax5043SPIReadRegister(spip,AX5043_REG_FIFOFREE0, (uint8_t)0x00, rxbuf);
+        /* Make sure sixteen bytes in FIFO are free. We can do with minimum 4 bytes free but taking in 16 here.*/
+        if (free_fifo_bytes < 19) {
+            /* FIFO commit.*/
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf);
+            continue;
+        }
 
-        switch (ax5043_trxstate) {
-        case TRXSTATE_TX_LONGPREAMBLE:
-            if (!ax5043_txbuffer_cnt) {
-                ax5043_trxstate = TRXSTATE_TX_SHORTPREAMBLE;
-                ax5043_txbuffer_cnt = ax5043_phy_preamble_len;
-                goto shortpreamble;
+        switch (devp->state) {
+        case AX5043_TX_LONGPREAMBLE:
+            if (!packet_bytes_sent) {
+                devp->state = AX5043_TX_SHORTPREAMBLE;
+                packet_bytes_sent = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_LEN);
+                break;
             }
-            if (cnt < 4) {
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
-                chThdSleepMilliseconds(1);
-                continue;
-            }
-            cnt = 7;
-            if (ax5043_txbuffer_cnt < 7)
-                cnt = ax5043_txbuffer_cnt;
-            ax5043_txbuffer_cnt -= cnt;
-            cnt <<= 5;
+
+            free_fifo_bytes = 7;
+            if (packet_bytes_sent < 7)
+                free_fifo_bytes = packet_bytes_sent;
+            packet_bytes_sent -= free_fifo_bytes;
+            free_fifo_bytes <<= 5;
             ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), rxbuf);
-            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_phy_preamble_flags, rxbuf);
-            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, cnt, rxbuf);
-            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_phy_preamble_byte, rxbuf);
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), rxbuf);
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, free_fifo_bytes, rxbuf);
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE), rxbuf);
             break;
 
-        case TRXSTATE_TX_SHORTPREAMBLE:
-shortpreamble:
-            if (!ax5043_txbuffer_cnt) {
-                if (cnt < 15) {
-                    ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
-                    chThdSleepMilliseconds(1);
-                    continue;
-                }
-                if (ax5043_phy_preamble_appendbits) {
+        case AX5043_TX_SHORTPREAMBLE:
+            if (!packet_bytes_sent) {
+                uint8_t preamble_appendbits = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_APPENDBITS);
+                if (preamble_appendbits) {
                     uint8_t byte;
                     ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (2 << 5), rxbuf);
                     ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x1C, rxbuf);
-                    byte = ax5043_phy_preamble_appendpattern;
+                    byte = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_APPENDPATTERN);
                     if (ax5043SPIReadRegister(spip,AX5043_REG_PKTADDRCFG, (uint8_t)0x00, rxbuf) & 0x80) {
                         // msb first -> stop bit below
-                        byte &= 0xFF << (8-ax5043_phy_preamble_appendbits);
-                        byte |= 0x80 >> ax5043_phy_preamble_appendbits;
+                        byte &= 0xFF << (8-preamble_appendbits);
+                        byte |= 0x80 >> preamble_appendbits;
                     } else {
                         // lsb first -> stop bit above
-                        byte &= 0xFF >> (8-ax5043_phy_preamble_appendbits);
-                        byte |= 0x01 << ax5043_phy_preamble_appendbits;
+                        byte &= 0xFF >> (8-preamble_appendbits);
+                        byte |= 0x01 << preamble_appendbits;
                     }
                     ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, byte, rxbuf);
                 }
-                if ((ax5043SPIReadRegister(spip,AX5043_REG_FRAMING, (uint8_t)0x00, rxbuf) & 0x0E) == 0x06 && ax5043_framing_synclen) {
-                    // write SYNC word if framing mode is raw_patternmatch, might use SYNCLEN > 0 as a criterion, but need to make sure SYNCLEN=0 for WMBUS (chip automatically sends SYNCWORD but matching in RX works via MATCH0PAT)
-                    uint8_t len_byte = ax5043_framing_synclen;
+                if ((ax5043SPIReadRegister(spip,AX5043_REG_FRAMING, (uint8_t)0x00, rxbuf) & 0x0E) == 0x06 && synclen) {
+                    /* Write SYNC word if framing mode is raw_patternmatch, might use SYNCLEN > 0 as a criterion, but need to make sure SYNCLEN=0 for WMBUS.
+                       Chip automatically sends SYNCWORD but matching in RX works via MATCH0PAT).*/
+                    int8_t len_byte = synclen;
                     uint8_t i = (len_byte & 0x07) ? 0x04 : 0;
-                    // SYNCLEN in bytes, rather than bits. Ceiled to next integer e.g. fractional bits are counted as full bits;v
+                    /* SYNCLEN in bytes, rather than bits. Ceiled to next integer e.g. fractional bits are counted as full bits.*/
                     len_byte += 7;
                     len_byte >>= 3;
                     ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | ((len_byte + 1) << 5), rxbuf);
-                    ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_framing_syncflags | i, rxbuf);
+                    ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCFLAGS) | i, rxbuf);
+
+                    uint8_t syncword[4] = {ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD0),
+                        ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD1),
+                        ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD2),
+                        ax5043_get_conf_val(devp, AXRADIO_FRAMING_SYNCWORD3)};
                     for (i = 0; i < len_byte; ++i) {
-                        // better put a brace, it might prevent SDCC from optimizing away the assignement...
-                        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_framing_syncword[i], rxbuf);
+                        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, syncword[i], rxbuf);
                     }
                 }
-                ax5043_trxstate = TRXSTATE_TX_PACKET;
+                devp->state = AX5043_TX_PACKET;
                 continue;
             }
-            if (cnt < 4) {
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
-                chThdSleepMilliseconds(1);
-                continue;
-            }
-            cnt = 255;
-            if (ax5043_txbuffer_cnt < 255*8)
-                cnt = ax5043_txbuffer_cnt >> 3;
-            if (cnt) {
-                ax5043_txbuffer_cnt -= ((uint16_t)cnt) << 3;
+            free_fifo_bytes = 255;
+            if (packet_bytes_sent < 255*8)
+                free_fifo_bytes = packet_bytes_sent >> 3;
+            if (free_fifo_bytes) {
+                packet_bytes_sent -= ((uint16_t)free_fifo_bytes) << 3;
                 ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_REPEATDATA | (3 << 5), rxbuf);
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_phy_preamble_flags, rxbuf);
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, cnt, rxbuf);
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, ax5043_phy_preamble_byte, rxbuf);
+                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_FLAGS), rxbuf);
+                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, free_fifo_bytes, rxbuf);
+                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, (uint8_t)ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE), rxbuf);
                 continue;
             }
             {
-                uint8_t byte = ax5043_phy_preamble_byte;
-                cnt = ax5043_txbuffer_cnt;
-                ax5043_txbuffer_cnt = 0;
+                uint8_t byte = ax5043_get_conf_val(devp, AXRADIO_PHY_PREAMBLE_BYTE) ;
+                free_fifo_bytes = packet_bytes_sent;
+                packet_bytes_sent = 0;
                 ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (2 << 5), rxbuf);
                 ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x1C, rxbuf);
                 if (ax5043SPIReadRegister(spip,AX5043_REG_PKTADDRCFG, (uint8_t)0x00, rxbuf) & 0x80) {
-                    // msb first -> stop bit below
-                    byte &= 0xFF << (8-cnt);
-                    byte |= 0x80 >> cnt;
+                    /* MSB first -> stop bit below.*/
+                    byte &= 0xFF << (8-free_fifo_bytes);
+                    byte |= 0x80 >> free_fifo_bytes;
                 } else {
                     // lsb first -> stop bit above
-                    byte &= 0xFF >> (8-cnt);
-                    byte |= 0x01 << cnt;
+                    byte &= 0xFF >> (8-free_fifo_bytes);
+                    byte |= 0x01 << free_fifo_bytes;
                 }
                 ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, byte, rxbuf);
             }
             continue;
 
-        case TRXSTATE_TX_PACKET:
-            if (cnt < 11) {
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
-                chThdSleepMilliseconds(1);
-                continue;
+        case AX5043_TX_PACKET:
+            flags = 0;
+            packet_len_to_be_sent = 0;
+            if (!packet_bytes_sent)
+                /* Flag byte indicates packetstart.*/
+                flags |= 0x01;
+
+            packet_len_to_be_sent = packet_len - packet_bytes_sent;
+            /* 3 bytes of FIFO commands are written before payload can be written to FIFO.*/
+            if (free_fifo_bytes >= packet_len_to_be_sent + 3) {
+                /* Flag byte indicates packet end.*/
+                flags |= 0x02;
             }
-            {
-                uint8_t flags = 0;
-                if (!ax5043_txbuffer_cnt)
-                    flags |= 0x01; // flag byte: pkt_start
-                {
-                    uint16_t len = ax5043_txbuffer_len - ax5043_txbuffer_cnt;
-                    cnt -= 3;
-                    if (cnt >= len) {
-                        cnt = len;
-                        flags |= 0x02; // flag byte: pkt_end
-                    }
-                }
-                if (!cnt)
-                    goto pktend;
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (7 << 5), rxbuf);
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, cnt + 1, rxbuf); // write FIFO chunk length byte (length includes the flag byte, thus the +1)
-                ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, flags, rxbuf);
-                ax5043_writefifo(spip,&ax5043_txbuffer[ax5043_txbuffer_cnt], cnt);
-                ax5043_txbuffer_cnt += cnt;
-                if (flags & 0x02)
-                    goto pktend;
+            else{
+                packet_len_to_be_sent = free_fifo_bytes - 3;
+            }
+
+
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (7 << 5), rxbuf);
+            /* Write FIFO chunk length byte. Length includes the flag byte, thus the +1.*/
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, packet_len_to_be_sent + 1, rxbuf);
+            ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, flags, rxbuf);
+            ax5043_writefifo(spip,&axradio_txbuffer[packet_bytes_sent], packet_len_to_be_sent);
+            packet_bytes_sent += packet_len_to_be_sent;
+            if (flags & 0x02){
+                packet_end_indicator = 1;
+                /* Enable radio event done (REVRDONE) event.*/
+                ax5043SPIWriteRegister(spip,AX5043_REG_RADIOEVENTMASK0, 0x01, rxbuf);
+                ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
             }
             break;
 
         default:
-            break;
-            /*chprintf(DEBUG_CHP, "ERROR: Unexpected state found in transmit \r\n");*/
+            packet_end_indicator = 1;
+            devp->error_code = AXRADIO_ERR_UNEXPECTED_STATE;
         }
     }
-
-pktend:
-    ax5043SPIWriteRegister(spip,AX5043_REG_RADIOEVENTMASK0, 0x01, rxbuf); // enable REVRDONE event
-    ax5043SPIWriteRegister(spip,AX5043_REG_FIFOSTAT, 4, rxbuf); // commit
+    devp->state = AX5043_TX;
 }
 
-
-
-
-
 /**
- * Transmits a packet
- * Logic similar to ax5043_transmit()
- * @param conf the AX5043 configuration handler
- * @return void
+ * @brief   Transmits a packet.
  *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  addr               remote destination address of packet.
+ * @param[in]  pkt                pointer to packet.
+ * @param[in]  pktlen             packet length.
+ *
+ * @param[out] AXRADIO_ERR        Error code.
+ *
+ * @api
+ * TODO Standardize the error handling, Maybe move address to a driver config structure
  */
-
-uint8_t transmit_packet(SPIDriver * spip, ax5043_address_t *addr, ax5043_address_mask_t *ax5043_localaddr, uint8_t *pkt, uint16_t pktlen) {
+uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) {
     uint8_t rxbuf[3]={0,0,0};
-    ax5043_trxstate_t ax5043_trxstate;
-    uint16_t ax5043_txbuffer_len;
-    uint8_t ax5043_txbuffer[PKTDATA_BUFLEN];
-    uint16_t ax5043_txbuffer_cnt = 0;
+    SPIDriver *spip = devp->config->spip;
+    uint16_t packet_len;
+    uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
+    uint8_t axradio_localaddr[4];
 
-    ax5043_txbuffer_len = pktlen + ax5043_framing_maclen;
-    if (ax5043_txbuffer_len > sizeof(ax5043_txbuffer))
-        return AX5043_ERR_INVALID;
-    memset(ax5043_txbuffer, 0, ax5043_framing_maclen);
-    memcpy(&ax5043_txbuffer[ax5043_framing_maclen], pkt, pktlen);
-    if (ax5043_framing_destaddrpos != 0xff)
-        memcpy(&ax5043_txbuffer[ax5043_framing_destaddrpos], &addr->addr, ax5043_framing_addrlen);
-    if (ax5043_framing_sourceaddrpos != 0xff)
-        memcpy(&ax5043_txbuffer[ax5043_framing_sourceaddrpos], &ax5043_localaddr->addr, ax5043_framing_addrlen);
-    if (ax5043_framing_lenmask) {
-        uint8_t len_byte = (uint8_t)(ax5043_txbuffer_len - ax5043_framing_lenoffs) & ax5043_framing_lenmask; // if you prefer not counting the len byte itself, set LENOFFS = 1
-        ax5043_txbuffer[ax5043_framing_lenpos] = (ax5043_txbuffer[ax5043_framing_lenpos] & (uint8_t)~ax5043_framing_lenmask) | len_byte;
+    uint8_t maclen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_MACLEN);
+    uint8_t destaddrpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_DESTADDRPOS);
+    uint8_t addrlen = ax5043_get_conf_val(devp, AXRADIO_FRAMING_ADDRLEN);
+    uint8_t sourceaddrpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_SOURCEADDRPOS);
+    uint8_t lenmask = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENMASK);
+    uint8_t lenoffs = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENOFFS);
+    uint8_t lenpos = ax5043_get_conf_val(devp, AXRADIO_FRAMING_LENPOS);
+
+    axradio_localaddr[0] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR0);
+    axradio_localaddr[1] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR1);
+    axradio_localaddr[2] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR2);
+    axradio_localaddr[3] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR3);
+
+    packet_len = pktlen + maclen;
+    if (packet_len > sizeof(axradio_txbuffer))
+        return AXRADIO_ERR_INVALID;
+
+    /* Prepare the MAC segment of the packet.*/
+    memset(axradio_txbuffer, 0, maclen);
+    memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
+    if (destaddrpos != 0xff)
+        memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
+    if (sourceaddrpos != 0xff)
+        memcpy(&axradio_txbuffer[sourceaddrpos], axradio_localaddr, addrlen);
+    if (lenmask) {
+        /* Calculate payload length and update the MAC of payload.*/
+        uint8_t len_byte = (uint8_t)(packet_len - lenoffs) & lenmask;
+        axradio_txbuffer[lenpos] = (axradio_txbuffer[lenpos] & (uint8_t)~lenmask) | len_byte;
     }
-    /*
-       if (ax5043_framing_swcrclen)
-       ax5043_txbuffer_len = ax5043_framing_append_crc(ax5043_txbuffer, ax5043_txbuffer_len);
-       if (ax5043_phy_pn9)
-       pn9_buffer(ax5043_txbuffer, ax5043_txbuffer_len, 0x1ff, -(ax5043SPIReadRegister(spip, AX5043_REG_ENCODING, (uint8_t)0x00, rxbuf) & 0x01));
-       ax5043_txbuffer_cnt = ax5043_phy_preamble_longlen;
-       */
-    //ax5043_prepare_tx(spip);
+    /*Clear radioevent flag. This indicator is set when packet is out.*/
+    ax5043SPIReadRegister(spip,AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, rxbuf);
+    /* Clear leftover FIFO data & flags.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, 3, rxbuf);
+    devp->state = AX5043_TX_LONGPREAMBLE;
 
-    ax5043SPIReadRegister(spip,AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, rxbuf);; // make sure REVRDONE bit is cleared, so it is a reliable indicator that the packet is out
-    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, 3, rxbuf); // clear FIFO data & flags (prevent transmitting anything left over in the FIFO, this has no effect if the FIFO is not powerered, in this case it is reset any way)
-    ax5043_trxstate = TRXSTATE_TX_LONGPREAMBLE;
-
-    if ((ax5043SPIReadRegister(spip,AX5043_REG_MODULATION, (uint8_t)0x00, rxbuf) & 0x0F) == 9) { // 4-FSK
+    /*Code for 4-FSK mode.*/
+    if ((ax5043SPIReadRegister(spip,AX5043_REG_MODULATION, (uint8_t)0x00, rxbuf) & 0x0F) == 9) {
         ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, AX5043_FIFOCMD_DATA | (7 << 5), rxbuf);
-        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 2, rxbuf);  // length (including flags)
-        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x01, rxbuf);  // flag PKTSTART -> dibit sync
-        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x11, rxbuf); // dummy byte for forcing dibit sync
+        /* Length including flags.*/
+        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 2, rxbuf);
+        /* Flag PKTSTART -> dibit sync.*/
+        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x01, rxbuf);
+        /* Dummy byte for forcing dibit sync.*/
+        ax5043SPIWriteRegister(spip,AX5043_REG_FIFODATA, 0x11, rxbuf);
     }
-    transmit_loop(spip, ax5043_trxstate, ax5043_txbuffer_len, ax5043_txbuffer, ax5043_txbuffer_cnt);
-    ax5043SPIWriteRegister(spip,AX5043_REG_PWRMODE, AX5043_FULL_TX, rxbuf);
+    transmit_loop(devp, packet_len, axradio_txbuffer);
+    ax5043_set_pwrmode(devp, AX5043_FULL_TX);
 
     ax5043SPIReadRegister(spip,AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, rxbuf);
-    //printf("INFO: Waiting for transmission to complete\n");
     while (ax5043SPIReadRegister(spip,AX5043_REG_RADIOSTATE, (uint8_t)0x00, rxbuf) != 0) {
         chThdSleepMilliseconds(1);
     }
-    //printf("INFO: Transmission complete\n");
 
     ax5043SPIWriteRegister(spip,AX5043_REG_RADIOEVENTMASK0, 0x00, rxbuf);
-
-    return AX5043_ERR_NOERROR;
+    devp->error_code = AXRADIO_ERR_NOERROR;
+    return AXRADIO_ERR_NOERROR;
 }
 
-
-
-
-
-uint8_t receive_loop(SPIDriver * spip, uint8_t ax5043_rxbuffer[]) {
+/**
+ * @brief   Receive loop to recieve bytes from FIFO.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[out] axradio_rxbuffer[] Pointer to array where the packet will be kept.
+ *
+ * @return                        Length of packet received.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
+ */
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
     uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
     uint8_t fifo_cmd;
     uint8_t i;
-    uint8_t b0;
-    uint8_t b1;
-    uint8_t b2;
-    uint8_t b3;
-    uint8_t len = ax5043SPIReadRegister(spip, AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, rxbuf); // clear request so interrupt does not fire again. sync_rx enables interrupt on radio state changed in order to wake up on SDF detected
-
+    uint8_t chunk_len;
     uint8_t bytesRead = 0;
 
-
-    /*chprintf(DEBUG_CHP,"INFO: Waiting for a packet\r\n");*/
-    while ((ax5043SPIReadRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x00, rxbuf) & 0x01) != 1) { // FIFO not empty
-        fifo_cmd = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf); // read command
-        len = (fifo_cmd & 0xE0) >> 5; // top 3 bits encode payload len
-        if (len == 7)
-            len = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf); // 7 means variable length, -> get length byte
+    /* Clear interrupt.*/
+    ax5043SPIReadRegister(spip, AX5043_REG_RADIOEVENTREQ0, (uint8_t)0x00, rxbuf);
+    devp->state = AX5043_RX_LOOP;
+    /* Loop until FIFO not empty.*/
+    while ((ax5043SPIReadRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x00, rxbuf) & 0x01) != 1) {
+        /* FIFO read comman.*/
+        fifo_cmd = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+        /* Top 3 bits encode payload length.*/
+        chunk_len = (fifo_cmd & 0xE0) >> 5;
+        /* 7 means variable length, get length byte from next read.*/
+        if (chunk_len == 7)
+            chunk_len = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
         fifo_cmd &= 0x1F;
         switch (fifo_cmd) {
         case AX5043_FIFOCMD_DATA:
-            if (!len)
-                break;
-            ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf); // Discard the flags
-            --len;
-            bytesRead = ax5043_readfifo(spip, ax5043_rxbuffer, len);
+            if (chunk_len!=0){
+                /* Discard the flag.*/
+                ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                chunk_len = chunk_len - 1;
+                bytesRead = ax5043_readfifo(spip, axradio_rxbuffer, chunk_len);
+            }
             break;
 
         case AX5043_FIFOCMD_RFFREQOFFS:
-            if (ax5043_phy_innerfreqloop || len != 3)
-                goto dropchunk;
-            i = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-            i &= 0x0F;
-            i |= 1 + (uint8_t)~(i & 0x08);
-            b3 = ((int8_t)i) >> 8;
-            b2 = i;
-            b1 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-            b0 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-
-            /*chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x%02x\r\n", b3, b2, b1, b0);*/
+            if (chunk_len == 3){
+                devp->rf_freq_off3 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                devp->rf_freq_off2 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                devp->rf_freq_off1 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+            }
+            else{
+                for(i=0;i<chunk_len;i++){
+                    devp->dropped[i] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                    devp->error_code = AXRADIO_ERR_FIFO_CHUNK;
+                }
+            }
             break;
 
         case AX5043_FIFOCMD_FREQOFFS:
-            if (!ax5043_phy_innerfreqloop || len != 2)
-                goto dropchunk;
-            b1 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-            b0 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-
-            /*chprintf(DEBUG_CHP,"INFO: Frequency offset: 0x%02x%02x\r\n", b1, b2);*/
+            if (chunk_len == 2){
+                devp->rf_freq_off3 = 0;
+                devp->rf_freq_off2 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                devp->rf_freq_off1 = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+            }
+            else{
+                for(i=0;i<chunk_len;i++){
+                    devp->dropped[i] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                    devp->error_code = AXRADIO_ERR_FIFO_CHUNK;
+                }
+            }
             break;
 
         case AX5043_FIFOCMD_RSSI:
-            if (len != 1)
-                goto dropchunk;
-            {
-                int8_t r;
-                r = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
-
-                /*chprintf(DEBUG_CHP,"INFO: RSSI %d\r\n", (int)r);*/
+            if (chunk_len == 1){
+                devp->rssi = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+            }
+            else{
+                for(i=0;i<chunk_len;i++){
+                    devp->dropped[i] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+                    devp->error_code = AXRADIO_ERR_FIFO_CHUNK;
+                }
             }
             break;
 
         default:
-            /*chprintf(DEBUG_CHP, "ERROR: Unknown FIFO cmd %x \r\n", fifo_cmd);*/
-dropchunk:
-            /*chprintf(DEBUG_CHP, "WARNING: Discarding chunk in FIFO\r\n");*/
-            if (!len)
-                break;
-            i = len;
-            do {
-                int8_t data;
-                data = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);// purge FIFO
-                /*chprintf(DEBUG_CHP,"Unknown: %x \r\n", data);*/
+            devp->error_code = AXRADIO_ERR_FIFO_CMD;
+            for(i=0;i<chunk_len;i++){
+                devp->dropped[i] = ax5043SPIReadRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
             }
-            while (--i);
-            break;
         }
+        devp->state = AX5043_RX;
+    }
+    return bytesRead;
+}
+
+/**
+ * @brief   Prepare for CW mode
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ *
+ * @return                        Length of packet received.
+ *
+ * @api
+ * TODO return a -ve return code if there are any errors
+ */
+uint8_t ax5043_prepare_cw(AX5043Driver *devp){
+    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
+
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV2, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV1, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FSKDEV0, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_TXRATE2, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_TXRATE1, (uint8_t)0x00, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_TXRATE0, (uint8_t)0x01, rxbuf);
+
+    ax5043_set_pwrmode(devp, AX5043_FULL_TX);
+
+    /* This is not mentioned in datasheet or programming manual but is required.
+     * Removing this will make the transmission to transmit in low power for a few seconds
+     * before it reaches peak power.*/
+    /* FIFO reset.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x03, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_FIFOCMD_REPEATDATA|0x60), rxbuf);
+    /* Preamble flag.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0xff, rxbuf);
+    /* Preamble.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x55, rxbuf);
+    /* FIFO Commit.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, rxbuf);
+
+    ax5043_set_pwrmode(devp, AX5043_STANDBY);
+    devp->state = AX5043_CW;
+    return 0;
+}
+
+/**
+ * @brief   Send Morse dot and dash over the air
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  dot_dash_time      time in milliseconds for transmiter to be on.
+ */
+void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time){
+
+    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = devp->config->spip;
+
+    ax5043_set_pwrmode(devp, AX5043_FULL_TX);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)(AX5043_FIFOCMD_REPEATDATA|0x60), rxbuf);
+    /* Preamble flag.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x38, rxbuf);
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0xFF, rxbuf);
+    /* Preamble.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFODATA, (uint8_t)0x00, rxbuf);
+    /* FIFO Commit.*/
+    ax5043SPIWriteRegister(spip, AX5043_REG_FIFOSTAT, (uint8_t)0x04, rxbuf);
+    chThdSleepMilliseconds(dot_dash_time);
+    ax5043_set_pwrmode(devp, AX5043_STANDBY);
+
+}
+
+/**
+ * @brief   Convert an alphabet or number to morse dot and dash
+ *
+ * @param[in]  letter             An alphabet or number.
+ *
+ * @return                        Length of packet received.
+ */
+const char *ax5043_ascii_to_morse(char letter){
+    letter = tolower(letter);
+
+    if (isalpha(letter)){
+        return alpha[letter-'a'];
+    }
+    else if (isdigit(letter)){
+        return num[letter-'0'];
     }
 
-    //chprintf(DEBUG_CHP, "INFO: Done waiting for a packet\r\n");
+    return SPACE;
+}
 
-    return bytesRead;
+/**
+ * @brief   Convert a message to morse code and transmit it.
+ *
+ * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  wpm                words per minute.
+ * @param[in]  beaconMessage      Message to be transmitted.
+ * @param[in]  pktlen             Length of packet/beacon message.
+ */
+void ax5043_send_cw(AX5043Driver *devp, int wpm, char beaconMessage[], uint16_t pktlen ){
+    int element;
+    int index = 0;
+    const char *morse;
 
+    uint16_t ditLength = 1200/wpm;
+    uint16_t letter_space = ditLength*3;
+    uint16_t word_space = ditLength*7;
+    uint16_t element_space = ditLength;
+    uint16_t dash = ditLength*3;
+
+    while (index < pktlen){
+        morse = ax5043_ascii_to_morse(beaconMessage[index]);
+
+        element = 0;
+        while (morse[element] != '\0'){
+            switch(morse[element]){
+            case '-':
+                ax5043_morse_dot_dash(devp, dash);
+                break;
+            case '.':
+                ax5043_morse_dot_dash(devp, ditLength);
+                break;
+            }
+
+            if (morse[element] == ' '){
+                chThdSleepMilliseconds(word_space);
+            }
+            else if (morse[element+1] != '\0'){
+                chThdSleepMilliseconds(element_space);
+            }
+            else if (morse[element+1] == '\0'){
+                chThdSleepMilliseconds(letter_space);
+            }
+            element++;
+        }
+
+        index++;
+    }
 }
 /*===========================================================================*/
 /* TODO END CLEANUP                                                          */
@@ -902,7 +1016,7 @@ static const struct AX5043VMT vmt_device = {
 /*===========================================================================*/
 
 /**
- * @brief   Initializes an instance.
+ * @brief   Initializes an instance of AX5043Driver object.
  *
  * @param[out] devp     pointer to the @p AX5043Driver object
  *
@@ -912,8 +1026,6 @@ void ax5043ObjectInit(AX5043Driver *devp) {
     devp->vmt = &vmt_device;
 
     devp->config = NULL;
-    /* TODO: Verify state stuff here */
-    devp->trx_state = TRXSTATE_OFF;
 
     devp->state = AX5043_STOP;
 }
@@ -925,128 +1037,52 @@ void ax5043ObjectInit(AX5043Driver *devp) {
  * @param[in] config    pointer to the @p AX5043Config object
  *
  * @api
- * TODO return a -ve return code if there are any errors
  */
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
-    uint8_t rxbuf[3]={0,0,0};
-
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == AX5043_STOP) ||
             (devp->state == AX5043_READY),
-            "ina226Start(), invalid state");
+            "ax5043Start(), invalid state");
 
     devp->config = config;
+    devp->rf_freq_off3 = 0;
+    devp->rf_freq_off2 = 0;
+    devp->rf_freq_off1 = 0;
+    devp->rssi = 0;
+    devp->error_code = 0;
+    devp->status_code = 0;
 
-    ax5043_reset(config->spip);
-
-    //ax5043_shutdown(config->spip);
-    ax5043_set_regs(devp);
-    ax5043_set_regs_tx(config->spip);
-
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLLOOP, (uint8_t)0x09, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLCPI, (uint8_t)0x08, rxbuf);
-
-    ax5043_standby(config->spip);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_MODULATION, (uint8_t)0x08, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV2, (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV1, (uint8_t)0x00, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV0, (uint8_t)0x00, rxbuf);
-
-    //wait for Xtal
-    while ((ax5043SPIReadRegister(config->spip, AX5043_REG_XTALSTATUS, (uint8_t)0x00, rxbuf) & 0x01) == 0)
-    {
-        chThdSleepMilliseconds(1);
+    ax5043_init(devp);
+    switch(config->ax5043_mode) {
+    case AX5043_MODE_RX:
+        ax5043_prepare_rx(devp);
+        break;
+    case AX5043_MODE_TX:
+        ax5043_prepare_tx(devp);
+        break;
+    case AX5043_MODE_CW:
+        ax5043_prepare_cw(devp);
+        break;
+    case AX5043_MODE_OFF:
+        ax5043_set_pwrmode(devp, AX5043_POWERDOWN);
+        break;
+    default:
+        ax5043_prepare_rx(devp);
     }
-
-    //set frequency based on line 693 on conig.c and 1640 on easyax5043.c from
-    //codeblocks generated code
-    uint32_t f = ax5043_phy_chanfreq[0];
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA0, (uint8_t)f, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA1, (uint8_t)(f >> 8), rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA3, (uint8_t)(f >> 24), rxbuf);
-
-
-
-    //PLL autoranging
-    uint8_t r;
-    if( !(ax5043_phy_chanpllrnginit[0] & 0xF0) ) { // start values for ranging available
-        r = ax5043_phy_chanpllrnginit[0] | 0x10;
-    }
-    else {
-        r = 0x18;
-    }
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLRANGINGA, (uint8_t)r, rxbuf);
-    chThdSleepMilliseconds(1);
-    while ((ax5043SPIReadRegister(config->spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, rxbuf) & 0x10) != 0)
-    {
-        chThdSleepMilliseconds(1);
-    }
-    ax5043_phy_chanpllrng[0] = ax5043SPIReadRegister(config->spip, AX5043_REG_PLLRANGINGA, (uint8_t)0x00, rxbuf);
-
-
-    //VCOI calibration
-    /*
-       ax5043_set_regs_tx(config->spip);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_MODULATION, (uint8_t)0x08, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV2, (uint8_t)0x00, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV1, (uint8_t)0x00, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FSKDEV0, (uint8_t)0x00, rxbuf);
-       value=ax5043SPIReadRegister(config->spip, AX5043_REG_PLLLOOP, (uint8_t)0x00, rxbuf);
-       value = value | 0x04;
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLLOOP, value, rxbuf);
-       value=ax5043SPIReadRegister(config->spip, AX5043_REG_0xF35, (uint8_t)0x00, rxbuf);
-       value = value | 0x80;
-       if (2 & (uint8_t)~value)
-       ++value;
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_0xF35, value, rxbuf);
-       ax5043_synth_tx(config->spip);
-       vcoi_save = ax5043SPIReadRegister(config->spip, AX5043_REG_PLLVCOI, (uint8_t)0x00, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLRANGINGA, (uint8_t)(pll_range_after & 0x0F), rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA0, (uint8_t)0xab, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA1, (uint8_t)0xaa, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA2, (uint8_t)0x12, rxbuf);
-       ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA3, (uint8_t)0x09, rxbuf);
-    //tune voltage. doesn't make sense. So, not implementing it for now..
-
-    num_retries = 64;
-    while (num_retries > 0)
-    {
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_GPADCCTRL, (uint8_t)0x84, rxbuf);
-    do{} while (ax5043SPIReadRegister(config->spip, AX5043_REG_GPADCCTRL, (uint8_t)0x00, rxbuf) & 0x80);
-    num_retries--;
-    }
-    num_retries = 32;
-    while (num_retries > 0)
-    {
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_GPADCCTRL, (uint8_t)0x84, rxbuf);
-    do{} while (ax5043SPIReadRegister(config->spip, AX5043_REG_GPADCCTRL, (uint8_t)0x00, rxbuf) & 0x80);
-    num_retries--;
-    }
-    //ax5043SPIWriteRegister(config->spip, AX5043_REG_PLLVCOI, vcoi_save, rxbuf);
-    */
-
-    ax5043_shutdown(config->spip);
-    ax5043_set_regs(devp);
-    ax5043_set_regs_rx(config->spip);
-
-    ax5043SPIReadRegister(config->spip, AX5043_REG_PLLRANGINGA, (uint8_t)(ax5043_phy_chanpllrng[0] & 0x0F), rxbuf);
-    f = ax5043_phy_chanfreq[0];
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA0, (uint8_t)f, rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA1, (uint8_t)(f >> 8), rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA2, (uint8_t)(f >> 16), rxbuf);
-    ax5043SPIWriteRegister(config->spip, AX5043_REG_FREQA3, (uint8_t)(f >> 24), rxbuf);
 }
 
 /**
  * @brief   Deactivates the AX5043 Radio Driver.
  *
- * @param[in] devp       pointer to the @p AX5043Driver object
+ * @param[in] devp      pointer to the @p AX5043Driver object
  *
  * @api
  */
 void ax5043Stop(AX5043Driver *devp) {
-    /* TODO: Implement stop routine */
+    ax5043_set_pwrmode(devp, AX5043_POWERDOWN);
+    devp->state = AX5043_OFF;
+    /* TODO: verify if additional driver things needs to be done.*/
+    devp->state = AX5043_STOP;
 }
 
 /** @} */

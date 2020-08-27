@@ -14,24 +14,6 @@
 /*===========================================================================*/
 
 /**
- * The maximum allowed frame size
-
-#define MAX_FRAME_LEN                   1024
-
-#define MIN_RF_FREQ_INT_VCO_RFDIV0      800000000
-#define MAX_RF_FREQ_INT_VCO_RFDIV0      1050000000
-
-#define MIN_RF_FREQ_INT_VCO_RFDIV1      (MIN_RF_FREQ_INT_VCO_RFDIV0 / 2)
-#define MAX_RF_FREQ_INT_VCO_RFDIV1      (MAX_RF_FREQ_INT_VCO_RFDIV0 / 2)
-
-#define MIN_RF_FREQ_EXT_VCO_RFDIV0      54000000
-#define MAX_RF_FREQ_EXT_VCO_RFDIV0      525000000
-
-#define MIN_RF_FREQ_EXT_VCO_RFDIV1      (MIN_RF_FREQ_EXT_VCO_RFDIV0 / 2)
-#define MAX_RF_FREQ_EXT_VCO_RFDIV1      (MAX_RF_FREQ_EXT_VCO_RFDIV0 / 2)
-*/
-
-/**
  * @name    Version Identification
  * @{
  */
@@ -304,8 +286,6 @@
 #define AX5043_REG_BBTUNE                   0x188
 #define AX5043_REG_BBOFFSCAP                0x189
 
-/* MAC parameters */
-
 /* Packet Format */
 #define AX5043_REG_PKTADDRCFG               0x200
 #define AX5043_REG_PKTLENCFG                0x201
@@ -400,201 +380,135 @@
 #define AX5043_REG_0xF44                    0xF44
 #define AX5043_REG_0xF72                    0xF72
 #define AX5043_REG_XTALDIV                  0xF35
-/** @} */
 
 /* TODO: Clean up from here to Driver pre-compile time settings. */
-#define AX5043_REV                          0x51
-#define AX5043_SCRATCH_TEST                 0xAA
+/* Not a real register. Indicator of end of registers.*/
+#define AX5043_REG_END                      0xFFF
+/** @} */
 
+/**
+ * @name    AX5043 Register and bit values
+ *
+ */
 /* Power modes */
-#define AX5043_RESET_BIT                    (1 << 7)
-#define AX5043_OSC_EN_BIT                   (1 << 6)
-#define AX5043_REF_EN_BIT                   (1 << 5)
+#define AX5043_RESET_BIT                (1 << 7)
+#define AX5043_OSC_EN_BIT               (1 << 6)
+#define AX5043_REF_EN_BIT               (1 << 5)
 
-#define AX5043_POWERDOWN                    0x0
-#define AX5043_DEEPSLEEP                    0x1
-#define AX5043_STANDBY                      0x5
-#define AX5043_FIFO_ENABLED                 0x7
-#define AX5043_SYNTH_RX                     0x8
-#define AX5043_FULL_RX                      0x9
-#define AX5043_WOR_RX                       0xB
-#define AX5043_SYNTH_TX                     0xC
-#define AX5043_FULL_TX                      0xD
-
-#define AX5043_RADIO_STATE_IDLE             0x0
-
-#define AX5043_PLLVCOI_MANUAL               (1 << 7)
+#define AX5043_POWERDOWN                0x0
+#define AX5043_DEEPSLEEP                0x1
+#define AX5043_STANDBY                  0x5
+#define AX5043_FIFO_ENABLED             0x7
+#define AX5043_SYNTH_RX                 0x8
+#define AX5043_FULL_RX                  0x9
+#define AX5043_WOR_RX                   0xB
+#define AX5043_SYNTH_TX                 0xC
+#define AX5043_FULL_TX                  0xD
 
 /**
- * Modem Domain Voltage Regulator Ready
+ * @name    AX5043 FIFO Commands
+ *
  */
-#define AX5043_SVMODEM                      (1 << 3)
+#define AX5043_FIFOCMD_NOP      0x00
+#define AX5043_FIFOCMD_DATA     0x01
+#define AX5043_FIFOCMD_REPEATDATA 0x02
+#define AX5043_FIFOCMD_TIMER    0x10
+#define AX5043_FIFOCMD_RSSI     0x11
+#define AX5043_FIFOCMD_FREQOFFS   0x12
+#define AX5043_FIFOCMD_RFFREQOFFS 0x13
+#define AX5043_FIFOCMD_DATARATE   0x14
+#define AX5043_FIFOCMD_ANTRSSI    0x15
+#define AX5043_FIFOCMD_TXCTRL   0x1C
+#define AX5043_FIFOCMD_TXPWR    0x1D
 
 /**
- * Init value for the VCO prior starting an autoranging
+ * @brief  FIFO commit command
  */
-#define AX5043_VCOR_INIT                    8
-
-#define AX5043_RFDIV0                       0x0
-#define AX5043_RFDIV1                       (1 << 2)
-
-#define AX5043_FREQSHAPE_EXT_FILTER         0x0
-#define AX5043_FREQSHAPE_INVALID            0x1
-#define AX5043_FREQSHAPE_GAUSSIAN_BT_03     0x2
-#define AX5043_FREQSHAPE_GAUSSIAN_BT_05     0x3
-
-/**
- *  FSK modulation mode
- */
-#define AX5043_MODULATION_FSK               (1 << 3)
-
-#define AX5043_ENC_INV                      (1 << 0)
-#define AX5043_ENC_DIFF                     (1 << 1)
-#define AX5043_ENC_SCRAM                    (1 << 2)
-
-/**
- * HDLC Framing mode
- */
-#define AX5043_HDLC_FRAMING                 (1 << 2)
-
-/**
- * HDLC compliant CRC16
- */
-#define AX5043_CRC16_CCITT                  (1 << 4)
-
-/**
- * FIFO commands
- */
-
-#define AX5043_NOP_CMD                      0x0
-#define AX5043_RSSI_CMD                     0x31
-#define AX5043_TXCTRL_CMD                   0x3C
-#define AX5043_FREQOFFS_CMD                 0x52
-#define AX5043_ANTRSSI2_CMD                 0x55
-#define AX5043_REPEATDATA_CMD               0x62
-#define AX5043_TIMER_CMD                    0x70
-#define AX5043_RFREQOFFS_CMD                0x73
-#define AX5043_DATARATE_CMD                 0x74
-#define AX5043_ANTRSSI3_CMD                 0x75
-#define AX5043_DATA_CMD                     0xE1
-#define AX5043_TXPWR_CMD                    0xFD
-
-
-//fifo commands
-#define AX5043_FIFOCMD_NOP                  0x00
-#define AX5043_FIFOCMD_DATA                 0x01
-#define AX5043_FIFOCMD_REPEATDATA           0x02
-#define AX5043_FIFOCMD_TIMER                0x10
-#define AX5043_FIFOCMD_RSSI                 0x11
-#define AX5043_FIFOCMD_FREQOFFS             0x12
-#define AX5043_FIFOCMD_RFFREQOFFS           0x13
-#define AX5043_FIFOCMD_DATARATE             0x14
-#define AX5043_FIFOCMD_ANTRSSI              0x15
-#define AX5043_FIFOCMD_TXCTRL               0x1C
-#define AX5043_FIFOCMD_TXPWR                0x1D
-
-
-
-/**
- * Poweramp pin function, output/Z pull up for board 0.9 with diodes for 1.4V
- */
-#define AX5043_POWERAMP_MODE_OUTPUT         ((1 << 2) | 1)
-#define AX5043_POWERAMP_MODE_PULLUP         ((1 << 7) | 1)
-#define AX5043_POWERAMP_MODE_DAC            ((1 << 2) | 1)
-/**
- * FIFO commit command
- */
-#define AX5043_FIFO_PKTSTART                (1 << 0)
-#define AX5043_FIFO_PKTEND                  (1 << 1)
-#define AX5043_FIFO_COMMIT_CMD              (1 << 2)
-#define AX5043_FIFO_NOCRC                   (1 << 3)
-#define AX5043_FIFO_RAW                     (1 << 4)
-
-/**
- * Maximum chuck that can be committed on the FIFO
- */
-#define AX5043_PKTCHUNKSIZE_240             0xD
-
-#define AX5043_FIFO_MAX_SIZE                240
-
-/**
- * When this threshold of free bytes in the TX FIFO is reached,
- * an IRQ is raised
- */
-#define AX5043_FIFO_FREE_THR                128
-
-#define AX5043_IRQMFIFOTHRFREE              (1 << 3)
-#define AX5043_IRQRFIFOTHRFREE              (1 << 3)
-#define AX5043_IRQMRADIOCTRL                (1 << 6)
-#define AX5043_REVMDONE                     0x1
-
-/**
- * TX antenna transmission mode
- */
-#define AX5043_TX_SINGLE_ENDED              0x2
-
-/**
- * Radio confguration information
- */
-#define CALLSIGN_STATION                    (uint8_t*) "KG7ZVV"
-#define CALLSIGN_DESTINATION                (uint8_t*) ""
-
-#define APRS_UHF                            433800000
-#define APRS_UHF_ALT                        432500000
-
-/******************************************************************************
- ************************* RF Configuration ***********************************
- *****************************************************************************/
-#define RX_FREQ_HZ                          433000000
-#define TX_FREQ_HZ                          APRS_UHF
-
-/**
- * Enables/Disables the appropriate setup for deployment on the devboards or
- * the
- */
-#define PQWS_DEV_BOARD                      0
-
-/* Reference Oscillator frequency */
-#if PQWS_DEV_BOARD
-#define XTAL_FREQ_HZ                        48000000
-#else
-#define XTAL_FREQ_HZ                        26000000
-#endif
-
-/**
- * External PA Control
- */
-
-#define AX5043_EXT_PA_ENABLE                0
-#define AX5043_EXT_PA_DISABLE               1
-
-/**
- * Ramp up/Ramp down period of the power amplifier in microseconds
- */
-#define PWRAMP_RAMP_PERIOD_US               200
-
-#define AX5043_RF_SWITCH_ENABLE             ANTSEL_OUTPUT_1
-#define AX5043_RF_SWITCH_DISABLE            ANTSEL_OUTPUT_0
-
+#define AX5043_FIFO_COMMIT_CMD          (1 << 2)
+#define AX5043_FIFO_PKTSTART            1
+#define AX5043_FIFO_PKTEND              (1 << 1)
+#define AX5043_FIFO_NOCRC               (1 << 3)
+#define AX5043_FIFO_RAW                 (1 << 4)
 
 #define PKTDATA_BUFLEN 260
 
+/**
+ * @brief  Error codes
+ */
+#define AXRADIO_ERR_NOERROR                     0x00
+#define AXRADIO_ERR_NOTSUPPORTED                0x01
+#define AXRADIO_ERR_BUSY                        0x02
+#define AXRADIO_ERR_TIMEOUT                     0x03
+#define AXRADIO_ERR_INVALID                     0x04
+#define AXRADIO_ERR_NOCHIP                      0x05
+#define AXRADIO_ERR_RANGING                     0x06
+#define AXRADIO_ERR_LOCKLOST                    0x07
+#define AXRADIO_ERR_RETRANSMISSION              0x08
+#define AXRADIO_ERR_RESYNC                      0x09
+#define AXRADIO_ERR_RESYNCTIMEOUT               0x0a
+#define AXRADIO_ERR_RECEIVESTART                0x0b
+#define AXRADIO_ERR_FIFO_CHUNK                  0x0c
+#define AXRADIO_ERR_FIFO_CMD                    0x0d
+#define AXRADIO_ERR_UNEXPECTED_STATE            0x0e
+#define AXRADIO_ERR_NOT_CONNECTED               0x0f
+#define AXRADIO_ERR_REG_NOT_IN_CONF             0x10
+#define AXRADIO_ERR_VAL_NOT_IN_CONF             0x11
+#define AXRADIO_ERR_PLLRNG_VAL                  0x12
 
 /**
- * Define error codes
+ * @brief  PHY and Framing details
  */
-#define AX5043_ERR_NOERROR                  0x00
-#define AX5043_ERR_NOTSUPPORTED             0x01
-#define AX5043_ERR_BUSY                     0x02
-#define AX5043_ERR_TIMEOUT                  0x03
-#define AX5043_ERR_INVALID                  0x04
-#define AX5043_ERR_NOCHIP                   0x05
-#define AX5043_ERR_RANGING                  0x06
-#define AX5043_ERR_LOCKLOST                 0x07
-#define AX5043_ERR_RETRANSMISSION           0x08
-#define AX5043_ERR_RESYNC                   0x09
-#define AX5043_ERR_RESYNCTIMEOUT            0x0a
-#define AX5043_ERR_RECEIVESTART             0x0b
+#define AXRADIO_PHY_PN9                     0
+#define AXRADIO_PHY_NRCHANNELS              1
+#define AXRADIO_PHY_CHANFREQ                2
+#define AXRADIO_PHY_CHANPLLRNGINIT          3
+#define AXRADIO_PHY_CHANVCOIINIT            4
+#define AXRADIO_PHY_CHANPLLRNG              5
+#define AXRADIO_PHY_CHANVCOI                6
+#define AXRADIO_PHY_VCOCALIB                7
+#define AXRADIO_PHY_MAXFREQOFFSET           8
+#define AXRADIO_PHY_RSSIOFFSET              9
+#define AXRADIO_PHY_RSSIREFERENCE           10
+#define AXRADIO_PHY_CHANNELBUSY             11
+#define AXRADIO_PHY_CS_PERIOD               12
+#define AXRADIO_PHY_CS_ENABLED              13
+#define AXRADIO_PHY_LBT_RETRIES             14
+#define AXRADIO_PHY_LBT_FORCETX             15
+#define AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    16
+#define AXRADIO_PHY_PREAMBLE_WOR_LEN        17
+#define AXRADIO_PHY_PREAMBLE_LONGLEN        18
+#define AXRADIO_PHY_PREAMBLE_LEN            19
+#define AXRADIO_PHY_PREAMBLE_BYTE           20
+#define AXRADIO_PHY_PREAMBLE_FLAGS          21
+#define AXRADIO_PHY_PREAMBLE_APPENDBITS     22
+#define AXRADIO_PHY_PREAMBLE_APPENDPATTERN  23
+#define AXRADIO_FRAMING_MACLEN              24
+#define AXRADIO_FRAMING_ADDRLEN             25
+#define AXRADIO_FRAMING_DESTADDRPOS         26
+#define AXRADIO_FRAMING_SOURCEADDRPOS       27
+#define AXRADIO_FRAMING_LENPOS              28
+#define AXRADIO_FRAMING_LENOFFS             29
+#define AXRADIO_FRAMING_LENMASK             30
+#define AXRADIO_FRAMING_SWCRCLEN            31
+#define AXRADIO_FRAMING_SYNCLEN             32
+#define AXRADIO_FRAMING_SYNCWORD0           33
+#define AXRADIO_FRAMING_SYNCWORD1           34
+#define AXRADIO_FRAMING_SYNCWORD2           35
+#define AXRADIO_FRAMING_SYNCWORD3           36
+#define AXRADIO_FRAMING_SYNCFLAGS           37
+#define AXRADIO_FRAMING_ENABLE_SFDCALLBACK  38
+#define AXRADIO_FRAMING_ACK_TIMEOUT         39
+#define AXRADIO_FRAMING_ACK_DELAY           40
+#define AXRADIO_FRAMING_ACK_RETRANSMISSIONS 41
+#define AXRADIO_FRAMING_ACK_SEQNRPOS        42
+#define AXRADIO_FRAMING_MINPAYLOADLEN       43
+#define AXRADIO_WOR_PERIOD                  44
+#define AXRADIO_PHY_INNERFREQLOOP           45
+#define AXRADIO_PHY_END                     200
+
+#define SPACE                               " "
+
+
 /* END TODO */
 
 /*===========================================================================*/
@@ -651,151 +565,67 @@
 typedef struct AX5043Driver AX5043Driver;
 
 /**
- * @brief   Selects frequency mode
- * @details Frequency mode A or B actually selects at which registers
- *          the frequency configuration should be written.
- *          This is quite handy for different RX/TX frequencies, to avoid
- *          writing every time the two different frequency configurations.
+ * @brief   AX5043 registers are gouped together based on this
  */
 typedef enum {
-    FREQA_MODE = 0,                     /**< FREQA_MODE                       */
-    FREQB_MODE                          /**< FREQB_MODE                       */
-} freq_mode_t;
+    common,
+    tx,
+    rx,
+    rx_cont,
+    local_address
+} ax5043_reg_group_t;
 
 /**
- * @brief   TODO: Brief
+ * @brief   Structure containing a four byte sender X.25 address
  */
-typedef enum {
-    VCO_INTERNAL = 0,
-    VCO_EXTERNAL
-} vco_mode_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef enum {
-    POWERDOWN,
-    DEEPSLEEP,
-    STANDBY,
-    FIFO_ENABLED,
-    RECEIVE_MODE,
-    RECEIVER_RUNNING,
-    RECEIVER_WOR,
-    TRANSMIT_MODE,
-    FULLTX
-} power_mode_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef enum {
-    ANTSEL_OUTPUT_0 = 0,
-    ANTSEL_OUTPUT_1,
-    ANTSEL_OUTPUT_Z,
-    ANTSEL_OUTPUT_BB_TUBE_CLK,
-    ANTSEL_OUTPUT_EXT_TCXO_EN,
-    ANTSEL_OUTPUT_DAC,
-    ANTSEL_OUTPUT_DIVERSITY,
-    ANTSEL_OUTPUT_TEST_OBS
-} pfantsel_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef enum {
-    PWRAMP_OUTPUT_0 = 0,
-    PWRAMP_OUTPUT_1,
-    PWRAMP_OUTPUT_Z,
-    PWRAMP_INPUT_DiBit_SYNC,
-    PWRAMP_OUTPUT_DiBit_SYNC,
-    PWRAMP_OUTPUT_DAC,
-    PWRAMP_OUTPUT_PA_CTRL,
-    PWRAMP_OUTPUT_EXT_TCXO_EN,
-    PWRAMP_OUTPUT_TEST_OBS,
-} pfpwramp_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef enum {
-    AX5043_OK = 0,
-    AX5043_INVALID_PARAM = 11,
-    AX5043_TIMEOUT = 12,
-    AX5043_NOT_FOUND = 13,
-    AX5043_AUTORANGING_ERROR = 14
-} ax5043_code_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef struct {
-    uint32_t tx_freq;
-    uint32_t rx_freq;
-    uint32_t f_xtal;
-    uint8_t f_xtaldiv;
-    uint32_t tx_baudrate;
-    uint32_t rx_baudrate;
-    SPIDriver *spi;
-    uint8_t rf_init;
-    freq_mode_t freqsel;
-    vco_mode_t vco;
-} ax5043_conf_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef enum {
-    TRXSTATE_OFF,
-    TRXSTATE_RX,
-    TRXSTATE_RXWOR,
-    TRXSTATE_WAIT_XTAL,
-    TRXSTATE_XTAL_READY,
-    TRXSTATE_PLL_RANGING,
-    TRXSTATE_PLL_RANGING_DONE,
-    TRXSTATE_PLL_SETTLING,
-    TRXSTATE_PLL_SETTLED,
-    TRXSTATE_TX_XTALWAIT,
-    TRXSTATE_TX_LONGPREAMBLE,
-    TRXSTATE_TX_SHORTPREAMBLE,
-    TRXSTATE_TX_PACKET,
-    TRXSTATE_TX_WAITDONE,
-    TRXSTATE_TXCW_XTALWAIT,
-    TRXSTATE_TXSTREAM_XTALWAIT,
-    TRXSTATE_TXSTREAM
-} ax5043_trxstate_t;
-
-/**
- * @brief   TODO: Brief
- */
-typedef struct{
+struct axradio_address {
     uint8_t addr[4];
-} ax5043_address_t;
+};
 
 /**
- * @brief   TODO: Brief
- */
-typedef struct{
-    uint8_t addr[4];
-    uint8_t mask[4];
-} ax5043_address_mask_t;
-
-/**
- * @brief   TODO: Brief
+ * @brief  Ax5043 Register values
  */
 typedef struct {
     uint16_t reg;
     uint8_t val;
+    ax5043_reg_group_t group;
 } ax5043_regval_t;
 
+/**
+ * @brief   Other configuration values
+ */
+typedef struct {
+    uint8_t conf_name;
+    uint32_t val;
+} ax5043_confval_t;
+
+/**
+ * @brief   Other configuration values
+ */
+typedef enum {
+    AX5043_MODE_RX,
+    AX5043_MODE_TX,
+    AX5043_MODE_CW,
+    AX5043_MODE_OFF,
+} ax5043_mode_t;
 /**
  * @brief   Driver state machine possible states.
  */
 typedef enum {
-    AX5043_UNINIT = 0,                  /**< Not initialized.                 */
-    AX5043_STOP = 1,                    /**< Stopped.                         */
-    AX5043_READY = 2,                   /**< Ready.                           */
-    AX5043_BUSY = 3,                    /**< Busy.                            */
-    AX5043_IDLE = 4,                    /**< Idle.                            */
+    AX5043_UNINIT,                  /**< Not initialized.                  */
+    AX5043_STOP,                    /**< Stopped.                          */
+    AX5043_READY,                   /**< Ready.                            */
+    AX5043_BUSY,                    /**< Busy.                             */
+    AX5043_IDLE,                    /**< Idle.                             */
+    AX5043_RX,
+    AX5043_RX_LOOP,                 /**< In the middle of receiving packet.*/
+    AX5043_TX,
+    AX5043_PLL_RANGE_DONE,
+    AX5043_OFF,
+    AX5043_TX_LONGPREAMBLE,
+    AX5043_TX_SHORTPREAMBLE,
+    AX5043_TX_PACKET,
+    AX5043_CW
 } ax5043_state_t;
 
 /**
@@ -814,11 +644,10 @@ typedef struct{
 #endif /* AX5043_USE_SPI */
     ioline_t irq;
     ax5043_regval_t *reg_values;
+    ax5043_confval_t *conf_values;
+    ax5043_mode_t ax5043_mode;
     /* TODO: probably move these to an implementation of the driver */
     mailbox_t *mb;
-    uint8_t *remoteaddr;
-    uint8_t *localaddr;
-    uint8_t *localadr_mask;
 } AX5043Config;
 
 /**
@@ -850,7 +679,14 @@ struct AX5043VMT {
     ax5043_state_t              state;                                      \
     /* Current configuration data.*/                                        \
     const AX5043Config          *config;                                    \
-    ax5043_trxstate_t           trx_state;                                  \
+    /* Ax5043 returned values.*/                                            \
+    uint8_t rf_freq_off1;                                                   \
+    uint8_t rf_freq_off2;                                                   \
+    uint8_t rf_freq_off3;                                                   \
+    uint8_t rssi;                                                           \
+    uint8_t dropped[250];                                                   \
+    uint8_t error_code;                                                     \
+    uint8_t status_code;                                                    \
 
 /**
  * @brief AX5043 Radio class.
@@ -877,17 +713,25 @@ extern "C" {
 void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 void ax5043Stop(AX5043Driver *devp);
-void ax5043_standby(SPIDriver *spip);
-void ax5043_fifo_en(SPIDriver *spip);
-void ax5043_full_rx(SPIDriver *spip);
-void ax5043_synth_tx(SPIDriver *spip);
-void ax5043_full_tx(SPIDriver *spip);
-void ax5043_set_addr(SPIDriver *spip, ax5043_address_mask_t *local_addr);
-void ax5043_reset(SPIDriver *spip);
-void ax5043_writefifo(SPIDriver *spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver *spip, uint8_t ax5043_rxbuffer[], uint8_t len);
-void ax5043_writefifo(SPIDriver *spip,const uint8_t *ptr, uint8_t len);
-uint8_t ax5043_readfifo(SPIDriver *spip, uint8_t ax5043_rxbuffer[], uint8_t len) ;
+
+uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
+uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name);
+uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
+uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
+void ax5043_prepare_tx(AX5043Driver *devp);
+void ax5043_prepare_rx(AX5043Driver *devp);
+void ax5043_init_registers_common(AX5043Driver *devp);
+uint8_t axradio_get_pllvcoi(AX5043Driver *devp);
+void ax5043_init(AX5043Driver *devp);
+void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
+uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
+
+/* TODO: Abstract these out? */
+void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time);
+const char *ax5043_ascii_to_morse(char letter);
+void ax5043_send_cw(AX5043Driver *devp, int wpm, char beaconMessage[], uint16_t pktlen );
+
 #ifdef __cplusplus
 }
 #endif
