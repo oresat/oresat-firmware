@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = no
+  USE_FPU = hard
 endif
 
 # FPU-related options.
@@ -87,7 +87,7 @@ PROJECT   = app_radio
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ORESAT_C3_V3
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -166,7 +166,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE
+UDEFS = -DSHELL_CONFIG_FILE -DAX5043_SHARED_SPI
 
 # Define ASM defines here
 UADEFS =
@@ -192,3 +192,15 @@ RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
 include $(RULESPATH)/arm-none-eabi.mk
 include $(RULESPATH)/rules.mk
 include $(TOOLCHAIN)/toolchain.mk
+
+#
+# Common rules
+##############################################################################
+
+##############################################################################
+# Custom rules
+#
+
+#
+# Custom rules
+##############################################################################

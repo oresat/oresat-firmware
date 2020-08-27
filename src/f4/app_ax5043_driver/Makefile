@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = no
+  USE_FPU = hard
 endif
 
 # FPU-related options.
@@ -87,7 +87,7 @@ PROJECT   = app_ax45043_driver
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ORESAT_C3_V3
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -106,7 +106,7 @@ DEPDIR   := $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
-include $(PROJ_SRC)/oresat.mk
+#include $(PROJ_SRC)/oresat.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -127,6 +127,7 @@ include $(CHIBIOS)/test/lib/test.mk
 include $(CHIBIOS)/test/rt/rt_test.mk
 include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
@@ -165,7 +166,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DAX5043_SHARED_SPI
+UDEFS = -DSHELL_CONFIG_FILE -DAX5043_SHARED_SPI
 
 # Define ASM defines here
 UADEFS =
