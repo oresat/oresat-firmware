@@ -24,11 +24,14 @@
 #include "solar.h"
 
 
+static worker_t worker2;
+
 static oresat_config_t oresat_conf = {
     &CAND1,
     0x04,
     ORESAT_DEFAULT_BITRATE
 };
+
 
 /**
  * @brief App Initialization
@@ -40,10 +43,10 @@ static void app_init(void)
     
     /* App initialization */
     //init_worker(&worker1, "Blink", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
-    //init_worker(&worker2, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL, true);
+    init_worker(&worker2, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL, true);
     //reg_worker(&worker1);
-    //reg_worker(&worker2);
-    chThdCreateStatic(solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);
+    reg_worker(&worker2);
+    //chThdCreateStatic(solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL);
 
 
 }
