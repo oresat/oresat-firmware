@@ -274,8 +274,8 @@ int16_t ina226ReadShunt(INA226Driver *devp) {
  *
  * @api
  */
-uint16_t ina226ReadVBUS(INA226Driver *devp) {
-    uint16_t voltage;
+int16_t ina226ReadVBUS(INA226Driver *devp) {
+    int16_t voltage;
 
     osalDbgCheck(devp != NULL);
 
@@ -314,8 +314,8 @@ int16_t ina226ReadCurrent(INA226Driver *devp) {
  *
  * @api
  */
-uint16_t ina226ReadPower(INA226Driver *devp) {
-    uint16_t power;
+int16_t ina226ReadPower(INA226Driver *devp) {
+    int16_t power;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,

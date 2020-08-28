@@ -6,7 +6,7 @@
 #define CURR_LSB    10  /* 10uA/bit */
 #define RSENSE      100 /* 0.1 ohm  */
 #define SLEEP_MS    500
-#define STEP_SIZE   5
+#define STEP_SIZE   3
 #define DAC_VDDA_MV 3000 /* 3.3 mV and 3.0 mv when powered from debug board */
 
 static const I2CConfig i2cconfig = {
@@ -17,13 +17,22 @@ static const I2CConfig i2cconfig = {
     0
 };
 
+/* Based on INA226 datasheet, page 15, Equation (2)
+ * CURR_LSB = Max Current / 2^15
+ * So, with CURR_LSB = 20 uA/bit, Max current = 655 mA 
+ * 
+ * Based on equation (1), 
+ * CAL = 0.00512 / (CURR_LSB * Rsense)
+ * Since CURR_LSB is in uA and Rsense is in mOhm
+ * CAL = 0.00512 / (CURR_LSB * Rsense * 10^-9)
+ */ 
 static const INA226Config ina226config = {
     &I2CD2,
     &i2cconfig,
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
     INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
-    INA226_CONFIG_AVG_1,
+    INA226_CONFIG_AVG_16,
     (5120000/(RSENSE*CURR_LSB)),
     CURR_LSB
 };
@@ -87,7 +96,7 @@ uint32_t calc_iadj(uint32_t i_out)
  *       increase max current limit immediatly if voltage is higher that expected.(shutdown condition)
  *       
  */
-int32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr)
+int32_t calc_mppt(int16_t volt, int16_t curr, int16_t pwr)
 {
 
     /* The values from the previous iteration of the loop */
@@ -188,8 +197,8 @@ int32_t calc_mppt(uint16_t volt, int16_t curr, uint16_t pwr)
     
     
     /* bounds checks for current */
-    if (i_in < 0) {
-      i_in = 0;
+    if (i_in < 25) {
+      i_in = 25;
     }
     if (i_in > 500) {
       i_in = 500;
@@ -214,7 +223,7 @@ THD_FUNCTION(solar, arg)
     palSetLine(LINE_LED);
     
     
-    chprintf((BaseSequentialStream *) &SD2, "\r\n ****** Max inoput curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
+    chprintf((BaseSequentialStream *) &SD2, "\r\n ****** Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
     while(!chThdShouldTerminateX()){
       chThdSleepMilliseconds(SLEEP_MS);
       //chprintf((BaseSequentialStream *) &SD2, "\r\n%d\r\n", i++);
@@ -225,11 +234,12 @@ THD_FUNCTION(solar, arg)
       OD_solarPanel.current = ina226ReadCurrent(&ina226dev); //Current in increments of 10uA
       OD_solarPanel.power = ina226ReadPower(&ina226dev); //Power in increments of 10uA * 25V
       //chprintf((BaseSequentialStream *) &SD2, "\r\nVolt: 0x%X, Current: 0x%X, Power: 0x%X, \r\n", OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power);
-      chprintf((BaseSequentialStream *) &SD2, "Volt: %u, Current: %u, Power: %u, \r\n", OD_solarPanel.voltage/100, OD_solarPanel.current/100, OD_solarPanel.power);
+      chprintf((BaseSequentialStream *) &SD2, "Volt: %d, Current: %d, Power: %d, \r\n", OD_solarPanel.voltage/100, OD_solarPanel.current/100, OD_solarPanel.power);
       
       
       /* Calculate iadj. Volt and curr are converted to mV and mA */
       i_in = calc_mppt(OD_solarPanel.voltage/100, OD_solarPanel.current/100, OD_solarPanel.power);
+      //i_in = 150;
       iadj_v = calc_iadj(i_in);
       dacPutMillivolts(&DACD1, 0, iadj_v) ;
       chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
