@@ -3,11 +3,14 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
-#define CURR_LSB    20  /* 20uA/bit */
-#define RSENSE      100 /* 0.1 ohm  */
-#define SLEEP_MS    500                //TODO: decrese the value. This is for testing.
-#define STEP_SIZE   3
-#define DAC_VDDA_MV 3333 /* 3.333 mV and 3.0 mv when powered from debug board */
+#define CURR_LSB           20  /* 20uA/bit */
+#define RSENSE             100 /* 0.1 ohm  */
+#define SLEEP_MS           500                //TODO: decrese the value. This is for testing.
+#define STEP_SIZE          5
+#define MIN_STEP_SIZE      1
+#define MAX_STEP_SIZE      25
+#define STEP_SIZE_FACTOR   10
+#define DAC_VDDA_MV        3333 /* 3.333 mV and 3.0 mv when powered from debug board */
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -100,20 +103,23 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
 {
 
     /* The values from the previous iteration of the loop */
-    static uint16_t prev_volt = 0;
-    static uint16_t prev_curr = 0;
-    static uint16_t prev_pwr = 0;
+    static int32_t prev_volt = 0;
+    static int32_t prev_curr = 0;
+    static int32_t prev_pwr = 0;
     /* programmed max current from previous iteration*/
     /* TODO: Update algorithm to use it to save from high to low illumination*/
     static int32_t i_in;
     
     /* Simple IC MPPT Algorithm */
     /* This should be run first to check step size and confirm other DAC and other working */
-    int16_t delta_v = volt - prev_volt;
-    int16_t delta_i = curr - prev_curr;
-    int16_t delta_p = pwr  - prev_pwr;
+    int32_t delta_v = volt - prev_volt;
+    int32_t delta_i = curr - prev_curr;
+    int32_t delta_p = pwr  - prev_pwr;
     
-    if (delta_i == 0) {                                // We may need to comment this portion.
+    int32_t dp_di;
+    int32_t step_size;
+    
+    if (delta_i == 0) {                                // We may need to comment this portion if algorithm is unstable.
         if (delta_i != 0) {
             if (delta_v > 0) {
                 i_in += STEP_SIZE;
@@ -129,6 +135,37 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
                 i_in -= STEP_SIZE;   //can be STEP_SIZE/2 
             }
         }
+        
+        /* Variable step algorithm. Comment above line if using below logic. */ 
+        dp_di = delta_p/delta_i;
+        step_size = (dp_di*1000*STEP_SIZE_FACTOR)/volt;
+        //chprintf((BaseSequentialStream *) &SD2, "dp_di: %d, step size: %d , \r\n", dp_di, step_size);
+        /*
+        if (dp_di != 0) {
+            if (dp_di > 0) {
+              if(step_size < MIN_STEP_SIZE) {
+                i_in += MIN_STEP_SIZE;   
+              } else {
+                if(step_size > MAX_STEP_SIZE) {
+                  i_in += MAX_STEP_SIZE;
+                }else{
+                  i_in += step_size;
+                }
+              }
+            } else {
+              if(step_size > (-1)*MIN_STEP_SIZE) {
+                i_in -= MIN_STEP_SIZE;   
+              } else {
+                if(step_size < (-1)*MAX_STEP_SIZE) {
+                  i_in -= MAX_STEP_SIZE;
+                }else{
+                  i_in += step_size;
+                }
+              }
+            }
+        }
+        */ 
+        
     } 
        
     prev_volt = volt;
