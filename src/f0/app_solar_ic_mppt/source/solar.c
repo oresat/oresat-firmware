@@ -3,11 +3,11 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
-#define CURR_LSB    10  /* 10uA/bit */
+#define CURR_LSB    20  /* 20uA/bit */
 #define RSENSE      100 /* 0.1 ohm  */
-#define SLEEP_MS    500
+#define SLEEP_MS    500                //TODO: decrese the value. This is for testing.
 #define STEP_SIZE   3
-#define DAC_VDDA_MV 3000 /* 3.3 mV and 3.0 mv when powered from debug board */
+#define DAC_VDDA_MV 3333 /* 3.333 mV and 3.0 mv when powered from debug board */
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -32,7 +32,7 @@ static const INA226Config ina226config = {
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
     INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
-    INA226_CONFIG_AVG_16,
+    INA226_CONFIG_AVG_16,                   //MUST change it to 16.
     (5120000/(RSENSE*CURR_LSB)),
     CURR_LSB
 };
@@ -87,8 +87,8 @@ uint32_t calc_iadj(uint32_t i_out)
 /**
  * @brief Maximum power point tracking algorithm for Solar cells
  * @param[in] volt      Solar cell bus voltage in mV.
- * @param[in] curr      Solar cell current in mA.
- * @param[in] pwr       Power output from solar cells. 
+ * @param[in] curr      Solar cell current in uA.
+ * @param[in] pwr       Power output from solar cells in microWatts. 
  * @return Maximum current to be drawn from solar cells in mA
  * TODO: Find min/max limits of step size. Also check the units that work the best
  *       Average a few samples to reduce noise
@@ -96,7 +96,7 @@ uint32_t calc_iadj(uint32_t i_out)
  *       increase max current limit immediatly if voltage is higher that expected.(shutdown condition)
  *       
  */
-int32_t calc_mppt(int16_t volt, int16_t curr, int16_t pwr)
+int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
 {
 
     /* The values from the previous iteration of the loop */
@@ -113,7 +113,7 @@ int32_t calc_mppt(int16_t volt, int16_t curr, int16_t pwr)
     int16_t delta_i = curr - prev_curr;
     int16_t delta_p = pwr  - prev_pwr;
     
-    if (delta_i == 0) {
+    if (delta_i == 0) {                                // We may need to comment this portion.
         if (delta_i != 0) {
             if (delta_v > 0) {
                 i_in += STEP_SIZE;
@@ -124,9 +124,9 @@ int32_t calc_mppt(int16_t volt, int16_t curr, int16_t pwr)
     } else {
         if (delta_p/delta_i != 0) {
             if (delta_p/delta_i > 0) {
-                i_in += STEP_SIZE;
+                i_in += STEP_SIZE;   //can be 4*STEP_SIZE;
             } else {
-                i_in -= STEP_SIZE;
+                i_in -= STEP_SIZE;   //can be STEP_SIZE/2 
             }
         }
     } 
@@ -136,65 +136,22 @@ int32_t calc_mppt(int16_t volt, int16_t curr, int16_t pwr)
     prev_pwr  = pwr;
     /* End IC MPPT Algorithm */
     
- 
-    /* Hybrid IC MPPT Algorithm */
-    /* Better noise handling and should work with changing illumination without reset*/
-    /* This should be run after previous algorithm runs successfully */
-    //static uint16_t count, sum_volt, sum_curr, sum_pwr;
-    //uint16_t avg_volt, avg_curr, avg_pwr, delta_v, delta_i, delta_p;
-    //
-    // /* We have lower current than allowed means lower illumination and chances of brownout */
-    //if (curr < THRESHOLD_CURR * i_in){
-    //  i_in = PCT_MAX_CURR*curr;
-    //  count = 0;
-    //  sum_volt = 0;
-    //  sum_curr = 0;
-    //  sum_pwr  = 0;   
-    //}  
-    //
-    //if ( count < CNT_FOR_AVG) {
-    //  count++;
-    //  sum_volt += volt;
-    //  sum_curr += curr;
-    //  sum_pwr  += pwr ;
-    //} else {
-    //  count = 0;
-    //  avg_volt = sum_volt/CNT_FOR_AVG;
-    //  avg_curr = sum_curr/CNT_FOR_AVG;
-    //  avg_pwr  = sum_pwr /CNT_FOR_AVG;
-    //  sum_volt = 0;
-    //  sum_curr = 0;
-    //  sum_pwr  = 0;
-    //  delta_v = avg_volt - prev_volt;
-    //  delta_i = avg_curr - prev_curr;
-    //  delta_p = avg_pwr  - prev_pwr; 
-    //       
-    //  if (delta_i == 0) {
-    //    if (delta_i != 0) {
-    //        if (delta_v > 0) {
-    //            i_in += STEP_SIZE;
-    //        } else {
-    //            i_in -= STEP_SIZE;
-    //        }
-    //    }
-    //  } else {
-    //    if (delta_p/delta_i != 0) {
-    //        if (delta_p/delta_i > 0) {
-    //            i_in += 4*STEP_SIZE;
-    //        } else {
-    //            i_in -= STEP_SIZE/2;
-    //        }
-    //    }
-    //  }
-    //}   
-    //
-    //prev_volt = avg_volt;
-    //prev_curr = avg_curr;
-    //prev_pwr  = avg_pwr; 
-    /* End Hybrid IC MPPT Algorithm */   
+
     
+    /* Compare the actual vs the allowed current */
+    /* Below is if the actual current is much lower that allowed current*/
+    /*
+    if (curr/1000 < 0.5 * i_in)  {                 //Uncomment it after algorithm test.
+      i_in = 0.75 * i_in;
+    }
+    */
     
-    
+    /* Below is if the actual current is much higher than allowed current*/
+    /*
+    if (curr/1000 < 0.5 * i_in)  {                 //Uncomment it after algorithm test.
+      i_in = 1.25 * i_in;
+    }
+    */ 
     
     /* bounds checks for current */
     if (i_in < 25) {
@@ -211,8 +168,10 @@ THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
+    int32_t voltage, current, power;
     uint32_t iadj_v = 1500;
     uint32_t i_in=0;
+    int i=0;                          //TODO: Delete this. For finding number of iterations until steady state.
     
     
     /* Start up drivers */
@@ -230,19 +189,25 @@ THD_FUNCTION(solar, arg)
       //palToggleLine(LINE_LED);
       
       /* Get present values */
-      OD_solarPanel.voltage = ina226ReadVBUS(&ina226dev); //VBUS voltage in 0.01mV increments (10uV)
-      OD_solarPanel.current = ina226ReadCurrent(&ina226dev); //Current in increments of 10uA
-      OD_solarPanel.power = ina226ReadPower(&ina226dev); //Power in increments of 10uA * 25V
+      voltage = ina226ReadVBUS(&ina226dev); //VBUS voltage in mV 
+      current = ina226ReadCurrent(&ina226dev); //Current in uA
+      power   = ina226ReadPower(&ina226dev); //Power in increments of uW
+      
+      OD_solarPanel.voltage = voltage;
+      OD_solarPanel.current = current;
+      OD_solarPanel.power   = power  ;
+      
       //chprintf((BaseSequentialStream *) &SD2, "\r\nVolt: 0x%X, Current: 0x%X, Power: 0x%X, \r\n", OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power);
-      chprintf((BaseSequentialStream *) &SD2, "Volt: %d, Current: %d, Power: %d, \r\n", OD_solarPanel.voltage/100, OD_solarPanel.current/100, OD_solarPanel.power);
+      chprintf((BaseSequentialStream *) &SD2, "\r\nIteration: %d, Volt: %d mv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
       
       
-      /* Calculate iadj. Volt and curr are converted to mV and mA */
-      i_in = calc_mppt(OD_solarPanel.voltage/100, OD_solarPanel.current/100, OD_solarPanel.power);
-      //i_in = 150;
+      /* Calculate max input current drawn from solar cells. This is used to calculate iadj. */
+      i_in = calc_mppt(voltage, current, power);
+      //i_in = 50;
       iadj_v = calc_iadj(i_in);
       dacPutMillivolts(&DACD1, 0, iadj_v) ;
-      chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
+      chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d ma, Bias Volt: %d mv, \r\n", i_in, iadj_v);
+      i++;
       
       
     }
