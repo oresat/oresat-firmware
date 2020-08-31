@@ -10,7 +10,7 @@
 #define CURR_THRES_SENS    20  /* 20 uA. Current Threshold Sensitivity */
 #define MIN_STEP_SIZE      1
 #define MAX_STEP_SIZE      25
-#define STEP_SIZE_FACTOR   10
+#define STEP_SIZE_FACTOR   3
 #define DAC_VDDA_MV        3333 /* 3.333 mV and 3.0 mv when powered from debug board */
 
 static const I2CConfig i2cconfig = {
@@ -131,7 +131,8 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
         }     
     } else {
 		dp_di = (delta_p*1000)/delta_i;
-		chprintf((BaseSequentialStream *) &SD2, "dp_di: %d , \r\n", dp_di);
+		//chprintf((BaseSequentialStream *) &SD2, "dp_di: %d , \r\n", dp_di);
+		/*
         if (dp_di != 0) {
             if (dp_di > 1000) {
                 i_in += STEP_SIZE;   
@@ -140,17 +141,15 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
                 i_in -= 4*STEP_SIZE;    
             }
         }
-        
+        */
         /* Variable step algorithm. Comment above line if using below logic. */ 
         
-        step_size = (dp_di*1000*STEP_SIZE_FACTOR)/volt;
-        //chprintf((BaseSequentialStream *) &SD2, "dp_di: %d, step size: %d , \r\n", dp_di, step_size);
-        /*
+        step_size = (dp_di*STEP_SIZE_FACTOR)/volt;
+        chprintf((BaseSequentialStream *) &SD2, "dp_di: %d, step size: %d , \r\n", dp_di, step_size);
+        
         if (dp_di != 0) {
             if (dp_di > 0) {
-              if(step_size < MIN_STEP_SIZE) {
-                i_in += MIN_STEP_SIZE;   
-              } else {
+              if(step_size > MIN_STEP_SIZE) {
                 if(step_size > MAX_STEP_SIZE) {
                   i_in += MAX_STEP_SIZE;
                 }else{
@@ -158,19 +157,15 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
                 }
               }
             } else {
-              if(step_size > (-1)*MIN_STEP_SIZE) {
-                i_in -= MIN_STEP_SIZE;   
-              } else {
+              if(step_size < (-1)*MIN_STEP_SIZE) {
                 if(step_size < (-1)*MAX_STEP_SIZE) {
                   i_in -= MAX_STEP_SIZE;
                 }else{
-                  i_in += step_size;
+                  i_in += 3*step_size;
                 }
               }
             }
-        }
-        */ 
-        
+        } 
     } 
        
     prev_volt = volt;
