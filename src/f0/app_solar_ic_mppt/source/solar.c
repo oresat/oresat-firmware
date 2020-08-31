@@ -6,7 +6,8 @@
 #define CURR_LSB           20  /* 20uA/bit */
 #define RSENSE             100 /* 0.1 ohm  */
 #define SLEEP_MS           500                //TODO: decrese the value. This is for testing.
-#define STEP_SIZE          5
+#define STEP_SIZE          1
+#define CURR_THRES_SENS    20  /* 20 uA. Current Threshold Sensitivity */
 #define MIN_STEP_SIZE      1
 #define MAX_STEP_SIZE      25
 #define STEP_SIZE_FACTOR   10
@@ -119,25 +120,29 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t dp_di;
     int32_t step_size;
     
-    if (delta_i == 0) {                                // We may need to comment this portion if algorithm is unstable.
+    
+    if (delta_i < CURR_THRES_SENS && delta_i > -CURR_THRES_SENS) {                                // We may need to comment this portion if algorithm is unstable.
         if (delta_i != 0) {
             if (delta_v > 0) {
                 i_in += STEP_SIZE;
             } else {
                 i_in -= STEP_SIZE;
             }
-        }
+        }     
     } else {
-        if (delta_p/delta_i != 0) {
-            if (delta_p/delta_i > 0) {
-                i_in += STEP_SIZE;   //can be 4*STEP_SIZE;
-            } else {
-                i_in -= STEP_SIZE;   //can be STEP_SIZE/2 
+		dp_di = (delta_p*1000)/delta_i;
+		chprintf((BaseSequentialStream *) &SD2, "dp_di: %d , \r\n", dp_di);
+        if (dp_di != 0) {
+            if (dp_di > 1000) {
+                i_in += STEP_SIZE;   
+            } 
+            if (dp_di < 1000) {
+                i_in -= 4*STEP_SIZE;    
             }
         }
         
         /* Variable step algorithm. Comment above line if using below logic. */ 
-        dp_di = delta_p/delta_i;
+        
         step_size = (dp_di*1000*STEP_SIZE_FACTOR)/volt;
         //chprintf((BaseSequentialStream *) &SD2, "dp_di: %d, step size: %d , \r\n", dp_di, step_size);
         /*
@@ -177,22 +182,23 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     
     /* Compare the actual vs the allowed current */
     /* Below is if the actual current is much lower that allowed current*/
-    /*
-    if (curr/1000 < 0.5 * i_in)  {                 //Uncomment it after algorithm test.
-      i_in = 0.75 * i_in;
+    
+    if (curr/1000 < 0.8 * i_in)  {                 //Uncomment it after algorithm test.
+      //i_in = 0.8*curr/1000;
     }
-    */
+    
     
     /* Below is if the actual current is much higher than allowed current*/
-    /*
-    if (curr/1000 < 0.5 * i_in)  {                 //Uncomment it after algorithm test.
-      i_in = 1.25 * i_in;
+    
+    if (curr/1000 > 1.5 * i_in)  {                 //Uncomment it after algorithm test.
+      //i_in = 1.25 * i_in;
+      //i_in = curr/1000;
     }
-    */ 
+     
     
     /* bounds checks for current */
-    if (i_in < 25) {
-      i_in = 25;
+    if (i_in < 5) {
+      i_in = 5;
     }
     if (i_in > 500) {
       i_in = 500;
@@ -217,6 +223,7 @@ THD_FUNCTION(solar, arg)
     ina226Start(&ina226dev, &ina226config);
 
     palSetLine(LINE_LED);
+    palSetLine(LINE_SHDN_LT1618);
     
     
     chprintf((BaseSequentialStream *) &SD2, "\r\n ****** Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
@@ -240,7 +247,7 @@ THD_FUNCTION(solar, arg)
       
       /* Calculate max input current drawn from solar cells. This is used to calculate iadj. */
       i_in = calc_mppt(voltage, current, power);
-      //i_in = 50;
+      //i_in = 30;
       iadj_v = calc_iadj(i_in);
       dacPutMillivolts(&DACD1, 0, iadj_v) ;
       chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d ma, Bias Volt: %d mv, \r\n", i_in, iadj_v);

@@ -200,6 +200,7 @@
  * IO lines assignments.
  */
 #define LINE_LED                    PAL_LINE(GPIOA, 0U)
+#define LINE_SHDN_LT1618            PAL_LINE(GPIOA, 1U)
 #define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
 #define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 
@@ -310,7 +311,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
-                                     PIN_PUPDR_FLOATING(GPIOA_SHDN_STM) |   \
+                                     PIN_PUPDR_PULLDOWN(GPIOA_SHDN_STM) |   \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_IADJ) |       \
@@ -326,7 +327,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN15))
 #define VAL_GPIOA_ODR               (PIN_ODR_LOW(GPIOA_LED) |               \
-                                     PIN_ODR_HIGH(GPIOA_SHDN_STM) |         \
+                                     PIN_ODR_LOW(GPIOA_SHDN_STM) |         \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
                                      PIN_ODR_HIGH(GPIOA_IADJ) |             \
