@@ -42,372 +42,2232 @@
  * @name    AX5043 Register Addresses
  * @{
  */
-/* Status and test registers */
-#define AX5043_REG_REV                      0x0
-#define AX5043_REG_SCRATCH                  0x1
+/* Revision and Interface Probing */
+#define AX5043_REG_REVISION                 0x000U
+#define AX5043_REG_SCRATCH                  0x001U
 
-/* Power and voltage regulator */
-#define AX5043_REG_PWRMODE                  0x2
-#define AX5043_REG_POWSTAT                  0x3
-#define AX5043_REG_POWSTICKYSTAT            0x4
-#define AX5043_REG_POWIRQMASK               0x5
+/* Operating Mode */
+#define AX5043_REG_PWRMODE                  0x002U
 
-/* Interrupt control */
-#define AX5043_REG_IRQMASK1                 0x6
-#define AX5043_REG_IRQMASK0                 0x7
-#define AX5043_REG_RADIOEVENTMASK1          0x8
-#define AX5043_REG_RADIOEVENTMASK0          0x9
+/* Voltage Regulator */
+#define AX5043_REG_POWSTAT                  0x003U
+#define AX5043_REG_POWSTICKYSTAT            0x004U
+#define AX5043_REG_POWIRQMASK               0x005U
 
-#define AX5043_REG_IRQREQUEST1              0xC
-#define AX5043_REG_IRQREQUEST0              0xD
-#define AX5043_REG_RADIOEVENTREQ1           0xE
-#define AX5043_REG_RADIOEVENTREQ0           0xF
+/* Interrupt Control */
+#define AX5043_REG_IRQMASK1                 0x006U
+#define AX5043_REG_IRQMASK0                 0x007U
+#define AX5043_REG_RADIOEVENTMASK1          0x008U
+#define AX5043_REG_RADIOEVENTMASK0          0x009U
+#define AX5043_REG_IRQINVERSION1            0x00AU
+#define AX5043_REG_IRQINVERSION0            0x00BU
+#define AX5043_REG_IRQREQUEST1              0x00CU
+#define AX5043_REG_IRQREQUEST0              0x00DU
+#define AX5043_REG_RADIOEVENTREQ1           0x00EU
+#define AX5043_REG_RADIOEVENTREQ0           0x00FU
 
-/* Modulation and framing */
-#define AX5043_REG_MODULATION               0x010
-#define AX5043_REG_ENCODING                 0x011
-#define AX5043_REG_FRAMING                  0x012
-#define AX5043_REG_CRCINIT3                 0x014
-#define AX5043_REG_CRCINIT2                 0x015
-#define AX5043_REG_CRCINIT1                 0x016
-#define AX5043_REG_CRCINIT0                 0x017
+/* Modulation and Framing */
+#define AX5043_REG_MODULATION               0x010U
+#define AX5043_REG_ENCODING                 0x011U
+#define AX5043_REG_FRAMING                  0x012U
+#define AX5043_REG_CRCINIT3                 0x014U
+#define AX5043_REG_CRCINIT2                 0x015U
+#define AX5043_REG_CRCINIT1                 0x016U
+#define AX5043_REG_CRCINIT0                 0x017U
 
-/* FEC */
-#define AX5043_REG_FEC                      0x018
-#define AX5043_REG_FECSYNC                  0x019
-#define AX5043_REG_FECSTATUS                0x01A
+/* Forward Error Correction */
+#define AX5043_REG_FEC                      0x018U
+#define AX5043_REG_FECSYNC                  0x019U
+#define AX5043_REG_FECSTATUS                0x01AU
 
 /* Status */
-#define AX5043_REG_RADIOSTATE               0x01C
-#define AX5043_REG_XTALSTATUS               0x01D
+#define AX5043_REG_RADIOSTATE               0x01CU
+#define AX5043_REG_XTALSTATUS               0x01DU
 
-/* Pin configuration */
-#define AX5043_REG_PINSTATE                 0x20
-#define AX5043_REG_PINFUNCSYSCLK            0x21
-#define AX5043_REG_PINFUNCDCLK              0x22
-#define AX5043_REG_PINFUNCDATA              0x23
-#define AX5043_REG_PINFUNCIRQ               0x24
-#define AX5043_REG_PINFUNCANTSEL            0x25
-#define AX5043_REG_PINFUNCPWRAMP            0x26
-#define AX5043_REG_PWRAMP                   0x27
+/* Pin Configuration */
+#define AX5043_REG_PINSTATE                 0x020U
+#define AX5043_REG_PINFUNCSYSCLK            0x021U
+#define AX5043_REG_PINFUNCDCLK              0x022U
+#define AX5043_REG_PINFUNCDATA              0x023U
+#define AX5043_REG_PINFUNCIRQ               0x024U
+#define AX5043_REG_PINFUNCANTSEL            0x025U
+#define AX5043_REG_PINFUNCPWRAMP            0x026U
+#define AX5043_REG_PWRAMP                   0x027U
 
-/* FIFO control */
-#define AX5043_REG_FIFOSTAT                 0x28
-#define AX5043_REG_FIFODATA                 0x29
-#define AX5043_REG_FIFOCOUNT1               0x2A
-#define AX5043_REG_FIFOCOUNT0               0x2B
-#define AX5043_REG_FIFOFREE1                0x2C
-#define AX5043_REG_FIFOFREE0                0x2D
-#define AX5043_REG_FIFOTHRESH1              0x2E
-#define AX5043_REG_FIFOTHRESH0              0x2F
+/* FIFO */
+#define AX5043_REG_FIFOSTAT                 0x028U
+#define AX5043_REG_FIFODATA                 0x029U
+#define AX5043_REG_FIFOCOUNT1               0x02AU
+#define AX5043_REG_FIFOCOUNT0               0x02BU
+#define AX5043_REG_FIFOFREE1                0x02CU
+#define AX5043_REG_FIFOFREE0                0x02DU
+#define AX5043_REG_FIFOTHRESH1              0x02EU
+#define AX5043_REG_FIFOTHRESH0              0x02FU
 
-/* Frequency Synthesizer */
-#define AX5043_REG_PLLLOOP                  0x30
-#define AX5043_REG_PLLCPI                   0x31
-#define AX5043_REG_PLLVCODIV                0x32
-#define AX5043_REG_PLLRANGINGA              0x33
-#define AX5043_REG_FREQA3                   0x34
-#define AX5043_REG_FREQA2                   0x35
-#define AX5043_REG_FREQA1                   0x36
-#define AX5043_REG_FREQA0                   0x37
-#define AX5043_REG_PLLLOOPBOOST             0x38
-#define AX5043_REG_PLLCPIBOOST              0x39
-#define AX5043_REG_PLLRANGINGB              0x3B
-#define AX5043_REG_FREQB3                   0x3C
-#define AX5043_REG_FREQB2                   0x3D
-#define AX5043_REG_FREQB1                   0x3E
-#define AX5043_REG_FREQB0                   0x3F
+/* Synthesizer */
+#define AX5043_REG_PLLLOOP                  0x030U
+#define AX5043_REG_PLLCPI                   0x031U
+#define AX5043_REG_PLLVCODIV                0x032U
+#define AX5043_REG_PLLRANGINGA              0x033U
+#define AX5043_REG_FREQA3                   0x034U
+#define AX5043_REG_FREQA2                   0x035U
+#define AX5043_REG_FREQA1                   0x036U
+#define AX5043_REG_FREQA0                   0x037U
+#define AX5043_REG_PLLLOOPBOOST             0x038U
+#define AX5043_REG_PLLCPIBOOST              0x039U
+#define AX5043_REG_PLLRANGINGB              0x03BU
+#define AX5043_REG_FREQB3                   0x03CU
+#define AX5043_REG_FREQB2                   0x03DU
+#define AX5043_REG_FREQB1                   0x03EU
+#define AX5043_REG_FREQB0                   0x03FU
 
-/* RSSI */
-#define AX5043_REG_RSSI                     0x40
-#define AX5043_REG_BGNDRSSI                 0x41
-#define AX5043_REG_DIVERSITY                0x42
-#define AX5043_REG_AGCCOUNTER               0x43
+/* Signal Strength */
+#define AX5043_REG_RSSI                     0x040U
+#define AX5043_REG_BGNDRSSI                 0x041U
+#define AX5043_REG_DIVERSITY                0x042U
+#define AX5043_REG_AGCCOUNTER               0x043U
 
 /* Receiver Tracking */
-#define AX5043_REG_TRKDATARATE2             0x45
-#define AX5043_REG_TRKDATARATE1             0x46
-#define AX5043_REG_TRKDATARATE0             0x47
-#define AX5043_REG_TRKAMPL1                 0x48
-#define AX5043_REG_TRKAMPL0                 0x49
-#define AX5043_REG_TRKPHASE1                0x4A
-#define AX5043_REG_TRKPHASE0                0x4B
-#define AX5043_REG_TRKRFFREQ2               0x4D
-#define AX5043_REG_TRKRFFREQ1               0x4E
-#define AX5043_REG_TRKRFFREQ0               0x4F
-#define AX5043_REG_TRKFREQ1                 0x50
-#define AX5043_REG_TRKFREQ0                 0x51
-#define AX5043_REG_TRKFSKDEMOD1             0x52
-#define AX5043_REG_TRKFSKDEMOD0             0x53
+#define AX5043_REG_TRKDATARATE2             0x045U
+#define AX5043_REG_TRKDATARATE1             0x046U
+#define AX5043_REG_TRKDATARATE0             0x047U
+#define AX5043_REG_TRKAMPL1                 0x048U
+#define AX5043_REG_TRKAMPL0                 0x049U
+#define AX5043_REG_TRKPHASE1                0x04AU
+#define AX5043_REG_TRKPHASE0                0x04BU
+#define AX5043_REG_TRKRFFREQ2               0x04DU
+#define AX5043_REG_TRKRFFREQ1               0x04EU
+#define AX5043_REG_TRKRFFREQ0               0x04FU
+#define AX5043_REG_TRKFREQ1                 0x050U
+#define AX5043_REG_TRKFREQ0                 0x051U
+#define AX5043_REG_TRKFSKDEMOD1             0x052U
+#define AX5043_REG_TRKFSKDEMOD0             0x053U
 
 /* Timers */
-#define AX5043_REG_TIMER2                   0x59
-#define AX5043_REG_TIMER1                   0x5A
-#define AX5043_REG_TIMER0                   0x5B
+#define AX5043_REG_TIMER2                   0x059U
+#define AX5043_REG_TIMER1                   0x05AU
+#define AX5043_REG_TIMER0                   0x05BU
 
-/* Wakeup timer */
-#define AX5043_REG_WAKEUPTIMER1             0x68
-#define AX5043_REG_WAKEUPTIMER0             0x69
-#define AX5043_REG_WAKEUP1                  0x6A
-#define AX5043_REG_WAKEUP0                  0x6B
-#define AX5043_REG_WAKEUPFREQ1              0x6C
-#define AX5043_REG_WAKEUPFREQ0              0x6D
-#define AX5043_REG_WAKEUPXOEARLY            0x6E
+/* Wakeup Timer */
+#define AX5043_REG_WAKEUPTIMER1             0x068U
+#define AX5043_REG_WAKEUPTIMER0             0x069U
+#define AX5043_REG_WAKEUP1                  0x06AU
+#define AX5043_REG_WAKEUP0                  0x06BU
+#define AX5043_REG_WAKEUPFREQ1              0x06CU
+#define AX5043_REG_WAKEUPFREQ0              0x06DU
+#define AX5043_REG_WAKEUPXOEARLY            0x06EU
 
-/* PHY related registers*/
-#define AX5043_REG_IFFREQ1                  0x100
-#define AX5043_REG_IFFREQ0                  0x101
-#define AX5043_REG_DECIMATION               0x102
-#define AX5043_REG_RXDATARATE2              0x103
-#define AX5043_REG_RXDATARATE1              0x104
-#define AX5043_REG_RXDATARATE0              0x105
-#define AX5043_REG_MAXDROFFSET2             0x106
-#define AX5043_REG_MAXDROFFSET1             0x107
-#define AX5043_REG_MAXDROFFSET0             0x108
-#define AX5043_REG_MAXRFOFFSET2             0x109
-#define AX5043_REG_MAXRFOFFSET1             0x10A
-#define AX5043_REG_MAXRFOFFSET0             0x10B
-#define AX5043_REG_FSKDMAX1                 0x10C
-#define AX5043_REG_FSKDMAX0                 0x10D
-#define AX5043_REG_FSKDMIN1                 0x10E
-#define AX5043_REG_FSKDMIN0                 0x10F
-#define AX5043_REG_AFSKSPACE1               0x110
-#define AX5043_REG_AFSKSPACE0               0x111
-#define AX5043_REG_AFSKMARK1                0x112
-#define AX5043_REG_AFSKMARK0                0x113
-#define AX5043_REG_AFSKCTRL                 0x114
-#define AX5043_REG_AMPLFILTER               0x115
-#define AX5043_REG_FREQUENCYLEAK            0x116
-#define AX5043_REG_RXPARAMSETS              0x117
-#define AX5043_REG_RXPARAMCURSET            0x118
+/* PHY Layer Parameters */
+/* Receiver Parameters */
+#define AX5043_REG_IFFREQ1                  0x100U
+#define AX5043_REG_IFFREQ0                  0x101U
+#define AX5043_REG_DECIMATION               0x102U
+#define AX5043_REG_RXDATARATE2              0x103U
+#define AX5043_REG_RXDATARATE1              0x104U
+#define AX5043_REG_RXDATARATE0              0x105U
+#define AX5043_REG_MAXDROFFSET2             0x106U
+#define AX5043_REG_MAXDROFFSET1             0x107U
+#define AX5043_REG_MAXDROFFSET0             0x108U
+#define AX5043_REG_MAXRFOFFSET2             0x109U
+#define AX5043_REG_MAXRFOFFSET1             0x10AU
+#define AX5043_REG_MAXRFOFFSET0             0x10BU
+#define AX5043_REG_FSKDMAX1                 0x10CU
+#define AX5043_REG_FSKDMAX0                 0x10DU
+#define AX5043_REG_FSKDMIN1                 0x10EU
+#define AX5043_REG_FSKDMIN0                 0x10FU
+#define AX5043_REG_AFSKSPACE1               0x110U
+#define AX5043_REG_AFSKSPACE0               0x111U
+#define AX5043_REG_AFSKMARK1                0x112U
+#define AX5043_REG_AFSKMARK0                0x113U
+#define AX5043_REG_AFSKCTRL                 0x114U
+#define AX5043_REG_AMPLFILTER               0x115U
+#define AX5043_REG_FREQUENCYLEAK            0x116U
+#define AX5043_REG_RXPARAMSETS              0x117U
+#define AX5043_REG_RXPARAMCURSET            0x118U
 
 /* Receiver Parameter Set 0 */
-#define AX5043_REG_AGCGAIN0                 0x120
-#define AX5043_REG_AGCTARGET0               0x121
-#define AX5043_REG_AGCAHYST0                0x122
-#define AX5043_REG_AGCMINMAX0               0x123
-#define AX5043_REG_TIMEGAIN0                0x124
-#define AX5043_REG_DRGAIN0                  0x125
-#define AX5043_REG_PHASEGAIN0               0x126
-#define AX5043_REG_FREQUENCYGAINA0          0x127
-#define AX5043_REG_FREQUENCYGAINB0          0x128
-#define AX5043_REG_FREQUENCYGAINC0          0x129
-#define AX5043_REG_FREQUENCYGAIND0          0x12A
-#define AX5043_REG_AMPLITUDEGAIN0           0x12B
-#define AX5043_REG_FREQDEV10                0x12C
-#define AX5043_REG_FREQDEV00                0x12D
-#define AX5043_REG_FOURFSK0                 0x12E
-#define AX5043_REG_BBOFFSRES0               0x12F
+#define AX5043_REG_AGCGAIN0                 0x120U
+#define AX5043_REG_AGCTARGET0               0x121U
+#define AX5043_REG_AGCAHYST0                0x122U
+#define AX5043_REG_AGCMINMAX0               0x123U
+#define AX5043_REG_TIMEGAIN0                0x124U
+#define AX5043_REG_DRGAIN0                  0x125U
+#define AX5043_REG_PHASEGAIN0               0x126U
+#define AX5043_REG_FREQGAINA0               0x127U
+#define AX5043_REG_FREQGAINB0               0x128U
+#define AX5043_REG_FREQGAINC0               0x129U
+#define AX5043_REG_FREQGAIND0               0x12AU
+#define AX5043_REG_AMPLGAIN0                0x12BU
+#define AX5043_REG_FREQDEV10                0x12CU
+#define AX5043_REG_FREQDEV00                0x12DU
+#define AX5043_REG_FOURFSK0                 0x12EU
+#define AX5043_REG_BBOFFSRES0               0x12FU
 
 /* Receiver Parameter Set 1 */
-#define AX5043_REG_AGCGAIN1                 0x130
-#define AX5043_REG_AGCTARGET1               0x131
-#define AX5043_REG_AGCAHYST1                0x132
-#define AX5043_REG_AGCMINMAX1               0x133
-#define AX5043_REG_TIMEGAIN1                0x134
-#define AX5043_REG_DRGAIN1                  0x135
-#define AX5043_REG_PHASEGAIN1               0x136
-#define AX5043_REG_FREQUENCYGAINA1          0x137
-#define AX5043_REG_FREQUENCYGAINB1          0x138
-#define AX5043_REG_FREQUENCYGAINC1          0x139
-#define AX5043_REG_FREQUENCYGAIND1          0x13A
-#define AX5043_REG_AMPLITUDEGAIN1           0x13B
-#define AX5043_REG_FREQDEV11                0x13C
-#define AX5043_REG_FREQDEV01                0x13D
-#define AX5043_REG_FOURFSK1                 0x13E
-#define AX5043_REG_BBOFFSRES1               0x13F
+#define AX5043_REG_AGCGAIN1                 0x130U
+#define AX5043_REG_AGCTARGET1               0x131U
+#define AX5043_REG_AGCAHYST1                0x132U
+#define AX5043_REG_AGCMINMAX1               0x133U
+#define AX5043_REG_TIMEGAIN1                0x134U
+#define AX5043_REG_DRGAIN1                  0x135U
+#define AX5043_REG_PHASEGAIN1               0x136U
+#define AX5043_REG_FREQGAINA1               0x137U
+#define AX5043_REG_FREQGAINB1               0x138U
+#define AX5043_REG_FREQGAINC1               0x139U
+#define AX5043_REG_FREQGAIND1               0x13AU
+#define AX5043_REG_AMPLGAIN1                0x13BU
+#define AX5043_REG_FREQDEV11                0x13CU
+#define AX5043_REG_FREQDEV01                0x13DU
+#define AX5043_REG_FOURFSK1                 0x13EU
+#define AX5043_REG_BBOFFSRES1               0x13FU
 
 /* Receiver Parameter Set 2 */
-#define AX5043_REG_AGCGAIN2                 0x140
-#define AX5043_REG_AGCTARGET2               0x141
-#define AX5043_REG_AGCAHYST2                0x142
-#define AX5043_REG_AGCMINMAX2               0x143
-#define AX5043_REG_TIMEGAIN2                0x144
-#define AX5043_REG_DRGAIN2                  0x145
-#define AX5043_REG_PHASEGAIN2               0x146
-#define AX5043_REG_FREQGAINA2               0x147
-#define AX5043_REG_FREQGAINB2               0x148
-#define AX5043_REG_FREQGAINC2               0x149
-#define AX5043_REG_FREQGAIND2               0x14A
-#define AX5043_REG_AMPLGAIN2                0x14B
-#define AX5043_REG_FREQDEV12                0x14C
-#define AX5043_REG_FREQDEV02                0x14D
-#define AX5043_REG_FOURFSK2                 0x14E
-#define AX5043_REG_BBOFFSRES2               0x14F
+#define AX5043_REG_AGCGAIN2                 0x140U
+#define AX5043_REG_AGCTARGET2               0x141U
+#define AX5043_REG_AGCAHYST2                0x142U
+#define AX5043_REG_AGCMINMAX2               0x143U
+#define AX5043_REG_TIMEGAIN2                0x144U
+#define AX5043_REG_DRGAIN2                  0x145U
+#define AX5043_REG_PHASEGAIN2               0x146U
+#define AX5043_REG_FREQGAINA2               0x147U
+#define AX5043_REG_FREQGAINB2               0x148U
+#define AX5043_REG_FREQGAINC2               0x149U
+#define AX5043_REG_FREQGAIND2               0x14AU
+#define AX5043_REG_AMPLGAIN2                0x14BU
+#define AX5043_REG_FREQDEV12                0x14CU
+#define AX5043_REG_FREQDEV02                0x14DU
+#define AX5043_REG_FOURFSK2                 0x14EU
+#define AX5043_REG_BBOFFSRES2               0x14FU
 
 /* Receiver Parameter Set 3 */
-#define AX5043_REG_AGCGAIN3                 0x150
-#define AX5043_REG_AGCTARGET3               0x151
-#define AX5043_REG_AGCAHYST3                0x152
-#define AX5043_REG_AGCMINMAX3               0x153
-#define AX5043_REG_TIMEGAIN3                0x154
-#define AX5043_REG_DRGAIN3                  0x155
-#define AX5043_REG_PHASEGAIN3               0x156
-#define AX5043_REG_FREQUENCYGAINA3          0x157
-#define AX5043_REG_FREQUENCYGAINB3          0x158
-#define AX5043_REG_FREQUENCYGAINC3          0x159
-#define AX5043_REG_FREQUENCYGAIND3          0x15A
-#define AX5043_REG_AMPLITUDEGAIN3           0x15B
-#define AX5043_REG_FREQDEV13                0x15C
-#define AX5043_REG_FREQDEV03                0x15D
-#define AX5043_REG_FOURFSK3                 0x15E
-#define AX5043_REG_BBOFFSRES3               0x15F
+#define AX5043_REG_AGCGAIN3                 0x150U
+#define AX5043_REG_AGCTARGET3               0x151U
+#define AX5043_REG_AGCAHYST3                0x152U
+#define AX5043_REG_AGCMINMAX3               0x153U
+#define AX5043_REG_TIMEGAIN3                0x154U
+#define AX5043_REG_DRGAIN3                  0x155U
+#define AX5043_REG_PHASEGAIN3               0x156U
+#define AX5043_REG_FREQGAINA3               0x157U
+#define AX5043_REG_FREQGAINB3               0x158U
+#define AX5043_REG_FREQGAINC3               0x159U
+#define AX5043_REG_FREQGAIND3               0x15AU
+#define AX5043_REG_AMPLGAIN3                0x15BU
+#define AX5043_REG_FREQDEV13                0x15CU
+#define AX5043_REG_FREQDEV03                0x15DU
+#define AX5043_REG_FOURFSK3                 0x15EU
+#define AX5043_REG_BBOFFSRES3               0x15FU
 
 /* Transmitter Parameters */
-#define AX5043_REG_MODCFGF                  0x160
-#define AX5043_REG_FSKDEV2                  0x161
-#define AX5043_REG_FSKDEV1                  0x162
-#define AX5043_REG_FSKDEV0                  0x163
-#define AX5043_REG_MODCFGA                  0x164
-#define AX5043_REG_TXRATE2                  0x165
-#define AX5043_REG_TXRATE1                  0x166
-#define AX5043_REG_TXRATE0                  0x167
-#define AX5043_REG_TXPWRCOEFFA1             0x168
-#define AX5043_REG_TXPWRCOEFFA0             0x169
-#define AX5043_REG_TXPWRCOEFFB1             0x16A
-#define AX5043_REG_TXPWRCOEFFB0             0x16B
-#define AX5043_REG_TXPWRCOEFFC1             0x16C
-#define AX5043_REG_TXPWRCOEFFC0             0x16D
-#define AX5043_REG_TXPWRCOEFFD1             0x16E
-#define AX5043_REG_TXPWRCOEFFD0             0x16F
-#define AX5043_REG_TXPWRCOEFFE1             0x170
-#define AX5043_REG_TXPWRCOEFFE0             0x171
+#define AX5043_REG_MODCFGF                  0x160U
+#define AX5043_REG_FSKDEV2                  0x161U
+#define AX5043_REG_FSKDEV1                  0x162U
+#define AX5043_REG_FSKDEV0                  0x163U
+#define AX5043_REG_MODCFGA                  0x164U
+#define AX5043_REG_TXRATE2                  0x165U
+#define AX5043_REG_TXRATE1                  0x166U
+#define AX5043_REG_TXRATE0                  0x167U
+#define AX5043_REG_TXPWRCOEFFA1             0x168U
+#define AX5043_REG_TXPWRCOEFFA0             0x169U
+#define AX5043_REG_TXPWRCOEFFB1             0x16AU
+#define AX5043_REG_TXPWRCOEFFB0             0x16BU
+#define AX5043_REG_TXPWRCOEFFC1             0x16CU
+#define AX5043_REG_TXPWRCOEFFC0             0x16DU
+#define AX5043_REG_TXPWRCOEFFD1             0x16EU
+#define AX5043_REG_TXPWRCOEFFD0             0x16FU
+#define AX5043_REG_TXPWRCOEFFE1             0x170U
+#define AX5043_REG_TXPWRCOEFFE0             0x171U
 
-/* PLL parameters */
-#define AX5043_REG_PLLVCOI                  0x180
-#define AX5043_REG_PLLVCOIR                 0x181
-#define AX5043_REG_PLLLOCKDET               0x182
-#define AX5043_REG_PLLRNGCLK                0x183
+/* PLL Parameters */
+#define AX5043_REG_PLLVCOI                  0x180U
+#define AX5043_REG_PLLVCOIR                 0x181U
+#define AX5043_REG_PLLLOCKDET               0x182U
+#define AX5043_REG_PLLRNGCLK                0x183U
 
 /* Crystal Oscillator */
-#define AX5043_REG_XTALCAP                  0x184
+#define AX5043_REG_XTALCAP                  0x184U
 
 /* Baseband */
-#define AX5043_REG_BBTUNE                   0x188
-#define AX5043_REG_BBOFFSCAP                0x189
+#define AX5043_REG_BBTUNE                   0x188U
+#define AX5043_REG_BBOFFSCAP                0x189U
 
+/* MAC Layer Parameters */
 /* Packet Format */
-#define AX5043_REG_PKTADDRCFG               0x200
-#define AX5043_REG_PKTLENCFG                0x201
-#define AX5043_REG_PKTLENOFFSET             0x202
-#define AX5043_REG_PKTMAXLEN                0x203
-#define AX5043_REG_PKTADDR3                 0x204
-#define AX5043_REG_PKTADDR2                 0x205
-#define AX5043_REG_PKTADDR1                 0x206
-#define AX5043_REG_PKTADDR0                 0x207
-#define AX5043_REG_PKTADDRMASK3             0x208
-#define AX5043_REG_PKTADDRMASK2             0x209
-#define AX5043_REG_PKTADDRMASK1             0x20A
-#define AX5043_REG_PKTADDRMASK0             0x20B
+#define AX5043_REG_PKTADDRCFG               0x200U
+#define AX5043_REG_PKTLENCFG                0x201U
+#define AX5043_REG_PKTLENOFFSET             0x202U
+#define AX5043_REG_PKTMAXLEN                0x203U
+#define AX5043_REG_PKTADDR3                 0x204U
+#define AX5043_REG_PKTADDR2                 0x205U
+#define AX5043_REG_PKTADDR1                 0x206U
+#define AX5043_REG_PKTADDR0                 0x207U
+#define AX5043_REG_PKTADDRMASK3             0x208U
+#define AX5043_REG_PKTADDRMASK2             0x209U
+#define AX5043_REG_PKTADDRMASK1             0x20AU
+#define AX5043_REG_PKTADDRMASK0             0x20BU
 
 /* Pattern Match */
-#define AX5043_REG_MATCH0PAT3               0x210
-#define AX5043_REG_MATCH0PAT2               0x211
-#define AX5043_REG_MATCH0PAT1               0x212
-#define AX5043_REG_MATCH0PAT0               0x213
-#define AX5043_REG_MATCH0LEN                0x214
-#define AX5043_REG_MATCH0MIN                0x215
-#define AX5043_REG_MATCH0MAX                0x216
-#define AX5043_REG_MATCH1PAT1               0x218
-#define AX5043_REG_MATCH1PAT0               0x219
-#define AX5043_REG_MATCH1LEN                0x21C
-#define AX5043_REG_MATCH1MIN                0x21D
-#define AX5043_REG_MATCH1MAX                0x21E
+#define AX5043_REG_MATCH0PAT3               0x210U
+#define AX5043_REG_MATCH0PAT2               0x211U
+#define AX5043_REG_MATCH0PAT1               0x212U
+#define AX5043_REG_MATCH0PAT0               0x213U
+#define AX5043_REG_MATCH0LEN                0x214U
+#define AX5043_REG_MATCH0MIN                0x215U
+#define AX5043_REG_MATCH0MAX                0x216U
+#define AX5043_REG_MATCH1PAT1               0x218U
+#define AX5043_REG_MATCH1PAT0               0x219U
+#define AX5043_REG_MATCH1LEN                0x21CU
+#define AX5043_REG_MATCH1MIN                0x21DU
+#define AX5043_REG_MATCH1MAX                0x21EU
 
 /* Packet Controller */
-#define AX5043_REG_TMGTXBOOST               0x220
-#define AX5043_REG_TMGTXSETTLE              0x221
-#define AX5043_REG_TMGRXBOOST               0x223
-#define AX5043_REG_TMGRXSETTLE              0x224
-#define AX5043_REG_TMGRXOFFSACQ             0x225
-#define AX5043_REG_TMGRXCOARSEAGC           0x226
-#define AX5043_REG_TMGRXAGC                 0x227
-#define AX5043_REG_TMGRXRSSI                0x228
-#define AX5043_REG_TMGRXPREAMBLE1           0x229
-#define AX5043_REG_TMGRXPREAMBLE2           0x22A
-#define AX5043_REG_TMGRXPREAMBLE3           0x22B
-#define AX5043_REG_RSSIREFERENCE            0x22C
-#define AX5043_REG_RSSIABSTHR               0x22D
-#define AX5043_REG_BGNDRSSIGAIN             0x22E
-#define AX5043_REG_BGNDRSSITHR              0x22F
-#define AX5043_REG_PKTCHUNKSIZE             0x230
-#define AX5043_REG_PKTMISCFLAGS             0x231
-#define AX5043_REG_PKTSTOREFLAGS            0x232
-#define AX5043_REG_PKTACCEPTFLAGS           0x233
+#define AX5043_REG_TMGTXBOOST               0x220U
+#define AX5043_REG_TMGTXSETTLE              0x221U
+#define AX5043_REG_TMGRXBOOST               0x223U
+#define AX5043_REG_TMGRXSETTLE              0x224U
+#define AX5043_REG_TMGRXOFFSACQ             0x225U
+#define AX5043_REG_TMGRXCOARSEAGC           0x226U
+#define AX5043_REG_TMGRXAGC                 0x227U
+#define AX5043_REG_TMGRXRSSI                0x228U
+#define AX5043_REG_TMGRXPREAMBLE1           0x229U
+#define AX5043_REG_TMGRXPREAMBLE2           0x22AU
+#define AX5043_REG_TMGRXPREAMBLE3           0x22BU
+#define AX5043_REG_RSSIREFERENCE            0x22CU
+#define AX5043_REG_RSSIABSTHR               0x22DU
+#define AX5043_REG_BGNDRSSIGAIN             0x22EU
+#define AX5043_REG_BGNDRSSITHR              0x22FU
+#define AX5043_REG_PKTCHUNKSIZE             0x230U
+#define AX5043_REG_PKTMISCFLAGS             0x231U
+#define AX5043_REG_PKTSTOREFLAGS            0x232U
+#define AX5043_REG_PKTACCEPTFLAGS           0x233U
 
 /* General Purpose ADC */
-#define AX5043_REG_GPADCCTRL                0x300
-#define AX5043_REG_GPADCPERIOD              0x301
-#define AX5043_REG_GPADC13VALUE1            0x308
-#define AX5043_REG_GPADC13VALUE0            0x309
+#define AX5043_REG_GPADCCTRL                0x300U
+#define AX5043_REG_GPADCPERIOD              0x301U
+#define AX5043_REG_GPADC13VALUE1            0x308U
+#define AX5043_REG_GPADC13VALUE0            0x309U
 
 /* Low Power Oscillator Calibration */
-#define AX5043_REG_LPOSCCONFIG              0x310
-#define AX5043_REG_LPOSCSTATUS              0x311
-#define AX5043_REG_LPOSCKFILT1              0x312
-#define AX5043_REG_LPOSCKFILT0              0x313
-#define AX5043_REG_LPOSCREF1                0x314
-#define AX5043_REG_LPOSCREF0                0x315
-#define AX5043_REG_LPOSCFREQ1               0x316
-#define AX5043_REG_LPOSCFREQ0               0x317
-#define AX5043_REG_LPOSCPER1                0x318
-#define AX5043_REG_LPOSCPER0                0x319
+#define AX5043_REG_LPOSCCONFIG              0x310U
+#define AX5043_REG_LPOSCSTATUS              0x311U
+#define AX5043_REG_LPOSCKFILT1              0x312U
+#define AX5043_REG_LPOSCKFILT0              0x313U
+#define AX5043_REG_LPOSCREF1                0x314U
+#define AX5043_REG_LPOSCREF0                0x315U
+#define AX5043_REG_LPOSCFREQ1               0x316U
+#define AX5043_REG_LPOSCFREQ0               0x317U
+#define AX5043_REG_LPOSCPER1                0x318U
+#define AX5043_REG_LPOSCPER0                0x319U
 
 /* DAC */
-#define AX5043_REG_DACVALUE1                0x330
-#define AX5043_REG_DACVALUE0                0x331
-#define AX5043_REG_DACCONFIG                0x332
+#define AX5043_REG_DACVALUE1                0x330U
+#define AX5043_REG_DACVALUE0                0x331U
+#define AX5043_REG_DACCONFIG                0x332U
 
 /* Performance Tuning Registers */
-#define AX5043_REG_REF                      0xF00
-#define AX5043_REG_0xF00                    0xF00
-#define AX5043_REG_0xF0C                    0xF0C
-#define AX5043_REG_0xF0D                    0xF0D
-#define AX5043_REG_XTALOSC                  0xF10
-#define AX5043_REG_XTALAMPL                 0xF11
-#define AX5043_REG_0xF1C                    0xF1C
-#define AX5043_REG_0xF18                    0xF18
-#define AX5043_REG_0xF21                    0xF21
-#define AX5043_REG_0xF22                    0xF22
-#define AX5043_REG_0xF23                    0xF23
-#define AX5043_REG_0xF26                    0xF26
-#define AX5043_REG_0xF30                    0xF30
-#define AX5043_REG_0xF31                    0xF31
-#define AX5043_REG_0xF32                    0xF32
-#define AX5043_REG_0xF33                    0xF33
-#define AX5043_REG_0xF34                    0xF34
-#define AX5043_REG_0xF35                    0xF35
-#define AX5043_REG_0xF44                    0xF44
-#define AX5043_REG_0xF72                    0xF72
-#define AX5043_REG_XTALDIV                  0xF35
+#define AX5043_REG_0xF00                    0xF00U
+#define AX5043_REG_0xF0C                    0xF0CU
+#define AX5043_REG_0xF0D                    0xF0DU
+#define AX5043_REG_0xF10                    0xF10U
+#define AX5043_REG_XTALOSC                  0xF10U
+#define AX5043_REG_0xF11                    0xF11U
+#define AX5043_REG_XTALAMPL                 0xF11U
+#define AX5043_REG_0xF18                    0xF18U
+#define AX5043_REG_0xF1C                    0xF1CU
+#define AX5043_REG_0xF21                    0xF21U
+#define AX5043_REG_0xF22                    0xF22U
+#define AX5043_REG_0xF23                    0xF23U
+#define AX5043_REG_0xF26                    0xF26U
+#define AX5043_REG_0xF30                    0xF30U
+#define AX5043_REG_0xF31                    0xF31U
+#define AX5043_REG_0xF32                    0xF32U
+#define AX5043_REG_0xF33                    0xF33U
+#define AX5043_REG_0xF34                    0xF34U
+#define AX5043_REG_0xF35                    0xF35U
+#define AX5043_REG_XTALDIV                  0xF35U
+#define AX5043_REG_0xF44                    0xF44U
+#define AX5043_REG_0xF72                    0xF72U
+/** @} */
 
 /* Not a real register. Indicator of end of registers.*/
-#define AX5043_REG_END                      0xFFF
+#define AX5043_REG_END                      0xFFFU
+
+/**
+ * @name    AX5043 REVISION register
+ * @{
+ */
+#define AX5043_REVISION_Pos                 (0U)
+#define AX5043_REVISION_Msk                 (0xFFU << AX5043_REVISION_Pos)
+#define AX5043_REVISION                     AX5043_REVISION_Msk
 /** @} */
 
 /**
- * @name    AX5043 Register and bit values
- *
+ * @name    AX5043 SCRATCH register
+ * @{
  */
-/* Power modes */
-#define AX5043_RESET_BIT                (1 << 7)
-#define AX5043_OSC_EN_BIT               (1 << 6)
-#define AX5043_REF_EN_BIT               (1 << 5)
-
-#define AX5043_POWERDOWN                0x0
-#define AX5043_DEEPSLEEP                0x1
-#define AX5043_STANDBY                  0x5
-#define AX5043_FIFO_ENABLED             0x7
-#define AX5043_SYNTH_RX                 0x8
-#define AX5043_FULL_RX                  0x9
-#define AX5043_WOR_RX                   0xB
-#define AX5043_SYNTH_TX                 0xC
-#define AX5043_FULL_TX                  0xD
+#define AX5043_SCRATCH_Pos                  (0U)
+#define AX5043_SCRATCH_Msk                  (0xFFU << AX5043_SCRATCH_Pos)
+#define AX5043_SCRATCH                      AX5043_SCRATCH_Msk
+/** @} */
 
 /**
- * @name    AX5043 FIFO Commands
+ * @name    AX5043 PWRMODE register fields
+ * @{
+ */
+#define AX5043_PWRMODE_Pos                  (0U)
+#define AX5043_PWRMODE_Msk                  (0xFU << AX5043_PWRMODE_Pos)
+#define AX5043_PWRMODE                      AX5043_PWRMODE_Msk
+#define AX5043_PWRMODE_POWERDOWN            (0x0U)
+#define AX5043_PWRMODE_DEEPSLEEP            (0x1U)
+#define AX5043_PWRMODE_STANDBY              (0x5U)
+#define AX5043_PWRMODE_FIFO_EN              (0x7U)
+#define AX5043_PWRMODE_RX_SYNTH             (0x8U)
+#define AX5043_PWRMODE_RX_FULL              (0x9U)
+#define AX5043_PWRMODE_RX_WOR               (0xBU)
+#define AX5043_PWRMODE_TX_SYNTH             (0xCU)
+#define AX5043_PWRMODE_TX_FULL              (0xDU)
+#define AX5043_PWRMODE_WDS_Pos              (4U)
+#define AX5043_PWRMODE_WDS_Msk              (0x1U << AX5043_PWRMODE_WDS_Pos)
+#define AX5043_PWRMODE_WDS                  AX5043_PWRMODE_WDS_Msk
+#define AX5043_PWRMODE_REFEN_Pos            (5U)
+#define AX5043_PWRMODE_REFEN_Msk            (0x1U << AX5043_PWRMODE_REFEN_Pos)
+#define AX5043_PWRMODE_REFEN                AX5043_PWRMODE_REFEN_Msk
+#define AX5043_PWRMODE_XOEN_Pos             (6U)
+#define AX5043_PWRMODE_XOEN_Msk             (0x1U << AX5043_PWRMODE_XOEN_Pos)
+#define AX5043_PWRMODE_XOEN                 AX5043_PWRMODE_XOEN_Msk
+#define AX5043_PWRMODE_RESET_Pos            (7U)
+#define AX5043_PWRMODE_RESET_Msk            (0x1U << AX5043_PWRMODE_RESET_Pos)
+#define AX5043_PWRMODE_RESET                AX5043_PWRMODE_RESET_Msk
+/** @} */
+
+/**
+ * @name    AX5043 POWSTAT/POWSTICKYSTAT/POWIRQMASK register fields
+ * @{
+ */
+#define AX5043_POWIRQ_SVIO_Pos              (0U)
+#define AX5043_POWIRQ_SVIOgsk               (0x1U << AX5043_POWIRQ_MSVIO_Pos)
+#define AX5043_POWIRQ_SVIO                  AX5043_POWIRQgSVIO_Msk
+#define AX5043_POWIRQ_SBEVMODEM_Pos         (1U)
+#define AX5043_POWIRQ_SBEVMODEMgsk          (0x1U << AX5043_POWIRQ_MSBEVMODEM_Pos)
+#define AX5043_POWIRQ_SBEVMODEM             AX5043_POWIRQgSBEVMODEM_Msk
+#define AX5043_POWIRQ_SBEVANA_Pos           (2U)
+#define AX5043_POWIRQ_SBEVANAgsk            (0x1U << AX5043_POWIRQ_MSBEVANA_Pos)
+#define AX5043_POWIRQ_SBEVANA               AX5043_POWIRQgSBEVANA_Msk
+#define AX5043_POWIRQ_SVMODEM_Pos           (3U)
+#define AX5043_POWIRQ_SVMODEMgsk            (0x1U << AX5043_POWIRQ_MSVMODEM_Pos)
+#define AX5043_POWIRQ_SVMODEM               AX5043_POWIRQgSVMODEM_Msk
+#define AX5043_POWIRQ_SVANA_Pos             (4U)
+#define AX5043_POWIRQ_SVANAgsk              (0x1U << AX5043_POWIRQ_MSVANA_Pos)
+#define AX5043_POWIRQ_SVANA                 AX5043_POWIRQgSVANA_Msk
+#define AX5043_POWIRQ_SVREF_Pos             (5U)
+#define AX5043_POWIRQ_SVREFgsk              (0x1U << AX5043_POWIRQ_MSVREF_Pos)
+#define AX5043_POWIRQ_SVREF                 AX5043_POWIRQ_SMVREFgsk
+#define AX5043_POWIRQ_SREF_Pos              (6U)
+#define AX5043_POWIRQ_SREFgsk               (0x1U << AX5043_POWIRQ_MSREF_Pos)
+#define AX5043_POWIRQ_SREF                  AX5043_POWIRQgSREF_Msk
+#define AX5043_POWIRQ_PWRGOOD_Pos           (7U)
+#define AX5043_POWIRQ_PWRGOODgsk            (0x1U << AX5043_POWIRQ_MPWRGOOD_Pos)
+#define AX5043_POWIRQ_PWRGOOD               AX5043_POWIRQgPWRGOOD_Msk
+/** @} */
+
+/**
+ * @name    AX5043 IRQMASK/IRQINVERSION/IRQREQUEST register fields
+ * @{
+ */
+#define AX5043_IRQ_FIFONOTEMPTY_Pos         (0U)
+#define AX5043_IRQ_FIFONOTEMPTY_Msk         (0x1U << AX5043_IRQ_FIFONOTEMPTY_Pos)
+#define AX5043_IRQ_FIFONOTEMPTY             AX5043_IRQ_FIFONOTEMPTY_Msk
+#define AX5043_IRQ_FIFONOTFULL_Pos          (1U)
+#define AX5043_IRQ_FIFONOTFULL_Msk          (0x1U << AX5043_IRQ_FIFONOTFULL_Pos)
+#define AX5043_IRQ_FIFONOTFULL              AX5043_IRQ_FIFONOTFULL_Msk
+#define AX5043_IRQ_FIFOTHRCNT_Pos           (2U)
+#define AX5043_IRQ_FIFOTHRCNT_Msk           (0x1U << AX5043_IRQ_FIFOTHRCNT_Pos)
+#define AX5043_IRQ_FIFOTHRCNT               AX5043_IRQ_FIFOTHRCNT_Msk
+#define AX5043_IRQ_FIFLTHRFREE_Pos          (3U)
+#define AX5043_IRQ_FIFLTHRFREE_Msk          (0x1U << AX5043_IRQ_FIFOTHRFREE_Pos)
+#define AX5043_IRQ_FIFLTHRFREE              AX5043_IRQ_FIFOTHRFREE_Msk
+#define AX5043_IRQ_FIFOERROR_Pos            (4U)
+#define AX5043_IRQ_FIFOERROR_Msk            (0x1U << AX5043_IRQ_FIFOERROR_Pos)
+#define AX5043_IRQ_FIFOERROR                AX5043_IRQ_FIFOERROR_Msk
+#define AX5043_IRQ_PLLUNLOCK_Pos            (5U)
+#define AX5043_IRQ_PLLUNLOCK_Msk            (0x1U << AX5043_IRQ_PLLUNLOCK_Pos)
+#define AX5043_IRQ_PLLUNLOCK                AX5043_IRQ_PLLUNLOCK_Msk
+#define AX5043_IRQ_RADIOCTRL_Pos            (6U)
+#define AX5043_IRQ_RADIOCTRL_Msk            (0x1U << AX5043_IRQ_RADIOCTRL_Pos)
+#define AX5043_IRQ_RADIOCTRL                AX5043_IRQ_RADIOCTRL_Msk
+#define AX5043_IRQ_POWER_Pos                (7U)
+#define AX5043_IRQ_POWER_Msk                (0x1U << AX5043_IRQ_POWER_Pos)
+#define AX5043_IRQ_POWER                    AX5043_IRQ_POWER_Msk
+#define AX5043_IRQ_XTALREADY_Pos            (8U)
+#define AX5043_IRQ_XTALREADY_Msk            (0x1U << AX5043_IRQ_XTALREADY_Pos)
+#define AX5043_IRQ_XTALREADY                AX5043_IRQ_XTALREADY_Msk
+#define AX5043_IRQ_WAKEUPTIMER_Pos          (9U)
+#define AX5043_IRQ_WAKEUPTIMER_Msk          (0x1U << AX5043_IRQ_WAKEUPTIMER_Pos)
+#define AX5043_IRQ_WAKEUPTIMER              AX5043_IRQ_WAKEUPTIMER_Msk
+#define AX5043_IRQ_LPOSC_Pos                (10U)
+#define AX5043_IRQ_LPOSC_Msk                (0x1U << AX5043_IRQ_LPOSC_Pos)
+#define AX5043_IRQ_LPOSC                    AX5043_IRQ_LPOSC_Msk
+#define AX5043_IRQ_GPADC_Pos                (11U)
+#define AX5043_IRQ_GPADC_Msk                (0x1U << AX5043_IRQ_GPADC_Pos)
+#define AX5043_IRQ_GPADC                    AX5043_IRQ_GPADC_Msk
+#define AX5043_IRQ_PLLRNGDONE_Pos           (12U)
+#define AX5043_IRQ_PLLRNGDONE_Msk           (0x1U << AX5043_IRQ_PLLRNGDONE_Pos)
+#define AX5043_IRQ_PLLRNGDONE               AX5043_IRQ_PLLRNGDONE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RADIOEVENTMASK/RADIOEVENTREQ register fields
+ * @{
+ */
+#define AX5043_RADIOEVENT_DONE_Pos          (0U)
+#define AX5043_RADIOEVENT_DONE_Msk          (0x1U << AX5043_RADIOEVENT_DONE_Pos)
+#define AX5043_RADIOEVENT_DONE              AX5043_RADIOEVENT_DONE_Msk
+#define AX5043_RADIOEVENT_SETTLED_Pos       (1U)
+#define AX5043_RADIOEVENT_SETTLED_Msk       (0x1U << AX5043_RADIOEVENT_SETTLED_Pos)
+#define AX5043_RADIOEVENT_SETTLED           AX5043_RADIOEVENT_SETTLED_Msk
+#define AX5043_RADIOEVENT_RADIOSTATECHG_Pos (2U)
+#define AX5043_RADIOEVENT_RADIOSTATECHG_Msk (0x1U << AX5043_RADIOEVENT_RADIOSTATECHG_Pos)
+#define AX5043_RADIOEVENT_RADIOSTATECHG     AX5043_RADIOEVENT_RADIOSTATECHG_Msk
+#define AX5043_RADIOEVENT_RXPARAMSETCHG_Pos (3U)
+#define AX5043_RADIOEVENT_RXPARAMSETCHG_Msk (0x1U << AX5043_RADIOEVENT_RXPARAMSETCHG_Pos)
+#define AX5043_RADIOEVENT_RXPARAMSETCHG     AX5043_RADIOEVENT_RXPARAMSETCHG_Msk
+#define AX5043_RADIOEVENT_FRAMECLK_Pos      (4U)
+#define AX5043_RADIOEVENT_FRAMECLK_Msk      (0x1U << AX5043_RADIOEVENT_FRAMECLK_Pos)
+#define AX5043_RADIOEVENT_FRAMECLK          AX5043_RADIOEVENT_FRAMECLK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MODULATION register fields
+ * @{
+ */
+#define AX5043_MODULATION_Pos               (0U)
+#define AX5043_MODULATION_Msk               (0xFU << AX5043_MODULATION_Pos)
+#define AX5043_MODULATION                   AX5043_MODULATION_Msk
+#define AX5043_MODULATION_ASK               (0x0U)
+#define AX5043_MODULATION_ASK_COHERENT      (0x1U)
+#define AX5043_MODULATION_PSK               (0x4U)
+#define AX5043_MODULATION_OQSK              (0x6U)
+#define AX5043_MODULATION_MSK               (0x7U)
+#define AX5043_MODULATION_FSK               (0x8U)
+#define AX5043_MODULATION_4FSK              (0x9U)
+#define AX5043_MODULATION_AFSK              (0xAU)
+#define AX5043_MODULATION_FM                (0xBU)
+#define AX5043_MODULATION_RXHALFSPEED_Pos   (4U)
+#define AX5043_MODULATION_RXHALFSPEED_Msk   (0x1U << AX5043_MODULATION_RXHALFSPEED_Pos)
+#define AX5043_MODULATION_RXHALFSPEED       AX5043_MODULATION_RXHALFSPEED_Msk
+/** @} */
+
+/**
+ * @name    AX5043 ENCODING register fields
+ * @{
+ */
+#define AX5043_ENCODING_Pos                 (0U)
+#define AX5043_ENCODING_Msk                 (0xFU << AX5043_ENCODING_Pos)
+#define AX5043_ENCODING                     AX5043_ENCODING_Msk
+#define AX5043_ENCODING_INV_Pos             (0U)
+#define AX5043_ENCODING_INV_Msk             (0x1U << AX5043_ENCODING_INV_Pos)
+#define AX5043_ENCODING_INV                 AX5043_ENCODING_INV_Msk
+#define AX5043_ENCODING_DIFF_Pos            (1U)
+#define AX5043_ENCODING_DIFF_Msk            (0x1U << AX5043_ENCODING_DIFF_Pos)
+#define AX5043_ENCODING_DIFF                AX5043_ENCODING_DIFF_Msk
+#define AX5043_ENCODING_SCRAM_Pos           (2U)
+#define AX5043_ENCODING_SCRAM_Msk           (0x1U << AX5043_ENCODING_SCRAM_Pos)
+#define AX5043_ENCODING_SCRAM               AX5043_ENCODING_SCRAM_Msk
+#define AX5043_ENCODING_MANCH_Pos           (3U)
+#define AX5043_ENCODING_MANCH_Msk           (0x1U << AX5043_ENCODING_MANCH_Pos)
+#define AX5043_ENCODING_MANCH               AX5043_ENCODING_MANCH_Msk
+#define AX5043_ENCODING_NOSYNC_Pos          (4U)
+#define AX5043_ENCODING_NOSYNC_Msk          (0x1U << AX5043_ENCODING_NOSYNC_Pos)
+#define AX5043_ENCODING_NOSYNC              AX5043_ENCODING_NOSYNC_Msk
+/* Customary Encodings */
+#define AX5043_ENCODING_NRZ                 (0x0U)  /* MANCH=0 SCRAM=0 DIFF=0 INV=0 */
+#define AX5043_ENCODING_NRZI                (0x3U)  /* MANCH=0 SCRAM=0 DIFF=1 INV=1 */
+#define AX5043_ENCODING_NRZ_SCRAM           (0x4U)  /* MANCH=0 SCRAM=1 DIFF=0 INV=0 */
+#define AX5043_ENCODING_NRZI_SCRAM          (0x7U)  /* MANCH=0 SCRAM=1 DIFF=1 INV=1 */
+#define AX5043_ENCODING_MANCHESTER          (0x8U)  /* MANCH=1 SCRAM=0 DIFF=0 INV=0 */
+#define AX5043_ENCODING_FM0                 (0xAU)  /* MANCH=1 SCRAM=0 DIFF=1 INV=0 */
+#define AX5043_ENCODING_FM1                 (0xBU)  /* MANCH=1 SCRAM=0 DIFF=1 INV=1 */
+/** @} */
+
+/**
+ * @name    AX5043 FRAMING register fields
+ * @{
+ */
+#define AX5043_FRAMING_FABORT_Pos           (0U)
+#define AX5043_FRAMING_FABORT_Msk           (0x1U << AX5043_FRAMING_FABORT_Pos)
+#define AX5043_FRAMING_FABORT               AX5043_FRAMING_FABORT_Msk
+#define AX5043_FRAMING_FRMMODE_Pos          (1U)
+#define AX5043_FRAMING_FRMMODE_Msk          (0x7U << AX5043_FRAMING_FRMMODE_Pos)
+#define AX5043_FRAMING_FRMMODE              AX5043_FRAMING_FRMMODE_Msk
+#define AX5043_FRAMING_FRMMODE_RAW          (0x0U)
+#define AX5043_FRAMING_FRMMODE_RAW_SOFTBITS (0x1U)
+#define AX5043_FRAMING_FRMMODE_HDLC         (0x2U)
+#define AX5043_FRAMING_FRMMODE_RAW_PATMATCH (0x3U)
+#define AX5043_FRAMING_FRMMODE_WMBUS        (0x4U)
+#define AX5043_FRAMING_FRMMODE_WMBUS_4TO6   (0x5U)
+#define AX5043_FRAMING_CRCMODE_Pos          (4U)
+#define AX5043_FRAMING_CRCMODE_Msk          (0x7U << AX5043_FRAMING_CRCMODE_Pos)
+#define AX5043_FRAMING_CRCMODE              AX5043_FRAMING_CRCMODE_Msk
+#define AX5043_FRAMING_CRCMODE_OFF          (0x0U)
+#define AX5043_FRAMING_CRCMODE_CCITT        (0x1U)
+#define AX5043_FRAMING_CRCMODE_CRC16        (0x2U)
+#define AX5043_FRAMING_CRCMODE_DNP          (0x3U)
+#define AX5043_FRAMING_CRCMODE_CRC32        (0x6U)
+#define AX5043_FRAMING_FRMRX_Pos            (7U)
+#define AX5043_FRAMING_FRMRX_Msk            (0x1U << AX5043_FRAMING_FRMRX_Pos)
+#define AX5043_FRAMING_FRMRX                AX5043_FRAMING_FRMRX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 CRCINIT register fields
+ * @{
+ */
+#define AX5043_CRCINIT_Pos                  (0U)
+#define AX5043_CRCINIT_Msk                  (0xFFFFFFFFU << AX5043_CRCINIT_Pos)
+#define AX5043_CRCINIT                      AX5043_CRCINIT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FEC register fields
+ * @{
+ */
+#define AX5043_FEC_FECENA_Pos               (0U)
+#define AX5043_FEC_FECENA_Msk               (0x1U << AX5043_FEC_FECENA_Pos)
+#define AX5043_FEC_FECENA                   AX5043_FEC_FECENA_Msk
+#define AX5043_FEC_FECINPSHIFT_Pos          (1U)
+#define AX5043_FEC_FECINPSHIFT_Msk          (0x7U << AX5043_FEC_FECINPSHIFT_Pos)
+#define AX5043_FEC_FECINPSHIFT              AX5043_FEC_FECINPSHIFT_Msk
+#define AX5043_FEC_FECPOS_Pos               (4U)
+#define AX5043_FEC_FECPOS_Msk               (0x1U << AX5043_FEC_FECPOS_Pos)
+#define AX5043_FEC_FECPOS                   AX5043_FEC_FECPOS_Msk
+#define AX5043_FEC_FECNEG_Pos               (5U)
+#define AX5043_FEC_FECNEG_Msk               (0x1U << AX5043_FEC_FECNEG_Pos)
+#define AX5043_FEC_FECNEG                   AX5043_FEC_FECNEG_Msk
+#define AX5043_FEC_RSTVITERBI_Pos           (6U)
+#define AX5043_FEC_RSTVITERBI_Msk           (0x1U << AX5043_FEC_RSTVITERBI_Pos)
+#define AX5043_FEC_RSTVITERBI               AX5043_FEC_RSTVITERBI_Msk
+#define AX5043_FEC_SHORTMEM_Pos             (7U)
+#define AX5043_FEC_SHORTMEM_Msk             (0x1U << AX5043_FEC_SHORTMEM_Pos)
+#define AX5043_FEC_SHORTMEM                 AX5043_FEC_SHORTMEM_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FECSYNC register fields
+ * @{
+ */
+#define AX5043_FECSYNC_Pos                  (0U)
+#define AX5043_FECSYNC_Msk                  (0xFFU << AX5043_FECSYNC_Pos)
+#define AX5043_FECSYNC                      AX5043_FECSYNC_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FECSTATUS register fields
+ * @{
+ */
+#define AX5043_FECSTATUS_MAXMETRIC_Pos      (0U)
+#define AX5043_FECSTATUS_MAXMETRIC_Msk      (0x7FU << AX5043_FECSTATUS_MAXMETRIC_Pos)
+#define AX5043_FECSTATUS_MAXMETRIC          AX5043_FECSTATUS_MAXMETRIC_Msk
+#define AX5043_FECSTATUS_FECINV_Pos         (7U)
+#define AX5043_FECSTATUS_FECINV_Msk         (0x1U << AX5043_FECSTATUS_FECINV_Pos)
+#define AX5043_FECSTATUS_FECINV             AX5043_FECSTATUS_FECINV_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RADIOSTATE register fields
+ * @{
+ */
+#define AX5043_RADIOSTATE_Pos               (0U)
+#define AX5043_RADIOSTATE_Msk               (0xFU << AX5043_RADIOSTATE_Pos)
+#define AX5043_RADIOSTATE                   AX5043_RADIOSTATE_Msk
+#define AX5043_RADIOSTATE_IDLE              (0x0U)
+#define AX5043_RADIOSTATE_POWERDOWN         (0x1U)
+#define AX5043_RADIOSTATE_TX_PLL_SET        (0x4U)
+#define AX5043_RADIOSTATE_TX                (0x6U)
+#define AX5043_RADIOSTATE_TX_TAIL           (0x7U)
+#define AX5043_RADIOSTATE_RX_PLL_SET        (0x8U)
+#define AX5043_RADIOSTATE_RX_ANTSEL         (0x9U)
+#define AX5043_RADIOSTATE_RX_PREAMBLE1      (0xCU)
+#define AX5043_RADIOSTATE_RX_PREAMBLE2      (0xDU)
+#define AX5043_RADIOSTATE_RX_PREAMBLE3      (0xEU)
+#define AX5043_RADIOSTATE_RX                (0xFU)
+/** @} */
+
+/**
+ * @name    AX5043 XTALSTATUS register fields
+ * @{
+ */
+#define AX5043_XTALSTATUS_XTALRUN_Pos       (0U)
+#define AX5043_XTALSTATUS_XTALRUN_Msk       (0x1U << AX5043_XTALSTATUS_XTALRUN_Pos)
+#define AX5043_XTALSTATUS_XTALRUN           AX5043_XTALSTATUS_XTALRUN_Msk
+
+/**
+ * @name    AX5043 PINSTATE register fields
+ * @{
+ */
+#define AX5043_PINSTATE_PSSYSCLK_Pos        (0U)
+#define AX5043_PINSTATE_PSSYSCLK_Msk        (0x1U << AX5043_PINSTATE_PSSYSCLK_Pos)
+#define AX5043_PINSTATE_PSSYSCLK            AX5043_PINSTATE_PSSYSCLK_Msk
+#define AX5043_PINSTATE_PSDCLK_Pos          (1U)
+#define AX5043_PINSTATE_PSDCLK_Msk          (0x1U << AX5043_PINSTATE_PSDCLK_Pos)
+#define AX5043_PINSTATE_PSDCLK              AX5043_PINSTATE_PSDCLK_Msk
+#define AX5043_PINSTATE_PSDATA_Pos          (2U)
+#define AX5043_PINSTATE_PSDATA_Msk          (0x1U << AX5043_PINSTATE_PSDATA_Pos)
+#define AX5043_PINSTATE_PSDATA              AX5043_PINSTATE_PSDATA_Msk
+#define AX5043_PINSTATE_PSIRQ_Pos           (3U)
+#define AX5043_PINSTATE_PSIRQ_Msk           (0x1U << AX5043_PINSTATE_PSIRQ_Pos)
+#define AX5043_PINSTATE_PSIRQ               AX5043_PINSTATE_PSIRQ_Msk
+#define AX5043_PINSTATE_PSANTSEL_Pos        (4U)
+#define AX5043_PINSTATE_PSANTSEL_Msk        (0x1U << AX5043_PINSTATE_PSANTSEL_Pos)
+#define AX5043_PINSTATE_PSANTSEL            AX5043_PINSTATE_PSANTSEL_Msk
+#define AX5043_PINSTATE_PSPWRAMP_Pos        (5U)
+#define AX5043_PINSTATE_PSPWRAMP_Msk        (0x1U << AX5043_PINSTATE_PSPWRAMP_Pos)
+#define AX5043_PINSTATE_PSPWRAMP            AX5043_PINSTATE_PSPWRAMP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCSYSCLK register fields
+ * @{
+ */
+#define AX5043_PINFUNCSYSCLK_Pos            (0U)
+#define AX5043_PINFUNCSYSCLK_Msk            (0x1FU << AX5043_PINFUNCSYSCLK_Pos)
+#define AX5043_PINFUNCSYSCLK                AX5043_PINFUNCSYSCLK_Msk
+#define AX5043_PFSYSCLK_OUT_0               (0x00U)
+#define AX5043_PFSYSCLK_OUT_1               (0x01U)
+#define AX5043_PFSYSCLK_OUT_Z               (0x02U)
+#define AX5043_PFSYSCLK_OUT_XTAL_INV        (0x03U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV1       (0x04U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV2       (0x05U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV4       (0x06U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV8       (0x07U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV16      (0x08U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV32      (0x09U)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV64      (0x0AU)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV128     (0x0BU)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV256     (0x0CU)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV512     (0x0DU)
+#define AX5043_PFSYSCLK_OUT_XTAL_DIV1024    (0x0EU)
+#define AX5043_PFSYSCLK_OUT_LPOSC           (0x0FU)
+#define AX5043_PFSYSCLK_OUT_TEST_OBS        (0x1FU)
+#define AX5043_PINFUNCSYSCLK_PUSYSCLK_Pos   (7U)
+#define AX5043_PINFUNCSYSCLK_PUSYSCLK_Msk   (0x1U << AX5043_PINFUNCSYSCLK_PUSYSCLK_Pos)
+#define AX5043_PINFUNCSYSCLK_PUSYSCLK       AX5043_PINFUNCSYSCLK_PUSYSCLK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCDCLK register fields
+ * @{
+ */
+#define AX5043_PINFUNCDCLK_Pos              (0U)
+#define AX5043_PINFUNCDCLK_Msk              (0x7U << AX5043_PINFUNCDCLK_Pos)
+#define AX5043_PINFUNCDCLK                  AX5043_PINFUNCDCLK_Msk
+#define AX5043_PFDCLK_OUT_0                 (0x0U)
+#define AX5043_PFDCLK_OUT_1                 (0x1U)
+#define AX5043_PFDCLK_OUT_Z                 (0x2U)
+#define AX5043_PFDCLK_IN_MODEM_IO           (0x3U)
+#define AX5043_PFDCLK_OUT_MODEM             (0x4U)
+#define AX5043_PFDCLK_OUT_MODEM_IO          (0x5U)
+#define AX5043_PFDCLK_OUT_TEST_OBS          (0x7U)
+#define AX5043_PINFUNCDCLK_PIDCLK_Pos       (6U)
+#define AX5043_PINFUNCDCLK_PIDCLK_Msk       (0x1U << AX5043_PINFUNCDCLK_PIDCLK_Pos)
+#define AX5043_PINFUNCDCLK_PIDCLK           AX5043_PINFUNCDCLK_PIDCLK_Msk
+#define AX5043_PINFUNCDCLK_PUDCLK_Pos       (7U)
+#define AX5043_PINFUNCDCLK_PUDCLK_Msk       (0x1U << AX5043_PINFUNCDCLK_PUDCLK_Pos)
+#define AX5043_PINFUNCDCLK_PUDCLK           AX5043_PINFUNCDCLK_PUDCLK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCDATA register fields
+ * @{
+ */
+#define AX5043_PINFUNCDATA_Pos              (0U)
+#define AX5043_PINFUNCDATA_Msk              (0xFU << AX5043_PINFUNCDATA_Pos)
+#define AX5043_PINFUNCDATA                  AX5043_PINFUNCDATA_Msk
+#define AX5043_PFDATA_OUT_0                 (0x0U)
+#define AX5043_PFDATA_OUT_1                 (0x1U)
+#define AX5043_PFDATA_OUT_Z                 (0x2U)
+#define AX5043_PFDATA_IO_FRAME              (0x3U)
+#define AX5043_PFDATA_IO_MODEM              (0x4U)
+#define AX5043_PFDATA_IO_MODEM_ASYNC        (0x5U)
+#define AX5043_PFDATA_OUT_MODEM             (0x7U)
+#define AX5043_PFDATA_OUT_TEST_OBS          (0xFU)
+#define AX5043_PINFUNCDATA_PIDATA_Pos       (6U)
+#define AX5043_PINFUNCDATA_PIDATA_Msk       (0x1U << AX5043_PINFUNCDATA_PIDATA_Pos)
+#define AX5043_PINFUNCDATA_PIDATA           AX5043_PINFUNCDATA_PIDATA_Msk
+#define AX5043_PINFUNCDATA_PUDATA_Pos       (7U)
+#define AX5043_PINFUNCDATA_PUDATA_Msk       (0x1U << AX5043_PINFUNCDATA_PUDATA_Pos)
+#define AX5043_PINFUNCDATA_PUDATA           AX5043_PINFUNCDATA_PUDATA_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCIRQ register fields
+ * @{
+ */
+#define AX5043_PINFUNCIRQ_Pos               (0U)
+#define AX5043_PINFUNCIRQ_Msk               (0x7U << AX5043_PINFUNCIRQ_Pos)
+#define AX5043_PINFUNCIRQ                   AX5043_PINFUNCIRQ_Msk
+#define AX5043_PFIRQ_OUT_0                  (0x0U)
+#define AX5043_PFIRQ_OUT_1                  (0x1U)
+#define AX5043_PFIRQ_OUT_Z                  (0x2U)
+#define AX5043_PFIRQ_OUT_IRQ                (0x3U)
+#define AX5043_PFIRQ_OUT_TEST_OBS           (0x7U)
+#define AX5043_PINFUNCIRQ_PIIRQ_Pos         (6U)
+#define AX5043_PINFUNCIRQ_PIIRQ_Msk         (0x1U << AX5043_PINFUNCIRQ_PIIRQ_Pos)
+#define AX5043_PINFUNCIRQ_PIIRQ             AX5043_PINFUNCIRQ_PIIRQ_Msk
+#define AX5043_PINFUNCIRQ_PUIRQ_Pos         (7U)
+#define AX5043_PINFUNCIRQ_PUIRQ_Msk         (0x1U << AX5043_PINFUNCIRQ_PUIRQ_Pos)
+#define AX5043_PINFUNCIRQ_PUIRQ             AX5043_PINFUNCIRQ_PUIRQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCANTSEL register fields
+ * @{
+ */
+#define AX5043_PINFUNCANTSEL_Pos            (0U)
+#define AX5043_PINFUNCANTSEL_Msk            (0x7U << AX5043_PINFUNCANTSEL_Pos)
+#define AX5043_PINFUNCANTSEL                AX5043_PINFUNCANTSEL_Msk
+#define AX5043_PFANTSEL_OUT_0               (0x0U)
+#define AX5043_PFANTSEL_OUT_1               (0x1U)
+#define AX5043_PFANTSEL_OUT_Z               (0x2U)
+#define AX5043_PFANTSEL_OUT_BB_TUNE_CLK     (0x3U)
+#define AX5043_PFANTSEL_OUT_TCXO_EN         (0x4U)
+#define AX5043_PFANTSEL_OUT_DAC             (0x5U)
+#define AX5043_PFANTSEL_OUT_DIVERSE_ANTSEL  (0x6U)
+#define AX5043_PFANTSEL_OUT_TEST_OBS        (0x7U)
+#define AX5043_PINFUNCANTSEL_PIANTSEL_Pos   (6U)
+#define AX5043_PINFUNCANTSEL_PIANTSEL_Msk   (0x1U << AX5043_PINFUNCANTSEL_PIANTSEL_Pos)
+#define AX5043_PINFUNCANTSEL_PIANTSEL       AX5043_PINFUNCANTSEL_PIANTSEL_Msk
+#define AX5043_PINFUNCANTSEL_PUANTSEL_Pos   (7U)
+#define AX5043_PINFUNCANTSEL_PUANTSEL_Msk   (0x1U << AX5043_PINFUNCANTSEL_PUANTSEL_Pos)
+#define AX5043_PINFUNCANTSEL_PUANTSEL       AX5043_PINFUNCANTSEL_PUANTSEL_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PINFUNCPWRAMP register fields
+ * @{
+ */
+#define AX5043_PINFUNCPWRAMP_Pos            (0U)
+#define AX5043_PINFUNCPWRAMP_Msk            (0xFU << AX5043_PINFUNCPWRAMP_Pos)
+#define AX5043_PINFUNCPWRAMP                AX5043_PINFUNCPWRAMP_Msk
+#define AX5043_PFPWRAMP_OUT_0               (0x0U)
+#define AX5043_PFPWRAMP_OUT_1               (0x1U)
+#define AX5043_PFPWRAMP_OUT_Z               (0x2U)
+#define AX5043_PFPWRAMP_IN_DIBIT_SYNC       (0x3U)
+#define AX5043_PFPWRAMP_OUT_DIBIT_SYNC      (0x4U)
+#define AX5043_PFPWRAMP_OUT_DAC             (0x5U)
+#define AX5043_PFPWRAMP_OUT_PWRAMP_CTRL     (0x6U)
+#define AX5043_PFPWRAMP_OUT_TXCO_EN         (0x7U)
+#define AX5043_PFPWRAMP_OUT_TEST_OBS        (0xFU)
+#define AX5043_PINFUNCPWRAMP_PIPWRAMP_Pos   (6U)
+#define AX5043_PINFUNCPWRAMP_PIPWRAMP_Msk   (0x1U << AX5043_PINFUNCPWRAMP_PIPWRAMP_Pos)
+#define AX5043_PINFUNCPWRAMP_PIPWRAMP       AX5043_PINFUNCPWRAMP_PIPWRAMP_Msk
+#define AX5043_PINFUNCPWRAMP_PUPWRAMP_Pos   (7U)
+#define AX5043_PINFUNCPWRAMP_PUPWRAMP_Msk   (0x1U << AX5043_PINFUNCPWRAMP_PUPWRAMP_Pos)
+#define AX5043_PINFUNCPWRAMP_PUPWRAMP       AX5043_PINFUNCPWRAMP_PUPWRAMP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PWRAMP register fields
+ * @{
+ */
+#define AX5043_PWRAMP_Pos                   (0U)
+#define AX5043_PWRAMP_Msk                   (0x1U << AX5043_PWRAMP_Pos)
+#define AX5043_PWRAMP                       AX5043_PWRAMP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFOSTAT register fields
+ * @{
+ */
+#define AX5043_FIFOSTAT_FIFOCMD_Pos         (0U)
+#define AX5043_FIFOSTAT_FIFOCMD_Msk         (0x3FU << AX5043_FIFOSTAT_FIFOCMD_Pos)
+#define AX5043_FIFOSTAT_FIFOCMD             AX5043_FIFOSTAT_FIFOCMD_Msk
+#define AX5043_FIFOCMD_NOP                  (0x00U)
+#define AX5043_FIFOCMD_ASK_COHERENT         (0x01U)
+#define AX5043_FIFOCMD_CLEAR_FIFOERR        (0x02U)
+#define AX5043_FIFOCMD_CLEAR_FIFODAT        (0x03U)
+#define AX5043_FIFOCMD_COMMIT               (0x04U)
+#define AX5043_FIFOCMD_ROLLBACK             (0x05U)
+#define AX5043_FIFOSTAT_FIFOEMPTY_Pos       (0U)
+#define AX5043_FIFOSTAT_FIFOEMPTY_Msk       (0x1U << AX5043_FIFOSTAT_FIFOEMPTY_Pos)
+#define AX5043_FIFOSTAT_FIFOEMPTY           AX5043_FIFOSTAT_FIFOEMPTY_Msk
+#define AX5043_FIFOSTAT_FIFOFULL_Pos        (1U)
+#define AX5043_FIFOSTAT_FIFOFULL_Msk        (0x1U << AX5043_FIFOSTAT_FIFOFULL_Pos)
+#define AX5043_FIFOSTAT_FIFOFULL            AX5043_FIFOSTAT_FIFOFULL_Msk
+#define AX5043_FIFOSTAT_FIFOUNDER_Pos       (2U)
+#define AX5043_FIFOSTAT_FIFOUNDER_Msk       (0x1U << AX5043_FIFOSTAT_FIFOUNDER_Pos)
+#define AX5043_FIFOSTAT_FIFOUNDER           AX5043_FIFOSTAT_FIFOUNDER_Msk
+#define AX5043_FIFOSTAT_FIFOOVER_Pos        (3U)
+#define AX5043_FIFOSTAT_FIFOOVER_Msk        (0x1U << AX5043_FIFOSTAT_FIFOOVER_Pos)
+#define AX5043_FIFOSTAT_FIFOOVER            AX5043_FIFOSTAT_FIFOOVER_Msk
+#define AX5043_FIFOSTAT_FIFOCNTTHR_Pos      (4U)
+#define AX5043_FIFOSTAT_FIFOCNTTHR_Msk      (0x1U << AX5043_FIFOSTAT_FIFOCNTTHR_Pos)
+#define AX5043_FIFOSTAT_FIFOCNTTHR          AX5043_FIFOSTAT_FIFOCNTTHR_Msk
+#define AX5043_FIFOSTAT_FIFOFREETHR_Pos     (5U)
+#define AX5043_FIFOSTAT_FIFOFREETHR_Msk     (0x1U << AX5043_FIFOSTAT_FIFOFREETHR_Pos)
+#define AX5043_FIFOSTAT_FIFOFREETHR         AX5043_FIFOSTAT_FIFOFREETHR_Msk
+#define AX5043_FIFOSTAT_FIFOAUTOCOMMIT_Pos  (7U)
+#define AX5043_FIFOSTAT_FIFOAUTOCOMMIT_Msk  (0x1U << AX5043_FIFOSTAT_FIFOAUTOCOMMIT_Pos)
+#define AX5043_FIFOSTAT_FIFOAUTOCOMMIT      AX5043_FIFOSTAT_FIFOAUTOCOMMIT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFODATA register fields
+ * @{
+ */
+#define AX5043_FIFODATA_Pos                 (0U)
+#define AX5043_FIFODATA_Msk                 (0xFFU << AX5043_FIFODATA_Pos)
+#define AX5043_FIFODATA                     AX5043_FIFODATA_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFOCOUNT register fields
+ * @{
+ */
+#define AX5043_FIFOCOUNT_Pos                (0U)
+#define AX5043_FIFOCOUNT_Msk                (0x1FFU << AX5043_FIFOCOUNT_Pos)
+#define AX5043_FIFOCOUNT                    AX5043_FIFOCOUNT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFOFREE register fields
+ * @{
+ */
+#define AX5043_FIFOFREE_Pos                 (0U)
+#define AX5043_FIFOFREE_Msk                 (0x1FFU << AX5043_FIFOFREE_Pos)
+#define AX5043_FIFOFREE                     AX5043_FIFOFREE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFOTHRESH register fields
+ * @{
+ */
+#define AX5043_FIFOTHRESH_Pos               (0U)
+#define AX5043_FIFOTHRESH_Msk               (0x1FFU << AX5043_FIFOTHRESH_Pos)
+#define AX5043_FIFOTHRESH                   AX5043_FIFOTHRESH_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLLOOP/PLLLOOPBOOST register fields
+ * @{
+ */
+#define AX5043_PLLLOOP_FLT_Pos              (0U)
+#define AX5043_PLLLOOP_FLT_Msk              (0x3U << AX5043_PLLLOOP_FLT_Pos)
+#define AX5043_PLLLOOP_FLT                  AX5043_PLLLOOP_FLT_Msk
+#define AX5043_FLT_EXTERN                   (0x0U)
+#define AX5043_FLT_INTERN_1                 (0x1U)
+#define AX5043_FLT_INTERN_2                 (0x2U)
+#define AX5043_FLT_INTERN_3                 (0x3U)
+#define AX5043_PLLLOOP_FLTEN_Pos            (2U)
+#define AX5043_PLLLOOP_FLTEN_Msk            (0x1U << AX5043_PLLLOOP_FLTEN_Pos)
+#define AX5043_PLLLOOP_FLTEN                AX5043_PLLLOOP_FLTEN_Msk
+#define AX5043_PLLLOOP_DIRECT_Pos           (3U)
+#define AX5043_PLLLOOP_DIRECT_Msk           (0x1U << AX5043_PLLLOOP_DIRECT_Pos)
+#define AX5043_PLLLOOP_DIRECT               AX5043_PLLLOOP_DIRECT_Msk
+#define AX5043_PLLLOOP_FREQSEL_Pos          (7U)
+#define AX5043_PLLLOOP_FREQSEL_Msk          (0x1U << AX5043_PLLLOOP_FREQSEL_Pos)
+#define AX5043_PLLLOOP_FREQSEL              AX5043_PLLLOOP_FREQSEL_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLCPI/PLLCPIBOOST register fields
+ * @{
+ */
+#define AX5043_PLLCPI_Pos                   (0U)
+#define AX5043_PLLCPI_Msk                   (0xFFU << AX5043_PLLCPI_Pos)
+#define AX5043_PLLCPI                       AX5043_PLLCPI_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLVCODIV register fields
+ * @{
+ */
+#define AX5043_PLLVCODIV_REFDIV_Pos         (0U)
+#define AX5043_PLLVCODIV_REFDIV_Msk         (0x3U << AX5043_PLLVCODIV_REFDIV_Pos)
+#define AX5043_PLLVCODIV_REFDIV             AX5043_PLLVCODIV_REFDIV_Msk
+#define AX5043_REFDIV_XTAL_DIV1             (0x0U)
+#define AX5043_REFDIV_XTAL_DIV2             (0x1U)
+#define AX5043_REFDIV_XTAL_DIV4             (0x2U)
+#define AX5043_REFDIV_XTAL_DIV8             (0x3U)
+#define AX5043_PLLVCODIV_RFDIV_Pos          (2U)
+#define AX5043_PLLVCODIV_RFDIV_Msk          (0x1U << AX5043_PLLVCODIV_RFDIV_Pos)
+#define AX5043_PLLVCODIV_RFDIV              AX5043_PLLVCODIV_RFDIV_Msk
+#define AX5043_PLLVCODIV_VCOSEL_Pos         (4U)
+#define AX5043_PLLVCODIV_VCOSEL_Msk         (0x1U << AX5043_PLLVCODIV_VCOSEL_Pos)
+#define AX5043_PLLVCODIV_VCOSEL             AX5043_PLLVCODIV_VCOSEL_Msk
+#define AX5043_PLLVCODIV_VCO2INT_Pos        (5U)
+#define AX5043_PLLVCODIV_VCO2INT_Msk        (0x1U << AX5043_PLLVCODIV_VCO2INT_Pos)
+#define AX5043_PLLVCODIV_VCO2INT            AX5043_PLLVCODIV_VCO2INT_Msk
+#define AX5043_PLLVCODIV_VCOIMAN_Pos        (6U)
+#define AX5043_PLLVCODIV_VCOIMAN_Msk        (0x1U << AX5043_PLLVCODIV_VCOIMAN_Pos)
+#define AX5043_PLLVCODIV_VCOIMAN            AX5043_PLLVCODIV_VCOIMAN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLRANGINGA/PLLRANGINGB register fields
+ * @{
+ */
+#define AX5043_PLLRANGING_VCOR_Pos          (0U)
+#define AX5043_PLLRANGING_VCOR_Msk          (0xFU << AX5043_PLLRANGING_VCOR_Pos)
+#define AX5043_PLLRANGING_VCOR              AX5043_PLLRANGING_VCOR_Msk
+#define AX5043_PLLRANGING_RNGSTART_Pos      (4U)
+#define AX5043_PLLRANGING_RNGSTART_Msk      (0x1U << AX5043_PLLRANGING_RNGSTART_Pos)
+#define AX5043_PLLRANGING_RNGSTART          AX5043_PLLRANGING_RNGSTART_Msk
+#define AX5043_PLLRANGING_RNGERR_Pos        (5U)
+#define AX5043_PLLRANGING_RNGERR_Msk        (0x1U << AX5043_PLLRANGING_RNGERR_Pos)
+#define AX5043_PLLRANGING_RNGERR            AX5043_PLLRANGING_RNGERR_Msk
+#define AX5043_PLLRANGING_PLLLOCK_Pos       (6U)
+#define AX5043_PLLRANGING_PLLLOCK_Msk       (0x1U << AX5043_PLLRANGING_PLLLOCK_Pos)
+#define AX5043_PLLRANGING_PLLLOCK           AX5043_PLLRANGING_PLLLOCK_Msk
+#define AX5043_PLLRANGING_STICKYLOCK_Pos    (7U)
+#define AX5043_PLLRANGING_STICKYLOCK_Msk    (0x1U << AX5043_PLLRANGING_STICKYLOCK_Pos)
+#define AX5043_PLLRANGING_STICKYLOCK        AX5043_PLLRANGING_STICKYLOCK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQA/FREQB register fields
+ * @{
+ */
+#define AX5043_FREQ_Pos                     (0U)
+#define AX5043_FREQ_Msk                     (0xFFFFFFFFU << AX5043_FREQ_Pos)
+#define AX5043_FREQ                         AX5043_FREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RSSI register fields
+ * @{
+ */
+#define AX5043_RSSI_Pos                     (0U)
+#define AX5043_RSSI_Msk                     (0xFFU << AX5043_RSSI_Pos)
+#define AX5043_RSSI                         AX5043_RSSI_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BGNDRSSI register fields
+ * @{
+ */
+#define AX5043_BGNDRSSI_Pos                 (0U)
+#define AX5043_BGNDRSSI_Msk                 (0xFFU << AX5043_BGNDRSSI_Pos)
+#define AX5043_BGNDRSSI                     AX5043_BGNDRSSI_Msk
+/** @} */
+
+/**
+ * @name    AX5043 DIVERSITY register fields
+ * @{
+ */
+#define AX5043_DIVERSITY_DIVENA_Pos         (0U)
+#define AX5043_DIVERSITY_DIVENA_Msk         (0x1U << AX5043_DIVERSITY_DIVENA_Pos)
+#define AX5043_DIVERSITY_DIVENA             AX5043_DIVERSITY_DIVENA_Msk
+#define AX5043_DIVERSITY_ANTSEL_Pos         (1U)
+#define AX5043_DIVERSITY_ANTSEL_Msk         (0x1U << AX5043_DIVERSITY_ANTSEL_Pos)
+#define AX5043_DIVERSITY_ANTSEL             AX5043_DIVERSITY_ANTSEL_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AGCCOUNTER register fields
+ * @{
+ */
+#define AX5043_AGCCOUNTER_Pos               (0U)
+#define AX5043_AGCCOUNTER_Msk               (0xFFU << AX5043_AGCCOUNTER_Pos)
+#define AX5043_AGCCOUNTER                   AX5043_AGCCOUNTER_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKDATARATE register fields
+ * @{
+ */
+#define AX5043_TRKDATARATE_Pos              (0U)
+#define AX5043_TRKDATARATE_Msk              (0xFFFFFFU << AX5043_TRKDATARATE_Pos)
+#define AX5043_TRKDATARATE                  AX5043_TRKDATARATE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKAMPL register fields
+ * @{
+ */
+#define AX5043_TRKAMPL_Pos                  (0U)
+#define AX5043_TRKAMPL_Msk                  (0xFFFFU << AX5043_TRKAMPL_Pos)
+#define AX5043_TRKAMPL                      AX5043_TRKAMPL_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKPHASE register fields
+ * @{
+ */
+#define AX5043_TRKPHASE_Pos                 (0U)
+#define AX5043_TRKPHASE_Msk                 (0xFFFU << AX5043_TRKPHASE_Pos)
+#define AX5043_TRKPHASE                     AX5043_TRKPHASE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKRFFREQ register fields
+ * @{
+ */
+#define AX5043_TRKRFFREQ_Pos                (0U)
+#define AX5043_TRKRFFREQ_Msk                (0xFFFFFU << AX5043_TRKRFFREQ_Pos)
+#define AX5043_TRKRFFREQ                    AX5043_TRKRFFREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKFREQ register fields
+ * @{
+ */
+#define AX5043_TRKFREQ_Pos                  (0U)
+#define AX5043_TRKFREQ_Msk                  (0xFFFFU << AX5043_TRKFREQ_Pos)
+#define AX5043_TRKFREQ                      AX5043_TRKFREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKFSKDEMOD register fields
+ * @{
+ */
+#define AX5043_TRKFSKDEMOD_Pos              (0U)
+#define AX5043_TRKFSKDEMOD_Msk              (0x3FFFU << AX5043_TRKFSKDEMOD_Pos)
+#define AX5043_TRKFSKDEMOD                  AX5043_TRKFSKDEMOD_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TRKAFSKDEMOD register fields
+ * @{
+ */
+#define AX5043_TRKAFSKDEMOD_Pos             (0U)
+#define AX5043_TRKAFSKDEMOD_Msk             (0xFFFFU << AX5043_TRKAFSKDEMOD_Pos)
+#define AX5043_TRKAFSKDEMOD                 AX5043_TRKAFSKDEMOD_Msk
+/** @} */
+
+/**
+ * @name    AX5043 Tracking register reset fields
+ *
+ * @note    For writes to TRKDATARATE, TRKAMPL, TRKPHASE registers
+ * TODO:    Verify these are correct?
+ * @{
+ */
+#define AX5043_TRACKING_DTRKRESET_Pos       (3U)
+#define AX5043_TRACKING_DTRKRESET_Msk       (0x1U << AX5043_TRACKING_DTRKRESET_Pos)
+#define AX5043_TRACKING_DTRKRESET           AX5043_TRACKING_DTRKRESET_Msk
+#define AX5043_TRACKING_ATRKRESET_Pos       (4U)
+#define AX5043_TRACKING_ATRKRESET_Msk       (0x1U << AX5043_TRACKING_ATRKRESET_Pos)
+#define AX5043_TRACKING_ATRKRESET           AX5043_TRACKING_ATRKRESET_Msk
+#define AX5043_TRACKING_PTRKRESET_Pos       (5U)
+#define AX5043_TRACKING_PTRKRESET_Msk       (0x1U << AX5043_TRACKING_PTRKRESET_Pos)
+#define AX5043_TRACKING_PTRKRESET           AX5043_TRACKING_PTRKRESET_Msk
+#define AX5043_TRACKING_RTRKRESET_Pos       (6U)
+#define AX5043_TRACKING_RTRKRESET_Msk       (0x1U << AX5043_TRACKING_RTRKRESET_Pos)
+#define AX5043_TRACKING_RTRKRESET           AX5043_TRACKING_RTRKRESET_Msk
+#define AX5043_TRACKING_FTRKRESET_Pos       (7U)
+#define AX5043_TRACKING_FTRKRESET_Msk       (0x1U << AX5043_TRACKING_FTRKRESET_Pos)
+#define AX5043_TRACKING_FTRKRESET           AX5043_TRACKING_FTRKRESET_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TIMER register fields
+ * @{
+ */
+#define AX5043_TIMER_Pos                    (0U)
+#define AX5043_TIMER_Msk                    (0xFFFFFFU << AX5043_TIMER_Pos)
+#define AX5043_TIMER                        AX5043_TIMER_Msk
+/** @} */
+
+/**
+ * @name    AX5043 WAKEUPTIMER register fields
+ * @{
+ */
+#define AX5043_WAKEUPTIMER_Pos              (0U)
+#define AX5043_WAKEUPTIMER_Msk              (0xFFFFU << AX5043_WAKEUPTIMER_Pos)
+#define AX5043_WAKEUPTIMER                  AX5043_WAKEUPTIMER_Msk
+/** @} */
+
+/**
+ * @name    AX5043 WAKEUP register fields
+ * @{
+ */
+#define AX5043_WAKEUP_Pos                   (0U)
+#define AX5043_WAKEUP_Msk                   (0xFFFFU << AX5043_WAKEUP_Pos)
+#define AX5043_WAKEUP                       AX5043_WAKEUP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 WAKEUPFREQ register fields
+ * @{
+ */
+#define AX5043_WAKEUPFREQ_Pos               (0U)
+#define AX5043_WAKEUPFREQ_Msk               (0xFFFFU << AX5043_WAKEUPFREQ_Pos)
+#define AX5043_WAKEUPFREQ                   AX5043_WAKEUPFREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 WAKEUPXOEARLY register fields
+ * @{
+ */
+#define AX5043_WAKEUPXOEARLY_Pos            (0U)
+#define AX5043_WAKEUPXOEARLY_Msk            (0xFFU << AX5043_WAKEUPXOEARLY_Pos)
+#define AX5043_WAKEUPXOEARLY                AX5043_WAKEUPXOEARLY_Msk
+/** @} */
+
+/**
+ * @name    AX5043 IFFREQ register fields
+ * @{
+ */
+#define AX5043_IFFREQ_Pos                   (0U)
+#define AX5043_IFFREQ_Msk                   (0xFFFFU << AX5043_IFFREQ_Pos)
+#define AX5043_IFFREQ                       AX5043_IFFREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 DECIMATION register fields
+ * @{
+ */
+#define AX5043_DECIMATION_Pos               (0U)
+#define AX5043_DECIMATION_Msk               (0x7F << AX5043_DECIMATION_Pos)
+#define AX5043_DECIMATION                   AX5043_DECIMATION_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RXDATARATE register fields
+ * @{
+ */
+#define AX5043_RXDATARATE_Pos               (0U)
+#define AX5043_RXDATARATE_Msk               (0xFFFFFFU << AX5043_RXDATARATE_Pos)
+#define AX5043_RXDATARATE                   AX5043_RXDATARATE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MAXDROFFSET register fields
+ * @{
+ */
+#define AX5043_MAXDROFFSET_Pos              (0U)
+#define AX5043_MAXDROFFSET_Msk              (0xFFFFFFU << AX5043_MAXDROFFSET_Pos)
+#define AX5043_MAXDROFFSET                  AX5043_MAXDROFFSET_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MAXRFOFFSET register fields
+ * @{
+ */
+#define AX5043_MAXRFOFFSET_Pos              (0U)
+#define AX5043_MAXRFOFFSET_Msk              (0xFFFFFU << AX5043_MAXRFOFFSET_Pos)
+#define AX5043_MAXRFOFFSET                  AX5043_MAXRFOFFSET_Msk
+#define AX5043_MAXRFOFFSET_FREQOFFSCORR_Pos (23U)
+#define AX5043_MAXRFOFFSET_FREQOFFSCORR_Msk (0x1U << AX5043_MAXRFOFFSET_FREQOFFSCORR_Pos)
+#define AX5043_MAXRFOFFSET_FREQOFFSCORR     AX5043_MAXRFOFFSET_FREQOFFSCORR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FSKDMAX register fields
+ * @{
+ */
+#define AX5043_FSKDMAX_Pos                  (0U)
+#define AX5043_FSKDMAX_Msk                  (0xFFFFU << AX5043_FSKDMAX_Pos)
+#define AX5043_FSKDMAX                      AX5043_FSKDMAX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FSKDMIN register fields
+ * @{
+ */
+#define AX5043_FSKDMIN_Pos                  (0U)
+#define AX5043_FSKDMIN_Msk                  (0xFFFFU << AX5043_FSKDMIN_Pos)
+#define AX5043_FSKDMIN                      AX5043_FSKDMIN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AFSKSPACE register fields
+ * TODO:    Verify the field width here
+ * @{
+ */
+#define AX5043_AFSKSPACE_Pos                (0U)
+#define AX5043_AFSKSPACE_Msk                (0xFFFFU << AX5043_AFSKSPACE_Pos)
+#define AX5043_AFSKSPACE                    AX5043_AFSKSPACE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AFSKMARK register fields
+ * TODO:    Verify the field width here
+ * @{
+ */
+#define AX5043_AFSKMARK_Pos                 (0U)
+#define AX5043_AFSKMARK_Msk                 (0xFFFFU << AX5043_AFSKMARK_Pos)
+#define AX5043_AFSKMARK                     AX5043_AFSKMARK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AFSKCTRL register fields
+ * @{
+ */
+#define AX5043_AFSKCTRL_AFSKSHIFT_Pos       (0U)
+#define AX5043_AFSKCTRL_AFSKSHIFT_Msk       (0x1FU << AX5043_AFSKCTRL_AFSKSHIFT_Pos)
+#define AX5043_AFSKCTRL_AFSKSHIFT           AX5043_AFSKCTRL_AFSKSHIFT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AMPLFILTER register fields
+ * @{
+ */
+#define AX5043_AMPLFILTER_Pos               (0U)
+#define AX5043_AMPLFILTER_Msk               (0xFU << AX5043_AMPLFILTER_Pos)
+#define AX5043_AMPLFILTER                   AX5043_AMPLFILTER_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQUENCYLEAK register fields
+ * @{
+ */
+#define AX5043_FREQUENCYLEAK_Pos            (0U)
+#define AX5043_FREQUENCYLEAK_Msk            (0xFU << AX5043_FREQUENCYLEAK_Pos)
+#define AX5043_FREQUENCYLEAK                AX5043_FREQUENCYLEAK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RXPARAMSETS register fields
+ * @{
+ */
+#define AX5043_RXPARAMSETS_RXPS0_Pos        (0U)
+#define AX5043_RXPARAMSETS_RXPS0_Msk        (0x3U << AX5043_RXPARAMSETS_RXPS0_Pos)
+#define AX5043_RXPARAMSETS_RXPS0            AX5043_RXPARAMSETS_RXPS0_Msk
+#define AX5043_RXPARAMSETS_RXPS1_Pos        (2U)
+#define AX5043_RXPARAMSETS_RXPS1_Msk        (0x3U << AX5043_RXPARAMSETS_RXPS1_Pos)
+#define AX5043_RXPARAMSETS_RXPS1            AX5043_RXPARAMSETS_RXPS1_Msk
+#define AX5043_RXPARAMSETS_RXPS2_Pos        (4U)
+#define AX5043_RXPARAMSETS_RXPS2_Msk        (0x3U << AX5043_RXPARAMSETS_RXPS2_Pos)
+#define AX5043_RXPARAMSETS_RXPS2            AX5043_RXPARAMSETS_RXPS2_Msk
+#define AX5043_RXPARAMSETS_RXPS3_Pos        (6U)
+#define AX5043_RXPARAMSETS_RXPS3_Msk        (0x3U << AX5043_RXPARAMSETS_RXPS3_Pos)
+#define AX5043_RXPARAMSETS_RXPS3            AX5043_RXPARAMSETS_RXPS3_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RXPARAMCURSET register fields
+ * @{
+ */
+#define AX5043_RXPARAMCURSET_RXSI_Pos       (0U)
+#define AX5043_RXPARAMCURSET_RXSI_Msk       (0x3U << AX5043_RXPARAMCURSET_RXSI_Pos)
+#define AX5043_RXPARAMCURSET_RXSI           AX5043_RXPARAMCURSET_RXSI_Msk
+#define AX5043_RXPARAMCURSET_RXSN_Pos       (2U)
+#define AX5043_RXPARAMCURSET_RXSN_Msk       (0x3U << AX5043_RXPARAMCURSET_RXSN_Pos)
+#define AX5043_RXPARAMCURSET_RXSN           AX5043_RXPARAMCURSET_RXSN_Msk
+#define AX5043_RXPARAMCURSET_RXSI_FUNC_Pos  (4U)
+#define AX5043_RXPARAMCURSET_RXSI_FUNC_Msk  (0x1U << AX5043_RXPARAMCURSET_RXSI_FUNC_Pos)
+#define AX5043_RXPARAMCURSET_RXSI_FUNC      AX5043_RXPARAMCURSET_RXSI_FUNC_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AGCGAIN 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_AGCGAIN_AGCATTACK_Pos        (0U)
+#define AX5043_AGCGAIN_AGCATTACK_Msk        (0xFU << AX5043_AGCGAIN_AGCATTACK_Pos)
+#define AX5043_AGCGAIN_AGCATTACK            AX5043_AGCGAIN_AGCATTACK_Msk
+#define AX5043_AGCGAIN_AGCDECAY_Pos         (4U)
+#define AX5043_AGCGAIN_AGCDECAY_Msk         (0xFU << AX5043_AGCGAIN_AGCDECAY_Pos)
+#define AX5043_AGCGAIN_AGCDECAY             AX5043_AGCGAIN_AGCDECAY_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AGCTARGET 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_AGCTARGET_Pos                (0U)
+#define AX5043_AGCTARGET_Msk                (0xFFU << AX5043_AGCTARGET_Pos)
+#define AX5043_AGCTARGET                    AX5043_AGCTARGET_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AGCAHYST 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_AGCAHYST_Pos                 (0U)
+#define AX5043_AGCAHYST_Msk                 (0x7U << AX5043_AGCAHYST_Pos)
+#define AX5043_AGCAHYST                     AX5043_AGCAHYST_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AGCMINMAX 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_AGCMINMAX_AGCMINDA_Pos       (0U)
+#define AX5043_AGCMINMAX_AGCMINDA_Msk       (0x7U << AX5043_AGCMINMAX_AGCMINDA_Pos)
+#define AX5043_AGCMINMAX_AGCMINDA           AX5043_AGCMINMAX_AGCMINDA_Msk
+#define AX5043_AGCMINMAX_AGCMAXDA_Pos       (4U)
+#define AX5043_AGCMINMAX_AGCMAXDA_Msk       (0x7U << AX5043_AGCMINMAX_AGCMAXDA_Pos)
+#define AX5043_AGCMINMAX_AGCMAXDA           AX5043_AGCMINMAX_AGCMAXDA_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TIMEGAIN 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_TIMEGAIN_E_Pos               (0U)
+#define AX5043_TIMEGAIN_E_Msk               (0xFU << AX5043_TIMEGAIN_E_Pos)
+#define AX5043_TIMEGAIN_E                   AX5043_TIMEGAIN_E_Msk
+#define AX5043_TIMEGAIN_M_Pos               (4U)
+#define AX5043_TIMEGAIN_M_Msk               (0xFU << AX5043_TIMEGAIN_M_Pos)
+#define AX5043_TIMEGAIN_M                   AX5043_TIMEGAIN_M_Msk
+/** @} */
+
+/**
+ * @name    AX5043 DRGAIN 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_DRGAIN_E_Pos                 (0U)
+#define AX5043_DRGAIN_E_Msk                 (0xFU << AX5043_DRGAIN_E_Pos)
+#define AX5043_DRGAIN_E                     AX5043_DRGAIN_E_Msk
+#define AX5043_DRGAIN_M_Pos                 (4U)
+#define AX5043_DRGAIN_M_Msk                 (0xFU << AX5043_DRGAIN_M_Pos)
+#define AX5043_DRGAIN_M                     AX5043_DRGAIN_M_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PHASEGAIN 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_PHASEGAIN_Pos                (0U)
+#define AX5043_PHASEGAIN_Msk                (0xFU << AX5043_PHASEGAIN_Pos)
+#define AX5043_PHASEGAIN                    AX5043_PHASEGAIN_Msk
+#define AX5043_PHASEGAIN_FILTERIDX_Pos      (6U)
+#define AX5043_PHASEGAIN_FILTERIDX_Msk      (0x3U << AX5043_PHASEGAIN_FILTERIDX_Pos)
+#define AX5043_PHASEGAIN_FILTERIDX          AX5043_PHASEGAIN_FILTERIDX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQGAINA 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_FREQGAINA_Pos                (0U)
+#define AX5043_FREQGAINA_Msk                (0xFU << AX5043_FREQGAINA_Pos)
+#define AX5043_FREQGAINA                    AX5043_FREQGAINA_Msk
+#define AX5043_FREQGAINA_FREQAMPLGATE_Pos   (4U)
+#define AX5043_FREQGAINA_FREQAMPLGATE_Msk   (0x1U << AX5043_FREQGAINA_FREQAMPLGATE_Pos)
+#define AX5043_FREQGAINA_FREQAMPLGATE       AX5043_FREQGAINA_FREQAMPLGATE_Msk
+#define AX5043_FREQGAINA_FREQHALFMOD_Pos    (5U)
+#define AX5043_FREQGAINA_FREQHALFMOD_Msk    (0x1U << AX5043_FREQGAINA_FREQHALFMOD_Pos)
+#define AX5043_FREQGAINA_FREQHALFMOD        AX5043_FREQGAINA_FREQHALFMOD_Msk
+#define AX5043_FREQGAINA_FREQMODULO_Pos     (6U)
+#define AX5043_FREQGAINA_FREQMODULO_Msk     (0x1U << AX5043_FREQGAINA_FREQMODULO_Pos)
+#define AX5043_FREQGAINA_FREQMODULO         AX5043_FREQGAINA_FREQMODULO_Msk
+#define AX5043_FREQGAINA_FREQLIM_Pos        (7U)
+#define AX5043_FREQGAINA_FREQLIM_Msk        (0x1U << AX5043_FREQGAINA_FREQLIM_Pos)
+#define AX5043_FREQGAINA_FREQLIM            AX5043_FREQGAINA_FREQLIM_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQGAINB 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_FREQGAINB_Pos                (0U)
+#define AX5043_FREQGAINB_Msk                (0x1FU << AX5043_FREQGAINB_Pos)
+#define AX5043_FREQGAINB                    AX5043_FREQGAINB_Msk
+#define AX5043_FREQGAINB_FREQAVG_Pos        (6U)
+#define AX5043_FREQGAINB_FREQAVG_Msk        (0x1U << AX5043_FREQGAINB_FREQAVG_Pos)
+#define AX5043_FREQGAINB_FREQAVG            AX5043_FREQGAINB_FREQAVG_Msk
+#define AX5043_FREQGAINB_FREQFREEZE_Pos     (7U)
+#define AX5043_FREQGAINB_FREQFREEZE_Msk     (0x1U << AX5043_FREQGAINB_FREQFREEZE_Pos)
+#define AX5043_FREQGAINB_FREQFREEZE         AX5043_FREQGAINB_FREQFREEZE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQGAINC 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_FREQGAINC_Pos                (0U)
+#define AX5043_FREQGAINC_Msk                (0x1FU << AX5043_FREQGAINC_Pos)
+#define AX5043_FREQGAINC                    AX5043_FREQGAINC_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQGAIND 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_FREQGAIND_Pos                (0U)
+#define AX5043_FREQGAIND_Msk                (0x1FU << AX5043_FREQGAIND_Pos)
+#define AX5043_FREQGAIND                    AX5043_FREQGAIND_Msk
+#define AX5043_FREQGAIND_RFFREQFREEZE_Pos   (7U)
+#define AX5043_FREQGAIND_RFFREQFREEZE_Msk   (0x1U << AX5043_FREQGAIND_RFFREQFREEZE_Pos)
+#define AX5043_FREQGAIND_RFFREQFREEZE       AX5043_FREQGAIND_RFFREQFREEZE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 AMPLGAIN 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_AMPLGAIN_Pos                 (0U)
+#define AX5043_AMPLGAIN_Msk                 (0xFU << AX5043_AMPLGAIN_Pos)
+#define AX5043_AMPLGAIN                     AX5043_AMPLGAIN_Msk
+#define AX5043_AMPLGAIN_AMPLAGC_Pos         (6U)
+#define AX5043_AMPLGAIN_AMPLAGC_Msk         (0x1U << AX5043_AMPLGAIN_AMPLAGC_Pos)
+#define AX5043_AMPLGAIN_AMPLAGC             AX5043_AMPLGAIN_AMPLAGC_Msk
+#define AX5043_AMPLGAIN_AMPLAVG_Pos         (7U)
+#define AX5043_AMPLGAIN_AMPLAVG_Msk         (0x1U << AX5043_AMPLGAIN_AMPLAVG_Pos)
+#define AX5043_AMPLGAIN_AMPLAVG             AX5043_AMPLGAIN_AMPLAVG_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FREQDEV 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_FREQDEV_Pos                  (0U)
+#define AX5043_FREQDEV_Msk                  (0xFFFU << AX5043_FREQDEV_Pos)
+#define AX5043_FREQDEV                      AX5043_FREQDEV_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FOURFSK register fields
+ * @{
+ */
+#define AX5043_FOURFSK_DEVDECAY_Pos         (0U)
+#define AX5043_FOURFSK_DEVDECAY_Msk         (0xFU << AX5043_FOURFSK_DEVDECAY_Pos)
+#define AX5043_FOURFSK_DEVDECAY             AX5043_FOURFSK_DEVDECAY_Msk
+#define AX5043_FOURFSK_DEVUPDATE_Pos        (4U)
+#define AX5043_FOURFSK_DEVUPDATE_Msk        (0x1U << AX5043_FOURFSK_DEVUPDATE_Pos)
+#define AX5043_FOURFSK_DEVUPDATE            AX5043_FOURFSK_DEVUPDATE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BBOFFSRES 0/1/2/3 register fields
+ * @{
+ */
+#define AX5043_BBOFFSRES_RESINTA_Pos        (0U)
+#define AX5043_BBOFFSRES_RESINTA_Msk        (0xFU << AX5043_BBOFFSRES_RESINTA_Pos)
+#define AX5043_BBOFFSRES_RESINTA            AX5043_BBOFFSRES_RESINTA_Msk
+#define AX5043_BBOFFSRES_RESINTB_Pos        (4U)
+#define AX5043_BBOFFSRES_RESINTB_Msk        (0xFU << AX5043_BBOFFSRES_RESINTB_Pos)
+#define AX5043_BBOFFSRES_RESINTB            AX5043_BBOFFSRES_RESINTB_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MODCFGF register fields
+ * @{
+ */
+#define AX5043_MODCFGF_FREQSHAPE_Pos        (0U)
+#define AX5043_MODCFGF_FREQSHAPE_Msk        (0x3U << AX5043_MODCFGF_FREQSHAPE_Pos)
+#define AX5043_MODCFGF_FREQSHAPE            AX5043_MODCFGF_FREQSHAPE_Msk
+#define AX5043_FREQSHAPE_EXTERN_LOOP_FILT   (0x0U)
+#define AX5043_FREQSHAPE_GAUSS_BT_0_3       (0x2U)
+#define AX5043_FREQSHAPE_GAUSS_BT_0_5       (0x3U)
+/** @} */
+
+/**
+ * @name    AX5043 FSKDEV register fields
+ * @{
+ */
+#define AX5043_FSKDEV_Pos                   (0U)
+#define AX5043_FSKDEV_Msk                   (0xFFFFFFU << AX5043_FSKDEV_Pos)
+#define AX5043_FSKDEV                       AX5043_FSKDEV_Msk
+#define AX5043_FSKDEV_FMSHIFT_Pos           (0U)
+#define AX5043_FSKDEV_FMSHIFT_Msk           (0x3U << AX5043_FSKDEV_FMSHIFT_Pos)
+#define AX5043_FSKDEV_FMSHIFT               AX5043_FSKDEV_FMSHIFT_Msk
+#define AX5043_FSKDEV_FMINPUT_Pos           (8U)
+#define AX5043_FSKDEV_FMINPUT_Msk           (0x3U << AX5043_FSKDEV_FMINPUT_Pos)
+#define AX5043_FSKDEV_FMINPUT               AX5043_FSKDEV_FMINPUT_Msk
+#define AX5043_FSKDEV_FMSEXT_Pos            (14U)
+#define AX5043_FSKDEV_FMSEXT_Msk            (0x1U << AX5043_FSKDEV_FMSEXT_Pos)
+#define AX5043_FSKDEV_FMSEXT                AX5043_FSKDEV_FMSEXT_Msk
+#define AX5043_FSKDEV_FMOFFS_Pos            (15U)
+#define AX5043_FSKDEV_FMOFFS_Msk            (0x1U << AX5043_FSKDEV_FMOFFS_Pos)
+#define AX5043_FSKDEV_FMOFFS                AX5043_FSKDEV_FMOFFS_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MODCFGA register fields
+ * @{
+ */
+#define AX5043_MODCFGA_TXDIFF_Pos           (0U)
+#define AX5043_MODCFGA_TXDIFF_Msk           (0x1U << AX5043_MODCFGA_TXDIFF_Pos)
+#define AX5043_MODCFGA_TXDIFF               AX5043_MODCFGA_TXDIFF_Msk
+#define AX5043_MODCFGA_TXSE_Pos             (1U)
+#define AX5043_MODCFGA_TXSE_Msk             (0x1U << AX5043_MODCFGA_TXSE_Pos)
+#define AX5043_MODCFGA_TXSE                 AX5043_MODCFGA_TXSE_Msk
+#define AX5043_MODCFGA_AMPLSHAPE_Pos        (2U)
+#define AX5043_MODCFGA_AMPLSHAPE_Msk        (0x1U << AX5043_MODCFGA_AMPLSHAPE_Pos)
+#define AX5043_MODCFGA_AMPLSHAPE            AX5043_MODCFGA_AMPLSHAPE_Msk
+#define AX5043_AMPLSHAPE_UNSHAPED           (0x0U)
+#define AX5043_AMPLSHAPE_RAISEDCOS          (0x1U)
+#define AX5043_MODCFGA_SLOWRAMP_Pos         (4U)
+#define AX5043_MODCFGA_SLOWRAMP_Msk         (0x3U << AX5043_MODCFGA_SLOWRAMP_Pos)
+#define AX5043_MODCFGA_SLOWRAMP             AX5043_MODCFGA_SLOWRAMP_Msk
+#define AX5043_SLOWRAMP_1BIT                (0x0U)
+#define AX5043_SLOWRAMP_2BIT                (0x1U)
+#define AX5043_SLOWRAMP_4BIT                (0x2U)
+#define AX5043_SLOWRAMP_8BIT                (0x3U)
+#define AX5043_MODCFGA_PTTLCKGATE_Pos       (6U)
+#define AX5043_MODCFGA_PTTLCKGATE_Msk       (0x1U << AX5043_MODCFGA_PTTLCKGATE_Pos)
+#define AX5043_MODCFGA_PTTLCKGATE           AX5043_MODCFGA_PTTLCKGATE_Msk
+#define AX5043_MODCFGA_BROWNGATE_Pos        (7U)
+#define AX5043_MODCFGA_BROWNGATE_Msk        (0x1U << AX5043_MODCFGA_BROWNGATE_Pos)
+#define AX5043_MODCFGA_BROWNGATE            AX5043_MODCFGA_BROWNGATE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TXRATE register fields
+ * @{
+ */
+#define AX5043_TXRATE_Pos                   (0U)
+#define AX5043_TXRATE_Msk                   (0xFFFFFFU << AX5043_TXRATE_Pos)
+#define AX5043_TXRATE                       AX5043_TXRATE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TXPWRCOEFF A/B/C/D/E register fields
+ * @{
+ */
+#define AX5043_TXPWRCOEFF_Pos               (0U)
+#define AX5043_TXPWRCOEFF_Msk               (0xFFFFU << AX5043_TXPWRCOEFF_Pos)
+#define AX5043_TXPWRCOEFF                   AX5043_TXPWRCOEFF_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLVCOI register fields
+ * @{
+ */
+#define AX5043_PLLVCOI_VCOI_Pos             (0U)
+#define AX5043_PLLVCOI_VCOI_Msk             (0x3FU << AX5043_PLLVCOI_VCOI_Pos)
+#define AX5043_PLLVCOI_VCOI                 AX5043_PLLVCOI_VCOI_Msk
+#define AX5043_PLLVCOI_VCOIE_Pos            (7U)
+#define AX5043_PLLVCOI_VCOIE_Msk            (0x1U << AX5043_PLLVCOI_VCOIE_Pos)
+#define AX5043_PLLVCOI_VCOIE                AX5043_PLLVCOI_VCOIE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLVCOIR register fields
+ * @{
+ */
+#define AX5043_PLLVCOIR_Pos                 (0U)
+#define AX5043_PLLVCOIR_Msk                 (0x3FU << AX5043_PLLVCOIR_Pos)
+#define AX5043_PLLVCOIR                     AX5043_PLLVCOIR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLLOCKDET register fields
+ * @{
+ */
+#define AX5043_PLLLOCKDET_LOCKDETDLY_Pos    (0U)
+#define AX5043_PLLLOCKDET_LOCKDETDLY_Msk    (0x3U << AX5043_PLLLOCKDET_LOCKDETDLY_Pos)
+#define AX5043_PLLLOCKDET_LOCKDETDLY        AX5043_PLLLOCKDET_LOCKDETDLY_Msk
+#define AX5043_LOCKDETDLY_6NS               (0x0U)
+#define AX5043_LOCKDETDLY_9NS               (0x1U)
+#define AX5043_LOCKDETDLY_12NS              (0x2U)
+#define AX5043_LOCKDETDLY_14NS              (0x3U)
+#define AX5043_PLLLOCKDET_LOCKDETDLYM_Pos   (2U)
+#define AX5043_PLLLOCKDET_LOCKDETDLYM_Msk   (0x1U << AX5043_PLLLOCKDET_LOCKDETDLYM_Pos)
+#define AX5043_PLLLOCKDET_LOCKDETDLYM       AX5043_PLLLOCKDET_LOCKDETDLYM_Msk
+#define AX5043_PLLLOCKDET_LOCKDETDLYR_Pos   (6U)
+#define AX5043_PLLLOCKDET_LOCKDETDLYR_Msk   (0x3U << AX5043_PLLLOCKDET_LOCKDETDLYR_Pos)
+#define AX5043_PLLLOCKDET_LOCKDETDLYR       AX5043_PLLLOCKDET_LOCKDETDLYR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PLLRNGCLK register fields
+ * @{
+ */
+#define AX5043_PLLRNGCLK_Pos                (0U)
+#define AX5043_PLLRNGCLK_Msk                (0x7U << AX5043_PLLRNGCLK_Pos)
+#define AX5043_PLLRNGCLK                    AX5043_PLLRNGCLK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 XTALCAP register fields
+ * @{
+ */
+#define AX5043_XTALCAP_Pos                  (0U)
+#define AX5043_XTALCAP_Msk                  (0xFFU << AX5043_XTALCAP_Pos)
+#define AX5043_XTALCAP                      AX5043_XTALCAP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BBTUNE register fields
+ * @{
+ */
+#define AX5043_BBTUNE_Pos                   (0U)
+#define AX5043_BBTUNE_Msk                   (0xFU << AX5043_BBTUNE_Pos)
+#define AX5043_BBTUNE                       AX5043_BBTUNE_Msk
+#define AX5043_BBTUNE_BBTUNERUN_Pos         (4U)
+#define AX5043_BBTUNE_BBTUNERUN_Msk         (0x1U << AX5043_BBTUNE_BBTUNERUN_Pos)
+#define AX5043_BBTUNE_BBTUNERUN             AX5043_BBTUNE_BBTUNERUN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BBOFFSCAP register fields
+ * @{
+ */
+#define AX5043_BBOFFSCAP_CAPINTA_Pos        (0U)
+#define AX5043_BBOFFSCAP_CAPINTA_Msk        (0x7U << AX5043_BBOFFSCAP_CAPINTA_Pos)
+#define AX5043_BBOFFSCAP_CAPINTA            AX5043_BBOFFSCAP_CAPINTA_Msk
+#define AX5043_BBOFFSCAP_CAPINTB_Pos        (4U)
+#define AX5043_BBOFFSCAP_CAPINTB_Msk        (0x7U << AX5043_BBOFFSCAP_CAPINTB_Pos)
+#define AX5043_BBOFFSCAP_CAPINTB            AX5043_BBOFFSCAP_CAPINTB_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTADDRCFG register fields
+ * @{
+ */
+#define AX5043_PKTADDRCFG_ADDRPOS_Pos       (0U)
+#define AX5043_PKTADDRCFG_ADDRPOS_Msk       (0xFU << AX5043_PKTADDRCFG_ADDRPOS_Pos)
+#define AX5043_PKTADDRCFG_ADDRPOS           AX5043_PKTADDRCFG_ADDRPOS_Msk
+#define AX5043_PKTADDRCFG_FECSYNCDIS_Pos    (5U)
+#define AX5043_PKTADDRCFG_FECSYNCDIS_Msk    (0x1U << AX5043_PKTADDRCFG_FECSYNCDIS_Pos)
+#define AX5043_PKTADDRCFG_FECSYNCDIS        AX5043_PKTADDRCFG_FECSYNCDIS_Msk
+#define AX5043_PKTADDRCFG_CRCSKIPFIRST_Pos  (6U)
+#define AX5043_PKTADDRCFG_CRCSKIPFIRST_Msk  (0x1U << AX5043_PKTADDRCFG_CRCSKIPFIRST_Pos)
+#define AX5043_PKTADDRCFG_CRCSKIPFIRST      AX5043_PKTADDRCFG_CRCSKIPFIRST_Msk
+#define AX5043_PKTADDRCFG_MSBFIRST_Pos      (7U)
+#define AX5043_PKTADDRCFG_MSBFIRST_Msk      (0x1U << AX5043_PKTADDRCFG_MSBFIRST_Pos)
+#define AX5043_PKTADDRCFG_MSBFIRST          AX5043_PKTADDRCFG_MSBFIRST_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTLENCFG register fields
+ * @{
+ */
+#define AX5043_PKTLENCFG_LENPOS_Pos         (0U)
+#define AX5043_PKTLENCFG_LENPOS_Msk         (0xFU << AX5043_PKTLENCFG_LENPOS_Pos)
+#define AX5043_PKTLENCFG_LENPOS             AX5043_PKTLENCFG_LENPOS_Msk
+#define AX5043_PKTLENCFG_LENBITS_Pos        (4U)
+#define AX5043_PKTLENCFG_LENBITS_Msk        (0xFU << AX5043_PKTLENCFG_LENBITS_Pos)
+#define AX5043_PKTLENCFG_LENBITS            AX5043_PKTLENCFG_LENBITS_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTLENOFFSET register fields
+ * @{
+ */
+#define AX5043_PKTLENOFFSET_Pos             (0U)
+#define AX5043_PKTLENOFFSET_Msk             (0xFFU << AX5043_PKTLENOFFSET_Pos)
+#define AX5043_PKTLENOFFSET                 AX5043_PKTLENOFFSET_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTMAXLEN register fields
+ * @{
+ */
+#define AX5043_PKTMAXLEN_Pos                (0U)
+#define AX5043_PKTMAXLEN_Msk                (0xFFU << AX5043_PKTMAXLEN_Pos)
+#define AX5043_PKTMAXLEN                    AX5043_PKTMAXLEN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTADDR register fields
+ * @{
+ */
+#define AX5043_PKTADDR_Pos                  (0U)
+#define AX5043_PKTADDR_Msk                  (0xFFFFFFFFU << AX5043_PKTADDR_Pos)
+#define AX5043_PKTADDR                      AX5043_PKTADDR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTADDRMASK register fields
+ * @{
+ */
+#define AX5043_PKTADDRMASK_Pos              (0U)
+#define AX5043_PKTADDRMASK_Msk              (0xFFFFFFFFU << AX5043_PKTADDRMASK_Pos)
+#define AX5043_PKTADDRMASK                  AX5043_PKTADDRMASK_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH0PAT register fields
+ * @{
+ */
+#define AX5043_MATCH0PAT_Pos                (0U)
+#define AX5043_MATCH0PAT_Msk                (0xFFFFFFFFU << AX5043_MATCH0PAT_Pos)
+#define AX5043_MATCH0PAT                    AX5043_MATCH0PAT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH0LEN register fields
+ * @{
+ */
+#define AX5043_MATCH0LEN_Pos                (0U)
+#define AX5043_MATCH0LEN_Msk                (0x1FU << AX5043_MATCH0LEN_Pos)
+#define AX5043_MATCH0LEN                    AX5043_MATCH0LEN_Msk
+#define AX5043_MATCH0LEN_MATCH0RAW_Pos      (7U)
+#define AX5043_MATCH0LEN_MATCH0RAW_Msk      (0x1U << AX5043_MATCH0LEN_MATCH0RAW_Pos)
+#define AX5043_MATCH0LEN_MATCH0RAW          AX5043_MATCH0LEN_MATCH0RAW_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH0MIN register fields
+ * @{
+ */
+#define AX5043_MATCH0MIN_Pos                (0U)
+#define AX5043_MATCH0MIN_Msk                (0x1FU << AX5043_MATCH0MIN_Pos)
+#define AX5043_MATCH0MIN                    AX5043_MATCH0MIN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH0MAX register fields
+ * @{
+ */
+#define AX5043_MATCH0MAX_Pos                (0U)
+#define AX5043_MATCH0MAX_Msk                (0x1FU << AX5043_MATCH0MAX_Pos)
+#define AX5043_MATCH0MAX                    AX5043_MATCH0MAX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH1PAT register fields
+ * @{
+ */
+#define AX5043_MATCH1PAT_Pos                (0U)
+#define AX5043_MATCH1PAT_Msk                (0xFFFFU << AX5043_MATCH1PAT_Pos)
+#define AX5043_MATCH1PAT                    AX5043_MATCH1PAT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH1LEN register fields
+ * @{
+ */
+#define AX5043_MATCH1LEN_Pos                (0U)
+#define AX5043_MATCH1LEN_Msk                (0xFU << AX5043_MATCH1LEN_Pos)
+#define AX5043_MATCH1LEN                    AX5043_MATCH1LEN_Msk
+#define AX5043_MATCH1LEN_MATCH1RAW_Pos      (7U)
+#define AX5043_MATCH1LEN_MATCH1RAW_Msk      (0x1U << AX5043_MATCH1LEN_MATCH1RAW_Pos)
+#define AX5043_MATCH1LEN_MATCH1RAW          AX5043_MATCH1LEN_MATCH1RAW_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH1MIN register fields
+ * @{
+ */
+#define AX5043_MATCH1MIN_Pos                (0U)
+#define AX5043_MATCH1MIN_Msk                (0xFU << AX5043_MATCH1MIN_Pos)
+#define AX5043_MATCH1MIN                    AX5043_MATCH1MIN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 MATCH1MAX register fields
+ * @{
+ */
+#define AX5043_MATCH1MAX_Pos                (0U)
+#define AX5043_MATCH1MAX_Msk                (0xFU << AX5043_MATCH1MAX_Pos)
+#define AX5043_MATCH1MAX                    AX5043_MATCH1MAX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGTXBOOST register fields
+ * @{
+ */
+#define AX5043_TMGTXBOOST_M_Pos             (0U)
+#define AX5043_TMGTXBOOST_M_Msk             (0x1FU << AX5043_TMGTXBOOST_M_Pos)
+#define AX5043_TMGTXBOOST_M                 AX5043_TMGTXBOOST_M_Msk
+#define AX5043_TMGTXBOOST_E_Pos             (5U)
+#define AX5043_TMGTXBOOST_E_Msk             (0x7U << AX5043_TMGTXBOOST_E_Pos)
+#define AX5043_TMGTXBOOST_E                 AX5043_TMGTXBOOST_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGTXSETTLE register fields
+ * @{
+ */
+#define AX5043_TMGTXSETTLE_M_Pos            (0U)
+#define AX5043_TMGTXSETTLE_M_Msk            (0x1FU << AX5043_TMGTXSETTLE_M_Pos)
+#define AX5043_TMGTXSETTLE_M                AX5043_TMGTXSETTLE_M_Msk
+#define AX5043_TMGTXSETTLE_E_Pos            (5U)
+#define AX5043_TMGTXSETTLE_E_Msk            (0x7U << AX5043_TMGTXSETTLE_E_Pos)
+#define AX5043_TMGTXSETTLE_E                AX5043_TMGTXSETTLE_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXBOOST register fields
+ * @{
+ */
+#define AX5043_TMGRXBOOST_M_Pos             (0U)
+#define AX5043_TMGRXBOOST_M_Msk             (0x1FU << AX5043_TMGRXBOOST_M_Pos)
+#define AX5043_TMGRXBOOST_M                 AX5043_TMGRXBOOST_M_Msk
+#define AX5043_TMGRXBOOST_E_Pos             (5U)
+#define AX5043_TMGRXBOOST_E_Msk             (0x7U << AX5043_TMGRXBOOST_E_Pos)
+#define AX5043_TMGRXBOOST_E                 AX5043_TMGRXBOOST_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXSETTLE register fields
+ * @{
+ */
+#define AX5043_TMGRXSETTLE_M_Pos            (0U)
+#define AX5043_TMGRXSETTLE_M_Msk            (0x1FU << AX5043_TMGRXSETTLE_M_Pos)
+#define AX5043_TMGRXSETTLE_M                AX5043_TMGRXSETTLE_M_Msk
+#define AX5043_TMGRXSETTLE_E_Pos            (5U)
+#define AX5043_TMGRXSETTLE_E_Msk            (0x7U << AX5043_TMGRXSETTLE_E_Pos)
+#define AX5043_TMGRXSETTLE_E                AX5043_TMGRXSETTLE_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXOFFSACQ register fields
+ * @{
+ */
+#define AX5043_TMGRXOFFSACQ_M_Pos           (0U)
+#define AX5043_TMGRXOFFSACQ_M_Msk           (0x1FU << AX5043_TMGRXOFFSACQ_M_Pos)
+#define AX5043_TMGRXOFFSACQ_M               AX5043_TMGRXOFFSACQ_M_Msk
+#define AX5043_TMGRXOFFSACQ_E_Pos           (5U)
+#define AX5043_TMGRXOFFSACQ_E_Msk           (0x7U << AX5043_TMGRXOFFSACQ_E_Pos)
+#define AX5043_TMGRXOFFSACQ_E               AX5043_TMGRXOFFSACQ_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXCOARSEAGC register fields
+ * @{
+ */
+#define AX5043_TMGRXCOARSEAGC_M_Pos         (0U)
+#define AX5043_TMGRXCOARSEAGC_M_Msk         (0x1FU << AX5043_TMGRXCOARSEAGC_M_Pos)
+#define AX5043_TMGRXCOARSEAGC_M             AX5043_TMGRXCOARSEAGC_M_Msk
+#define AX5043_TMGRXCOARSEAGC_E_Pos         (0U)
+#define AX5043_TMGRXCOARSEAGC_E_Msk         (0x7U << AX5043_TMGRXCOARSEAGC_E_Pos)
+#define AX5043_TMGRXCOARSEAGC_E             AX5043_TMGRXCOARSEAGC_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXAGC register fields
+ * @{
+ */
+#define AX5043_TMGRXAGC_M_Pos               (0U)
+#define AX5043_TMGRXAGC_M_Msk               (0x1FU << AX5043_TMGRXAGC_M_Pos)
+#define AX5043_TMGRXAGC_M                   AX5043_TMGRXAGC_M_Msk
+#define AX5043_TMGRXAGC_E_Pos               (5U)
+#define AX5043_TMGRXAGC_E_Msk               (0x7U << AX5043_TMGRXAGC_E_Pos)
+#define AX5043_TMGRXAGC_E                   AX5043_TMGRXAGC_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXRSSI register fields
+ * @{
+ */
+#define AX5043_TMGRXRSSI_M_Pos              (0U)
+#define AX5043_TMGRXRSSI_M_Msk              (0x1FU << AX5043_TMGRXRSSI_M_Pos)
+#define AX5043_TMGRXRSSI_M                  AX5043_TMGRXRSSI_M_Msk
+#define AX5043_TMGRXRSSI_E_Pos              (5U)
+#define AX5043_TMGRXRSSI_E_Msk              (0x7U << AX5043_TMGRXRSSI_E_Pos)
+#define AX5043_TMGRXRSSI_E                  AX5043_TMGRXRSSI_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 TMGRXPREAMBLE 1/2/3 register fields
+ * @{
+ */
+#define AX5043_TMGRXPREAMBLE_M_Pos          (0U)
+#define AX5043_TMGRXPREAMBLE_M_Msk          (0x1FU << AX5043_TMGRXPREAMBLE_M_Pos)
+#define AX5043_TMGRXPREAMBLE_M              AX5043_TMGRXPREAMBLE_M_Msk
+#define AX5043_TMGRXPREAMBLE_E_Pos          (5U)
+#define AX5043_TMGRXPREAMBLE_E_Msk          (0x7U << AX5043_TMGRXPREAMBLE_E_Pos)
+#define AX5043_TMGRXPREAMBLE_E              AX5043_TMGRXPREAMBLE_E_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RSSIREFERENCE register fields
+ * @{
+ */
+#define AX5043_RSSIREFERENCE_Pos            (0U)
+#define AX5043_RSSIREFERENCE_Msk            (0xFFU << AX5043_RSSIREFERENCE_Pos)
+#define AX5043_RSSIREFERENCE                AX5043_RSSIREFERENCE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 RSSIABSTHR register fields
+ * @{
+ */
+#define AX5043_RSSIABSTHR_Pos               (0U)
+#define AX5043_RSSIABSTHR_Msk               (0xFFU << AX5043_RSSIABSTHR_Pos)
+#define AX5043_RSSIABSTHR                   AX5043_RSSIABSTHR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BGNDRSSIGAIN register fields
+ * @{
+ */
+#define AX5043_BGNDRSSIGAIN_Pos             (0U)
+#define AX5043_BGNDRSSIGAIN_Msk             (0xFU << AX5043_BGNDRSSIGAIN_Pos)
+#define AX5043_BGNDRSSIGAIN                 AX5043_BGNDRSSIGAIN_Msk
+/** @} */
+
+/**
+ * @name    AX5043 BGNDRSSITHR register fields
+ * @{
+ */
+#define AX5043_BGNDRSSITHR_Pos              (0U)
+#define AX5043_BGNDRSSITHR_Msk              (0x3FU << AX5043_BGNDRSSITHR_Pos)
+#define AX5043_BGNDRSSITHR                  AX5043_BGNDRSSITHR_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTCHUNKSIZE register fields
+ * @{
+ */
+#define AX5043_PKTCHUNKSIZE_Pos             (0U)
+#define AX5043_PKTCHUNKSIZE_Msk             (0xFU << AX5043_PKTCHUNKSIZE_Pos)
+#define AX5043_PKTCHUNKSIZE                 AX5043_PKTCHUNKSIZE_Msk
+#define AX5043_PKTCHUNKSIZE_1               (0x1U)
+#define AX5043_PKTCHUNKSIZE_2               (0x2U)
+#define AX5043_PKTCHUNKSIZE_4               (0x3U)
+#define AX5043_PKTCHUNKSIZE_8               (0x4U)
+#define AX5043_PKTCHUNKSIZE_16              (0x5U)
+#define AX5043_PKTCHUNKSIZE_32              (0x6U)
+#define AX5043_PKTCHUNKSIZE_64              (0x7U)
+#define AX5043_PKTCHUNKSIZE_96              (0x8U)
+#define AX5043_PKTCHUNKSIZE_128             (0x9U)
+#define AX5043_PKTCHUNKSIZE_160             (0xAU)
+#define AX5043_PKTCHUNKSIZE_192             (0xBU)
+#define AX5043_PKTCHUNKSIZE_224             (0xCU)
+#define AX5043_PKTCHUNKSIZE_240             (0xDU)
+/** @} */
+
+/**
+ * @name    AX5043 PKTMISCFLAGS register fields
+ * @{
+ */
+#define AX5043_PKTMISCFLAGS_RXRSSICLK_Pos   (0U)
+#define AX5043_PKTMISCFLAGS_RXRSSICLK_Msk   (0x1U << AX5043_PKTMISCFLAGS_RXRSSICLK_Pos)
+#define AX5043_PKTMISCFLAGS_RXRSSICLK       AX5043_PKTMISCFLAGS_RXRSSICLK_Msk
+#define AX5043_PKTMISCFLAGS_RXAGCCLK_Pos    (1U)
+#define AX5043_PKTMISCFLAGS_RXAGCCLK_Msk    (0x1U << AX5043_PKTMISCFLAGS_RXAGCCLK_Pos)
+#define AX5043_PKTMISCFLAGS_RXAGCCLK        AX5043_PKTMISCFLAGS_RXAGCCLK_Msk
+#define AX5043_PKTMISCFLAGS_BGNDRSSI_Pos    (2U)
+#define AX5043_PKTMISCFLAGS_BGNDRSSI_Msk    (0x1U << AX5043_PKTMISCFLAGS_BGNDRSSI_Pos)
+#define AX5043_PKTMISCFLAGS_BGNDRSSI        AX5043_PKTMISCFLAGS_BGNDRSSI_Msk
+#define AX5043_PKTMISCFLAGS_AGCSETTLDET_Pos (3U)
+#define AX5043_PKTMISCFLAGS_AGCSETTLDET_Msk (0x1U << AX5043_PKTMISCFLAGS_AGCSETTLDET_Pos)
+#define AX5043_PKTMISCFLAGS_AGCSETTLDET     AX5043_PKTMISCFLAGS_AGCSETTLDET_Msk
+#define AX5043_PKTMISCFLAGS_WORMULTIPKT_Pos (4U)
+#define AX5043_PKTMISCFLAGS_WORMULTIPKT_Msk (0x1U << AX5043_PKTMISCFLAGS_WORMULTIPKT_Pos)
+#define AX5043_PKTMISCFLAGS_WORMULTIPKT     AX5043_PKTMISCFLAGS_WORMULTIPKT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTSTOREFLAGS register fields
+ * @{
+ */
+#define AX5043_PKTSTOREFLAGS_TIMER_Pos      (0U)
+#define AX5043_PKTSTOREFLAGS_TIMER_Msk      (0x1U << AX5043_PKTSTOREFLAGS_TIMER_Pos)
+#define AX5043_PKTSTOREFLAGS_TIMER          AX5043_PKTSTOREFLAGS_TIMER_Msk
+#define AX5043_PKTSTOREFLAGS_FOFFS_Pos      (1U)
+#define AX5043_PKTSTOREFLAGS_FOFFS_Msk      (0x1U << AX5043_PKTSTOREFLAGS_FOFFS_Pos)
+#define AX5043_PKTSTOREFLAGS_FOFFS          AX5043_PKTSTOREFLAGS_FOFFS_Msk
+#define AX5043_PKTSTOREFLAGS_RFOFFS_Pos     (2U)
+#define AX5043_PKTSTOREFLAGS_RFOFFS_Msk     (0x1U << AX5043_PKTSTOREFLAGS_RFOFFS_Pos)
+#define AX5043_PKTSTOREFLAGS_RFOFFS         AX5043_PKTSTOREFLAGS_RFOFFS_Msk
+#define AX5043_PKTSTOREFLAGS_DR_Pos         (3U)
+#define AX5043_PKTSTOREFLAGS_DR_Msk         (0x1U << AX5043_PKTSTOREFLAGS_DR_Pos)
+#define AX5043_PKTSTOREFLAGS_DR             AX5043_PKTSTOREFLAGS_DR_Msk
+#define AX5043_PKTSTOREFLAGS_RSSI_Pos       (4U)
+#define AX5043_PKTSTOREFLAGS_RSSI_Msk       (0x1U << AX5043_PKTSTOREFLAGS_RSSI_Pos)
+#define AX5043_PKTSTOREFLAGS_RSSI           AX5043_PKTSTOREFLAGS_RSSI_Msk
+#define AX5043_PKTSTOREFLAGS_CRCB_Pos       (5U)
+#define AX5043_PKTSTOREFLAGS_CRCB_Msk       (0x1U << AX5043_PKTSTOREFLAGS_CRCB_Pos)
+#define AX5043_PKTSTOREFLAGS_CRCB           AX5043_PKTSTOREFLAGS_CRCB_Msk
+#define AX5043_PKTSTOREFLAGS_ANTRSSI_Pos    (6U)
+#define AX5043_PKTSTOREFLAGS_ANTRSSI_Msk    (0x1U << AX5043_PKTSTOREFLAGS_ANTRSSI_Pos)
+#define AX5043_PKTSTOREFLAGS_ANTRSSI        AX5043_PKTSTOREFLAGS_ANTRSSI_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PKTACCEPTFLAGS register fields
+ * @{
+ */
+#define AX5043_PKTACCEPTFLAGS_RESIDUE_Pos   (0U)
+#define AX5043_PKTACCEPTFLAGS_RESIDUE_Msk   (0x1U << AX5043_PKTACCEPTFLAGS_RESIDUE_Pos)
+#define AX5043_PKTACCEPTFLAGS_RESIDUE       AX5043_PKTACCEPTFLAGS_RESIDUE_Msk
+#define AX5043_PKTACCEPTFLAGS_ABRT_Pos      (1U)
+#define AX5043_PKTACCEPTFLAGS_ABRT_Msk      (0x1U << AX5043_PKTACCEPTFLAGS_ABRT_Pos)
+#define AX5043_PKTACCEPTFLAGS_ABRT          AX5043_PKTACCEPTFLAGS_ABRT_Msk
+#define AX5043_PKTACCEPTFLAGS_CRCF_Pos      (2U)
+#define AX5043_PKTACCEPTFLAGS_CRCF_Msk      (0x1U << AX5043_PKTACCEPTFLAGS_CRCF_Pos)
+#define AX5043_PKTACCEPTFLAGS_CRCF          AX5043_PKTACCEPTFLAGS_CRCF_Msk
+#define AX5043_PKTACCEPTFLAGS_ADDRF_Pos     (3U)
+#define AX5043_PKTACCEPTFLAGS_ADDRF_Msk     (0x1U << AX5043_PKTACCEPTFLAGS_ADDRF_Pos)
+#define AX5043_PKTACCEPTFLAGS_ADDRF         AX5043_PKTACCEPTFLAGS_ADDRF_Msk
+#define AX5043_PKTACCEPTFLAGS_SZF_Pos       (4U)
+#define AX5043_PKTACCEPTFLAGS_SZF_Msk       (0x1U << AX5043_PKTACCEPTFLAGS_SZF_Pos)
+#define AX5043_PKTACCEPTFLAGS_SZF           AX5043_PKTACCEPTFLAGS_SZF_Msk
+#define AX5043_PKTACCEPTFLAGS_LRGP_Pos      (5U)
+#define AX5043_PKTACCEPTFLAGS_LRGP_Msk      (0x1U << AX5043_PKTACCEPTFLAGS_LRGP_Pos)
+#define AX5043_PKTACCEPTFLAGS_LRGP          AX5043_PKTACCEPTFLAGS_LRGP_Msk
+/** @} */
+
+/**
+ * @name    AX5043 GPADCCTRL register fields
+ * @{
+ */
+#define AX5043_GPADCCTRL_CHISOL_Pos         (0U)
+#define AX5043_GPADCCTRL_CHISOL_Msk         (0x1U << AX5043_GPADCCTRL_CHISOL_Pos)
+#define AX5043_GPADCCTRL_CHISOL             AX5043_GPADCCTRL_CHISOL_Msk
+#define AX5043_GPADCCTRL_CONT_Pos           (1U)
+#define AX5043_GPADCCTRL_CONT_Msk           (0x1U << AX5043_GPADCCTRL_CONT_Pos)
+#define AX5043_GPADCCTRL_CONT               AX5043_GPADCCTRL_CONT_Msk
+#define AX5043_GPADCCTRL_GPADC13_Pos        (2U)
+#define AX5043_GPADCCTRL_GPADC13_Msk        (0x1U << AX5043_GPADCCTRL_GPADC13_Pos)
+#define AX5043_GPADCCTRL_GPADC13            AX5043_GPADCCTRL_GPADC13_Msk
+#define AX5043_GPADCCTRL_BUSY_Pos           (7U)
+#define AX5043_GPADCCTRL_BUSY_Msk           (0x1U << AX5043_GPADCCTRL_BUSY_Pos)
+#define AX5043_GPADCCTRL_BUSY               AX5043_GPADCCTRL_BUSY_Msk
+/** @} */
+
+/**
+ * @name    AX5043 GPADCPERIOD register fields
+ * @{
+ */
+#define AX5043_GPADCPERIOD_Pos              (0U)
+#define AX5043_GPADCPERIOD_Msk              (0xFFU << AX5043_GPADCPERIOD_Pos)
+#define AX5043_GPADCPERIOD                  AX5043_GPADCPERIOD_Msk
+/** @} */
+
+/**
+ * @name    AX5043 GPADC13VALUE register fields
+ * @{
+ */
+#define AX5043_GPADC13VALUE_Pos             (0U)
+#define AX5043_GPADC13VALUE_Msk             (0x3FFU << AX5043_GPADC13VALUE_Pos)
+#define AX5043_GPADC13VALUE                 AX5043_GPADC13VALUE_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCCONFIG register fields
+ * @{
+ */
+#define AX5043_LPOSCCONFIG_ENA_Pos          (0U)
+#define AX5043_LPOSCCONFIG_ENA_Msk          (0x1U << AX5043_LPOSCCONFIG_ENA_Pos)
+#define AX5043_LPOSCCONFIG_ENA              AX5043_LPOSCCONFIG_ENA_Msk
+#define AX5043_LPOSCCONFIG_FAST_Pos         (1U)
+#define AX5043_LPOSCCONFIG_FAST_Msk         (0x1U << AX5043_LPOSCCONFIG_FAST_Pos)
+#define AX5043_LPOSCCONFIG_FAST             AX5043_LPOSCCONFIG_FAST_Msk
+/* TODO: Verify which bit is IRQF/IRQR, manual is inconsistent */
+#define AX5043_LPOSCCONFIG_IRQF_Pos         (2U)
+#define AX5043_LPOSCCONFIG_IRQF_Msk         (0x1U << AX5043_LPOSCCONFIG_IRQF_Pos)
+#define AX5043_LPOSCCONFIG_IRQF             AX5043_LPOSCCONFIG_IRQF_Msk
+#define AX5043_LPOSCCONFIG_IRQR_Pos         (3U)
+#define AX5043_LPOSCCONFIG_IRQR_Msk         (0x1U << AX5043_LPOSCCONFIG_IRQR_Pos)
+#define AX5043_LPOSCCONFIG_IRQR             AX5043_LPOSCCONFIG_IRQR_Msk
+#define AX5043_LPOSCCONFIG_CALIBF_Pos       (4U)
+#define AX5043_LPOSCCONFIG_CALIBF_Msk       (0x1U << AX5043_LPOSCCONFIG_CALIBF_Pos)
+#define AX5043_LPOSCCONFIG_CALIBF           AX5043_LPOSCCONFIG_CALIBF_Msk
+#define AX5043_LPOSCCONFIG_CALIBR_Pos       (5U)
+#define AX5043_LPOSCCONFIG_CALIBR_Msk       (0x1U << AX5043_LPOSCCONFIG_CALIBR_Pos)
+#define AX5043_LPOSCCONFIG_CALIBR           AX5043_LPOSCCONFIG_CALIBR_Msk
+#define AX5043_LPOSCCONFIG_OSCDOUBLE_Pos    (6U)
+#define AX5043_LPOSCCONFIG_OSCDOUBLE_Msk    (0x1U << AX5043_LPOSCCONFIG_OSCDOUBLE_Pos)
+#define AX5043_LPOSCCONFIG_OSCDOUBLE        AX5043_LPOSCCONFIG_OSCDOUBLE_Msk
+#define AX5043_LPOSCCONFIG_OSCINVERT_Pos    (7U)
+#define AX5043_LPOSCCONFIG_OSCINVERT_Msk    (0x1U << AX5043_LPOSCCONFIG_OSCINVERT_Pos)
+#define AX5043_LPOSCCONFIG_OSCINVERT        AX5043_LPOSCCONFIG_OSCINVERT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCSTATUS register fields
+ * @{
+ */
+#define AX5043_LPOSCSTATUS_EDGE_Pos         (0U)
+#define AX5043_LPOSCSTATUS_EDGE_Msk         (0x1U << AX5043_LPOSCSTATUS_EDGE_Pos)
+#define AX5043_LPOSCSTATUS_EDGE             AX5043_LPOSCSTATUS_EDGE_Msk
+#define AX5043_LPOSCSTATUS_IRQ_Pos          (1U)
+#define AX5043_LPOSCSTATUS_IRQ_Msk          (0x1U << AX5043_LPOSCSTATUS_IRQ_Pos)
+#define AX5043_LPOSCSTATUS_IRQ              AX5043_LPOSCSTATUS_IRQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCFILT register fields
+ * @{
+ */
+#define AX5043_LPOSCFILT_Pos                (0U)
+#define AX5043_LPOSCFILT_Msk                (0xFFFFU << AX5043_LPOSCFILT_Pos)
+#define AX5043_LPOSCFILT                    AX5043_LPOSCFILT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCREF register fields
+ * @{
+ */
+#define AX5043_LPOSCREF_Pos                 (0U)
+#define AX5043_LPOSCREF_Msk                 (0xFFFFU << AX5043_LPOSCREF_Pos)
+#define AX5043_LPOSCREF                     AX5043_LPOSCREF_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCFREQ register fields
+ * TODO:    Verify the field width here
+ * @{
+ */
+#define AX5043_LPOSCFREQ_Pos                (0U)
+#define AX5043_LPOSCFREQ_Msk                (0x3FFU << AX5043_LPOSCFREQ_Pos)
+#define AX5043_LPOSCFREQ                    AX5043_LPOSCFREQ_Msk
+/** @} */
+
+/**
+ * @name    AX5043 LPOSCPER register fields
+ * @{
+ */
+#define AX5043_LPOSCPER_Pos                 (0U)
+#define AX5043_LPOSCPER_Msk                 (0xFFFFU << AX5043_LPOSCPER_Pos)
+#define AX5043_LPOSCPER                     AX5043_LPOSCPER_Msk
+/** @} */
+
+/**
+ * @name    AX5043 DACVALUE register fields
+ * @{
+ */
+#define AX5043_DACVALUE_Pos                 (0U)
+#define AX5043_DACVALUE_Msk                 (0xFFFU << AX5043_DACVALUE_Pos)
+#define AX5043_DACVALUE                     AX5043_DACVALUE_Msk
+#define AX5043_DACVALUE_DACSHIFT_Pos        (0U)
+#define AX5043_DACVALUE_DACSHIFT_Msk        (0xFU << AX5043_DACVALUE_DACSHIFT_Pos)
+#define AX5043_DACVALUE_DACSHIFT            AX5043_DACVALUE_DACSHIFT_Msk
+/** @} */
+
+/**
+ * @name    AX5043 DACCONFIG register fields
+ * @{
+ */
+#define AX5043_DACCONFIG_DACINPUT_Pos       (0U)
+#define AX5043_DACCONFIG_DACINPUT_Msk       (0xFU << AX5043_DACCONFIG_DACINPUT_Pos)
+#define AX5043_DACCONFIG_DACINPUT           AX5043_DACCONFIG_DACINPUT_Msk
+#define AX5043_DACINPUT_DACVALUER           (0x0U)
+#define AX5043_DACINPUT_TRKAMPLITUDE        (0x1U)
+#define AX5043_DACINPUT_TRKRFFREQUENCY      (0x2U)
+#define AX5043_DACINPUT_TRKFREQUENCY        (0x3U)
+#define AX5043_DACINPUT_FSKDEMOD            (0x4U)
+#define AX5043_DACINPUT_AFSKDEMOD           (0x5U)
+#define AX5043_DACINPUT_RXSOFTDATA          (0x6U)
+#define AX5043_DACINPUT_RSSI                (0x7U)
+#define AX5043_DACINPUT_SAMPLE_ROT_I        (0x8U)
+#define AX5043_DACINPUT_SAMPLE_ROT_Q        (0x9U)
+#define AX5043_DACINPUT_GPADC13             (0xCU)
+#define AX5043_DACCONFIG_DACCLKX2_Pos       (6U)
+#define AX5043_DACCONFIG_DACCLKX2_Msk       (0x1U << AX5043_DACCONFIG_DACCLKX2_Pos)
+#define AX5043_DACCONFIG_DACCLKX2           AX5043_DACCONFIG_DACCLKX2_Msk
+#define AX5043_DACCONFIG_DACPWM_Pos         (7U)
+#define AX5043_DACCONFIG_DACPWM_Msk         (0x1U << AX5043_DACCONFIG_DACPWM_Pos)
+#define AX5043_DACCONFIG_DACPWM             AX5043_DACCONFIG_DACPWM_Msk
+/** @} */
+
+/**
+ * @name    AX5043 PERFTUNE registers
+ * @{
+ */
+#define AX5043_0xF00_VAL                    (0x0FU)
+#define AX5043_0xF0C_VAL                    (0x00U)
+#define AX5043_0xF0D_VAL                    (0x03U)
+#define AX5043_0xF10_CRYSTAL                (0x03U)
+#define AX5043_0xF10_TCXO                   (0x04U)
+#define AX5043_0xF10_GT_43MHZ               (0x0DU)
+#define AX5043_0xF11_TCXO                   (0x00U)
+#define AX5043_0xF11_CRYSTAL                (0x07U)
+#define AX5043_0xF1C_VAL                    (0x07U)
+#define AX5043_0xF21_VAL                    (0x5CU)
+#define AX5043_0xF22_VAL                    (0x53U)
+#define AX5043_0xF23_VAL                    (0x76U)
+#define AX5043_0xF26_VAL                    (0x92U)
+#define AX5043_0xF30_VAL                    (0x3FU)
+#define AX5043_0xF31_VAL                    (0xF0U)
+#define AX5043_0xF32_VAL                    (0x3FU)
+#define AX5043_0xF33_VAL                    (0xF0U)
+#define AX5043_0xF34_NORFDIV                (0x08U)
+#define AX5043_0xF34_RFDIV                  (0x28U)
+#define AX5043_0xF35_XTALDIV1               (0x10U)
+#define AX5043_0xF35_XTALDIV2               (0x11U)
+#define AX5043_0xF44_VAL                    (0x24U)
+#define AX5043_0xF72_NORAWSOFTBITS          (0x00U)
+#define AX5043_0xF72_RAWSOFTBITS            (0x06U)
+/** @} */
+
+/**
+ * AX5043 FIFO Chunk Encodings
+ *
+ * TODO: Overhaul this stuff
+ * It should probably be structs defining the various types of headers
  *
  */
+/*
 #define AX5043_FIFOCMD_NOP      0x00
 #define AX5043_FIFOCMD_DATA     0x01
 #define AX5043_FIFOCMD_REPEATDATA 0x02
@@ -420,9 +2280,6 @@
 #define AX5043_FIFOCMD_TXCTRL   0x1C
 #define AX5043_FIFOCMD_TXPWR    0x1D
 
-/**
- * @brief  FIFO commit command
- */
 #define AX5043_FIFO_COMMIT_CMD          (1 << 2)
 #define AX5043_FIFO_PKTSTART            1
 #define AX5043_FIFO_PKTEND              (1 << 1)
@@ -430,6 +2287,7 @@
 #define AX5043_FIFO_RAW                 (1 << 4)
 
 #define PKTDATA_BUFLEN 260
+*/
 
 /**
  * @brief  Error codes
@@ -606,6 +2464,10 @@ typedef enum {
 
 #if AX5043_USE_SPI && !HAL_USE_SPI
 #error "AX5043_USE_SPI requires HAL_USE_SPI"
+#endif
+
+#if AX5043_SHARED_I2C && !I2C_USE_MUTUAL_EXCLUSION
+#error "AX5043_SHARED_I2C requires I2C_USE_MUTUAL_EXCLUSION"
 #endif
 
 /*===========================================================================*/
