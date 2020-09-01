@@ -3,15 +3,29 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
-#define CURR_LSB           20  /* 20uA/bit */
+/* Defines for INA226 */
+#define CURR_LSB           30  /* 20uA/bit */
 #define RSENSE             100 /* 0.1 ohm  */
-#define SLEEP_MS           500                //TODO: decrese the value. This is for testing.
-#define STEP_SIZE          1
-#define CURR_THRES_SENS    20  /* 20 uA. Current Threshold Sensitivity */
-#define MIN_STEP_SIZE      1
-#define MAX_STEP_SIZE      25
-#define STEP_SIZE_FACTOR   3
-#define DAC_VDDA_MV        3333 /* 3.333 mV and 3.0 mv when powered from debug board */
+#define DAC_VDDA_UV        3333000 /* 3.333 V. Chgange to 3.0 v when powered from debug board */
+
+/*Defines for MPPT algorithm speed*/
+#define SLEEP_MS           10                
+
+/*Defines for MPPT algorithm that changes with each solar cell variant */
+/*Things to note
+ * Negative step size needs to be greater as the curve falls quickly.
+ * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
+ */ 
+#define PVE_STEP_SIZE          0        /* +ve step size for constant current condition */
+#define NVE_STEP_SIZE          5000     /* -ve step size for constant current condition */
+#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces noise in current. */
+#define MAX_STEP_SIZE          5000     /* 25000uA or 25 mA. Maximum step size for variable step IC.*/
+#define STEP_SIZE_FACTOR       1000     /* Posive step factor.*/
+#define NVE_STEP_SIZE_FACTOR   5        /* Negative step factor. This is multipled with Positive step factor*/
+#define MIN_PV_CURRENT         5000     /* 5000 uA or 5 mA */
+#define MAX_PV_CURRENT         500000   /* 500000 uA or 500 mA */
+
+
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -35,8 +49,8 @@ static const INA226Config ina226config = {
     &i2cconfig,
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
-    INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
-    INA226_CONFIG_AVG_16,                   //MUST change it to 16.
+    INA226_CONFIG_VSHCT_140US | INA226_CONFIG_VBUSCT_140US |
+    INA226_CONFIG_AVG_16,                   
     (5120000/(RSENSE*CURR_LSB)),
     CURR_LSB
 };
@@ -51,27 +65,26 @@ static const DACConfig dac1cfg = {
 static INA226Driver ina226dev;
 
 /**
- * @brief control DAC output in millivolts.
+ * @brief control DAC output in microvolts.
  * @param[in] dacp      DAC driver pointer.
  * @param[in] chan      DAC channel.
- * @param[in] mv        output volts in mv.
- * @param[in] busv      bus volts in mv.
- * 
+ * @param[in] uv        output volts in uv (microVolts).
  */
  
-void dacPutMillivolts(DACDriver *dacp, dacchannel_t chan, uint32_t mv) {
+void dacPutMillivolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
     /* Per section 14.5.3 of the STM32F0x1 ref manual,
      * Vout(mV) = VDDA(mV) * (reg_val / 4096)
      * so, reg_val = (Vout * 4096) / VDDA
      */
-    dacsample_t val = (mv << 12) / DAC_VDDA_MV;
+    dacsample_t val = ((uv/100) << 12) / (DAC_VDDA_UV/100);
     dacPutChannelX(dacp, chan, val);
 }
 
+
 /**
  * @brief Calculates Iadj_v required for a particular max current.
- * @param[in] i_out      current in mA.
- * @return    Iadj_v     DAC output in millivolts.
+ * @param[in] i_out      current in uA.
+ * @return    Iadj_v     DAC output in microvolts.
  */    
 uint32_t calc_iadj(uint32_t i_out)
 {
@@ -80,12 +93,13 @@ uint32_t calc_iadj(uint32_t i_out)
    * => 25 * i_out * Rsense  = 1.263 - 0.8 * V_iadj
    * Multiplying 4000 on both sides
    * 100000 * i_out * Rsense = 5052 - 3200 * V_iadj
-   * Now i_out is in mA, Rsense is in mOhm and V_iadj is in mV
-   * => 100000 * i_out/1000 * Rsense/1000 = 5052 - 3200 * V_iadj/1000
-   * => 100 * i_out * Rsense = 5052000 - 3200 * V_iadj
+   * Now i_out is in uA, Rsense is in mOhm and V_iadj is in uV
+   * => 100000 * i_out/1000000 * Rsense/1000 = 5052 - 3200 * V_iadj/1000000
+   * => 100 * i_out * Rsense = 5052000000 - 3200 * V_iadj
+   * => i_out * Rsense = 50520000 - 32 * V_iadj
    * => V_adj = (5052000 - i_out * Rsense * 100)/3200
    */
-  return ((5052000 - i_out * RSENSE * 100) / 3200);
+  return ((50520000 - i_out * RSENSE) / 32);
 }
 
 /**
@@ -93,7 +107,7 @@ uint32_t calc_iadj(uint32_t i_out)
  * @param[in] volt      Solar cell bus voltage in mV.
  * @param[in] curr      Solar cell current in uA.
  * @param[in] pwr       Power output from solar cells in microWatts. 
- * @return Maximum current to be drawn from solar cells in mA
+ * @return Maximum current to be drawn from solar cells in uA
  * TODO: Find min/max limits of step size. Also check the units that work the best
  *       Average a few samples to reduce noise
  *       reduce max current limit immediatly if current is lower that the allowed current.(brownout condition)
@@ -110,9 +124,12 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     /* programmed max current from previous iteration*/
     /* TODO: Update algorithm to use it to save from high to low illumination*/
     static int32_t i_in;
+    static int32_t prev_i_in;
+    //static int32_t prev_dp_di;
     
-    /* Simple IC MPPT Algorithm */
-    /* This should be run first to check step size and confirm other DAC and other working */
+    static int k=0;   //remove after debuging
+    
+    /* Variable Step IC MPPT Algorithm */
     int32_t delta_v = volt - prev_volt;
     int32_t delta_i = curr - prev_curr;
     int32_t delta_p = pwr  - prev_pwr;
@@ -120,83 +137,61 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t dp_di;
     int32_t step_size;
     
+    if (curr < 0.8 * i_in)  {                 
+      i_in = 0.8*curr;
+      return i_in;
+    }
     
-    if (delta_i < CURR_THRES_SENS && delta_i > -CURR_THRES_SENS) {                                // We may need to comment this portion if algorithm is unstable.
-        if (delta_i != 0) {
-            if (delta_v > 0) {
-                i_in += STEP_SIZE;
-            } else {
-                i_in -= STEP_SIZE;
-            }
-        }     
+    if (curr > 1.2 * i_in)  {               
+      i_in = curr;
+      return i_in;
+    }
+    
+    if ((prev_i_in-i_in) == 0 && (delta_p < 0 || delta_i <0 || delta_v<0)) {
+      prev_i_in = i_in;                                
+      i_in -= NVE_STEP_SIZE;  
     } else {
-		dp_di = (delta_p*1000)/delta_i;
-		//chprintf((BaseSequentialStream *) &SD2, "dp_di: %d , \r\n", dp_di);
-		/*
-        if (dp_di != 0) {
-            if (dp_di > 1000) {
-                i_in += STEP_SIZE;   
-            } 
-            if (dp_di < 1000) {
-                i_in -= 4*STEP_SIZE;    
+      prev_i_in = i_in;
+      if (delta_i > CURR_THRES_SENS || delta_i < -CURR_THRES_SENS) {        
+		    dp_di = (delta_p*1000)/delta_i;
+        step_size = (dp_di * STEP_SIZE_FACTOR)/volt;   
+                
+        if (dp_di > 4000) {
+          if(step_size > MAX_STEP_SIZE) {
+            i_in += MAX_STEP_SIZE;
+          }else{
+            i_in += step_size;
+          }
+        } else {
+          i_in -= 2000;
+          if (dp_di < 0) {
+            if(step_size < (-1)*MAX_STEP_SIZE) {
+              i_in -= MAX_STEP_SIZE;
+            }else{
+              i_in += NVE_STEP_SIZE_FACTOR*step_size;
             }
+          }
         }
-        */
-        /* Variable step algorithm. Comment above line if using below logic. */ 
-        
-        step_size = (dp_di*STEP_SIZE_FACTOR)/volt;
-        chprintf((BaseSequentialStream *) &SD2, "dp_di: %d, step size: %d , \r\n", dp_di, step_size);
-        
-        if (dp_di != 0) {
-            if (dp_di > 0) {
-              if(step_size > MIN_STEP_SIZE) {
-                if(step_size > MAX_STEP_SIZE) {
-                  i_in += MAX_STEP_SIZE;
-                }else{
-                  i_in += step_size;
-                }
-              }
-            } else {
-              if(step_size < (-1)*MIN_STEP_SIZE) {
-                if(step_size < (-1)*MAX_STEP_SIZE) {
-                  i_in -= MAX_STEP_SIZE;
-                }else{
-                  i_in += 3*step_size;
-                }
-              }
-            }
-        } 
+      }
     } 
+
+    //if(k>50){
+    //  chprintf((BaseSequentialStream *) &SD2, "\r\n dp_di: %d, step: %d, dp: %d, di: %d, volt: %d, pwr: %d, i_in: %d, prev_i_in: %d,\r\n", dp_di, step_size,delta_p, delta_i, volt, pwr, i_in, prev_i_in );
+    //  k=0;
+    //}
+    //k++;
        
     prev_volt = volt;
     prev_curr = curr;
     prev_pwr  = pwr;
     /* End IC MPPT Algorithm */
-    
 
-    
-    /* Compare the actual vs the allowed current */
-    /* Below is if the actual current is much lower that allowed current*/
-    
-    if (curr/1000 < 0.8 * i_in)  {                 //Uncomment it after algorithm test.
-      //i_in = 0.8*curr/1000;
-    }
-    
-    
-    /* Below is if the actual current is much higher than allowed current*/
-    
-    if (curr/1000 > 1.5 * i_in)  {                 //Uncomment it after algorithm test.
-      //i_in = 1.25 * i_in;
-      //i_in = curr/1000;
-    }
-     
-    
     /* bounds checks for current */
-    if (i_in < 5) {
-      i_in = 5;
+    if (i_in < MIN_PV_CURRENT) {
+      i_in = MIN_PV_CURRENT;
     }
-    if (i_in > 500) {
-      i_in = 500;
+    if (i_in > MAX_PV_CURRENT) {
+      i_in = MAX_PV_CURRENT;
     } 
     return i_in;
 }
@@ -209,7 +204,7 @@ THD_FUNCTION(solar, arg)
     int32_t voltage, current, power;
     uint32_t iadj_v = 1500;
     uint32_t i_in=0;
-    int i=0;                          //TODO: Delete this. For finding number of iterations until steady state.
+    int i=0, j=0;                          //TODO: Delete this. For finding number of iterations until steady state.
     
     
     /* Start up drivers */
@@ -237,15 +232,21 @@ THD_FUNCTION(solar, arg)
       OD_solarPanel.power   = power  ;
       
       //chprintf((BaseSequentialStream *) &SD2, "\r\nVolt: 0x%X, Current: 0x%X, Power: 0x%X, \r\n", OD_solarPanel.voltage, OD_solarPanel.current, OD_solarPanel.power);
-      chprintf((BaseSequentialStream *) &SD2, "\r\nIteration: %d, Volt: %d mv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+
       
       
       /* Calculate max input current drawn from solar cells. This is used to calculate iadj. */
       i_in = calc_mppt(voltage, current, power);
-      //i_in = 30;
       iadj_v = calc_iadj(i_in);
       dacPutMillivolts(&DACD1, 0, iadj_v) ;
-      chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d ma, Bias Volt: %d mv, \r\n", i_in, iadj_v);
+      
+      if (j >= 500){
+        chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d mv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+        chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_v);
+        j=0;
+      }
+      j++;
+      
       i++;
       
       
