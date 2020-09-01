@@ -16,10 +16,10 @@
  * Negative step size needs to be greater as the curve falls quickly.
  * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
  */ 
-#define PVE_STEP_SIZE          0        /* +ve step size for constant current condition */
+#define MIN_DP_DI              4000     /* The most important piece. This keeps the point to the left of MPPT. */ 
 #define NVE_STEP_SIZE          5000     /* -ve step size for constant current condition */
-#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces noise in current. */
-#define MAX_STEP_SIZE          5000     /* 25000uA or 25 mA. Maximum step size for variable step IC.*/
+#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
+#define MAX_STEP_SIZE          5000     /* Maximum step size for variable step IC.*/
 #define STEP_SIZE_FACTOR       1000     /* Posive step factor.*/
 #define NVE_STEP_SIZE_FACTOR   5        /* Negative step factor. This is multipled with Positive step factor*/
 #define MIN_PV_CURRENT         5000     /* 5000 uA or 5 mA */
@@ -121,15 +121,14 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     static int32_t prev_volt = 0;
     static int32_t prev_curr = 0;
     static int32_t prev_pwr = 0;
-    /* programmed max current from previous iteration*/
-    /* TODO: Update algorithm to use it to save from high to low illumination*/
+    
+    /* programmed max allowed current from current and previous iteration*/
     static int32_t i_in;
     static int32_t prev_i_in;
     //static int32_t prev_dp_di;
     
     static int k=0;   //remove after debuging
     
-    /* Variable Step IC MPPT Algorithm */
     int32_t delta_v = volt - prev_volt;
     int32_t delta_i = curr - prev_curr;
     int32_t delta_p = pwr  - prev_pwr;
@@ -137,17 +136,23 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t dp_di;
     int32_t step_size;
     
+    /*Handles sudden decrease in illumination */ 
     if (curr < 0.8 * i_in)  {                 
       i_in = 0.8*curr;
       return i_in;
     }
     
+    /*Handles sudden decrease in load*/
     if (curr > 1.2 * i_in)  {               
       i_in = curr;
       return i_in;
     }
     
+    /* Variable Step IC MPPT Algorithm */
     if ((prev_i_in-i_in) == 0 && (delta_p < 0 || delta_i <0 || delta_v<0)) {
+      /* decrease current if power/current decreases without being specified. 
+       * closed loop control.
+       */ 
       prev_i_in = i_in;                                
       i_in -= NVE_STEP_SIZE;  
     } else {
@@ -156,7 +161,7 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
 		    dp_di = (delta_p*1000)/delta_i;
         step_size = (dp_di * STEP_SIZE_FACTOR)/volt;   
                 
-        if (dp_di > 4000) {
+        if (dp_di > MIN_DP_DI) {  
           if(step_size > MAX_STEP_SIZE) {
             i_in += MAX_STEP_SIZE;
           }else{
@@ -206,7 +211,6 @@ THD_FUNCTION(solar, arg)
     uint32_t i_in=0;
     int i=0, j=0;                          //TODO: Delete this. For finding number of iterations until steady state.
     
-    
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
     dacStart(&DACD1, &dac1cfg);
@@ -214,7 +218,6 @@ THD_FUNCTION(solar, arg)
 
     palSetLine(LINE_LED);
     palSetLine(LINE_SHDN_LT1618);
-    
     
     chprintf((BaseSequentialStream *) &SD2, "\r\n ****** Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
     while(!chThdShouldTerminateX()){
