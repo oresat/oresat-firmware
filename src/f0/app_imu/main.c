@@ -21,9 +21,10 @@
 /* Project header files */
 #include "oresat.h"
 #include "blink.h"
-#include "bmi088.h"
+#include "imu.h"
 
 static worker_t worker1;
+static worker_t worker2;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -37,8 +38,10 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, false);
+    init_worker(&worker1, "Blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
     reg_worker(&worker1);
+    init_worker(&worker2, "IMU test thread", imu_wa, sizeof(imu_wa), NORMALPRIO, imu, NULL, true);
+    reg_worker(&worker2);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);

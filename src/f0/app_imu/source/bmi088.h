@@ -899,8 +899,6 @@ extern "C" {
 void bmi088ObjectInit(BMI088Driver *devp);
 void bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
-uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg);
-bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
 uint8_t bmi088ReadChipId(BMI088Driver *devp);
 uint8_t bmi088ReadErrCode(BMI088Driver *devp);
 uint8_t bmi088ReadErrFatal(BMI088Driver *devp);
