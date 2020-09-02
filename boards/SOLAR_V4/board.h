@@ -61,7 +61,7 @@
  * IO pins assignments.
  */
 #define GPIOA_LED                   0U
-#define GPIOA_SHDN_STM              1U
+#define GPIOA_SHDN_LT1618           1U
 #define GPIOA_USART2_TX             2U
 #define GPIOA_USART2_RX             3U
 #define GPIOA_IADJ                  4U
@@ -246,7 +246,7 @@
  * GPIOA setup:
  *
  * PA0  - LED                       (output pushpull).
- * PA1  - SHDN_STM                  (output pushpull).
+ * PA1  - SHDN_LT1618               (output pushpull).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - IADJ                      (analog).
@@ -263,7 +263,7 @@
  * PA15 - PIN15                     (analog).
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_OUTPUT(GPIOA_LED) |           \
-                                     PIN_MODE_OUTPUT(GPIOA_SHDN_STM) |      \
+                                     PIN_MODE_OUTPUT(GPIOA_SHDN_LT1618) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_ANALOG(GPIOA_IADJ) |          \
@@ -279,7 +279,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SWCLK) |      \
                                      PIN_MODE_ANALOG(GPIOA_PIN15))
 #define VAL_GPIOA_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOA_LED) |        \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_SHDN_STM) |   \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_SHDN_LT1618) |\
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_IADJ) |       \
@@ -295,7 +295,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SWCLK) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN15))
 #define VAL_GPIOA_OSPEEDR           (PIN_OSPEED_HIGH(GPIOA_LED) |           \
-                                     PIN_OSPEED_HIGH(GPIOA_SHDN_STM) |      \
+                                     PIN_OSPEED_HIGH(GPIOA_SHDN_LT1618) |   \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_IADJ) |          \
@@ -311,7 +311,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
-                                     PIN_PUPDR_PULLDOWN(GPIOA_SHDN_STM) |   \
+                                     PIN_PUPDR_PULLDOWN(GPIOA_SHDN_LT1618) |\
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_IADJ) |       \
@@ -327,7 +327,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN15))
 #define VAL_GPIOA_ODR               (PIN_ODR_LOW(GPIOA_LED) |               \
-                                     PIN_ODR_LOW(GPIOA_SHDN_STM) |         \
+                                     PIN_ODR_LOW(GPIOA_SHDN_LT1618) |       \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
                                      PIN_ODR_HIGH(GPIOA_IADJ) |             \
@@ -343,7 +343,7 @@
                                      PIN_ODR_HIGH(GPIOA_SWCLK) |            \
                                      PIN_ODR_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_LED, 0U) |           \
-                                     PIN_AFIO_AF(GPIOA_SHDN_STM, 0U) |      \
+                                     PIN_AFIO_AF(GPIOA_SHDN_LT1618, 0U) |   \
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_IADJ, 0U) |          \
