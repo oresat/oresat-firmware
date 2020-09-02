@@ -21,26 +21,38 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "wdt.h"
 #include "opd.h"
+#include "time_sync.h"
 #include "command.h"
+#include "CO_master.h"
 
 /*
- * Workers
- */
-static worker_t shell_worker;
+static const oresat_node_t nodes[] = {
+    {0x02, 0x00, 2000, "Battery 1"},
+    {0x03, 0x00, 2000, "Battery 2"},
+    {0x04, 0x00, 2000, "Solar Panel 1"},
+    {0x05, 0x00, 2000, "Solar Panel 2"},
+    {0x06, 0x00, 2000, "Solar Panel 3"},
+    {0x07, 0x00, 2000, "Solar Panel 4"},
+    {0x08, 0x00, 2000, "Solar Panel 5"},
+    {0x09, 0x00, 2000, "Solar Panel 6"},
+    {0x0A, 0x00, 2000, "Solar Panel 7"},
+    {0x0B, 0x00, 2000, "Solar Panel 8"},
+    {0x31, 0x18, 2000, "Protocard 1"},
+    {0x32, 0x19, 2000, "Protocard 2"},
+    {0x33, 0x1A, 2000, "Protocard 3"},
+    {0x11, 0x1D, 2000, "Star Tracker"}
+};
+*/
 
 /*
  * Working area for driver.
  */
-static uint8_t sd_scratchpad[512];
 
-/*
- * SDIO configuration.
- */
-static const SDCConfig sdccfg = {
-  sd_scratchpad,
-  SDC_MODE_4BIT
-};
+
+static worker_t wdt_worker;
+static worker_t cmd_worker;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -53,20 +65,27 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* App initialization */
-    init_worker(&shell_worker, "Command Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL);
-    reg_worker(&shell_worker);
+    /* Initialize WDT worker thread */
+    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
+    reg_worker(&wdt_worker);
+
+    /* Initialize shell worker thread */
+    init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
+    reg_worker(&cmd_worker);
 
     /* Initialize OPD */
     opd_init();
-    opd_start();
+    /*opd_start();*/
+
+    /* Initialize SDO client */
+    sdo_init();
 
     /* Initialize shell and start serial interface */
     shellInit();
-    sdStart(&SD2, NULL);
+    sdStart(&SD3, NULL);
 
-    /* Initializes SDIO drivers */
-    sdcStart(&SDCD1, &sdccfg);
+    /* Configure SCET time object */
+    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
 }
 
 /**

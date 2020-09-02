@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -107,6 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/CO_master.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk

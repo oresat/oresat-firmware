@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = no
+  USE_FPU = hard
 endif
 
 # FPU-related options.
@@ -87,7 +87,7 @@ PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ORESAT_C3_V3
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -108,6 +108,9 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/opd.mk
+include $(PROJ_SRC)/time_sync.mk
+include $(PROJ_SRC)/CO_master.mk
+include $(PROJ_SRC)/littlefs.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -137,6 +140,7 @@ LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
+       $(CHIBIOS)/os/various/syscalls.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -167,7 +171,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C
+UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DLFS_CONFIG=lfs_util_custom.h
 
 # Define ASM defines here
 UADEFS =

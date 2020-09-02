@@ -1,7 +1,9 @@
 [submodule "ChibiOS"]
-	path = ChibiOS
+	path = ext/ChibiOS
 	url = https://github.com/ChibiOS/ChibiOS.git
 [submodule "common/CANopenNode"]
-	path = common/CANopenNode
-	url = https://github.com/heliochronix/CANopenNode.git
-	branch = master
+	path = ext/CANopenNode
+	url = https://github.com/CANopenNode/CANopenNode.git
+[submodule "ext/littlefs"]
+	path = ext/littlefs
+	url = git@github.com:ARMmbed/littlefs.git

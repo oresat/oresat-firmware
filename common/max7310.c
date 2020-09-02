@@ -49,7 +49,7 @@ typedef union {
 msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
         uint8_t* rxbuf, size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+            TIME_MS2I(10));
 }
 
 /**
@@ -67,7 +67,7 @@ msg_t max7310I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
 msg_t max7310I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-            TIME_INFINITE);
+            TIME_MS2I(10));
 }
 #endif /* MAX7310_USE_I2C */
 

@@ -36,7 +36,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    init_worker(&worker1, "Example thread", waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL, false);
     reg_worker(&worker1);
 
     /* Start up debug output */
