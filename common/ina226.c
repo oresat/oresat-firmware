@@ -252,16 +252,16 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
  * @brief   Reads INA226 Shunt voltage.
  *
  * @param[in] devp       Pointer to the @p INA226Driver object
- * @return               Shunt voltage in 1uV increments
+ * @return               Shunt voltage in 0.1uV increments
  *
  * @api
  */
-int32_t ina226ReadShunt(INA226Driver *devp) {
-    int32_t voltage;
+int16_t ina226ReadShunt(INA226Driver *devp) {
+    int16_t voltage;
 
     osalDbgCheck(devp != NULL);
 
-    voltage = (int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT) * 2.5;
+    voltage = ina226ReadRaw(devp, INA226_AD_SHUNT) * 25;
 
     return voltage;
 }
@@ -270,16 +270,16 @@ int32_t ina226ReadShunt(INA226Driver *devp) {
  * @brief   Reads INA226 VBUS voltage.
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               VBUS voltage in mV increments
+ * @return               VBUS voltage in 0.01mV increments
  *
  * @api
  */
-int32_t ina226ReadVBUS(INA226Driver *devp) {
-    int32_t voltage;
+uint16_t ina226ReadVBUS(INA226Driver *devp) {
+    uint16_t voltage;
 
     osalDbgCheck(devp != NULL);
 
-    voltage = (int16_t)ina226ReadRaw(devp, INA226_AD_VBUS) * 1.25;
+    voltage = ina226ReadRaw(devp, INA226_AD_VBUS) * 125;
 
     return voltage;
 }
@@ -293,14 +293,14 @@ int32_t ina226ReadVBUS(INA226Driver *devp) {
  *
  * @api
  */
-int32_t ina226ReadCurrent(INA226Driver *devp) {
-    int32_t current;
+int16_t ina226ReadCurrent(INA226Driver *devp) {
+    int16_t current;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    current = (int16_t)ina226ReadRaw(devp, INA226_AD_CURRENT) * devp->config->curr_lsb;
+    current = ina226ReadRaw(devp, INA226_AD_CURRENT) * devp->config->curr_lsb;
 
     return current;
 }
@@ -314,14 +314,14 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  *
  * @api
  */
-int32_t ina226ReadPower(INA226Driver *devp) {
-    int32_t power;
+uint16_t ina226ReadPower(INA226Driver *devp) {
+    uint16_t power;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    power = (int16_t)ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
+    power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
 
     return power;
 }
