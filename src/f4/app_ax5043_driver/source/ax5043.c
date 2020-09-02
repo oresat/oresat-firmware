@@ -6,6 +6,7 @@
  * @ingrup ORESAT
  * @{
  */
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
@@ -69,6 +70,17 @@ static const char *num[] = {
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
+/* TODO: Can I consolidate these without it being convoluted? */
+typedef union {
+    struct __attribute__((packed)) {
+        union {
+            uint16_t    reg;
+            uint16_t    status;
+        };
+        uint8_t         *data;
+    };
+    uint8_t             *buf;
+} spibufl_t;
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -76,137 +88,235 @@ static const char *num[] = {
 
 #if (AX5043_USE_SPI) || defined(__DOXYGEN__)
 /**
- * @brief   Reads AX5043 registers using SPI.
+ * @brief   Perform a long (16-bit address) exchange with AX5043 using SPI.
+ * @note    Can be called with NULL values for txbuf and/or rxbuf.
  * @pre     The SPI interface must be initialized and the driver started.
  *
  * @param[in]   spip        SPI Configuration
  * @param[in]   reg         Register address
- * @param[in]   value       Register value
- * @param[out]  rxbuf       Returned data
- * @return                  The value in the register
+ * @param[in]   write       Indicates Read/Write bit
+ * @param[in]   txbuf       Buffer to send data from
+ * @param[out]  rxbuf       Buffer to return data in
+ * @param[in]   n           Number of bytes to exchange
+ *
+ * @return                  AX5043 status bits
  * @notapi
  */
-uint8_t ax5043SPIReadRegister(SPIDriver *spip, uint16_t reg, uint8_t value, uint8_t rxbuf[]) {
-    uint8_t cmd[3];
+ax5043_status_t ax5043SPIExchangeLong(SPIDriver *spip, uint16_t reg, bool write, uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+    ax5043_status_t status;
+    spibufl_t sendbuf;
+    spibufl_t recvbuf;
+    size_t bufsize = sizeof(uint16_t) + n;
 
-    /* TODO: Optimize these functions */
-    if (reg <  0x0070) {
-        cmd[0] = reg;
-        cmd[1] = value;
-        spiSelect(spip);
-        spiExchange(spip, 2, cmd, rxbuf);
-        spiUnselect(spip);
-        return rxbuf[1];    //return the reg value when reading the register
-    } else {
-        cmd[0] = 0x70 | (reg >> 8);
-        cmd[1] = reg;
-        cmd[2] = value;
-        spiSelect(spip);
-        spiExchange(spip, 3, cmd, rxbuf);
-        spiUnselect(spip);
-        return rxbuf[2];    //return the reg value when reading the register
+    /* Allocate internal buffers */
+    sendbuf.buf = malloc(bufsize);
+    recvbuf.buf = malloc(bufsize);
+
+    /* Set the register address to perform the transaction with */
+    sendbuf.reg = __REVSH((reg & 0x0FFF) | 0x7000 | (write << 16));
+
+    /* Copy the TX data to the sending buffer */
+    if (txbuf != NULL) {
+        memcpy(sendbuf.data, txbuf, n);
     }
+
+    /* Perform the exchange */
+    /* We always receive because we need the status bits */
+    spiSelect(spip);
+    if (txbuf != NULL) {
+        spiExchange(spip, bufsize, sendbuf.buf, recvbuf.buf);
+    } else if (rxbuf != NULL) {
+        spiReceive(spip, bufsize, recvbuf.buf);
+    } else {
+        /* Status only */
+        spiReceive(spip, sizeof(uint16_t), recvbuf.buf);
+    }
+    spiUnselect(spip);
+
+    /* Copy the RX data to provided buffer */
+    if (rxbuf != NULL) {
+        memcpy(rxbuf, recvbuf.data, n);
+    }
+
+    /* Copy status bits for return */
+    status = __REVSH(recvbuf.status);
+
+    /* Free internal buffers */
+    free(sendbuf.buf);
+    free(recvbuf.buf);
+
+    return status;
 }
 
 /**
- * @brief   Writes a value into a register using SPI.
+ * @brief   Perform a short (8-bit address) quick exchange with AX5043 using SPI.
+ * @note    A maximum of 4 bytes can be transferred at a time using this function.
+ * @pre     The SPI interface must be initialized and the driver started.
+ *
+ * @param[in]   spip        SPI Configuration
+ * @param[in]   reg         Register address
+ * @param[in]   write       Indicates Read/Write bit
+ * @param[in]   txbuf       Buffer to send data from
+ * @param[out]  rxbuf       Buffer to return data in
+ * @param[in]   n           Number of bytes to exchange (<=4)
+ *
+ * @return                  AX5043 status bits
+ * @notapi
+ */
+ax5043_status_t ax5043SPIExchangeShort(SPIDriver *spip, uint8_t reg, bool write, uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+    uint8_t sendbuf[5] = {0}, recvbuf[5] = {0};
+
+    /* Ensure we don't exceed 4 bytes of data */
+    n = (n <= 4 ? n : 4);
+
+    /* Set the register address to perform the transaction with */
+    sendbuf[0] = (reg & 0x7F) | (write << 8);
+
+    /* Copy the TX data to the sending buffer */
+    if (txbuf != NULL) {
+        memcpy(&sendbuf[1], txbuf, n);
+    }
+
+    /* Perform the exchange */
+    spiSelect(spip);
+    spiExchange(spip, n + 1, sendbuf, recvbuf);
+    spiUnselect(spip);
+
+    /* Copy the RX data to provided buffer */
+    if (rxbuf != NULL) {
+        memcpy(rxbuf, &recvbuf[1], n);
+    }
+
+    return recvbuf[0];
+}
+
+/**
+ * @brief   Reads a single 8-bit register using SPI.
+ * @pre     The SPI interface must be initialized and the driver started.
+ *
+ * @param[in]   spip        SPI Configuration
+ * @param[in]   reg         Register address
+ *
+ * @return                  The value in the register
+ * @notapi
+ */
+uint8_t ax5043SPIReadRegister(SPIDriver *spip, uint16_t reg) {
+    uint8_t value;
+
+    if (reg < 0x0070U) {
+        ax5043SPIExchangeShort(spip, reg, false, NULL, &value, 1);
+    } else {
+        ax5043SPIExchangeLong(spip, reg, false, NULL, &value, 1);
+    }
+    return value;
+}
+
+/**
+ * @brief   Writes a single 8-bit register using SPI.
  * @pre     The SPI interface must be initialized and the driver started.
  *
  * @param       spip        SPI Driver
  * @param[in]   reg         Register address
  * @param[in]   value       Register value
- * @param[out]  rxbuf       Returned data
- * @return                  The value in the register
+ *
  * @notapi
  */
-uint8_t ax5043SPIWriteRegister(SPIDriver *spip, uint16_t reg, uint8_t value, uint8_t rxbuf[]) {
-    uint8_t cmd[3];
-
-    /* TODO: Optimize these functions */
-    if (reg <  0x0070) {
-        cmd[0]=0x80|reg;
-        cmd[1]=value;
-        spiSelect(spip);
-        spiExchange(spip, 2, cmd, rxbuf);
-        spiUnselect(spip);
+void ax5043SPIWriteRegister(SPIDriver *spip, uint16_t reg, uint8_t value) {
+    if (reg < 0x0070U) {
+        ax5043SPIExchangeShort(spip, reg, true, &value, NULL, 1);
     } else {
-        cmd[0]=0xF0|(reg>>8);
-        cmd[1]=reg;
-        cmd[2]=value;
-        spiSelect(spip);
-        spiExchange(spip, 3, cmd, rxbuf);
-        spiUnselect(spip);
+        ax5043SPIExchangeLong(spip, reg, true, &value, NULL, 1);
     }
-    return rxbuf[0];   //retun status while writting the register
 }
 
 /**
  * @brief   Sets powermode register of AX5043.
  *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  reg_value          powermode register value.
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  pwrmode      Power mode register value.
  *
- * @return                        Most significant status bits from last SPI call.
+ * @return                  Most significant status bits (S14...S8)
  */
-uint8_t ax5043_set_pwrmode(AX5043Driver *devp, uint8_t reg_value){
-    uint8_t rxbuf[3]={0,0,0};
-    uint8_t value;
-    SPIDriver *spip = devp->config->spip;
+ax5043_status_t ax5043_set_pwrmode(AX5043Driver *devp, uint8_t pwrmode){
+    SPIDriver *spip = NULL;
+    ax5043_status_t status = 0;
+    uint8_t regval = 0;
 
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, (uint8_t)0x00, rxbuf);
-    value = value & 0xF0;
-    value = value | reg_value;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-    devp->status_code = rxbuf[0];
-    /*Return last status from Ax5043 while writting the register.
-      Normal value is 0x80 0r 0x88*/
-    return rxbuf[0];
+    osalDbgCheck(devp != NULL);
+    /* TODO: Add state sanity check */
+    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_set_pwrmode(), invalid state");*/
+
+#if AX5043_USE_SPI
+    spip = devp->config->spip;
+#if AX5043_SHARED_SPI
+    spiAcquireBus(spip);
+#endif /* AX5043_SHARED_SPI */
+
+    regval = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE);
+    regval &= ~AX5043_PWRMODE;
+    regval |= _VAL2FLD(AX5043_PWRMODE, pwrmode);
+    status = ax5043SPIExchangeShort(spip, AX5043_REG_PWRMODE, true, &regval, NULL, 1);
+#if AX5043_SHARED_SPI
+    spiReleaseBus(spip);
+#endif /* AX5043_SHARED_SPI */
+#endif /* AX5043_USE_SPI */
+
+    return status;
 }
 
 /**
- * @brief   Resets the AX5043.
+ * @brief   Resets the AX5043 device.
  *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
  *
- * @return                        Most significant status bits from last SPI call.
  */
-uint8_t ax5043_reset(AX5043Driver *devp)
+void ax5043_reset(AX5043Driver *devp)
 {
-    SPIDriver *spip = devp->config->spip;
-    uint8_t value = 0;
-    uint8_t rxbuf[3]={0,0,0};
+    SPIDriver *spip = NULL;
+    uint8_t regval = 0;
 
-    /* TODO: What's this for? */
-    spiSelect(spip);
-    chThdSleepMicroseconds(5);
+    osalDbgCheck(devp != NULL);
+    /* TODO: Add state sanity check */
+    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_set_pwrmode(), invalid state");*/
+
+#if AX5043_USE_SPI
+    spip = devp->config->spip;
+#if AX5043_SHARED_SPI
+    spiAcquireBus(spip);
+#endif /* AX5043_SHARED_SPI */
+
+    /* Wait for device to become active */
     spiUnselect(spip);
-    chThdSleepMicroseconds(5);
+    chThdSleepMicroseconds(1);
     spiSelect(spip);
-    chThdSleepMicroseconds(5);
+    while (!palReadLine(devp->config->miso));
 
     /* Reset the chip through powermode register.*/
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, AX5043_RESET_BIT, rxbuf);
-    chThdSleepMilliseconds(1);
+    regval = AX5043_PWRMODE_RESET;
+    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, regval);
 
-    /* Write to powermode register for enabling XOEN and REFIN and shutdown mode.
+    /* Write to PWRMODE: XOEN, REFEN and POWERDOWN mode. Clear RST bit.
        Page 33 in programming manual.*/
-    value = ax5043SPIReadRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
-    /* TODO: Why are we grabbing the register value if we overwrite it completely? */
-    value = AX5043_OSC_EN_BIT | AX5043_REF_EN_BIT | AX5043_POWERDOWN;
-    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, value, rxbuf);
+    regval = AX5043_PWRMODE_XOEN | AX5043_PWRMODE_REFEN | AX5043_PWRMODE_POWERDOWN;
+    ax5043SPIWriteRegister(spip, AX5043_REG_PWRMODE, regval);
 
-    ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0xAA, rxbuf);
-    value = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x00, rxbuf);
-    if (value != 0xAA) {
+    /* Verify functionality with SCRATCH register */
+    ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, 0xAA);
+    regval = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH);
+    if (regval != 0xAA) {
         devp->error_code = AXRADIO_ERR_NOT_CONNECTED;
     }
-    ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x55, rxbuf);
-    value = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH, (uint8_t)0x00, rxbuf);
-    if (value != 0x55) {
+    ax5043SPIWriteRegister(spip, AX5043_REG_SCRATCH, 0x55);
+    regval = ax5043SPIReadRegister(spip, AX5043_REG_SCRATCH);
+    if (regval != 0x55) {
         devp->error_code = AXRADIO_ERR_NOT_CONNECTED;
     }
-    /*Return last status from Ax5043 while writting the register.*/
-    return rxbuf[0];
+
+#if AX5043_SHARED_SPI
+    spiReleaseBus(spip);
+#endif /* AX5043_SHARED_SPI */
+#endif /* AX5043_USE_SPI */
+    /* TODO: Do we need to change driver state or something? */
 }
 
 /**
