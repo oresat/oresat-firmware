@@ -120,8 +120,8 @@
 #define GPIOD_FIRE_TURN_1           1U
 #define GPIOD_SDIO_CMD              2U
 #define GPIOD_TEST_HELI             3U
-#define GPIOD_UHF_EN                4U
-#define GPIOD_OPD_EN                5U
+#define GPIOD_UHF_ENABLE            4U
+#define GPIOD_OPD_ENABLE            5U
 #define GPIOD_PIN6                  6U
 #define GPIOD_PIN7                  7U
 #define GPIOD_LBAND_IRQ             8U
@@ -215,8 +215,8 @@
 #define LINE_UHF_CS                 PAL_LINE(GPIOC, 7U)
 #define LINE_FIRE_HELI_1            PAL_LINE(GPIOD, 0U)
 #define LINE_FIRE_TURN_1            PAL_LINE(GPIOD, 1U)
-#define LINE_UHF_EN                 PAL_LINE(GPIOD, 4U)
-#define LINE_OPD_EN                 PAL_LINE(GPIOD, 5U)
+#define LINE_UHF_ENABLE             PAL_LINE(GPIOD, 4U)
+#define LINE_OPD_ENABLE             PAL_LINE(GPIOD, 5U)
 #define LINE_WDT                    PAL_LINE(GPIOE, 1U)
 #define LINE_FIRE_TURN_2            PAL_LINE(GPIOE, 2U)
 #define LINE_FIRE_HELI_2            PAL_LINE(GPIOE, 3U)
@@ -618,8 +618,8 @@
  * PD1  - FIRE_TURN_1               (output pushpull).
  * PD2  - SDIO_CMD                  (alternate 12).
  * PD3  - TEST_HELI                 (analog).
- * PD4  - UHF_EN                    (output pushpull).
- * PD5  - OPD_EN                    (output pushpull).
+ * PD4  - UHF_ENABLE                (output pushpull).
+ * PD5  - OPD_ENABLE                (output pushpull).
  * PD6  - PIN6                      (analog).
  * PD7  - PIN7                      (analog).
  * PD8  - LBAND_IRQ                 (input).
@@ -635,8 +635,8 @@
                                      PIN_MODE_OUTPUT(GPIOD_FIRE_TURN_1) |   \
                                      PIN_MODE_ALTERNATE(GPIOD_SDIO_CMD) |   \
                                      PIN_MODE_ANALOG(GPIOD_TEST_HELI) |     \
-                                     PIN_MODE_OUTPUT(GPIOD_UHF_EN) |        \
-                                     PIN_MODE_OUTPUT(GPIOD_OPD_EN) |        \
+                                     PIN_MODE_OUTPUT(GPIOD_UHF_ENABLE) |    \
+                                     PIN_MODE_OUTPUT(GPIOD_OPD_ENABLE) |    \
                                      PIN_MODE_ANALOG(GPIOD_PIN6) |          \
                                      PIN_MODE_ANALOG(GPIOD_PIN7) |          \
                                      PIN_MODE_INPUT(GPIOD_LBAND_IRQ) |      \
@@ -651,8 +651,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOD_FIRE_TURN_1) |\
                                      PIN_OTYPE_PUSHPULL(GPIOD_SDIO_CMD) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOD_TEST_HELI) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOD_UHF_EN) |     \
-                                     PIN_OTYPE_PUSHPULL(GPIOD_OPD_EN) |     \
+                                     PIN_OTYPE_PUSHPULL(GPIOD_UHF_ENABLE) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOD_OPD_ENABLE) | \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN6) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOD_PIN7) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOD_LBAND_IRQ) |  \
@@ -667,8 +667,8 @@
                                      PIN_OSPEED_HIGH(GPIOD_FIRE_TURN_1) |   \
                                      PIN_OSPEED_HIGH(GPIOD_SDIO_CMD) |      \
                                      PIN_OSPEED_HIGH(GPIOD_TEST_HELI) |     \
-                                     PIN_OSPEED_HIGH(GPIOD_UHF_EN) |        \
-                                     PIN_OSPEED_HIGH(GPIOD_OPD_EN) |        \
+                                     PIN_OSPEED_HIGH(GPIOD_UHF_ENABLE) |    \
+                                     PIN_OSPEED_HIGH(GPIOD_OPD_ENABLE) |    \
                                      PIN_OSPEED_HIGH(GPIOD_PIN6) |          \
                                      PIN_OSPEED_HIGH(GPIOD_PIN7) |          \
                                      PIN_OSPEED_HIGH(GPIOD_LBAND_IRQ) |     \
@@ -683,8 +683,8 @@
                                      PIN_PUPDR_FLOATING(GPIOD_FIRE_TURN_1) |\
                                      PIN_PUPDR_FLOATING(GPIOD_SDIO_CMD) |   \
                                      PIN_PUPDR_FLOATING(GPIOD_TEST_HELI) |  \
-                                     PIN_PUPDR_FLOATING(GPIOD_UHF_EN) |     \
-                                     PIN_PUPDR_FLOATING(GPIOD_OPD_EN) |     \
+                                     PIN_PUPDR_FLOATING(GPIOD_UHF_ENABLE) | \
+                                     PIN_PUPDR_FLOATING(GPIOD_OPD_ENABLE) | \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN6) |       \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN7) |       \
                                      PIN_PUPDR_FLOATING(GPIOD_LBAND_IRQ) |  \
@@ -695,12 +695,12 @@
                                      PIN_PUPDR_FLOATING(GPIOD_PIN13) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN14) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN15))
-#define VAL_GPIOD_ODR               (PIN_ODR_LOW(GPIOD_FIRE_HELI_1) |       \
-                                     PIN_ODR_LOW(GPIOD_FIRE_TURN_1) |       \
+#define VAL_GPIOD_ODR               (PIN_ODR_HIGH(GPIOD_FIRE_HELI_1) |      \
+                                     PIN_ODR_HIGH(GPIOD_FIRE_TURN_1) |      \
                                      PIN_ODR_HIGH(GPIOD_SDIO_CMD) |         \
                                      PIN_ODR_HIGH(GPIOD_TEST_HELI) |        \
-                                     PIN_ODR_HIGH(GPIOD_UHF_EN) |           \
-                                     PIN_ODR_HIGH(GPIOD_OPD_EN) |           \
+                                     PIN_ODR_HIGH(GPIOD_UHF_ENABLE) |       \
+                                     PIN_ODR_HIGH(GPIOD_OPD_ENABLE) |       \
                                      PIN_ODR_HIGH(GPIOD_PIN6) |             \
                                      PIN_ODR_HIGH(GPIOD_PIN7) |             \
                                      PIN_ODR_HIGH(GPIOD_LBAND_IRQ) |        \
@@ -715,8 +715,8 @@
                                      PIN_AFIO_AF(GPIOD_FIRE_TURN_1, 0U) |   \
                                      PIN_AFIO_AF(GPIOD_SDIO_CMD, 12U) |     \
                                      PIN_AFIO_AF(GPIOD_TEST_HELI, 0U) |     \
-                                     PIN_AFIO_AF(GPIOD_UHF_EN, 0U) |        \
-                                     PIN_AFIO_AF(GPIOD_OPD_EN, 0U) |        \
+                                     PIN_AFIO_AF(GPIOD_UHF_ENABLE, 0U) |    \
+                                     PIN_AFIO_AF(GPIOD_OPD_ENABLE, 0U) |    \
                                      PIN_AFIO_AF(GPIOD_PIN6, 0U) |          \
                                      PIN_AFIO_AF(GPIOD_PIN7, 0U))
 #define VAL_GPIOD_AFRH              (PIN_AFIO_AF(GPIOD_LBAND_IRQ, 0U) |     \
@@ -814,12 +814,12 @@
                                      PIN_PUPDR_FLOATING(GPIOE_PIN15))
 #define VAL_GPIOE_ODR               (PIN_ODR_HIGH(GPIOE_PIN0) |             \
                                      PIN_ODR_LOW(GPIOE_WDT) |               \
-                                     PIN_ODR_LOW(GPIOE_FIRE_TURN_2) |       \
-                                     PIN_ODR_LOW(GPIOE_FIRE_HELI_2) |       \
+                                     PIN_ODR_HIGH(GPIOE_FIRE_TURN_2) |      \
+                                     PIN_ODR_HIGH(GPIOE_FIRE_HELI_2) |      \
                                      PIN_ODR_HIGH(GPIOE_PIN4) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN5) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN6) |             \
-                                     PIN_ODR_LOW(GPIOE_MMC_PWR) |           \
+                                     PIN_ODR_HIGH(GPIOE_MMC_PWR) |          \
                                      PIN_ODR_HIGH(GPIOE_PIN8) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN9) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN10) |            \
