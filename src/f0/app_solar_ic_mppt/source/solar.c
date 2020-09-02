@@ -4,12 +4,12 @@
 #include "chprintf.h"
 
 /* Defines for INA226 */
-#define CURR_LSB           30  /* 20uA/bit */
+#define CURR_LSB           20  /* 20uA/bit */
 #define RSENSE             100 /* 0.1 ohm  */
 #define DAC_VDDA_UV        3333000 /* 3.333 V. Chgange to 3.0 v when powered from debug board */
 
 /*Defines for MPPT algorithm speed*/
-#define SLEEP_MS           10                
+#define SLEEP_MS           8
 
 /*Defines for MPPT algorithm that changes with each solar cell variant */
 /*Things to note
@@ -17,13 +17,13 @@
  * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
  */ 
 #define MIN_DP_DI              4000     /* The most important piece. This keeps the point to the left of MPPT. */ 
-#define NVE_STEP_SIZE          5000     /* -ve step size for constant current condition */
-#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
-#define MAX_STEP_SIZE          5000     /* Maximum step size for variable step IC.*/
-#define STEP_SIZE_FACTOR       1000     /* Posive step factor.*/
-#define NVE_STEP_SIZE_FACTOR   5        /* Negative step factor. This is multipled with Positive step factor*/
-#define MIN_PV_CURRENT         5000     /* 5000 uA or 5 mA */
-#define MAX_PV_CURRENT         500000   /* 500000 uA or 500 mA */
+#define NVE_STEP_SIZE          3500     /* Fixed -ve step size */ 
+#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */ 
+#define MAX_STEP_SIZE          10000     /* Maximum step size for variable step IC.*/ 
+#define STEP_SIZE_FACTOR       1400     /* Posive step factor.*/
+#define NVE_STEP_SIZE_FACTOR   4        /* Negative step factor. This is multipled with Positive step factor*/ 
+#define MIN_PV_CURRENT         10000    /* Minimum current drawn from PV cells */
+#define MAX_PV_CURRENT         500000   /* Maximum current drawn from PV cells */
 
 
 
@@ -50,7 +50,7 @@ static const INA226Config ina226config = {
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
     INA226_CONFIG_VSHCT_140US | INA226_CONFIG_VBUSCT_140US |
-    INA226_CONFIG_AVG_16,                   
+    INA226_CONFIG_AVG_16,
     (5120000/(RSENSE*CURR_LSB)),
     CURR_LSB
 };
@@ -106,7 +106,7 @@ uint32_t calc_iadj(uint32_t i_out)
  * @brief Maximum power point tracking algorithm for Solar cells
  * @param[in] volt      Solar cell bus voltage in mV.
  * @param[in] curr      Solar cell current in uA.
- * @param[in] pwr       Power output from solar cells in microWatts. 
+ * @param[in] pwr       Power output from solar cells in microWatts.
  * @return Maximum current to be drawn from solar cells in uA
  * TODO: Find min/max limits of step size. Also check the units that work the best
  *       Average a few samples to reduce noise
@@ -137,13 +137,16 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t step_size;
     
     /*Handles sudden decrease in illumination */ 
-    if (curr < 0.8 * i_in)  {                 
+    if (curr < 0.8 * i_in)  {
       i_in = 0.8*curr;
+      if (i_in < MIN_PV_CURRENT) {
+        i_in = MIN_PV_CURRENT;
+      }
       return i_in;
     }
     
     /*Handles sudden decrease in load*/
-    if (curr > 1.2 * i_in)  {               
+    if (curr > 1.2 * i_in)  {
       i_in = curr;
       return i_in;
     }
@@ -153,13 +156,13 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
       /* decrease current if power/current decreases without being specified. 
        * closed loop control.
        */ 
-      prev_i_in = i_in;                                
-      i_in -= NVE_STEP_SIZE;  
+      prev_i_in = i_in;
+      i_in -= NVE_STEP_SIZE;
     } else {
       prev_i_in = i_in;
-      if (delta_i > CURR_THRES_SENS || delta_i < -CURR_THRES_SENS) {        
+      if (delta_i > CURR_THRES_SENS || delta_i < -CURR_THRES_SENS) {
 		    dp_di = (delta_p*1000)/delta_i;
-        step_size = (dp_di * STEP_SIZE_FACTOR)/volt;   
+        step_size = (dp_di * STEP_SIZE_FACTOR)/volt;
                 
         if (dp_di > MIN_DP_DI) {  
           if(step_size > MAX_STEP_SIZE) {
@@ -168,7 +171,7 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
             i_in += step_size;
           }
         } else {
-          i_in -= 2000;
+          i_in -= NVE_STEP_SIZE;
           if (dp_di < 0) {
             if(step_size < (-1)*MAX_STEP_SIZE) {
               i_in -= MAX_STEP_SIZE;
@@ -241,7 +244,7 @@ THD_FUNCTION(solar, arg)
       /* Calculate max input current drawn from solar cells. This is used to calculate iadj. */
       i_in = calc_mppt(voltage, current, power);
       iadj_v = calc_iadj(i_in);
-      dacPutMillivolts(&DACD1, 0, iadj_v) ;
+      dacPutMillivolts(&DACD1, 0, iadj_v);
       
       if (j >= 500){
         chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d mv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
@@ -249,12 +252,8 @@ THD_FUNCTION(solar, arg)
         j=0;
       }
       j++;
-      
       i++;
-      
-      
     }
-
 
     /* Stop drivers */
     dacStop(&DACD1);
