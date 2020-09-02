@@ -388,6 +388,9 @@
 #define AX5043_REG_0xF72                    0xF72U
 /** @} */
 
+/* TODO: Eventually get rid of this */
+#define AX5043_REG_END                      0xFFFU
+
 /**
  * @name    AX5043 REVISION register
  * @{
@@ -2514,33 +2517,24 @@ struct AX5043Driver {
  * It should probably be structs defining the various types of headers
  *
  */
-/*
-#define AX5043_FIFOCMD_NOP      0x00
-#define AX5043_FIFOCMD_DATA     0x01
-#define AX5043_FIFOCMD_REPEATDATA 0x02
-#define AX5043_FIFOCMD_TIMER    0x10
-#define AX5043_FIFOCMD_RSSI     0x11
-#define AX5043_FIFOCMD_FREQOFFS   0x12
-#define AX5043_FIFOCMD_RFFREQOFFS 0x13
-#define AX5043_FIFOCMD_DATARATE   0x14
-#define AX5043_FIFOCMD_ANTRSSI    0x15
-#define AX5043_FIFOCMD_TXCTRL   0x1C
-#define AX5043_FIFOCMD_TXPWR    0x1D
-
-#define AX5043_FIFO_COMMIT_CMD          (1 << 2)
-#define AX5043_FIFO_PKTSTART            1
-#define AX5043_FIFO_PKTEND              (1 << 1)
-#define AX5043_FIFO_NOCRC               (1 << 3)
-#define AX5043_FIFO_RAW                 (1 << 4)
+#define AX5043_PAYLOADCMD_NOP      0x00
+#define AX5043_PAYLOADCMD_DATA     0x01
+#define AX5043_PAYLOADCMD_REPEATDATA 0x02
+#define AX5043_PAYLOADCMD_TIMER    0x10
+#define AX5043_PAYLOADCMD_RSSI     0x11
+#define AX5043_PAYLOADCMD_FREQOFFS   0x12
+#define AX5043_PAYLOADCMD_RFFREQOFFS 0x13
+#define AX5043_PAYLOADCMD_DATARATE   0x14
+#define AX5043_PAYLOADCMD_ANTRSSI    0x15
+#define AX5043_PAYLOADCMD_TXCTRL   0x1C
+#define AX5043_PAYLOADCMD_TXPWR    0x1D
 
 #define PKTDATA_BUFLEN 260
-*/
 
 /**
  * @brief  PHY and Framing details
- * TODO: Determine what this is
+ * TODO: Overhaul this stuff
  */
-/*
 #define AXRADIO_PHY_PN9                     0
 #define AXRADIO_PHY_NRCHANNELS              1
 #define AXRADIO_PHY_CHANFREQ                2
@@ -2588,7 +2582,6 @@ struct AX5043Driver {
 #define AXRADIO_WOR_PERIOD                  44
 #define AXRADIO_PHY_INNERFREQLOOP           45
 #define AXRADIO_PHY_END                     200
-*/
 
 /*===========================================================================*/
 /* External declarations.                                                    */
