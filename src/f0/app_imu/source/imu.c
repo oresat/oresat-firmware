@@ -1,8 +1,11 @@
 #include "imu.h"
 #include "bmi088.h"
+#include "chprintf.h"
 
 /* TODO: Set this to the correct slave address for the BMI088 device */
 #define BMI088_SADDR 0x00U
+
+#define CHP ((BaseSequentialStream*)&SD2)
 
 static const I2CConfig i2ccfg = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -30,7 +33,7 @@ THD_FUNCTION(imu, arg)
     bmi088Start(&imudev, &imucfg);
 
     while (!chThdShouldTerminateX()) {
-
+        chprintf(CHP, "Test!\r\n");
         chThdSleepMilliseconds(250);
     }
 
