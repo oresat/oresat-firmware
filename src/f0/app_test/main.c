@@ -18,25 +18,39 @@
 #include "ch.h"
 #include "hal.h"
 
+/* Project header files */
+#include "oresat.h"
+#include "blink.h"
+
+static worker_t worker1;
+
+static oresat_config_t oresat_conf = {
+    &CAND1,
+    ORESAT_DEFAULT_ID,
+    ORESAT_DEFAULT_BITRATE
+};
+
+/**
+ * @brief App Initialization
+ */
+static void app_init(void)
+{
+    /* App initialization */
+    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL);
+    reg_worker(&worker1);
+
+    /* Start up debug output */
+    sdStart(&SD2, NULL);
+}
+
+/**
+ * @brief Main Application
+ */
 int main(void)
 {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-
-    while (true)
-    {
-        palClearLine(LINE_LED);
-        chThdSleepMilliseconds(50);
-        palSetLine(LINE_LED);
-        chThdSleepMilliseconds(500);
-    }
-
+    // Initialize and start
+    oresat_init();
+    app_init();
+    oresat_start(&oresat_conf);
     return 0;
 }

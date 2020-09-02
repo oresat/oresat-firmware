@@ -67,7 +67,7 @@ msg_t bmi088I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  * @return               the operation status.
  * @notapi
  */
-msg_t bmi088I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
             TIME_INFINITE);
@@ -126,8 +126,8 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif /* BMI088_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    buf.reg = BMI088_AD_CONFIG;
-    buf.value = __REVSH(BMI088_CONFIG_RST);
+    buf.reg = BMI088_AD_ACC_CONFIG_0;
+    buf.value = BMI088_CONFIG_RST;
     bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
     do {
         bmi088I2CReadRegister(config->i2cp, config->saddr, BMI088_AD_CONFIG,
@@ -181,7 +181,6 @@ void bmi088Stop(BMI088Driver *devp) {
     }
     devp->state = BMI088_STOP;
 }
-
 /**
  * @brief   Sets BMI088 Alert type and value
  *
@@ -224,6 +223,61 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
 }
 
 /**
+ * @brief   Soft Reset Command.
+ *
+ * @param[in] devp       Pointer to the @p BMI088Driver object
+ * @param[in] soft_rst   write 0xB6 to soft reset register (Do not write any other value to this register)
+ *               
+ * @api
+ */
+void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst){
+    i2cbuf_t buf;
+    uint8_t softRst;
+
+    osalDbgCheck(devp != NULL);
+
+    buf.reg = BMI088_ACC_SOFTRESET;
+    buf.value = soft_rst;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));    
+}
+
+/**
+ * @brief   Enable BMI088 Accelerometer.
+ *
+ * @param[in] devp       Pointer to the @p BMI088Driver object              
+ * @param[in] enable     Value to write to enable: 4, to disable: 0;
+ * @api
+ */
+void accEnable(BMI088Driver *devp, uint8_t enable){
+    i2cbuf_t buf;
+
+    osalDbgCheck( devp != NULL );
+    
+    buf.reg = BMI088_ACC_PWR_CTRL;
+    buf.value = enable;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+}
+
+/**
+ * @brief   Read Power Control Register BMI088 Accelerometer.
+ *
+ * @param[in] devp       Pointer to the @p BMI088Driver object
+ *
+ * @eturn                Power Status
+ *
+ * @api
+ */
+uint8_t readPwrCtrlReg(BMI088Driver *devp){
+    uint8_t powerStatus;
+
+    osalDbgCheck(devp != NULL);
+
+    powerStatus = bmi088ReadRaw(devp, BMI088_ACC_PWR_CTRL);
+
+    return powerStatus;
+}
+
+/**
  * @brief   Reads BMI088 Chip ID.
  *
  * @param[in] devp       Pointer to the @p BMI088Driver object
@@ -236,7 +290,7 @@ uint8_t bmi088ReadChipId(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    chipId = bmi088ReadRaw(devp, BMI088_AD_ACC_CHIP_ID)*1;
+    chipId = bmi088ReadRaw(devp, BMI088_AD_ACC_CHIP_ID);
 
     return chipId;    
 }
@@ -285,14 +339,14 @@ uint8_t bmi088ReadErrFatal(BMI088Driver *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccStatus(){
+uint8_t bmi088ReadAccStatus(BMI088Driver *devp){
     uint8_t stat;
 
     osalDbgCheck(devp != NULL);
 
     stat = bmi088ReadRaw(devp, BMI088_ACC_STATUS);
 
-    return status;
+    return stat;
 }
 
 /**
@@ -304,7 +358,7 @@ uint8_t bmi088ReadAccStatus(){
  *
  * @api
  */
-int16_t bmi088ReadAccInX(BMI088Driver, *devp){
+int16_t bmi088ReadAccInX(BMI088Driver *devp){
     int16_t accXInMG;
     int16_t accXInt16;
     int8_t  accXLsb;
@@ -315,7 +369,7 @@ int16_t bmi088ReadAccInX(BMI088Driver, *devp){
     accXLsb     = bmi088ReadRaw(devp, BMI088_ACC_X_LSB);
     accXMsb     = bmi088ReadRaw(devp, BMI088_ACC_X_MSB);
     accXInt16   = (accXMsb*256 + accXLsb);
-    accXInMG    = accXInt16/32768*1000*2^(<0x41> + 1)*1.5;
+    accXInMG    = accXInt16/32768*1000*2(0x41 + 1)*1.5;
 
     return accXInMG;
 }
@@ -377,26 +431,77 @@ int16_t bmi088ReadAccInZ(BMI088Driver, *devp){
  * @api
  */
 uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp){
-    uint8_t  sensorTime0;
-    uint8_t  sensorTime1;
-    uint8_t  sensorTime2;
+    uint8_t   sensorTime0;
+    uint8_t   sensorTime1;
+    uint8_t   sensorTime2;
     uint32_t  sensorTime;
 
     osalDbgCheck(devp != NULL);
 
-    sensorTime0 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_0)
-    sensorTime1 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_1)
-    sensorTime2 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_2)
+    sensorTime0 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_0);
+    sensorTime1 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_1);
+    sensorTime2 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_2);
     sensorTime  = (sensorTime2 << 16) | (sensorTime1 << 8) | sensorTime0;
 
     return sensorTime;
 }
+
 /**
- * @brief   Reads BMI088 ACC Status Register.
+ * @brief   Reads BMI088 Interrupt Status Register.
  *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               Data ready for accelerometer. Reset when one acceleration data register is read out.
+ * @return               interrupt status 
  *
  * @api
  */
-/** @} */
+uint8_t bmi088ReadIntStat(BMI088Driver *devp){
+    uint8_t DataReady;
+
+    osalDbgCheck(devp != NULL);
+
+    DataReady = bmi088ReadRaw(devp, BMI088_ACC_INT_STAT_1);
+
+    return DataReady;
+}
+
+/**
+ * @brief   Reads BMI088 ACC Temperature sensor data
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @return               11 bit temp value in 2's complement format 
+ *
+ * @api
+ */
+
+  uint16_t bmi088ReadTemp(BMI088Driver *devp){
+    int16_t  temperature;
+    uint16_t temp_uint11;
+    int16_t  temp_int11;
+    uint8_t LSB;
+
+    osalDbgCheck(devp != NULL);
+
+    temp_uint11 = (BMI088_ACC_TEMP_MSB*8) + (BMI088_ACC_TEMP_LSB/32);
+
+    if (temp_uint11 > 1023) {
+      temp_int11 = (temp_uint11 - 2048);
+    }
+    else {
+      temp_int11 = temp_uint11;
+    }	
+    
+    LSB = 1;
+
+    temperature = (temp_int11*0.125)/(LSB) + 23;
+
+    return temperature;
+}
+
+/**
+ * @brief   Reads BMI088 ACC Temperature sensor data
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @return               11 bit temp value in 2's complement format 
+ *
+ * @api
+ */

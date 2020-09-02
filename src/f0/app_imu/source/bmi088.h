@@ -8,7 +8,6 @@
  */
 #ifndef _BMI088_H_
 #define _BMI088_H_
-
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
@@ -58,7 +57,7 @@
 #define BMI088_AD_ACC_CONF                  0x40U
 #define BMI088_AD_FIFO_DATA                 0x26U
 #define BMI088_AD_FIFO_LENGTH_1             0x25U
-#define BMI088_AD_FIFO_LENGTH_1             0x24U
+#define BMI088_AD_FIFO_LENGTH_0             0x24U
 #define BMI088_AD_TEMP_LSB                  0x23U
 #define BMI088_AD_TEMP_MSB                  0x22U
 #define BMI088_AD_ACC_INT_STAT_1            0x1DU
@@ -641,7 +640,7 @@
 #define BMI088_GYR_INT3_LVL_H               (0x1U << BMI088_GYR_INT3_LVL_Pos)
 #define BMI088_GYR_INT3_OD_Pos              (1U)
 #define BMI088_GYR_INT3_OD_Msk              (0x1U << BMI088_GYR_INT3_OD_Pos)
-#define BMI088_GYR_INT3_LVL                 BMI088_GYR_INT3_OD_Msk
+#define BMI088_GYR_INT3_OD                  BMI088_GYR_INT3_OD_Msk
 #define BMI088_GYR_INT3_OD_OPEN_DRAIN       (0x1U << BMI088_GYR_INT3_OD_Pos)  
 #define BMI088_GYR_INT3_OD_PUSH_PULL        (0x0U << BMI088_GYR_INT3_OD_Pos) 
 #define BMI088_GYR_INT4_LVL_Pos             (2U)
@@ -700,7 +699,7 @@
 #define BMI088_GYR_EXT_FIFO_S_SELECT_INT4   (0x1U << BMI088_GYR_EXT_INT_S_Pos)
 #define BMI088_GYR_EXT_FIFO_S_SELECT_INT3   (0x0U << BMI088_GYR_EXT_INT_S_Pos)
 #define BMI088_GYR_EXT_FIFO_S_EN_Pos        (0x5U)
-#define BMI088_GYR_EXT_FIFO_S_EN_Msk        (0x1U << BMI088_GYR_EXT_FIFO_S_EN_Pos)
+#define BMI088_GYR_EXT_FIFO_S_EN_Mst         (0x1U << BMI088_GYR_EXT_FIFO_S_EN_Pos)
 #define BMI088_GYR_EXT_FIFO_S_EN            BMI088_GYR_EXT_FIFO_S_EN_Msk
 /**@} */
 
@@ -775,7 +774,7 @@
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
 #if !defined(BMI088_SHARED_I2C) || defined(__DOXYGEN__)
-#define BMI088_SHARED_I2C                   FALSE
+#define BMI088_SHARED_I2C                   TRUE
 #endif
 /** @} */
 
@@ -901,14 +900,21 @@ void bmi088ObjectInit(BMI088Driver *devp);
 void bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
 uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg);
+bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
 uint8_t bmi088ReadChipId(BMI088Driver *devp);
 uint8_t bmi088ReadErrCode(BMI088Driver *devp);
-uint8_t bmi088ReadErrFatal(BMI088driver *devp);
+uint8_t bmi088ReadErrFatal(BMI088Driver *devp);
 uint8_t bmi088ReadAccStatus(BMI088Driver *devp);
 uint8_t bmi088ReadAccInX(BMI088Driver *devp);
 uint8_t bmi088ReadAccInY(BMI088Driver *devp);
 uint8_t bmi088ReadAccInZ(BMI088Driver *devp);
 uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
+void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst);
+void accEnable(BMI088Driver *devp, uint8_t enable);
+uint8_t readPowerCtrlReg(BMI088Driver *devp);
+uint8_t bmi088ReadIntStat(Bmi088Driver *devp);
+uint16_t bmi088ReadTemp(BMI088Driver *devp);
+
 #ifdef __cplusplus
 }
 #endif
