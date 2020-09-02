@@ -83,8 +83,8 @@
 #define GPIOB_PIN3                  3U
 #define GPIOB_PIN4                  4U
 #define GPIOB_PIN5                  5U
-#define GPIOB_I2C1_SCL              6U
-#define GPIOB_I2C1_SDA              7U
+#define GPIOB_PIN6                  6U
+#define GPIOB_PIN7                  7U
 #define GPIOB_PIN8                  8U
 #define GPIOB_PIN9                  9U
 #define GPIOB_I2C2_SCL              10U
@@ -368,12 +368,12 @@
  * PB3  - PIN3                      (analog).
  * PB4  - PIN4                      (analog).
  * PB5  - PIN5                      (analog).
- * PB6  - I2C1_SCL                  (alternate 1).
- * PB7  - I2C1_SDA                  (alternate 1).
+ * PB6  - PIN6                      (analog).
+ * PB7  - PIN7                      (analog).
  * PB8  - PIN8                      (analog).
  * PB9  - PIN9                      (analog).
- * PB10 - PIN10                     (alternate 1).
- * PB11 - PIN11                     (alternate 1).
+ * PB10 - I2C2_SCL                  (alternate 1).
+ * PB11 - I2C2_SDA                  (alternate 1).
  * PB12 - PIN12                     (analog).
  * PB13 - PIN13                     (analog).
  * PB14 - PIN14                     (analog).
@@ -385,8 +385,8 @@
                                      PIN_MODE_ANALOG(GPIOB_PIN3) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN4) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN5) |          \
-                                     PIN_MODE_ALTERNATE(GPIOB_I2C1_SCL) |   \
-                                     PIN_MODE_ALTERNATE(GPIOB_I2C1_SDA) |   \
+                                     PIN_MODE_ANALOG(GPIOB_PIN6) |          \
+                                     PIN_MODE_ANALOG(GPIOB_PIN7) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN8) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN9) |          \
                                      PIN_MODE_ALTERNATE(GPIOB_I2C2_SCL) |   \
@@ -401,8 +401,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN3) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN4) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN5) |       \
-                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SCL) |  \
-                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C1_SDA) |  \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_PIN6) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_PIN7) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN9) |       \
                                      PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SCL) |  \
@@ -417,12 +417,12 @@
                                      PIN_OSPEED_HIGH(GPIOB_PIN3) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN4) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN5) |          \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C1_SCL) |      \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C1_SDA) |      \
+                                     PIN_OSPEED_HIGH(GPIOB_PIN6) |          \
+                                     PIN_OSPEED_HIGH(GPIOB_PIN7) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN8) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN9) |          \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SCL) |         \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SDA) |         \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SCL) |      \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SDA) |      \
                                      PIN_OSPEED_HIGH(GPIOB_PIN12) |         \
                                      PIN_OSPEED_HIGH(GPIOB_PIN13) |         \
                                      PIN_OSPEED_HIGH(GPIOB_PIN14) |         \
@@ -433,8 +433,8 @@
                                      PIN_PUPDR_FLOATING(GPIOB_PIN3) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN4) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN5) |       \
-                                     PIN_PUPDR_PULLUP(GPIOB_I2C1_SCL) |     \
-                                     PIN_PUPDR_PULLUP(GPIOB_I2C1_SDA) |     \
+                                     PIN_PUPDR_FLOATING(GPIOB_PIN6) |       \
+                                     PIN_PUPDR_FLOATING(GPIOB_PIN7) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN8) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN9) |       \
                                      PIN_PUPDR_PULLUP(GPIOB_I2C2_SCL) |     \
@@ -449,12 +449,12 @@
                                      PIN_ODR_HIGH(GPIOB_PIN3) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN4) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN5) |             \
-                                     PIN_ODR_HIGH(GPIOB_I2C1_SCL) |         \
-                                     PIN_ODR_HIGH(GPIOB_I2C1_SDA) |         \
+                                     PIN_ODR_HIGH(GPIOB_PIN6) |             \
+                                     PIN_ODR_HIGH(GPIOB_PIN7) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN8) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN9) |             \
-                                     PIN_ODR_HIGH(GPIOB_I2C2_SCL) |            \
-                                     PIN_ODR_HIGH(GPIOB_I2C2_SDA) |            \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SCL) |         \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SDA) |         \
                                      PIN_ODR_HIGH(GPIOB_PIN12) |            \
                                      PIN_ODR_HIGH(GPIOB_PIN13) |            \
                                      PIN_ODR_HIGH(GPIOB_PIN14) |            \
@@ -465,12 +465,12 @@
                                      PIN_AFIO_AF(GPIOB_PIN3, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN4, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN5, 0U) |          \
-                                     PIN_AFIO_AF(GPIOB_I2C1_SCL, 1U) |      \
-                                     PIN_AFIO_AF(GPIOB_I2C1_SDA, 1U))
+                                     PIN_AFIO_AF(GPIOB_PIN6, 0U) |          \
+                                     PIN_AFIO_AF(GPIOB_PIN7, 0U))
 #define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_PIN8, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_I2C2_SCL, 1U) |      \
-                                     PIN_AFIO_AF(GPIOB_I2C2_SDA, 1U) |         \
+                                     PIN_AFIO_AF(GPIOB_I2C2_SDA, 1U) |      \
                                      PIN_AFIO_AF(GPIOB_PIN12, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN13, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN14, 0U) |         \
