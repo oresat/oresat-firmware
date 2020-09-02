@@ -1,12 +1,12 @@
-#ifndef _MMC_H_
-#define _MMC_H_
+#ifndef _TEST_MMC_H_
+#define _TEST_MMC_H_
+
+#include "ch.h"
+#include "hal.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "ch.h"
-#include "hal.h"
 
 void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]);
 
