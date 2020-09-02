@@ -38,12 +38,12 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
         space = CO_fifo_getSpace(&sdocli->sdo_c->bufFifo);
         do {
             size = lfs_file_read(&lfs, &data->file, data->buf, lfs_min(space, BUF_SIZE));
-            if (size <= 0) {
+            if (size < 0) {
                 *abort_code = CO_SDO_AB_NO_DATA;
                 return true;
             }
             CO_SDOclientDownloadBufWrite(sdocli->sdo_c, data->buf, size);
-        } while (space -= size);
+        } while (size && (space -= size));
     } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
         if (ret == CO_SDO_RT_uploadDataBufferFull || ret == CO_SDO_RT_ok_communicationEnd) {
             do {
@@ -290,9 +290,11 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
         }
         do {
             err = lfs_dir_read(&lfs, &dir, &info); 
-            if (err < 0) {
-                chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
-                return;
+            if (err <= 0) {
+                if (err < 0) {
+                    chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
+                }
+                continue;
             }
             if (info.type == LFS_TYPE_REG) {
                 chprintf(chp, "reg  ");
