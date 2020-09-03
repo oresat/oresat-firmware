@@ -4,7 +4,6 @@
 #include "ch.h"
 #include "hal.h"
 
-#define MAX5805_SADDR       0x18
 #define INA226_SADDR        0x40
 #define TMP101_SADDR        0x4A
 
