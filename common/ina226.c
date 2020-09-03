@@ -270,16 +270,16 @@ int32_t ina226ReadShunt(INA226Driver *devp) {
  * @brief   Reads INA226 VBUS voltage.
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               VBUS voltage in uV increments
+ * @return               VBUS voltage in 1uV increments
  *
  * @api
  */
-int32_t ina226ReadVBUS(INA226Driver *devp) {
-    int32_t voltage;
+uint32_t ina226ReadVBUS(INA226Driver *devp) {
+    uint32_t voltage;
 
     osalDbgCheck(devp != NULL);
 
-    voltage = (int16_t)ina226ReadRaw(devp, INA226_AD_VBUS) * 1250;
+    voltage = ina226ReadRaw(devp, INA226_AD_VBUS) * 1250;
 
     return voltage;
 }
@@ -314,14 +314,14 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  *
  * @api
  */
-int32_t ina226ReadPower(INA226Driver *devp) {
-    int32_t power;
+uint32_t ina226ReadPower(INA226Driver *devp) {
+    uint32_t power;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    power = (int16_t)ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
+    power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
 
     return power;
 }

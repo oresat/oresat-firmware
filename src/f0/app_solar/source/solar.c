@@ -116,9 +116,9 @@ uint32_t calc_iadj(uint32_t i_out)
 int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
 {
     /* The values from the previous iteration of the loop */
-    static int32_t prev_volt = 0;
+    static uint32_t prev_volt = 0;
     static int32_t prev_curr = 0;
-    static int32_t prev_pwr = 0;
+    static uint32_t prev_pwr = 0;
     
     /* programmed max allowed current from current and previous iteration*/
     static int32_t i_in;
@@ -199,8 +199,9 @@ THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    int32_t voltage, current, power;
-    uint32_t iadj_v = 1500;
+    int32_t voltage, power;
+    uint32_t current;
+    uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
 
     /* Start up drivers */
@@ -218,16 +219,16 @@ THD_FUNCTION(solar, arg)
       current = ina226ReadCurrent(&ina226dev); //Current in uA
       power   = ina226ReadPower(&ina226dev);   //Power in increments of uW
       
-      OD_solarPanel.voltage = voltage;
-      OD_solarPanel.current = current;
-      OD_solarPanel.power   = power  ;
+      OD_solarPanel.voltage = ina226ReadRaw(&ina226dev, INA226_AD_VBUS);
+      OD_solarPanel.current = (int16_t)ina226ReadRaw(&ina226dev, INA226_AD_CURRENT);
+      OD_solarPanel.power   = ina226ReadRaw(&ina226dev, INA226_AD_POWER);
 
       /* Calculate max input current drawn from solar cells. 
        * This is used to calculate iadj. 
        */
       i_in = calc_mppt(voltage, current, power);
-      iadj_v = calc_iadj(i_in);
-      dacPutMillivolts(&DACD1, 0, iadj_v);
+      iadj_uv = calc_iadj(i_in);
+      dacPutMicrovolts(&DACD1, 0, iadj_uv);
     }
 
     /* Stop drivers */
