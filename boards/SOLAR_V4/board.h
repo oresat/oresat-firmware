@@ -61,7 +61,7 @@
  * IO pins assignments.
  */
 #define GPIOA_LED                   0U
-#define GPIOA_SHDN_LT1618           1U
+#define GPIOA_LT1618_EN             1U
 #define GPIOA_USART2_TX             2U
 #define GPIOA_USART2_RX             3U
 #define GPIOA_IADJ                  4U
