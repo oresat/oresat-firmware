@@ -113,7 +113,7 @@ uint32_t calc_iadj(uint32_t i_out)
  *       increase max current limit immediatly if voltage is higher that expected.(shutdown condition)
  *       
  */
-int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
+int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
 {
     /* The values from the previous iteration of the loop */
     static uint32_t prev_volt = 0;
