@@ -343,7 +343,7 @@
                                      PIN_ODR_HIGH(GPIOA_SWCLK) |            \
                                      PIN_ODR_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_LED, 0U) |           \
-                                     PIN_AFIO_AF(GPIOA_SHDN_LT1618, 0U) |   \
+                                     PIN_AFIO_AF(GPIOA_LT1618_EN, 0U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_IADJ, 0U) |          \
