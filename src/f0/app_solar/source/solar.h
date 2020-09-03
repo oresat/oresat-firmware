@@ -9,7 +9,7 @@
 #define TMP101_SADDR        0x4A
 
 /* Example blinker thread prototypes */
-extern THD_WORKING_AREA(solar_wa, 0x100);
+extern THD_WORKING_AREA(solar_wa, 0x400);
 extern THD_FUNCTION(solar, arg);
 
 #endif

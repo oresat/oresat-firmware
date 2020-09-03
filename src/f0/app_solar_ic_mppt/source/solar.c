@@ -104,7 +104,7 @@ uint32_t calc_iadj(uint32_t i_out)
 
 /**
  * @brief Maximum power point tracking algorithm for Solar cells
- * @param[in] volt      Solar cell bus voltage in mV.
+ * @param[in] volt      Solar cell bus voltage in uV.
  * @param[in] curr      Solar cell current in uA.
  * @param[in] pwr       Power output from solar cells in microWatts.
  * @return Maximum current to be drawn from solar cells in uA
@@ -161,8 +161,8 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     } else {
       prev_i_in = i_in;
       if (delta_i > CURR_THRES_SENS || delta_i < -CURR_THRES_SENS) {
-		    dp_di = (delta_p*1000)/delta_i;
-        step_size = (dp_di * STEP_SIZE_FACTOR)/volt;
+        dp_di = (delta_p*1000)/delta_i;
+        step_size = (dp_di * STEP_SIZE_FACTOR)/(volt/1000);
                 
         if (dp_di > MIN_DP_DI) {  
           if(step_size > MAX_STEP_SIZE) {
@@ -247,7 +247,7 @@ THD_FUNCTION(solar, arg)
       dacPutMillivolts(&DACD1, 0, iadj_v);
       
       if (j >= 500){
-        chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d mv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+        chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
         chprintf((BaseSequentialStream *) &SD2, "Max input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_v);
         j=0;
       }
