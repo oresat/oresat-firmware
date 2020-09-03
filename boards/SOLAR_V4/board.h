@@ -327,7 +327,7 @@
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN15))
 #define VAL_GPIOA_ODR               (PIN_ODR_LOW(GPIOA_LED) |               \
-                                     PIN_ODR_LOW(GPIOA_SHDN_LT1618) |       \
+                                     PIN_ODR_LOW(GPIOA_LT1618_EN) |         \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
                                      PIN_ODR_HIGH(GPIOA_IADJ) |             \
