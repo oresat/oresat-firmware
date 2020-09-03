@@ -70,7 +70,7 @@ static INA226Driver ina226dev;
  * @param[in] uv        output volts in uv (microVolts).
  */
  
-void dacPutMillivolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
+void dacPutMicrovolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
     /* Per section 14.5.3 of the STM32F0x1 ref manual,
      * Vout(mV) = VDDA(mV) * (reg_val / 4096)
      * so, reg_val = (Vout * 4096) / VDDA
@@ -123,7 +123,6 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     /* programmed max allowed current from current and previous iteration*/
     static int32_t i_in;
     static int32_t prev_i_in;
-    //static int32_t prev_dp_di;
     
     int32_t delta_v = volt - prev_volt;
     int32_t delta_i = curr - prev_curr;
