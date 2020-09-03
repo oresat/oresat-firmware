@@ -246,7 +246,7 @@
  * GPIOA setup:
  *
  * PA0  - LED                       (output pushpull).
- * PA1  - SHDN_LT1618               (output pushpull).
+ * PA1  - LT1618_EN                 (output pushpull).
  * PA2  - USART2_TX                 (alternate 1).
  * PA3  - USART2_RX                 (alternate 1).
  * PA4  - IADJ                      (analog).
