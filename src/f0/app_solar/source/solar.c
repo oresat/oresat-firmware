@@ -208,7 +208,7 @@ THD_FUNCTION(solar, arg)
     dacStart(&DACD1, &dac1cfg);
     ina226Start(&ina226dev, &ina226config);
     /*Start up LT1618.*/
-    palSetLine(LINE_SHDN_LT1618);
+    palSetLine(LINE_LT1618_EN);
     
     while(!chThdShouldTerminateX()){
       chThdSleepMilliseconds(SLEEP_MS);
