@@ -261,7 +261,7 @@ int32_t ina226ReadShunt(INA226Driver *devp) {
 
     osalDbgCheck(devp != NULL);
 
-    voltage = (int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT) * 2.5;
+    voltage = ((int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT) * 25)/10;
 
     return voltage;
 }

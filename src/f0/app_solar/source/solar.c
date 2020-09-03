@@ -133,8 +133,8 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t step_size;
     
     /*Handles sudden decrease in illumination */ 
-    if (curr < 0.8 * i_in) {
-      i_in = 0.8*curr;
+    if (curr < (8 * i_in)/10) {
+      i_in = (8*curr)/10;
       if (i_in < MIN_PV_CURRENT) {
         i_in = MIN_PV_CURRENT;
       }
@@ -142,7 +142,7 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     }
     
     /*Handles sudden decrease in load*/
-    if (curr > 1.2 * i_in)  {
+    if (curr > (12 * i_in)/10)  {
       i_in = curr;
       return i_in;
     }

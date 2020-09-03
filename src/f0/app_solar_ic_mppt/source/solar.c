@@ -137,8 +137,8 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     int32_t step_size;
     
     /*Handles sudden decrease in illumination */ 
-    if (curr < 0.8 * i_in)  {
-      i_in = 0.8*curr;
+    if (curr < (8 * i_in)/10)  {
+      i_in = (8*curr)/10;
       if (i_in < MIN_PV_CURRENT) {
         i_in = MIN_PV_CURRENT;
       }
@@ -146,7 +146,7 @@ int32_t calc_mppt(int32_t volt, int32_t curr, int32_t pwr)
     }
     
     /*Handles sudden decrease in load*/
-    if (curr > 1.2 * i_in)  {
+    if (curr > (12 * i_in)/10)  {
       i_in = curr;
       return i_in;
     }
@@ -220,7 +220,7 @@ THD_FUNCTION(solar, arg)
     ina226Start(&ina226dev, &ina226config);
 
     palSetLine(LINE_LED);
-    palSetLine(LINE_SHDN_LT1618);
+    palSetLine(LINE_LT1618_EN);
     
     chprintf((BaseSequentialStream *) &SD2, "\r\n ****** Max input curr: %d, Bias Volt: %d mv \r\n", i_in, iadj_v);
     while(!chThdShouldTerminateX()){
@@ -258,6 +258,7 @@ THD_FUNCTION(solar, arg)
     /* Stop drivers */
     dacStop(&DACD1);
     ina226Stop(&ina226dev);
+    palClearLine(LINE_LT1618_EN);
 
     chThdExit(MSG_OK);
 }
