@@ -233,7 +233,7 @@ THD_FUNCTION(solar, arg)
     /* Stop drivers */
     dacStop(&DACD1);
     ina226Stop(&ina226dev);
-    palClearLine(LINE_SHDN_LT1618);
+    palClearLine(LINE_LT1618_EN);
 
     chThdExit(MSG_OK);
 }

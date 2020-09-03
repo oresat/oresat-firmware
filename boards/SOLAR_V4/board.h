@@ -263,7 +263,7 @@
  * PA15 - PIN15                     (analog).
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_OUTPUT(GPIOA_LED) |           \
-                                     PIN_MODE_OUTPUT(GPIOA_SHDN_LT1618) |   \
+                                     PIN_MODE_OUTPUT(GPIOA_LT1618_EN) |     \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_ANALOG(GPIOA_IADJ) |          \
@@ -295,7 +295,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SWCLK) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN15))
 #define VAL_GPIOA_OSPEEDR           (PIN_OSPEED_HIGH(GPIOA_LED) |           \
-                                     PIN_OSPEED_HIGH(GPIOA_SHDN_LT1618) |   \
+                                     PIN_OSPEED_HIGH(GPIOA_LT1618_EN) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_IADJ) |          \
@@ -311,7 +311,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
-                                     PIN_PUPDR_PULLDOWN(GPIOA_SHDN_LT1618) |\
+                                     PIN_PUPDR_PULLDOWN(GPIOA_LT1618_EN) |  \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_IADJ) |       \
