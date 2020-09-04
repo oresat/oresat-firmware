@@ -200,8 +200,8 @@ THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    int32_t voltage, power;
-    uint32_t current;
+    uint32_t voltage, power;
+    int32_t current;
     uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
 
