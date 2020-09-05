@@ -204,6 +204,7 @@
 /*
  * IO lines assignments.
  */
+#define LINE_UHF_IRQ                PAL_LINE(GPIOA, 8U)
 #define LINE_CAN1_SILENT            PAL_LINE(GPIOA, 9U)
 #define LINE_CAN1_SHDN              PAL_LINE(GPIOA, 10U)
 #define LINE_CAN2_SHDN              PAL_LINE(GPIOB, 4U)
@@ -217,6 +218,7 @@
 #define LINE_FIRE_TURN_1            PAL_LINE(GPIOD, 1U)
 #define LINE_UHF_ENABLE             PAL_LINE(GPIOD, 4U)
 #define LINE_OPD_ENABLE             PAL_LINE(GPIOD, 5U)
+#define LINE_LBAND_IRQ              PAL_LINE(GPIOD, 8U)
 #define LINE_WDT                    PAL_LINE(GPIOE, 1U)
 #define LINE_FIRE_TURN_2            PAL_LINE(GPIOE, 2U)
 #define LINE_FIRE_HELI_2            PAL_LINE(GPIOE, 3U)
