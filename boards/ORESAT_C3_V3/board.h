@@ -204,6 +204,7 @@
 /*
  * IO lines assignments.
  */
+#define LINE_SPI1_MISO              PAL_LINE(GPIOA, 6U)
 #define LINE_UHF_IRQ                PAL_LINE(GPIOA, 8U)
 #define LINE_CAN1_SILENT            PAL_LINE(GPIOA, 9U)
 #define LINE_CAN1_SHDN              PAL_LINE(GPIOA, 10U)

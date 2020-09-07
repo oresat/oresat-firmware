@@ -20,7 +20,6 @@
 #include "shell.h"
 
 /* Project header files */
-#include "ax5043.h"
 #include "cmd.h"
 
 /**
@@ -28,6 +27,9 @@
  */
 static void app_init(void)
 {
+    ax5043ObjectInit(&lband);
+    ax5043ObjectInit(&uhf);
+
     /* Initialize shell and start serial interface */
     shellInit();
     sdStart(&SD3, NULL);
