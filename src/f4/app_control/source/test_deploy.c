@@ -17,10 +17,10 @@ void cmd_deploy(BaseSequentialStream *chp, int argc, char *argv[]) {
         goto deploy_usage;
     }
 
-    if (argv[1][0] == 'h') {
+    if (argv[0][0] == 'h') {
         chprintf(chp, "Attempting to deploy helical antenna...");
         deployed = deploy_heli();
-    } else if (argv[1][0] == 't') {
+    } else if (argv[0][0] == 't') {
         chprintf(chp, "Attempting to deploy helical antenna...");
         deployed = deploy_turn();
     } else {
