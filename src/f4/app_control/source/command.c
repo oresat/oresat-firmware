@@ -9,6 +9,8 @@
 #include "max7310.h"
 #include "mmc.h"
 #include "test_mmc.h"
+#include "deployer.h"
+#include "test_deploy.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -289,7 +291,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         do {
-            err = lfs_dir_read(&lfs, &dir, &info); 
+            err = lfs_dir_read(&lfs, &dir, &info);
             if (err <= 0) {
                 if (err < 0) {
                     chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
@@ -362,6 +364,7 @@ static const ShellCommand commands[] = {
     {"mmc", cmd_mmc},
     {"time", cmd_time},
     {"lfs", cmd_lfs},
+    {"deploy", cmd_deploy},
     {NULL, NULL}
 };
 
