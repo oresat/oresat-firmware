@@ -438,9 +438,6 @@
 #define AX5043_REG_0xF72                    0xF72U
 /** @} */
 
-/* TODO: Eventually get rid of this */
-#define AX5043_REG_END                      0xFFFU
-
 /**
  * @name    AX5043 REVISION register
  * @{
@@ -2284,28 +2281,28 @@
  * @name    AX5043 PERFTUNE registers
  * @{
  */
-#define AX5043_0xF00_VAL                    (0x0FU)
-#define AX5043_0xF0C_VAL                    (0x00U)
-#define AX5043_0xF0D_VAL                    (0x03U)
+#define AX5043_0xF00_DEFVAL                 (0x0FU)
+#define AX5043_0xF0C_DEFVAL                 (0x00U)
+#define AX5043_0xF0D_DEFVAL                 (0x03U)
 #define AX5043_0xF10_CRYSTAL                (0x03U)
 #define AX5043_0xF10_TCXO                   (0x04U)
 #define AX5043_0xF10_GT_43MHZ               (0x0DU)
 #define AX5043_0xF11_TCXO                   (0x00U)
 #define AX5043_0xF11_CRYSTAL                (0x07U)
-#define AX5043_0xF1C_VAL                    (0x07U)
-#define AX5043_0xF21_VAL                    (0x5CU)
-#define AX5043_0xF22_VAL                    (0x53U)
-#define AX5043_0xF23_VAL                    (0x76U)
-#define AX5043_0xF26_VAL                    (0x92U)
-#define AX5043_0xF30_VAL                    (0x3FU)
-#define AX5043_0xF31_VAL                    (0xF0U)
-#define AX5043_0xF32_VAL                    (0x3FU)
-#define AX5043_0xF33_VAL                    (0xF0U)
+#define AX5043_0xF1C_DEFVAL                 (0x07U)
+#define AX5043_0xF21_DEFVAL                 (0x5CU)
+#define AX5043_0xF22_DEFVAL                 (0x53U)
+#define AX5043_0xF23_DEFVAL                 (0x76U)
+#define AX5043_0xF26_DEFVAL                 (0x92U)
+#define AX5043_0xF30_DEFVAL                 (0x3FU)
+#define AX5043_0xF31_DEFVAL                 (0xF0U)
+#define AX5043_0xF32_DEFVAL                 (0x3FU)
+#define AX5043_0xF33_DEFVAL                 (0xF0U)
 #define AX5043_0xF34_NORFDIV                (0x08U)
 #define AX5043_0xF34_RFDIV                  (0x28U)
 #define AX5043_0xF35_XTALDIV1               (0x10U)
 #define AX5043_0xF35_XTALDIV2               (0x11U)
-#define AX5043_0xF44_VAL                    (0x24U)
+#define AX5043_0xF44_DEFVAL                 (0x24U)
 #define AX5043_0xF72_NORAWSOFTBITS          (0x00U)
 #define AX5043_0xF72_RAWSOFTBITS            (0x06U)
 /** @} */
@@ -2389,17 +2386,6 @@ typedef struct AX5043Driver AX5043Driver;
 typedef uint16_t ax5043_status_t;
 
 /**
- * @brief   AX5043 registers are gouped together based on this
- */
-typedef enum {
-    common,
-    tx,
-    rx,
-    rx_cont,
-    local_address
-} ax5043_reg_group_t;
-
-/**
  * @brief   Structure containing a four byte sender X.25 address
  */
 struct axradio_address {
@@ -2407,12 +2393,11 @@ struct axradio_address {
 };
 
 /**
- * @brief  Ax5043 Register values
+ * @brief  Ax5043 Register value pair type
  */
 typedef struct {
     uint16_t reg;
     uint8_t val;
-    ax5043_reg_group_t group;
 } ax5043_regval_t;
 
 /**
@@ -2508,11 +2493,23 @@ typedef struct{
      * @brief XTAL Frequency in Hz
      */
     uint32_t                    xtal_freq;
-    ax5043_regval_t *reg_values;
+    /**
+     * @brief TCXO connected to XTAL
+     */
+    bool                        xtal_tcxo;
+    /**
+     * @brief Radio Address
+     */
+    uint32_t                    addr;
+    /**
+     * @brief Preset register values table
+     * @note  This is for initial configuration and performance tuning.
+     *        Certain values may be overwritten later.
+     */
+    ax5043_regval_t             *reg_values;
+
     ax5043_confval_t *conf_values;
     ax5043_mode_t ax5043_mode;
-    /* TODO: probably move these to an implementation of the driver */
-    mailbox_t *mb;
 } AX5043Config;
 
 /**
@@ -2546,6 +2543,10 @@ struct AX5043VMT {
     const AX5043Config          *config;                                    \
     /* Status as of last exchange */                                        \
     ax5043_status_t             status;                                     \
+    /* IRQ Worker thread */                                                 \
+    thread_t                    *irq_worker;                                \
+    /* IRQ Event Source */                                                  \
+    event_source_t              irq_event;                                  \
     /* Error state of device */                                             \
     ax5043_err_t                error;                                      \
     uint8_t                     rf_freq_off1;                               \
@@ -2662,8 +2663,6 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
 
 ax5043_status_t ax5043Reset(AX5043Driver *devp);
 
-uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group);
-uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name);
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 void ax5043_prepare_tx(AX5043Driver *devp);

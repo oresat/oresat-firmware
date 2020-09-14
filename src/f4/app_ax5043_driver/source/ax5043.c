@@ -111,7 +111,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     n = (n <= 256 ? n : 256);
 
     /* Set the register address to perform the transaction with */
-    sendbuf.reg = __REVSH((reg & 0x0FFF) | 0x7000 | (write << 16));
+    sendbuf.reg = __REVSH((reg & 0x0FFFU) | 0x7000U | (write << 16));
 
     /* Copy the TX data to the sending buffer */
     if (txbuf != NULL) {
@@ -150,26 +150,59 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
 void ax5043IRQHandler(void *arg) {
     AX5043Driver *devp = arg;
 
+    osalDbgCheck(devp != NULL, devp->irq_worker != NULL);
+
+    chSysLockFromISR();
+    chEvtSignalI(devp->irq_worker, EVENT_MASK(0));
+    chSysUnlockFromISR();
+}
+
+/**
+ * @brief   Interrupt worker thread for AX5043 IRQ signals.
+ *
+ * @param[in]   arg         Pointer to the @p AX5043Driver object
+ *
+ * @notapi
+ */
+THD_WORKING_AREA(irq_wa, 0x100);
+THD_FUNCTION(irq_worker, arg) {
+    AX5043Driver *devp = arg;
+    eventmask_t irq = 0;
+
+    osalDbgCheck(devp != NULL);
+
+    while (!chThdShouldTerminateX()) {
+        chEvtWaitAny(ALL_EVENTS);
+
+        /* Retrieve the pending interrupt requests */
+        irq = ax5043ReadU16(devp, AX5043_REG_IRQREQUEST);
+
+        /* Signal waiting thread with pending interrupts */
+        /*chEvt...(&devp->irq_event, irq);*/
+    }
+    chThdExit(MSG_OK);
 }
 
 /**
  * @brief   Sets powermode register of AX5043.
  *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  pwrmode      Power mode register value.
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ * @param[in]   pwrmode     Power mode register value.
  *
  * @return                  Most significant status bits (S14...S8)
  * @notapi
  */
 ax5043_status_t ax5043SetPWRMode(AX5043Driver *devp, uint8_t pwrmode) {
+    bool tcxo_en = (pwrmode != AX5043_PWRMODE_POWERDOWN
+                 && pwrmode != AX5043_PWRMODE_DEEPSLEEP);
     uint8_t regval = 0;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetPWRMode(), invalid state");
 
     ax5043Exchange(devp, AX5043_REG_PWRMODE, false, NULL, &regval, 1);
-    regval &= ~AX5043_PWRMODE;
-    regval |= _VAL2FLD(AX5043_PWRMODE, pwrmode);
+    regval &= ~(AX5043_PWRMODE | AX5043_PWRMODE_XOEN);
+    regval |= _VAL2FLD(AX5043_PWRMODE, pwrmode) | (tcxo_en ? AX5043_PWRMODE_XOEN : 0);
     return ax5043Exchange(devp, AX5043_REG_PWRMODE, true, &regval, NULL, 1);
 }
 
@@ -196,6 +229,8 @@ void ax5043ObjectInit(AX5043Driver *devp) {
     devp->vmt = &vmt_device;
 
     devp->config = NULL;
+    devp->irq_worker = NULL;
+    chEvtObjectInit(&devp->irq_event);
 
     devp->state = AX5043_STOP;
 }
@@ -217,7 +252,13 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     devp->config = config;
     devp->error = AX5043_ERR_NOERROR;
 
-    /* Register interrupt handler for device */
+    devp->rf_freq_off3 = 0;
+    devp->rf_freq_off2 = 0;
+    devp->rf_freq_off1 = 0;
+    devp->rssi = 0;
+
+    /* Register interrupt handler for device and start worker */
+    devp->irq_worker = chThdCreateStatic(irq_wa, sizeof(irq_wa), HIGHPRIO, irq_worker, devp);
     palSetLineCallback(config->irq, ax5043IRQHandler, devp);
     palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
 
@@ -237,75 +278,13 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     /* Reset device into POWERDOWN state */
     devp->status = ax5043Reset(devp);
 
+    /* Apply register overrides provided by user */
+    for (ax5043_regval_t *entry = config->reg_values; entry->reg; entry++) {
+        ax5043WriteU8(devp, entry->reg, entry->val);
+    }
+
     /* Transition to ready state */
     devp->state = AX5043_READY;
-
-    /*===========================*/
-    /* TODO: START OVERHAUL HERE */
-    /*===========================*/
-
-    /* TODO: What are these for exactly? */
-    devp->rf_freq_off3 = 0;
-    devp->rf_freq_off2 = 0;
-    devp->rf_freq_off1 = 0;
-    devp->rssi = 0;
-
-    ax5043_set_regs_group(devp,common);
-    ax5043_set_regs_group(devp,tx);
-
-    /* TODO: Should this be configurable at runtime? */
-    /* Configure PLL Loop for internal 100kHz filter, bypass external */
-    ax5043WriteU8(devp, AX5043_REG_PLLLOOP, AX5043_PLLLOOP_DIRECT | _VAL2FLD(AX5043_PLLLOOP_FLT, AX5043_FLT_INTERN_100KHZ));
-    /* Configure PLL Charge Pump Current for 68uA (8.5uA * 8) */
-    ax5043WriteU8(devp, AX5043_REG_PLLCPI, 0x08);
-
-    /* Enter Standby mode */
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_STANDBY);
-
-    /* FSK */
-    /* TODO: Make this configurable, not static in here */
-    ax5043WriteU8(devp, AX5043_REG_MODULATION, AX5043_MODULATION_FSK);
-    ax5043WriteU32(devp, AX5043_REG_FSKDEV, 0x000000);
-
-    /* Wait for XTAL */
-    while ((ax5043ReadU8(devp, AX5043_REG_XTALSTATUS) & 0x01) == 0){
-        chThdSleepMilliseconds(1);
-    }
-
-    /* Set frequency */
-    /* TODO: Make this configurable, not static in here */
-    uint32_t f = __REVSH(ax5043_get_conf_val(devp, AX5043_PHY_CHANFREQ));
-    ax5043WriteU32(devp, AX5043_REG_FREQA, f);
-
-    /* PLL autoranging */
-    uint8_t r;
-    uint8_t pll_init_val = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNGINIT);
-    if( !(pll_init_val & 0xF0) ) { // start values for ranging available
-        r = pll_init_val | 0x10;
-    }
-    else {
-        r = 0x18;
-    }
-    ax5043WriteU8(devp, AX5043_REG_PLLRANGINGA, r);
-    chThdSleepMilliseconds(1);
-    while ((ax5043ReadU8(devp, AX5043_REG_PLLRANGINGA) & 0x10) != 0)
-    {
-        chThdSleepMilliseconds(1);
-    }
-    int8_t value = ax5043ReadU8(devp, AX5043_REG_PLLRANGINGA);
-    ax5043_set_conf_val(devp, AX5043_PHY_CHANPLLRNG, value);
-    devp->state = AX5043_PLL_RANGE_DONE;
-
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-    ax5043_set_regs_group(devp,common);
-    ax5043_set_regs_group(devp,rx);
-
-    uint8_t pll_val = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNG);
-    ax5043WriteU8(devp, AX5043_REG_PLLRANGINGA, (pll_val & 0x0F));
-    f = ax5043_get_conf_val(devp, AX5043_PHY_CHANFREQ);
-    ax5043WriteU32(devp, AX5043_REG_FREQA, f);
-
-    ax5043_set_regs_group(devp,local_address);
 }
 
 /**
@@ -338,9 +317,13 @@ void ax5043Stop(AX5043Driver *devp) {
 #endif /* AX5043_SHARED_SPI */
 #endif /* AX5043_USE_SPI */
 
-        /* Disable the interrupt handler */
+        /* Disable the interrupt handler and worker thread */
         palDisableLineEvent(devp->config->irq);
         palSetLineCallback(devp->config->irq, NULL, NULL);
+        chThdTerminate(devp->irq_worker);
+        chEvtSignal(devp->irq_worker, (eventmask_t)1);
+        chThdWait(devp->irq_worker);
+        devp->irq_worker = NULL;
     }
 
     /* Transition to stop state */
@@ -383,7 +366,7 @@ ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, con
 #endif /* AX5043_SHARED_SPI */
 #endif /* AX5043_USE_SPI */
 
-    return __REVSH(status);
+    return status;
 }
 
 /**
@@ -569,8 +552,7 @@ ax5043_status_t ax5043Reset(AX5043Driver *devp) {
 
     /* Write to PWRMODE: XOEN, REFEN and POWERDOWN mode. Clear RST bit.
        Page 33 in programming manual */
-    /* TODO: Maybe no XOEN and possible REFEN? */
-    regval = AX5043_PWRMODE_XOEN | AX5043_PWRMODE_REFEN | AX5043_PWRMODE_POWERDOWN;
+    regval = AX5043_PWRMODE_REFEN | AX5043_PWRMODE_POWERDOWN;
     ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
 
     /* Verify functionality with SCRATCH register */
@@ -590,6 +572,55 @@ ax5043_status_t ax5043Reset(AX5043Driver *devp) {
     return status;
 }
 
+/**
+ * @brief   Sets Carrier Frequency on an AX5043 device.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  freq         Carrier frequency in Hz.
+ * @param[in]  vcor         VCO Range value. Set to 0 if unknown.
+ * @param[in]  chan_b       Set channel B frequency if true, channel A otherwise.
+ *
+ * @return                  Corrected VCOR for given frequency
+ * @api
+ */
+uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b) {
+    uint16_t freq_reg = (chan_b ? AX5043_REG_FREQB : AX5043_REG_FREQA);
+    uint16_t rng_reg = (chan_b ? AX5043_REG_PLLRANGINGB : AX5043_REG_PLLRANGINGA);
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
+
+    /* If no VCOR specified, default to 8 */
+    if (vcor == 0) {
+        vcor = 8;
+    }
+
+    /* Enter Standby mode */
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_STANDBY);
+
+    /* Wait for XTAL */
+    while ((ax5043ReadU8(devp, AX5043_REG_XTALSTATUS) & AX5043_XTALSTATUS_XTALRUN) == 0);
+
+    /* Set frequencies
+     * We treat these as 64 bit values to accomodate the calculations
+     * NOTE: The programming manual recommends always setting bit 0
+     *
+     * REG = f_carrier * 2^24 / f_xtal + 1/2
+     *     = (f_carrier * 2^25 + f_xtal) / (f_xtal * 2)
+     */
+    freq = (uint32_t)(((uint64_t)freq * 0x2000000U + devp->config->xtal_freq) / (devp->config->xtal_freq * 2)) | 0x01U;
+    ax5043WriteU32(devp, freq_reg, freq);
+    ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
+    while ((vcor = ax5043ReadU8(devp, rng_reg)) & AX5043_PLLRANGING_RNGSTART);
+    if (vcor & AX5043_PLLRANGING_RNGERR) {
+        devp->error = AX5043_ERR_RANGING;
+    }
+
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+
+    return _FLD2VAL(AX5043_PLLRANGING_VCOR, vcor);
+}
+
 /*===========================*/
 /* TODO: START OVERHAUL HERE */
 /*===========================*/
@@ -597,64 +628,6 @@ ax5043_status_t ax5043Reset(AX5043Driver *devp) {
 /*
  * TODO: Switch to direct register configuration, use structs
  */
-/**
- * @brief   Sets AX5043 registers.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  group        register group that needs to be written.
- *
- * @return                  Most significant status bits (S14...S8)
- * @api
- */
-uint8_t ax5043_set_regs_group(AX5043Driver *devp, ax5043_reg_group_t group) {
-    ax5043_status_t status = 0;
-    int i = 0;
-
-    osalDbgCheck(devp != NULL);
-    /* TODO: Add state sanity check */
-    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_set_regs_group(), invalid state");*/
-
-    ax5043_regval_t* entry = devp->config->reg_values;
-    while (entry[i].reg != AX5043_REG_END) {
-        if (entry[i].group == group){
-            status = ax5043Exchange(devp, entry[i].reg, true, &entry[i].val, NULL, 1);
-        }
-        i++;
-    }
-
-    devp->status = status;
-
-    /* Return last status from AX5043 while writting the register */
-    return status;
-}
-
-/**
- * @brief   Gets AX5043 register values from the AX5043 driver structure.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  reg_name           register name.
- *
- * @return                        register value.
- * @api
- */
-uint8_t ax5043_get_reg_val(AX5043Driver *devp, uint16_t reg_name) {
-    int i = 0;
-
-    osalDbgCheck(devp != NULL);
-    /* TODO: Add state sanity check */
-    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_get_reg_val(), invalid state");*/
-
-    ax5043_regval_t* entry = devp->config->reg_values;
-    while (entry[i].reg != AX5043_REG_END) {
-        if (entry[i].reg == reg_name){
-            return entry[i].val;
-        }
-        i++;
-    }
-    devp->error = AX5043_ERR_REG_NOT_IN_CONF;
-    return 0;
-}
-
 /**
  * @brief   Gets AX5043 configuration values from the AX5043 driver structure.
  *
@@ -728,17 +701,11 @@ void ax5043_prepare_tx(AX5043Driver *devp){
     ax5043SetPWRMode(devp, AX5043_PWRMODE_FIFO_EN);
 
     /* TODO */
-    ax5043_set_regs_group(devp,tx);
+    /*ax5043_set_regs_group(devp,tx);*/
     ax5043_init_registers_common(devp);
 
-    /* Set FIFO threshold and interrupt mask */
-    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 0x0080);
-    ax5043WriteU16(devp, AX5043_REG_IRQMASK, 0x0100);
-
-    /* Wait for XTAL */
-    while ((ax5043ReadU8(devp, AX5043_REG_XTALSTATUS) & 0x01) == 0) {
-        chThdSleepMilliseconds(1);
-    }
+    /* Set FIFO threshold */
+    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
 
     devp->status = ax5043GetStatus(devp);
     devp->state = AX5043_TX;
@@ -756,49 +723,22 @@ void ax5043_prepare_rx(AX5043Driver *devp){
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_prepare_rx(), invalid state");*/
 
-    ax5043_set_regs_group(devp,rx);
+    /*ax5043_set_regs_group(devp,rx);*/
     ax5043_init_registers_common(devp);
 
     /* Updates RSSI reference value, Sets a group of RX registers */
     uint8_t rssireference = ax5043_get_conf_val(devp, AX5043_PHY_RSSIREFERENCE) ;
     ax5043WriteU8(devp, AX5043_REG_RSSIREFERENCE, rssireference);
-    ax5043_set_regs_group(devp,rx_cont);
+    /*ax5043_set_regs_group(devp,rx_cont);*/
     /* Resets FIFO, changes powermode to FULL RX */
-    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, 0x03);
+    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, _VAL2FLD(AX5043_FIFOSTAT_FIFOCMD, AX5043_FIFOCMD_CLEAR_FIFODAT));
     ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_FULL);
     /* Sets FIFO threshold and interrupt mask */
-    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 0x0080);
-    ax5043WriteU16(devp, AX5043_REG_IRQMASK, 0x0001);
+    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
+    ax5043WriteU16(devp, AX5043_REG_IRQMASK, AX5043_IRQ_FIFONOTEMPTY);
 
     devp->status = ax5043GetStatus(devp);
     devp->state = AX5043_RX;
-}
-
-/**
- * @brief   Does PLL ranging.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- *
- * @returns                       PLLVCOI Register content.
- * @api
- */
-uint8_t axradio_get_pllvcoi(AX5043Driver *devp){
-    osalDbgCheck(devp != NULL);
-    /* TODO: Add state sanity check */
-    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_get_pllvcoi(), invalid state");*/
-
-    uint8_t x = ax5043_get_conf_val(devp, AX5043_PHY_CHANVCOIINIT) ;
-    uint8_t pll_init_val = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNGINIT);
-    uint8_t pll_val = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNG);
-    if (x & 0x80) {
-        if (!(pll_init_val & 0xF0)) {
-            x += (pll_val & 0x0F) - (pll_init_val & 0x0F);
-            x &= 0x3f;
-            x |= 0x80;
-        }
-        return x;
-    }
-    return ax5043ReadU8(devp, AX5043_REG_PLLVCOI);
 }
 
 /**
@@ -814,17 +754,23 @@ void ax5043_init_registers_common(AX5043Driver *devp){
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_init_registers_common(), invalid state");*/
 
     uint8_t rng = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNG);
-    if (rng & 0x20)
+    if (rng & AX5043_PLLRANGING_RNGERR)
         devp->status = AX5043_ERR_PLLRNG_VAL;
-    if (ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & 0x80) {
-        ax5043WriteU8(devp, AX5043_REG_PLLRANGINGB, (rng & 0x0F));
+    if (ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL) {
+        ax5043WriteU8(devp, AX5043_REG_PLLRANGINGB, (rng & AX5043_PLLRANGING_VCOR));
     }
     else {
-        ax5043WriteU8(devp, AX5043_REG_PLLRANGINGA, (rng & 0x0F));
+        ax5043WriteU8(devp, AX5043_REG_PLLRANGINGA, (rng & AX5043_PLLRANGING_VCOR));
     }
-    rng = axradio_get_pllvcoi(devp);
-    if (rng & 0x80)
-        ax5043WriteU8(devp, AX5043_REG_PLLVCOI, rng);
+    uint8_t x = ax5043_get_conf_val(devp, AX5043_PHY_CHANVCOIINIT) ;
+    uint8_t pll_init_val = ax5043_get_conf_val(devp, AX5043_PHY_CHANPLLRNGINIT);
+    if (x & AX5043_PLLVCOI_VCOIE) {
+        if (!(pll_init_val & 0xF0)) {
+            x += _FLD2VAL(AX5043_PLLRANGING_VCOR, rng) - _FLD2VAL(AX5043_PLLRANGING_VCOR, pll_init_val);
+            x = AX5043_PLLVCOI_VCOIE | _VAL2FLD(AX5043_PLLVCOI_VCOI, x);
+        }
+        ax5043WriteU8(devp, AX5043_REG_PLLVCOI, x);
+    }
 }
 
 /**
@@ -1004,7 +950,6 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) {
     uint16_t packet_len;
     uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
-    uint8_t axradio_localaddr[4];
 
     uint8_t maclen = ax5043_get_conf_val(devp, AX5043_FRAMING_MACLEN);
     uint8_t destaddrpos = ax5043_get_conf_val(devp, AX5043_FRAMING_DESTADDRPOS);
@@ -1014,11 +959,6 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     uint8_t lenoffs = ax5043_get_conf_val(devp, AX5043_FRAMING_LENOFFS);
     uint8_t lenpos = ax5043_get_conf_val(devp, AX5043_FRAMING_LENPOS);
 
-    axradio_localaddr[0] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR0);
-    axradio_localaddr[1] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR1);
-    axradio_localaddr[2] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR2);
-    axradio_localaddr[3] = ax5043_get_reg_val(devp, AX5043_REG_PKTADDR3);
-
     packet_len = pktlen + maclen;
     if (packet_len > sizeof(axradio_txbuffer))
         return AX5043_ERR_INVALID;
@@ -1026,10 +966,13 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     /* Prepare the MAC segment of the packet */
     memset(axradio_txbuffer, 0, maclen);
     memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
-    if (destaddrpos != 0xff)
+    if (destaddrpos != 0xff) {
         memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
-    if (sourceaddrpos != 0xff)
-        memcpy(&axradio_txbuffer[sourceaddrpos], axradio_localaddr, addrlen);
+    }
+    if (sourceaddrpos != 0xff) {
+        uint32_t axradio_localaddr = __REV(devp->config->addr);
+        memcpy(&axradio_txbuffer[sourceaddrpos], &axradio_localaddr, addrlen);
+    }
     if (lenmask) {
         /* Calculate payload length and update the MAC of payload */
         uint8_t len_byte = (uint8_t)(packet_len - lenoffs) & lenmask;
