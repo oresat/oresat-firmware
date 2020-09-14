@@ -695,8 +695,8 @@
                                      PIN_PUPDR_FLOATING(GPIOD_PIN13) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN14) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_PIN15))
-#define VAL_GPIOD_ODR               (PIN_ODR_HIGH(GPIOD_FIRE_HELI_1) |      \
-                                     PIN_ODR_HIGH(GPIOD_FIRE_TURN_1) |      \
+#define VAL_GPIOD_ODR               (PIN_ODR_LOW(GPIOD_FIRE_HELI_1) |       \
+                                     PIN_ODR_LOW(GPIOD_FIRE_TURN_1) |       \
                                      PIN_ODR_HIGH(GPIOD_SDIO_CMD) |         \
                                      PIN_ODR_HIGH(GPIOD_TEST_HELI) |        \
                                      PIN_ODR_HIGH(GPIOD_UHF_ENABLE) |       \
@@ -814,8 +814,8 @@
                                      PIN_PUPDR_FLOATING(GPIOE_PIN15))
 #define VAL_GPIOE_ODR               (PIN_ODR_HIGH(GPIOE_PIN0) |             \
                                      PIN_ODR_LOW(GPIOE_WDT) |               \
-                                     PIN_ODR_HIGH(GPIOE_FIRE_TURN_2) |      \
-                                     PIN_ODR_HIGH(GPIOE_FIRE_HELI_2) |      \
+                                     PIN_ODR_LOW(GPIOE_FIRE_TURN_2) |       \
+                                     PIN_ODR_LOW(GPIOE_FIRE_HELI_2) |       \
                                      PIN_ODR_HIGH(GPIOE_PIN4) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN5) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN6) |             \
