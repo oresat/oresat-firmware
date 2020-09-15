@@ -2662,6 +2662,7 @@ void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value);
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
 
 ax5043_status_t ax5043Reset(AX5043Driver *devp);
+uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
 
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);

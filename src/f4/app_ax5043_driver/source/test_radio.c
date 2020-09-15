@@ -1,8 +1,10 @@
+#include <stdlib.h>
 #include <string.h>
 #include "ch.h"
 #include "hal.h"
 #include "test_radio.h"
 #include "ax5043.h"
+#include "chprintf.h"
 
 static const SPIConfig lband_spicfg = {
     false,
@@ -68,6 +70,25 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "Stopping AX5043 driver...");
         ax5043Stop(&lband);
         chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "setfreq")) {
+        uint32_t freq;
+        uint8_t vcor = 0;
+        bool chan_b = false;
+        if (lband.state != AX5043_READY) {
+            chprintf(chp, "Please start the AX5043 driver first\r\n");
+            goto radio_usage;
+        }
+        if (argc < 2) {
+            goto radio_usage;
+        }
+        freq = strtoul(argv[1], NULL, 0);
+        if (argc > 2) {
+            vcor = strtoul(argv[2], NULL, 0);
+            if (argc == 4) {
+                chan_b = !strcmp(argv[3], "true");
+            }
+        }
+        ax5043SetFreq(&lband, freq, vcor, chan_b);
     } else {
         goto radio_usage;
     }
@@ -76,8 +97,11 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 
 radio_usage:
     chprintf(chp, "Usage: radio <cmd>\r\n"
-                  "    start:      Start AX5043 device\r\n"
-                  "    stop:       Stop AX5043 device\r\n"
+                  "    start:   Start AX5043 device\r\n"
+                  "    stop:    Stop AX5043 device\r\n"
+                  "    setfreq <freq> [vcor] [chan_b]:\r\n"
+                  "             Sets frequency of channel A/B to <freq>\r\n"
+                  "             Optionally provide VCOR. [chan_b] specifies channel B\r\n"
                   "\r\n");
     return;
 }
