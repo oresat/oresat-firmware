@@ -150,7 +150,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
 void ax5043IRQHandler(void *arg) {
     AX5043Driver *devp = arg;
 
-    osalDbgCheck(devp != NULL, devp->irq_worker != NULL);
+    osalDbgCheck(devp != NULL && devp->irq_worker != NULL);
 
     chSysLockFromISR();
     chEvtSignalI(devp->irq_worker, EVENT_MASK(0));
@@ -178,9 +178,40 @@ THD_FUNCTION(irq_worker, arg) {
         irq = ax5043ReadU16(devp, AX5043_REG_IRQREQUEST);
 
         /* Signal waiting thread with pending interrupts */
-        /*chEvt...(&devp->irq_event, irq);*/
+        chEvtBroadcastFlags(&devp->irq_event, irq);
     }
     chThdExit(MSG_OK);
+}
+
+/**
+ * @brief   Waits for the specified interrupts to occur
+ *
+ * @notapi
+ */
+void ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeout) {
+    event_listener_t el;
+    uint16_t regval;
+
+    osalDbgCheck(devp != NULL);
+
+    /* Register on the interrupt with the specified IRQ signals */
+    chEvtRegisterMaskWithFlags(&devp->irq_event, &el, EVENT_MASK(0), irq);
+
+    /* Enable the interrupt source */
+    regval = ax5043ReadU16(devp, AX5043_REG_IRQMASK);
+    regval |= irq;
+    ax5043WriteU16(devp, AX5043_REG_IRQMASK, regval);
+
+    /* Wait for the interrupt to occur */
+    chEvtWaitAllTimeout(EVENT_MASK(0), timeout);
+
+    /* Retrieve interrupt request value and unregister from interrupt */
+    regval = chEvtGetAndClearFlags(&el);
+    chEvtUnregister(&devp->irq_event, &el);
+
+    /* Disable the interrupt */
+    regval &= ~irq;
+    ax5043WriteU16(devp, AX5043_REG_IRQMASK, regval);
 }
 
 /**
@@ -599,7 +630,7 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     ax5043SetPWRMode(devp, AX5043_PWRMODE_STANDBY);
 
     /* Wait for XTAL */
-    while ((ax5043ReadU8(devp, AX5043_REG_XTALSTATUS) & AX5043_XTALSTATUS_XTALRUN) == 0);
+    ax5043WaitIRQ(devp, AX5043_IRQ_XTALREADY, TIME_INFINITE);
 
     /* Set frequencies
      * We treat these as 64 bit values to accomodate the calculations
@@ -611,7 +642,8 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     freq = (uint32_t)(((uint64_t)freq * 0x2000000U + devp->config->xtal_freq) / (devp->config->xtal_freq * 2)) | 0x01U;
     ax5043WriteU32(devp, freq_reg, freq);
     ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
-    while ((vcor = ax5043ReadU8(devp, rng_reg)) & AX5043_PLLRANGING_RNGSTART);
+    ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
+    vcor = ax5043ReadU8(devp, rng_reg);
     if (vcor & AX5043_PLLRANGING_RNGERR) {
         devp->error = AX5043_ERR_RANGING;
     }
@@ -997,10 +1029,12 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     transmit_loop(devp, packet_len, axradio_txbuffer);
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
 
-    ax5043ReadU8(devp,AX5043_REG_RADIOEVENTREQ0);
-    while (ax5043ReadU8(devp,AX5043_REG_RADIOSTATE) != 0) {
-        chThdSleepMilliseconds(1);
-    }
+    /* Clear radio event register, enable DONE, and wait for interrupt */
+    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+    ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
+    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     ax5043WriteU8(devp,AX5043_REG_RADIOEVENTMASK0, 0x00);
     devp->error = AX5043_ERR_NOERROR;
@@ -1109,12 +1143,8 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
  * TODO return a -ve return code if there are any errors
  */
 uint8_t ax5043_prepare_cw(AX5043Driver *devp){
-    ax5043WriteU8(devp, AX5043_REG_FSKDEV2, 0x00);
-    ax5043WriteU8(devp, AX5043_REG_FSKDEV1, 0x00);
-    ax5043WriteU8(devp, AX5043_REG_FSKDEV0, 0x00);
-    ax5043WriteU8(devp, AX5043_REG_TXRATE2, 0x00);
-    ax5043WriteU8(devp, AX5043_REG_TXRATE1, 0x00);
-    ax5043WriteU8(devp, AX5043_REG_TXRATE0, 0x01);
+    ax5043WriteU32(devp, AX5043_REG_FSKDEV, 0x000000U);
+    ax5043WriteU32(devp, AX5043_REG_TXRATE, 0x000001U);
 
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
 
