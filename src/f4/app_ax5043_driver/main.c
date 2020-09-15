@@ -21,6 +21,7 @@
 
 /* Project header files */
 #include "cmd.h"
+#include "test_radio.h"
 
 /**
  * @brief App Initialization
