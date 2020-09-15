@@ -310,8 +310,10 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     devp->status = ax5043Reset(devp);
 
     /* Apply register overrides provided by user */
-    for (ax5043_regval_t *entry = config->reg_values; entry->reg; entry++) {
-        ax5043WriteU8(devp, entry->reg, entry->val);
+    if (config->reg_values) {
+        for (const ax5043_regval_t *entry = config->reg_values; entry->reg; entry++) {
+            ax5043WriteU8(devp, entry->reg, entry->val);
+        }
     }
 
     /* Transition to ready state */

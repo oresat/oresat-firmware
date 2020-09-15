@@ -529,9 +529,9 @@
 #define AX5043_IRQ_FIFOTHRCNT_Pos           (2U)
 #define AX5043_IRQ_FIFOTHRCNT_Msk           (0x1U << AX5043_IRQ_FIFOTHRCNT_Pos)
 #define AX5043_IRQ_FIFOTHRCNT               AX5043_IRQ_FIFOTHRCNT_Msk
-#define AX5043_IRQ_FIFLTHRFREE_Pos          (3U)
-#define AX5043_IRQ_FIFLTHRFREE_Msk          (0x1U << AX5043_IRQ_FIFOTHRFREE_Pos)
-#define AX5043_IRQ_FIFLTHRFREE              AX5043_IRQ_FIFOTHRFREE_Msk
+#define AX5043_IRQ_FIFOTHRFREE_Pos          (3U)
+#define AX5043_IRQ_FIFOTHRFREE_Msk          (0x1U << AX5043_IRQ_FIFOTHRFREE_Pos)
+#define AX5043_IRQ_FIFOTHRFREE              AX5043_IRQ_FIFOTHRFREE_Msk
 #define AX5043_IRQ_FIFOERROR_Pos            (4U)
 #define AX5043_IRQ_FIFOERROR_Msk            (0x1U << AX5043_IRQ_FIFOERROR_Pos)
 #define AX5043_IRQ_FIFOERROR                AX5043_IRQ_FIFOERROR_Msk
@@ -2289,6 +2289,7 @@
 #define AX5043_0xF10_GT_43MHZ               (0x0DU)
 #define AX5043_0xF11_TCXO                   (0x00U)
 #define AX5043_0xF11_CRYSTAL                (0x07U)
+/* TODO: Try to figure out 0xF18 values */
 #define AX5043_0xF1C_DEFVAL                 (0x07U)
 #define AX5043_0xF21_DEFVAL                 (0x5CU)
 #define AX5043_0xF22_DEFVAL                 (0x53U)
@@ -2494,10 +2495,6 @@ typedef struct{
      */
     uint32_t                    xtal_freq;
     /**
-     * @brief TCXO connected to XTAL
-     */
-    bool                        xtal_tcxo;
-    /**
      * @brief Radio Address
      */
     uint32_t                    addr;
@@ -2506,7 +2503,7 @@ typedef struct{
      * @note  This is for initial configuration and performance tuning.
      *        Certain values may be overwritten later.
      */
-    ax5043_regval_t             *reg_values;
+    const ax5043_regval_t       *reg_values;
 
     ax5043_confval_t *conf_values;
     ax5043_mode_t ax5043_mode;
