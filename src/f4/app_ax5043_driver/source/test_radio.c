@@ -109,7 +109,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     if (!strcmp(argv[0], "start")) {
         chprintf(chp, "Starting AX5043 driver...");
         ax5043Start(&lband, &lbandcfg);
-        if (lband.state != READY) {
+        if (lband.state != AX5043_READY) {
             chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", lband.error);
         } else {
             chprintf(chp, "OK\r\n");
@@ -123,7 +123,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t vcor = 0;
         bool chan_b = false;
         if (lband.state != AX5043_READY) {
-            chprintf(chp, "Please start the AX5043 driver first\r\n");
+            chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
             goto radio_usage;
         }
         if (argc < 2) {
@@ -140,7 +140,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "readreg")) {
         uint16_t reg;
         if (lband.state != AX5043_READY) {
-            chprintf(chp, "Please start the AX5043 driver first\r\n");
+            chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
             goto radio_usage;
         }
         if (argc < 3) {
@@ -190,7 +190,8 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     return;
 
 radio_usage:
-    chprintf(chp, "Usage: radio <cmd>\r\n"
+    chprintf(chp, "\r\n"
+                  "Usage: radio <cmd>\r\n"
                   "    start:       Start AX5043 device\r\n"
                   "    stop:        Stop AX5043 device\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"

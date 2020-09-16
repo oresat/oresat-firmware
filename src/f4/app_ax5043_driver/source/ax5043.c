@@ -288,11 +288,6 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     devp->rf_freq_off1 = 0;
     devp->rssi = 0;
 
-    /* Register interrupt handler for device and start worker */
-    devp->irq_worker = chThdCreateStatic(irq_wa, sizeof(irq_wa), HIGHPRIO, irq_worker, devp);
-    palSetLineCallback(config->irq, ax5043IRQHandler, devp);
-    palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
-
 #if AX5043_USE_SPI
 #if AX5043_SHARED_SPI
     spiAcquireBus(config->spip);
@@ -310,6 +305,13 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     devp->status = ax5043Reset(devp);
     if (devp->error != AX5043_ERR_NOERROR) {
         return;
+    }
+
+    /* Register interrupt handler for device and start worker */
+    if (devp->irq_worker == NULL) {
+        devp->irq_worker = chThdCreateStatic(irq_wa, sizeof(irq_wa), HIGHPRIO, irq_worker, devp);
+        palSetLineCallback(config->irq, ax5043IRQHandler, devp);
+        palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
 
     /* Apply register overrides provided by user */
