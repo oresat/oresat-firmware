@@ -102,84 +102,82 @@ AX5043Driver uhf;
 /*===========================================================================*/
 void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    static AX5043Driver *devp = NULL;
     if (argc < 1) {
+        goto radio_usage;
+    }
+
+    if (!strcmp(argv[0], "setdev") && argc > 1) {
+        if (argv[1][0] == 'l') {
+            devp = &lband;
+        } else if (argv[1][0] == 'u') {
+            devp = &uhf;
+        } else {
+            goto radio_usage;
+        }
+    }
+
+    if (devp == NULL) {
         goto radio_usage;
     }
 
     if (!strcmp(argv[0], "start")) {
         chprintf(chp, "Starting AX5043 driver...");
-        ax5043Start(&lband, &lbandcfg);
-        if (lband.state != AX5043_READY) {
-            chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", lband.error);
+        ax5043Start(devp, &lbandcfg);
+        if (devp->state != AX5043_READY) {
+            chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", devp->error);
         } else {
             chprintf(chp, "OK\r\n");
         }
     } else if (!strcmp(argv[0], "stop")) {
         chprintf(chp, "Stopping AX5043 driver...");
-        ax5043Stop(&lband);
+        ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "setfreq")) {
-        uint32_t freq;
-        uint8_t vcor = 0;
-        bool chan_b = false;
-        if (lband.state != AX5043_READY) {
+    } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
+        uint32_t freq = strtoul(argv[1], NULL, 0);
+        uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
+        bool chan_b = (argc > 3 && !strcmp(argv[3], "true") ? true : false);
+
+        if (devp->state != AX5043_READY) {
             chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
-            goto radio_usage;
-        }
-        if (argc < 2) {
-            goto radio_usage;
-        }
-        freq = strtoul(argv[1], NULL, 0);
-        if (argc > 2) {
-            vcor = strtoul(argv[2], NULL, 0);
-            if (argc == 4) {
-                chan_b = !strcmp(argv[3], "true");
-            }
-        }
-        ax5043SetFreq(&lband, freq, vcor, chan_b);
-    } else if (!strcmp(argv[0], "readreg")) {
-        uint16_t reg;
-        if (lband.state != AX5043_READY) {
-            chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
-            goto radio_usage;
-        }
-        if (argc < 3) {
             goto radio_usage;
         }
 
-        reg = strtoul(argv[1], NULL, 0);
+        ax5043SetFreq(devp, freq, vcor, chan_b);
+    } else if (!strcmp(argv[0], "readreg") && argc > 2) {
+        uint16_t reg = strtoul(argv[1], NULL, 0);
+
+        if (devp->state != AX5043_READY) {
+            chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
+            goto radio_usage;
+        }
 
         if (!strcmp(argv[2], "u8")) {
-            chprintf(chp, "0x%02X\r\n", ax5043ReadU8(&lband, reg));
+            chprintf(chp, "0x%02X\r\n", ax5043ReadU8(devp, reg));
         } else if (!strcmp(argv[2], "u16")) {
-            chprintf(chp, "0x%04X\r\n", ax5043ReadU16(&lband, reg));
+            chprintf(chp, "0x%04X\r\n", ax5043ReadU16(devp, reg));
         } else if (!strcmp(argv[2], "u24")) {
-            chprintf(chp, "0x%06X\r\n", ax5043ReadU24(&lband, reg));
+            chprintf(chp, "0x%06X\r\n", ax5043ReadU24(devp, reg));
         } else if (!strcmp(argv[2], "u32")) {
-            chprintf(chp, "0x%08X\r\n", ax5043ReadU32(&lband, reg));
+            chprintf(chp, "0x%08X\r\n", ax5043ReadU32(devp, reg));
         } else {
             goto radio_usage;
         }
-    } else if (!strcmp(argv[0], "writereg")) {
-        uint16_t reg;
-        if (argc < 4) {
-            goto radio_usage;
-        }
-
-        reg = strtoul(argv[1], NULL, 0);
+    } else if (!strcmp(argv[0], "writereg") && argc > 3) {
+        uint16_t reg = strtoul(argv[1], NULL, 0);
 
         if (!strcmp(argv[2], "u8")) {
             uint8_t value = strtoul(argv[3], NULL, 0);
-            ax5043WriteU8(&lband, reg, value);
+            ax5043WriteU8(devp, reg, value);
         } else if (!strcmp(argv[2], "u16")) {
             uint16_t value = strtoul(argv[3], NULL, 0);
-            ax5043WriteU8(&lband, reg, value);
+            ax5043WriteU16(devp, reg, value);
         } else if (!strcmp(argv[2], "u24")) {
             uint32_t value = strtoul(argv[3], NULL, 0);
-            ax5043WriteU8(&lband, reg, value);
+            ax5043WriteU24(devp, reg, value);
         } else if (!strcmp(argv[2], "u32")) {
             uint32_t value = strtoul(argv[3], NULL, 0);
-            ax5043WriteU8(&lband, reg, value);
+            ax5043WriteU32(devp, reg, value);
         } else {
             goto radio_usage;
         }
@@ -192,13 +190,18 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 radio_usage:
     chprintf(chp, "\r\n"
                   "Usage: radio <cmd>\r\n"
+                  "    setdev <dev>:\r\n"
+                  "                 Set the device to (l)band or (u)hf\r\n"
+                  "\r\n"
                   "    start:       Start AX5043 device\r\n"
                   "    stop:        Stop AX5043 device\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
                   "                 Sets frequency of channel A/B to <freq>\r\n"
                   "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"
+                  "\r\n"
                   "    readreg <reg> <type>:\r\n"
                   "                 Read <reg> where <type> is u8|u16|u24|u32\r\n"
+                  "\r\n"
                   "    writereg <reg> <value> <type>:\r\n"
                   "                 Write <reg> with <value> where <type> is u8|u16|u24|u32\r\n"
                   "\r\n");
