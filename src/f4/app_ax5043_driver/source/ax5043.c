@@ -91,7 +91,7 @@ typedef union __attribute__((packed)) {
  * @brief   Perform a long (16-bit address) exchange with AX5043 using SPI.
  * @note    Can be called with NULL values for txbuf and/or rxbuf.
  * @note    A maximum of 256 bytes can be transferred at a time using this function.
- * @pre     The SPI interface must be initialized and the driver started.
+ * @pre     The SPI interface must be initialized, the driver started, and the device selected.
  *
  * @param[in]   spip        SPI Configuration
  * @param[in]   reg         Register address
@@ -103,7 +103,7 @@ typedef union __attribute__((packed)) {
  * @return                  AX5043 status bits
  * @notapi
  */
-ax5043_status_t ax5043SPIExchange(SPIDriver *spip, ioline_t miso, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
     spibuf_t sendbuf;
     spibuf_t recvbuf;
 
@@ -120,8 +120,6 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, ioline_t miso, uint16_t reg, 
 
     /* Perform the exchange */
     /* We always receive because we need the status bits */
-    spiSelect(spip);
-    while (!palReadLine(miso));
     if (txbuf != NULL) {
         spiExchange(spip, n + sizeof(uint16_t), sendbuf.buf, recvbuf.buf);
     } else if (rxbuf != NULL) {
@@ -130,7 +128,6 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, ioline_t miso, uint16_t reg, 
         /* Status only */
         spiReceive(spip, sizeof(uint16_t), recvbuf.buf);
     }
-    spiUnselect(spip);
 
     /* Copy the RX data to provided buffer */
     if (rxbuf != NULL) {
@@ -396,7 +393,10 @@ ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, con
     spiStart(spip, devp->config->spicfg);
 #endif /* AX5043_SHARED_SPI */
 
-    status = ax5043SPIExchange(spip, devp->config->miso, reg, write, txbuf, rxbuf, n);
+    spiSelect(spip);
+    while (!palReadLine(devp->config->miso));
+    status = ax5043SPIExchange(spip, reg, write, txbuf, rxbuf, n);
+    spiUnselect(spip);
 
 #if AX5043_SHARED_SPI
     spiReleaseBus(spip);

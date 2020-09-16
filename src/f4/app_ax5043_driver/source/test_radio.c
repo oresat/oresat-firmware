@@ -118,9 +118,11 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             goto radio_usage;
         }
+        return;
     }
 
     if (devp == NULL) {
+        chprintf(chp, "Error: Set the device via 'setdev' first\r\n");
         goto radio_usage;
     }
 
