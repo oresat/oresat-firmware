@@ -2328,6 +2328,132 @@
 #define AX5043_STATUS_GPADC_INT_PENDING     (1 << 14)
 /** @} */
 
+/**
+ * @name    AX5043 FIFO chunk header fields and encodings
+ * @{
+ */
+#define AX5043_FIFOCHUNK_CMD_Pos            (0U)
+#define AX5043_FIFOCHUNK_CMD_Msk            (0x1FU << AX5043_FIFOCHUNK_CMD_Pos)
+#define AX5043_FIFOCHUNK_CMD                AX5043_FIFOCHUNK_CMD_Msk
+#define AX5043_CHUNKCMD_NOP                 (0x00U)
+#define AX5043_CHUNKCMD_DATA                (0x01U)
+#define AX5043_CHUNKCMD_REPEATDATA          (0x02U)
+#define AX5043_CHUNKCMD_TIMER               (0x10U)
+#define AX5043_CHUNKCMD_RSSI                (0x11U)
+#define AX5043_CHUNKCMD_FREQOFFS            (0x12U)
+#define AX5043_CHUNKCMD_RFFREQOFFS          (0x13U)
+#define AX5043_CHUNKCMD_DATARATE            (0x14U)
+#define AX5043_CHUNKCMD_ANTRSSI             (0x15U)
+#define AX5043_CHUNKCMD_TXCTRL              (0x1CU)
+#define AX5043_CHUNKCMD_TXPWR               (0x1DU)
+#define AX5043_FIFOCHUNK_SIZE_Pos           (5U)
+#define AX5043_FIFOCHUNK_SIZE_Msk           (0x7U << AX5043_FIFOCHUNK_SIZE_Pos)
+#define AX5043_FIFOCHUNK_SIZE               AX5043_FIFOCHUNK_SIZE_Msk
+#define AX5043_CHUNKSIZE_VAR                (0x7U)
+/** @} */
+
+/**
+ * @name    AX5043 FIFO TXCTRL Command flags
+ * @{
+ */
+#define AX5043_CHUNK_TXCTRL_PASTATE_Pos     (0U)
+#define AX5043_CHUNK_TXCTRL_PASTATE_Msk     (0x1U << AX5043_CHUNK_TXCTRL_PASTATE_Pos)
+#define AX5043_CHUNK_TXCTRL_PASTATE         AX5043_CHUNK_TXCTRL_PASTATE_Msk
+#define AX5043_CHUNK_TXCTRL_SETPA_Pos       (1U)
+#define AX5043_CHUNK_TXCTRL_SETPA_Msk       (0x1U << AX5043_CHUNK_TXCTRL_SETPA_Pos)
+#define AX5043_CHUNK_TXCTRL_SETPA           AX5043_CHUNK_TXCTRL_SETPA_Msk
+#define AX5043_CHUNK_TXCTRL_ANTSTATE_Pos    (2U)
+#define AX5043_CHUNK_TXCTRL_ANTSTATE_Msk    (0x1U << AX5043_CHUNK_TXCTRL_ANTSTATE_Pos)
+#define AX5043_CHUNK_TXCTRL_ANTSTATE        AX5043_CHUNK_TXCTRL_ANTSTATE_Msk
+#define AX5043_CHUNK_TXCTRL_SETANT_Pos      (3U)
+#define AX5043_CHUNK_TXCTRL_SETANT_Msk      (0x1U << AX5043_CHUNK_TXCTRL_SETANT_Pos)
+#define AX5043_CHUNK_TXCTRL_SETANT          AX5043_CHUNK_TXCTRL_SETANT_Msk
+#define AX5043_CHUNK_TXCTRL_TXDIFF_Pos      (4U)
+#define AX5043_CHUNK_TXCTRL_TXDIFF_Msk      (0x1U << AX5043_CHUNK_TXCTRL_TXDIFF_Pos)
+#define AX5043_CHUNK_TXCTRL_TXDIFF          AX5043_CHUNK_TXCTRL_TXDIFF_Msk
+#define AX5043_CHUNK_TXCTRL_TXSE_Pos        (5U)
+#define AX5043_CHUNK_TXCTRL_TXSE_Msk        (0x1U << AX5043_CHUNK_TXCTRL_TXSE_Pos)
+#define AX5043_CHUNK_TXCTRL_TXSE            AX5043_CHUNK_TXCTRL_TXSE_Msk
+#define AX5043_CHUNK_TXCTRL_SETTX_Pos       (6U)
+#define AX5043_CHUNK_TXCTRL_SETTX_Msk       (0x1U << AX5043_CHUNK_TXCTRL_SETTX_Pos)
+#define AX5043_CHUNK_TXCTRL_SETTX           AX5043_CHUNK_TXCTRL_SETTX_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFO REPEATDATA Command flags
+ * @{
+ */
+#define AX5043_CHUNK_REPEATDATA_PKTSTART_Pos (0U)
+#define AX5043_CHUNK_REPEATDATA_PKTSTART_Msk (0x1U << AX5043_CHUNK_REPEATDATA_PKTSTART_Pos)
+#define AX5043_CHUNK_REPEATDATA_PKTSTART     AX5043_CHUNK_REPEATDATA_PKTSTART_Msk
+#define AX5043_CHUNK_REPEATDATA_PKTEND_Pos  (1U)
+#define AX5043_CHUNK_REPEATDATA_PKTEND_Msk  (0x1U << AX5043_CHUNK_REPEATDATA_PKTEND_Pos)
+#define AX5043_CHUNK_REPEATDATA_PKTEND      AX5043_CHUNK_REPEATDATA_PKTEND_Msk
+#define AX5043_CHUNK_REPEATDATA_RESIDUE_Pos (2U)
+#define AX5043_CHUNK_REPEATDATA_RESIDUE_Msk (0x1U << AX5043_CHUNK_REPEATDATA_RESIDUE_Pos)
+#define AX5043_CHUNK_REPEATDATA_RESIDUE     AX5043_CHUNK_REPEATDATA_RESIDUE_Msk
+#define AX5043_CHUNK_REPEATDATA_NOCRC_Pos   (3U)
+#define AX5043_CHUNK_REPEATDATA_NOCRC_Msk   (0x1U << AX5043_CHUNK_REPEATDATA_NOCRC_Pos)
+#define AX5043_CHUNK_REPEATDATA_NOCRC       AX5043_CHUNK_REPEATDATA_NOCRC_Msk
+#define AX5043_CHUNK_REPEATDATA_RAW_Pos     (4U)
+#define AX5043_CHUNK_REPEATDATA_RAW_Msk     (0x1U << AX5043_CHUNK_REPEATDATA_RAW_Pos)
+#define AX5043_CHUNK_REPEATDATA_RAW         AX5043_CHUNK_REPEATDATA_RAW_Msk
+#define AX5043_CHUNK_REPEATDATA_UNENC_Pos   (5U)
+#define AX5043_CHUNK_REPEATDATA_UNENC_Msk   (0x1U << AX5043_CHUNK_REPEATDATA_UNENC_Pos)
+#define AX5043_CHUNK_REPEATDATA_UNENC       AX5043_CHUNK_REPEATDATA_UNENC_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFO DATA TX flags
+ * @{
+ */
+#define AX5043_CHUNK_DATATX_PKTSTART_Pos    (0U)
+#define AX5043_CHUNK_DATATX_PKTSTART_Msk    (0x1U << AX5043_CHUNK_DATATX_PKTSTART_Pos)
+#define AX5043_CHUNK_DATATX_PKTSTART        AX5043_CHUNK_DATATX_PKTSTART_Msk
+#define AX5043_CHUNK_DATATX_PKTEND_Pos      (0U)
+#define AX5043_CHUNK_DATATX_PKTEND_Msk      (0x1U << AX5043_CHUNK_DATATX_PKTEND_Pos)
+#define AX5043_CHUNK_DATATX_PKTEND          AX5043_CHUNK_DATATX_PKTEND_Msk
+#define AX5043_CHUNK_DATATX_RESIDUE_Pos     (0U)
+#define AX5043_CHUNK_DATATX_RESIDUE_Msk     (0x1U << AX5043_CHUNK_DATATX_RESIDUE_Pos)
+#define AX5043_CHUNK_DATATX_RESIDUE         AX5043_CHUNK_DATATX_RESIDUE_Msk
+#define AX5043_CHUNK_DATATX_NOCRC_Pos       (0U)
+#define AX5043_CHUNK_DATATX_NOCRC_Msk       (0x1U << AX5043_CHUNK_DATATX_NOCRC_Pos)
+#define AX5043_CHUNK_DATATX_NOCRC           AX5043_CHUNK_DATATX_NOCRC_Msk
+#define AX5043_CHUNK_DATATX_RAW_Pos         (0U)
+#define AX5043_CHUNK_DATATX_RAW_Msk         (0x1U << AX5043_CHUNK_DATATX_RAW_Pos)
+#define AX5043_CHUNK_DATATX_RAW             AX5043_CHUNK_DATATX_RAW_Msk
+#define AX5043_CHUNK_DATATX_UNENC_Pos       (0U)
+#define AX5043_CHUNK_DATATX_UNENC_Msk       (0x1U << AX5043_CHUNK_DATATX_UNENC_Pos)
+#define AX5043_CHUNK_DATATX_UNENC           AX5043_CHUNK_DATATX_UNENC_Msk
+/** @} */
+
+/**
+ * @name    AX5043 FIFO DATA RX flags
+ * @{
+ */
+#define AX5043_CHUNK_DATARX_PKTSTART_Pos    (0U)
+#define AX5043_CHUNK_DATARX_PKTSTART_Msk    (0x1U << AX5043_CHUNK_DATARX_PKTSTART_Pos)
+#define AX5043_CHUNK_DATARX_PKTSTART        AX5043_CHUNK_DATARX_PKTSTART_Msk
+#define AX5043_CHUNK_DATARX_PKTEND_Pos      (0U)
+#define AX5043_CHUNK_DATARX_PKTEND_Msk      (0x1U << AX5043_CHUNK_DATARX_PKTEND_Pos)
+#define AX5043_CHUNK_DATARX_PKTEND          AX5043_CHUNK_DATARX_PKTEND_Msk
+#define AX5043_CHUNK_DATARX_RESIDUE_Pos     (0U)
+#define AX5043_CHUNK_DATARX_RESIDUE_Msk     (0x1U << AX5043_CHUNK_DATARX_RESIDUE_Pos)
+#define AX5043_CHUNK_DATARX_RESIDUE         AX5043_CHUNK_DATARX_RESIDUE_Msk
+#define AX5043_CHUNK_DATARX_CRCFAIL_Pos     (0U)
+#define AX5043_CHUNK_DATARX_CRCFAIL_Msk     (0x1U << AX5043_CHUNK_DATARX_CRCFAIL_Pos)
+#define AX5043_CHUNK_DATARX_CRCFAIL         AX5043_CHUNK_DATARX_CRCFAIL_Msk
+#define AX5043_CHUNK_DATARX_ADDRFAIL_Pos    (0U)
+#define AX5043_CHUNK_DATARX_ADDRFAIL_Msk    (0x1U << AX5043_CHUNK_DATARX_ADDRFAIL_Pos)
+#define AX5043_CHUNK_DATARX_ADDRFAIL        AX5043_CHUNK_DATARX_ADDRFAIL_Msk
+#define AX5043_CHUNK_DATARX_SIZEFAIL_Pos    (0U)
+#define AX5043_CHUNK_DATARX_SIZEFAIL_Msk    (0x1U << AX5043_CHUNK_DATARX_SIZEFAIL_Pos)
+#define AX5043_CHUNK_DATARX_SIZEFAIL        AX5043_CHUNK_DATARX_SIZEFAIL_Msk
+#define AX5043_CHUNK_DATARX_ABORT_Pos       (0U)
+#define AX5043_CHUNK_DATARX_ABORT_Msk       (0x1U << AX5043_CHUNK_DATARX_ABORT_Pos)
+#define AX5043_CHUNK_DATARX_ABORT           AX5043_CHUNK_DATARX_ABORT_Msk
+/** @} */
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -2385,6 +2511,147 @@ typedef struct AX5043Driver AX5043Driver;
  * @brief   AX5043 status bits.
  */
 typedef uint16_t ax5043_status_t;
+
+/**
+ * @name    AX5043 chunk structures
+ * @{
+ */
+/**
+ * @brief   RSSI
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t rssi;
+} ax5043_chunk_rssi_t;
+
+/**
+ * @brief   TXCTRL
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t flags;
+} ax5043_chunk_txctrl_t;
+
+/**
+ * @brief   FREQOFFS
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    union {
+        struct {
+            uint8_t freqoffs1;
+            uint8_t freqoffs0;
+        };
+        uint16_t freqoffs;
+    };
+} ax5043_chunk_freqoffs_t;
+
+/**
+ * @brief   ANTRSSI2
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t rssi;
+    uint8_t bgndnoise;
+} ax5043_chunk_antrssi2_t;
+
+/**
+ * @brief   REPEATDATA
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t flags;
+    uint8_t repeatcnt;
+    uint8_t data;
+} ax5043_chunk_repeatdata_t;
+
+/**
+ * @brief   TIMER
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    union {
+        struct {
+            uint8_t timer2;
+            uint8_t timer1;
+            uint8_t timer0;
+            uint8_t padding;
+        };
+        uint32_t timer;
+    };
+} ax5043_chunk_timer_t;
+
+/**
+ * @brief   RFFREQOFFS
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    union {
+        struct {
+            uint8_t rffreqoffs2;
+            uint8_t rffreqoffs1;
+            uint8_t rffreqoffs0;
+            uint8_t padding;
+        };
+        uint32_t rffreqoffs;
+    };
+} ax5043_chunk_rffreqoffs_t;
+
+/**
+ * @brief   DATARATE
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    union {
+        struct {
+            uint8_t datarate2;
+            uint8_t datarate1;
+            uint8_t datarate0;
+            uint8_t padding;
+        };
+        uint32_t datarate;
+    };
+} ax5043_chunk_datarate_t;
+
+/**
+ * @brief   ANTRSSI3
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    union {
+        struct {
+            uint8_t antrssi2;
+            uint8_t antrssi1;
+            uint8_t antrssi0;
+            uint8_t padding;
+        };
+        uint32_t antrssi;
+    };
+} ax5043_chunk_antrssi3_t;
+
+/**
+ * @brief   DATA
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t length;
+    uint8_t flags;
+    uint8_t data[];
+} ax5043_chunk_data_t;
+
+/**
+ * @brief   TXPWR
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t header;
+    uint8_t length;
+    uint16_t txpwrcoeffa;
+    uint16_t txpwrcoeffb;
+    uint16_t txpwrcoeffc;
+    uint16_t txpwrcoeffd;
+    uint16_t txpwrcoeffe;
+} ax5043_chunk_txpwr_t;
+/** @} */
 
 /**
  * @brief   Structure containing a four byte sender X.25 address
@@ -2566,27 +2833,6 @@ struct AX5043Driver {
 /*===========================================================================*/
 
 /**
- * AX5043 FIFO Chunk Encodings
- *
- * TODO: Overhaul this stuff
- * It should probably be structs defining the various types of headers
- *
- */
-#define AX5043_PAYLOADCMD_NOP      0x00
-#define AX5043_PAYLOADCMD_DATA     0x01
-#define AX5043_PAYLOADCMD_REPEATDATA 0x02
-#define AX5043_PAYLOADCMD_TIMER    0x10
-#define AX5043_PAYLOADCMD_RSSI     0x11
-#define AX5043_PAYLOADCMD_FREQOFFS   0x12
-#define AX5043_PAYLOADCMD_RFFREQOFFS 0x13
-#define AX5043_PAYLOADCMD_DATARATE   0x14
-#define AX5043_PAYLOADCMD_ANTRSSI    0x15
-#define AX5043_PAYLOADCMD_TXCTRL   0x1C
-#define AX5043_PAYLOADCMD_TXPWR    0x1D
-
-#define PKTDATA_BUFLEN 260
-
-/**
  * @brief  PHY and Framing details
  * TODO: Overhaul this stuff
  */
@@ -2653,9 +2899,11 @@ ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, con
 ax5043_status_t ax5043GetStatus(AX5043Driver *devp);
 uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg);
 uint16_t ax5043ReadU16(AX5043Driver *devp, uint16_t reg);
+uint32_t ax5043ReadU24(AX5043Driver *devp, uint16_t reg);
 uint32_t ax5043ReadU32(AX5043Driver *devp, uint16_t reg);
 void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value);
 void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value);
+void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value);
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
 
 ax5043_status_t ax5043Reset(AX5043Driver *devp);

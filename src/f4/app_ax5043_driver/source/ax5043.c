@@ -71,8 +71,8 @@ static const char *num[] = {
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
-typedef union {
-    struct __attribute__((packed)) {
+typedef union __attribute__((packed)) {
+    struct {
         union {
             uint16_t    reg;
             uint16_t    status;
@@ -436,7 +436,7 @@ ax5043_status_t ax5043GetStatus(AX5043Driver *devp) {
 }
 
 /**
- * @brief   Read a raw uint8_t value from a register
+ * @brief   Read a uint8_t value from a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -450,13 +450,13 @@ uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU8(), invalid state");
 
-    ax5043Exchange(devp, reg, false, NULL, &value, sizeof(value));
+    ax5043Exchange(devp, reg, false, NULL, &value, 1);
 
     return value;
 }
 
 /**
- * @brief   Read a raw uint16_t value from a register
+ * @brief   Read a uint16_t value from a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -470,13 +470,33 @@ uint16_t ax5043ReadU16(AX5043Driver *devp, uint16_t reg) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU8(), invalid state");
 
-    ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, sizeof(value));
+    ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 2);
 
     return __REVSH(value);
 }
 
 /**
- * @brief   Read a raw uint32_t value from a register
+ * @brief   Read a uint32_t value from a 24-bit register
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ * @param[in]   reg         Register address
+ *
+ * @return                  The value in the register
+ * @api
+ */
+uint32_t ax5043ReadU24(AX5043Driver *devp, uint16_t reg) {
+    uint32_t value;
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU32(), invalid state");
+
+    ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 3);
+
+    return __REV(value);
+}
+
+/**
+ * @brief   Read a uint32_t value from a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -490,13 +510,13 @@ uint32_t ax5043ReadU32(AX5043Driver *devp, uint16_t reg) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU32(), invalid state");
 
-    ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, sizeof(value));
+    ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 4);
 
     return __REV(value);
 }
 
 /**
- * @brief   Write a raw uint8_t value to a register
+ * @brief   Write a uint8_t value to a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -508,11 +528,11 @@ void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
-    ax5043Exchange(devp, reg, true, &value, NULL, sizeof(value));
+    ax5043Exchange(devp, reg, true, &value, NULL, 1);
 }
 
 /**
- * @brief   Write a raw uint16_t value to a register
+ * @brief   Write a uint16_t value to a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -525,11 +545,28 @@ void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value) {
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
     value = __REVSH(value);
-    ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, sizeof(value));
+    ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 2);
 }
 
 /**
- * @brief   Write a raw uint32_t value to a register
+ * @brief   Write a uint32_t value to a 24-bit register
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ * @param[in]   reg         Register address
+ * @param[in]   value       Register value
+ *
+ * @api
+ */
+void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
+
+    value = __REV(value);
+    ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 3);
+}
+
+/**
+ * @brief   Write a uint32_t value to a register
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
  * @param[in]   reg         Register address
@@ -542,7 +579,7 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU32(), invalid state");
 
     value = __REV(value);
-    ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, sizeof(value));
+    ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 4);
 }
 
 /**
@@ -851,7 +888,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                 free_fifo_bytes = packet_bytes_sent;
             packet_bytes_sent -= free_fifo_bytes;
             free_fifo_bytes <<= 5;
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_REPEATDATA | (3 << 5));
+            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3));
             ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_FLAGS));
             ax5043WriteU8(devp,AX5043_REG_FIFODATA, free_fifo_bytes);
             ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE));
@@ -862,7 +899,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                 uint8_t preamble_appendbits = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_APPENDBITS);
                 if (preamble_appendbits) {
                     uint8_t byte;
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_DATA | (2 << 5));
+                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 2));
                     ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x1C);
                     byte = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_APPENDPATTERN);
                     if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & 0x80) {
@@ -884,7 +921,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                     /* SYNCLEN in bytes, rather than bits. Ceiled to next integer e.g. fractional bits are counted as full bits */
                     len_byte += 7;
                     len_byte >>= 3;
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_DATA | ((len_byte + 1) << 5));
+                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA  | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, (len_byte + 1)));
                     ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCFLAGS) | i);
 
                     uint8_t syncword[4] = {ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCWORD0),
@@ -903,7 +940,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                 free_fifo_bytes = packet_bytes_sent >> 3;
             if (free_fifo_bytes) {
                 packet_bytes_sent -= ((uint16_t)free_fifo_bytes) << 3;
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_REPEATDATA | (3 << 5));
+                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3));
                 ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_FLAGS));
                 ax5043WriteU8(devp,AX5043_REG_FIFODATA, free_fifo_bytes);
                 ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE));
@@ -913,7 +950,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                 uint8_t byte = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE) ;
                 free_fifo_bytes = packet_bytes_sent;
                 packet_bytes_sent = 0;
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_DATA | (2 << 5));
+                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 2));
                 ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x1C);
                 if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & 0x80) {
                     /* MSB first -> stop bit below */
@@ -946,7 +983,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
             }
 
 
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_DATA | (7 << 5));
+            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | AX5043_CHUNKSIZE_VAR);
             /* Write FIFO chunk length byte. Length includes the flag byte, thus the +1 */
             ax5043WriteU8(devp,AX5043_REG_FIFODATA, packet_len_to_be_sent + 1);
             ax5043WriteU8(devp,AX5043_REG_FIFODATA, flags);
@@ -983,7 +1020,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
  */
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) {
     uint16_t packet_len;
-    uint8_t axradio_txbuffer[PKTDATA_BUFLEN];
+    uint8_t axradio_txbuffer[260];
 
     uint8_t maclen = ax5043_get_conf_val(devp, AX5043_FRAMING_MACLEN);
     uint8_t destaddrpos = ax5043_get_conf_val(devp, AX5043_FRAMING_DESTADDRPOS);
@@ -1020,7 +1057,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
 
     /*Code for 4-FSK mode */
     if ((ax5043ReadU8(devp,AX5043_REG_MODULATION) & 0x0F) == 9) {
-        ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_PAYLOADCMD_DATA | (7 << 5));
+        ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | AX5043_CHUNKSIZE_VAR);
         /* Length including flags */
         ax5043WriteU8(devp,AX5043_REG_FIFODATA, 2);
         /* Flag PKTSTART -> dibit sync */
@@ -1074,7 +1111,7 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
             chunk_len = ax5043ReadU8(devp, AX5043_REG_FIFODATA);
         fifo_cmd &= 0x1F;
         switch (fifo_cmd) {
-        case AX5043_PAYLOADCMD_DATA:
+        case AX5043_CHUNKCMD_DATA:
             if (chunk_len!=0){
                 /* Discard the flag */
                 ax5043ReadU8(devp, AX5043_REG_FIFODATA);
@@ -1083,7 +1120,7 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
             }
             break;
 
-        case AX5043_PAYLOADCMD_RFFREQOFFS:
+        case AX5043_CHUNKCMD_RFFREQOFFS:
             if (chunk_len == 3){
                 devp->rf_freq_off3 = ax5043ReadU8(devp, AX5043_REG_FIFODATA);
                 devp->rf_freq_off2 = ax5043ReadU8(devp, AX5043_REG_FIFODATA);
@@ -1097,7 +1134,7 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
             }
             break;
 
-        case AX5043_PAYLOADCMD_FREQOFFS:
+        case AX5043_CHUNKCMD_FREQOFFS:
             if (chunk_len == 2){
                 devp->rf_freq_off3 = 0;
                 devp->rf_freq_off2 = ax5043ReadU8(devp, AX5043_REG_FIFODATA);
@@ -1111,7 +1148,7 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
             }
             break;
 
-        case AX5043_PAYLOADCMD_RSSI:
+        case AX5043_CHUNKCMD_RSSI:
             if (chunk_len == 1){
                 devp->rssi = ax5043ReadU8(devp, AX5043_REG_FIFODATA);
             }
@@ -1145,8 +1182,8 @@ uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]) {
  * TODO return a -ve return code if there are any errors
  */
 uint8_t ax5043_prepare_cw(AX5043Driver *devp){
-    ax5043WriteU32(devp, AX5043_REG_FSKDEV, 0x000000U);
-    ax5043WriteU32(devp, AX5043_REG_TXRATE, 0x000001U);
+    ax5043WriteU24(devp, AX5043_REG_FSKDEV, 0x000000U);
+    ax5043WriteU24(devp, AX5043_REG_TXRATE, 0x000001U);
 
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
 
@@ -1154,8 +1191,8 @@ uint8_t ax5043_prepare_cw(AX5043Driver *devp){
      * Removing this will make the transmission to transmit in low power for a few seconds
      * before it reaches peak power */
     /* FIFO reset */
-    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, 0x03);
-    ax5043WriteU8(devp, AX5043_REG_FIFODATA, (AX5043_PAYLOADCMD_REPEATDATA|0x60));
+    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, _VAL2FLD(AX5043_FIFOSTAT_FIFOCMD, AX5043_FIFOCMD_CLEAR_FIFODAT));
+    ax5043WriteU8(devp, AX5043_REG_FIFODATA, (AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3)));
     /* Preamble flag */
     ax5043WriteU8(devp, AX5043_REG_FIFODATA, 0x38);
     ax5043WriteU8(devp, AX5043_REG_FIFODATA, 0xff);
@@ -1177,7 +1214,7 @@ uint8_t ax5043_prepare_cw(AX5043Driver *devp){
  */
 void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time){
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
-    ax5043WriteU8(devp, AX5043_REG_FIFODATA, (AX5043_PAYLOADCMD_REPEATDATA|0x60));
+    ax5043WriteU8(devp, AX5043_REG_FIFODATA, (AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3)));
     /* Preamble flag */
     ax5043WriteU8(devp, AX5043_REG_FIFODATA, 0x38);
     ax5043WriteU8(devp, AX5043_REG_FIFODATA, 0xFF);

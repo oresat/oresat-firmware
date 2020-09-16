@@ -133,6 +133,48 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             }
         }
         ax5043SetFreq(&lband, freq, vcor, chan_b);
+    } else if (!strcmp(argv[0], "readreg")) {
+        uint16_t reg;
+        if (argc < 3) {
+            goto radio_usage;
+        }
+
+        reg = strtoul(argv[1], NULL, 0);
+
+        if (!strcmp(argv[2], "u8")) {
+            chprintf(chp, "0x%02X\r\n", ax5043ReadU8(&lband, reg));
+        } else if (!strcmp(argv[2], "u16")) {
+            chprintf(chp, "0x%04X\r\n", ax5043ReadU16(&lband, reg));
+        } else if (!strcmp(argv[2], "u24")) {
+            chprintf(chp, "0x%06X\r\n", ax5043ReadU24(&lband, reg));
+        } else if (!strcmp(argv[2], "u32")) {
+            chprintf(chp, "0x%08X\r\n", ax5043ReadU32(&lband, reg));
+        } else {
+            goto radio_usage;
+        }
+    } else if (!strcmp(argv[0], "writereg")) {
+        uint16_t reg;
+        if (argc < 4) {
+            goto radio_usage;
+        }
+
+        reg = strtoul(argv[1], NULL, 0);
+
+        if (!strcmp(argv[2], "u8")) {
+            uint8_t value = strtoul(argv[3], NULL, 0);
+            ax5043WriteU8(&lband, reg, value);
+        } else if (!strcmp(argv[2], "u16")) {
+            uint16_t value = strtoul(argv[3], NULL, 0);
+            ax5043WriteU8(&lband, reg, value);
+        } else if (!strcmp(argv[2], "u24")) {
+            uint32_t value = strtoul(argv[3], NULL, 0);
+            ax5043WriteU8(&lband, reg, value);
+        } else if (!strcmp(argv[2], "u32")) {
+            uint32_t value = strtoul(argv[3], NULL, 0);
+            ax5043WriteU8(&lband, reg, value);
+        } else {
+            goto radio_usage;
+        }
     } else {
         goto radio_usage;
     }
