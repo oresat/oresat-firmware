@@ -77,7 +77,7 @@ typedef union __attribute__((packed)) {
             uint16_t    reg;
             uint16_t    status;
         };
-        uint8_t         *data;
+        uint8_t         data[256];
     };
     uint8_t             buf[256 + sizeof(uint16_t)];
 } spibuf_t;
@@ -111,7 +111,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     n = (n <= 256 ? n : 256);
 
     /* Set the register address to perform the transaction with */
-    sendbuf.reg = __REVSH((reg & 0x0FFFU) | 0x7000U | (write << 16));
+    sendbuf.reg = __REVSH((reg & 0x0FFFU) | 0x7000U | (write << 15));
 
     /* Copy the TX data to the sending buffer */
     if (txbuf != NULL) {

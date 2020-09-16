@@ -41,6 +41,9 @@ static void app_init(void)
  */
 int main(void)
 {
+    halInit();
+    chSysInit();
+
     // Initialize and start
     app_init();
 
