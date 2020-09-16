@@ -89,7 +89,7 @@ static const AX5043Config uhfcfg = {
     .spip       = &SPID1,
     .spicfg     = &uhf_spicfg,
     .miso       = LINE_SPI1_MISO,
-    .irq        = LINE_LBAND_IRQ,
+    .irq        = LINE_UHF_IRQ,
     .xtal_freq  = 16000000,
     .reg_values = uhf_regs,
 };
@@ -103,6 +103,7 @@ AX5043Driver uhf;
 void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 {
     static AX5043Driver *devp = NULL;
+    static const AX5043Config *cfgp = NULL;
     if (argc < 1) {
         goto radio_usage;
     }
@@ -110,8 +111,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     if (!strcmp(argv[0], "setdev") && argc > 1) {
         if (argv[1][0] == 'l') {
             devp = &lband;
+            cfgp = &lbandcfg;
         } else if (argv[1][0] == 'u') {
             devp = &uhf;
+            cfgp = &uhfcfg;
         } else {
             goto radio_usage;
         }
@@ -123,7 +126,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 
     if (!strcmp(argv[0], "start")) {
         chprintf(chp, "Starting AX5043 driver...");
-        ax5043Start(devp, &lbandcfg);
+        ax5043Start(devp, cfgp);
         if (devp->state != AX5043_READY) {
             chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", devp->error);
         } else {
