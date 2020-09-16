@@ -109,7 +109,11 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     if (!strcmp(argv[0], "start")) {
         chprintf(chp, "Starting AX5043 driver...");
         ax5043Start(&lband, &lbandcfg);
-        chprintf(chp, "OK\r\n");
+        if (lband.state != READY) {
+            chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", lband.error);
+        } else {
+            chprintf(chp, "OK\r\n");
+        }
     } else if (!strcmp(argv[0], "stop")) {
         chprintf(chp, "Stopping AX5043 driver...");
         ax5043Stop(&lband);
@@ -135,6 +139,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         ax5043SetFreq(&lband, freq, vcor, chan_b);
     } else if (!strcmp(argv[0], "readreg")) {
         uint16_t reg;
+        if (lband.state != AX5043_READY) {
+            chprintf(chp, "Please start the AX5043 driver first\r\n");
+            goto radio_usage;
+        }
         if (argc < 3) {
             goto radio_usage;
         }
@@ -183,11 +191,15 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
 
 radio_usage:
     chprintf(chp, "Usage: radio <cmd>\r\n"
-                  "    start:   Start AX5043 device\r\n"
-                  "    stop:    Stop AX5043 device\r\n"
+                  "    start:       Start AX5043 device\r\n"
+                  "    stop:        Stop AX5043 device\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
-                  "             Sets frequency of channel A/B to <freq>\r\n"
-                  "             Optionally provide VCOR. [chan_b] specifies channel B\r\n"
+                  "                 Sets frequency of channel A/B to <freq>\r\n"
+                  "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"
+                  "    readreg <reg> <type>:\r\n"
+                  "                 Read <reg> where <type> is u8|u16|u24|u32\r\n"
+                  "    writereg <reg> <value> <type>:\r\n"
+                  "                 Write <reg> with <value> where <type> is u8|u16|u24|u32\r\n"
                   "\r\n");
     return;
 }

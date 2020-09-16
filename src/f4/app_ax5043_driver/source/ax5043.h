@@ -2719,13 +2719,14 @@ typedef enum {
  * @brief   Driver state machine possible states.
  */
 typedef enum {
-    AX5043_UNINIT,                  /**< Not initialized.                  */
-    AX5043_STOP,                    /**< Stopped.                          */
-    AX5043_READY,                   /**< Ready.                            */
-    AX5043_BUSY,                    /**< Busy.                             */
-    AX5043_IDLE,                    /**< Idle.                             */
+    AX5043_UNINIT,                  /**< Not initialized.                   */
+    AX5043_STOP,                    /**< Stopped.                           */
+    AX5043_RESET,                   /**< Reset.                             */
+    AX5043_READY,                   /**< Ready.                             */
+    AX5043_BUSY,                    /**< Busy.                              */
+    AX5043_IDLE,                    /**< Idle.                              */
     AX5043_RX,
-    AX5043_RX_LOOP,                 /**< In the middle of receiving packet.*/
+    AX5043_RX_LOOP,                 /**< In the middle of receiving packet. */
     AX5043_TX,
     AX5043_PLL_RANGE_DONE,
     AX5043_OFF,

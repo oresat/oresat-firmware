@@ -103,7 +103,7 @@ typedef union __attribute__((packed)) {
  * @return                  AX5043 status bits
  * @notapi
  */
-ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043SPIExchange(SPIDriver *spip, ioline_t miso, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
     spibuf_t sendbuf;
     spibuf_t recvbuf;
 
@@ -121,6 +121,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     /* Perform the exchange */
     /* We always receive because we need the status bits */
     spiSelect(spip);
+    while (!palReadLine(miso));
     if (txbuf != NULL) {
         spiExchange(spip, n + sizeof(uint16_t), sendbuf.buf, recvbuf.buf);
     } else if (rxbuf != NULL) {
@@ -192,7 +193,7 @@ void ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeout) {
     event_listener_t el;
     uint16_t regval;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
 
     /* Register on the interrupt with the specified IRQ signals */
     chEvtRegisterMaskWithFlags(&devp->irq_event, &el, EVENT_MASK(0), irq);
@@ -228,7 +229,7 @@ ax5043_status_t ax5043SetPWRMode(AX5043Driver *devp, uint8_t pwrmode) {
                  && pwrmode != AX5043_PWRMODE_DEEPSLEEP);
     uint8_t regval = 0;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetPWRMode(), invalid state");
 
     ax5043Exchange(devp, AX5043_REG_PWRMODE, false, NULL, &regval, 1);
@@ -276,8 +277,7 @@ void ax5043ObjectInit(AX5043Driver *devp) {
  */
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     osalDbgCheck((devp != NULL) && (config != NULL));
-    osalDbgAssert((devp->state == AX5043_STOP) ||
-            (devp->state == AX5043_READY),
+    osalDbgAssert((devp->state != AX5043_UNINIT),
             "ax5043Start(), invalid state");
 
     devp->config = config;
@@ -308,6 +308,9 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Reset device into POWERDOWN state */
     devp->status = ax5043Reset(devp);
+    if (devp->error != AX5043_ERR_NOERROR) {
+        return;
+    }
 
     /* Apply register overrides provided by user */
     if (config->reg_values) {
@@ -328,9 +331,8 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
  * @api
  */
 void ax5043Stop(AX5043Driver *devp) {
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert((devp->state == AX5043_STOP) ||
-            (devp->state == AX5043_READY),
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT),
             "ax5043Stop(), invalid state");
 
     if (devp->state != AX5043_STOP) {
@@ -382,8 +384,8 @@ ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, con
     SPIDriver *spip = NULL;
     ax5043_status_t status = 0;
 
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU8(), invalid state");
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043Exchange(), invalid state");
 
 #if AX5043_USE_SPI
     spip = devp->config->spip;
@@ -392,7 +394,7 @@ ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, con
     spiStart(spip, devp->config->spicfg);
 #endif /* AX5043_SHARED_SPI */
 
-    status = ax5043SPIExchange(spip, reg, write, txbuf, rxbuf, n);
+    status = ax5043SPIExchange(spip, devp->config->miso, reg, write, txbuf, rxbuf, n);
 
 #if AX5043_SHARED_SPI
     spiReleaseBus(spip);
@@ -414,7 +416,7 @@ ax5043_status_t ax5043GetStatus(AX5043Driver *devp) {
     SPIDriver *spip = NULL;
     ax5043_status_t status = 0;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043GetStatus(), invalid state");
 #if AX5043_USE_SPI
     spip = devp->config->spip;
@@ -424,6 +426,7 @@ ax5043_status_t ax5043GetStatus(AX5043Driver *devp) {
 #endif /* AX5043_SHARED_SPI */
 
     spiSelect(spip);
+    while (!palReadLine(devp->config->miso));
     spiReceive(spip, 2, &status);
     spiUnselect(spip);
 
@@ -447,7 +450,7 @@ ax5043_status_t ax5043GetStatus(AX5043Driver *devp) {
 uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg) {
     uint8_t value;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU8(), invalid state");
 
     ax5043Exchange(devp, reg, false, NULL, &value, 1);
@@ -467,8 +470,8 @@ uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg) {
 uint16_t ax5043ReadU16(AX5043Driver *devp, uint16_t reg) {
     uint16_t value;
 
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU8(), invalid state");
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU16(), invalid state");
 
     ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 2);
 
@@ -487,7 +490,7 @@ uint16_t ax5043ReadU16(AX5043Driver *devp, uint16_t reg) {
 uint32_t ax5043ReadU24(AX5043Driver *devp, uint16_t reg) {
     uint32_t value;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU32(), invalid state");
 
     ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 3);
@@ -507,7 +510,7 @@ uint32_t ax5043ReadU24(AX5043Driver *devp, uint16_t reg) {
 uint32_t ax5043ReadU32(AX5043Driver *devp, uint16_t reg) {
     uint32_t value;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043ReadU32(), invalid state");
 
     ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 4);
@@ -525,7 +528,7 @@ uint32_t ax5043ReadU32(AX5043Driver *devp, uint16_t reg) {
  * @api
  */
 void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value) {
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
     ax5043Exchange(devp, reg, true, &value, NULL, 1);
@@ -541,7 +544,7 @@ void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value) {
  * @api
  */
 void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value) {
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
     value = __REVSH(value);
@@ -558,7 +561,7 @@ void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value) {
  * @api
  */
 void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value) {
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
     value = __REV(value);
@@ -575,7 +578,7 @@ void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value) {
  * @api
  */
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU32(), invalid state");
 
     value = __REV(value);
@@ -591,30 +594,11 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
  * @api
  */
 ax5043_status_t ax5043Reset(AX5043Driver *devp) {
-    SPIDriver *spip = NULL;
     ax5043_status_t status = 0;
     uint8_t regval = 0;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043Reset(), invalid state");
-
-#if AX5043_USE_SPI
-    spip = devp->config->spip;
-#if AX5043_SHARED_SPI
-    spiAcquireBus(spip);
-    spiStart(spip, devp->config->spicfg);
-#endif /* AX5043_SHARED_SPI */
-
-    /* Wait for device to become active */
-    spiUnselect(spip);
-    chThdSleepMicroseconds(1);
-    spiSelect(spip);
-    while (!palReadLine(devp->config->miso));
-
-#if AX5043_SHARED_SPI
-    spiReleaseBus(spip);
-#endif /* AX5043_SHARED_SPI */
-#endif /* AX5043_USE_SPI */
 
     /* Reset the chip through powermode register */
     regval = AX5043_PWRMODE_RESET;
@@ -629,16 +613,20 @@ ax5043_status_t ax5043Reset(AX5043Driver *devp) {
     regval = 0xAA;
     ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, NULL, 1);
     regval = 0x55;
-    ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, &regval, 1);
+    status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, &regval, 1);
     if (regval != 0xAA) {
         devp->error = AX5043_ERR_NOT_CONNECTED;
+        devp->state = AX5043_STOP;
+        return status;
     }
     status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, NULL, &regval, 1);
     if (regval != 0x55) {
         devp->error = AX5043_ERR_NOT_CONNECTED;
+        devp->state = AX5043_STOP;
+        return status;
     }
 
-    devp->state = AX5043_READY;
+    devp->state = AX5043_RESET;
     return status;
 }
 
@@ -657,7 +645,7 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     uint16_t freq_reg = (chan_b ? AX5043_REG_FREQB : AX5043_REG_FREQA);
     uint16_t rng_reg = (chan_b ? AX5043_REG_PLLRANGINGB : AX5043_REG_PLLRANGINGA);
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
 
     /* If no VCOR specified, default to 8 */
@@ -712,7 +700,7 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name) {
     int i = 0;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_get_conf_val(), invalid state");*/
 
@@ -740,7 +728,7 @@ uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name) {
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value) {
     int i = 0;
 
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_set_conf_val(), invalid state");*/
 
@@ -764,7 +752,7 @@ uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t valu
  * @api
  */
 void ax5043_prepare_tx(AX5043Driver *devp){
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_prepare_tx(), invalid state");*/
 
@@ -790,7 +778,7 @@ void ax5043_prepare_tx(AX5043Driver *devp){
  * @api
  */
 void ax5043_prepare_rx(AX5043Driver *devp){
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_prepare_rx(), invalid state");*/
 
@@ -820,7 +808,7 @@ void ax5043_prepare_rx(AX5043Driver *devp){
  * @api
  */
 void ax5043_init_registers_common(AX5043Driver *devp){
-    osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL && devp->config != NULL);
     /* TODO: Add state sanity check */
     /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_init_registers_common(), invalid state");*/
 
