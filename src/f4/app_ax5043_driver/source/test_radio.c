@@ -171,17 +171,17 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "writereg") && argc > 3) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
-        if (!strcmp(argv[2], "u8")) {
-            uint8_t value = strtoul(argv[3], NULL, 0);
+        if (!strcmp(argv[3], "u8")) {
+            uint8_t value = strtoul(argv[2], NULL, 0);
             ax5043WriteU8(devp, reg, value);
-        } else if (!strcmp(argv[2], "u16")) {
-            uint16_t value = strtoul(argv[3], NULL, 0);
+        } else if (!strcmp(argv[3], "u16")) {
+            uint16_t value = strtoul(argv[2], NULL, 0);
             ax5043WriteU16(devp, reg, value);
-        } else if (!strcmp(argv[2], "u24")) {
-            uint32_t value = strtoul(argv[3], NULL, 0);
+        } else if (!strcmp(argv[3], "u24")) {
+            uint32_t value = strtoul(argv[2], NULL, 0);
             ax5043WriteU24(devp, reg, value);
-        } else if (!strcmp(argv[2], "u32")) {
-            uint32_t value = strtoul(argv[3], NULL, 0);
+        } else if (!strcmp(argv[3], "u32")) {
+            uint32_t value = strtoul(argv[2], NULL, 0);
             ax5043WriteU32(devp, reg, value);
         } else {
             goto radio_usage;
