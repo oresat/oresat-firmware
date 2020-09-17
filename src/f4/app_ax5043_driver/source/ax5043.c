@@ -491,7 +491,7 @@ uint32_t ax5043ReadU24(AX5043Driver *devp, uint16_t reg) {
 
     ax5043Exchange(devp, reg, false, NULL, (uint8_t*)&value, 3);
 
-    return __REV(value);
+    return __REV(value << 8);
 }
 
 /**
@@ -560,7 +560,7 @@ void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value) {
     osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043WriteU8(), invalid state");
 
-    value = __REV(value);
+    value = __REV(value) >> 8;
     ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 3);
 }
 
