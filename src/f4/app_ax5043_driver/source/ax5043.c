@@ -116,18 +116,13 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     /* Copy the TX data to the sending buffer */
     if (txbuf != NULL) {
         memcpy(sendbuf.data, txbuf, n);
+    } else {
+        memset(sendbuf.data, 0, n);
     }
 
     /* Perform the exchange */
     /* We always receive because we need the status bits */
-    if (txbuf != NULL) {
-        spiExchange(spip, n + sizeof(uint16_t), sendbuf.buf, recvbuf.buf);
-    } else if (rxbuf != NULL) {
-        spiReceive(spip, n + sizeof(uint16_t), recvbuf.buf);
-    } else {
-        /* Status only */
-        spiReceive(spip, sizeof(uint16_t), recvbuf.buf);
-    }
+    spiExchange(spip, n + sizeof(uint16_t), sendbuf.buf, recvbuf.buf);
 
     /* Copy the RX data to provided buffer */
     if (rxbuf != NULL) {
