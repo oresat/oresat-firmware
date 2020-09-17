@@ -157,7 +157,6 @@ void ax5043IRQHandler(void *arg) {
  *
  * @notapi
  */
-THD_WORKING_AREA(irq_wa, 0x100);
 THD_FUNCTION(irq_worker, arg) {
     AX5043Driver *devp = arg;
     eventmask_t irq = 0;
@@ -301,7 +300,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Register interrupt handler for device and start worker */
     if (devp->irq_worker == NULL) {
-        devp->irq_worker = chThdCreateStatic(irq_wa, sizeof(irq_wa), HIGHPRIO, irq_worker, devp);
+        devp->irq_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
         palSetLineCallback(config->irq, ax5043IRQHandler, devp);
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
