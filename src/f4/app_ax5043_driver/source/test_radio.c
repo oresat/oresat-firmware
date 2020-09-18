@@ -5,6 +5,16 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
+static SI41XXConfig synth_cfg = {
+    .sen = LINE_LO_SEN,
+    .sclk = LINE_LO_SCLK,
+    .sdata = LINE_LO_SDATA,
+    .ref_freq = 16000000,
+    .if_div = 1,
+    .if_n = 808,
+    .if_r = 16,
+};
+
 static const SPIConfig lband_spicfg = {
     false,
     NULL,                                   // Operation complete callback
@@ -95,6 +105,14 @@ static const AX5043Config uhfcfg = {
 
 AX5043Driver lband;
 AX5043Driver uhf;
+SI41XXDriver synth;
+
+void radio_init(void)
+{
+    ax5043ObjectInit(&lband);
+    ax5043ObjectInit(&uhf);
+    si41xxObjectInit(&synth);
+}
 
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
@@ -212,3 +230,48 @@ radio_usage:
     return;
 }
 
+void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[])
+{
+
+    if (argc < 1) {
+        goto synth_usage;
+    }
+
+    if (!strcmp(argv[0], "start")) {
+        si41xxStart(&synth, &synth_cfg);
+    } else if (!strcmp(argv[0], "stop")) {
+        si41xxStop(&synth);
+    } else if (!strcmp(argv[0], "reg") && argc > 3) {
+        uint32_t reg = strtoul(argv[1], NULL, 0);
+        uint32_t value = strtoul(argv[2], NULL, 0);
+        si41xxWriteRaw(&synth, reg, value);
+    } else if (!strcmp(argv[0], "freq") && argc > 2) {
+        uint32_t freq = strtoul(argv[1], NULL, 0);
+        if (!si41xxSetIF(&synth, freq)) {
+            chprintf(chp, "Failed to set frequency\r\n");
+            goto synth_usage;
+        }
+    } else if (!strcmp(argv[0], "ifdiv") && argc > 2) {
+        uint32_t div = strtoul(argv[1], NULL, 0);
+        if (!si41xxSetIFDiv(&synth, div)) {
+            chprintf(chp, "Failed to set IF divider value\r\n");
+            goto synth_usage;
+        }
+    } else {
+        goto synth_usage;
+    }
+
+    return;
+synth_usage:
+    chprintf(chp, "\r\n"
+                  "Usage: synth <cmd>\r\n"
+                  "    start:       Start the device\r\n"
+                  "    stop:        Stop the device\r\n"
+                  "    reg <reg> <value>:\r\n"
+                  "                 Write <reg> with <value>\r\n"
+                  "\r\n"
+                  "    freq <freq>: Sets frequency of IF output to <freq>\r\n"
+                  "    ifdiv <div>: Sets IF output divider to <div>\r\n"
+                  "\r\n");
+    return;
+}

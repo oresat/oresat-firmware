@@ -22,16 +22,13 @@
 /* Project header files */
 #include "cmd.h"
 #include "test_radio.h"
-#include "test_synth.h"
 
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-    ax5043ObjectInit(&lband);
-    ax5043ObjectInit(&uhf);
-    si41xxObjectInit(&synth);
+    radio_init();
 
     /* Initialize shell and start serial interface */
     shellInit();

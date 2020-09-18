@@ -216,16 +216,14 @@ void ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeout) {
  * @notapi
  */
 ax5043_status_t ax5043SetPWRMode(AX5043Driver *devp, uint8_t pwrmode) {
-    bool tcxo_en = (pwrmode != AX5043_PWRMODE_POWERDOWN
-                 && pwrmode != AX5043_PWRMODE_DEEPSLEEP);
     uint8_t regval = 0;
 
     osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetPWRMode(), invalid state");
 
     ax5043Exchange(devp, AX5043_REG_PWRMODE, false, NULL, &regval, 1);
-    regval &= ~(AX5043_PWRMODE | AX5043_PWRMODE_XOEN);
-    regval |= _VAL2FLD(AX5043_PWRMODE, pwrmode) | (tcxo_en ? AX5043_PWRMODE_XOEN : 0);
+    regval &= ~AX5043_PWRMODE;
+    regval |= _VAL2FLD(AX5043_PWRMODE, pwrmode);
     return ax5043Exchange(devp, AX5043_REG_PWRMODE, true, &regval, NULL, 1);
 }
 
@@ -602,7 +600,7 @@ ax5043_status_t ax5043Reset(AX5043Driver *devp) {
 
     /* Write to PWRMODE: XOEN, REFEN and POWERDOWN mode. Clear RST bit.
        Page 33 in programming manual */
-    regval = AX5043_PWRMODE_REFEN | AX5043_PWRMODE_POWERDOWN;
+    regval = AX5043_PWRMODE_REFEN | AX5043_PWRMODE_XOEN | AX5043_PWRMODE_POWERDOWN;
     ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
 
     /* Verify functionality with SCRATCH register */
