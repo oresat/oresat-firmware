@@ -35,47 +35,36 @@
 #include "si41xx.h"
 
 /*
- * Initialize the SPI drivers and configure the ax5043 chips
- */
-static void app_init(void)
-{
-    sdStart(&SD3, NULL);
-}
-
-
-/*
- *This function bit bangs the si41xx registers with default values.
  *The dafult values are set as
  *  RF1 output = 1265 MHz
  *  RF2 output = disabled
  *  IF output  = 436.5 MHz
  *The following pins are connected between M4 and si41xx chip
- *LINE_LO_SCLK                PAL_LINE(GPIOC, 2U)
- *LINE_LO_SDATA               PAL_LINE(GPIOC, 3U)
- *LINE_LO_SEN                PAL_LINE(GPIOC, 4U)
+ *LINE_LO_SCLK              PAL_LINE(GPIOC, 2U)
+ *LINE_LO_SDATA             PAL_LINE(GPIOC, 3U)
+ *LINE_LO_SEN               PAL_LINE(GPIOC, 4U)
  */
 
-static void si41xx_init(void)
+static const SI41XXConfig synth_cfg = {
+    .sen = LINE_LO_SEN,
+    .sclk = LINE_LO_SCLK,
+    .sdata = LINE_LO_SDATA,
+    .if_n = 873,
+    .if_r = 16,
+    .rf1_n = 1265,
+    .rf1_r = 32,
+};
+
+SI41XXDriver synth;
+
+/*
+ * Initialize the SPI drivers and configure the ax5043 chips
+ */
+static void app_init(void)
 {
-
-    palSetLine(LINE_LO_SEN);
-    palSetLine(LINE_LO_SDATA);
-    palSetLine(LINE_LO_SCLK);
-
-    si_write_reg(SI41XX_REG_MAIN_CONFIG, 0b000011000000000100);
-    si_write_reg(SI41XX_REG_PHASE_GAIN,  0b000000000000000000);
-    si_write_reg(SI41XX_REG_PWRDOWN,     0b000000000000000011);
-    si_write_reg(SI41XX_REG_RF1_NDIV,    0b000000010011110001);
-    si_write_reg(SI41XX_REG_IF_NDIV,     0b000000001101101001);
-    si_write_reg(SI41XX_REG_RF1_RDIV,    0b000000000000010000);
-    si_write_reg(SI41XX_REG_IF_RDIV,     0b000000000000100000);
-
-    palSetLine(LINE_LO_SEN);
-    palSetLine(LINE_LO_SDATA);
-    palSetLine(LINE_LO_SCLK);
-
+    sdStart(&SD3, NULL);
+    si41xxObjectInit(&synth);
 }
-
 
 /*
  * The main loop.
@@ -112,7 +101,7 @@ static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
     reg_address = strtoul(argv[0], NULL, 0);
     reg_value = strtoul((argv[1][0] == '0' && argv[1][1] == 'b') ?  argv[1]+2: argv[1], NULL, (argv[1][0] == '0' && argv[1][1] == 'b') ? 2 : 0);
 
-    si_write_reg(reg_address, reg_value);
+    si41xxWriteRaw(&synth, reg_address, reg_value);
     chprintf(sd, "INFO: Updated register %d with value 0x%x.\r\n", reg_address, reg_value);
 }
 
@@ -148,8 +137,8 @@ static void rf1(BaseSequentialStream *sd, int argc, char *argv[]) {
     rdiv = SI41XX_FREF * 1000/phase;
     ndiv = freq * rdiv / (1000*SI41XX_FREF);
 
-    si_write_reg(SI41XX_REG_RF1_NDIV, ndiv);
-    si_write_reg(SI41XX_REG_RF1_RDIV, rdiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_RF1_NDIV, ndiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_RF1_RDIV, rdiv);
 
     chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
 }
@@ -186,8 +175,8 @@ static void rf2(BaseSequentialStream *sd, int argc, char *argv[]) {
     rdiv = SI41XX_FREF * 1000/phase;
     ndiv = freq * rdiv / (1000*SI41XX_FREF);
 
-    si_write_reg(SI41XX_REG_RF2_NDIV, ndiv);
-    si_write_reg(SI41XX_REG_RF2_RDIV, rdiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_RF2_NDIV, ndiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_RF2_RDIV, rdiv);
 
     chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
 }
@@ -224,8 +213,8 @@ static void ifr(BaseSequentialStream *sd, int argc, char *argv[]) {
     rdiv = SI41XX_FREF * 1000/phase;
     ndiv = freq * rdiv / (1000*SI41XX_FREF);
 
-    si_write_reg(SI41XX_REG_IF_NDIV, ndiv);
-    si_write_reg(SI41XX_REG_IF_RDIV, rdiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_IF_NDIV, ndiv);
+    si41xxWriteRaw(&synth, SI41XX_REG_IF_RDIV, rdiv);
 
     chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
 }
@@ -282,7 +271,7 @@ int main(void)
     chSysInit();
     app_init();
 
-    si41xx_init();
+    si41xxStart(&synth, &synth_cfg);
 
     /*
      * Shell manager initialization.
