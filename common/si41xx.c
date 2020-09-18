@@ -185,9 +185,9 @@ void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
-    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP |
-                _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET) |
-                _VAL2FLD(SI41XX_CONFIG_IFDIV, config->if_div));
+    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP | SI41XX_CONFIG_AUTOPDB |
+                                        _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET) |
+                                        _VAL2FLD(SI41XX_CONFIG_IFDIV, config->if_div));
     si41xxWriteRegister(devp, SI41XX_REG_PHASE_GAIN, 0x00000U);
 #if SI41XX_HAS_IF
     si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, devp->config->if_n));
