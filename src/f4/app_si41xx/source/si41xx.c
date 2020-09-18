@@ -48,7 +48,7 @@
 /**
  * @brief   Writes to an SI41xx device using its serial interface.
  *
- * @param[in]   devp        SI41XXDriver
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
  * @param[in]   addr        Register address
  * @param[in]   data        Data to write to register
  *
@@ -73,15 +73,15 @@ void si41xxWriteRegister(SI41XXDriver *devp, uint8_t addr, uint32_t data) {
     palSetLine(devp->config->sen);
 }
 
-#if (SI41XX_USE_MUTUAL_EXCLUSION == TRUE) || defined(__DOXYGEN__)
+#if (SI41XX_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
 /**
- * @brief   Gains exclusive access to the I2C bus.
- * @details This function tries to gain ownership to the I2C bus, if the bus
+ * @brief   Gains exclusive access to the SI41XX bus.
+ * @details This function tries to gain ownership to the SI41XX bus, if the bus
  *          is already being used then the invoking thread is queued.
- * @pre     In order to use this function the option @p I2C_USE_MUTUAL_EXCLUSION
+ * @pre     In order to use this function the option @p SI41XX_USE_MUTUAL_EXCLUSION
  *          must be enabled.
  *
- * @param[in] i2cp      pointer to the @p I2CDriver object
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
  *
  * @notapi
  */
@@ -92,22 +92,55 @@ void si41xxAcquireBus(SI41XXDriver *devp) {
 }
 
 /**
- * @brief   Releases exclusive access to the I2C bus.
- * @pre     In order to use this function the option @p I2C_USE_MUTUAL_EXCLUSION
+ * @brief   Releases exclusive access to the SI41XX bus.
+ * @pre     In order to use this function the option @p SI41XX_USE_MUTUAL_EXCLUSION
  *          must be enabled.
  *
- * @param[in] i2cp      pointer to the @p I2CDriver object
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
  *
- * @api
+ * @notapi
  */
 void si41xxReleaseBus(SI41XXDriver *devp) {
   osalDbgCheck(devp != NULL);
 
   osalMutexUnlock(&devp->mutex);
 }
-#endif /* SI41XX_USE_MUTUAL_EXCLUSION == TRUE */
-
+#endif /* SI41XX_USE_MUTUAL_EXCLUSION */
 #endif /* SI41XX_USE_SERIAL */
+
+/**
+ * @brief   Calculates N-Div and R-Div values.
+ * @details This function calculates N and R division values needed to provided
+ *          the specified frequency from the reference frequency defined in the
+ *          device configuration.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   freq        Desired output frequency
+ * @param[out]  ndiv        Calculated N-Divider value
+ * @param[out]  rdiv        Calculated R-Divider value
+ *
+ * @notapi
+ */
+void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *rdiv) {
+    osalDbgCheck(devp != NULL && devp->config != NULL && ndiv != NULL && rdiv != NULL);
+    osalDbgAssert(devp->config->ref_freq != 0 && freq != 0,
+            "si41xxCalcDiv(), non-zero values required");
+
+    uint32_t ref_freq = devp->config->ref_freq;
+    uint32_t n1 = ref_freq, n2 = freq;
+
+    /* Find GCD of both frequencies */
+    while (n1 != n2) {
+        if (n1 > n2) {
+            n1 -= n2;
+        } else {
+            n2 -= n1;
+        }
+    }
+    /* Calculate needed N and R values */
+    *ndiv = freq / n1;
+    *rdiv = ref_freq / n1;
+}
 
 /*==========================================================================*/
 /* Interface implementation.                                                */
@@ -117,16 +150,31 @@ void si41xxReleaseBus(SI41XXDriver *devp) {
 /* Driver exported functions.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Initializes an instance.
+ *
+ * @param[out]  devp        Pointer to the @p SI41XXDriver object
+ *
+ * @init
+ */
 void si41xxObjectInit(SI41XXDriver *devp) {
     devp->config = NULL;
 
-#if SI41XX_USE_MUTUAL_EXCLUSION == TRUE
+#if SI41XX_USE_MUTUAL_EXCLUSION
     osalMutexObjectInit(&devp->mutex);
 #endif
 
     devp->state = SI41XX_STOP;
 }
 
+/**
+ * @brief   Configures and activates SI41XX Driver peripheral.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   config      Pointer to the @p SI41XXConfig object
+ *
+ * @api
+ */
 void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config) {
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
@@ -137,19 +185,21 @@ void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
-    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP | _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET));
-    si41xxWriteRegister(devp, SI41XX_REG_PHASE_GAIN, 0x00000);
+    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP |
+                _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET) |
+                _VAL2FLD(SI41XX_CONFIG_IFDIV, config->if_div));
+    si41xxWriteRegister(devp, SI41XX_REG_PHASE_GAIN, 0x00000U);
 #if SI41XX_HAS_IF
-    si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, devp->config->if_n);
-    si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, devp->config->if_r);
+    si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, devp->config->if_n));
+    si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, devp->config->if_r));
 #endif
 #if SI41XX_HAS_RF1
-    si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, devp->config->rf1_n);
-    si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, devp->config->rf1_r);
+    si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, _VAL2FLD(SI41XX_RF1_NDIV, devp->config->rf1_n));
+    si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, _VAL2FLD(SI41XX_RF1_RDIV, devp->config->rf1_r));
 #endif
 #if SI41XX_HAS_RF2
-    si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, devp->config->rf2_n);
-    si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, devp->config->rf2_r);
+    si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, devp->config->rf2_n));
+    si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, devp->config->rf2_r));
 #endif
     si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, SI41XX_POWERDOWN_PBRB | SI41XX_POWERDOWN_PBIB);
 
@@ -160,6 +210,13 @@ void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config) {
     devp->state = SI41XX_READY;
 }
 
+/**
+ * @brief   Deactivates the SI41XX Complex Driver peripheral.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ *
+ * @api
+ */
 void si41xxStop(SI41XXDriver *devp) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
@@ -170,6 +227,8 @@ void si41xxStop(SI41XXDriver *devp) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, 0x00000U);
+
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
@@ -177,6 +236,15 @@ void si41xxStop(SI41XXDriver *devp) {
     devp->state = SI41XX_STOP;
 }
 
+/**
+ * @brief   Writes a raw value to an SI41XX register.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   reg         The register to write to
+ * @param[in]   value       The value to write
+ *
+ * @api
+ */
 void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t value) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
@@ -194,5 +262,131 @@ void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t value) {
 #endif /* SI41XX_SHARED_SERIAL */
 #endif /* SI41XX_USE_SERIAL */
 }
+
+#if (SI41XX_HAS_IF) || defined(__DOXYGEN__)
+/**
+ * @brief   Sets IF dividers to provide the desired frequency.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   freq        The desired frequency
+ *
+ * @return                  Successfully set frequency
+ * @api
+ */
+bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq) {
+    uint32_t n, r;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state == SI41XX_READY),
+            "si41xxSetIF(), invalid state");
+
+    /* Calculate N and R values */
+    si41xxCalcDiv(devp, freq << devp->config->if_div, &n, &r);
+
+    /* Check that values are within bounds of programmable values */
+    if (n >= (SI41XX_IF_NDIV + 1) || r >= (SI41XX_IF_RDIV + 1)) {
+        return false;
+    }
+    devp->config->if_n = n;
+    devp->config->if_r = r;
+
+#if SI41XX_USE_SERIAL
+#if SI41XX_SHARED_SERIAL
+    si41xxAcquireBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+
+    si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, n));
+    si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, r));
+
+#if SI41XX_SHARED_SERIAL
+    si41xxReleaseBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+#endif /* SI41XX_USE_SERIAL */
+    return true;
+}
+#endif /* SI41XX_HAS_IF */
+
+#if (SI41XX_HAS_RF1) || defined(__DOXYGEN__)
+/**
+ * @brief   Sets RF1 dividers to provide the desired frequency.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   freq        The desired frequency
+ *
+ * @return                  Successfully set frequency
+ * @api
+ */
+bool si41xxSetRF1(SI41XXDriver *devp, uint32_t freq) {
+    uint32_t n, r;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state == SI41XX_READY),
+            "si41xxSetRF1(), invalid state");
+
+    /* Calculate N and R values */
+    si41xxCalcDiv(devp, freq, &n, &r);
+
+    /* Check that values are within bounds of programmable values */
+    if (n >= (SI41XX_RF1_NDIV + 1) || r >= (SI41XX_RF1_RDIV + 1)) {
+        return false;
+    }
+    devp->config->rf1_n = n;
+    devp->config->rf1_r = r;
+
+#if SI41XX_USE_SERIAL
+#if SI41XX_SHARED_SERIAL
+    si41xxAcquireBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+
+    si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, _VAL2FLD(SI41XX_RF1_NDIV, n));
+    si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, _VAL2FLD(SI41XX_RF1_RDIV, r));
+
+#if SI41XX_SHARED_SERIAL
+    si41xxReleaseBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+#endif /* SI41XX_USE_SERIAL */
+    return true;
+}
+#endif /* SI41XX_HAS_RF1 */
+
+#if (SI41XX_HAS_RF2) || defined(__DOXYGEN__)
+/**
+ * @brief   Sets RF2 dividers to provide the desired frequency.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   freq        The desired frequency
+ *
+ * @return                  Successfully set frequency
+ * @api
+ */
+bool si41xxSetRF2(SI41XXDriver *devp, uint32_t freq) {
+    uint32_t n, r;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state == SI41XX_READY),
+            "si41xxSetRF2(), invalid state");
+
+    /* Calculate N and R values */
+    si41xxCalcDiv(devp, freq, &n, &r);
+
+    /* Check that values are within bounds of programmable values */
+    if (n >= (SI41XX_RF2_NDIV + 1) || r >= (SI41XX_RF2_RDIV + 1)) {
+        return false;
+    }
+    devp->config->rf2_n = n;
+    devp->config->rf2_r = r;
+
+#if SI41XX_USE_SERIAL
+#if SI41XX_SHARED_SERIAL
+    si41xxAcquireBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+
+    si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, n));
+    si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, r));
+
+#if SI41XX_SHARED_SERIAL
+    si41xxReleaseBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+#endif /* SI41XX_USE_SERIAL */
+    return true;
+}
+#endif /* SI41XX_HAS_RF2 */
 
 /** @} */

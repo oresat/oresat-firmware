@@ -36,8 +36,6 @@
 
 /*
  *The dafult values are set as
- *  RF1 output = 1265 MHz
- *  RF2 output = disabled
  *  IF output  = 436.5 MHz
  *The following pins are connected between M4 and si41xx chip
  *LINE_LO_SCLK              PAL_LINE(GPIOC, 2U)
@@ -49,10 +47,10 @@ static const SI41XXConfig synth_cfg = {
     .sen = LINE_LO_SEN,
     .sclk = LINE_LO_SCLK,
     .sdata = LINE_LO_SDATA,
+    .ref_freq = 16000000,
+    .if_div = 2,
     .if_n = 873,
     .if_r = 16,
-    .rf1_n = 1265,
-    .rf1_r = 32,
 };
 
 SI41XXDriver synth;
@@ -108,135 +106,35 @@ static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
 
 /*
  * shell commands for user entry
- * This lets the user update RF1 registers via the chibios shell
- * Requires frequency and phase values in KHz.
- */
-static void rf1(BaseSequentialStream *sd, int argc, char *argv[]) {
-
-    uint32_t freq;
-    uint32_t phase;
-    uint32_t ndiv;
-    uint32_t rdiv;
-
-    if (argc < 2) {
-        chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-
-    freq = strtoul(argv[0], NULL, 10);
-    phase = strtoul(argv[1], NULL, 10);
-
-    if (freq == 0) {
-        chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-    if (phase == 0) {
-        chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-    rdiv = SI41XX_FREF * 1000/phase;
-    ndiv = freq * rdiv / (1000*SI41XX_FREF);
-
-    si41xxWriteRaw(&synth, SI41XX_REG_RF1_NDIV, ndiv);
-    si41xxWriteRaw(&synth, SI41XX_REG_RF1_RDIV, rdiv);
-
-    chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
-}
-
-
-/*
- * shell commands for user entry
- * This lets the user update RF2 registers via the chibios shell
- * Requires frequency and phase values in KHz. This should not be used for si4123
- */
-static void rf2(BaseSequentialStream *sd, int argc, char *argv[]) {
-
-    uint32_t freq;
-    uint32_t phase;
-    uint32_t ndiv;
-    uint32_t rdiv;
-
-    if (argc < 2) {
-        chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-
-    freq = strtoul(argv[0], NULL, 10);
-    phase = strtoul(argv[1], NULL, 10);
-
-    if (freq == 0) {
-        chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-    if (phase == 0) {
-        chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
-    }
-    rdiv = SI41XX_FREF * 1000/phase;
-    ndiv = freq * rdiv / (1000*SI41XX_FREF);
-
-    si41xxWriteRaw(&synth, SI41XX_REG_RF2_NDIV, ndiv);
-    si41xxWriteRaw(&synth, SI41XX_REG_RF2_RDIV, rdiv);
-
-    chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
-}
-
-
-/*
- * shell commands for user entry
  * This lets the user update IF registers via the chibios shell
  * Requires frequency and phase values in KHz.
  */
 static void ifr(BaseSequentialStream *sd, int argc, char *argv[]) {
-
     uint32_t freq;
-    uint32_t phase;
-    uint32_t ndiv;
-    uint32_t rdiv;
 
-    if (argc < 2) {
-        chprintf(sd, "Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
+    if (argc < 1) {
+        goto ifr_usage;
     }
 
-    freq = strtoul(argv[0], NULL, 10);
-    phase = strtoul(argv[1], NULL, 10);
+    freq = strtoul(argv[0], NULL, 0);
 
     if (freq == 0) {
-        chprintf(sd, "ERROR: freqency cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
+        chprintf(sd, "ERROR: Freqency cannot be 0.\r\n");
+        goto ifr_usage;
     }
-    if (phase == 0) {
-        chprintf(sd, "ERROR: phase value cannot be 0. \r\nUsage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-        return;
+
+    if (si41xxSetIF(&synth, freq)) {
+        chprintf(sd, "INFO: IF freqency set to %u Hz.\r\n", freq);
+    } else {
+        chprintf(sd, "ERROR: IF freqency could not be set to this value.\r\n", freq);
     }
-    rdiv = SI41XX_FREF * 1000/phase;
-    ndiv = freq * rdiv / (1000*SI41XX_FREF);
 
-    si41xxWriteRaw(&synth, SI41XX_REG_IF_NDIV, ndiv);
-    si41xxWriteRaw(&synth, SI41XX_REG_IF_RDIV, rdiv);
+    return;
 
-    chprintf(sd, "INFO: freqency set at %d Khz, phase set at %d Khz.\r\n", freq, phase);
+ifr_usage:
+    chprintf(sd, "Usage: ifr <frequency in Hz>\r\n");
+    return;
 }
-
-
-/*
- * shell commands for user entry
- * Provides a list of comamnds and their description to Chibios shell user.
- */
-static void si_help(BaseSequentialStream *sd, int argc, char *argv[]) {
-
-    (void) argc;
-    (void) argv;
-
-    chprintf(sd, "Available commands:\r\n");
-    chprintf(sd, "    reg:   Update registers,Usage reg <register address> <register value>\r\n");
-    chprintf(sd, "    rf1:   Update RF1 registers,Usage: rf1 <frequency in KHz> <Phase detector in KHz>\r\n");
-    chprintf(sd, "    rf2:   Update RF2 registers,Usage: rf2 <frequency in KHz> <Phase detector in KHz>\r\n");
-    chprintf(sd, "    if:   Update IF registers,Usage: ifr <frequency in KHz> <Phase detector in KHz>\r\n");
-    chprintf(sd, "    ?:   provides list of commands\n\n\r\n");
-}
-
 
 /*
  * shell commands for user entry
@@ -244,10 +142,7 @@ static void si_help(BaseSequentialStream *sd, int argc, char *argv[]) {
  */
 static const ShellCommand commands[] = {
     {"reg", reg},
-    {"rf1", rf1},
-    {"rf2", rf2},
     {"if", ifr},
-    {"?", si_help},
     {NULL, NULL}
 };
 

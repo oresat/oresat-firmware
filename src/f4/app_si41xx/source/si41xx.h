@@ -175,8 +175,6 @@
 #define SI41XX_IF_RDIV                      SI41XX_IF_RDIV_Msk
 /** @} */
 
-#define SI41XX_FREF                         16
-
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -245,14 +243,20 @@
 
 #if (SI41XX_DEVICE == SI4112 || SI41XX_DEVICE == SI4122 || SI41XX_DEVICE == SI4123 || SI41XX_DEVICE == SI4133)
 #define SI41XX_HAS_IF                       TRUE
+#else
+#define SI41XX_HAS_IF                       FALSE
 #endif
 
 #if (SI41XX_DEVICE == SI4113 || SI41XX_DEVICE == SI4123 || SI41XX_DEVICE == SI4133)
 #define SI41XX_HAS_RF1                      TRUE
+#else
+#define SI41XX_HAS_RF1                      FALSE
 #endif
 
 #if (SI41XX_DEVICE == SI4113 || SI41XX_DEVICE == SI4122 || SI41XX_DEVICE == SI4133)
 #define SI41XX_HAS_RF2                      TRUE
+#else
+#define SI41XX_HAS_RF2                      FALSE
 #endif
 
 /*===========================================================================*/
@@ -290,16 +294,42 @@ typedef struct{
      */
     ioline_t                    sdata;
 #endif /* SI41XX_USE_SERIAL */
+    /**
+     * @brief   SI41XX Reference frequency.
+     */
+    uint32_t                    ref_freq;
 #if SI41XX_HAS_IF
+    /**
+     * @brief   SI41XX IF Output Divider register value.
+     */
+    uint8_t                     if_div;
+    /**
+     * @brief   SI41XX IF N-Divider value.
+     */
     uint32_t                    if_n;
+    /**
+     * @brief   SI41XX IF R-Divider value.
+     */
     uint32_t                    if_r;
 #endif /* SI41XX_HAS_IF */
 #if SI41XX_HAS_RF1
+    /**
+     * @brief   SI41XX RF1 N-Divider value.
+     */
     uint32_t                    rf1_n;
+    /**
+     * @brief   SI41XX RF1 R-Divider value.
+     */
     uint32_t                    rf1_r;
 #endif /* SI41XX_HAS_RF1 */
 #if SI41XX_HAS_RF2
+    /**
+     * @brief   SI41XX RF2 N-Divider value.
+     */
     uint32_t                    rf2_n;
+    /**
+     * @brief   SI41XX RF2 R-Divider value.
+     */
     uint32_t                    rf2_r;
 #endif /* SI41XX_HAS_RF2 */
 } SI41XXConfig;
@@ -315,7 +345,7 @@ typedef struct SI41XXDriver {
     /**
      * @brief   Current configuration data.
      */
-    const SI41XXConfig          *config;
+    SI41XXConfig                *config;
 #if SI41XX_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
     /**
      * @brief   Mutex protecting the bus.
@@ -340,6 +370,15 @@ void si41xxObjectInit(SI41XXDriver *devp);
 void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config);
 void si41xxStop(SI41XXDriver *devp);
 void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t data);
+#if SI41XX_HAS_IF
+bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq);
+#endif
+#if SI41XX_HAS_RF1
+bool si41xxSetRF1(SI41XXDriver *devp, uint32_t freq);
+#endif
+#if SI41XX_HAS_RF2
+bool si41xxSetRF2(SI41XXDriver *devp, uint32_t freq);
+#endif
 #ifdef __cplusplus
 }
 #endif
