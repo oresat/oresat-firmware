@@ -177,6 +177,7 @@ void si41xxObjectInit(SI41XXDriver *devp) {
  * @api
  */
 void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
+    uint8_t pwr = 0;
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
             "si41xxStart(), invalid state");
@@ -188,22 +189,26 @@ void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
-    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP | SI41XX_CONFIG_AUTOPDB |
+    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, SI41XX_CONFIG_AUTOKP |
                                         _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET) |
                                         _VAL2FLD(SI41XX_CONFIG_IFDIV, config->if_div));
     si41xxWriteRegister(devp, SI41XX_REG_PHASE_GAIN, 0x00000U);
 #if SI41XX_HAS_IF
+    pwr |= SI41XX_POWERDOWN_PBIB;
     si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, devp->config->if_n));
     si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, devp->config->if_r));
 #endif
 #if SI41XX_HAS_RF1
+    pwr |= SI41XX_POWERDOWN_PBRB;
     si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, _VAL2FLD(SI41XX_RF1_NDIV, devp->config->rf1_n));
     si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, _VAL2FLD(SI41XX_RF1_RDIV, devp->config->rf1_r));
 #endif
 #if SI41XX_HAS_RF2
+    pwr |= SI41XX_POWERDOWN_PBRB;
     si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, devp->config->rf2_n));
     si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, devp->config->rf2_r));
 #endif
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, pwr);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
