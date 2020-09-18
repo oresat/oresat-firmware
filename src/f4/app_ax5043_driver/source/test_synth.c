@@ -36,6 +36,13 @@ void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[])
 
     return;
 synth_usage:
-    chprintf(chp, "Usage: synth <cmd>\r\n");
+    chprintf(chp, "\r\n"
+                  "Usage: synth <cmd>\r\n"
+                  "    reg <reg> <value>:\r\n"
+                  "                 Write <reg> with <value>\r\n"
+                  "\r\n"
+                  "    freq <freq>: Sets frequency of IF output to <freq>\r\n"
+                  "    ifdiv <div>: Sets IF output divider to <div>\r\n"
+                  "\r\n");
     return;
 }

@@ -212,6 +212,7 @@
 #define LINE_LO_SEN                 PAL_LINE(GPIOB, 12U)
 #define LINE_LO_SCLK                PAL_LINE(GPIOB, 13U)
 #define LINE_LO_SDATA               PAL_LINE(GPIOB, 14U)
+#define LINE_LO_PLL                 PAL_LINE(GPIOB, 15U)
 #define LINE_LBAND_CS               PAL_LINE(GPIOC, 6U)
 #define LINE_UHF_CS                 PAL_LINE(GPIOC, 7U)
 #define LINE_UHF_IRQ                PAL_LINE(GPIOC, 9U)

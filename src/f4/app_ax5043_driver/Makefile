@@ -167,7 +167,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DAX5043_SHARED_SPI
+UDEFS = -DSHELL_CONFIG_FILE -DAX5043_SHARED_SPI -DSI41XX_DEVICE=SI4112
 
 # Define ASM defines here
 UADEFS =
