@@ -21,7 +21,7 @@
 #define SI41XX_ADDRESS_Pos                  (0U)
 #define SI41XX_ADDRESS_Msk                  (0xFU << SI41XX_ADDRESS_Pos)
 #define SI41XX_ADDRESS                      SI41XX_ADDRESS_Msk
-#define SI41XX_DATA_Pos                     (5U)
+#define SI41XX_DATA_Pos                     (4U)
 #define SI41XX_DATA_Msk                     (0x3FFFFU << SI41XX_DATA_Pos)
 #define SI41XX_DATA                         SI41XX_DATA_Msk
 #define SI41XX_MSB_Pos                      (21U)
@@ -55,6 +55,7 @@
  * @notapi
  */
 void si41xxWriteRegister(SI41XXDriver *devp, uint8_t addr, uint32_t data) {
+    uint32_t i = 22;
     uint32_t word = _VAL2FLD(SI41XX_ADDRESS, addr)
                   | _VAL2FLD(SI41XX_DATA, data);
 
@@ -62,7 +63,7 @@ void si41xxWriteRegister(SI41XXDriver *devp, uint8_t addr, uint32_t data) {
 
     palClearLine(devp->config->sen);
 
-    while (word & SI41XX_WORD) {
+    while (i--) {
         palClearLine(devp->config->sclk);
 
         palWriteLine(devp->config->sdata, (word & SI41XX_MSB ? PAL_HIGH : PAL_LOW));
@@ -203,7 +204,6 @@ void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
     si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, devp->config->rf2_n));
     si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, devp->config->rf2_r));
 #endif
-    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, SI41XX_POWERDOWN_PBRB | SI41XX_POWERDOWN_PBIB);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
@@ -230,6 +230,7 @@ void si41xxStop(SI41XXDriver *devp) {
 #endif /* SI41XX_SHARED_SERIAL */
 
     si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, 0x00000U);
+    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, 0x00000U);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
