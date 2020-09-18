@@ -175,10 +175,12 @@ void si41xxObjectInit(SI41XXDriver *devp) {
  *
  * @api
  */
-void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config) {
+void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
             "si41xxStart(), invalid state");
+
+    devp->config = config;
 
 #if SI41XX_USE_SERIAL
 #if SI41XX_SHARED_SERIAL

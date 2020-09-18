@@ -367,7 +367,7 @@ typedef struct SI41XXDriver {
 extern "C" {
 #endif
 void si41xxObjectInit(SI41XXDriver *devp);
-void si41xxStart(SI41XXDriver *devp, const SI41XXConfig *config);
+void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config);
 void si41xxStop(SI41XXDriver *devp);
 void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t data);
 #if SI41XX_HAS_IF

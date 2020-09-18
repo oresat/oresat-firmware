@@ -24,7 +24,7 @@
 #include "test_radio.h"
 #include "test_synth.h"
 
-static const SI41XXConfig synth_cfg = {
+static SI41XXConfig synth_cfg = {
     .sen = LINE_LO_SEN,
     .sclk = LINE_LO_SCLK,
     .sdata = LINE_LO_SDATA,
