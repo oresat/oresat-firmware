@@ -1,6 +1,5 @@
 #include "cmd.h"
 #include "test_radio.h"
-#include "test_synth.h"
 #include "chprintf.h"
 #include "shell.h"
 
