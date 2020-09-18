@@ -372,6 +372,7 @@ void si41xxStop(SI41XXDriver *devp);
 void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t data);
 #if SI41XX_HAS_IF
 bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq);
+bool si41xxSetIFDiv(SI41XXDriver *devp, uint8_t div);
 #endif
 #if SI41XX_HAS_RF1
 bool si41xxSetRF1(SI41XXDriver *devp, uint32_t freq);

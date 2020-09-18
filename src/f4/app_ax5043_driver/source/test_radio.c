@@ -3,7 +3,6 @@
 #include "ch.h"
 #include "hal.h"
 #include "test_radio.h"
-#include "ax5043.h"
 #include "chprintf.h"
 
 static const SPIConfig lband_spicfg = {

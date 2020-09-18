@@ -22,6 +22,17 @@
 /* Project header files */
 #include "cmd.h"
 #include "test_radio.h"
+#include "test_synth.h"
+
+static const SI41XXConfig synth_cfg = {
+    .sen = LINE_LO_SEN,
+    .sclk = LINE_LO_SCLK,
+    .sdata = LINE_LO_SDATA,
+    .ref_freq = 16000000,
+    .if_div = 2,
+    .if_n = 873,
+    .if_r = 16,
+};
 
 /**
  * @brief App Initialization
@@ -30,6 +41,8 @@ static void app_init(void)
 {
     ax5043ObjectInit(&lband);
     ax5043ObjectInit(&uhf);
+    si41xxObjectInit(&synth);
+    si41xxStart(&synth, &synth_cfg);
 
     /* Initialize shell and start serial interface */
     shellInit();

@@ -1,5 +1,6 @@
 #include "cmd.h"
 #include "test_radio.h"
+#include "test_synth.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -10,6 +11,7 @@ static thread_t *shell_tp;
 /*===========================================================================*/
 static const ShellCommand commands[] = {
     {"radio", cmd_radio},
+    {"synth", cmd_synth},
     {NULL, NULL}
 };
 

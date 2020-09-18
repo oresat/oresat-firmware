@@ -265,7 +265,7 @@ void si41xxWriteRaw(SI41XXDriver *devp, uint8_t reg, uint32_t value) {
 
 #if (SI41XX_HAS_IF) || defined(__DOXYGEN__)
 /**
- * @brief   Sets IF dividers to provide the desired frequency.
+ * @brief   Sets IF N and R values to provide the desired frequency.
  *
  * @param[in]   devp        Pointer to the @p SI41XXDriver object
  * @param[in]   freq        The desired frequency
@@ -296,6 +296,45 @@ bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq) {
 
     si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, n));
     si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, r));
+
+#if SI41XX_SHARED_SERIAL
+    si41xxReleaseBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+#endif /* SI41XX_USE_SERIAL */
+    return true;
+}
+
+/**
+ * @brief   Sets IF divider value.
+ *
+ * @param[in]   devp        Pointer to the @p SI41XXDriver object
+ * @param[in]   div         The divisor (1,2,4,8)
+ *
+ * @return                  Successfully set divisor
+ * @api
+ */
+bool si41xxSetIFDiv(SI41XXDriver *devp, uint8_t div) {
+    uint8_t i;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state == SI41XX_READY),
+            "si41xxSetIFDiv(), invalid state");
+
+    /* Check that values are within bounds of programmable values */
+    if (!((div != 0) && ((div & (div - 1))))) {
+        return false;
+    }
+    for (i = 0; i < 4 && (div & 1); i++, div >>= 1);
+    if (i == 4) {
+        return false;
+    }
+    devp->config->if_div = i;
+
+#if SI41XX_USE_SERIAL
+#if SI41XX_SHARED_SERIAL
+    si41xxAcquireBus(devp);
+#endif /* SI41XX_SHARED_SERIAL */
+
+    si41xxWriteRegister(devp, SI41XX_REG_CONFIG, _VAL2FLD(SI41XX_CONFIG_IFDIV, i));
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);

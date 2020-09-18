@@ -107,6 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 #include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/si41xx.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk

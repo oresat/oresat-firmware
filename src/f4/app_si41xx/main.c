@@ -85,9 +85,8 @@ static void main_loop(void)
  * Requires register address and register value as entry.
  */
 static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
-
-    uint32_t reg_address;
-    uint32_t reg_value;
+    uint32_t address;
+    uint32_t value;
 
     if (argc < 2) {
         chprintf(sd, "Usage: reg <register address in decimal/hexadecimal> <register value in binary/decimal/hexadecimal>\r\n");
@@ -96,11 +95,11 @@ static void reg(BaseSequentialStream *sd, int argc, char *argv[]) {
         chprintf(sd, "           reg 2 0b10\r\n");
     }
 
-    reg_address = strtoul(argv[0], NULL, 0);
-    reg_value = strtoul((argv[1][0] == '0' && argv[1][1] == 'b') ?  argv[1]+2: argv[1], NULL, (argv[1][0] == '0' && argv[1][1] == 'b') ? 2 : 0);
+    address = strtoul(argv[0], NULL, 0);
+    value = strtoul((argv[1][0] == '0' && argv[1][1] == 'b') ?  argv[1]+2: argv[1], NULL, (argv[1][0] == '0' && argv[1][1] == 'b') ? 2 : 0);
 
-    si41xxWriteRaw(&synth, reg_address, reg_value);
-    chprintf(sd, "INFO: Updated register %d with value 0x%x.\r\n", reg_address, reg_value);
+    si41xxWriteRaw(&synth, address, value);
+    chprintf(sd, "INFO: Updated register %d with value 0x%x.\r\n", address, value);
 }
 
 
