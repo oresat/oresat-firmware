@@ -11,8 +11,8 @@ static SI41XXConfig synthcfg = {
     .sdata = LINE_LO_SDATA,
     .ref_freq = 16000000,
     .if_div = SI41XX_IFDIV_DIV1,
-    .if_n = 808,
-    .if_r = 16,
+    .if_n = 1616,
+    .if_r = 32,
 };
 
 static const SPIConfig lband_spicfg = {
@@ -255,12 +255,14 @@ void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Failed to set frequency\r\n");
             goto synth_usage;
         }
+        chprintf(chp, "N=%u R=%u\r\n", synthcfg.if_n, synthcfg.if_r);
     } else if (!strcmp(argv[0], "ifdiv") && argc > 1) {
         uint32_t div = strtoul(argv[1], NULL, 0);
         if (!si41xxSetIFDiv(&synth, div)) {
             chprintf(chp, "Failed to set IF divider value\r\n");
             goto synth_usage;
         }
+        chprintf(chp, "IFDIV=%u\r\n", synthcfg.if_div);
     } else if (!strcmp(argv[0], "status")) {
         chprintf(chp, "PLL: %s\r\n", (palReadLine(LINE_LO_PLL) ? "NOT LOCKED" : "LOCKED"));
     } else {
@@ -277,7 +279,7 @@ synth_usage:
                   "                 Write <reg> with <value>\r\n"
                   "\r\n"
                   "    freq <freq>: Sets frequency of IF output to <freq>\r\n"
-                  "    ifdiv <div>: Sets IF output divider to <div>\r\n"
+                  "    ifdiv <div>: Sets IF output divider to <div> (1,2,4,8)\r\n"
                   "    status:      Print PLL lock status\r\n"
                   "\r\n");
     return;

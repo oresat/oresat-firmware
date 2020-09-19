@@ -32,6 +32,13 @@
 #define SI41XX_WORD                         SI41XX_WORD_Msk
 /** @} */
 
+/**
+ * @name    Maximum phase detector frequency
+ * @{
+ */
+#define SI41XX_MAX_PHASEDET                 (1000000U)
+/** @} */
+
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -71,7 +78,9 @@ void si41xxWriteRegister(SI41XXDriver *devp, uint8_t addr, uint32_t data) {
         word <<= 1;
     }
 
+    palClearLine(devp->config->sclk);
     palSetLine(devp->config->sen);
+    palSetLine(devp->config->sclk);
 }
 
 #if (SI41XX_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
@@ -128,19 +137,21 @@ void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *
             "si41xxCalcDiv(), non-zero values required");
 
     uint32_t ref_freq = devp->config->ref_freq;
-    uint32_t n1 = ref_freq, n2 = freq;
+    uint32_t phasedet = ref_freq, gcd = freq;
 
     /* Find GCD of both frequencies */
-    while (n1 != n2) {
-        if (n1 > n2) {
-            n1 -= n2;
+    while (phasedet != gcd) {
+        if (phasedet > gcd) {
+            phasedet -= gcd;
         } else {
-            n2 -= n1;
+            gcd -= phasedet;
         }
     }
+    /* Divide until frequency is less than the maximum */
+    for (; phasedet > SI41XX_MAX_PHASEDET; phasedet /= 2);
     /* Calculate needed N and R values */
-    *ndiv = freq / n1;
-    *rdiv = ref_freq / n1;
+    *ndiv = freq / phasedet;
+    *rdiv = ref_freq / phasedet;
 }
 
 /*==========================================================================*/
@@ -177,12 +188,12 @@ void si41xxObjectInit(SI41XXDriver *devp) {
  * @api
  */
 void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
-    uint8_t pwr = 0;
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
             "si41xxStart(), invalid state");
 
     devp->config = config;
+    devp->pwr = 0;
 
 #if SI41XX_USE_SERIAL
 #if SI41XX_SHARED_SERIAL
@@ -193,22 +204,23 @@ void si41xxStart(SI41XXDriver *devp, SI41XXConfig *config) {
                                         _VAL2FLD(SI41XX_CONFIG_AUXSEL, SI41XX_AUXSEL_LOCKDET) |
                                         _VAL2FLD(SI41XX_CONFIG_IFDIV, config->if_div));
     si41xxWriteRegister(devp, SI41XX_REG_PHASE_GAIN, 0x00000U);
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
 #if SI41XX_HAS_IF
-    pwr |= SI41XX_POWERDOWN_PBIB;
+    devp->pwr |= SI41XX_POWERDOWN_PBIB;
     si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, devp->config->if_n));
     si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, devp->config->if_r));
 #endif
 #if SI41XX_HAS_RF1
-    pwr |= SI41XX_POWERDOWN_PBRB;
+    devp->pwr |= SI41XX_POWERDOWN_PBRB;
     si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, _VAL2FLD(SI41XX_RF1_NDIV, devp->config->rf1_n));
     si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, _VAL2FLD(SI41XX_RF1_RDIV, devp->config->rf1_r));
 #endif
 #if SI41XX_HAS_RF2
-    pwr |= SI41XX_POWERDOWN_PBRB;
+    devp->pwr |= SI41XX_POWERDOWN_PBRB;
     si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, devp->config->rf2_n));
     si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, devp->config->rf2_r));
 #endif
-    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, pwr);
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
@@ -229,12 +241,14 @@ void si41xxStop(SI41XXDriver *devp) {
     osalDbgAssert((devp->state == SI41XX_STOP) || (devp->state == SI41XX_READY),
             "si41xxStop(), invalid state");
 
+    devp->pwr = 0U;
+
 #if SI41XX_USE_SERIAL
 #if SI41XX_SHARED_SERIAL
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
-    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, 0x00000U);
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
     si41xxWriteRegister(devp, SI41XX_REG_CONFIG, 0x00000U);
 
 #if SI41XX_SHARED_SERIAL
@@ -302,8 +316,12 @@ bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
+    devp->pwr &= ~SI41XX_POWERDOWN_PBIB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
     si41xxWriteRegister(devp, SI41XX_REG_IF_NDIV, _VAL2FLD(SI41XX_IF_NDIV, n));
     si41xxWriteRegister(devp, SI41XX_REG_IF_RDIV, _VAL2FLD(SI41XX_IF_RDIV, r));
+    devp->pwr |= SI41XX_POWERDOWN_PBIB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
@@ -316,7 +334,7 @@ bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq) {
  * @brief   Sets IF divider value.
  *
  * @param[in]   devp        Pointer to the @p SI41XXDriver object
- * @param[in]   div         The divisor (1,2,4,8)
+ * @param[in]   div         The divisor value (1,2,4,8)
  *
  * @return                  Successfully set divisor
  * @api
@@ -328,10 +346,11 @@ bool si41xxSetIFDiv(SI41XXDriver *devp, uint8_t div) {
             "si41xxSetIFDiv(), invalid state");
 
     /* Check that values are within bounds of programmable values */
-    if (!((div != 0) && ((div & (div - 1))))) {
+    if (!((div != 0) && ((div & (div - 1)) == 0))) {
+        /* Not a power of 2 */
         return false;
     }
-    for (i = 0; i < 4 && (div & 1); i++, div >>= 1);
+    for (i = 0; i < 4 && (div & 0xEU); i++, div >>= 1);
     if (i == 4) {
         return false;
     }
@@ -383,8 +402,12 @@ bool si41xxSetRF1(SI41XXDriver *devp, uint32_t freq) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
+    devp->pwr &= ~SI41XX_POWERDOWN_PBRB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
     si41xxWriteRegister(devp, SI41XX_REG_RF1_NDIV, _VAL2FLD(SI41XX_RF1_NDIV, n));
     si41xxWriteRegister(devp, SI41XX_REG_RF1_RDIV, _VAL2FLD(SI41XX_RF1_RDIV, r));
+    devp->pwr |= SI41XX_POWERDOWN_PBRB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);
@@ -425,8 +448,12 @@ bool si41xxSetRF2(SI41XXDriver *devp, uint32_t freq) {
     si41xxAcquireBus(devp);
 #endif /* SI41XX_SHARED_SERIAL */
 
+    devp->pwr &= ~SI41XX_POWERDOWN_PBRB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
     si41xxWriteRegister(devp, SI41XX_REG_RF2_NDIV, _VAL2FLD(SI41XX_RF2_NDIV, n));
     si41xxWriteRegister(devp, SI41XX_REG_RF2_RDIV, _VAL2FLD(SI41XX_RF2_RDIV, r));
+    devp->pwr |= SI41XX_POWERDOWN_PBRB;
+    si41xxWriteRegister(devp, SI41XX_REG_PWRDOWN, devp->pwr);
 
 #if SI41XX_SHARED_SERIAL
     si41xxReleaseBus(devp);

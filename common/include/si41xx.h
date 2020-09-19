@@ -352,6 +352,7 @@ typedef struct SI41XXDriver {
      */
     mutex_t                     mutex;
 #endif /* SI41XX_USE_MUTUAL_EXCLUSION */
+    uint8_t                     pwr;
 } SI41XXDriver;
 /** @} */
 
