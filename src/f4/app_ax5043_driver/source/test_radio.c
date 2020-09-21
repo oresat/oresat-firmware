@@ -148,7 +148,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     if (!strcmp(argv[0], "start")) {
-        chprintf(chp, "Starting AX5043 driver...");
+        chprintf(chp, "Starting %s AX5043 driver...", (devp == UHF ? "UHF" : "L-Band"));
         ax5043Start(devp, cfgp);
         if (devp->state != AX5043_READY) {
             chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", devp->error);
@@ -156,7 +156,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "OK\r\n");
         }
     } else if (!strcmp(argv[0], "stop")) {
-        chprintf(chp, "Stopping AX5043 driver...");
+        chprintf(chp, "Stopping %s AX5043 driver...", (devp == UHF ? "UHF" : "L-Band"));
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
@@ -169,7 +169,13 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             goto radio_usage;
         }
 
+        chprintf(chp, "Setting %s %s frequency to %u...", (devp == UHF ? "UHF" : "L-Band"), (chan_b ? "B" : "A"), freq);
         ax5043SetFreq(devp, freq, vcor, chan_b);
+        if (devp->error != AX5043_ERR_NOERROR) {
+            chprintf(chp, "Error: Failed to set frequency. Error code %d.\r\n", devp->error);
+        } else {
+            chprintf(chp, "OK\r\n");
+        }
     } else if (!strcmp(argv[0], "readreg") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 

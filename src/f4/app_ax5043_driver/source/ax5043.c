@@ -654,13 +654,31 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     ax5043WaitIRQ(devp, AX5043_IRQ_XTALREADY, TIME_INFINITE);
 
     /* Set frequencies
-     * We treat these as 64 bit values to accomodate the calculations
+     * We first find the GCD of the two frequencies in order to reduce them
+     * as much as possible before doing the calculations.
      * NOTE: The programming manual recommends always setting bit 0
      *
      * REG = f_carrier * 2^24 / f_xtal + 1/2
      *     = (f_carrier * 2^25 + f_xtal) / (f_xtal * 2)
      */
-    freq = (uint32_t)(((uint64_t)freq * 0x2000000U + devp->config->xtal_freq) / (devp->config->xtal_freq * 2)) | 0x01U;
+
+    /* Find GCD */
+    uint32_t n1 = freq, n2 = devp->config->xtal_freq;
+    while (n1 != n2) {
+        if (n1 > n2) {
+            n1 -= n2;
+        } else {
+            n2 -= n1;
+        }
+    }
+    /* n1 = GCD reduced set frequency */
+    n1 = freq / n1;
+    /* n2 = GCD reduced XTAL frequency */
+    n2 = devp->config->xtal_freq / n2;
+    /* Calculate the register value */
+    freq = ((n1 * 0x2000000U + n2) / (n2 * 2)) | 0x01U;
+
+    /* Set the frequency and initiate ranging */
     ax5043WriteU32(devp, freq_reg, freq);
     ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
     ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
