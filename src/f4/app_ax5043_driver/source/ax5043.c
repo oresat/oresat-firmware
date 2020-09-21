@@ -676,7 +676,7 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     /* n2 = GCD reduced XTAL frequency */
     n2 = devp->config->xtal_freq / n2;
     /* Calculate the register value */
-    freq = ((n1 * 0x2000000U + n2) / (n2 * 2)) | 0x01U;
+    freq = ((n1 * UINT64_C(0x2000000) + n2) / (n2 * 2)) | 0x01U;
 
     /* Set the frequency and initiate ranging */
     ax5043WriteU32(devp, freq_reg, freq);
