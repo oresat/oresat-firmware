@@ -147,8 +147,12 @@ void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *
             gcd -= phasedet;
         }
     }
+
     /* Divide until frequency is less than the maximum */
-    for (; phasedet > SI41XX_MAX_PHASEDET; phasedet /= 2);
+    while (phasedet > SI41XX_MAX_PHASEDET) {
+        phasedet /= 2;
+    }
+
     /* Calculate needed N and R values */
     *ndiv = freq / phasedet;
     *rdiv = ref_freq / phasedet;
