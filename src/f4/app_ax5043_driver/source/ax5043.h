@@ -2454,6 +2454,24 @@
 #define AX5043_CHUNK_DATARX_ABORT           AX5043_CHUNK_DATARX_ABORT_Msk
 /** @} */
 
+/**
+ * @name    AX5043 Frequency ranges
+ * @{
+ */
+#ifndef AX5043_RFDIV1_MAX
+#define AX5043_RFDIV1_MAX                   (1050U)
+#endif /* AX5043_RFDIV1_MAX */
+#ifndef AX5043_RFDIV1_MIN
+#define AX5043_RFDIV1_MIN                   (800U)
+#endif /* AX5043_RFDIV1_MIN */
+#ifndef AX5043_RFDIV2_MAX
+#define AX5043_RFDIV2_MAX                   (525U)
+#endif /* AX5043_RFDIV2_MAX */
+#ifndef AX5043_RFDIV2_MIN
+#define AX5043_RFDIV2_MIN                   (400U)
+#endif /* AX5043_RFDIV2_MIN */
+/** @} */
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/

@@ -641,6 +641,9 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
 
     osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
+    osalDbgAssert((freq >= AX5043_RFDIV1_MIN && freq <= AX5043_RFDIV1_MAX) ||
+                  (freq >= AX5043_RFDIV2_MIN && freq <= AX5043_RFDIV2_MAX),
+                  "ax5043SetFreq(), frequency out of bounds");
 
     /* If no VCOR specified, default to 8 */
     if (vcor == 0) {
@@ -675,11 +678,16 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     n1 = freq / n1;
     /* n2 = GCD reduced XTAL frequency */
     n2 = devp->config->xtal_freq / n2;
-    /* Calculate the register value */
-    freq = ((n1 * 0x2000000U + n2) / (n2 * 2)) | 0x01U;
 
-    /* Set the frequency and initiate ranging */
-    ax5043WriteU32(devp, freq_reg, freq);
+    /* Set the frequency and RFDIV if needed, and initiate ranging */
+    ax5043WriteU32(devp, freq_reg, ((n1 * 0x2000000U + n2) / (n2 * 2)) | 0x01U);
+    uint8_t pllvcodiv = ax5043ReadU8(devp, AX5043_REG_PLLVCODIV);
+    if (freq >= AX5043_RFDIV1_MIN && freq <= AX5043_RFDIV1_MAX) {
+        pllvcodiv &= ~AX5043_PLLVCODIV_RFDIV;
+    } else {
+        pllvcodiv |= AX5043_PLLVCODIV_RFDIV;
+    }
+    ax5043WriteU8(devp, AX5043_REG_PLLVCODIV, pllvcodiv);
     ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
     ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
     vcor = ax5043ReadU8(devp, rng_reg);
