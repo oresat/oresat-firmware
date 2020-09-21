@@ -680,7 +680,7 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     n2 = devp->config->xtal_freq / n2;
 
     /* Set the frequency and RFDIV if needed, and initiate ranging */
-    ax5043WriteU32(devp, freq_reg, ((n1 * 0x2000000U + n2) / (n2 * 2)) | 0x01U);
+    ax5043WriteU32(devp, freq_reg, ((n1 * UINT64_C(0x2000000) + n2) / (n2 * 2)) | 0x01U);
     uint8_t pllvcodiv = ax5043ReadU8(devp, AX5043_REG_PLLVCODIV);
     if (freq >= AX5043_RFDIV1_MIN && freq <= AX5043_RFDIV1_MAX) {
         pllvcodiv &= ~AX5043_PLLVCODIV_RFDIV;
