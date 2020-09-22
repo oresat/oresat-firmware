@@ -2459,16 +2459,16 @@
  * @{
  */
 #ifndef AX5043_RFDIV1_MAX
-#define AX5043_RFDIV1_MAX                   (1050U)
+#define AX5043_RFDIV1_MAX                   (1050000000U)
 #endif /* AX5043_RFDIV1_MAX */
 #ifndef AX5043_RFDIV1_MIN
-#define AX5043_RFDIV1_MIN                   (800U)
+#define AX5043_RFDIV1_MIN                   (800000000U)
 #endif /* AX5043_RFDIV1_MIN */
 #ifndef AX5043_RFDIV2_MAX
-#define AX5043_RFDIV2_MAX                   (525U)
+#define AX5043_RFDIV2_MAX                   (525000000U)
 #endif /* AX5043_RFDIV2_MAX */
 #ifndef AX5043_RFDIV2_MIN
-#define AX5043_RFDIV2_MIN                   (400U)
+#define AX5043_RFDIV2_MIN                   (400000000U)
 #endif /* AX5043_RFDIV2_MIN */
 /** @} */
 
@@ -2796,55 +2796,26 @@ typedef struct{
 } AX5043Config;
 
 /**
- * @brief   @p AX5043 specific methods.
- */
-#define _ax5043_methods_alone
-
-/**
- * @brief   @p AX5043 specific methods with inherited ones.
- */
-#define _ax5043_methods                                                     \
-    _base_object_methods
-
-/**
- * @extends BaseObjectVMT
- *
- * @brief   @p AX5043 virtual methods table.
- */
-struct AX5043VMT {
-    _ax5043_methods
-};
-
-/**
- * @brief   @p AX5043Driver specific data.
- */
-#define _ax5043_data                                                        \
-    _base_object_data                                                       \
-    /* Driver state */                                                      \
-    ax5043_state_t              state;                                      \
-    /* Current configuration data */                                        \
-    const AX5043Config          *config;                                    \
-    /* Status as of last exchange */                                        \
-    ax5043_status_t             status;                                     \
-    /* IRQ Worker thread */                                                 \
-    thread_t                    *irq_worker;                                \
-    /* IRQ Event Source */                                                  \
-    event_source_t              irq_event;                                  \
-    /* Error state of device */                                             \
-    ax5043_err_t                error;                                      \
-    uint8_t                     rf_freq_off1;                               \
-    uint8_t                     rf_freq_off2;                               \
-    uint8_t                     rf_freq_off3;                               \
-    uint8_t                     rssi;                                       \
-    uint8_t                     dropped[250];
-
-/**
  * @brief AX5043 Radio class.
  */
 struct AX5043Driver {
-    /** @brief Virtual Methods Table.*/
-    const struct AX5043VMT     *vmt;
-    _ax5043_data
+    /* Driver state */
+    ax5043_state_t              state;
+    /* Current configuration data */
+    const AX5043Config          *config;
+    /* Status as of last exchange */
+    ax5043_status_t             status;
+    /* IRQ Worker thread */
+    thread_t                    *irq_worker;
+    /* IRQ Event Source */
+    event_source_t              irq_event;
+    /* Error state of device */
+    ax5043_err_t                error;
+    uint8_t                     rf_freq_off1;
+    uint8_t                     rf_freq_off2;
+    uint8_t                     rf_freq_off3;
+    uint8_t                     rssi;
+    uint8_t                     dropped[250];
 };
 /** @} */
 

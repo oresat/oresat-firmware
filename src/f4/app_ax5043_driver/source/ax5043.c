@@ -231,10 +231,6 @@ ax5043_status_t ax5043SetPWRMode(AX5043Driver *devp, uint8_t pwrmode) {
 /* Interface implementation.                                                */
 /*==========================================================================*/
 
-static const struct AX5043VMT vmt_device = {
-    (size_t)0,
-};
-
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
@@ -247,8 +243,6 @@ static const struct AX5043VMT vmt_device = {
  * @init
  */
 void ax5043ObjectInit(AX5043Driver *devp) {
-    devp->vmt = &vmt_device;
-
     devp->config = NULL;
     devp->irq_worker = NULL;
     chEvtObjectInit(&devp->irq_event);
