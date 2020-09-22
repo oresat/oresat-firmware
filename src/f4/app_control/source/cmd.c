@@ -371,6 +371,7 @@ lfs_usage:
 /*===========================================================================*/
 static const ShellCommand commands[] = {
     {"radio", cmd_radio},
+    {"synth", cmd_synth},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
@@ -389,7 +390,7 @@ static const ShellConfig shell_cfg = {
 };
 
 THD_WORKING_AREA(shell_wa, 0x1000);
-THD_WORKING_AREA(cmd_wa, 0x200);
+THD_WORKING_AREA(cmd_wa, 0x400);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
