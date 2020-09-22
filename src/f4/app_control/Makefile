@@ -111,6 +111,8 @@ include $(PROJ_SRC)/opd.mk
 include $(PROJ_SRC)/time_sync.mk
 include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/littlefs.mk
+include $(PROJ_SRC)/si41xx.mk
+include $(PROJ_SRC)/ax5043.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -171,7 +173,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DLFS_CONFIG=lfs_util_custom.h
+UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DAX5043_SHARED_SPI -DSI41XX_DEVICE=SI4112 -DLFS_CONFIG=lfs_util_custom.h
 
 # Define ASM defines here
 UADEFS =

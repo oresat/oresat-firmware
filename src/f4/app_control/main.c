@@ -24,8 +24,8 @@
 #include "wdt.h"
 #include "opd.h"
 #include "time_sync.h"
-#include "command.h"
 #include "CO_master.h"
+#include "cmd.h"
 
 /*
 static const oresat_node_t nodes[] = {
@@ -45,11 +45,6 @@ static const oresat_node_t nodes[] = {
     {0x11, 0x1D, 2000, "Star Tracker"}
 };
 */
-
-/*
- * Working area for driver.
- */
-
 
 static worker_t wdt_worker;
 static worker_t cmd_worker;

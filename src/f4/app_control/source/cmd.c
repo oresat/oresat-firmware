@@ -2,13 +2,14 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "command.h"
+#include "cmd.h"
 #include "opd.h"
 #include "CO_master.h"
 #include "time_sync.h"
 #include "max7310.h"
 #include "mmc.h"
 #include "test_mmc.h"
+#include "test_radio.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -369,6 +370,7 @@ lfs_usage:
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
+    {"radio", cmd_radio},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
@@ -391,6 +393,8 @@ THD_WORKING_AREA(cmd_wa, 0x200);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;
+
+    radio_init();
 
     /* Start a shell */
     while (!chThdShouldTerminateX()) {

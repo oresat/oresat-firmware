@@ -29,6 +29,8 @@ THD_FUNCTION(cmd, arg)
 {
     (void)arg;
 
+    radio_init();
+
     /* Start a shell */
     while (!chThdShouldTerminateX()) {
         shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);

@@ -218,7 +218,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(PAL_USE_WAIT) || defined(__DOXYGEN__)
-#define PAL_USE_WAIT                        TRUE
+#define PAL_USE_WAIT                        FALSE
 #endif
 
 /*===========================================================================*/

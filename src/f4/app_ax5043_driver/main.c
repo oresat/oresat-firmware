@@ -21,15 +21,12 @@
 
 /* Project header files */
 #include "cmd.h"
-#include "test_radio.h"
 
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-    radio_init();
-
     /* Initialize shell and start serial interface */
     shellInit();
     sdStart(&SD3, NULL);
