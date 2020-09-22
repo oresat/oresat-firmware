@@ -34,9 +34,6 @@
 #include "ax5043.h"
 #include "morse.h"
 
-
-//#include "adf7030.h"
-
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
 
@@ -54,6 +51,10 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_MODULATION,     0x08,common},
   {AX5043_REG_ENCODING,       0x00,common},
   {AX5043_REG_FRAMING,        0x24,common},
+  {AX5043_REG_CRCINIT3,       0x00,common},
+  {AX5043_REG_CRCINIT2,       0x00,common},
+  {AX5043_REG_CRCINIT1,       0xFF,common},
+  {AX5043_REG_CRCINIT0,       0xFF,common},
   {AX5043_REG_PINFUNCSYSCLK,  0x01,common},
   {AX5043_REG_PINFUNCDCLK,    0x01,common},
   {AX5043_REG_PINFUNCDATA,    0x01,common},
@@ -125,14 +126,10 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_BBOFFSRES3,     0x00,common},
   {AX5043_REG_MODCFGF,        0x02,common},
   {AX5043_REG_FSKDEV2,        0x00,common},
-//  {AX5043_REG_FSKDEV1,        0x22,common},
-//  {AX5043_REG_FSKDEV0,        0x22,common},
   {AX5043_REG_FSKDEV1,        0x00,common},
   {AX5043_REG_FSKDEV0,        0x00,common},
   {AX5043_REG_MODCFGA,        0x05,common},
   {AX5043_REG_TXRATE2,        0x00,common},
-//  {AX5043_REG_TXRATE1,        0x88,common},
-//  {AX5043_REG_TXRATE0,        0x89,common},
   {AX5043_REG_TXRATE1,        0x00,common},
   {AX5043_REG_TXRATE0,        0x01,common},
   {AX5043_REG_TXPWRCOEFFB1,   0x07,common},
@@ -256,6 +253,8 @@ ax5043_confval_t conf_values[]={
   {AXRADIO_PHY_END                     ,0}
 };
 
+uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
+
 /*
  * Serial Driver Configuration
  */
@@ -300,7 +299,7 @@ static const SPIConfig spicfg_tx =
     SPI_CR1_BR_1    |
     SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
     SPI_CR1_SSM,
-    0, // SPI_CR2_SSOE,
+    0
 };
 
 //mailboxes to receive the radio packets
@@ -318,12 +317,12 @@ static AX5043Config axcfg1 =
   reg_values,
   conf_values,
   AX5043_MODE_CW,
-  &radio1_rx_mb,
+  &radio1_rx_mb
 };
 AX5043Driver axd1;
 
 /*
- * Initialize the SPI drivers and configure the adf7030 chips
+ * Initialize the SPI drivers and configure the ax5043 chips
  */
 static void app_init(void)
 {
@@ -332,9 +331,9 @@ static void app_init(void)
 
     // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
+
     set_util_fwversion(&version_info);
     set_util_hwversion(&version_info);
-
 
     //Print FW/HW information
     chprintf(DEBUG_CHP, "\r\nFirmware Info\r\n");
@@ -345,12 +344,8 @@ static void app_init(void)
              , version_info.hardware.id_low
             );
 
-    chThdSleepMilliseconds(1000);
     spiStart(&SPID1, &spicfg_rx);
     spiStart(&SPID2, &spicfg_tx);
-	//spiSelect(&SPID2);
-    chThdSleepMilliseconds(1000);
-
 
     // Creating the mailboxes.
     chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);

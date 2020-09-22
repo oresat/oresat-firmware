@@ -24,6 +24,8 @@
  * Include Files
  */
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
@@ -31,11 +33,8 @@
 #include "util_numbers.h"
 #include "ax5043.h"
 
-//#include "adf7030.h"
-
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
-
 
 const struct axradio_address remoteaddr_tx = {
 	{ 0x32, 0x34, 0x00, 0x00}
@@ -323,12 +322,14 @@ static AX5043Config axcfg1 =
 };
 AX5043Driver axd1;
 
-
 /*
  * Initialize the SPI drivers and configure the ax5043 chips
  */
 static void app_init(void)
 {
+
+    uint16_t pkt_counter = 0;
+
     // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
 
@@ -343,7 +344,6 @@ static void app_init(void)
              , version_info.hardware.id_center
              , version_info.hardware.id_low
             );
-
 
     spiStart(&SPID1, &spicfg_rx);
     spiStart(&SPID2, &spicfg_tx);

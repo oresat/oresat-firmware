@@ -24,6 +24,8 @@
  * Include Files
  */
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
@@ -31,11 +33,8 @@
 #include "util_numbers.h"
 #include "ax5043.h"
 
-//#include "adf7030.h"
-
 #define     DEBUG_SERIAL                    SD2
 #define     DEBUG_CHP                       ((BaseSequentialStream *) &DEBUG_SERIAL)
-
 
 const struct axradio_address remoteaddr_tx = {
 	{ 0x32, 0x34, 0x00, 0x00}
@@ -52,6 +51,10 @@ ax5043_regval_t reg_values[] = {
   {AX5043_REG_MODULATION,     0x08,common},
   {AX5043_REG_ENCODING,       0x00,common},
   {AX5043_REG_FRAMING,        0x24,common},
+  {AX5043_REG_CRCINIT3,       0x00,common},
+  {AX5043_REG_CRCINIT2,       0x00,common},
+  {AX5043_REG_CRCINIT1,       0xFF,common},
+  {AX5043_REG_CRCINIT0,       0xFF,common},
   {AX5043_REG_PINFUNCSYSCLK,  0x01,common},
   {AX5043_REG_PINFUNCDCLK,    0x01,common},
   {AX5043_REG_PINFUNCDATA,    0x01,common},
@@ -213,11 +216,11 @@ ax5043_confval_t conf_values[]={
   {AXRADIO_PHY_RSSIOFFSET              ,64},
   {AXRADIO_PHY_RSSIREFERENCE           ,313},
   {AXRADIO_PHY_CHANNELBUSY             ,-23},
-  {AXRADIO_PHY_CS_PERIOD               ,7}, 
+  {AXRADIO_PHY_CS_PERIOD               ,7},
   {AXRADIO_PHY_CS_ENABLED              ,0},
   {AXRADIO_PHY_LBT_RETRIES             ,0},
   {AXRADIO_PHY_LBT_FORCETX             ,0},
-  {AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    ,23}, 
+  {AXRADIO_PHY_PREAMBLE_WOR_LONGLEN    ,23},
   {AXRADIO_PHY_PREAMBLE_WOR_LEN        ,184},
   {AXRADIO_PHY_PREAMBLE_LONGLEN        ,0},
   {AXRADIO_PHY_PREAMBLE_LEN            ,72},
@@ -240,16 +243,15 @@ ax5043_confval_t conf_values[]={
   {AXRADIO_FRAMING_SYNCWORD3           ,0XAA},
   {AXRADIO_FRAMING_SYNCFLAGS           ,0X38},
   {AXRADIO_FRAMING_ENABLE_SFDCALLBACK  ,0},
-  {AXRADIO_FRAMING_ACK_TIMEOUT         ,8}, 
-  {AXRADIO_FRAMING_ACK_DELAY           ,313}, 
+  {AXRADIO_FRAMING_ACK_TIMEOUT         ,8},
+  {AXRADIO_FRAMING_ACK_DELAY           ,313},
   {AXRADIO_FRAMING_ACK_RETRANSMISSIONS ,0},
   {AXRADIO_FRAMING_ACK_SEQNRPOS        ,0XFF},
-  {AXRADIO_FRAMING_MINPAYLOADLEN       ,0}, 
+  {AXRADIO_FRAMING_MINPAYLOADLEN       ,0},
   {AXRADIO_WOR_PERIOD                  ,128},
   {AXRADIO_PHY_INNERFREQLOOP           ,0},
   {AXRADIO_PHY_END                     ,0}
 };
-
 
 uint8_t axradio_rxbuffer[256];  //buffer to receive radio data
 
@@ -319,12 +321,14 @@ static AX5043Config axcfg1 =
 };
 AX5043Driver axd1;
 
-
 /*
  * Initialize the SPI drivers and configure the ax5043 chips
  */
 static void app_init(void)
 {
+
+    uint16_t pkt_counter = 0;
+
     // Start up debug output, chprintf(DEBUG_CHP,...)
     sdStart(&DEBUG_SERIAL, &ser_cfg);
 
@@ -340,13 +344,12 @@ static void app_init(void)
              , version_info.hardware.id_low
             );
 
-
     spiStart(&SPID1, &spicfg_rx);
     spiStart(&SPID2, &spicfg_tx);
 
     // Creating the mailboxes.
     chMBObjectInit(&radio1_rx_mb, radio1_rx_queue, NUM_BUFFERS);
-    
+
     //initiating radio driver
     ax5043ObjectInit(&axd1);
     ax5043Start(&axd1, &axcfg1);
@@ -379,7 +382,7 @@ static void main_loop(void)
       chprintf(DEBUG_CHP, "\r\r INFO: interrupt happened ** \r\n");
     else
       chprintf(DEBUG_CHP, "\r\r INFO: interrupt timeout** \r\n");
-    
+
     packet_len=receive_loop(&axd1, axradio_rxbuffer);
     //chprintf(DEBUG_CHP,"INFO: RF Frequency Offset: 0x%02x%02x%02x\r\n", axd1.rf_freq_off3, axd1.rf_freq_off2, axd1.rf_freq_off1);
     //chprintf(DEBUG_CHP,"INFO: RSSI %d\r\n", (int)axd1.rssi);
