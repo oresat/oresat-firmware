@@ -180,6 +180,17 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
+        } else if (!strcmp(argv[0], "summary")) {
+            chprintf(chp, "Board summary:\r\n");
+            for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
+                if (!opd_status(i, &status)) {
+                    chprintf(chp, "0x%02X: CONNECTED - %s - %s\r\n", i,
+                            (status.odr & MAX7310_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
+                            (status.input & MAX7310_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
+                } else {
+                    chprintf(chp, "0x%02X: NOT CONNECTED\r\n", i);
+                }
+            }
         } else if (!strcmp(argv[0], "boot")) {
             int retval = opd_boot(opd_addr);
             chprintf(chp, "Boot returned 0x%02X\r\n", retval);
@@ -200,6 +211,7 @@ opd_usage:
                   "    reset:      Reset the circuit breaker of a card\r\n"
                   "    probe:      Probe an address to see if a card responds\r\n"
                   "    status:     Report the status of a card\r\n"
+                  "    summary:    Report the status of all cards\r\n"
                   "    boot:       Attempt to bootstrap a card\r\n");
     return;
 }
@@ -289,7 +301,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         do {
-            err = lfs_dir_read(&lfs, &dir, &info); 
+            err = lfs_dir_read(&lfs, &dir, &info);
             if (err <= 0) {
                 if (err < 0) {
                     chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
