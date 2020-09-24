@@ -25,7 +25,11 @@
 #include "opd.h"
 #include "time_sync.h"
 #include "CO_master.h"
+#include "si41xx.h"
+#include "ax5043.h"
+#ifdef SHELL_ENABLE
 #include "cmd.h"
+#endif
 
 /*
 static const oresat_node_t nodes[] = {
@@ -46,8 +50,124 @@ static const oresat_node_t nodes[] = {
 };
 */
 
+static const SPIConfig lband_spicfg = {
+    false,
+    NULL,                                   // Operation complete callback
+    LINE_LBAND_CS,
+    // SPI cr1 data                            (see 446 ref man.)
+    SPI_CR1_SPE     |                       // SPI enable
+    SPI_CR1_MSTR    |                       // Master
+    //SPI_CR1_BR_2    |
+    SPI_CR1_BR_1    |
+    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
+    SPI_CR1_SSM,
+    0, // SPI_CR2_SSOE,
+};
+
+static const SPIConfig uhf_spicfg = {
+    false,
+    NULL,                                   // Operation complete callback
+    LINE_UHF_CS,
+    // SPI cr1 data                         (see 446 ref man.)
+    SPI_CR1_SPE     |                       // SPI enable
+    SPI_CR1_MSTR    |                       // Master
+    //SPI_CR1_BR_2    |
+    SPI_CR1_BR_1    |
+    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
+    SPI_CR1_SSM,
+    0, // SPI_CR2_SSOE,
+};
+
+static const ax5043_regval_t lband_regs[] = {
+    {AX5043_REG_PINFUNCSYSCLK, AX5043_PFSYSCLK_OUT_XTAL_DIV1},
+    {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL},
+    {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL},
+    {AX5043_REG_0xF0D, AX5043_0xF0D_DEFVAL},
+    {AX5043_REG_0xF10, AX5043_0xF10_TCXO},
+    {AX5043_REG_0xF11, AX5043_0xF11_TCXO},
+    {AX5043_REG_0xF1C, AX5043_0xF1C_DEFVAL},
+    {AX5043_REG_0xF21, AX5043_0xF21_DEFVAL},
+    {AX5043_REG_0xF22, AX5043_0xF22_DEFVAL},
+    {AX5043_REG_0xF23, AX5043_0xF23_DEFVAL},
+    {AX5043_REG_0xF26, AX5043_0xF26_DEFVAL},
+    {AX5043_REG_0xF30, AX5043_0xF30_DEFVAL},
+    {AX5043_REG_0xF31, AX5043_0xF31_DEFVAL},
+    {AX5043_REG_0xF32, AX5043_0xF32_DEFVAL},
+    {AX5043_REG_0xF33, AX5043_0xF33_DEFVAL},
+    {AX5043_REG_0xF35, AX5043_0xF35_XTALDIV1},
+    {AX5043_REG_0xF44, AX5043_0xF44_DEFVAL},
+    {0, 0}
+};
+
+static const ax5043_regval_t uhf_regs[] = {
+    {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL},
+    {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL},
+    {AX5043_REG_0xF0D, AX5043_0xF0D_DEFVAL},
+    {AX5043_REG_0xF10, AX5043_0xF10_TCXO},
+    {AX5043_REG_0xF11, AX5043_0xF11_TCXO},
+    {AX5043_REG_0xF1C, AX5043_0xF1C_DEFVAL},
+    {AX5043_REG_0xF21, AX5043_0xF21_DEFVAL},
+    {AX5043_REG_0xF22, AX5043_0xF22_DEFVAL},
+    {AX5043_REG_0xF23, AX5043_0xF23_DEFVAL},
+    {AX5043_REG_0xF26, AX5043_0xF26_DEFVAL},
+    {AX5043_REG_0xF30, AX5043_0xF30_DEFVAL},
+    {AX5043_REG_0xF31, AX5043_0xF31_DEFVAL},
+    {AX5043_REG_0xF32, AX5043_0xF32_DEFVAL},
+    {AX5043_REG_0xF33, AX5043_0xF33_DEFVAL},
+    {AX5043_REG_0xF35, AX5043_0xF35_XTALDIV1},
+    {AX5043_REG_0xF44, AX5043_0xF44_DEFVAL},
+    {0, 0}
+};
+
+const AX5043Config lbandcfg = {
+    .spip       = &SPID1,
+    .spicfg     = &lband_spicfg,
+    .miso       = LINE_SPI1_MISO,
+    .irq        = LINE_LBAND_IRQ,
+    .xtal_freq  = 16000000,
+    .reg_values = lband_regs,
+};
+
+const AX5043Config uhfcfg = {
+    .spip       = &SPID1,
+    .spicfg     = &uhf_spicfg,
+    .miso       = LINE_SPI1_MISO,
+    .irq        = LINE_UHF_IRQ,
+    .xtal_freq  = 16000000,
+    .reg_values = uhf_regs,
+};
+
+SI41XXConfig synthcfg = {
+    .sen = LINE_LO_SEN,
+    .sclk = LINE_LO_SCLK,
+    .sdata = LINE_LO_SDATA,
+    .ref_freq = 16000000,
+    .if_div = SI41XX_IFDIV_DIV1,
+    .if_n = 1616,
+    .if_r = 32,
+};
+
+AX5043Driver lband;
+AX5043Driver uhf;
+SI41XXDriver synth;
+
+#ifdef SHELL_ENABLE
+radio_dev_t radio_devices[] = {
+    {&lband, &lbandcfg, "L-Band"},
+    {&uhf, &uhfcfg, "UHF"},
+    {NULL, NULL, ""},
+};
+
+synth_dev_t synth_devices[] = {
+    {&synth, &synthcfg, "LO"},
+    {NULL, NULL, ""},
+};
+#endif
+
 static worker_t wdt_worker;
+#ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+#endif
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -65,18 +185,31 @@ static void app_init(void)
     reg_worker(&wdt_worker);
 
     /* Initialize shell worker thread */
+#ifdef SHELL_ENABLE
     init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
     reg_worker(&cmd_worker);
+#endif
 
     /* Initialize OPD */
     opd_init();
-    /*opd_start();*/
+    opd_start();
 
     /* Initialize SDO client */
     sdo_init();
 
+    /* Initialize and start radio systems */
+    ax5043ObjectInit(&lband);
+    ax5043ObjectInit(&uhf);
+    si41xxObjectInit(&synth);
+
+    ax5043Start(&lband, &lbandcfg);
+    ax5043Start(&uhf, &uhfcfg);
+    si41xxStart(&synth, &synthcfg);
+
     /* Initialize shell and start serial interface */
+#ifdef SHELL_ENABLE
     shellInit();
+#endif
     sdStart(&SD3, NULL);
 
     /* Configure SCET time object */

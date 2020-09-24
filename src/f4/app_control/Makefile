@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -173,7 +173,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DAX5043_SHARED_SPI -DSI41XX_DEVICE=SI4112 -DLFS_CONFIG=lfs_util_custom.h
+UDEFS = -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DAX5043_SHARED_SPI -DSI41XX_DEVICE=SI4112 -DLFS_CONFIG=lfs_util_custom.h
 
 # Define ASM defines here
 UADEFS =

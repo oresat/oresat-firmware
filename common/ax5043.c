@@ -275,7 +275,9 @@ THD_FUNCTION(fifo_worker, arg) {
                     /* Copy packet data */
                     osalDbgAssert(mb != NULL, "fifo_worker(),  NULL mailbox");
                     if (mb->index + chunk_len >= AX5043_MAILBOX_SIZE) {
+                        chSysLock();
                         chMBPostI(&devp->mb_filled, (msg_t)mb);
+                        chSysUnlock();
                         chMBFetchTimeout(&devp->mb_free, (msg_t*)&mb, TIME_INFINITE);
                     }
                     memcpy(&mb->data[mb->index], pchunk->data.data, chunk_len);
@@ -283,7 +285,9 @@ THD_FUNCTION(fifo_worker, arg) {
 
                     /* End of packet */
                     if (pchunk->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
+                        chSysLock();
                         chMBPostI(&devp->mb_filled, (msg_t)mb);
+                        chSysUnlock();
                         mb = NULL;
                     }
                     break;
@@ -341,7 +345,9 @@ THD_FUNCTION(fifo_worker, arg) {
     }
 
     if (mb != NULL) {
+        chSysLock();
         chMBPostI(&devp->mb_free, (msg_t)mb);
+        chSysUnlock();
     }
     chThdExit(MSG_OK);
 }
@@ -416,9 +422,11 @@ void ax5043ObjectInit(AX5043Driver *devp) {
 
     chMBObjectInit(&devp->mb_filled, devp->mb_filled_queue, AX5043_MAILBOX_COUNT);
     chMBObjectInit(&devp->mb_free, devp->mb_free_queue, AX5043_MAILBOX_COUNT);
+    chSysLock();
     for (uint32_t i = 0; i < AX5043_MAILBOX_COUNT; i++) {
         chMBPostI(&devp->mb_free, (msg_t)&devp->mb_buf[i]);
     }
+    chSysUnlock();
 
     devp->state = AX5043_STOP;
 }
