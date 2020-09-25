@@ -5,6 +5,24 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
+static char str[] = "KJ7SAT";
+
+size_t tx_cb(uint8_t *buf, size_t max_len) {
+    struct __attribute__((packed)) {
+        ax5043_chunk_repeatdata_t preamble;
+        ax5043_chunk_data_t data;
+    } txbuf;
+    txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
+    txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
+    txbuf.preamble.repeatcnt = 20;
+    txbuf.preamble.data = 0x55;
+    txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
+    txbuf.data.length = sizeof(str) + 1;
+    txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
+    /*memcpy(buf, &txbuf, */
+    return sizeof(txbuf);
+}
+
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
 /*===========================================================================*/
@@ -84,7 +102,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             chSysUnlock();
         }
     } else if (!strcmp(argv[0], "tx")) {
-        chprintf(chp, "Not yet implemented\r\n");
+        chprintf(chp, "Size of buffer: %u\r\n", tx_cb(NULL, 100));
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);

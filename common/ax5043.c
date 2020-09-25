@@ -228,8 +228,8 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
  */
 THD_FUNCTION(fifo_worker, arg) {
     AX5043Driver *devp = arg;
-    ax5043_mailbox_t *mb = NULL;
-    ax5043_chunk_t *pchunk = NULL;
+    ax5043_mailbox_t *mbp = NULL;
+    ax5043_chunk_t *chunkp = NULL;
     uint8_t buf[256];
     size_t fifo_len;
 
@@ -251,69 +251,71 @@ THD_FUNCTION(fifo_worker, arg) {
             size_t chunk_len = 0;;
             while (pos != fifo_len) {
                 /* Set chunk pointer to base of next chunk */
-                pchunk = (ax5043_chunk_t*)&buf[pos];
+                chunkp = (ax5043_chunk_t*)&buf[pos];
                 /* Determine chunk length */
-                if (_FLD2VAL(AX5043_FIFOCHUNK_SIZE, pchunk->header) == 0x7U) {
-                    chunk_len = pchunk->length;
+                if (_FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header) == 0x7U) {
+                    chunk_len = chunkp->length;
                     pos += chunk_len + 2;
                 } else {
-                    chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, pchunk->header);
+                    chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
                     pos += chunk_len + 1;
                 }
                 /* Process chunk */
-                switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, pchunk->header)) {
+                switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, chunkp->header)) {
                 case AX5043_CHUNKCMD_DATA:
+                    /* TODO: Handle error flags */
                     /* Start of new packet */
-                    if (pchunk->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
+                    if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
                         /* Acquire mailbox if needed */
-                        if (mb == NULL) {
-                            chMBFetchTimeout(&devp->mb_free, (msg_t*)&mb, TIME_INFINITE);
+                        if (mbp == NULL) {
+                            chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
                         }
-                        mb->index = 0;
+                        mbp->index = 0;
                     }
 
                     /* Copy packet data */
-                    osalDbgAssert(mb != NULL, "fifo_worker(),  NULL mailbox");
-                    if (mb->index + chunk_len >= AX5043_MAILBOX_SIZE) {
+                    osalDbgAssert(mbp != NULL, "fifo_worker(),  NULL mailbox");
+                    if (mbp->index + chunk_len >= AX5043_MAILBOX_SIZE) {
                         chSysLock();
-                        chMBPostI(&devp->mb_filled, (msg_t)mb);
+                        chMBPostI(&devp->mb_filled, (msg_t)mbp);
                         chSysUnlock();
-                        chMBFetchTimeout(&devp->mb_free, (msg_t*)&mb, TIME_INFINITE);
+                        chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
+                        mbp->index = 0;
                     }
-                    memcpy(&mb->data[mb->index], pchunk->data.data, chunk_len);
-                    mb->index += chunk_len;
+                    memcpy(&mbp->data[mbp->index], chunkp->data.data, chunk_len);
+                    mbp->index += chunk_len;
 
                     /* End of packet */
-                    if (pchunk->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
+                    if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
                         chSysLock();
-                        chMBPostI(&devp->mb_filled, (msg_t)mb);
+                        chMBPostI(&devp->mb_filled, (msg_t)mbp);
                         chSysUnlock();
-                        mb = NULL;
+                        mbp = NULL;
                     }
                     break;
                 case AX5043_CHUNKCMD_TIMER:
-                    devp->timer = __REV(pchunk->timer.timer << 8);
+                    devp->timer = __REV(chunkp->timer.timer << 8);
                     break;
                 case AX5043_CHUNKCMD_RSSI:
-                    devp->rssi = pchunk->rssi.rssi;
+                    devp->rssi = chunkp->rssi.rssi;
                     break;
                 case AX5043_CHUNKCMD_FREQOFFS:
-                    devp->freq_off = __REV(pchunk->freqoffs.freqoffs << 8);
+                    devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
                     break;
                 case AX5043_CHUNKCMD_RFFREQOFFS:
-                    devp->rf_freq_off = __REV(pchunk->rffreqoffs.rffreqoffs << 8);
+                    devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
                     break;
                 case AX5043_CHUNKCMD_DATARATE:
-                    devp->datarate = __REV(pchunk->datarate.datarate << 8);
+                    devp->datarate = __REV(chunkp->datarate.datarate << 8);
                     break;
                 case AX5043_CHUNKCMD_ANTRSSI:
                     if (chunk_len == 2) {
-                        devp->ant0rssi = pchunk->antrssi2.rssi;
-                        devp->bgndnoise = pchunk->antrssi2.bgndnoise;
+                        devp->ant0rssi = chunkp->antrssi2.rssi;
+                        devp->bgndnoise = chunkp->antrssi2.bgndnoise;
                     } else if (chunk_len == 3) {
-                        devp->ant0rssi = pchunk->antrssi3.ant0rssi;
-                        devp->ant1rssi = pchunk->antrssi3.ant1rssi;
-                        devp->bgndnoise = pchunk->antrssi3.bgndnoise;
+                        devp->ant0rssi = chunkp->antrssi3.ant0rssi;
+                        devp->ant1rssi = chunkp->antrssi3.ant1rssi;
+                        devp->bgndnoise = chunkp->antrssi3.bgndnoise;
                     }
                     break;
                 default:
@@ -322,7 +324,6 @@ THD_FUNCTION(fifo_worker, arg) {
                 pos += chunk_len;
             }
         } else if (devp->state == AX5043_TX) {
-            /* TODO: This still needs FIFO commit code */
             /* Wait for free space in FIFO */
             if (ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE) & AX5043_EVENT_TERMINATE) {
                 continue;
@@ -339,14 +340,15 @@ THD_FUNCTION(fifo_worker, arg) {
 
             /* Write to FIFO */
             ax5043Exchange(devp, AX5043_REG_FIFODATA, true, buf, NULL, fifo_len);
+            ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
         } else {
             break;
         }
     }
 
-    if (mb != NULL) {
+    if (mbp != NULL) {
         chSysLock();
-        chMBPostI(&devp->mb_free, (msg_t)mb);
+        chMBPostI(&devp->mb_free, (msg_t)mbp);
         chSysUnlock();
     }
     chThdExit(MSG_OK);
@@ -582,6 +584,296 @@ void ax5043Stop(AX5043Driver *devp) {
 }
 
 /**
+ * @brief   Puts AX5043 into idle mode.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ *
+ * @api
+ */
+void ax5043Idle(AX5043Driver *devp) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(((devp->state == AX5043_READY) ||
+                   (devp->state == AX5043_RX) ||
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043Idle(), invalid state");
+
+    if (devp->state != AX5043_READY) {
+        devp->error = AX5043_ERR_NOERROR;
+        if (devp->fifo_worker) {
+            chThdTerminate(devp->fifo_worker);
+            chEvtSignal(devp->fifo_worker, AX5043_EVENT_TERMINATE);
+            chThdWait(devp->fifo_worker);
+            devp->fifo_worker = NULL;
+        }
+
+        ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
+        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
+
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+
+        devp->state = AX5043_READY;
+    }
+}
+
+/**
+ * @brief   Puts AX5043 into receive mode.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ *
+ * @api
+ */
+void ax5043RX(AX5043Driver *devp) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(((devp->state == AX5043_READY) ||
+                   (devp->state == AX5043_RX) ||
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043RX(), invalid state");
+
+    if (devp->state != AX5043_RX) {
+        devp->error = AX5043_ERR_NOERROR;
+
+        /* Enter idle state first */
+        ax5043Idle(devp);
+
+        /* Activate synthesizer and wait for PLL to settle */
+        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
+        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
+            /* Not settled in a reasonable amount of time, shutdown and return error */
+            ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+            devp->error = AX5043_ERR_TIMEOUT;
+            return;
+        }
+        /* RADIOCTRL interrupt will wait for the radio to be done */
+        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+        /* Clear FIFO and set threshold */
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
+        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
+
+        /* Activate RX */
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_FULL);
+        devp->state = AX5043_RX;
+
+        /* Start the FIFO worker */
+        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+    }
+}
+
+/**
+ * @brief   Puts AX5043 into wake-on-radio mode.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ *
+ * @api
+ */
+void ax5043WOR(AX5043Driver *devp) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(((devp->state == AX5043_READY) ||
+                   (devp->state == AX5043_RX) ||
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043WOR(), invalid state");
+
+    if (devp->state != AX5043_WOR) {
+        devp->error = AX5043_ERR_NOERROR;
+
+        /* Enter idle state first */
+        ax5043Idle(devp);
+
+        /* Activate synthesizer and wait for PLL to settle */
+        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
+        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
+            /* Not settled in a reasonable amount of time, shutdown and return error */
+            ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+            devp->error = AX5043_ERR_TIMEOUT;
+            return;
+        }
+        /* RADIOCTRL interrupt will wait for the radio to be done */
+        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+        /* Clear FIFO and set threshold */
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
+        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
+
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_WOR);
+        devp->state = AX5043_WOR;
+
+        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+    }
+}
+
+/**
+ * @brief   Puts AX5043 into transmit mode and transmits a packet.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  tx_cb        Transmit FIFO fill callback.
+ *
+ * TODO: This still needs preamble code
+ * @api
+ */
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb) {
+    ax5043_state_t prev_state;
+    osalDbgCheck(devp != NULL && tx_cb != NULL);
+    osalDbgAssert(((devp->state == AX5043_READY) ||
+                   (devp->state == AX5043_RX) ||
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
+
+    devp->error = AX5043_ERR_NOERROR;
+
+    /* Record previous state */
+    prev_state = devp->state;
+
+    /* Enter idle state first */
+    ax5043Idle(devp);
+
+    devp->tx_cb = tx_cb;
+
+    /* Activate synthesizer and wait for PLL to settle */
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
+    if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
+        /* Not settled in a reasonable amount of time, shutdown and return error */
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+        devp->error = AX5043_ERR_TIMEOUT;
+        return;
+    }
+    /* RADIOCTRL interrupt will wait for the radio to be done */
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+    /* Clear FIFO and set threshold */
+    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
+    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
+
+    /* Activate TX */
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
+    devp->state = AX5043_TX;
+
+    /* Start the FIFO worker */
+    devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+
+    /* Wait for transmission to finish */
+    chThdWait(devp->fifo_worker);
+    devp->tx_cb = NULL;
+
+    /* Return to original state */
+    switch (prev_state) {
+    case AX5043_RX:
+        ax5043RX(devp);
+        break;
+    case AX5043_WOR:
+        ax5043WOR(devp);
+        break;
+    case AX5043_READY:
+    default:
+        ax5043Idle(devp);
+    }
+}
+
+/**
+ * @brief   Sets register values from a profile.
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ * @param[in]   profile     Pointer to the @p ax5043_profile_t list of register values.
+ *
+ * @api
+ */
+void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state == AX5043_READY), "ax5043SetProfile(), invalid state");
+
+    /* Set all profile values */
+    for (const ax5043_profile_t *entry = profile; entry->reg; entry++) {
+        switch (entry->len) {
+        case 1:
+            ax5043WriteU8(devp, entry->reg, entry->val);
+            break;
+        case 2:
+            ax5043WriteU16(devp, entry->reg, entry->val);
+            break;
+        case 3:
+            ax5043WriteU24(devp, entry->reg, entry->val);
+            break;
+        case 4:
+            ax5043WriteU32(devp, entry->reg, entry->val);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /* Re-range frequencies in case they changed */
+    ax5043SetFreq(devp, 0, devp->vcora, false);
+    ax5043SetFreq(devp, 0, devp->vcorb, true);
+}
+
+/**
+ * @brief   Sets Carrier Frequency on an AX5043 device.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  freq         Carrier frequency in Hz. If 0, ranges existing reg value.
+ * @param[in]  vcor         VCO Range value. Set to 0 if unknown.
+ * @param[in]  chan_b       Set channel B frequency if true, channel A otherwise.
+ *
+ * @return                  Corrected VCOR for given frequency
+ * @api
+ */
+uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b) {
+    uint16_t freq_reg = (chan_b ? AX5043_REG_FREQB : AX5043_REG_FREQA);
+    uint16_t rng_reg = (chan_b ? AX5043_REG_PLLRANGINGB : AX5043_REG_PLLRANGINGA);
+
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
+    osalDbgAssert((freq >= AX5043_RFDIV_DIV1_MIN && freq <= AX5043_RFDIV_DIV1_MAX) ||
+                  (freq >= AX5043_RFDIV_DIV2_MIN && freq <= AX5043_RFDIV_DIV2_MAX) ||
+                   freq == 0, "ax5043SetFreq(), frequency out of bounds");
+
+    devp->error = AX5043_ERR_NOERROR;
+
+    /* If no VCOR specified, default to 8 */
+    if (vcor == 0) {
+        vcor = 8;
+    }
+
+    /* Enter Standby mode */
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_STANDBY);
+
+    /* Wait for XTAL */
+    ax5043WaitIRQ(devp, AX5043_IRQ_XTALREADY, TIME_INFINITE);
+
+    /* Set frequencies
+     * We first find the GCD of the two frequencies in order to reduce them
+     * as much as possible before doing the calculations.
+     * NOTE: The programming manual recommends always setting bit 0
+     *
+     * REG = f_carrier * 2^24 / f_xtal + 1/2
+     *     = (f_carrier * 2^25 + f_xtal) / (f_xtal * 2)
+     */
+
+    /* Set the frequency and RFDIV if needed, and initiate ranging */
+    if (freq) {
+        ax5043WriteU32(devp, freq_reg, AX5043_FREQ_TO_REG(freq, devp->config->xtal_freq));
+    } else {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, freq_reg), devp->config->xtal_freq);
+    }
+    ax5043SetRFDIV(devp, freq);
+    ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
+    ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
+    vcor = ax5043ReadU8(devp, rng_reg);
+    if (vcor & AX5043_PLLRANGING_RNGERR) {
+        devp->error = AX5043_ERR_RANGING;
+    }
+    vcor = _FLD2VAL(AX5043_PLLRANGING_VCOR, vcor);
+    if (chan_b) {
+        devp->vcorb = vcor;
+    } else {
+        devp->vcora = vcor;
+    }
+
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+
+    return vcor;
+}
+
+/**
  * @brief   Perform a long (16-bit address) exchange with an AX5043 device.
  * @note    Can be called with NULL values for txbuf and/or rxbuf.
  * @note    A maximum of 256 bytes can be transferred at a time using this function.
@@ -803,281 +1095,6 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
 
     value = __REV(value);
     ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 4);
-}
-
-/**
- * @brief   Sets register values from a profile.
- *
- * @param[in]   devp        Pointer to the @p AX5043Driver object.
- * @param[in]   profile     Pointer to the @p ax5043_profile_t list of register values.
- *
- * @api
- */
-void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
-    osalDbgCheck(devp != NULL && devp->config != NULL);
-    osalDbgAssert((devp->state == AX5043_READY), "ax5043SetProfile(), invalid state");
-
-    /* Set all profile values */
-    for (const ax5043_profile_t *entry = profile; entry->reg; entry++) {
-        ax5043WriteU8(devp, entry->reg, entry->val);
-    }
-
-    /* Re-range frequencies in case they changed */
-    ax5043SetFreq(devp, 0, devp->vcora, false);
-    ax5043SetFreq(devp, 0, devp->vcorb, true);
-}
-
-/**
- * @brief   Sets Carrier Frequency on an AX5043 device.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  freq         Carrier frequency in Hz. If 0, ranges existing reg value.
- * @param[in]  vcor         VCO Range value. Set to 0 if unknown.
- * @param[in]  chan_b       Set channel B frequency if true, channel A otherwise.
- *
- * @return                  Corrected VCOR for given frequency
- * @api
- */
-uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b) {
-    uint16_t freq_reg = (chan_b ? AX5043_REG_FREQB : AX5043_REG_FREQA);
-    uint16_t rng_reg = (chan_b ? AX5043_REG_PLLRANGINGB : AX5043_REG_PLLRANGINGA);
-
-    osalDbgCheck(devp != NULL && devp->config != NULL);
-    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
-    osalDbgAssert((freq >= AX5043_RFDIV_DIV1_MIN && freq <= AX5043_RFDIV_DIV1_MAX) ||
-                  (freq >= AX5043_RFDIV_DIV2_MIN && freq <= AX5043_RFDIV_DIV2_MAX) ||
-                   freq == 0, "ax5043SetFreq(), frequency out of bounds");
-
-    devp->error = AX5043_ERR_NOERROR;
-
-    /* If no VCOR specified, default to 8 */
-    if (vcor == 0) {
-        vcor = 8;
-    }
-
-    /* Enter Standby mode */
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_STANDBY);
-
-    /* Wait for XTAL */
-    ax5043WaitIRQ(devp, AX5043_IRQ_XTALREADY, TIME_INFINITE);
-
-    /* Set frequencies
-     * We first find the GCD of the two frequencies in order to reduce them
-     * as much as possible before doing the calculations.
-     * NOTE: The programming manual recommends always setting bit 0
-     *
-     * REG = f_carrier * 2^24 / f_xtal + 1/2
-     *     = (f_carrier * 2^25 + f_xtal) / (f_xtal * 2)
-     */
-
-    /* Set the frequency and RFDIV if needed, and initiate ranging */
-    if (freq) {
-        ax5043WriteU32(devp, freq_reg, AX5043_FREQ_TO_REG(freq, devp->config->xtal_freq));
-    } else {
-        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, freq_reg), devp->config->xtal_freq);
-    }
-    ax5043SetRFDIV(devp, freq);
-    ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
-    ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
-    vcor = ax5043ReadU8(devp, rng_reg);
-    if (vcor & AX5043_PLLRANGING_RNGERR) {
-        devp->error = AX5043_ERR_RANGING;
-    }
-    vcor = _FLD2VAL(AX5043_PLLRANGING_VCOR, vcor);
-    if (chan_b) {
-        devp->vcorb = vcor;
-    } else {
-        devp->vcora = vcor;
-    }
-
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-
-    return vcor;
-}
-
-/**
- * @brief   Puts AX5043 into idle mode.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- *
- * @api
- */
-void ax5043Idle(AX5043Driver *devp) {
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(((devp->state == AX5043_READY) ||
-                   (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043Idle(), invalid state");
-
-    if (devp->state != AX5043_READY) {
-        devp->error = AX5043_ERR_NOERROR;
-        if (devp->fifo_worker) {
-            chThdTerminate(devp->fifo_worker);
-            chEvtSignal(devp->fifo_worker, AX5043_EVENT_TERMINATE);
-            chThdWait(devp->fifo_worker);
-            devp->fifo_worker = NULL;
-        }
-
-        ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
-
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-
-        devp->state = AX5043_READY;
-    }
-}
-
-/**
- * @brief   Puts AX5043 into receive mode.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- *
- * @api
- */
-void ax5043RX(AX5043Driver *devp) {
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(((devp->state == AX5043_READY) ||
-                   (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043RX(), invalid state");
-
-    if (devp->state != AX5043_RX) {
-        devp->error = AX5043_ERR_NOERROR;
-
-        /* Enter idle state first */
-        ax5043Idle(devp);
-
-        /* Activate synthesizer and wait for PLL to settle */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
-        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-            /* Not settled in a reasonable amount of time, shutdown and return error */
-            ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-            devp->error = AX5043_ERR_TIMEOUT;
-            return;
-        }
-        /* RADIOCTRL interrupt will wait for the radio to be done */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
-        /* Clear FIFO and set threshold */
-        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
-
-        /* Activate RX */
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_FULL);
-        devp->state = AX5043_RX;
-
-        /* Start the FIFO worker */
-        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
-    }
-}
-
-/**
- * @brief   Puts AX5043 into wake-on-radio mode.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- *
- * @api
- */
-void ax5043WOR(AX5043Driver *devp) {
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(((devp->state == AX5043_READY) ||
-                   (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043WOR(), invalid state");
-
-    if (devp->state != AX5043_WOR) {
-        devp->error = AX5043_ERR_NOERROR;
-
-        /* Enter idle state first */
-        ax5043Idle(devp);
-
-        /* Activate synthesizer and wait for PLL to settle */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
-        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-            /* Not settled in a reasonable amount of time, shutdown and return error */
-            ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-            devp->error = AX5043_ERR_TIMEOUT;
-            return;
-        }
-        /* RADIOCTRL interrupt will wait for the radio to be done */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
-        /* Clear FIFO and set threshold */
-        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
-
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_WOR);
-        devp->state = AX5043_WOR;
-
-        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
-    }
-}
-
-/**
- * @brief   Puts AX5043 into transmit mode and transmits a packet.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  tx_cb        Transmit FIFO fill callback.
- *
- * TODO: This still needs preamble code
- * @api
- */
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb) {
-    ax5043_state_t prev_state;
-    osalDbgCheck(devp != NULL && tx_cb != NULL);
-    osalDbgAssert(((devp->state == AX5043_READY) ||
-                   (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
-
-    devp->error = AX5043_ERR_NOERROR;
-
-    /* Record previous state */
-    prev_state = devp->state;
-
-    /* Enter idle state first */
-    ax5043Idle(devp);
-
-    devp->tx_cb = tx_cb;
-
-    /* Activate synthesizer and wait for PLL to settle */
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
-    if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-        /* Not settled in a reasonable amount of time, shutdown and return error */
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-        devp->error = AX5043_ERR_TIMEOUT;
-        return;
-    }
-    /* RADIOCTRL interrupt will wait for the radio to be done */
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
-    /* Clear FIFO and set threshold */
-    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
-
-    /* Activate TX */
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
-    devp->state = AX5043_TX;
-
-    /* Start the FIFO worker */
-    devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
-
-    /* Wait for transmission to finish */
-    chThdWait(devp->fifo_worker);
-    devp->tx_cb = NULL;
-
-    /* Return to original state */
-    switch (prev_state) {
-    case AX5043_RX:
-        ax5043RX(devp);
-        break;
-    case AX5043_WOR:
-        ax5043WOR(devp);
-        break;
-    case AX5043_READY:
-    default:
-        ax5043Idle(devp);
-    }
 }
 
 /*===========================*/

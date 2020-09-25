@@ -645,20 +645,20 @@
 #define AX5043_FRAMING_FRMMODE_Pos          (1U)
 #define AX5043_FRAMING_FRMMODE_Msk          (0x7U << AX5043_FRAMING_FRMMODE_Pos)
 #define AX5043_FRAMING_FRMMODE              AX5043_FRAMING_FRMMODE_Msk
-#define AX5043_FRAMING_FRMMODE_RAW          (0x0U)
-#define AX5043_FRAMING_FRMMODE_RAW_SOFTBITS (0x1U)
-#define AX5043_FRAMING_FRMMODE_HDLC         (0x2U)
-#define AX5043_FRAMING_FRMMODE_RAW_PATMATCH (0x3U)
-#define AX5043_FRAMING_FRMMODE_WMBUS        (0x4U)
-#define AX5043_FRAMING_FRMMODE_WMBUS_4TO6   (0x5U)
+#define AX5043_FRMMODE_RAW                  (0x0U)
+#define AX5043_FRMMODE_RAW_SOFTBITS         (0x1U)
+#define AX5043_FRMMODE_HDLC                 (0x2U)
+#define AX5043_FRMMODE_RAW_PATMATCH         (0x3U)
+#define AX5043_FRMMODE_WMBUS                (0x4U)
+#define AX5043_FRMMODE_WMBUS_4TO6           (0x5U)
 #define AX5043_FRAMING_CRCMODE_Pos          (4U)
 #define AX5043_FRAMING_CRCMODE_Msk          (0x7U << AX5043_FRAMING_CRCMODE_Pos)
 #define AX5043_FRAMING_CRCMODE              AX5043_FRAMING_CRCMODE_Msk
-#define AX5043_FRAMING_CRCMODE_OFF          (0x0U)
-#define AX5043_FRAMING_CRCMODE_CCITT        (0x1U)
-#define AX5043_FRAMING_CRCMODE_CRC16        (0x2U)
-#define AX5043_FRAMING_CRCMODE_DNP          (0x3U)
-#define AX5043_FRAMING_CRCMODE_CRC32        (0x6U)
+#define AX5043_CRCMODE_OFF                  (0x0U)
+#define AX5043_CRCMODE_CCITT                (0x1U)
+#define AX5043_CRCMODE_CRC16                (0x2U)
+#define AX5043_CRCMODE_DNP                  (0x3U)
+#define AX5043_CRCMODE_CRC32                (0x6U)
 #define AX5043_FRAMING_FRMRX_Pos            (7U)
 #define AX5043_FRAMING_FRMRX_Msk            (0x1U << AX5043_FRAMING_FRMRX_Pos)
 #define AX5043_FRAMING_FRMRX                AX5043_FRAMING_FRMRX_Msk
@@ -2720,7 +2720,8 @@ struct axradio_address {
  */
 typedef struct {
     uint16_t reg;
-    uint8_t val;
+    uint32_t val;
+    size_t   len;
 } ax5043_profile_t;
 
 /**
@@ -2932,6 +2933,14 @@ void ax5043ObjectInit(AX5043Driver *devp);
 void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 void ax5043Stop(AX5043Driver *devp);
 
+void ax5043Idle(AX5043Driver *devp);
+void ax5043RX(AX5043Driver *devp);
+void ax5043WOR(AX5043Driver *devp);
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb);
+
+void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
+uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
+
 ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n);
 ax5043_status_t ax5043GetStatus(AX5043Driver *devp);
 uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg);
@@ -2942,14 +2951,6 @@ void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value);
 void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value);
 void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value);
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
-
-void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
-uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
-
-void ax5043Idle(AX5043Driver *devp);
-void ax5043RX(AX5043Driver *devp);
-void ax5043WOR(AX5043Driver *devp);
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb);
 
 /*===========================*/
 /* TODO: START OVERHAUL HERE */
