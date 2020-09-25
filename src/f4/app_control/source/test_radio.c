@@ -6,6 +6,7 @@
 #include "chprintf.h"
 
 static char str[] = "KJ7SAT";
+static bool tx_once = false;
 
 size_t tx_cb(uint8_t *buf, size_t max_len) {
     struct __attribute__((packed)) {
@@ -15,16 +16,17 @@ size_t tx_cb(uint8_t *buf, size_t max_len) {
 
     size_t len = sizeof(txbuf) + sizeof(str);
 
-    txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
-    txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
-    txbuf.preamble.repeatcnt = 20;
-    txbuf.preamble.data = 0x55;
-    txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
-    txbuf.data.length = sizeof(str) + 1;
-    txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
-    if (len < max_len) {
+    if (tx_once && len < max_len) {
+        txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
+        txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
+        txbuf.preamble.repeatcnt = 20;
+        txbuf.preamble.data = 0x55;
+        txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
+        txbuf.data.length = sizeof(str) + 1;
+        txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
         memcpy(buf, &txbuf, sizeof(txbuf));
         memcpy(&buf[sizeof(txbuf)], str, sizeof(str));
+        tx_once = true;
     } else {
         return 0;
     }
@@ -110,7 +112,8 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             chSysUnlock();
         }
     } else if (!strcmp(argv[0], "tx")) {
-        chprintf(chp, "Size of buffer: %u\r\n", tx_cb(NULL, 100));
+        tx_once = false;
+        ax5043TX(devp, tx_cb);
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
