@@ -149,7 +149,7 @@ void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *
     }
 
     /* Divide until frequency is less than the maximum */
-    while (phasedet > SI41XX_MAX_PHASEDET) {
+    while (phasedet >= SI41XX_MAX_PHASEDET) {
         phasedet /= 2;
     }
 
