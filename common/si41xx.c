@@ -37,6 +37,7 @@
  * @{
  */
 #define SI41XX_MAX_PHASEDET                 (1000000U)
+#define SI41XX_MIN_PHASEDET                 (10000U)
 /** @} */
 
 /*===========================================================================*/
@@ -129,9 +130,10 @@ void si41xxReleaseBus(SI41XXDriver *devp) {
  * @param[out]  ndiv        Calculated N-Divider value
  * @param[out]  rdiv        Calculated R-Divider value
  *
+ * @return                  Successfully found values within phase detector frequency bounds
  * @notapi
  */
-void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *rdiv) {
+bool si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *rdiv) {
     osalDbgCheck(devp != NULL && devp->config != NULL && ndiv != NULL && rdiv != NULL);
     osalDbgAssert(devp->config->ref_freq != 0 && freq != 0,
             "si41xxCalcDiv(), non-zero values required");
@@ -152,10 +154,14 @@ void si41xxCalcDiv(SI41XXDriver *devp, uint32_t freq, uint32_t *ndiv, uint32_t *
     while (phasedet >= SI41XX_MAX_PHASEDET) {
         phasedet /= 2;
     }
+    if (phasedet < SI41XX_MIN_PHASEDET) {
+        return false;
+    }
 
     /* Calculate needed N and R values */
     *ndiv = freq / phasedet;
     *rdiv = ref_freq / phasedet;
+    return true;
 }
 
 /*==========================================================================*/
@@ -306,7 +312,9 @@ bool si41xxSetIF(SI41XXDriver *devp, uint32_t freq) {
             "si41xxSetIF(), invalid state");
 
     /* Calculate N and R values */
-    si41xxCalcDiv(devp, freq << devp->config->if_div, &n, &r);
+    if (!si41xxCalcDiv(devp, freq << devp->config->if_div, &n, &r)) {
+        return false;
+    }
 
     /* Check that values are within bounds of programmable values */
     if (n >= (SI41XX_IF_NDIV + 1) || r >= (SI41XX_IF_RDIV + 1)) {
@@ -392,7 +400,9 @@ bool si41xxSetRF1(SI41XXDriver *devp, uint32_t freq) {
             "si41xxSetRF1(), invalid state");
 
     /* Calculate N and R values */
-    si41xxCalcDiv(devp, freq, &n, &r);
+    if (!si41xxCalcDiv(devp, freq, &n, &r)) {
+        return false;
+    }
 
     /* Check that values are within bounds of programmable values */
     if (n >= (SI41XX_RF1_NDIV + 1) || r >= (SI41XX_RF1_RDIV + 1)) {
@@ -438,7 +448,9 @@ bool si41xxSetRF2(SI41XXDriver *devp, uint32_t freq) {
             "si41xxSetRF2(), invalid state");
 
     /* Calculate N and R values */
-    si41xxCalcDiv(devp, freq, &n, &r);
+    if (!si41xxCalcDiv(devp, freq, &n, &r)) {
+        return false;
+    }
 
     /* Check that values are within bounds of programmable values */
     if (n >= (SI41XX_RF2_NDIV + 1) || r >= (SI41XX_RF2_RDIV + 1)) {
