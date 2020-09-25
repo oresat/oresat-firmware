@@ -12,6 +12,9 @@ size_t tx_cb(uint8_t *buf, size_t max_len) {
         ax5043_chunk_repeatdata_t preamble;
         ax5043_chunk_data_t data;
     } txbuf;
+
+    size_t len = sizeof(txbuf) + sizeof(str);
+
     txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
     txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
     txbuf.preamble.repeatcnt = 20;
@@ -19,8 +22,13 @@ size_t tx_cb(uint8_t *buf, size_t max_len) {
     txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
     txbuf.data.length = sizeof(str) + 1;
     txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
-    /*memcpy(buf, &txbuf, */
-    return sizeof(txbuf);
+    if (len < max_len) {
+        memcpy(buf, &txbuf, sizeof(txbuf));
+        memcpy(&buf[sizeof(txbuf)], str, sizeof(str));
+    } else {
+        return 0;
+    }
+    return len;
 }
 
 /*===========================================================================*/
