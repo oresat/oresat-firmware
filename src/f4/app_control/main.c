@@ -78,7 +78,11 @@ static const SPIConfig uhf_spicfg = {
     0, // SPI_CR2_SSOE,
 };
 
-static const ax5043_regval_t lband_regs[] = {
+static const ax5043_profile_t lband_eng[] = {
+    {AX5043_REG_MODULATION, AX5043_MODULATION_MSK},
+    {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM},
+    {AX5043_REG_FRAMING, _VAL2FLD(AX5043_FRAMING_FRMMODE, AX5043_FRAMING_FRMMODE_HDLC) |
+                         _VAL2FLD(AX5043_FRAMING_CRCMODE, AX5043_FRAMING_CRCMODE_CRC32)},
     {AX5043_REG_PINFUNCSYSCLK, AX5043_PFSYSCLK_OUT_XTAL_DIV1},
     {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL},
     {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL},
@@ -99,7 +103,12 @@ static const ax5043_regval_t lband_regs[] = {
     {0, 0}
 };
 
-static const ax5043_regval_t uhf_regs[] = {
+static const ax5043_profile_t uhf_eng[] = {
+    {AX5043_REG_MODULATION, AX5043_MODULATION_MSK},
+    {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM},
+    {AX5043_REG_FRAMING, _VAL2FLD(AX5043_FRAMING_FRMMODE, AX5043_FRAMING_FRMMODE_HDLC) |
+                         _VAL2FLD(AX5043_FRAMING_CRCMODE, AX5043_FRAMING_CRCMODE_CRC32)},
+    {AX5043_REG_MODCFGF, AX5043_FREQSHAPE_GAUSS_BT_0_3},
     {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL},
     {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL},
     {AX5043_REG_0xF0D, AX5043_0xF0D_DEFVAL},
@@ -125,7 +134,7 @@ const AX5043Config lbandcfg = {
     .miso       = LINE_SPI1_MISO,
     .irq        = LINE_LBAND_IRQ,
     .xtal_freq  = 16000000,
-    .reg_values = lband_regs,
+    .profile    = lband_eng,
 };
 
 const AX5043Config uhfcfg = {
@@ -134,17 +143,17 @@ const AX5043Config uhfcfg = {
     .miso       = LINE_SPI1_MISO,
     .irq        = LINE_UHF_IRQ,
     .xtal_freq  = 16000000,
-    .reg_values = uhf_regs,
+    .profile    = uhf_eng,
 };
 
 SI41XXConfig synthcfg = {
-    .sen = LINE_LO_SEN,
-    .sclk = LINE_LO_SCLK,
-    .sdata = LINE_LO_SDATA,
-    .ref_freq = 16000000,
-    .if_div = SI41XX_IFDIV_DIV1,
-    .if_n = 1616,
-    .if_r = 32,
+    .sen        = LINE_LO_SEN,
+    .sclk       = LINE_LO_SCLK,
+    .sdata      = LINE_LO_SDATA,
+    .ref_freq   = 16000000,
+    .if_div     = SI41XX_IFDIV_DIV1,
+    .if_n       = 1616,
+    .if_r       = 32,
 };
 
 AX5043Driver lband;

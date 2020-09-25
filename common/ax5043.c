@@ -374,6 +374,53 @@ ax5043_status_t ax5043SetPWRMode(AX5043Driver *devp, uint8_t pwrmode) {
 }
 
 /**
+ * @brief   Resets the AX5043 device into POWERDOWN state.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ *
+ * @return                  AX5043 status bits
+ * @notapi
+ */
+ax5043_status_t ax5043Reset(AX5043Driver *devp) {
+    ax5043_status_t status = 0;
+    uint8_t regval = 0;
+
+    osalDbgCheck(devp != NULL && devp->config != NULL);
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043Reset(), invalid state");
+
+    devp->error = AX5043_ERR_NOERROR;
+
+    /* Reset the chip through powermode register */
+    regval = AX5043_PWRMODE_RESET;
+    ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
+
+    /* Write to PWRMODE: XOEN, REFEN and POWERDOWN mode. Clear RST bit.
+       Page 33 in programming manual */
+    regval = AX5043_PWRMODE_REFEN | AX5043_PWRMODE_XOEN | AX5043_PWRMODE_POWERDOWN;
+    ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
+
+    /* Verify functionality with SCRATCH register */
+    regval = 0xAA;
+    ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, NULL, 1);
+    regval = 0x55;
+    status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, &regval, 1);
+    if (regval != 0xAA) {
+        devp->error = AX5043_ERR_NOT_CONNECTED;
+        devp->state = AX5043_STOP;
+        return status;
+    }
+    status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, NULL, &regval, 1);
+    if (regval != 0x55) {
+        devp->error = AX5043_ERR_NOT_CONNECTED;
+        devp->state = AX5043_STOP;
+        return status;
+    }
+
+    devp->state = AX5043_RESET;
+    return status;
+}
+
+/**
  * @brief   Sets RFDIV related registers.
  *
  * @param[in]   freq        Frequency
@@ -447,6 +494,8 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
     devp->config = config;
     devp->error = AX5043_ERR_NOERROR;
 
+    devp->vcora = 0;
+    devp->vcorb = 0;
     devp->timer = 0;
     devp->datarate = 0;
     devp->freq_off = 0;
@@ -482,11 +531,9 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
 
-    /* Apply register overrides provided by user */
-    if (config->reg_values) {
-        for (const ax5043_regval_t *entry = config->reg_values; entry->reg; entry++) {
-            ax5043WriteU8(devp, entry->reg, entry->val);
-        }
+    /* Apply initial profile provided by user */
+    if (config->profile) {
+        ax5043SetProfile(devp, config->profile);
     }
 
     /* Transition to ready state */
@@ -759,57 +806,32 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
 }
 
 /**
- * @brief   Resets the AX5043 device into POWERDOWN state.
+ * @brief   Sets register values from a profile.
  *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ * @param[in]   profile     Pointer to the @p ax5043_profile_t list of register values.
  *
- * @return                  AX5043 status bits
  * @api
  */
-ax5043_status_t ax5043Reset(AX5043Driver *devp) {
-    ax5043_status_t status = 0;
-    uint8_t regval = 0;
-
+void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
     osalDbgCheck(devp != NULL && devp->config != NULL);
-    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043Reset(), invalid state");
+    osalDbgAssert((devp->state == AX5043_READY), "ax5043SetProfile(), invalid state");
 
-    devp->error = AX5043_ERR_NOERROR;
-
-    /* Reset the chip through powermode register */
-    regval = AX5043_PWRMODE_RESET;
-    ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
-
-    /* Write to PWRMODE: XOEN, REFEN and POWERDOWN mode. Clear RST bit.
-       Page 33 in programming manual */
-    regval = AX5043_PWRMODE_REFEN | AX5043_PWRMODE_XOEN | AX5043_PWRMODE_POWERDOWN;
-    ax5043WriteU8(devp, AX5043_REG_PWRMODE, regval);
-
-    /* Verify functionality with SCRATCH register */
-    regval = 0xAA;
-    ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, NULL, 1);
-    regval = 0x55;
-    status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, &regval, &regval, 1);
-    if (regval != 0xAA) {
-        devp->error = AX5043_ERR_NOT_CONNECTED;
-        devp->state = AX5043_STOP;
-        return status;
-    }
-    status = ax5043Exchange(devp, AX5043_REG_SCRATCH, true, NULL, &regval, 1);
-    if (regval != 0x55) {
-        devp->error = AX5043_ERR_NOT_CONNECTED;
-        devp->state = AX5043_STOP;
-        return status;
+    /* Set all profile values */
+    for (const ax5043_profile_t *entry = profile; entry->reg; entry++) {
+        ax5043WriteU8(devp, entry->reg, entry->val);
     }
 
-    devp->state = AX5043_RESET;
-    return status;
+    /* Re-range frequencies in case they changed */
+    ax5043SetFreq(devp, 0, devp->vcora, false);
+    ax5043SetFreq(devp, 0, devp->vcorb, true);
 }
 
 /**
  * @brief   Sets Carrier Frequency on an AX5043 device.
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  freq         Carrier frequency in Hz.
+ * @param[in]  freq         Carrier frequency in Hz. If 0, ranges existing reg value.
  * @param[in]  vcor         VCO Range value. Set to 0 if unknown.
  * @param[in]  chan_b       Set channel B frequency if true, channel A otherwise.
  *
@@ -823,8 +845,8 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetFreq(), invalid state");
     osalDbgAssert((freq >= AX5043_RFDIV_DIV1_MIN && freq <= AX5043_RFDIV_DIV1_MAX) ||
-                  (freq >= AX5043_RFDIV_DIV2_MIN && freq <= AX5043_RFDIV_DIV2_MAX),
-                  "ax5043SetFreq(), frequency out of bounds");
+                  (freq >= AX5043_RFDIV_DIV2_MIN && freq <= AX5043_RFDIV_DIV2_MAX) ||
+                   freq == 0, "ax5043SetFreq(), frequency out of bounds");
 
     devp->error = AX5043_ERR_NOERROR;
 
@@ -849,7 +871,11 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
      */
 
     /* Set the frequency and RFDIV if needed, and initiate ranging */
-    ax5043WriteU32(devp, freq_reg, AX5043_FREQ_TO_REG(freq, devp->config->xtal_freq));
+    if (freq) {
+        ax5043WriteU32(devp, freq_reg, AX5043_FREQ_TO_REG(freq, devp->config->xtal_freq));
+    } else {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, freq_reg), devp->config->xtal_freq);
+    }
     ax5043SetRFDIV(devp, freq);
     ax5043WriteU8(devp, rng_reg, _VAL2FLD(AX5043_PLLRANGING_VCOR, vcor) | AX5043_PLLRANGING_RNGSTART);
     ax5043WaitIRQ(devp, AX5043_IRQ_PLLRNGDONE, TIME_INFINITE);
@@ -857,10 +883,16 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     if (vcor & AX5043_PLLRANGING_RNGERR) {
         devp->error = AX5043_ERR_RANGING;
     }
+    vcor = _FLD2VAL(AX5043_PLLRANGING_VCOR, vcor);
+    if (chan_b) {
+        devp->vcorb = vcor;
+    } else {
+        devp->vcora = vcor;
+    }
 
     ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
 
-    return _FLD2VAL(AX5043_PLLRANGING_VCOR, vcor);
+    return vcor;
 }
 
 /**

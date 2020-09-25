@@ -2721,7 +2721,7 @@ struct axradio_address {
 typedef struct {
     uint16_t reg;
     uint8_t val;
-} ax5043_regval_t;
+} ax5043_profile_t;
 
 /**
  * TODO: Update brief to describe this
@@ -2806,11 +2806,12 @@ typedef struct{
      */
     uint32_t                    addr;
     /**
-     * @brief Preset register values table
+     * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.
-     *        Certain values may be overwritten later.
+     *        Certain registers may be overwritten later, either by
+     *        the driver or a future call to @p ax5043SetProfile.
      */
-    const ax5043_regval_t       *reg_values;
+    const ax5043_profile_t      *profile;
 
     ax5043_confval_t *conf_values;
 } AX5043Config;
@@ -2844,6 +2845,11 @@ struct AX5043Driver {
     mailbox_t                   mb_free;
     msg_t                       mb_free_queue[AX5043_MAILBOX_COUNT];
 
+    /* Last VCOR returned from ranging */
+    uint8_t                     vcora;
+    uint8_t                     vcorb;
+
+    /* RX information */
     uint32_t                    timer;
     uint32_t                    datarate;
     uint32_t                    freq_off;
@@ -2937,7 +2943,7 @@ void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value);
 void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value);
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
 
-ax5043_status_t ax5043Reset(AX5043Driver *devp);
+void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
 
 void ax5043Idle(AX5043Driver *devp);
