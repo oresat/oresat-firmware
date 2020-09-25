@@ -53,6 +53,38 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "Stopping AX5043 driver...");
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "rx")) {
+        ax5043_mailbox_t *mb = NULL;
+        chprintf(chp, "Entering receive mode and waiting for 10 seconds for message...");
+        ax5043RX(devp);
+        chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
+        ax5043Idle(devp);
+        if (mb == NULL) {
+            chprintf(chp, "No message received\r\n");
+        } else {
+            chprintf(chp, "Message received\r\n");
+
+            chSysLock();
+            chMBPostI(&devp->mb_free, (msg_t)mb);
+            chSysUnlock();
+        }
+    } else if (!strcmp(argv[0], "wor")) {
+        ax5043_mailbox_t *mb = NULL;
+        chprintf(chp, "Entering WOR mode and waiting for 10 seconds for message...");
+        ax5043RX(devp);
+        chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
+        ax5043Idle(devp);
+        if (mb == NULL) {
+            chprintf(chp, "No message received\r\n");
+        } else {
+            chprintf(chp, "Message received\r\n");
+
+            chSysLock();
+            chMBPostI(&devp->mb_free, (msg_t)mb);
+            chSysUnlock();
+        }
+    } else if (!strcmp(argv[0], "tx")) {
+        chprintf(chp, "Not yet implemented\r\n");
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
@@ -70,7 +102,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             chprintf(chp, "OK\r\n");
         }
-    } else if (!strcmp(argv[0], "readreg") && argc > 2) {
+    } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
         if (devp->state != AX5043_READY) {
@@ -89,7 +121,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             goto radio_usage;
         }
-    } else if (!strcmp(argv[0], "writereg") && argc > 3) {
+    } else if (!strcmp(argv[0], "write") && argc > 3) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
         if (!strcmp(argv[3], "u8")) {
@@ -121,14 +153,17 @@ radio_usage:
                   "\r\n"
                   "    start:       Start AX5043 device\r\n"
                   "    stop:        Stop AX5043 device\r\n"
+                  "    rx:          Puts device into RX mode\r\n"
+                  "    wor:         Puts device into WOR mode\r\n"
+                  "    tx:          Puts device into TX mode\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
                   "                 Sets frequency of channel A/B to <freq>\r\n"
                   "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"
                   "\r\n"
-                  "    readreg <reg> <type>:\r\n"
+                  "    read<reg> <type>:\r\n"
                   "                 Read <reg> where <type> is u8|u16|u24|u32\r\n"
                   "\r\n"
-                  "    writereg <reg> <value> <type>:\r\n"
+                  "    write<reg> <value> <type>:\r\n"
                   "                 Write <reg> with <value> where <type> is u8|u16|u24|u32\r\n"
                   "\r\n");
     return;
