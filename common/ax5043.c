@@ -533,13 +533,14 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
 
+    /* Transition to ready state */
+    devp->state = AX5043_READY;
+
     /* Apply initial profile provided by user */
     if (config->profile) {
         ax5043SetProfile(devp, config->profile);
     }
 
-    /* Transition to ready state */
-    devp->state = AX5043_READY;
 }
 
 /**
