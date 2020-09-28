@@ -2934,9 +2934,9 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 void ax5043Stop(AX5043Driver *devp);
 
 void ax5043Idle(AX5043Driver *devp);
-void ax5043RX(AX5043Driver *devp);
-void ax5043WOR(AX5043Driver *devp);
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb);
+void ax5043RX(AX5043Driver *devp, bool chan_b);
+void ax5043WOR(AX5043Driver *devp, bool chan_b);
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);

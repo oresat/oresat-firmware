@@ -623,26 +623,39 @@ void ax5043Idle(AX5043Driver *devp) {
  *
  * @api
  */
-void ax5043RX(AX5043Driver *devp) {
+void ax5043RX(AX5043Driver *devp, bool chan_b) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
                    (devp->state == AX5043_WOR) ||
                    (devp->state == AX5043_TX)), "ax5043RX(), invalid state");
 
-    if (devp->state != AX5043_RX) {
+    bool cur_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+
+    if (devp->state != AX5043_RX || chan_b != cur_chan) {
         devp->error = AX5043_ERR_NOERROR;
 
         /* Enter idle state first */
         ax5043Idle(devp);
 
-        /* Activate synthesizer and wait for PLL to settle */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+        /* Set the channel */
+        uint32_t freq;
+        uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
+        if (chan_b) {
+            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQB), devp->config->xtal_freq);
+            pllloop |= AX5043_PLLLOOP_FREQSEL;
+        } else {
+            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQA), devp->config->xtal_freq);
+            pllloop &= ~AX5043_PLLLOOP_FREQSEL;
+        }
+        ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
+        ax5043SetRFDIV(devp, freq);
+
+        /* Activate synthesizer to lock PLL */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
-        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-            /* Not settled in a reasonable amount of time, shutdown and return error */
+        if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
             ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-            devp->error = AX5043_ERR_TIMEOUT;
+            devp->error = AX5043_ERR_LOCKLOST;
             return;
         }
         /* RADIOCTRL interrupt will wait for the radio to be done */
@@ -667,26 +680,39 @@ void ax5043RX(AX5043Driver *devp) {
  *
  * @api
  */
-void ax5043WOR(AX5043Driver *devp) {
+void ax5043WOR(AX5043Driver *devp, bool chan_b) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
                    (devp->state == AX5043_WOR) ||
                    (devp->state == AX5043_TX)), "ax5043WOR(), invalid state");
 
-    if (devp->state != AX5043_WOR) {
+    bool cur_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+
+    if (devp->state != AX5043_WOR || chan_b != cur_chan) {
         devp->error = AX5043_ERR_NOERROR;
 
         /* Enter idle state first */
         ax5043Idle(devp);
 
-        /* Activate synthesizer and wait for PLL to settle */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+        /* Set the channel */
+        uint32_t freq;
+        uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
+        if (chan_b) {
+            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQB), devp->config->xtal_freq);
+            pllloop |= AX5043_PLLLOOP_FREQSEL;
+        } else {
+            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQA), devp->config->xtal_freq);
+            pllloop &= ~AX5043_PLLLOOP_FREQSEL;
+        }
+        ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
+        ax5043SetRFDIV(devp, freq);
+
+        /* Activate synthesizer to lock PLL */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
-        if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-            /* Not settled in a reasonable amount of time, shutdown and return error */
+        if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
             ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-            devp->error = AX5043_ERR_TIMEOUT;
+            devp->error = AX5043_ERR_LOCKLOST;
             return;
         }
         /* RADIOCTRL interrupt will wait for the radio to be done */
@@ -711,8 +737,9 @@ void ax5043WOR(AX5043Driver *devp) {
  * TODO: This still needs preamble code
  * @api
  */
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb) {
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
     ax5043_state_t prev_state;
+    bool prev_chan;
     osalDbgCheck(devp != NULL && tx_cb != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
@@ -720,22 +747,29 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb) {
                    (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
 
     devp->error = AX5043_ERR_NOERROR;
+    devp->tx_cb = tx_cb;
 
     /* Record previous state */
     prev_state = devp->state;
+    prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
 
     /* Enter idle state first */
     ax5043Idle(devp);
 
-    devp->tx_cb = tx_cb;
+    /* Set Frequency Selection */
+    uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
+    if (chan_b) {
+        pllloop |= AX5043_PLLLOOP_FREQSEL;
+    } else {
+        pllloop &= ~AX5043_PLLLOOP_FREQSEL;
+    }
+    ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
 
-    /* Activate synthesizer and wait for PLL to settle */
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_SETTLED);
+    /* Activate synthesizer to lock PLL */
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
-    if (ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_MS2I(1)) == 0) {
-        /* Not settled in a reasonable amount of time, shutdown and return error */
+    if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-        devp->error = AX5043_ERR_TIMEOUT;
+        devp->error = AX5043_ERR_LOCKLOST;
         return;
     }
     /* RADIOCTRL interrupt will wait for the radio to be done */
@@ -758,10 +792,10 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb) {
     /* Return to original state */
     switch (prev_state) {
     case AX5043_RX:
-        ax5043RX(devp);
+        ax5043RX(devp, prev_chan);
         break;
     case AX5043_WOR:
-        ax5043WOR(devp);
+        ax5043WOR(devp, prev_chan);
         break;
     case AX5043_READY:
     default:
@@ -802,8 +836,8 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
     }
 
     /* Re-range frequencies in case they changed */
-    ax5043SetFreq(devp, 0, devp->vcora, false);
     ax5043SetFreq(devp, 0, devp->vcorb, true);
+    ax5043SetFreq(devp, 0, devp->vcora, false);
 }
 
 /**
@@ -848,6 +882,15 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
      * REG = f_carrier * 2^24 / f_xtal + 1/2
      *     = (f_carrier * 2^25 + f_xtal) / (f_xtal * 2)
      */
+
+    /* Set Frequency Selection */
+    uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
+    if (chan_b) {
+        pllloop |= AX5043_PLLLOOP_FREQSEL;
+    } else {
+        pllloop &= ~AX5043_PLLLOOP_FREQSEL;
+    }
+    ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
 
     /* Set the frequency and RFDIV if needed, and initiate ranging */
     if (freq) {

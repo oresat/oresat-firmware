@@ -5,7 +5,7 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
-static char str[] = "KJ7SAT";
+static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 static bool tx_once = false;
 
 size_t tx_cb(uint8_t *buf, size_t max_len) {
@@ -84,7 +84,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "rx")) {
         ax5043_mailbox_t *mb = NULL;
         chprintf(chp, "Entering receive mode and waiting for 10 seconds for message...");
-        ax5043RX(devp);
+        ax5043RX(devp, false);
+        if (devp->error != AX5043_ERR_NOERROR) {
+            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
+        }
         chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
         ax5043Idle(devp);
         if (mb == NULL) {
@@ -99,7 +102,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "wor")) {
         ax5043_mailbox_t *mb = NULL;
         chprintf(chp, "Entering WOR mode and waiting for 10 seconds for message...");
-        ax5043RX(devp);
+        ax5043WOR(devp, false);
+        if (devp->error != AX5043_ERR_NOERROR) {
+            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
+        }
         chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
         ax5043Idle(devp);
         if (mb == NULL) {
@@ -113,7 +119,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         }
     } else if (!strcmp(argv[0], "tx")) {
         tx_once = false;
-        ax5043TX(devp, tx_cb);
+        ax5043TX(devp, tx_cb, false);
+        if (devp->error != AX5043_ERR_NOERROR) {
+            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
+        }
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
