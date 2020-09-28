@@ -390,7 +390,7 @@ static const ShellConfig shell_cfg = {
 };
 
 THD_WORKING_AREA(shell_wa, 0x1000);
-THD_WORKING_AREA(cmd_wa, 0x400);
+THD_WORKING_AREA(cmd_wa, 0x100);
 THD_FUNCTION(cmd, arg)
 {
     (void)arg;

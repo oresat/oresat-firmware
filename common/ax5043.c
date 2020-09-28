@@ -653,6 +653,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b) {
 
         /* Activate synthesizer to lock PLL */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
+        chThdSleepMicroseconds(1);
         if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
             ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
             devp->error = AX5043_ERR_LOCKLOST;
@@ -710,6 +711,7 @@ void ax5043WOR(AX5043Driver *devp, bool chan_b) {
 
         /* Activate synthesizer to lock PLL */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
+        chThdSleepMicroseconds(1);
         if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
             ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
             devp->error = AX5043_ERR_LOCKLOST;
@@ -767,6 +769,7 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
 
     /* Activate synthesizer to lock PLL */
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
+    chThdSleepMicroseconds(1);
     if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
         devp->error = AX5043_ERR_LOCKLOST;
@@ -783,10 +786,11 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
     devp->state = AX5043_TX;
 
     /* Start the FIFO worker */
-    devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+    devp->fifo_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
 
     /* Wait for transmission to finish */
     chThdWait(devp->fifo_worker);
+    devp->fifo_worker = NULL;
     devp->tx_cb = NULL;
 
     /* Return to original state */

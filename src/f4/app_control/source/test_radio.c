@@ -16,7 +16,7 @@ size_t tx_cb(uint8_t *buf, size_t max_len) {
 
     size_t len = sizeof(txbuf) + sizeof(str);
 
-    if (tx_once && len < max_len) {
+    if (!tx_once && len < max_len) {
         txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
         txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
         txbuf.preamble.repeatcnt = 20;
