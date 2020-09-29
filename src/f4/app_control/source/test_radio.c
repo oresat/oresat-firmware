@@ -83,7 +83,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "rx")) {
         ax5043_mailbox_t *mb = NULL;
-        chprintf(chp, "Entering receive mode and waiting for 10 seconds for message...");
+        chprintf(chp, "Entering receive mode and waiting 10 seconds for message...");
         ax5043RX(devp, false);
         if (devp->error != AX5043_ERR_NOERROR) {
             chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
@@ -93,7 +93,14 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         if (mb == NULL) {
             chprintf(chp, "No message received\r\n");
         } else {
-            chprintf(chp, "Message received\r\n");
+            chprintf(chp, "Message received:");
+            for (uint32_t i = 0; i < mb->index; i++) {
+                if (i % 0x10 == 0) {
+                    chprintf(chp, "\r\n%02X:", i);
+                }
+                chprintf(chp, " %02X", mb->data[i]);
+            }
+            chprintf(chp, "\r\n");
 
             chSysLock();
             chMBPostI(&devp->mb_free, (msg_t)mb);

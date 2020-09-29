@@ -528,7 +528,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Register interrupt handler for device and start worker */
     if (devp->irq_worker == NULL) {
-        devp->irq_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
+        devp->irq_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
         palSetLineCallback(config->irq, ax5043IRQHandler, devp);
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
@@ -607,9 +607,6 @@ void ax5043Idle(AX5043Driver *devp) {
             devp->fifo_worker = NULL;
         }
 
-        ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
-
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
 
         devp->state = AX5043_READY;
@@ -659,8 +656,6 @@ void ax5043RX(AX5043Driver *devp, bool chan_b) {
             devp->error = AX5043_ERR_LOCKLOST;
             return;
         }
-        /* RADIOCTRL interrupt will wait for the radio to be done */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
         /* Clear FIFO and set threshold */
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
         ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
@@ -670,7 +665,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b) {
         devp->state = AX5043_RX;
 
         /* Start the FIFO worker */
-        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
     }
 }
 
@@ -717,8 +712,6 @@ void ax5043WOR(AX5043Driver *devp, bool chan_b) {
             devp->error = AX5043_ERR_LOCKLOST;
             return;
         }
-        /* RADIOCTRL interrupt will wait for the radio to be done */
-        ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
         /* Clear FIFO and set threshold */
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
         ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
@@ -775,8 +768,6 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
         devp->error = AX5043_ERR_LOCKLOST;
         return;
     }
-    /* RADIOCTRL interrupt will wait for the radio to be done */
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
     /* Clear FIFO and set threshold */
     ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
     ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
