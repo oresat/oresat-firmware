@@ -1269,7 +1269,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                     }
                     ax5043WriteU8(devp,AX5043_REG_FIFODATA, byte);
                 }
-                if ((ax5043ReadU8(devp,AX5043_REG_FRAMING) & 0x0E) == 0x06 && synclen) {
+                if (_FLD2VAL(AX5043_FRAMING_FRMMODE, ax5043ReadU8(devp,AX5043_REG_FRAMING)) == AX5043_FRMMODE_RAW_PATMATCH && synclen) {
                     /* Write SYNC word if framing mode is raw_patternmatch, might use SYNCLEN > 0 as a criterion, but need to make sure SYNCLEN=0 for WMBUS.
                        Chip automatically sends SYNCWORD but matching in RX works via MATCH0PAT) */
                     int8_t len_byte = synclen;
