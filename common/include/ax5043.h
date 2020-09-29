@@ -2604,101 +2604,9 @@ typedef uint16_t ax5043_status_t;
 typedef size_t (*ax5043_tx_cb_t)(uint8_t *buf, size_t max_len);
 
 /**
- * @name    AX5043 chunk structures.
- * @{
- */
-/**
- * @brief   RSSI
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     rssi;
-} ax5043_chunk_rssi_t;
-
-/**
- * @brief   TXCTRL
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     flags;
-} ax5043_chunk_txctrl_t;
-
-/**
- * @brief   FREQOFFS
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint16_t                    freqoffs;
-} ax5043_chunk_freqoffs_t;
-
-/**
- * @brief   ANTRSSI2
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     rssi;
-    uint8_t                     bgndnoise;
-} ax5043_chunk_antrssi2_t;
-
-/**
- * @brief   REPEATDATA
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     flags;
-    uint8_t                     repeatcnt;
-    uint8_t                     data;
-} ax5043_chunk_repeatdata_t;
-
-/**
- * @brief   TIMER
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint32_t                    timer;
-} ax5043_chunk_timer_t;
-
-/**
- * @brief   RFFREQOFFS
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint32_t                    rffreqoffs;
-} ax5043_chunk_rffreqoffs_t;
-
-/**
- * @brief   DATARATE
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint32_t                    datarate;
-} ax5043_chunk_datarate_t;
-
-/**
- * @brief   ANTRSSI3
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     ant0rssi;
-    uint8_t                     ant1rssi;
-    uint8_t                     bgndnoise;
-} ax5043_chunk_antrssi3_t;
-
-/**
- * @brief   DATA
- */
-typedef struct __attribute__((packed)) {
-    uint8_t                     header;
-    uint8_t                     length;
-    uint8_t                     flags;
-    uint8_t                     data[];
-} ax5043_chunk_data_t;
-
-/**
  * @brief   TXPWR
  */
 typedef struct __attribute__((packed)) {
-    uint8_t                     header;
     uint8_t                     length;
     uint16_t                    txpwrcoeffa;
     uint16_t                    txpwrcoeffb;
@@ -2708,25 +2616,47 @@ typedef struct __attribute__((packed)) {
 } ax5043_chunk_txpwr_t;
 
 /**
- * @brief   FIFO Chunk union type
+ * @brief   FIFO Chunk type
  */
-typedef union __attribute__((packed)) {
-    struct {
-        uint8_t                 header;
-        uint8_t                 length;
+typedef struct __attribute__((packed)) {
+    uint8_t                 header;
+    union {
+        uint8_t             length;
+        uint8_t             rssi;
+        uint8_t             txctrl;
+        uint16_t            freqoffs;
+        struct {
+            uint8_t         rssi;
+            uint8_t         bgndnoise;
+        } antrssi2;
+        uint32_t            timer;
+        uint32_t            rffreqoffs;
+        uint32_t            datarate;
+        struct {
+            uint8_t         flags;
+            uint8_t         repeatcnt;
+            uint8_t         data;
+        } repeatdata;
+        struct {
+            uint8_t         ant0rssi;
+            uint8_t         ant1rssi;
+            uint8_t         bgndnoise;
+        } antrssi3;
+        struct {
+            uint8_t         length;
+            uint8_t         flags;
+            uint8_t         data[];
+        } data;
+        struct {
+            uint8_t         length;
+            uint16_t        txpwrcoeffa;
+            uint16_t        txpwrcoeffb;
+            uint16_t        txpwrcoeffc;
+            uint16_t        txpwrcoeffd;
+            uint16_t        txpwrcoeffe;
+        } txpwr;
     };
-    ax5043_chunk_rssi_t         rssi;
-    ax5043_chunk_txctrl_t       txctrl;
-    ax5043_chunk_freqoffs_t     freqoffs;
-    ax5043_chunk_antrssi2_t     antrssi2;
-    ax5043_chunk_timer_t        timer;
-    ax5043_chunk_rffreqoffs_t   rffreqoffs;
-    ax5043_chunk_datarate_t     datarate;
-    ax5043_chunk_antrssi3_t     antrssi3;
-    ax5043_chunk_data_t         data;
-    ax5043_chunk_txpwr_t        txpwr;
 } ax5043_chunk_t;
-/** @} */
 
 /**
  * @brief   Mailbox structure for TX/RX
@@ -2735,13 +2665,6 @@ typedef struct {
     size_t                      index;
     uint8_t                     data[AX5043_MAILBOX_SIZE];
 } ax5043_mailbox_t;
-
-/**
- * @brief   Structure containing a four byte sender X.25 address
- */
-struct axradio_address {
-    uint8_t addr[4];
-};
 
 /**
  * @brief  Ax5043 Register value pair type
@@ -2986,7 +2909,7 @@ uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 
 void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
-uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+uint8_t transmit_packet(AX5043Driver *devp, const char addr[4], const uint8_t *pkt, uint16_t pktlen);
 
 #ifdef __cplusplus
 }
