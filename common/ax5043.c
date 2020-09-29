@@ -248,19 +248,19 @@ THD_FUNCTION(fifo_worker, arg) {
                     }
                     break;
                 case AX5043_CHUNKCMD_TIMER:
-                    devp->timer = __REV(chunkp->timer << 8);
+                    devp->timer = __REV(chunkp->timer.timer << 8);
                     break;
                 case AX5043_CHUNKCMD_RSSI:
-                    devp->rssi = chunkp->rssi;
+                    devp->rssi = chunkp->rssi.rssi;
                     break;
                 case AX5043_CHUNKCMD_FREQOFFS:
-                    devp->freq_off = __REV(chunkp->freqoffs << 8);
+                    devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
                     break;
                 case AX5043_CHUNKCMD_RFFREQOFFS:
-                    devp->rf_freq_off = __REV(chunkp->rffreqoffs << 8);
+                    devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
                     break;
                 case AX5043_CHUNKCMD_DATARATE:
-                    devp->datarate = __REV(chunkp->datarate << 8);
+                    devp->datarate = __REV(chunkp->datarate.datarate << 8);
                     break;
                 case AX5043_CHUNKCMD_ANTRSSI:
                     if (chunk_len == 2) {
@@ -1328,7 +1328,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
  * @api
  * TODO Standardize the error handling, Maybe move address to a driver config structure
  */
-uint8_t transmit_packet(AX5043Driver *devp, const char addr[4], const uint8_t *pkt, uint16_t pktlen) {
+uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) {
     uint16_t packet_len;
     uint8_t axradio_txbuffer[260];
 
@@ -1348,7 +1348,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const char addr[4], const uint8_t *p
     memset(axradio_txbuffer, 0, maclen);
     memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
     if (destaddrpos != 0xff) {
-        memcpy(&axradio_txbuffer[destaddrpos], addr, addrlen);
+        memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
     }
     if (sourceaddrpos != 0xff) {
         uint32_t axradio_localaddr = __REV(devp->config->addr);

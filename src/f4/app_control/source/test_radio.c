@@ -10,20 +10,20 @@ static bool tx_once = false;
 
 size_t tx_cb(uint8_t *buf, size_t max_len) {
     struct __attribute__((packed)) {
-        ax5043_chunk_t preamble;
-        ax5043_chunk_t data;
+        ax5043_chunk_repeatdata_t preamble;
+        ax5043_chunk_data_t data;
     } txbuf;
 
     size_t len = sizeof(txbuf) + sizeof(str);
 
     if (!tx_once && len < max_len) {
         txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
-        txbuf.preamble.repeatdata.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
-        txbuf.preamble.repeatdata.repeatcnt = 20;
-        txbuf.preamble.repeatdata.data = 0x55;
+        txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
+        txbuf.preamble.repeatcnt = 20;
+        txbuf.preamble.data = 0x55;
         txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
         txbuf.data.length = sizeof(str) + 1;
-        txbuf.data.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
+        txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
         memcpy(buf, &txbuf, sizeof(txbuf));
         memcpy(&buf[sizeof(txbuf)], str, sizeof(str));
         tx_once = true;
