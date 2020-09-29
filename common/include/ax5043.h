@@ -2796,12 +2796,10 @@ typedef enum {
     AX5043_READY,               /**< Ready.                             */
     AX5043_RX,
     AX5043_WOR,
-    AX5043_RX_LOOP,             /**< In the middle of receiving packet. */
     AX5043_TX,
     AX5043_TX_LONGPREAMBLE,
     AX5043_TX_SHORTPREAMBLE,
-    AX5043_TX_PACKET,
-    AX5043_CW
+    AX5043_TX_PACKET
 } ax5043_state_t;
 
 /**
@@ -2986,13 +2984,10 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
 
 uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
+
 void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
 uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
-uint8_t receive_loop(AX5043Driver *devp, uint8_t axradio_rxbuffer[]);
 
-void ax5043_morse_dot_dash(AX5043Driver *devp, uint16_t dot_dash_time);
-const char *ax5043_ascii_to_morse(char letter);
-void ax5043_send_cw(AX5043Driver *devp, int wpm, char beaconMessage[], uint16_t pktlen );
 #ifdef __cplusplus
 }
 #endif
