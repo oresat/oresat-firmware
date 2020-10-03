@@ -411,7 +411,7 @@
  */
 #define BMI088_ACC_X_LSB_Pos                (0U)
 #define BMI088_ACC_X_LSB_Msk                (0xFFU << BMI088_ACC_X_LSB_Pos)
-#define BMI088_ACC_X_LSB                    BMI088_ACC_x_LSB_Msk
+#define BMI088_ACC_X_LSB                    BMI088_ACC_X_LSB_Msk
 /** @} */
 
 /**

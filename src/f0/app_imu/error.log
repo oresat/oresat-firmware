@@ -1,0 +1,138 @@
+Compiling bmi088.c
+In file included from ./source/bmi088.c:11:
+./source/bmi088.h:903:30: error: expected ')' before '->' token
+  903 | bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+      |                              ^~
+      |                              )
+./source/bmi088.h:915:27: error: unknown type name 'Bmi088Driver'; did you mean 'BMI088Driver'?
+  915 | uint8_t bmi088ReadIntStat(Bmi088Driver *devp);
+      |                           ^~~~~~~~~~~~
+      |                           BMI088Driver
+./source/bmi088.c: In function 'bmi088I2CWriteRegister':
+./source/bmi088.c:72:37: warning: passing argument 1 of 'i2cMasterTransmitTimeout' from incompatible pointer type [-Wincompatible-pointer-types]
+   72 |     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
+      |                                     ^~~~
+      |                                     |
+      |                                     BMI088Driver *
+In file included from ../../../ext/ChibiOS/os/hal/include/hal.h:146,
+                 from ./source/bmi088.c:10:
+../../../ext/ChibiOS/os/hal/include/hal_i2c.h:144:45: note: expected 'I2CDriver *' but argument is of type 'BMI088Driver *'
+  144 |   msg_t i2cMasterTransmitTimeout(I2CDriver *i2cp,
+      |                                  ~~~~~~~~~~~^~~~
+./source/bmi088.c: In function 'bmi088Start':
+./source/bmi088.c:129:15: error: 'BMI088_AD_ACC_CONFIG_0' undeclared (first use in this function); did you mean 'BMI088_AD_GYR_CONFIG_0'?
+  129 |     buf.reg = BMI088_AD_ACC_CONFIG_0;
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+      |               BMI088_AD_GYR_CONFIG_0
+./source/bmi088.c:129:15: note: each undeclared identifier is reported only once for each function it appears in
+./source/bmi088.c:130:17: error: 'BMI088_CONFIG_RST' undeclared (first use in this function)
+  130 |     buf.value = BMI088_CONFIG_RST;
+      |                 ^~~~~~~~~~~~~~~~~
+./source/bmi088.c:131:34: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  131 |     bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+      |                            ~~~~~~^~~~~~
+      |                                  |
+      |                                  I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+./source/bmi088.c:133:60: error: 'BMI088_AD_CONFIG' undeclared (first use in this function); did you mean 'BMI088_ACC_CONF_BWP'?
+  133 |         bmi088I2CReadRegister(config->i2cp, config->saddr, BMI088_AD_CONFIG,
+      |                                                            ^~~~~~~~~~~~~~~~
+      |                                                            BMI088_ACC_CONF_BWP
+./source/bmi088.c:138:34: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  138 |     bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+      |                            ~~~~~~^~~~~~
+      |                                  |
+      |                                  I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+./source/bmi088.c:139:15: error: 'BMI088_AD_CAL' undeclared (first use in this function)
+  139 |     buf.reg = BMI088_AD_CAL;
+      |               ^~~~~~~~~~~~~
+./source/bmi088.c:141:34: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  141 |     bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+      |                            ~~~~~~^~~~~~
+      |                                  |
+      |                                  I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+./source/bmi088.c: In function 'bmi088Stop':
+./source/bmi088.c:172:19: error: 'BMI088_AD_CONFIG' undeclared (first use in this function); did you mean 'BMI088_ACC_CONF_BWP'?
+  172 |         buf.reg = BMI088_AD_CONFIG;
+      |                   ^~~~~~~~~~~~~~~~
+      |                   BMI088_ACC_CONF_BWP
+./source/bmi088.c:173:29: error: 'BMI088_CONFIG_RST' undeclared (first use in this function)
+  173 |         buf.value = __REVSH(BMI088_CONFIG_RST);
+      |                             ^~~~~~~~~~~~~~~~~
+./source/bmi088.c:174:44: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  174 |         bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+      |                                ~~~~~~~~~~~~^~~~~~
+      |                                            |
+      |                                            I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+In file included from ./source/bmi088.c:11:
+./source/bmi088.c: In function 'bmi088SoftReset':
+./source/bmi088.h:84:45: error: 'BMI088_ACC_SOFTRESET_Msk' undeclared (first use in this function); did you mean 'BMI088_ACC_SFOTRESET_Msk'?
+   84 | #define BMI088_ACC_SOFTRESET                BMI088_ACC_SOFTRESET_Msk
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~
+./source/bmi088.c:239:15: note: in expansion of macro 'BMI088_ACC_SOFTRESET'
+  239 |     buf.reg = BMI088_ACC_SOFTRESET;
+      |               ^~~~~~~~~~~~~~~~~~~~
+./source/bmi088.c:240:17: error: 'soft_rst' undeclared (first use in this function); did you mean 'softrst'?
+  240 |     buf.value = soft_rst;
+      |                 ^~~~~~~~
+      |                 softrst
+./source/bmi088.c:241:40: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  241 |     bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+      |                            ~~~~~~~~~~~~^~~~~~
+      |                                        |
+      |                                        I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+./source/bmi088.c:235:13: warning: unused variable 'softRst' [-Wunused-variable]
+  235 |     uint8_t softRst;
+      |             ^~~~~~~
+./source/bmi088.c:233:50: warning: unused parameter 'softrst' [-Wunused-parameter]
+  233 | void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst){
+      |                                          ~~~~~~~~^~~~~~~
+./source/bmi088.c: In function 'accEnable':
+./source/bmi088.c:258:40: warning: passing argument 1 of 'bmi088I2CWriteRegister' from incompatible pointer type [-Wincompatible-pointer-types]
+  258 |     bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+      |                            ~~~~~~~~~~~~^~~~~~
+      |                                        |
+      |                                        I2CDriver * const
+./source/bmi088.c:70:44: note: expected 'BMI088Driver *' but argument is of type 'I2CDriver * const'
+   70 | msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+      |                              ~~~~~~~~~~~~~~^~~~
+./source/bmi088.c: At top level:
+./source/bmi088.c:361:9: error: conflicting types for 'bmi088ReadAccInX'
+  361 | int16_t bmi088ReadAccInX(BMI088Driver *devp){
+      |         ^~~~~~~~~~~~~~~~
+In file included from ./source/bmi088.c:11:
+./source/bmi088.h:908:9: note: previous declaration of 'bmi088ReadAccInX' was here
+  908 | uint8_t bmi088ReadAccInX(BMI088Driver *devp);
+      |         ^~~~~~~~~~~~~~~~
+./source/bmi088.c: In function 'bmi088ReadAccInX':
+./source/bmi088.h:414:45: error: 'BMI088_ACC_x_LSB_Msk' undeclared (first use in this function); did you mean 'BMI088_ACC_X_LSB_Msk'?
+  414 | #define BMI088_ACC_X_LSB                    BMI088_ACC_x_LSB_Msk
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+./source/bmi088.c:369:39: note: in expansion of macro 'BMI088_ACC_X_LSB'
+  369 |     accXLsb     = bmi088ReadRaw(devp, BMI088_ACC_X_LSB);
+      |                                       ^~~~~~~~~~~~~~~~
+./source/bmi088.c:372:40: error: called object is not a function or function pointer
+  372 |     accXInMG    = accXInt16/32768*1000*2(0x41 + 1)*1.5;
+      |                                        ^
+./source/bmi088.c: At top level:
+./source/bmi088.c:385:40: error: expected declaration specifiers or '...' before '*' token
+  385 | int16_t bmi088ReadAccInY(BMI088Driver, *devp){
+      |                                        ^
+./source/bmi088.c:409:40: error: expected declaration specifiers or '...' before '*' token
+  409 | int16_t bmi088ReadAccInZ(BMI088Driver, *devp){
+      |                                        ^
+make: *** [../../../ext/ChibiOS/os/common/startup/ARMCMx/compilers/GCC/mk/rules.mk:190: build/obj/bmi088.o] Error 1

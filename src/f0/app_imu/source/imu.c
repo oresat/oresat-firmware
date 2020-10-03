@@ -3,7 +3,9 @@
 #include "chprintf.h"
 
 /* TODO: Set this to the correct slave address for the BMI088 device */
-#define BMI088_SADDR 0x00U
+#define BMI088_GYRO_SADDR 0x68U
+#define BMI088_ACC_SADDR 0x18U
+
 
 #define CHP ((BaseSequentialStream*)&SD2)
 
@@ -18,7 +20,8 @@ static const I2CConfig i2ccfg = {
 static const BMI088Config imucfg = {
     .i2cp = &I2CD1,
     .i2ccfg = &i2ccfg,
-    .saddr = BMI088_SADDR,
+    .gyro_saddr = BMI088_GYRO_SADDR,
+    .acc_saddr = BMI088_ACC_SADDR,
 };
 
 static BMI088Driver imudev;

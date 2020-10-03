@@ -358,7 +358,7 @@ uint8_t bmi088ReadAccStatus(BMI088Driver *devp){
  *
  * @api
  */
-int16_t bmi088ReadAccInX(BMI088Driver *devp){
+uint8_t bmi088ReadAccInX(BMI088Driver *devp){
     int16_t accXInMG;
     int16_t accXInt16;
     int8_t  accXLsb;
@@ -369,7 +369,7 @@ int16_t bmi088ReadAccInX(BMI088Driver *devp){
     accXLsb     = bmi088ReadRaw(devp, BMI088_ACC_X_LSB);
     accXMsb     = bmi088ReadRaw(devp, BMI088_ACC_X_MSB);
     accXInt16   = (accXMsb*256 + accXLsb);
-    accXInMG    = accXInt16/32768*1000*2(0x41 + 1)*1.5;
+    accXInMG    = accXInt16/32768*1000*2*(0x41 + 1)*1.5;
 
     return accXInMG;
 }
@@ -382,7 +382,7 @@ int16_t bmi088ReadAccInX(BMI088Driver *devp){
  *
  * @api
  */
-int16_t bmi088ReadAccInY(BMI088Driver, *devp){
+uint8_t bmi088ReadAccInY(BMI088Driver, *devp){
     int16_t accYInMG;
     int16_t accYInt16;
     int8_t  accYLsb;
@@ -406,7 +406,7 @@ int16_t bmi088ReadAccInY(BMI088Driver, *devp){
  *
  * @api
  */
-int16_t bmi088ReadAccInZ(BMI088Driver, *devp){
+uint8_t bmi088ReadAccInZ(BMI088Driver, *devp){
     int16_t accZInMG;
     int16_t accZInt16;
     int8_t  accZLsb;
