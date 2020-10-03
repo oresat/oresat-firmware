@@ -80,7 +80,7 @@
  * @{
  */
 #define BMI088_ACC_SOFTRESET_Pos            (0U)
-#define BMI088_ACC_SFOTRESET_Msk            (0xFFU << BMI088_ACC_SOFT_RESET_Pos)
+#define BMI088_ACC_SOFTRESET_Msk            (0xFFU << BMI088_ACC_SOFT_RESET_Pos)
 #define BMI088_ACC_SOFTRESET                BMI088_ACC_SOFTRESET_Msk
 #define BMI088_ACC_SOFTRESET_RST            (0xB6U << BMI088_ACC_SOFTRESET_Pos)
 /**@} */
