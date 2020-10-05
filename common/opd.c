@@ -2,14 +2,13 @@
 #include "max7310.h"
 #include "opd.h"
 
-#define OPD_ADDR_MAX        (MAX7310_MAX_ADDR + 1)
 #define OPD_I2C_TRIES       3
 
 static struct {
     MAX7310Driver dev;
     MAX7310Config config;
     bool valid;
-} opd_dev[OPD_ADDR_MAX];
+} opd_dev[OPD_MAX_ADDR + 1];
 
 static const I2CConfig i2cconfig = {
     OPMODE_I2C,
@@ -52,9 +51,7 @@ void opd_start(void)
     /* Start the I2C driver */
     i2cStart(&I2CD1, &i2cconfig);
     /* Probe all devices on the bus */
-    for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
-        opd_probe(i);
-    }
+    opd_scan(true);
 }
 
 void opd_stop(void)
@@ -72,7 +69,14 @@ void opd_stop(void)
 #endif /* LINE_OPD_ENABLE */
 }
 
-bool opd_probe(i2caddr_t addr)
+void opd_scan(bool restart)
+{
+    for (i2caddr_t i = MAX7310_MIN_ADDR; i <= MAX7310_MAX_ADDR; i++) {
+        opd_probe(i, restart);
+    }
+}
+
+bool opd_probe(i2caddr_t addr, bool restart)
 {
     msg_t result;
     uint8_t temp;
@@ -83,9 +87,11 @@ bool opd_probe(i2caddr_t addr)
     result = i2cMasterReceiveTimeout(&I2CD1, addr, &temp, 1, TIME_MS2I(10));
     i2cReleaseBus(&I2CD1);
     if (result == MSG_OK) {
-        /* If a device responded, set as valid and activate */
+        /* If a device responded, set as valid and (re)start if needed */
+        if (opd_dev[addr].valid != true || restart) {
+            max7310Start(&opd_dev[addr].dev, &opd_dev[addr].config);
+        }
         opd_dev[addr].valid = true;
-        max7310Start(&opd_dev[addr].dev, &opd_dev[addr].config);
     } else {
         /* If no response, ensure address is stopped and set as invalid */
         max7310Stop(&opd_dev[addr].dev);
@@ -99,8 +105,9 @@ bool opd_probe(i2caddr_t addr)
 int opd_enable(i2caddr_t addr)
 {
     /* Ensure device is valid */
-    if (opd_dev[addr].valid != true)
+    if (opd_dev[addr].valid != true) {
         return -1;
+    }
 
     max7310SetPin(&opd_dev[addr].dev, OPD_EN);
     return 0;
@@ -109,8 +116,9 @@ int opd_enable(i2caddr_t addr)
 int opd_disable(i2caddr_t addr)
 {
     /* Ensure device is valid */
-    if (opd_dev[addr].valid != true)
+    if (opd_dev[addr].valid != true) {
         return -1;
+    }
 
     max7310ClearPin(&opd_dev[addr].dev, OPD_EN);
     return 0;
@@ -119,8 +127,9 @@ int opd_disable(i2caddr_t addr)
 int opd_reset(i2caddr_t addr)
 {
     /* Ensure device is valid */
-    if (opd_dev[addr].valid != true)
+    if (opd_dev[addr].valid != true) {
         return -1;
+    }
 
     max7310SetPin(&opd_dev[addr].dev, OPD_CB_RESET);
     chThdSleepMilliseconds(100);
@@ -131,8 +140,9 @@ int opd_reset(i2caddr_t addr)
 int opd_status(i2caddr_t addr, opd_status_t *status)
 {
     /* Ensure device is valid */
-    if (opd_dev[addr].valid != true)
+    if (opd_dev[addr].valid != true) {
         return -1;
+    }
 
     status->input = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_INPUT);
     status->odr = max7310ReadRaw(&opd_dev[addr].dev, MAX7310_AD_ODR);
