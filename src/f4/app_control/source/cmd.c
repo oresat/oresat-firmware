@@ -134,6 +134,17 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "rescan")) {
         chprintf(chp, "Re-scanning OPD devices\r\n");
         opd_scan(false);
+    } else if (!strcmp(argv[0], "summary")) {
+        chprintf(chp, "Board summary:\r\n");
+        for (i2caddr_t i = OPD_MIN_ADDR; i <= OPD_MAX_ADDR; i++) {
+            if (!opd_status(i, &status)) {
+                chprintf(chp, "0x%02X: CONNECTED - %s - %s\r\n", i,
+                        (status.odr & OPD_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
+                        (status.input & OPD_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
+            } else {
+                chprintf(chp, "0x%02X: NOT CONNECTED\r\n", i);
+            }
+        }
     } else {
         if (opd_addr == 0) {
             chprintf(chp, "Please specify an OPD address at least once (it will persist)\r\n");
@@ -189,17 +200,6 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
                 chprintf(chp, "Timeout:     %02X\r\n", status.timeout);
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
-            }
-        } else if (!strcmp(argv[0], "summary")) {
-            chprintf(chp, "Board summary:\r\n");
-            for (i2caddr_t i = OPD_MIN_ADDR; i <= OPD_MAX_ADDR; i++) {
-                if (!opd_status(i, &status)) {
-                    chprintf(chp, "0x%02X: CONNECTED - %s - %s\r\n", i,
-                            (status.odr & OPD_PIN_MASK(OPD_EN) ? "ENABLED" : "DISABLED"),
-                            (status.input & OPD_PIN_MASK(OPD_FAULT) ? "TRIPPED" : "NOT TRIPPED"));
-                } else {
-                    chprintf(chp, "0x%02X: NOT CONNECTED\r\n", i);
-                }
             }
         } else if (!strcmp(argv[0], "boot")) {
             int retval = opd_boot(opd_addr);
