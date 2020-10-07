@@ -42,63 +42,43 @@
 extern "C" {
 #endif
 
-/* Stack configuration override from CO_driver.h. Compile full stack.
+/* Stack configuration override default values.
  * For more information see file CO_config.h. */
 #ifndef CO_CONFIG_NMT
-#define CO_CONFIG_NMT (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT | \
-                       CO_CONFIG_NMT_CALLBACK_CHANGE | \
-                       CO_CONFIG_NMT_MASTER)
-#endif
-
-#ifndef CO_CONFIG_SDO
-#define CO_CONFIG_SDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT | \
-                       CO_CONFIG_SDO_SEGMENTED | \
-                       CO_CONFIG_SDO_BLOCK)
-#endif
-
-#ifndef CO_CONFIG_SDO_BUFFER_SIZE
-#define CO_CONFIG_SDO_BUFFER_SIZE 1800
-#endif
-
-#ifndef CO_CONFIG_EM
-#define CO_CONFIG_EM (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                      CO_CONFIG_FLAG_TIMERNEXT | \
-                      CO_CONFIG_EM_CONSUMER)
+#define CO_CONFIG_NMT (CO_CONFIG_NMT_CALLBACK_CHANGE | \
+                       CO_CONFIG_NMT_MASTER | \
+                       CO_CONFIG_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_HB_CONS
-#define CO_CONFIG_HB_CONS (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_FLAG_TIMERNEXT | \
+#define CO_CONFIG_HB_CONS (CO_CONFIG_HB_CONS_ENABLE | \
                            CO_CONFIG_HB_CONS_CALLBACK_CHANGE | \
                            CO_CONFIG_HB_CONS_CALLBACK_MULTI | \
-                           CO_CONFIG_HB_CONS_QUERY_FUNCT)
+                           CO_CONFIG_HB_CONS_QUERY_FUNCT | \
+                           CO_CONFIG_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_FLAG_TIMERNEXT)
 #endif
 
-#ifndef CO_CONFIG_GFC
-#define CO_CONFIG_GFC 0
+#ifndef CO_CONFIG_EM
+#define CO_CONFIG_EM (CO_CONFIG_EM_PRODUCER | \
+                      CO_CONFIG_EM_HISTORY | \
+                      CO_CONFIG_EM_CONSUMER | \
+                      CO_CONFIG_FLAG_CALLBACK_PRE | \
+                      CO_CONFIG_FLAG_TIMERNEXT | \
+                      CO_CONFIG_FLAG_OD_DYNAMIC)
 #endif
 
-#ifndef CO_CONFIG_SRDO
-#define CO_CONFIG_SRDO 0
+#ifndef CO_CONFIG_SDO_SRV
+#define CO_CONFIG_SDO_SRV (CO_CONFIG_SDO_SRV_SEGMENTED | \
+                           CO_CONFIG_SDO_SRV_BLOCK | \
+                           CO_CONFIG_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_FLAG_TIMERNEXT | \
+                           CO_CONFIG_FLAG_OD_DYNAMIC)
 #endif
 
-#ifndef CO_CONFIG_SRDO_MINIMUM_DELAY
-#define CO_CONFIG_SRDO_MINIMUM_DELAY 0
-#endif
-
-#ifndef CO_CONFIG_PDO
-#define CO_CONFIG_PDO (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT | \
-                       CO_CONFIG_PDO_SYNC_ENABLE | \
-                       CO_CONFIG_RPDO_CALLS_EXTENSION | \
-                       CO_CONFIG_TPDO_CALLS_EXTENSION)
-#endif
-
-#ifndef CO_CONFIG_SYNC
-#define CO_CONFIG_SYNC (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                        CO_CONFIG_FLAG_TIMERNEXT)
+#ifndef CO_CONFIG_SDO_SRV_BUFFER_SIZE
+#define CO_CONFIG_SDO_SRV_BUFFER_SIZE (127*7)
 #endif
 
 #ifndef CO_CONFIG_SDO_CLI
@@ -113,8 +93,37 @@ extern "C" {
 #define CO_CONFIG_TIME 0
 #endif
 
+#ifndef CO_CONFIG_SYNC
+#define CO_CONFIG_SYNC (CO_CONFIG_SYNC_ENABLE | \
+                        CO_CONFIG_SYNC_PRODUCER | \
+                        CO_CONFIG_FLAG_CALLBACK_PRE | \
+                        CO_CONFIG_FLAG_TIMERNEXT)
+#endif
+
+#ifndef CO_CONFIG_PDO
+#define CO_CONFIG_PDO (CO_CONFIG_RPDO_ENABLE | \
+                       CO_CONFIG_TPDO_ENABLE | \
+                       CO_CONFIG_PDO_SYNC_ENABLE | \
+                       CO_CONFIG_RPDO_CALLS_EXTENSION | \
+                       CO_CONFIG_TPDO_CALLS_EXTENSION | \
+                       CO_CONFIG_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_FLAG_TIMERNEXT)
+#endif
+
 #ifndef CO_CONFIG_LEDS
 #define CO_CONFIG_LEDS 0
+#endif
+
+#ifndef CO_CONFIG_GFC
+#define CO_CONFIG_GFC 0
+#endif
+
+#ifndef CO_CONFIG_SRDO
+#define CO_CONFIG_SRDO 0
+#endif
+
+#ifndef CO_CONFIG_SRDO_MINIMUM_DELAY
+#define CO_CONFIG_SRDO_MINIMUM_DELAY 0
 #endif
 
 #ifndef CO_CONFIG_LSS
@@ -123,6 +132,20 @@ extern "C" {
 
 #ifndef CO_CONFIG_GTW
 #define CO_CONFIG_GTW 0
+#endif
+
+#ifndef CO_CONFIG_CRC16
+#define CO_CONFIG_CRC16 (CO_CONFIG_CRC16_ENABLE)
+#endif
+
+#ifndef CO_CONFIG_FIFO
+#define CO_CONFIG_FIFO (CO_CONFIG_FIFO_ENABLE | \
+                        CO_CONFIG_FIFO_ALT_READ | \
+                        CO_CONFIG_FIFO_CRC16_CCITT)
+#endif
+
+#ifndef CO_CONFIG_TRACE
+#define CO_CONFIG_TRACE 0
 #endif
 
 

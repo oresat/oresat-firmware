@@ -100,8 +100,8 @@ Terminal 2:
 ```
 user@hostname:oresat-firmware/src/f0/app_blinky
 ➜ make gdb
-arm-none-eabi-gdb -q /home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf -cd ../../../toolchain -x ./gdbstl.cmd
-Reading symbols from /home/locutus/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf...
+arm-none-eabi-gdb -q /home/user/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf -cd ../../../toolchain -x ./gdbstl.cmd
+Reading symbols from /home/user/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf...
 _port_thread_start () at ../../../ChibiOS/os/common/ports/ARMCMx/compilers/GCC/chcoreasm_v6m.S:110
 110	                bl      chThdExit
 Loading section .vectors, size 0xc0 lma 0x8000000
