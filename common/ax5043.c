@@ -6,11 +6,7 @@
  * @ingrup ORESAT
  * @{
  */
-#include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
-#include <ctype.h>
 #include "ch.h"
 #include "hal.h"
 #include "ax5043.h"
@@ -682,11 +678,13 @@ void ax5043WOR(AX5043Driver *devp, bool chan_b) {
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
  * @param[in]  tx_cb        Transmit FIFO fill callback.
+ * @param[in]  ptt          Assert PWRAMP for transmission if true.
+ * @param[in]  chan_b       Use channel B if true.
  *
  * TODO: This still needs preamble code
  * @api
  */
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b) {
     ax5043_state_t prev_state;
     bool prev_chan;
     osalDbgCheck(devp != NULL && tx_cb != NULL);
@@ -728,6 +726,9 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
 
     /* Activate TX */
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
+    if (ptt) {
+        ax5043WriteU8(devp, AX5043_REG_PWRAMP, AX5043_PWRAMP);
+    }
     devp->state = AX5043_TX;
 
     /* Start the FIFO worker */
@@ -737,6 +738,10 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b) {
     chThdWait(devp->fifo_worker);
     devp->fifo_worker = NULL;
     devp->tx_cb = NULL;
+
+    if (ptt) {
+        ax5043WriteU8(devp, AX5043_REG_PWRAMP, 0x00U);
+    }
 
     /* Return to original state */
     switch (prev_state) {
@@ -1210,9 +1215,9 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
                 if (preamble_appendbits) {
                     uint8_t byte;
                     ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 2));
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x1C);
+                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNK_DATATX_RAW | AX5043_CHUNK_DATATX_NOCRC | AX5043_CHUNK_DATATX_RESIDUE);
                     byte = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_APPENDPATTERN);
-                    if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & 0x80) {
+                    if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & AX5043_PKTADDRCFG_MSBFIRST) {
                         // msb first -> stop bit below
                         byte &= 0xFF << (8-preamble_appendbits);
                         byte |= 0x80 >> preamble_appendbits;
@@ -1328,7 +1333,7 @@ void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuf
  * @api
  * TODO Standardize the error handling, Maybe move address to a driver config structure
  */
-uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen) {
+uint8_t transmit_packet(AX5043Driver *devp, const uint8_t addr[4], const uint8_t *pkt, uint16_t pktlen) {
     uint16_t packet_len;
     uint8_t axradio_txbuffer[260];
 
@@ -1348,7 +1353,7 @@ uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, 
     memset(axradio_txbuffer, 0, maclen);
     memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
     if (destaddrpos != 0xff) {
-        memcpy(&axradio_txbuffer[destaddrpos], &addr->addr, addrlen);
+        memcpy(&axradio_txbuffer[destaddrpos], addr, addrlen);
     }
     if (sourceaddrpos != 0xff) {
         uint32_t axradio_localaddr = __REV(devp->config->addr);

@@ -2737,13 +2737,6 @@ typedef struct {
 } ax5043_mailbox_t;
 
 /**
- * @brief   Structure containing a four byte sender X.25 address
- */
-struct axradio_address {
-    uint8_t addr[4];
-};
-
-/**
  * @brief  Ax5043 Register value pair type
  */
 typedef struct {
@@ -2962,7 +2955,7 @@ void ax5043Stop(AX5043Driver *devp);
 void ax5043Idle(AX5043Driver *devp);
 void ax5043RX(AX5043Driver *devp, bool chan_b);
 void ax5043WOR(AX5043Driver *devp, bool chan_b);
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool chan_b);
+void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
@@ -2986,7 +2979,7 @@ uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
 uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
 
 void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
-uint8_t transmit_packet(AX5043Driver *devp, const struct axradio_address *addr, const uint8_t *pkt, uint16_t pktlen);
+uint8_t transmit_packet(AX5043Driver *devp, const uint8_t addr[4], const uint8_t *pkt, uint16_t pktlen);
 
 #ifdef __cplusplus
 }

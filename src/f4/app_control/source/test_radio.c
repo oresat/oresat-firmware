@@ -126,7 +126,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         }
     } else if (!strcmp(argv[0], "tx")) {
         tx_once = false;
-        ax5043TX(devp, tx_cb, false);
+        ax5043TX(devp, tx_cb, true, false);
         if (devp->error != AX5043_ERR_NOERROR) {
             chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
         }
