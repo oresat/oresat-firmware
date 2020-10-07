@@ -16,8 +16,14 @@ typedef struct {
     const char *name;
 } radio_dev_t;
 
+typedef struct {
+    const ax5043_profile_t *profile;
+    const char *name;
+} radio_profile_t;
+
 extern synth_dev_t synth_devices[];
 extern radio_dev_t radio_devices[];
+extern radio_profile_t radio_profiles[];
 
 #ifdef __cplusplus
 extern "C" {

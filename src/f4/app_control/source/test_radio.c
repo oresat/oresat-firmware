@@ -147,6 +147,25 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             chprintf(chp, "OK\r\n");
         }
+    } else if (!strcmp(argv[0], "profile") && argc > 1) {
+        if (!strcmp(argv[1], "list")) {
+            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
+                chprintf(chp, "%u:\t%s\r\n", i, radio_profiles[i].name);
+            }
+            chprintf(chp, "\r\n");
+            return;
+        } else {
+            uint32_t i, index;
+            /* Find max index */
+            for (i = 0; radio_profiles[i].profile != NULL; i++);
+            index = strtoul(argv[1], NULL, 0);
+            if (index >= i) {
+                chprintf(chp, "ERROR: Invalid profile\r\n");
+                goto radio_usage;
+            }
+            ax5043SetProfile(devp, radio_profiles[index].profile);
+            return;
+        }
     } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
@@ -204,6 +223,8 @@ radio_usage:
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
                   "                 Sets frequency of channel A/B to <freq>\r\n"
                   "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"
+                  "    profile list|<num>:\r\n"
+                  "                 List the profiles or set the profile to <num> as shown by 'list'\r\n"
                   "\r\n"
                   "    read<reg> <type>:\r\n"
                   "                 Read <reg> where <type> is u8|u16|u24|u32\r\n"

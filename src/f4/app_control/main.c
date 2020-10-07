@@ -131,14 +131,15 @@ static const ax5043_profile_t lband_eng[] = {
     {0, 0, 0}
 };
 
-static const ax5043_profile_t uhf_eng[] = {
+static const ax5043_profile_t uhf_ax25[] = {
     /* Modulation and Framing */
-    {AX5043_REG_MODULATION, AX5043_MODULATION_MSK, 1},
+    {AX5043_REG_MODULATION, AX5043_MODULATION_FSK, 1},
     {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM, 1},
     {AX5043_REG_FRAMING, _VAL2FLD(AX5043_FRAMING_FRMMODE, AX5043_FRMMODE_HDLC) |
                          _VAL2FLD(AX5043_FRAMING_CRCMODE, AX5043_CRCMODE_CCITT), 1},
     /* Synthesizer */
     {AX5043_REG_FREQA, 0x1B480001, 4},
+    {AX5043_REG_FREQB, 0x1B4A0001, 4},
     /* PHY Layer Parameters */
     /* Receiver Parameters */
     {AX5043_REG_IFFREQ, 0x126F, 2},
@@ -154,9 +155,67 @@ static const ax5043_profile_t uhf_eng[] = {
     /* Receiver Parameter Set 3 */
     /* TODO */
     /* Transmitter Parameters */
-    {AX5043_REG_MODCFGF, AX5043_FREQSHAPE_GAUSS_BT_0_3, 1},
+    {AX5043_REG_FSKDEV, 0x0009D5, 3},
+    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS) |
+                         AX5043_MODCFGA_PTTLCKGATE | AX5043_MODCFGA_BROWNGATE, 1},
+    {AX5043_REG_TXRATE, 0x002752, 3},
+    /* MAC Layer Parameters */
+    /* Packet Format */
+    {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
+    {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    /* Pattern Match */
+    /* Packet Controller */
+    {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
+    {AX5043_REG_PKTACCEPTFLAGS, AX5043_PKTACCEPTFLAGS_LRGP, 1},
+    /* Performance Tuning Registers */
+    {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL, 1},
+    {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL, 1},
+    {AX5043_REG_0xF0D, AX5043_0xF0D_DEFVAL, 1},
+    {AX5043_REG_0xF10, AX5043_0xF10_TCXO, 1},
+    {AX5043_REG_0xF11, AX5043_0xF11_TCXO, 1},
+    {AX5043_REG_0xF1C, AX5043_0xF1C_DEFVAL, 1},
+    {AX5043_REG_0xF21, AX5043_0xF21_DEFVAL, 1},
+    {AX5043_REG_0xF22, AX5043_0xF22_DEFVAL, 1},
+    {AX5043_REG_0xF23, AX5043_0xF23_DEFVAL, 1},
+    {AX5043_REG_0xF26, AX5043_0xF26_DEFVAL, 1},
+    {AX5043_REG_0xF30, AX5043_0xF30_DEFVAL, 1},
+    {AX5043_REG_0xF31, AX5043_0xF31_DEFVAL, 1},
+    {AX5043_REG_0xF32, AX5043_0xF32_DEFVAL, 1},
+    {AX5043_REG_0xF33, AX5043_0xF33_DEFVAL, 1},
+    {AX5043_REG_0xF35, AX5043_0xF35_XTALDIV1, 1},
+    {AX5043_REG_0xF44, AX5043_0xF44_DEFVAL, 1},
+    {AX5043_REG_0xF72, AX5043_0xF72_NORAWSOFTBITS, 1},
+    {0, 0, 0}
+};
+
+static const ax5043_profile_t uhf_eng[] = {
+    /* Modulation and Framing */
+    {AX5043_REG_MODULATION, AX5043_MODULATION_MSK, 1},
+    {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM, 1},
+    {AX5043_REG_FRAMING, _VAL2FLD(AX5043_FRAMING_FRMMODE, AX5043_FRMMODE_HDLC) |
+                         _VAL2FLD(AX5043_FRAMING_CRCMODE, AX5043_CRCMODE_CCITT), 1},
+    /* Synthesizer */
+    {AX5043_REG_FREQA, 0x1B480001, 4},
+    {AX5043_REG_FREQB, 0x1B4A0001, 4},
+    /* PHY Layer Parameters */
+    /* Receiver Parameters */
+    {AX5043_REG_IFFREQ, 0x126F, 2},
+    {AX5043_REG_DECIMATION, 0x01, 1},
+    {AX5043_REG_RXDATARATE, 0x005355, 3},
+    {AX5043_REG_MAXRFOFFSET, 0x008F1 | AX5043_MAXRFOFFSET_FREQOFFSCORR, 3},
+    /* Receiver Parameter Set 0 */
+    /* TODO */
+    /* Receiver Parameter Set 1 */
+    /* TODO */
+    /* Receiver Parameter Set 2 */
+    /* TODO */
+    /* Receiver Parameter Set 3 */
+    /* TODO */
+    /* Transmitter Parameters */
+    {AX5043_REG_MODCFGF, AX5043_FREQSHAPE_GAUSS_BT_0_5, 1},
     {AX5043_REG_FSKDEV, 0x00624E, 3},
-    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | AX5043_MODCFGA_PTTLCKGATE, 1},
+    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS) |
+                         AX5043_MODCFGA_PTTLCKGATE | AX5043_MODCFGA_BROWNGATE, 1},
     {AX5043_REG_TXRATE, 0x018937, 3},
     /* MAC Layer Parameters */
     /* Packet Format */
@@ -202,7 +261,7 @@ const AX5043Config uhfcfg = {
     .miso       = LINE_SPI1_MISO,
     .irq        = LINE_UHF_IRQ,
     .xtal_freq  = 16000000,
-    .profile    = uhf_eng,
+    .profile    = uhf_ax25,
 };
 
 SI41XXConfig synthcfg = {
@@ -224,6 +283,13 @@ radio_dev_t radio_devices[] = {
     {&lband, &lbandcfg, "L-Band"},
     {&uhf, &uhfcfg, "UHF"},
     {NULL, NULL, ""},
+};
+
+radio_profile_t radio_profiles[] = {
+    {lband_eng, "L-Band Engineering"},
+    {uhf_ax25, "UHF AX.25"},
+    {uhf_eng, "UHF Engineering"},
+    {NULL, ""},
 };
 
 synth_dev_t synth_devices[] = {
