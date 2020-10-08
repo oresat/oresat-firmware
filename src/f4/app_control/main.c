@@ -156,8 +156,7 @@ static const ax5043_profile_t uhf_ax25[] = {
     /* TODO */
     /* Transmitter Parameters */
     {AX5043_REG_FSKDEV, 0x0009D5, 3},
-    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS) |
-                         AX5043_MODCFGA_PTTLCKGATE | AX5043_MODCFGA_BROWNGATE, 1},
+    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS), 1},
     {AX5043_REG_TXRATE, 0x002752, 3},
     /* MAC Layer Parameters */
     /* Packet Format */
@@ -214,8 +213,7 @@ static const ax5043_profile_t uhf_eng[] = {
     /* Transmitter Parameters */
     {AX5043_REG_MODCFGF, AX5043_FREQSHAPE_GAUSS_BT_0_5, 1},
     {AX5043_REG_FSKDEV, 0x00624E, 3},
-    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS) |
-                         AX5043_MODCFGA_PTTLCKGATE | AX5043_MODCFGA_BROWNGATE, 1},
+    {AX5043_REG_MODCFGA, AX5043_MODCFGA_TXSE | _VAL2FLD(AX5043_MODCFGA_AMPLSHAPE, AX5043_AMPLSHAPE_RAISEDCOS), 1},
     {AX5043_REG_TXRATE, 0x018937, 3},
     /* MAC Layer Parameters */
     /* Packet Format */
@@ -261,7 +259,7 @@ const AX5043Config uhfcfg = {
     .miso       = LINE_SPI1_MISO,
     .irq        = LINE_UHF_IRQ,
     .xtal_freq  = 16000000,
-    .profile    = uhf_ax25,
+    .profile    = uhf_eng,
 };
 
 SI41XXConfig synthcfg = {
