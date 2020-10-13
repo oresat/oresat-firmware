@@ -3,7 +3,6 @@
  * @brief   AX5043 Radio.
  *
  * @addtogroup AX5043
- * @ingroup ORESAT
  * @{
  */
 #ifndef _AX5043_H_

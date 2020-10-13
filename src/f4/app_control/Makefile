@@ -111,8 +111,7 @@ include $(PROJ_SRC)/opd.mk
 include $(PROJ_SRC)/time_sync.mk
 include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/littlefs.mk
-include $(PROJ_SRC)/si41xx.mk
-include $(PROJ_SRC)/ax5043.mk
+include $(PROJ_SRC)/radio.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
