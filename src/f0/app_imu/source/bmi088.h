@@ -37,6 +37,10 @@
 #define BMI088_PATCH                        0
 /** @} */
 
+#define BMI088_SADDR                        0
+/** @} */
+#define BMI088_ACC_SADDR                    0x18u 
+#define BMI088_GYRO_SADDR 					0x68u
 /**
  * @name    BMI088 Accelerometer Register Addresses
  * @{
@@ -80,7 +84,7 @@
  * @{
  */
 #define BMI088_ACC_SOFTRESET_Pos            (0U)
-#define BMI088_ACC_SOFTRESET_Msk            (0xFFU << BMI088_ACC_SOFT_RESET_Pos)
+#define BMI088_ACC_SOFTRESET_Msk            (0xFFU << BMI088_ACC_SOFTRESET_Pos)
 #define BMI088_ACC_SOFTRESET                BMI088_ACC_SOFTRESET_Msk
 #define BMI088_ACC_SOFTRESET_RST            (0xB6U << BMI088_ACC_SOFTRESET_Pos)
 /**@} */
@@ -365,7 +369,7 @@
  * @{
  */
 #define BMI088_ACC_Z_MSB_Pos                (0U)
-#define BMI088_ACC_Z_MSB_MsK                (0XFFU << BMI088_ACC_Z_MSB_Pos )
+#define BMI088_ACC_Z_MSB_Msk                (0XFFU << BMI088_ACC_Z_MSB_Pos )
 #define BMI088_ACC_Z_MSB                    BMI088_ACC_Z_MSB_Msk
 /** @} */
 
@@ -826,9 +830,13 @@ typedef struct {
      */
     const I2CConfig             *i2ccfg;
     /**
-     * @brief BMI088 Slave Address
+     * @brief BMI088 Accelerometer Slave Address
      */
-    i2caddr_t                   saddr;
+    i2caddr_t                   acc_saddr;
+    /**
+     * @brief BMI088 Gyro Slave Address
+     */
+    i2caddr_t                   gyro_saddr;
 #endif /* BMI088_USE_I2C */
 /**
 * @brief BMI088 configuration register value

@@ -3,8 +3,8 @@
 #include "chprintf.h"
 
 /* TODO: Set this to the correct slave address for the BMI088 device */
-#define BMI088_GYRO_SADDR 0x68U
-#define BMI088_ACC_SADDR 0x18U
+//#define BMI088_GYRO_SADDR 0x68U
+//#define BMI088_ACC_SADDR 0x18U
 
 
 #define CHP ((BaseSequentialStream*)&SD2)

@@ -67,7 +67,7 @@ msg_t bmi088I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  * @return               the operation status.
  * @notapi
  */
-msg_t bmi088I2CWriteRegister(BMI088Driver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+msg_t bmi088I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
             TIME_INFINITE);
@@ -126,19 +126,19 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif /* BMI088_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    buf.reg = BMI088_AD_ACC_CONFIG_0;
-    buf.value = BMI088_CONFIG_RST;
-    bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+    buf.reg = BMI088_AD_ACC_PWR_CONF;
+    buf.value = BMI088_AD_ACC_SOFTRESET;
+    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
     do {
-        bmi088I2CReadRegister(config->i2cp, config->saddr, BMI088_AD_CONFIG,
+        bmi088I2CReadRegister(config->i2cp, config->acc_saddr, BMI088_AD_ACC_PWR_CONF,
                                                 buf.data, sizeof(buf.data));
     } while (buf.data[0] & 0x80U); /* While still resetting */
-    buf.reg = BMI088_AD_CONFIG;
+    buf.reg = BMI088_AD_ACC_PWR_CONF;
     buf.value = __REVSH(config->cfg);
-    bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    buf.reg = BMI088_AD_CAL;
+    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
+    buf.reg = BMI088_AD_ACC_STATUS;
     buf.value = __REVSH(config->cal);
-    bmi088I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
 
 #if BMI088_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -169,9 +169,9 @@ void bmi088Stop(BMI088Driver *devp) {
 #endif /* BMI088_SHARED_I2C */
 
         /* Reset to input.*/
-        buf.reg = BMI088_AD_CONFIG;
-        buf.value = __REVSH(BMI088_CONFIG_RST);
-        bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+        buf.reg = BMI088_AD_ACC_PWR_CONF;
+        buf.value = __REVSH(BMI088_AD_ACC_SOFTRESET);
+        bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));
 
         i2cStop(devp->config->i2cp);
 #if BMI088_SHARED_I2C
@@ -213,7 +213,7 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
 #endif /* BMI088_SHARED_I2C */
 
     buf.reg = reg;
-    bmi088I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
+    bmi088I2CReadRegister(devp->config->i2cp, devp->config->acc_saddr, buf.reg, buf.data, sizeof(buf.data));
 
 #if BMI088_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
@@ -230,15 +230,14 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
  *               
  * @api
  */
-void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst){
+void bmi088SoftReset(BMI088Driver *devp, uint8_t softRst){
     i2cbuf_t buf;
-    uint8_t softRst;
 
     osalDbgCheck(devp != NULL);
 
     buf.reg = BMI088_ACC_SOFTRESET;
-    buf.value = softrst;
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));    
+    buf.value = softRst;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));    
 }
 
 /**
@@ -255,7 +254,7 @@ void accEnable(BMI088Driver *devp, uint8_t enable){
     
     buf.reg = BMI088_ACC_PWR_CTRL;
     buf.value = enable;
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));
 }
 
 /**
@@ -382,7 +381,7 @@ uint8_t bmi088ReadAccInX(BMI088Driver *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccInY(BMI088Driver, *devp){
+uint8_t bmi088ReadAccInY(BMI088Driver *devp){
     int16_t accYInMG;
     int16_t accYInt16;
     int8_t  accYLsb;
@@ -393,7 +392,7 @@ uint8_t bmi088ReadAccInY(BMI088Driver, *devp){
     accYLsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_LSB);
     accYMsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_MSB);
     accYInt16   = (accYMsb*256 + accYLsb);
-    accYInMG    = accYInt16/32768*1000*2^(<0x41> + 1)*1.5;
+    accYInMG    = accYInt16/32768*1000*2*(0x41 + 1)*1.5;
 
     return accYInMG;
 }
@@ -406,7 +405,7 @@ uint8_t bmi088ReadAccInY(BMI088Driver, *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccInZ(BMI088Driver, *devp){
+uint8_t bmi088ReadAccInZ(BMI088Driver *devp){
     int16_t accZInMG;
     int16_t accZInt16;
     int8_t  accZLsb;
@@ -417,7 +416,7 @@ uint8_t bmi088ReadAccInZ(BMI088Driver, *devp){
     accZLsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_LSB);
     accZMsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_MSB);
     accZInt16   = (accZMsb*256 + accZLsb);
-    accZInMG    = accZInt16/32768*1000*2^(<0x41> + 1)*1.5;
+    accZInMG    = accZInt16/32768*1000*2*(0x41 + 1)*1.5;
 
     return accZInMG;
 }
