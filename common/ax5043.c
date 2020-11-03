@@ -169,13 +169,13 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
 }
 
 /**
- * @brief   FIFO worker thread for handling AX5043 data.
+ * @brief   RX worker thread for handling AX5043 receive data.
  *
  * @param[in]   arg         Pointer to the @p AX5043Driver object
  *
  * @notapi
  */
-THD_FUNCTION(fifo_worker, arg) {
+THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
     ax5043_mailbox_t *mbp = NULL;
     ax5043_chunk_t *chunkp = NULL;
@@ -185,113 +185,91 @@ THD_FUNCTION(fifo_worker, arg) {
     osalDbgCheck(devp != NULL);
 
     while (!chThdShouldTerminateX()) {
-        if (devp->state == AX5043_RX) {
-            /* Wait for FIFO data */
-            if (ax5043WaitIRQ(devp, AX5043_IRQ_FIFONOTEMPTY, TIME_INFINITE) & AX5043_EVENT_TERMINATE) {
-                continue;
+        /* Wait for FIFO data */
+        if (ax5043WaitIRQ(devp, AX5043_IRQ_FIFONOTEMPTY, TIME_INFINITE) & AX5043_EVENT_TERMINATE) {
+            continue;
+        }
+
+        /* Get data from FIFO */
+        fifo_len = ax5043ReadU16(devp, AX5043_REG_FIFOCOUNT);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, buf, fifo_len);
+
+        /* Decode chunks */
+        size_t pos = 0;
+        size_t chunk_len = 0;;
+        while (pos != fifo_len) {
+            /* Set chunk pointer to base of next chunk */
+            chunkp = (ax5043_chunk_t*)&buf[pos];
+            /* Determine chunk length */
+            if (_FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header) == 0x7U) {
+                chunk_len = chunkp->length;
+                pos += chunk_len + 2;
+            } else {
+                chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
+                pos += chunk_len + 1;
             }
-
-            /* Get data from FIFO */
-            fifo_len = ax5043ReadU16(devp, AX5043_REG_FIFOCOUNT);
-            ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, buf, fifo_len);
-
-            /* Decode chunks */
-            size_t pos = 0;
-            size_t chunk_len = 0;;
-            while (pos != fifo_len) {
-                /* Set chunk pointer to base of next chunk */
-                chunkp = (ax5043_chunk_t*)&buf[pos];
-                /* Determine chunk length */
-                if (_FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header) == 0x7U) {
-                    chunk_len = chunkp->length;
-                    pos += chunk_len + 2;
-                } else {
-                    chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
-                    pos += chunk_len + 1;
-                }
-                /* Process chunk */
-                switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, chunkp->header)) {
-                case AX5043_CHUNKCMD_DATA:
-                    /* TODO: Handle error flags */
-                    /* Start of new packet */
-                    if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
-                        /* Acquire mailbox if needed */
-                        if (mbp == NULL) {
-                            chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
-                        }
-                        mbp->index = 0;
-                    }
-
-                    /* Copy packet data */
-                    osalDbgAssert(mbp != NULL, "fifo_worker(),  NULL mailbox");
-                    if (mbp->index + chunk_len >= AX5043_MAILBOX_SIZE) {
-                        chSysLock();
-                        chMBPostI(&devp->mb_filled, (msg_t)mbp);
-                        chSysUnlock();
+            /* Process chunk */
+            switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, chunkp->header)) {
+            case AX5043_CHUNKCMD_DATA:
+                /* TODO: Handle error flags */
+                /* Start of new packet */
+                if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
+                    /* Acquire mailbox if needed */
+                    if (mbp == NULL) {
                         chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
-                        mbp->index = 0;
                     }
-                    memcpy(&mbp->data[mbp->index], chunkp->data.data, chunk_len);
-                    mbp->index += chunk_len;
-
-                    /* End of packet */
-                    if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
-                        chSysLock();
-                        chMBPostI(&devp->mb_filled, (msg_t)mbp);
-                        chSysUnlock();
-                        mbp = NULL;
-                    }
-                    break;
-                case AX5043_CHUNKCMD_TIMER:
-                    devp->timer = __REV(chunkp->timer.timer << 8);
-                    break;
-                case AX5043_CHUNKCMD_RSSI:
-                    devp->rssi = chunkp->rssi.rssi;
-                    break;
-                case AX5043_CHUNKCMD_FREQOFFS:
-                    devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
-                    break;
-                case AX5043_CHUNKCMD_RFFREQOFFS:
-                    devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
-                    break;
-                case AX5043_CHUNKCMD_DATARATE:
-                    devp->datarate = __REV(chunkp->datarate.datarate << 8);
-                    break;
-                case AX5043_CHUNKCMD_ANTRSSI:
-                    if (chunk_len == 2) {
-                        devp->ant0rssi = chunkp->antrssi2.rssi;
-                        devp->bgndnoise = chunkp->antrssi2.bgndnoise;
-                    } else if (chunk_len == 3) {
-                        devp->ant0rssi = chunkp->antrssi3.ant0rssi;
-                        devp->ant1rssi = chunkp->antrssi3.ant1rssi;
-                        devp->bgndnoise = chunkp->antrssi3.bgndnoise;
-                    }
-                    break;
-                default:
-                    break;
+                    mbp->index = 0;
                 }
-                pos += chunk_len;
-            }
-        } else if (devp->state == AX5043_TX) {
-            /* Wait for free space in FIFO */
-            if (ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE) & AX5043_EVENT_TERMINATE) {
-                continue;
-            }
 
-            /* Get free space */
-            fifo_len = ax5043ReadU16(devp, AX5043_REG_FIFOFREE);
+                /* Copy packet data */
+                osalDbgAssert(mbp != NULL, "rx_worker(),  NULL mailbox");
+                if (mbp->index + chunk_len >= AX5043_MAILBOX_SIZE) {
+                    chSysLock();
+                    chMBPostI(&devp->mb_filled, (msg_t)mbp);
+                    chSysUnlock();
+                    chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
+                    mbp->index = 0;
+                }
+                memcpy(&mbp->data[mbp->index], chunkp->data.data, chunk_len);
+                mbp->index += chunk_len;
 
-            /* Copy data. If no data, terminate TX */
-            fifo_len = devp->tx_cb(buf, fifo_len);
-            if (fifo_len == 0) {
+                /* End of packet */
+                if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
+                    chSysLock();
+                    chMBPostI(&devp->mb_filled, (msg_t)mbp);
+                    chSysUnlock();
+                    mbp = NULL;
+                }
+                break;
+            case AX5043_CHUNKCMD_TIMER:
+                devp->timer = __REV(chunkp->timer.timer << 8);
+                break;
+            case AX5043_CHUNKCMD_RSSI:
+                devp->rssi = chunkp->rssi.rssi;
+                break;
+            case AX5043_CHUNKCMD_FREQOFFS:
+                devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
+                break;
+            case AX5043_CHUNKCMD_RFFREQOFFS:
+                devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
+                break;
+            case AX5043_CHUNKCMD_DATARATE:
+                devp->datarate = __REV(chunkp->datarate.datarate << 8);
+                break;
+            case AX5043_CHUNKCMD_ANTRSSI:
+                if (chunk_len == 2) {
+                    devp->ant0rssi = chunkp->antrssi2.rssi;
+                    devp->bgndnoise = chunkp->antrssi2.bgndnoise;
+                } else if (chunk_len == 3) {
+                    devp->ant0rssi = chunkp->antrssi3.ant0rssi;
+                    devp->ant1rssi = chunkp->antrssi3.ant1rssi;
+                    devp->bgndnoise = chunkp->antrssi3.bgndnoise;
+                }
+                break;
+            default:
                 break;
             }
-
-            /* Write to FIFO */
-            ax5043Exchange(devp, AX5043_REG_FIFODATA, true, buf, NULL, fifo_len);
-            ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
-        } else {
-            break;
+            pos += chunk_len;
         }
     }
 
@@ -416,7 +394,10 @@ void ax5043ObjectInit(AX5043Driver *devp) {
     devp->irq_worker = NULL;
     chEvtObjectInit(&devp->irq_event);
 
-    devp->fifo_worker = NULL;
+    devp->rx_worker = NULL;
+
+    devp->preamble = NULL;
+    devp->postamble = NULL;
 
     chMBObjectInit(&devp->mb_filled, devp->mb_filled_queue, AX5043_MAILBOX_COUNT);
     chMBObjectInit(&devp->mb_free, devp->mb_free_queue, AX5043_MAILBOX_COUNT);
@@ -444,6 +425,10 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     devp->config = config;
     devp->error = AX5043_ERR_NOERROR;
+    devp->preamble = config->preamble;
+    devp->preamble_len = config->preamble_len;
+    devp->postamble = config->postamble;
+    devp->postamble_len = config->postamble_len;
 
     devp->vcora = 0;
     devp->vcorb = 0;
@@ -549,11 +534,11 @@ void ax5043Idle(AX5043Driver *devp) {
 
     if (devp->state != AX5043_READY) {
         devp->error = AX5043_ERR_NOERROR;
-        if (devp->fifo_worker) {
-            chThdTerminate(devp->fifo_worker);
-            chEvtSignal(devp->fifo_worker, AX5043_EVENT_TERMINATE);
-            chThdWait(devp->fifo_worker);
-            devp->fifo_worker = NULL;
+        if (devp->rx_worker) {
+            chThdTerminate(devp->rx_worker);
+            chEvtSignal(devp->rx_worker, AX5043_EVENT_TERMINATE);
+            chThdWait(devp->rx_worker);
+            devp->rx_worker = NULL;
         }
 
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
@@ -563,13 +548,15 @@ void ax5043Idle(AX5043Driver *devp) {
 }
 
 /**
- * @brief   Puts AX5043 into receive mode.
+ * @brief   Puts AX5043 into receive or wake-on-radio mode.
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  chan_b       Use channel B if true.
+ * @param[in]  wor          Enable Wake-On-Radio mode.
  *
  * @api
  */
-void ax5043RX(AX5043Driver *devp, bool chan_b) {
+void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
@@ -578,7 +565,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b) {
 
     bool cur_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
 
-    if (devp->state != AX5043_RX || chan_b != cur_chan) {
+    if ((!wor && devp->state != AX5043_RX) || (wor && devp->state != AX5043_WOR) || chan_b != cur_chan) {
         devp->error = AX5043_ERR_NOERROR;
 
         /* Enter idle state first */
@@ -609,66 +596,17 @@ void ax5043RX(AX5043Driver *devp, bool chan_b) {
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
         ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
 
-        /* Activate RX */
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_FULL);
-        devp->state = AX5043_RX;
+        /* Activate RX or WOR */
+        if (wor) {
+            ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_WOR);
+            devp->state = AX5043_WOR;
+        } else {
+            ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_FULL);
+            devp->state = AX5043_RX;
+        }
 
         /* Start the FIFO worker */
-        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
-    }
-}
-
-/**
- * @brief   Puts AX5043 into wake-on-radio mode.
- *
- * @param[in]  devp         Pointer to the @p AX5043Driver object.
- *
- * @api
- */
-void ax5043WOR(AX5043Driver *devp, bool chan_b) {
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(((devp->state == AX5043_READY) ||
-                   (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043WOR(), invalid state");
-
-    bool cur_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
-
-    if (devp->state != AX5043_WOR || chan_b != cur_chan) {
-        devp->error = AX5043_ERR_NOERROR;
-
-        /* Enter idle state first */
-        ax5043Idle(devp);
-
-        /* Set the channel */
-        uint32_t freq;
-        uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
-        if (chan_b) {
-            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQB), devp->config->xtal_freq);
-            pllloop |= AX5043_PLLLOOP_FREQSEL;
-        } else {
-            freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQA), devp->config->xtal_freq);
-            pllloop &= ~AX5043_PLLLOOP_FREQSEL;
-        }
-        ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
-        ax5043SetRFDIV(devp, freq);
-
-        /* Activate synthesizer to lock PLL */
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_SYNTH);
-        chThdSleepMicroseconds(1);
-        if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
-            ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
-            devp->error = AX5043_ERR_LOCKLOST;
-            return;
-        }
-        /* Clear FIFO and set threshold */
-        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
-
-        ax5043SetPWRMode(devp, AX5043_PWRMODE_RX_WOR);
-        devp->state = AX5043_WOR;
-
-        devp->fifo_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+        devp->rx_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
     }
 }
 
@@ -676,24 +614,27 @@ void ax5043WOR(AX5043Driver *devp, bool chan_b) {
  * @brief   Puts AX5043 into transmit mode and transmits a packet.
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
- * @param[in]  tx_cb        Transmit FIFO fill callback.
- * @param[in]  ptt          Assert PWRAMP for transmission if true.
+ * @param[in]  buf          Transmit buffer.
+ * @param[in]  len          Initial length provided in the buffer.
+ * @param[in]  total_len    Total length of data to be transmitted.
+ * @param[in]  tx_cb        Optional transmit buffer fill callback.
+ * @param[in]  tx_cb_arg    Optional transmit buffer fill callback argument.
  * @param[in]  chan_b       Use channel B if true.
  *
- * TODO: This still needs preamble code
  * @api
  */
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
     ax5043_state_t prev_state;
     bool prev_chan;
-    osalDbgCheck(devp != NULL && tx_cb != NULL);
+
+    osalDbgCheck(devp != NULL && buf != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
                    (devp->state == AX5043_WOR) ||
                    (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
+    osalDbgAssert(total_len != 0, "ax5043TX(), invalid total length");
 
     devp->error = AX5043_ERR_NOERROR;
-    devp->tx_cb = tx_cb;
 
     /* Record previous state */
     prev_state = devp->state;
@@ -712,6 +653,7 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b) {
     ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
 
     /* Activate synthesizer to lock PLL */
+    /* TODO: Can we base this on an interrupt instead of a delay? */
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
     chThdSleepMicroseconds(1);
     if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
@@ -719,36 +661,88 @@ void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b) {
         devp->error = AX5043_ERR_LOCKLOST;
         return;
     }
-    /* Clear FIFO and set threshold */
+    /* Clear FIFO */
     ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
 
     /* Activate TX */
     ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
-    if (ptt) {
-        ax5043WriteU8(devp, AX5043_REG_PWRAMP, AX5043_PWRAMP);
-    }
     devp->state = AX5043_TX;
 
-    /* Start the FIFO worker */
-    devp->fifo_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_fifo_worker", HIGHPRIO-1, fifo_worker, devp);
+    /* Write preamble if provided */
+    if (devp->preamble) {
+        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, devp->preamble_len);
+        ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
 
-    /* Wait for transmission to finish */
-    chThdWait(devp->fifo_worker);
-    devp->fifo_worker = NULL;
-    devp->tx_cb = NULL;
+        /* Write preamble to FIFO */
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, devp->preamble, NULL, devp->preamble_len);
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
+    }
 
-    if (ptt) {
-        ax5043WriteU8(devp, AX5043_REG_PWRAMP, 0x00U);
+    osalDbgAssert(tx_cb != NULL || len == total_len,
+            "ax5043TX(), no callback when len != total_len");
+
+    size_t transferred = 0;
+    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, AX5043_FIFO_WRITE_LEN);
+    while (transferred < total_len) {
+        ax5043_chunk_data_t data;
+        static size_t offset = 0;
+        size_t write_len;
+
+        /* Refill buffer if needed */
+        if (len == 0 && tx_cb) {
+            len = tx_cb(tx_cb_arg);
+            offset = 0;
+            osalDbgAssert(len == 0,
+                    "ax5043TX(), callback returned zero length");
+            osalDbgAssert(transferred + len <= total_len,
+                    "ax5043TX(), callback returned length exceeding total length");
+        }
+
+        /* Determine length of data chunk write */
+        write_len = AX5043_FIFO_WRITE_LEN - sizeof(data);
+        if (len < write_len) {
+            write_len = len;
+        }
+
+        /* Prepare chunk */
+        data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
+        data.length = write_len + 1;
+        data.flags = 0;
+        if (transferred == 0) {
+            data.flags |= AX5043_CHUNK_DATATX_PKTSTART;
+        }
+        if (transferred + write_len == total_len) {
+            data.flags |= AX5043_CHUNK_DATATX_PKTEND;
+        }
+
+        /* Once there's enough free space, write the data chunk and commit */
+        ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, (uint8_t*)(&data), NULL, sizeof(data));
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &buf[offset], NULL, write_len);
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
+
+        len -= write_len;
+        offset += write_len;
+        transferred += write_len;
+    }
+
+    /* Write postamble if provided */
+    if (devp->postamble) {
+        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, devp->postamble_len);
+        ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
+
+        /* Write postamble to FIFO */
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, devp->postamble, NULL, devp->postamble_len);
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
     }
 
     /* Return to original state */
     switch (prev_state) {
     case AX5043_RX:
-        ax5043RX(devp, prev_chan);
+        ax5043RX(devp, prev_chan, false);
         break;
     case AX5043_WOR:
-        ax5043WOR(devp, prev_chan);
+        ax5043RX(devp, prev_chan, true);
         break;
     case AX5043_READY:
     default:
@@ -868,6 +862,40 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
     ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
 
     return vcor;
+}
+
+/**
+ * @brief   Sets Preamble pointer and length for AX5043 transmission  operations.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  preamble     Pointer to the preamble buffer.
+ * @param[in]  len          Length of the buffer.
+ *
+ * @api
+ */
+void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(len <= 256, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
+
+    devp->preamble = preamble;
+    devp->preamble_len = len;
+}
+
+/**
+ * @brief   Sets Postamble pointer and length for AX5043 transmission operations.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  postamble    Pointer to the postamble buffer.
+ * @param[in]  len          Length of the buffer.
+ *
+ * @api
+ */
+void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(len <= 256, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
+
+    devp->postamble = postamble;
+    devp->postamble_len = len;
 }
 
 /**
@@ -1092,306 +1120,6 @@ void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value) {
 
     value = __REV(value);
     ax5043Exchange(devp, reg, true, (uint8_t*)&value, NULL, 4);
-}
-
-/*===========================*/
-/* TODO: START OVERHAUL HERE */
-/*===========================*/
-
-/*
- * TODO: Switch to direct register configuration, use structs
- */
-/**
- * @brief   Gets AX5043 configuration values from the AX5043 driver structure.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  conf_name          configuration variable name.
- *
- * @return                        value in configuration variable.
- *
- * @api
- */
-uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name) {
-    int i = 0;
-
-    osalDbgCheck(devp != NULL && devp->config != NULL);
-    /* TODO: Add state sanity check */
-    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_get_conf_val(), invalid state");*/
-
-    ax5043_confval_t* entry = devp->config->conf_values;
-    while (entry[i].conf_name != AX5043_PHY_END) {
-        if (entry[i].conf_name == conf_name){
-            return entry[i].val;
-        }
-        i++;
-    }
-    devp->error = AX5043_ERR_VAL_NOT_IN_CONF;
-    return 0;
-}
-
-/**
- * @brief   Sets AX5043 configuration values from the AX5043 driver structure.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  conf_name          configuration variable name.
- * @param[in]  value              value in configuration variable.
- *
- * @return                        0 if successful, else 0x11.
- * @api
- */
-uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value) {
-    int i = 0;
-
-    osalDbgCheck(devp != NULL && devp->config != NULL);
-    /* TODO: Add state sanity check */
-    /*osalDbgAssert((devp->state == AX5043_READY) ||, "ax5043_set_conf_val(), invalid state");*/
-
-    ax5043_confval_t* entry = devp->config->conf_values;
-    while (entry[i].conf_name != AX5043_PHY_END) {
-        if (entry[i].conf_name == conf_name){
-            entry[i].val = value;
-            return 0;
-        }
-        i++;
-    }
-    devp->error = AX5043_ERR_VAL_NOT_IN_CONF;
-    return AX5043_ERR_VAL_NOT_IN_CONF;
-}
-
-/**
- * @brief   Transmit loop to transmit bytes of a packet.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  packet_len         Complete packet length including mac.
- * @param[in]  axradio_txbuffer   pointer to packet.
- * @param[in]  packet_bytes_sent length before the packet.
- *
- * @api
- * TODO Standardize the error handling, remove packet_bytes_sent, simplify the code.
- */
-void transmit_loop(AX5043Driver *devp, uint16_t packet_len,uint8_t axradio_txbuffer[]){
-    uint8_t free_fifo_bytes;
-    uint8_t packet_end_indicator = 0;
-    uint16_t packet_bytes_sent = 0;
-    uint8_t flags = 0;
-    uint16_t packet_len_to_be_sent = 0;
-    uint8_t synclen = ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCLEN);
-
-    while (packet_end_indicator == 0) {
-        if (ax5043ReadU8(devp,AX5043_REG_FIFOFREE1))
-            free_fifo_bytes = 0xff;
-        else
-            free_fifo_bytes = ax5043ReadU8(devp,AX5043_REG_FIFOFREE0);
-        /* Make sure sixteen bytes in FIFO are free. We can do with minimum 4 bytes free but taking in 16 here */
-        if (free_fifo_bytes < 19) {
-            /* FIFO commit */
-            ax5043WriteU8(devp,AX5043_REG_FIFOSTAT, 4);
-            continue;
-        }
-
-        switch (devp->state) {
-        case AX5043_TX_LONGPREAMBLE:
-            if (!packet_bytes_sent) {
-                devp->state = AX5043_TX_SHORTPREAMBLE;
-                packet_bytes_sent = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_LEN);
-                break;
-            }
-
-            free_fifo_bytes = 7;
-            if (packet_bytes_sent < 7)
-                free_fifo_bytes = packet_bytes_sent;
-            packet_bytes_sent -= free_fifo_bytes;
-            free_fifo_bytes <<= 5;
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3));
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_FLAGS));
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, free_fifo_bytes);
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE));
-            break;
-
-        case AX5043_TX_SHORTPREAMBLE:
-            if (!packet_bytes_sent) {
-                uint8_t preamble_appendbits = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_APPENDBITS);
-                if (preamble_appendbits) {
-                    uint8_t byte;
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 2));
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNK_DATATX_RAW | AX5043_CHUNK_DATATX_NOCRC | AX5043_CHUNK_DATATX_RESIDUE);
-                    byte = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_APPENDPATTERN);
-                    if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & AX5043_PKTADDRCFG_MSBFIRST) {
-                        // msb first -> stop bit below
-                        byte &= 0xFF << (8-preamble_appendbits);
-                        byte |= 0x80 >> preamble_appendbits;
-                    } else {
-                        // lsb first -> stop bit above
-                        byte &= 0xFF >> (8-preamble_appendbits);
-                        byte |= 0x01 << preamble_appendbits;
-                    }
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, byte);
-                }
-                if (_FLD2VAL(AX5043_FRAMING_FRMMODE, ax5043ReadU8(devp,AX5043_REG_FRAMING)) == AX5043_FRMMODE_RAW_PATMATCH && synclen) {
-                    /* Write SYNC word if framing mode is raw_patternmatch, might use SYNCLEN > 0 as a criterion, but need to make sure SYNCLEN=0 for WMBUS.
-                       Chip automatically sends SYNCWORD but matching in RX works via MATCH0PAT) */
-                    int8_t len_byte = synclen;
-                    uint8_t i = (len_byte & 0x07) ? 0x04 : 0;
-                    /* SYNCLEN in bytes, rather than bits. Ceiled to next integer e.g. fractional bits are counted as full bits */
-                    len_byte += 7;
-                    len_byte >>= 3;
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA  | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, (len_byte + 1)));
-                    ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCFLAGS) | i);
-
-                    uint8_t syncword[4] = {ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCWORD0),
-                        ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCWORD1),
-                        ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCWORD2),
-                        ax5043_get_conf_val(devp, AX5043_FRAMING_SYNCWORD3)};
-                    for (i = 0; i < len_byte; ++i) {
-                        ax5043WriteU8(devp,AX5043_REG_FIFODATA, syncword[i]);
-                    }
-                }
-                devp->state = AX5043_TX_PACKET;
-                continue;
-            }
-            free_fifo_bytes = 255;
-            if (packet_bytes_sent < 255*8)
-                free_fifo_bytes = packet_bytes_sent >> 3;
-            if (free_fifo_bytes) {
-                packet_bytes_sent -= ((uint16_t)free_fifo_bytes) << 3;
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3));
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_FLAGS));
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, free_fifo_bytes);
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE));
-                continue;
-            }
-            {
-                uint8_t byte = ax5043_get_conf_val(devp, AX5043_PHY_PREAMBLE_BYTE) ;
-                free_fifo_bytes = packet_bytes_sent;
-                packet_bytes_sent = 0;
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 2));
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x1C);
-                if (ax5043ReadU8(devp,AX5043_REG_PKTADDRCFG) & 0x80) {
-                    /* MSB first -> stop bit below */
-                    byte &= 0xFF << (8-free_fifo_bytes);
-                    byte |= 0x80 >> free_fifo_bytes;
-                } else {
-                    // lsb first -> stop bit above
-                    byte &= 0xFF >> (8-free_fifo_bytes);
-                    byte |= 0x01 << free_fifo_bytes;
-                }
-                ax5043WriteU8(devp,AX5043_REG_FIFODATA, byte);
-            }
-            continue;
-
-        case AX5043_TX_PACKET:
-            flags = 0;
-            packet_len_to_be_sent = 0;
-            if (!packet_bytes_sent)
-                /* Flag byte indicates packetstart */
-                flags |= 0x01;
-
-            packet_len_to_be_sent = packet_len - packet_bytes_sent;
-            /* 3 bytes of FIFO commands are written before payload can be written to FIFO */
-            if (free_fifo_bytes >= packet_len_to_be_sent + 3) {
-                /* Flag byte indicates packet end */
-                flags |= 0x02;
-            }
-            else{
-                packet_len_to_be_sent = free_fifo_bytes - 3;
-            }
-
-
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | AX5043_CHUNKSIZE_VAR);
-            /* Write FIFO chunk length byte. Length includes the flag byte, thus the +1 */
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, packet_len_to_be_sent + 1);
-            ax5043WriteU8(devp,AX5043_REG_FIFODATA, flags);
-            ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &axradio_txbuffer[packet_bytes_sent], NULL, packet_len_to_be_sent);
-            packet_bytes_sent += packet_len_to_be_sent;
-            if (flags & 0x02){
-                packet_end_indicator = 1;
-                /* Enable radio event done (REVRDONE) event */
-                ax5043WriteU16(devp,AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
-                ax5043WriteU8(devp,AX5043_REG_FIFOSTAT, 4); // commit
-            }
-            break;
-
-        default:
-            packet_end_indicator = 1;
-            devp->error = AX5043_ERR_UNEXPECTED_STATE;
-        }
-    }
-    devp->state = AX5043_TX;
-}
-
-/**
- * @brief   Transmits a packet.
- *
- * @param[in]  devp               pointer to the @p AX5043Driver object.
- * @param[in]  addr               remote destination address of packet.
- * @param[in]  pkt                pointer to packet.
- * @param[in]  pktlen             packet length.
- *
- * @param[out] AX5043_ERR        Error code.
- *
- * @api
- * TODO Standardize the error handling, Maybe move address to a driver config structure
- */
-uint8_t transmit_packet(AX5043Driver *devp, const uint8_t addr[4], const uint8_t *pkt, uint16_t pktlen) {
-    uint16_t packet_len;
-    uint8_t axradio_txbuffer[260];
-
-    uint8_t maclen = ax5043_get_conf_val(devp, AX5043_FRAMING_MACLEN);
-    uint8_t destaddrpos = ax5043_get_conf_val(devp, AX5043_FRAMING_DESTADDRPOS);
-    uint8_t addrlen = ax5043_get_conf_val(devp, AX5043_FRAMING_ADDRLEN);
-    uint8_t sourceaddrpos = ax5043_get_conf_val(devp, AX5043_FRAMING_SOURCEADDRPOS);
-    uint8_t lenmask = ax5043_get_conf_val(devp, AX5043_FRAMING_LENMASK);
-    uint8_t lenoffs = ax5043_get_conf_val(devp, AX5043_FRAMING_LENOFFS);
-    uint8_t lenpos = ax5043_get_conf_val(devp, AX5043_FRAMING_LENPOS);
-
-    packet_len = pktlen + maclen;
-    if (packet_len > sizeof(axradio_txbuffer))
-        return AX5043_ERR_INVALID;
-
-    /* Prepare the MAC segment of the packet */
-    memset(axradio_txbuffer, 0, maclen);
-    memcpy(&axradio_txbuffer[maclen], pkt, pktlen);
-    if (destaddrpos != 0xff) {
-        memcpy(&axradio_txbuffer[destaddrpos], addr, addrlen);
-    }
-    if (sourceaddrpos != 0xff) {
-        uint32_t axradio_localaddr = __REV(devp->config->addr);
-        memcpy(&axradio_txbuffer[sourceaddrpos], &axradio_localaddr, addrlen);
-    }
-    if (lenmask) {
-        /* Calculate payload length and update the MAC of payload */
-        uint8_t len_byte = (uint8_t)(packet_len - lenoffs) & lenmask;
-        axradio_txbuffer[lenpos] = (axradio_txbuffer[lenpos] & (uint8_t)~lenmask) | len_byte;
-    }
-    /*Clear radioevent flag. This indicator is set when packet is out */
-    ax5043ReadU16(devp,AX5043_REG_RADIOEVENTREQ);
-    /* Clear leftover FIFO data & flags */
-    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, 3);
-    devp->state = AX5043_TX_LONGPREAMBLE;
-
-    /*Code for 4-FSK mode */
-    if ((ax5043ReadU8(devp,AX5043_REG_MODULATION) & 0x0F) == 9) {
-        ax5043WriteU8(devp,AX5043_REG_FIFODATA, AX5043_CHUNKCMD_DATA | AX5043_CHUNKSIZE_VAR);
-        /* Length including flags */
-        ax5043WriteU8(devp,AX5043_REG_FIFODATA, 2);
-        /* Flag PKTSTART -> dibit sync */
-        ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x01);
-        /* Dummy byte for forcing dibit sync */
-        ax5043WriteU8(devp,AX5043_REG_FIFODATA, 0x11);
-    }
-    transmit_loop(devp, packet_len, axradio_txbuffer);
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
-
-    /* Clear radio event register, enable DONE, and wait for interrupt */
-    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
-    ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
-    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
-    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
-
-    ax5043WriteU16(devp,AX5043_REG_RADIOEVENTMASK, 0x0000U);
-    devp->error = AX5043_ERR_NOERROR;
-    return AX5043_ERR_NOERROR;
 }
 
 /** @} */

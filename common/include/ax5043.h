@@ -2517,28 +2517,28 @@
 /**
  * @brief   Maximum frequency for RFDIV = 0 (DIV 1)
  */
-#ifndef AX5043_RFDIV_DIV1_MAX
+#if !defined(AX5043_RFDIV_DIV1_MAX) || defined(__DOXYGEN__)
 #define AX5043_RFDIV_DIV1_MAX               (1050000000U)
 #endif
 
 /**
  * @brief   Minimum frequency for RFDIV = 0 (DIV 1)
  */
-#ifndef AX5043_RFDIV_DIV1_MIN
+#if !defined(AX5043_RFDIV_DIV1_MIN) || defined(__DOXYGEN__)
 #define AX5043_RFDIV_DIV1_MIN               (800000000U)
 #endif
 
 /**
  * @brief   Maximum frequency for RFDIV = 1 (DIV 2)
  */
-#ifndef AX5043_RFDIV_DIV2_MAX
+#if !defined(AX5043_RFDIV_DIV2_MAX) || defined(__DOXYGEN__)
 #define AX5043_RFDIV_DIV2_MAX               (525000000U)
 #endif
 
 /**
  * @brief   Maximum frequency for RFDIV = 1 (DIV 2)
  */
-#ifndef AX5043_RFDIV_DIV2_MIN
+#if !defined(AX5043_RFDIV_DIV2_MIN) || defined(__DOXYGEN__)
 #define AX5043_RFDIV_DIV2_MIN               (400000000U)
 #endif
 
@@ -2546,7 +2546,7 @@
  * @brief   Number of mailboxes
  * @note    The default is 8 mailboxes.
  */
-#ifndef AX5043_MAILBOX_COUNT
+#if !defined(AX5043_MAILBOX_COUNT) || defined(__DOXYGEN__)
 #define AX5043_MAILBOX_COUNT                (8U)
 #endif
 
@@ -2554,8 +2554,15 @@
  * @brief   Size of mailboxes
  * @note    The default size of a mailbox is 512 bytes.
  */
-#ifndef AX5043_MAILBOX_SIZE
+#if !defined(AX5043_MAILBOX_SIZE) || defined(__DOXYGEN__)
 #define AX5043_MAILBOX_SIZE                 (512U)
+#endif
+
+/**
+ * @brief   FIFO Write Length
+ */
+#if !defined(AX5043_FIFO_WRITE_LEN) || defined(__DOXYGEN__)
+#define AX5043_FIFO_WRITE_LEN               (128U)
 #endif
 
 /** @} */
@@ -2570,6 +2577,10 @@
 
 #if AX5043_SHARED_SPI && !SPI_USE_MUTUAL_EXCLUSION
 #error "AX5043_SHARED_SPI requires SPI_USE_MUTUAL_EXCLUSION"
+#endif
+
+#if (AX5043_FIFO_WRITE_LEN > 256U)
+#error "AX5043_FIFO_WRITE_LEN must be less than or equal to 256"
 #endif
 
 /*===========================================================================*/
@@ -2592,15 +2603,14 @@ typedef uint16_t ax5043_status_t;
 
 /**
  * @brief   AX5043 TX buffer fill callback type.
- * @details Callback used to fill the buffer driver TX buffer.
+ * @details Callback used to fill the TX buffer with more data.
  *
- * @param   buf     The buffer to copy data into
- * @param   max_len The maximum number of bytes to copy
+ * @param   arg     User provided pointer
  *
- * @return          The actual number of bytes copied.
+ * @return          The number of bytes written to the buffer.
  *                  If 0, TX terminates.
  */
-typedef size_t (*ax5043_tx_cb_t)(uint8_t *buf, size_t max_len);
+typedef size_t (*ax5043_tx_cb_t)(void *arg);
 
 /**
  * @name    AX5043 chunk structures.
@@ -2745,15 +2755,6 @@ typedef struct {
 } ax5043_profile_t;
 
 /**
- * TODO: Update brief to describe this
- * @brief   Other configuration values
- */
-typedef struct {
-    uint8_t conf_name;
-    uint32_t val;
-} ax5043_confval_t;
-
-/**
  * @brief   Error codes
  */
 typedef enum {
@@ -2786,12 +2787,9 @@ typedef enum {
     AX5043_STOP,                /**< Stopped.                           */
     AX5043_RESET,               /**< Reset.                             */
     AX5043_READY,               /**< Ready.                             */
-    AX5043_RX,
-    AX5043_WOR,
-    AX5043_TX,
-    AX5043_TX_LONGPREAMBLE,
-    AX5043_TX_SHORTPREAMBLE,
-    AX5043_TX_PACKET
+    AX5043_RX,                  /**< Receive.                           */
+    AX5043_WOR,                 /**< Wake-On-Radio.                     */
+    AX5043_TX                   /**< Transmit.                          */
 } ax5043_state_t;
 
 /**
@@ -2831,8 +2829,16 @@ typedef struct{
      *        the driver or a future call to @p ax5043SetProfile.
      */
     const ax5043_profile_t      *profile;
-
-    ax5043_confval_t *conf_values;
+    /**
+     * @brief Preamble pointer and length
+     */
+    const uint8_t               *preamble;
+    size_t                      preamble_len;
+    /**
+     * @brief Postamble pointer and length
+     */
+    const uint8_t               *postamble;
+    size_t                      postamble_len;
 } AX5043Config;
 
 /**
@@ -2843,18 +2849,24 @@ struct AX5043Driver {
     ax5043_state_t              state;
     /* Current configuration data */
     const AX5043Config          *config;
-    /* Status as of last exchange */
+    /* AX5043 Status bits as of last exchange */
     ax5043_status_t             status;
     /* Error state of device */
     ax5043_err_t                error;
+
     /* IRQ worker thread */
     thread_t                    *irq_worker;
     /* IRQ event Source */
     event_source_t              irq_event;
-    /* FIFO worker thread */
-    thread_t                    *fifo_worker;
-    /* TX buffer fill callback */
-    ax5043_tx_cb_t              tx_cb;
+    /* RX worker thread */
+    thread_t                    *rx_worker;
+
+    /* Preamble buffer and length */
+    const uint8_t               *preamble;
+    size_t                      preamble_len;
+    /* Postamble buffer and length */
+    const uint8_t               *postamble;
+    size_t                      postamble_len;
     /* RX Mailbox buffer */
     ax5043_mailbox_t            mb_buf[AX5043_MAILBOX_COUNT];
     /* Filled Mailboxes */
@@ -2877,7 +2889,6 @@ struct AX5043Driver {
     uint8_t                     ant0rssi;
     uint8_t                     ant1rssi;
     uint8_t                     bgndnoise;
-    uint8_t                     dropped[250];
 };
 /** @} */
 
@@ -2887,58 +2898,6 @@ struct AX5043Driver {
 
 #define AX5043_FREQ_TO_REG(freq, ref)       (((freq * UINT64_C(0x2000000) + ref) / (ref * 2)) | 0x01U)
 #define AX5043_REG_TO_FREQ(reg, ref)        (((reg & ~UINT64_C(1)) * ref) / UINT64_C(0x1000000))
-
-/**
- * @brief  PHY and Framing details
- * TODO: Overhaul this stuff
- */
-#define AX5043_PHY_PN9                     0
-#define AX5043_PHY_NRCHANNELS              1
-#define AX5043_PHY_CHANFREQ                2
-#define AX5043_PHY_CHANPLLRNGINIT          3
-#define AX5043_PHY_CHANVCOIINIT            4
-#define AX5043_PHY_CHANPLLRNG              5
-#define AX5043_PHY_CHANVCOI                6
-#define AX5043_PHY_VCOCALIB                7
-#define AX5043_PHY_MAXFREQOFFSET           8
-#define AX5043_PHY_RSSIOFFSET              9
-#define AX5043_PHY_RSSIREFERENCE           10
-#define AX5043_PHY_CHANNELBUSY             11
-#define AX5043_PHY_CS_PERIOD               12
-#define AX5043_PHY_CS_ENABLED              13
-#define AX5043_PHY_LBT_RETRIES             14
-#define AX5043_PHY_LBT_FORCETX             15
-#define AX5043_PHY_PREAMBLE_WOR_LONGLEN    16
-#define AX5043_PHY_PREAMBLE_WOR_LEN        17
-#define AX5043_PHY_PREAMBLE_LONGLEN        18
-#define AX5043_PHY_PREAMBLE_LEN            19
-#define AX5043_PHY_PREAMBLE_BYTE           20
-#define AX5043_PHY_PREAMBLE_FLAGS          21
-#define AX5043_PHY_PREAMBLE_APPENDBITS     22
-#define AX5043_PHY_PREAMBLE_APPENDPATTERN  23
-#define AX5043_FRAMING_MACLEN              24
-#define AX5043_FRAMING_ADDRLEN             25
-#define AX5043_FRAMING_DESTADDRPOS         26
-#define AX5043_FRAMING_SOURCEADDRPOS       27
-#define AX5043_FRAMING_LENPOS              28
-#define AX5043_FRAMING_LENOFFS             29
-#define AX5043_FRAMING_LENMASK             30
-#define AX5043_FRAMING_SWCRCLEN            31
-#define AX5043_FRAMING_SYNCLEN             32
-#define AX5043_FRAMING_SYNCWORD0           33
-#define AX5043_FRAMING_SYNCWORD1           34
-#define AX5043_FRAMING_SYNCWORD2           35
-#define AX5043_FRAMING_SYNCWORD3           36
-#define AX5043_FRAMING_SYNCFLAGS           37
-#define AX5043_FRAMING_ENABLE_SFDCALLBACK  38
-#define AX5043_FRAMING_ACK_TIMEOUT         39
-#define AX5043_FRAMING_ACK_DELAY           40
-#define AX5043_FRAMING_ACK_RETRANSMISSIONS 41
-#define AX5043_FRAMING_ACK_SEQNRPOS        42
-#define AX5043_FRAMING_MINPAYLOADLEN       43
-#define AX5043_WOR_PERIOD                  44
-#define AX5043_PHY_INNERFREQLOOP           45
-#define AX5043_PHY_END                     200
 
 /*===========================================================================*/
 /* External declarations.                                                    */
@@ -2952,12 +2911,13 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config);
 void ax5043Stop(AX5043Driver *devp);
 
 void ax5043Idle(AX5043Driver *devp);
-void ax5043RX(AX5043Driver *devp, bool chan_b);
-void ax5043WOR(AX5043Driver *devp, bool chan_b);
-void ax5043TX(AX5043Driver *devp, ax5043_tx_cb_t tx_cb, bool ptt, bool chan_b);
+void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor);
+void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
+void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len);
+void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len);
 
 ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n);
 ax5043_status_t ax5043GetStatus(AX5043Driver *devp);
@@ -2969,16 +2929,6 @@ void ax5043WriteU8(AX5043Driver *devp, uint16_t reg, uint8_t value);
 void ax5043WriteU16(AX5043Driver *devp, uint16_t reg, uint16_t value);
 void ax5043WriteU24(AX5043Driver *devp, uint16_t reg, uint32_t value);
 void ax5043WriteU32(AX5043Driver *devp, uint16_t reg, uint32_t value);
-
-/*===========================*/
-/* TODO: START OVERHAUL HERE */
-/*===========================*/
-
-uint32_t ax5043_get_conf_val(AX5043Driver *devp, uint8_t conf_name);
-uint8_t ax5043_set_conf_val(AX5043Driver *devp, uint8_t conf_name, uint32_t value);
-
-void transmit_loop(AX5043Driver *devp, uint16_t axradio_txbuffer_len,uint8_t axradio_txbuffer[]);
-uint8_t transmit_packet(AX5043Driver *devp, const uint8_t addr[4], const uint8_t *pkt, uint16_t pktlen);
 
 #ifdef __cplusplus
 }
