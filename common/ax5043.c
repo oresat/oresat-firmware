@@ -177,12 +177,16 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
  */
 THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
-    ax5043_mailbox_t *mbp = NULL;
+    objects_fifo_t *pdu_fifo;
     ax5043_chunk_t *chunkp = NULL;
+    uint8_t *pdu = NULL;
     uint8_t buf[256];
     size_t fifo_len;
+    size_t pdu_offset;
 
     osalDbgCheck(devp != NULL);
+
+    pdu_fifo = devp->config->pdu_fifo;
 
     while (!chThdShouldTerminateX()) {
         /* Wait for FIFO data */
@@ -195,50 +199,43 @@ THD_FUNCTION(rx_worker, arg) {
         ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, buf, fifo_len);
 
         /* Decode chunks */
-        size_t pos = 0;
-        size_t chunk_len = 0;;
-        while (pos != fifo_len) {
+        size_t fifo_pos = 0;
+        while (fifo_pos != fifo_len) {
+            size_t chunk_len, data_len;
             /* Set chunk pointer to base of next chunk */
-            chunkp = (ax5043_chunk_t*)&buf[pos];
+            chunkp = (ax5043_chunk_t*)&buf[fifo_pos];
             /* Determine chunk length */
-            if (_FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header) == 0x7U) {
-                chunk_len = chunkp->length;
-                pos += chunk_len + 2;
+            chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
+            if (chunk_len == AX5043_CHUNKSIZE_VAR) {
+                chunk_len = chunkp->length + 2;
             } else {
-                chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
-                pos += chunk_len + 1;
+                chunk_len += 1;
             }
+            fifo_pos += chunk_len;
             /* Process chunk */
             switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, chunkp->header)) {
             case AX5043_CHUNKCMD_DATA:
+                data_len = chunk_len - sizeof(ax5043_chunk_data_t);
                 /* TODO: Handle error flags */
                 /* Start of new packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
-                    /* Acquire mailbox if needed */
-                    if (mbp == NULL) {
-                        chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
+                    /* Acquire PDU object if needed */
+                    if (pdu == NULL) {
+                        pdu = chFifoTakeObjectTimeout(pdu_fifo, TIME_INFINITE);
                     }
-                    mbp->index = 0;
+                    pdu_offset = 0;
                 }
 
                 /* Copy packet data */
-                osalDbgAssert(mbp != NULL, "rx_worker(),  NULL mailbox");
-                if (mbp->index + chunk_len >= AX5043_MAILBOX_SIZE) {
-                    chSysLock();
-                    chMBPostI(&devp->mb_filled, (msg_t)mbp);
-                    chSysUnlock();
-                    chMBFetchTimeout(&devp->mb_free, (msg_t*)&mbp, TIME_INFINITE);
-                    mbp->index = 0;
-                }
-                memcpy(&mbp->data[mbp->index], chunkp->data.data, chunk_len);
-                mbp->index += chunk_len;
+                osalDbgAssert(pdu != NULL, "rx_worker(), NULL PDU object");
+                osalDbgAssert(pdu_offset + data_len < devp->config->pdu_size, "rx_worker(), data exceeds PDU object size");
+                memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
+                pdu_offset += data_len;
 
                 /* End of packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
-                    chSysLock();
-                    chMBPostI(&devp->mb_filled, (msg_t)mbp);
-                    chSysUnlock();
-                    mbp = NULL;
+                    chFifoSendObject(pdu_fifo, pdu);
+                    pdu = NULL;
                 }
                 break;
             case AX5043_CHUNKCMD_TIMER:
@@ -257,10 +254,10 @@ THD_FUNCTION(rx_worker, arg) {
                 devp->datarate = __REV(chunkp->datarate.datarate << 8);
                 break;
             case AX5043_CHUNKCMD_ANTRSSI:
-                if (chunk_len == 2) {
+                if (chunk_len == 3) {
                     devp->ant0rssi = chunkp->antrssi2.rssi;
                     devp->bgndnoise = chunkp->antrssi2.bgndnoise;
-                } else if (chunk_len == 3) {
+                } else if (chunk_len == 4) {
                     devp->ant0rssi = chunkp->antrssi3.ant0rssi;
                     devp->ant1rssi = chunkp->antrssi3.ant1rssi;
                     devp->bgndnoise = chunkp->antrssi3.bgndnoise;
@@ -269,14 +266,12 @@ THD_FUNCTION(rx_worker, arg) {
             default:
                 break;
             }
-            pos += chunk_len;
         }
     }
 
-    if (mbp != NULL) {
-        chSysLock();
-        chMBPostI(&devp->mb_free, (msg_t)mbp);
-        chSysUnlock();
+    if (pdu != NULL) {
+        chFifoReturnObject(pdu_fifo, pdu);
+        pdu = NULL;
     }
     chThdExit(MSG_OK);
 }
@@ -398,14 +393,6 @@ void ax5043ObjectInit(AX5043Driver *devp) {
 
     devp->preamble = NULL;
     devp->postamble = NULL;
-
-    chMBObjectInit(&devp->mb_filled, devp->mb_filled_queue, AX5043_MAILBOX_COUNT);
-    chMBObjectInit(&devp->mb_free, devp->mb_free_queue, AX5043_MAILBOX_COUNT);
-    chSysLock();
-    for (uint32_t i = 0; i < AX5043_MAILBOX_COUNT; i++) {
-        chMBPostI(&devp->mb_free, (msg_t)&devp->mb_buf[i]);
-    }
-    chSysUnlock();
 
     devp->state = AX5043_STOP;
 }

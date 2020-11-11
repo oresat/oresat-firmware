@@ -2543,22 +2543,6 @@
 #endif
 
 /**
- * @brief   Number of mailboxes
- * @note    The default is 8 mailboxes.
- */
-#if !defined(AX5043_MAILBOX_COUNT) || defined(__DOXYGEN__)
-#define AX5043_MAILBOX_COUNT                (8U)
-#endif
-
-/**
- * @brief   Size of mailboxes
- * @note    The default size of a mailbox is 512 bytes.
- */
-#if !defined(AX5043_MAILBOX_SIZE) || defined(__DOXYGEN__)
-#define AX5043_MAILBOX_SIZE                 (512U)
-#endif
-
-/**
  * @brief   FIFO Write Length
  */
 #if !defined(AX5043_FIFO_WRITE_LEN) || defined(__DOXYGEN__)
@@ -2738,14 +2722,6 @@ typedef union __attribute__((packed)) {
 /** @} */
 
 /**
- * @brief   Mailbox structure for TX/RX
- */
-typedef struct {
-    size_t                      index;
-    uint8_t                     data[AX5043_MAILBOX_SIZE];
-} ax5043_mailbox_t;
-
-/**
  * @brief  Ax5043 Register value pair type
  */
 typedef struct {
@@ -2823,6 +2799,14 @@ typedef struct{
      */
     uint32_t                    addr;
     /**
+     * @brief PDU Object FIFO pointer
+     */
+    objects_fifo_t              *pdu_fifo;
+    /**
+     * @brief PDU Object maximum size
+     */
+    size_t                      pdu_size;
+    /**
      * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.
      *        Certain registers may be overwritten later, either by
@@ -2867,14 +2851,6 @@ struct AX5043Driver {
     /* Postamble buffer and length */
     const uint8_t               *postamble;
     size_t                      postamble_len;
-    /* RX Mailbox buffer */
-    ax5043_mailbox_t            mb_buf[AX5043_MAILBOX_COUNT];
-    /* Filled Mailboxes */
-    mailbox_t                   mb_filled;
-    msg_t                       mb_filled_queue[AX5043_MAILBOX_COUNT];
-    /* Free Mailboxes */
-    mailbox_t                   mb_free;
-    msg_t                       mb_free_queue[AX5043_MAILBOX_COUNT];
 
     /* Last VCOR returned from ranging */
     uint8_t                     vcora;
