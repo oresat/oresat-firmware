@@ -17,6 +17,33 @@
 /* Pre-compile time settings.                                                */
 /*===========================================================================*/
 
+/**
+ * @name    Configuration options
+ * @{
+ */
+/**
+ * @brief   Enable SDLS for USLP
+ */
+#if !defined(USLP_USE_SDLS) || defined(__DOXYGEN__)
+#define USLP_USE_SDLS                       TRUE
+#endif
+
+/**
+ * @brief   PDU FIFO Object count
+ */
+#if !defined(RADIO_PDU_SIZE) || defined(__DOXYGEN__)
+#define RADIO_PDU_COUNT                   8U
+#endif
+
+/**
+ * @brief   PDU FIFO Object maximum size
+ */
+#if !defined(RADIO_PDU_SIZE) || defined(__DOXYGEN__)
+#define RADIO_PDU_SIZE                    512U
+#endif
+
+/** @} */
+
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
@@ -36,6 +63,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void radio_init(void);
+void radio_start(void);
+
+void uhf_send(const void *pdu, size_t len, const void *arg);
 
 #ifdef __cplusplus
 }
