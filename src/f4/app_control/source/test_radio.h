@@ -1,6 +1,7 @@
 #ifndef _TEST_RADIO_H_
 #define _TEST_RADIO_H_
 
+#include "radio.h"
 #include "ax5043.h"
 #include "si41xx.h"
 
@@ -20,10 +21,6 @@ typedef struct {
     const ax5043_profile_t *profile;
     const char *name;
 } radio_profile_t;
-
-extern synth_dev_t synth_devices[];
-extern radio_dev_t radio_devices[];
-extern radio_profile_t radio_profiles[];
 
 #ifdef __cplusplus
 extern "C" {

@@ -5,33 +5,37 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
-static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
-static bool tx_once = false;
+static const unsigned char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 
-size_t tx_cb(uint8_t *buf, size_t max_len) {
-    struct __attribute__((packed)) {
-        ax5043_chunk_repeatdata_t preamble;
-        ax5043_chunk_data_t data;
-    } txbuf;
+extern AX5043Driver lband;
+extern AX5043Config lbandcfg;
+extern AX5043Driver uhf;
+extern AX5043Config uhfcfg;
+extern SI41XXDriver synth;
+extern SI41XXConfig synthcfg;
+extern ax5043_profile_t lband_eng[];
+extern ax5043_profile_t uhf_eng[];
+extern ax5043_profile_t uhf_ax25[];
+extern ax5043_profile_t uhf_cw[];
 
-    size_t len = sizeof(txbuf) + sizeof(str);
+radio_dev_t radio_devices[] = {
+    {&lband, &lbandcfg, "L-Band"},
+    {&uhf, &uhfcfg, "UHF"},
+    {NULL, NULL, ""},
+};
 
-    if (!tx_once && len < max_len) {
-        txbuf.preamble.header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3);
-        txbuf.preamble.flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC;
-        txbuf.preamble.repeatcnt = 20;
-        txbuf.preamble.data = 0x55;
-        txbuf.data.header = AX5043_CHUNKCMD_DATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, AX5043_CHUNKSIZE_VAR);
-        txbuf.data.length = sizeof(str) + 1;
-        txbuf.data.flags = AX5043_CHUNK_DATATX_PKTSTART | AX5043_CHUNK_DATATX_PKTEND;
-        memcpy(buf, &txbuf, sizeof(txbuf));
-        memcpy(&buf[sizeof(txbuf)], str, sizeof(str));
-        tx_once = true;
-    } else {
-        return 0;
-    }
-    return len;
-}
+radio_profile_t radio_profiles[] = {
+    {lband_eng, "L-Band Engineering"},
+    {uhf_eng, "UHF Engineering"},
+    {uhf_ax25, "UHF AX.25"},
+    {uhf_cw, "UHF CW"},
+    {NULL, ""},
+};
+
+synth_dev_t synth_devices[] = {
+    {&synth, &synthcfg, "LO"},
+    {NULL, NULL, ""},
+};
 
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
@@ -81,55 +85,8 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "Stopping AX5043 driver...");
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "rx")) {
-        ax5043_mailbox_t *mb = NULL;
-        chprintf(chp, "Entering receive mode and waiting 10 seconds for message...");
-        ax5043RX(devp, false);
-        if (devp->error != AX5043_ERR_NOERROR) {
-            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
-        }
-        chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
-        ax5043Idle(devp);
-        if (mb == NULL) {
-            chprintf(chp, "No message received\r\n");
-        } else {
-            chprintf(chp, "Message received:");
-            for (uint32_t i = 0; i < mb->index; i++) {
-                if (i % 0x10 == 0) {
-                    chprintf(chp, "\r\n%02X:", i);
-                }
-                chprintf(chp, " %02X", mb->data[i]);
-            }
-            chprintf(chp, "\r\n");
-
-            chSysLock();
-            chMBPostI(&devp->mb_free, (msg_t)mb);
-            chSysUnlock();
-        }
-    } else if (!strcmp(argv[0], "wor")) {
-        ax5043_mailbox_t *mb = NULL;
-        chprintf(chp, "Entering WOR mode and waiting for 10 seconds for message...");
-        ax5043WOR(devp, false);
-        if (devp->error != AX5043_ERR_NOERROR) {
-            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
-        }
-        chMBFetchTimeout(&devp->mb_filled, (msg_t*)&mb, TIME_S2I(10));
-        ax5043Idle(devp);
-        if (mb == NULL) {
-            chprintf(chp, "No message received\r\n");
-        } else {
-            chprintf(chp, "Message received\r\n");
-
-            chSysLock();
-            chMBPostI(&devp->mb_free, (msg_t)mb);
-            chSysUnlock();
-        }
     } else if (!strcmp(argv[0], "tx")) {
-        tx_once = false;
-        ax5043TX(devp, tx_cb, true, false);
-        if (devp->error != AX5043_ERR_NOERROR) {
-            chprintf(chp, "Error: Failed to enter mode. Error code %d.\r\n", devp->error);
-        }
+        uhf_send(str, sizeof(str), NULL);
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
@@ -252,7 +209,7 @@ void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "dev") && argc > 1) {
         uint32_t i, index;
         /* Find max index */
-        for (i = 0; radio_devices[i].devp != NULL; i++);
+        for (i = 0; synth_devices[i].devp != NULL; i++);
         index = strtoul(argv[1], NULL, 0);
         if (index >= i) {
             chprintf(chp, "ERROR: Invalid device\r\n");
