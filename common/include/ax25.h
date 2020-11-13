@@ -105,6 +105,23 @@
 /*===========================================================================*/
 
 /**
+ * @name    AX.25 Link Descriptor
+ * @{
+ */
+typedef struct {
+    char            dest[6];
+    char            src[6];
+    void            (*phy_send)(const void *pdu, size_t len, const void *phy_arg);
+    const void      *phy_arg;
+} ax25_link_t;
+/** @} */
+
+typedef struct __attribute__((packed)) {
+    uint8_t         pid;
+    uint8_t         data[];
+} ax25_info_t;
+
+/**
  * @name    AX.25 frame data structure.
  * @{
  */
@@ -129,6 +146,8 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
+void ax25_send(const void *pdu, size_t len, const void *arg);
+void ax25_recv(const void *pdu, size_t len, size_t offset, const void *arg);
 
 #ifdef __cplusplus
 }

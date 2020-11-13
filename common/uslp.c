@@ -38,8 +38,8 @@ void uslp_send(const void *pdu, size_t len, const void *arg)
 
 void uslp_recv(const void *pdu, size_t len, size_t offset, const void *arg)
 {
-    const uslp_mc_t *mc = arg;
     const uslp_tfph_t *hdr = pdu;
+    const uslp_link_t *link = arg;
 
 }
 

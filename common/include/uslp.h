@@ -252,7 +252,7 @@ typedef struct {
 /** @} */
 
 /**
- * @name    USLP Socket Descriptor
+ * @name    USLP Link Definition
  * @{
  */
 typedef struct {
@@ -260,7 +260,7 @@ typedef struct {
     const uslp_mc_t *master_chan;
     uint8_t     vcid;
     uint8_t     mapid;
-} uslp_sock_t;
+} uslp_link_t;
 /** @} */
 
 /**
