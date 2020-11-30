@@ -5,7 +5,7 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
-static const unsigned char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
+static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 
 extern AX5043Driver lband;
 extern AX5043Config lbandcfg;
@@ -86,7 +86,11 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "tx")) {
-        uhf_send(str, sizeof(str), NULL);
+        pdu_t pdu = {
+            .buf = str,
+            .buf_len = sizeof(str),
+        };
+        uhf_send(&pdu, NULL);
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
