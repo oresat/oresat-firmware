@@ -146,7 +146,6 @@ typedef enum {
 
 /**
  * @name    Packet Version Number (PVN)
- * TODO: Move to CCSDS header?
  * @{
  */
 typedef enum {

@@ -31,12 +31,12 @@
 /* Exported functions.                                                       */
 /*===========================================================================*/
 
-ssize_t pdu_gen(pdu_t *pdu)
+size_t pdu_gen(pdu_t *pdu)
 {
     pdu->buf_len = 0;
     if (pdu->mac_hdr) {
         if (pdu->buf_len + pdu->mac_len > pdu->buf_max) {
-            return -1;
+            return 0;
         }
         memcpy(pdu->buf, pdu->mac_hdr, pdu->mac_len);
         pdu->buf_len += pdu->mac_len;
@@ -44,7 +44,7 @@ ssize_t pdu_gen(pdu_t *pdu)
 
     if (net_hdr) {
         if (pdu->buf_len + pdu->net_len > pdu->buf_max) {
-            return -1;
+            return 0;
         }
         memcpy(pdu->buf, pdu->net_hdr, pdu->net_len);
         pdu->buf_len += pdu->net_len;
@@ -52,7 +52,7 @@ ssize_t pdu_gen(pdu_t *pdu)
 
     if (trans_hdr) {
         if (pdu->buf_len + pdu->trans_len > pdu->buf_max) {
-            return -1;
+            return 0;
         }
         memcpy(pdu->buf, pdu->trans_hdr, pdu->trans_len);
         pdu->buf_len += pdu->trans_len;
@@ -60,7 +60,7 @@ ssize_t pdu_gen(pdu_t *pdu)
 
     if (data) {
         if (pdu->buf_len + pdu->data_len > pdu->buf_max) {
-            return -1;
+            return 0;
         }
         memcpy(pdu->buf, &pdu->data[pdu->data_offset], pdu->data_len);
         pdu->buf_len += pdu->data_len;

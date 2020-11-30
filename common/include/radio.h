@@ -9,6 +9,8 @@
 #ifndef _RADIO_H_
 #define _RADIO_H_
 
+#include "pdu.h"
+
 /*===========================================================================*/
 /* Constants.                                                                */
 /*===========================================================================*/
@@ -66,8 +68,9 @@ extern "C" {
 
 void radio_init(void);
 void radio_start(void);
+void radio_stop(void);
 
-void uhf_send(const void *pdu, size_t len, const void *arg);
+void uhf_send(pdu_t *pdu, void *arg);
 
 #ifdef __cplusplus
 }

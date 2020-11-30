@@ -8,6 +8,8 @@
 #ifndef _AX25_H_
 #define _AX25_H_
 
+#include "pdu.h"
+
 /*===========================================================================*/
 /* Constants.                                                                */
 /*===========================================================================*/
@@ -146,8 +148,8 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void ax25_send(const void *pdu, size_t len, const void *arg);
-void ax25_recv(const void *pdu, size_t len, size_t offset, const void *arg);
+void ax25_send(pdu_t *pdu, void *arg);
+void ax25_recv(const pdu_t *pdu, const void *next_hdr, void *arg);
 
 #ifdef __cplusplus
 }

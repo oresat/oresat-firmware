@@ -5,6 +5,7 @@
  * @addtogroup AX25
  * @{
  */
+#include <string.h>
 #include "ax25.h"
 
 /*===========================================================================*/
@@ -31,7 +32,7 @@
 /* Exported functions.                                                       */
 /*===========================================================================*/
 
-void ax25_send(const void *pdu, size_t len, const void *arg)
+void ax25_send(pdu_t *pdu, void *arg)
 {
     ax25_frame_t frame;
     const ax25_link_t *link = arg;
@@ -42,9 +43,9 @@ void ax25_send(const void *pdu, size_t len, const void *arg)
     frame.src_ssid = 0;
 }
 
-void ax25_recv(const void *pdu, size_t len, size_t offset, const void *arg)
+void ax25_recv(const pdu_t *pdu, const void *next_hdr, void *arg)
 {
-    const ax25_frame_t *frame = pdu;
+    const ax25_frame_t *frame = pdu->buf;
     const ax25_link_t *link = arg;
 
 }

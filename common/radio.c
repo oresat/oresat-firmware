@@ -29,6 +29,7 @@
 static objects_fifo_t pdu_fifo;
 static msg_t pdu_fifo_msgs[RADIO_PDU_COUNT];
 static uint8_t pdu_fifo_buf[RADIO_PDU_COUNT][RADIO_PDU_SIZE];
+static thread_t *rx_tp = NULL;
 
 static const SPIConfig lband_spicfg = {
     false,
@@ -389,6 +390,7 @@ static const uslp_pc_t lband_pc = {
 /* Local functions.                                                          */
 /*===========================================================================*/
 
+THD_WORKING_AREA(radio_rx_wa, 0x400);
 THD_FUNCTION(radio_rx, arg) {
     (void)arg;
     uint8_t *pdu;
@@ -398,7 +400,7 @@ THD_FUNCTION(radio_rx, arg) {
             continue;
         }
 
-        uslp_recv(pdu, RADIO_PDU_SIZE, 0, &mc);
+        /*uslp_recv(pdu, RADIO_PDU_SIZE, 0, &mc);*/
 
         chFifoReturnObject(&pdu_fifo, pdu);
     }
@@ -430,17 +432,29 @@ void radio_start(void)
     ax5043Start(&uhf, &uhfcfg);
     si41xxStart(&synth, &synthcfg);
 
+    rx_tp = chThdCreateStatic(radio_rx_wa, sizeof(radio_rx_wa), NORMALPRIO, radio_rx, NULL);
+
     ax5043RX(&lband, false, false);
     ax5043RX(&uhf, false, false);
 }
 
-void uhf_send(const void *pdu, size_t len, const void *arg)
+void radio_stop(void)
+{
+    ax5043Stop(&lband);
+    ax5043Stop(&uhf);
+
+    chThdTerminate(rx_tp);
+    chThdWait(rx_tp);
+    rx_tp = NULL;
+}
+
+void uhf_send(pdu_t *pdu, void *arg)
 {
     if (arg) {
         ax5043SetProfile(&uhf, arg);
     }
 
-    ax5043TX(&uhf, pdu, len, len, NULL, NULL, false);
+    ax5043TX(&uhf, pdu->buf, pdu->buf_len, pdu->buf_len, NULL, NULL, false);
 }
 
 /** @} */
