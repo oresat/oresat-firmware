@@ -53,7 +53,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_OD.eds
+      FileName:     app.eds
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
@@ -78,6 +78,8 @@
   #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
   #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               0   //Associated objects: 1280-12FF
+  #define CO_NO_GFC                      0   //Associated objects: 1300
+  #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     4   //Associated objects: 14xx, 16xx
