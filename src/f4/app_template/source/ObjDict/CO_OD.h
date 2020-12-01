@@ -5,7 +5,7 @@
    CANopen Object Dictionary.
 
    This file was automatically generated with libedssharp Object
-   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+   Dictionary Editor v0.8-92-g7d06a5a   DON'T EDIT THIS FILE MANUALLY !!!!
 *******************************************************************************/
 
 
@@ -53,7 +53,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_master.eds
+      FileName:     app.eds
       FileVersion:  0
       CreationTime: 12:18PM
       CreationDate: 08-30-2019
@@ -78,6 +78,8 @@
   #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
   #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               1   //Associated objects: 1280-12FF
+  #define CO_NO_GFC                      0   //Associated objects: 1300
+  #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     16   //Associated objects: 14xx, 16xx
@@ -96,30 +98,30 @@
    TYPE DEFINITIONS FOR RECORDS
 *******************************************************************************/
 /*1018      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
+               UNSIGNED8      identity;
                UNSIGNED32     vendorID;
                UNSIGNED32     productCode;
                UNSIGNED32     revisionNumber;
                UNSIGNED32     serialNumber;
                }              OD_identity_t;
 /*1200      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
+               UNSIGNED8      SDOServerParameter;
                UNSIGNED32     COB_IDClientToServer;
                UNSIGNED32     COB_IDServerToClient;
                }              OD_SDOServerParameter_t;
 /*1280      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
+               UNSIGNED8      SDOClientParameter;
                UNSIGNED32     COB_IDClientToServer;
                UNSIGNED32     COB_IDServerToClient;
                UNSIGNED8      nodeIDOfTheSDOServer;
                }              OD_SDOClientParameter_t;
 /*1400      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
+               UNSIGNED8      RPDOCommunicationParameter;
                UNSIGNED32     COB_IDUsedByRPDO;
                UNSIGNED8      transmissionType;
                }              OD_RPDOCommunicationParameter_t;
 /*1600      */ typedef struct {
-               UNSIGNED8      numberOfMappedObjects;
+               UNSIGNED8      RPDOMappingParameter;
                UNSIGNED32     mappedObject1;
                UNSIGNED32     mappedObject2;
                UNSIGNED32     mappedObject3;
@@ -130,7 +132,7 @@
                UNSIGNED32     mappedObject8;
                }              OD_RPDOMappingParameter_t;
 /*1800      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
+               UNSIGNED8      TPDOCommunicationParameter;
                UNSIGNED32     COB_IDUsedByTPDO;
                UNSIGNED8      transmissionType;
                UNSIGNED16     inhibitTime;
@@ -139,7 +141,7 @@
                UNSIGNED8      SYNCStartValue;
                }              OD_TPDOCommunicationParameter_t;
 /*1A00      */ typedef struct {
-               UNSIGNED8      numberOfMappedObjects;
+               UNSIGNED8      TPDOMappingParameter;
                UNSIGNED32     mappedObject1;
                UNSIGNED32     mappedObject2;
                UNSIGNED32     mappedObject3;
