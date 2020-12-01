@@ -200,15 +200,21 @@
  * IO lines assignments.
  */
 #define LINE_LED                    PAL_LINE(GPIOA, 0U)
+#define LINE_DCHG_STAT_PK1          PAL_LINE(GPIOA, 1U)
 #define LINE_CHG_DIS_PK1            PAL_LINE(GPIOA, 4U)
 #define LINE_DCHG_DIS_PK1           PAL_LINE(GPIOA, 5U)
 #define LINE_FASTCHG_PK1            PAL_LINE(GPIOA, 6U)
+#define LINE_CHG_STAT_PK1           PAL_LINE(GPIOA, 7U)
 #define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
 #define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 #define LINE_CHG_DIS_PK2            PAL_LINE(GPIOB, 0U)
 #define LINE_DCHG_DIS_PK2           PAL_LINE(GPIOB, 1U)
 #define LINE_FASTCHG_PK2            PAL_LINE(GPIOB, 2U)
-#define LINE_FASTCHG_PK2            PAL_LINE(GPIOB, 14U)
+#define LINE_ALERT_PK2              PAL_LINE(GPIOB, 4U)
+#define LINE_ALERT_PK1              PAL_LINE(GPIOB, 5U)
+#define LINE_CHG_STAT_PK2           PAL_LINE(GPIOB, 10U)
+#define LINE_DCHG_STAT_PK2          PAL_LINE(GPIOB, 11U)
+#define LINE_MOARPWR                PAL_LINE(GPIOB, 14U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
