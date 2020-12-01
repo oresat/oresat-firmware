@@ -66,7 +66,7 @@ endif
 
 # Enables the use of FPU (no, softfp, hard).
 ifeq ($(USE_FPU),)
-  USE_FPU = softfp
+  USE_FPU = no
 endif
 
 # FPU-related options.
@@ -97,7 +97,7 @@ PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
 # Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ChibiOS
+CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
@@ -130,7 +130,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
+LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -166,10 +166,10 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UDEFS =
 
 # Define ASM defines here
-UADEFS = -DPORT_IGNORE_GCC_VERSION_CHECK
+UADEFS =
 
 # List all user directories here
 UINCDIR = $(PROJ_INC)
