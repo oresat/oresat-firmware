@@ -52,11 +52,11 @@ THD_FUNCTION(batt, arg)
         }
 
         /* Toggle LED */
-        palToggleLine(LINE_LED_GREEN);
+        palToggleLine(LINE_LED);
     }
 
     max17205Stop(&max17205dev);
 
-    palClearLine(LINE_LED_GREEN);
+    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }
