@@ -28,11 +28,12 @@ static const MAX17205Config max17205config = {
 static MAX17205Driver max17205dev;
 
 /* Battery monitoring thread */
-THD_WORKING_AREA(batt_wa, 0x40);
+THD_WORKING_AREA(batt_wa, 0x400);
 THD_FUNCTION(batt, arg)
 {
     (void)arg;
 
+    max17205ObjectInit(&max17205dev);
     max17205Start(&max17205dev, &max17205config);
 
     while (!chThdShouldTerminateX()) {

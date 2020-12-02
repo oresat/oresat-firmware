@@ -5,7 +5,7 @@
 #include "hal.h"
 
 /* Battery monitoring thread prototypes */
-extern THD_WORKING_AREA(batt_wa, 0x40);
+extern THD_WORKING_AREA(batt_wa, 0x400);
 extern THD_FUNCTION(batt, arg);
 
 #endif
