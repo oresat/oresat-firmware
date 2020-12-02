@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "pdu.h"
 
 #if defined(USLP_USE_SDLS) && USLP_USE_SDLS == 1
 #include "sdls.h"
@@ -184,7 +185,7 @@ typedef struct {
     ccsds_pvn_t pvn;            /** Packet Version Number                    */
     size_t      max_pkt_len;    /** Maximum Packet Length                    */
     bool        incomplete;     /** Delivery of incomplete packets required  */
-    void        (*pkt_recv)(const void *sdu, size_t len, size_t offset, const void *pkt_arg);
+    void        (*pkt_recv)(pdu_t *pdu, void *pkt_arg);
     const void  *pkt_arg;
 } uslp_pkt_t;
 /** @} */
@@ -245,7 +246,7 @@ typedef struct {
     bool        fecf;           /** Presence of Frame Error Control Field    */
     size_t      fecf_len;       /** Frame Error Control Field Length (octets)*/
     bool        gen_oid;        /** Generate OID Frame                       */
-    void        (*phy_send)(const void *pdu, size_t len, const void *phy_arg);
+    void        (*phy_send)(pdu_t *pdu, void *phy_arg);
     const void  *phy_arg;
 } uslp_pc_t;
 /** @} */
