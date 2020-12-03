@@ -593,7 +593,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
         }
 
         /* Start the FIFO worker */
-        devp->rx_worker = chThdCreateFromHeap(NULL, 0x400, "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
+        devp->rx_worker = chThdCreateFromHeap(NULL, 0x800, "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
     }
 }
 
