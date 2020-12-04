@@ -6,4 +6,4 @@
 	url = https://github.com/CANopenNode/CANopenNode.git
 [submodule "ext/littlefs"]
 	path = ext/littlefs
-	url = https://github.com/ARMmbed/littlefs.git
+	url = https://github.com/littlefs-project/littlefs
