@@ -1,6 +1,7 @@
 # Required libraries for RADIO
 include $(PROJ_SRC)/si41xx.mk
 include $(PROJ_SRC)/ax5043.mk
+include $(PROJ_SRC)/pdu.mk
 include $(PROJ_SRC)/ax25.mk
 include $(PROJ_SRC)/aprs.mk
 include $(PROJ_SRC)/uslp.mk

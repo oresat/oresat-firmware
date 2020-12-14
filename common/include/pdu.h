@@ -59,6 +59,7 @@ typedef struct {
 extern "C" {
 #endif
 
+void pdu_init(pdu_t *pdu);
 size_t pdu_gen(pdu_t *pdu);
 
 #ifdef __cplusplus

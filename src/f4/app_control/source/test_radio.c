@@ -5,6 +5,9 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
+static uint8_t mac_hdr[] = {'C' << 1, 'Q' << 1, ' ' << 1, ' ' << 1, ' ' << 1, ' ' << 1, 0x00U,  /* APRS Destination                         */
+                            'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x01U,  /* APRS Source                              */
+                            0x03, 0xF0, 'T'};                                                   /* UI Frame, No protocol ID, APRS Telemetry */
 static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 
 extern AX5043Driver lband;
@@ -86,10 +89,16 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "tx")) {
+        uint8_t buf[512];
         pdu_t pdu = {
-            .buf = str,
-            .buf_len = sizeof(str),
+            .mac_hdr = mac_hdr,
+            .mac_len = sizeof(mac_hdr),
+            .data = str,
+            .data_len = sizeof(str),
+            .buf = buf,
+            .buf_max = 512,
         };
+        pdu_gen(&pdu);
         uhf_send(&pdu, NULL);
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
