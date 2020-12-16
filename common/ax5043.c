@@ -623,11 +623,9 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
 
     devp->error = AX5043_ERR_NOERROR;
 
-    /* Record previous state */
+    /* Record previous state and enter idle state */
     prev_state = devp->state;
     prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
-
-    /* Enter idle state first */
     ax5043Idle(devp);
 
     /* Set Frequency Selection */
@@ -746,8 +744,16 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
  * @api
  */
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
+    ax5043_state_t prev_state;
+    bool prev_chan;
+
     osalDbgCheck(devp != NULL && devp->config != NULL);
-    osalDbgAssert((devp->state == AX5043_READY), "ax5043SetProfile(), invalid state");
+    osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetProfile(), invalid state");
+
+    /* Record previous state and enter idle state */
+    prev_state = devp->state;
+    prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+    ax5043Idle(devp);
 
     /* Set all profile values */
     for (const ax5043_profile_t *entry = profile; entry->reg; entry++) {
@@ -772,6 +778,19 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
     /* Re-range frequencies in case they changed */
     ax5043SetFreq(devp, 0, devp->vcorb, true);
     ax5043SetFreq(devp, 0, devp->vcora, false);
+
+    /* Return to original state */
+    switch (prev_state) {
+    case AX5043_RX:
+        ax5043RX(devp, prev_chan, false);
+        break;
+    case AX5043_WOR:
+        ax5043RX(devp, prev_chan, true);
+        break;
+    case AX5043_READY:
+    default:
+        ax5043Idle(devp);
+    }
 }
 
 /**
@@ -786,6 +805,9 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
  * @api
  */
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b) {
+    ax5043_state_t prev_state;
+    bool prev_chan;
+
     uint16_t freq_reg = (chan_b ? AX5043_REG_FREQB : AX5043_REG_FREQA);
     uint16_t rng_reg = (chan_b ? AX5043_REG_PLLRANGINGB : AX5043_REG_PLLRANGINGA);
 
@@ -796,6 +818,11 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
                    freq == 0, "ax5043SetFreq(), frequency out of bounds");
 
     devp->error = AX5043_ERR_NOERROR;
+
+    /* Record previous state and enter idle state */
+    prev_state = devp->state;
+    prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+    ax5043Idle(devp);
 
     /* If no VCOR specified, default to 8 */
     if (vcor == 0) {
@@ -846,7 +873,18 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
         devp->vcora = vcor;
     }
 
-    ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+    /* Return to original state */
+    switch (prev_state) {
+    case AX5043_RX:
+        ax5043RX(devp, prev_chan, false);
+        break;
+    case AX5043_WOR:
+        ax5043RX(devp, prev_chan, true);
+        break;
+    case AX5043_READY:
+    default:
+        ax5043Idle(devp);
+    }
 
     return vcor;
 }
