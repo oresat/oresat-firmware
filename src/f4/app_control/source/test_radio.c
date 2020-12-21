@@ -5,9 +5,9 @@
 #include "test_radio.h"
 #include "chprintf.h"
 
-static uint8_t mac_hdr[] = {'C' << 1, 'Q' << 1, ' ' << 1, ' ' << 1, ' ' << 1, ' ' << 1, 0x00U,  /* APRS Destination                         */
-                            'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x01U,  /* APRS Source                              */
-                            0x03, 0xF0, 'T'};                                                   /* UI Frame, No protocol ID, APRS Telemetry */
+static uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
+                            'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
+                            0x03, 0xF0, ':'};                                                   /* UI Frame, No protocol ID, APRS Telemetry */
 static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 
 extern AX5043Driver lband;
@@ -79,7 +79,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     if (!strcmp(argv[0], "start")) {
         chprintf(chp, "Starting AX5043 driver...");
         ax5043Start(devp, cfgp);
-        if (devp->state != AX5043_READY) {
+        if (devp->state < AX5043_READY) {
             chprintf(chp, "Error: Failed to start driver. Error code %d.\r\n", devp->error);
         } else {
             chprintf(chp, "OK\r\n");
@@ -105,7 +105,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
         bool chan_b = (argc > 3 && !strcmp(argv[3], "true") ? true : false);
 
-        if (devp->state != AX5043_READY) {
+        if (devp->state < AX5043_READY) {
             chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
             goto radio_usage;
         }
@@ -139,7 +139,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
-        if (devp->state != AX5043_READY) {
+        if (devp->state < AX5043_READY) {
             chprintf(chp, "Error: Please start the AX5043 driver first\r\n");
             goto radio_usage;
         }
@@ -187,9 +187,7 @@ radio_usage:
                   "\r\n"
                   "    start:       Start AX5043 device\r\n"
                   "    stop:        Stop AX5043 device\r\n"
-                  "    rx:          Puts device into RX mode\r\n"
-                  "    wor:         Puts device into WOR mode\r\n"
-                  "    tx:          Puts device into TX mode\r\n"
+                  "    tx:          Test transmission with APRS data\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
                   "                 Sets frequency of channel A/B to <freq>\r\n"
                   "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"

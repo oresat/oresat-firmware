@@ -521,6 +521,7 @@ void ax5043Idle(AX5043Driver *devp) {
 
     if (devp->state != AX5043_READY) {
         devp->error = AX5043_ERR_NOERROR;
+
         if (devp->rx_worker) {
             chThdTerminate(devp->rx_worker);
             chEvtSignal(devp->rx_worker, AX5043_EVENT_TERMINATE);
@@ -720,6 +721,11 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         ax5043Exchange(devp, AX5043_REG_FIFODATA, true, devp->postamble, NULL, devp->postamble_len);
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
     }
+
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+    ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
+    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     /* Return to original state */
     switch (prev_state) {

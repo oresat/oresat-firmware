@@ -59,7 +59,7 @@ size_t pdu_gen(pdu_t *pdu)
         if (pdu->buf_len + pdu->mac_len > pdu->buf_max) {
             return 0;
         }
-        memcpy(pdu->buf, pdu->mac_hdr, pdu->mac_len);
+        memcpy(&((uint8_t*)pdu->buf)[pdu->buf_len], pdu->mac_hdr, pdu->mac_len);
         pdu->buf_len += pdu->mac_len;
     }
 
@@ -67,7 +67,7 @@ size_t pdu_gen(pdu_t *pdu)
         if (pdu->buf_len + pdu->net_len > pdu->buf_max) {
             return 0;
         }
-        memcpy(pdu->buf, pdu->net_hdr, pdu->net_len);
+        memcpy(&((uint8_t*)pdu->buf)[pdu->buf_len], pdu->net_hdr, pdu->net_len);
         pdu->buf_len += pdu->net_len;
     }
 
@@ -75,7 +75,7 @@ size_t pdu_gen(pdu_t *pdu)
         if (pdu->buf_len + pdu->trans_len > pdu->buf_max) {
             return 0;
         }
-        memcpy(pdu->buf, pdu->trans_hdr, pdu->trans_len);
+        memcpy(&((uint8_t*)pdu->buf)[pdu->buf_len], pdu->trans_hdr, pdu->trans_len);
         pdu->buf_len += pdu->trans_len;
     }
 
@@ -83,7 +83,7 @@ size_t pdu_gen(pdu_t *pdu)
         if (pdu->buf_len + pdu->data_len > pdu->buf_max) {
             return 0;
         }
-        memcpy(pdu->buf, &((uint8_t*)pdu->data)[pdu->data_offset], pdu->data_len);
+        memcpy(&((uint8_t*)pdu->buf)[pdu->buf_len], &((uint8_t*)pdu->data)[pdu->data_offset], pdu->data_len);
         pdu->buf_len += pdu->data_len;
     }
 
