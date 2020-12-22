@@ -7,11 +7,14 @@
 
 static uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
                             'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
-                            0x03, 0xF0, ':'};                                                   /* UI Frame, No protocol ID, APRS Telemetry */
+                            0x03, 0xF0};                                                        /* UI Frame, No protocol ID                 */
+static uint8_t net_hdr[] = {':'};                                                               /* APRS Message                             */
 static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 uint8_t buf[512];
 
 pdu_t pdu = {
+    .net_hdr = net_hdr,
+    .net_len = sizeof(net_hdr),
     .mac_hdr = mac_hdr,
     .mac_len = sizeof(mac_hdr),
     .data = str,
