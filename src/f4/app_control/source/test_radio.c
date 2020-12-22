@@ -9,6 +9,16 @@ static uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' 
                             'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
                             0x03, 0xF0, ':'};                                                   /* UI Frame, No protocol ID, APRS Telemetry */
 static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
+uint8_t buf[512];
+
+pdu_t pdu = {
+    .mac_hdr = mac_hdr,
+    .mac_len = sizeof(mac_hdr),
+    .data = str,
+    .data_len = sizeof(str),
+    .buf = buf,
+    .buf_max = sizeof(buf),
+};
 
 extern AX5043Driver lband;
 extern AX5043Config lbandcfg;
@@ -89,17 +99,15 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "tx")) {
-        uint8_t buf[512];
-        pdu_t pdu = {
-            .mac_hdr = mac_hdr,
-            .mac_len = sizeof(mac_hdr),
-            .data = str,
-            .data_len = sizeof(str),
-            .buf = buf,
-            .buf_max = 512,
-        };
         pdu_gen(&pdu);
         uhf_send(&pdu, NULL);
+    } else if (!strcmp(argv[0], "dump")) {
+        chprintf(chp, "\r\n");
+        for (int i = 0; i < 0x1000; i++) {
+            if (i % 0x20 == 0) chprintf(chp, "\r\n%03X:", i);
+            chprintf(chp, " %02X", ax5043ReadU8(devp, i));
+        }
+        chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "setfreq") && argc > 1) {
         uint32_t freq = strtoul(argv[1], NULL, 0);
         uint8_t vcor = (argc > 2 ? strtoul(argv[2], NULL, 0) : 0);
@@ -199,6 +207,7 @@ radio_usage:
                   "\r\n"
                   "    write<reg> <value> <type>:\r\n"
                   "                 Write <reg> with <value> where <type> is u8|u16|u24|u32\r\n"
+                  "    dump:        Dump all register values\r\n"
                   "\r\n");
     return;
 }

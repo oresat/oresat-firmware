@@ -630,13 +630,17 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
     ax5043Idle(devp);
 
     /* Set Frequency Selection */
+    uint32_t freq;
     uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
     if (chan_b) {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQB), devp->config->xtal_freq);
         pllloop |= AX5043_PLLLOOP_FREQSEL;
     } else {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQA), devp->config->xtal_freq);
         pllloop &= ~AX5043_PLLLOOP_FREQSEL;
     }
     ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
+    ax5043SetRFDIV(devp, freq);
 
     /* Activate synthesizer to lock PLL */
     /* TODO: Can we base this on an interrupt instead of a delay? */
@@ -668,10 +672,10 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
             "ax5043TX(), no callback when len != total_len");
 
     size_t transferred = 0;
+    size_t offset = 0;
     ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, AX5043_FIFO_WRITE_LEN);
     while (transferred < total_len) {
         ax5043_chunk_data_t data;
-        static size_t offset = 0;
         size_t write_len;
 
         /* Refill buffer if needed */
