@@ -22,8 +22,9 @@
 /* Project header files */
 #include "oresat.h"
 #include "wdt.h"
+#include "c3.h"
 #include "opd.h"
-#include "radio.h"
+#include "comms.h"
 #include "time_sync.h"
 #include "CO_master.h"
 #ifdef SHELL_ENABLE
@@ -50,6 +51,7 @@ static const oresat_node_t nodes[] = {
 */
 
 static worker_t wdt_worker;
+static worker_t c3_worker;
 #ifdef SHELL_ENABLE
 static worker_t cmd_worker;
 #endif
@@ -69,6 +71,10 @@ static void app_init(void)
     init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
     reg_worker(&wdt_worker);
 
+    /* Initialize C3 worker thread */
+    init_worker(&c3_worker, "C3", c3_wa, sizeof(c3_wa), NORMALPRIO, c3, NULL, true);
+    reg_worker(&c3_worker);
+
     /* Initialize shell worker thread */
 #ifdef SHELL_ENABLE
     init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
@@ -83,8 +89,8 @@ static void app_init(void)
     sdo_init();
 
     /* Initialize and start radio systems */
-    radio_init();
-    radio_start();
+    comms_init();
+    comms_start();
 
     /* Initialize shell and start serial interface */
 #ifdef SHELL_ENABLE

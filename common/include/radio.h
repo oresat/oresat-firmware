@@ -9,6 +9,8 @@
 #ifndef _RADIO_H_
 #define _RADIO_H_
 
+#include "ax5043.h"
+#include "si41xx.h"
 #include "pdu.h"
 
 /*===========================================================================*/
@@ -30,20 +32,6 @@
 #define USLP_USE_SDLS                       TRUE
 #endif
 
-/**
- * @brief   PDU FIFO Object count
- */
-#if !defined(RADIO_PDU_SIZE) || defined(__DOXYGEN__)
-#define RADIO_PDU_COUNT                   8U
-#endif
-
-/**
- * @brief   PDU FIFO Object maximum size
- */
-#if !defined(RADIO_PDU_SIZE) || defined(__DOXYGEN__)
-#define RADIO_PDU_SIZE                    512U
-#endif
-
 /** @} */
 
 /*===========================================================================*/
@@ -53,6 +41,30 @@
 /*===========================================================================*/
 /* Data structures and types.                                                */
 /*===========================================================================*/
+
+typedef struct {
+    SI41XXDriver            *devp;
+    SI41XXConfig            *cfgp;
+    const char              *name;
+} synth_dev_t;
+
+typedef struct {
+    AX5043Driver            *devp;
+    const AX5043Config      *cfgp;
+    const char              *name;
+} radio_dev_t;
+
+typedef struct {
+    const ax5043_profile_t  *profile;
+    const char              *name;
+} radio_profile_t;
+
+typedef struct {
+    radio_dev_t             *radio_devices;
+    radio_profile_t         *radio_profiles;
+    synth_dev_t             *synth_devices;
+    objects_fifo_t          *pdu_fifo;
+} radio_config_t;
 
 /*===========================================================================*/
 /* Macros.                                                                   */
@@ -67,10 +79,8 @@ extern "C" {
 #endif
 
 void radio_init(void);
-void radio_start(void);
+void radio_start(radio_config_t *radio_config);
 void radio_stop(void);
-
-void uhf_send(pdu_t *pdu, void *arg);
 
 #ifdef __cplusplus
 }

@@ -32,18 +32,29 @@
  * @{
  */
 typedef struct {
-    void            *data;
-    size_t          data_len;
-    size_t          data_offset;
-    void            *trans_hdr;
-    size_t          trans_len;
-    void            *net_hdr;
-    size_t          net_len;
-    void            *mac_hdr;
-    size_t          mac_len;
-    void            *buf;
-    size_t          buf_len;
-    size_t          buf_max;
+    /* Application Layer */
+    void            *data_arg;      /* Application layer argument           */
+    void            *data;          /* Application layer data pointer       */
+    size_t          data_len;       /* Application layer data length        */
+    size_t          data_total_len; /* Application layer total data length  */
+    size_t          data_offset;    /* Application layer data offset        */
+    /* Transport Layer (Layer 4) */
+    void            *trans_arg;     /* Transport layer argument             */
+    void            *trans_hdr;     /* Transport layer header pointer       */
+    size_t          trans_len;      /* Transport layer header length        */
+    /* Network Layer (Layer 3) */
+    void            *net_arg;       /* Network layer argument               */
+    void            *net_hdr;       /* Network layer header pointer         */
+    size_t          net_len;        /* Network layer header length          */
+    /* MAC Layer (Layer 2) */
+    void            *mac_arg;       /* Data link layer argument             */
+    void            *mac_hdr;       /* Data link layer header               */
+    size_t          mac_len;        /* Data link layer header length        */
+    /* PHY Layer (Layer 1) */
+    void            *phy_arg;       /* Physical layer argument              */
+    void            *buf;           /* PDU buffer for physical layer        */
+    size_t          buf_len;        /* PDU buffer length                    */
+    size_t          buf_max;        /* Maximum size of PDU buffer           */
 } pdu_t;
 /** @} */
 

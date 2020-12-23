@@ -1,26 +1,8 @@
 #ifndef _TEST_RADIO_H_
 #define _TEST_RADIO_H_
 
-#include "radio.h"
-#include "ax5043.h"
-#include "si41xx.h"
-
-typedef struct {
-    SI41XXDriver *devp;
-    SI41XXConfig *cfgp;
-    const char *name;
-} synth_dev_t;
-
-typedef struct {
-    AX5043Driver *devp;
-    const AX5043Config *cfgp;
-    const char *name;
-} radio_dev_t;
-
-typedef struct {
-    const ax5043_profile_t *profile;
-    const char *name;
-} radio_profile_t;
+#include "ch.h"
+#include "hal.h"
 
 #ifdef __cplusplus
 extern "C" {

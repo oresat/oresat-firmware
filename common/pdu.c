@@ -34,15 +34,20 @@
 
 void pdu_init(pdu_t *pdu)
 {
+    pdu->data_arg = NULL;
     pdu->data = NULL;
     pdu->data_len = 0;
     pdu->data_offset = 0;
+    pdu->trans_arg = NULL;
     pdu->trans_hdr = NULL;
     pdu->trans_len = 0;
+    pdu->net_arg = NULL;
     pdu->net_hdr = NULL;
     pdu->net_len = 0;
+    pdu->mac_arg = NULL;
     pdu->mac_hdr = NULL;
     pdu->mac_len = 0;
+    pdu->phy_arg = NULL;
     pdu->buf = NULL;
     pdu->buf_len = 0;
     pdu->buf_max = 0;

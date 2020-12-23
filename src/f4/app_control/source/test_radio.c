@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include "ch.h"
-#include "hal.h"
 #include "test_radio.h"
+#include "comms.h"
+#include "radio.h"
+#include "ax5043.h"
+#include "si41xx.h"
 #include "chprintf.h"
 
 static uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
@@ -11,6 +13,10 @@ static uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' 
 static char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
 uint8_t buf[512];
 
+extern radio_dev_t radio_devices[];
+extern radio_profile_t radio_profiles[];
+extern synth_dev_t synth_devices[];
+
 pdu_t pdu = {
     .mac_hdr = mac_hdr,
     .mac_len = sizeof(mac_hdr),
@@ -18,36 +24,6 @@ pdu_t pdu = {
     .data_len = sizeof(str),
     .buf = buf,
     .buf_max = sizeof(buf),
-};
-
-extern AX5043Driver lband;
-extern AX5043Config lbandcfg;
-extern AX5043Driver uhf;
-extern AX5043Config uhfcfg;
-extern SI41XXDriver synth;
-extern SI41XXConfig synthcfg;
-extern ax5043_profile_t lband_eng[];
-extern ax5043_profile_t uhf_eng[];
-extern ax5043_profile_t uhf_ax25[];
-extern ax5043_profile_t uhf_cw[];
-
-radio_dev_t radio_devices[] = {
-    {&lband, &lbandcfg, "L-Band"},
-    {&uhf, &uhfcfg, "UHF"},
-    {NULL, NULL, ""},
-};
-
-radio_profile_t radio_profiles[] = {
-    {lband_eng, "L-Band Engineering"},
-    {uhf_eng, "UHF Engineering"},
-    {uhf_ax25, "UHF AX.25"},
-    {uhf_cw, "UHF CW"},
-    {NULL, ""},
-};
-
-synth_dev_t synth_devices[] = {
-    {&synth, &synthcfg, "LO"},
-    {NULL, NULL, ""},
 };
 
 /*===========================================================================*/
@@ -98,9 +74,13 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "Stopping AX5043 driver...");
         ax5043Stop(devp);
         chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "idle")) {
+        ax5043Idle(devp);
+    } else if (!strcmp(argv[0], "rx")) {
+        ax5043RX(devp, false, false);
     } else if (!strcmp(argv[0], "tx")) {
         pdu_gen(&pdu);
-        uhf_send(&pdu, NULL);
+        ax5043TX(devp, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);
     } else if (!strcmp(argv[0], "dump")) {
         chprintf(chp, "\r\n");
         for (int i = 0; i < 0x1000; i++) {
