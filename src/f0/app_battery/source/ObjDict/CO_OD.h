@@ -1,14 +1,15 @@
 // clang-format off
 /*******************************************************************************
+    CANopen Object Dictionary definition for CANopenNode v1 to v2
 
-   File - CO_OD.c/CO_OD.h
-   CANopen Object Dictionary.
+    This file was automatically generated with
+    libedssharp Object Dictionary Editor v0.8-98-g0425f94
 
-   This file was automatically generated with libedssharp Object
-   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+    https://github.com/CANopenNode/CANopenNode
+    https://github.com/robincornelius/libedssharp
+
+    DON'T EDIT THIS FILE MANUALLY !!!!
 *******************************************************************************/
-
-
 #ifndef CO_OD_H_
 #define CO_OD_H_
 
@@ -53,7 +54,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app.eds
+      FileName:     app.xdd
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
@@ -91,7 +92,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             49
+   #define CO_OD_NoOfElements             51
 
 
 /*******************************************************************************
@@ -109,12 +110,6 @@
                UNSIGNED32     COB_IDClientToServer;
                UNSIGNED32     COB_IDServerToClient;
                }              OD_SDOServerParameter_t;
-/*1280      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     COB_IDClientToServer;
-               UNSIGNED32     COB_IDServerToClient;
-               UNSIGNED8      nodeIDOfTheSDOServer;
-               }              OD_SDOClientParameter_t;
 /*1400      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                UNSIGNED32     COB_IDUsedByRPDO;
@@ -157,6 +152,15 @@
                UNSIGNED16     VCell;
                UNSIGNED16     cell1;
                UNSIGNED16     cell2;
+               UNSIGNED16     fullCapacity;
+               UNSIGNED16     timeToEmpty;
+               UNSIGNED16     timeToFull;
+               UNSIGNED16     cycles;
+               UNSIGNED16     chargeState;
+               UNSIGNED16     availableCapacity;
+               UNSIGNED16     availableStateOfCharge;
+               UNSIGNED16     presentStateOfCharge;
+               UNSIGNED16     mixCapacity;
                }              OD_battery_t;
 
 /*******************************************************************************
@@ -501,42 +505,26 @@
         #define OD_2110_2_battery_VCell                             2
         #define OD_2110_3_battery_cell1                             3
         #define OD_2110_4_battery_cell2                             4
+        #define OD_2110_5_battery_fullCapacity                      5
+        #define OD_2110_6_battery_timeToEmpty                       6
+        #define OD_2110_7_battery_timeToFull                        7
+        #define OD_2110_8_battery_cycles                            8
+        #define OD_2110_9_battery_chargeState                       9
+        #define OD_2110_10_battery_availableCapacity                10
+        #define OD_2110_11_battery_availableStateOfCharge           11
+        #define OD_2110_12_battery_presentStateOfCharge             12
+        #define OD_2110_13_battery_mixCapacity                      13
+
+/*2111 */
+        #define OD_2111_batteryStatus                               0x2111
+
+/*2112 */
+        #define OD_2112_modelGaugeAlgStatus                         0x2112
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
 #define  CO_OD_FIRST_LAST_WORD     0x55 //Any value from 0x01 to 0xFE. If changed, EEPROM will be reinitialized.
-
-/***** Structure for ROM variables ********************************************/
-struct sCO_OD_ROM{
-               UNSIGNED32     FirstWord;
-
-/*1000      */ UNSIGNED32     deviceType;
-/*1005      */ UNSIGNED32     COB_ID_SYNCMessage;
-/*1006      */ UNSIGNED32     communicationCyclePeriod;
-/*1007      */ UNSIGNED32     synchronousWindowLength;
-/*1008      */ VISIBLE_STRING manufacturerDeviceName[11];
-/*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
-/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
-/*1014      */ UNSIGNED32     COB_ID_EMCY;
-/*1015      */ UNSIGNED16     inhibitTimeEMCY;
-/*1016      */ UNSIGNED32      consumerHeartbeatTime[4];
-/*1017      */ UNSIGNED16     producerHeartbeatTime;
-/*1018      */ OD_identity_t   identity;
-/*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
-/*1029      */ UNSIGNED8       errorBehavior[6];
-/*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
-/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[4];
-/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[4];
-/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[4];
-/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[4];
-/*1F80      */ UNSIGNED32     NMTStartup;
-/*2101      */ UNSIGNED8      CANNodeID;
-/*2102      */ UNSIGNED16     CANBitRate;
-/*2106      */ UNSIGNED16      calibration[3];
-
-               UNSIGNED32     LastWord;
-};
 
 /***** Structure for RAM variables ********************************************/
 struct sCO_OD_RAM{
@@ -544,9 +532,9 @@ struct sCO_OD_RAM{
 
 /*1001      */ UNSIGNED8      errorRegister;
 /*1002      */ UNSIGNED32     manufacturerStatusRegister;
-/*1003      */ UNSIGNED32      preDefinedErrorField[8];
-/*1010      */ UNSIGNED32      storeParameters[1];
-/*1011      */ UNSIGNED32      restoreDefaultParameters[1];
+/*1003      */ INTEGER32       preDefinedErrorField[8];
+/*1010      */ INTEGER32       storeParameters[1];
+/*1011      */ INTEGER32       restoreDefaultParameters[1];
 /*2010      */ UNSIGNED64     SCET;
 /*2011      */ UNSIGNED64     UTC;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
@@ -556,24 +544,14 @@ struct sCO_OD_RAM{
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
 /*2110      */ OD_battery_t    battery;
-
-               UNSIGNED32     LastWord;
-};
-
-/***** Structure for EEPROM variables ********************************************/
-struct sCO_OD_EEPROM{
-               UNSIGNED32     FirstWord;
-
+/*2111      */ UNSIGNED16     batteryStatus;
+/*2112      */ UNSIGNED16     modelGaugeAlgStatus;
 
                UNSIGNED32     LastWord;
 };
 
 /***** Declaration of Object Dictionary variables *****************************/
-extern struct sCO_OD_ROM CO_OD_ROM;
-
 extern struct sCO_OD_RAM CO_OD_RAM;
-
-extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
@@ -587,7 +565,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*1002, Data Type: UNSIGNED32 */
         #define OD_manufacturerStatusRegister                       CO_OD_RAM.manufacturerStatusRegister
 
-/*1003, Data Type: UNSIGNED32, Array[8] */
+/*1003, Data Type: INTEGER32, Array[8] */
         #define OD_preDefinedErrorField                             CO_OD_RAM.preDefinedErrorField
         #define ODL_preDefinedErrorField_arrayLength                8
         #define ODA_preDefinedErrorField_standardErrorField         0
@@ -603,7 +581,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*1008, Data Type: VISIBLE_STRING */
         #define OD_manufacturerDeviceName                           CO_OD_ROM.manufacturerDeviceName
-        #define ODL_manufacturerDeviceName_stringLength             11
+        #define ODL_manufacturerDeviceName_stringLength             14
 
 /*1009, Data Type: VISIBLE_STRING */
         #define OD_manufacturerHardwareVersion                      CO_OD_ROM.manufacturerHardwareVersion
@@ -613,12 +591,12 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
         #define OD_manufacturerSoftwareVersion                      CO_OD_ROM.manufacturerSoftwareVersion
         #define ODL_manufacturerSoftwareVersion_stringLength        5
 
-/*1010, Data Type: UNSIGNED32, Array[1] */
+/*1010, Data Type: INTEGER32, Array[1] */
         #define OD_storeParameters                                  CO_OD_RAM.storeParameters
         #define ODL_storeParameters_arrayLength                     1
         #define ODA_storeParameters_saveAllParameters               0
 
-/*1011, Data Type: UNSIGNED32, Array[1] */
+/*1011, Data Type: INTEGER32, Array[1] */
         #define OD_restoreDefaultParameters                         CO_OD_RAM.restoreDefaultParameters
         #define ODL_restoreDefaultParameters_arrayLength            1
         #define ODA_restoreDefaultParameters_restoreAllDefaultParameters 0
@@ -629,7 +607,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*1015, Data Type: UNSIGNED16 */
         #define OD_inhibitTimeEMCY                                  CO_OD_ROM.inhibitTimeEMCY
 
-/*1016, Data Type: UNSIGNED32, Array[4] */
+/*1016, Data Type: INTEGER32, Array[4] */
         #define OD_consumerHeartbeatTime                            CO_OD_ROM.consumerHeartbeatTime
         #define ODL_consumerHeartbeatTime_arrayLength               4
         #define ODA_consumerHeartbeatTime_consumerHeartbeatTime     0
@@ -643,7 +621,7 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 /*1019, Data Type: UNSIGNED8 */
         #define OD_synchronousCounterOverflowValue                  CO_OD_ROM.synchronousCounterOverflowValue
 
-/*1029, Data Type: UNSIGNED8, Array[6] */
+/*1029, Data Type: INTEGER32, Array[6] */
         #define OD_errorBehavior                                    CO_OD_ROM.errorBehavior
         #define ODL_errorBehavior_arrayLength                       6
         #define ODA_errorBehavior_communication                     0
@@ -719,6 +697,12 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 
 /*2110, Data Type: battery_t */
         #define OD_battery                                          CO_OD_RAM.battery
+
+/*2111, Data Type: UNSIGNED16 */
+        #define OD_batteryStatus                                    CO_OD_RAM.batteryStatus
+
+/*2112, Data Type: UNSIGNED16 */
+        #define OD_modelGaugeAlgStatus                              CO_OD_RAM.modelGaugeAlgStatus
 
 #endif
 // clang-format on

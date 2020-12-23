@@ -1,15 +1,15 @@
 [FileInfo]
 FileName=app.eds
 FileVersion=0
-FileRevision=0
+FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat Battery Application Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=2:51PM
-ModificationDate=09-10-2019
+ModificationTime=11:30AM
+ModificationDate=12-11-2020
 ModifiedBy=
 
 [DeviceInfo]
@@ -24,7 +24,7 @@ BaudRate_50=1
 BaudRate_125=1
 BaudRate_250=1
 BaudRate_500=1
-BaudRate_800=0
+BaudRate_800=1
 BaudRate_1000=1
 SimpleBootUpMaster=0
 SimpleBootUpSlave=0
@@ -35,7 +35,6 @@ GroupMessaging=0
 NrOfRXPDO=4
 NrOfTXPDO=4
 LSS_Supported=0
-;LSS_Type=Server
 
 [DummyUsage]
 Dummy0001=0
@@ -189,7 +188,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -198,7 +197,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -207,7 +206,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -216,7 +215,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -225,7 +224,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -234,7 +233,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -243,7 +242,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -252,7 +251,7 @@ PDOMapping=0
 ParameterName=Standard error field
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0
 PDOMapping=0
@@ -330,7 +329,7 @@ PDOMapping=0
 ParameterName=save all parameters
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000003
 PDOMapping=0
@@ -354,7 +353,7 @@ PDOMapping=0
 ParameterName=restore all default parameters
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000001
 PDOMapping=0
@@ -396,7 +395,7 @@ PDOMapping=0
 ParameterName=Consumer heartbeat time
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000000
 PDOMapping=0
@@ -405,7 +404,7 @@ PDOMapping=0
 ParameterName=Consumer heartbeat time
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000000
 PDOMapping=0
@@ -414,7 +413,7 @@ PDOMapping=0
 ParameterName=Consumer heartbeat time
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000000
 PDOMapping=0
@@ -423,7 +422,7 @@ PDOMapping=0
 ParameterName=Consumer heartbeat time
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00000000
 PDOMapping=0
@@ -465,7 +464,7 @@ PDOMapping=0
 ParameterName=Communication
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00
 PDOMapping=0
@@ -474,7 +473,7 @@ PDOMapping=0
 ParameterName=Communication other
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00
 PDOMapping=0
@@ -483,7 +482,7 @@ PDOMapping=0
 ParameterName=Communication passive
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x01
 PDOMapping=0
@@ -492,7 +491,7 @@ PDOMapping=0
 ParameterName=Generic
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00
 PDOMapping=0
@@ -501,7 +500,7 @@ PDOMapping=0
 ParameterName=Device profile
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00
 PDOMapping=0
@@ -510,7 +509,7 @@ PDOMapping=0
 ParameterName=Manufacturer specific
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0000
+DataType=0x0004
 AccessType=rw
 DefaultValue=0x00
 PDOMapping=0
@@ -1662,7 +1661,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=12
+SupportedObjects=14
 1=0x2010
 2=0x2011
 3=0x2100
@@ -1675,6 +1674,8 @@ SupportedObjects=12
 10=0x2108
 11=0x2109
 12=0x2110
+13=0x2111
+14=0x2112
 
 [2010]
 ParameterName=SCET
@@ -1875,7 +1876,7 @@ PDOMapping=1
 ParameterName=Battery
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x5
+SubNumber=0xE
 
 [2110sub0]
 ParameterName=max sub-index
@@ -1883,7 +1884,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=4
+DefaultValue=0x0D
 PDOMapping=0
 
 [2110sub1]
@@ -1921,4 +1922,103 @@ DataType=0x0006
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
+
+[2110sub5]
+ParameterName=Full Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110sub6]
+ParameterName=Time To Empty
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110sub7]
+ParameterName=Time To Full
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110sub8]
+ParameterName=Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110sub9]
+ParameterName=Charge State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110subA]
+ParameterName=Available Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110subB]
+ParameterName=Available State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110subC]
+ParameterName=Present State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2110subD]
+ParameterName=Mix Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2111]
+ParameterName=Battery Status
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0x0002
+PDOMapping=1
+
+[2112]
+ParameterName=ModelGauge Alg Status
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
 

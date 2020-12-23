@@ -129,7 +129,7 @@ void max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
 
     /* Reset device */
     buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-    buf.value = MAX17205_COMMAND_RST;
+    buf.value = MAX17205_COMMAND_HARDWARE_RESET;
     max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
     do {
         max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_STATUS),
@@ -175,7 +175,7 @@ void max17205Stop(MAX17205Driver *devp) {
 
         /* Reset device */
         buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-        buf.value = MAX17205_COMMAND_RST;
+        buf.value = MAX17205_COMMAND_HARDWARE_RESET;
         max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
         buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
         buf.value = MAX17205_SETVAL(MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);

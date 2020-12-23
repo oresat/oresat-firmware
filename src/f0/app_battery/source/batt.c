@@ -1,10 +1,20 @@
 #include "batt.h"
+#include "ObjDict/CO_OD.h"
 #include "max17205.h"
 #include "CANopen.h"
 
 #define NCELLS          2U          /* Number of cells */
 #define FASTCHG_THRSH   250U        /* Threshold below VBUS to enable Fast Charge (mV) */
 #define SLOWCHG_THRSH   500U        /* Threshold below VBUS to enable Slow Charge (mV) */
+
+/* ModelGauge Register Standard Resolutions */
+#define MAX17205_STD_CAPACITY(cap) (cap*5)              /* uVh / R_SENSE */
+#define MAX17205_STD_PERCENTAGE(per) (per/256)          /* % */
+#define MAX17205_STD_VOLTAGE(volt) ((volt*78125)/1000)  /* mV */
+#define MAX17205_STD_CURRENT(curr) ((curr*15625)/10000) /* uV / R_SENSE */
+#define MAX17205_STD_TEMPERATUR(temp) (temp/256)        /* C */
+#define MAX17205_STD_RESISTANCE(res) (res/4096)         /* ohm */
+#define MAX17205_STD_TIME(time) ((time/4625)/1000)      /* s */
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -40,9 +50,9 @@ THD_FUNCTION(batt, arg)
         chThdSleepMilliseconds(1000);
 
         /* Record pack and cell voltages to object dictionary */
-        OD_battery.cell1 = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL1) * 78125) / 1000;
-        OD_battery.cell2 = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL2)* 78125) / 1000;
-        OD_battery.VCell = (max17205ReadRaw(&max17205dev, MAX17205_AD_AVGVCELL)* 78125) / 1000;
+        OD_battery.cell1 = MAX17205_STD_VOLTAGE(max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL1));
+        OD_battery.cell2 = MAX17205_STD_VOLTAGE(max17205ReadRaw(&max17205dev, MAX17205_AD_AVGCELL2));
+        OD_battery.VCell = MAX17205_STD_VOLTAGE(max17205ReadRaw(&max17205dev, MAX17205_AD_AVGVCELL));
 
         if (OD_battery.VCell >= OD_battery.VBUS - FASTCHG_THRSH) {
             /*palSetLine(LINE_FASTCHG);*/
@@ -51,6 +61,20 @@ THD_FUNCTION(batt, arg)
         } else {
             /*palClearLine(LINE_FASTCHG);*/
         }
+        
+        /* capacity */
+        OD_battery.fullCapacity = MAX17205_STD_CAPACITY(max17205ReadRaw(&max17205dev, MAX17205_AD_FULLCAP));
+        OD_battery.availableCapacity = MAX17205_STD_CAPACITY(max17205ReadRaw(&max17205dev, MAX17205_AD_AVCAP));
+        OD_battery.mixCapacity = MAX17205_STD_CAPACITY(max17205ReadRaw(&max17205dev, MAX17205_AD_MIXCAP));
+
+        /* state of charge */
+        OD_battery.timeToEmpty = MAX17205_STD_TIME(max17205ReadRaw(&max17205dev, MAX17205_AD_TTE));
+        OD_battery.timeToFull = MAX17205_STD_TIME(max17205ReadRaw(&max17205dev, MAX17205_AD_TTF));
+        OD_battery.availableStateOfCharge = MAX17205_STD_PERCENTAGE(max17205ReadRaw(&max17205dev, MAX17205_AD_AVSOC));
+        OD_battery.presentStateOfCharge = MAX17205_STD_PERCENTAGE(max17205ReadRaw(&max17205dev, MAX17205_AD_VFSOC));
+
+        /* other info */
+        OD_battery.cycles = max17205ReadRaw(&max17205dev, MAX17205_AD_CYCLES);
 
         /* Toggle LED */
         palToggleLine(LINE_LED);
