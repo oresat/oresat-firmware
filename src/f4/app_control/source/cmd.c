@@ -3,6 +3,8 @@
 #include <inttypes.h>
 
 #include "cmd.h"
+#include "c3.h"
+#include "comms.h"
 #include "opd.h"
 #include "CO_master.h"
 #include "time_sync.h"
@@ -378,6 +380,31 @@ lfs_usage:
 }
 
 /*===========================================================================*/
+/* OreSat C3 State Control                                                   */
+/*===========================================================================*/
+void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto state_usage;
+    }
+    if (!strcmp(argv[0], "status")) {
+        chprintf(chp, "C3 State: %c\r\n", c3_state);
+    } else if (!strcmp(argv[0], "beacon_start")) {
+        c3_state = BEACON;
+        comms_beacon(true);
+    } else if (!strcmp(argv[0], "beacon_stop")) {
+        c3_state = STANDBY;
+        comms_beacon(false);
+    } else {
+        goto state_usage;
+    }
+
+state_usage:
+    chprintf(chp,  "Usage: state <command>\r\n");
+    return;
+}
+
+/*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
@@ -388,6 +415,7 @@ static const ShellCommand commands[] = {
     {"mmc", cmd_mmc},
     {"time", cmd_time},
     {"lfs", cmd_lfs},
+    {"state", cmd_state},
     {NULL, NULL}
 };
 

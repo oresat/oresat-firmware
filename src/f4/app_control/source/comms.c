@@ -4,8 +4,10 @@
 #include "uslp.h"
 
 #define XTAL_CLK                            16000000
-#define RADIO_PDU_COUNT                   8U
-#define RADIO_PDU_SIZE                    512U
+#define RADIO_PDU_COUNT                     8U
+#define RADIO_PDU_SIZE                      512U
+
+#define BEACON_MS                           10000U
 
 static objects_fifo_t pdu_fifo;
 static msg_t pdu_fifo_msgs[RADIO_PDU_COUNT];
@@ -351,8 +353,8 @@ static const uslp_pc_t uhf_pc = {
     .tf_len         = RADIO_PDU_SIZE,
     .fecf           = true,
     .fecf_len       = 2,
-    .phy_send       = uhf_send,
-    .phy_arg        = uhf_eng,
+    .phy_send       = NULL,
+    .phy_arg        = NULL,
 };
 
 static const uslp_pc_t lband_pc = {
@@ -389,6 +391,7 @@ static radio_config_t radio_config = {
 };
 
 static thread_t *rx_tp = NULL;
+static thread_t *beacon_tp = NULL;
 
 THD_WORKING_AREA(radio_rx_wa, 0x400);
 THD_FUNCTION(radio_rx, arg) {
@@ -411,9 +414,35 @@ THD_FUNCTION(radio_rx, arg) {
 THD_WORKING_AREA(radio_beacon_wa, 0x400);
 THD_FUNCTION(radio_beacon, arg) {
     (void)arg;
-    uint8_t *pdu;
+    uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
+                         'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
+                         0x03, 0xF0};                                                        /* UI Frame, No protocol ID                 */
+    uint8_t net_hdr[] = {':'};                                                               /* APRS Message                             */
+    char telem_data[] = "KJ7SAT - Test beacon from AX5043 driver";
+    uint8_t buf[512];
+
+    pdu_t pdu = {
+        .net_hdr = net_hdr,
+        .net_len = sizeof(net_hdr),
+        .mac_hdr = mac_hdr,
+        .mac_len = sizeof(mac_hdr),
+        .data = telem_data,
+        .data_len = sizeof(telem_data),
+        .buf = buf,
+        .buf_max = sizeof(buf),
+    };
 
     while (!chThdShouldTerminateX()) {
+        /* TODO: CW Beacon */
+        /*ax5043_SetProfile(&uhf, uhf_cw);*/
+        /*ax5043TX(&uhf, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);*/
+
+        /* APRS Beacon */
+        pdu_gen(&pdu);
+        ax5043SetProfile(&uhf, uhf_ax25);
+        ax5043TX(&uhf, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);
+
+        chThdSleepMilliseconds(BEACON_MS);
     }
 
     chThdExit(MSG_OK);
@@ -444,12 +473,13 @@ void comms_stop(void)
     rx_tp = NULL;
 }
 
-void uhf_send(pdu_t *pdu, void *arg)
+void comms_beacon(bool enable)
 {
-    if (arg) {
-        ax5043SetProfile(&uhf, arg);
+    if (enable && beacon_tp == NULL) {
+        beacon_tp = chThdCreateStatic(radio_beacon_wa, sizeof(radio_beacon_wa), NORMALPRIO, radio_beacon, NULL);
+    } else if (!enable && beacon_tp != NULL) {
+        chThdTerminate(beacon_tp);
+        chThdWait(beacon_tp);
+        beacon_tp = NULL;
     }
-
-    ax5043TX(&uhf, pdu->buf, pdu->buf_len, pdu->buf_len, NULL, NULL, false);
 }
-
