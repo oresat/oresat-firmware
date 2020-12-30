@@ -389,18 +389,24 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "status")) {
         chprintf(chp, "C3 State: %c\r\n", c3_state);
-    } else if (!strcmp(argv[0], "beacon_start")) {
-        c3_state = BEACON;
-        comms_beacon(true);
-    } else if (!strcmp(argv[0], "beacon_stop")) {
+    } else if (!strcmp(argv[0], "standby")) {
         c3_state = STANDBY;
         comms_beacon(false);
+    } else if (!strcmp(argv[0], "beacon")) {
+        c3_state = BEACON;
+        comms_beacon(true);
     } else {
         goto state_usage;
     }
 
+    return;
+
 state_usage:
-    chprintf(chp,  "Usage: state <command>\r\n");
+    chprintf(chp,  "Usage: state <command>\r\n"
+                   "    status:     Get current system state\r\n"
+                   "    standby:    Enter standby mode\r\n"
+                   "    beacon:     Enter beacon mode\r\n"
+                   "\r\n");
     return;
 }
 
