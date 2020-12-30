@@ -1,14 +1,15 @@
 // clang-format off
 /*******************************************************************************
+    CANopen Object Dictionary definition for CANopenNode v1 to v2
 
-   File - CO_OD.c/CO_OD.h
-   CANopen Object Dictionary.
+    This file was automatically generated with
+    libedssharp Object Dictionary Editor v0.8-98-g0425f94
 
-   This file was automatically generated with libedssharp Object
-   Dictionary Editor v0.8-14-gf64b37c   DON'T EDIT THIS FILE MANUALLY !!!!
+    https://github.com/CANopenNode/CANopenNode
+    https://github.com/robincornelius/libedssharp
+
+    DON'T EDIT THIS FILE MANUALLY !!!!
 *******************************************************************************/
-
-
 #ifndef CO_OD_H_
 #define CO_OD_H_
 
@@ -53,7 +54,7 @@
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_OD.eds
+      FileName:     app_OD.xdd
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
@@ -65,7 +66,7 @@
    DEVICE INFO:
       VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    OreSat Template
+      ProductName:    OreSat IMU
       ProductNumber:  0
 *******************************************************************************/
 
@@ -78,6 +79,8 @@
   #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
   #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               0   //Associated objects: 1280-12FF
+  #define CO_NO_GFC                      0   //Associated objects: 1300
+  #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     4   //Associated objects: 14xx, 16xx
@@ -89,7 +92,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             48
+   #define CO_OD_NoOfElements             54
 
 
 /*******************************************************************************
@@ -107,12 +110,6 @@
                UNSIGNED32     COB_IDClientToServer;
                UNSIGNED32     COB_IDServerToClient;
                }              OD_SDOServerParameter_t;
-/*1280      */ typedef struct {
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     COB_IDClientToServer;
-               UNSIGNED32     COB_IDServerToClient;
-               UNSIGNED8      nodeIDOfTheSDOServer;
-               }              OD_SDOClientParameter_t;
 /*1400      */ typedef struct {
                UNSIGNED8      maxSubIndex;
                UNSIGNED32     COB_IDUsedByRPDO;
@@ -149,6 +146,30 @@
                UNSIGNED32     mappedObject7;
                UNSIGNED32     mappedObject8;
                }              OD_TPDOMappingParameter_t;
+/*6000      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               INTEGER16      pitch;
+               INTEGER16      yaw;
+               INTEGER16      roll;
+               }              OD_IMU_RotationAvg_t;
+/*6001      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               INTEGER16      x;
+               INTEGER16      y;
+               INTEGER16      z;
+               }              OD_IMU_AccelerationAvg_t;
+/*6003      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               INTEGER16      pitch;
+               INTEGER16      yaw;
+               INTEGER16      roll;
+               }              OD_IMU_RotationRaw_t;
+/*6005      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               INTEGER16      x;
+               INTEGER16      y;
+               INTEGER16      z;
+               }              OD_IMU_AccelerationRaw_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -484,10 +505,75 @@
         #define OD_2109_0_voltage_maxSubIndex                       0
         #define OD_2109_1_voltage_MCU_VDDA                          1
 
+/*6000 */
+        #define OD_6000_IMU_RotationAvg                             0x6000
+
+        #define OD_6000_0_IMU_RotationAvg_maxSubIndex               0
+        #define OD_6000_1_IMU_RotationAvg_pitch                     1
+        #define OD_6000_2_IMU_RotationAvg_yaw                       2
+        #define OD_6000_3_IMU_RotationAvg_roll                      3
+
+/*6001 */
+        #define OD_6001_IMU_AccelerationAvg                         0x6001
+
+        #define OD_6001_0_IMU_AccelerationAvg_maxSubIndex           0
+        #define OD_6001_1_IMU_AccelerationAvg_x                     1
+        #define OD_6001_2_IMU_AccelerationAvg_y                     2
+        #define OD_6001_3_IMU_AccelerationAvg_z                     3
+
+/*6002 */
+        #define OD_6002_IMU_Temperature                             0x6002
+
+/*6003 */
+        #define OD_6003_IMU_RotationRaw                             0x6003
+
+        #define OD_6003_0_IMU_RotationRaw_maxSubIndex               0
+        #define OD_6003_1_IMU_RotationRaw_pitch                     1
+        #define OD_6003_2_IMU_RotationRaw_yaw                       2
+        #define OD_6003_3_IMU_RotationRaw_roll                      3
+
+/*6005 */
+        #define OD_6005_IMU_AccelerationRaw                         0x6005
+
+        #define OD_6005_0_IMU_AccelerationRaw_maxSubIndex           0
+        #define OD_6005_1_IMU_AccelerationRaw_x                     1
+        #define OD_6005_2_IMU_AccelerationRaw_y                     2
+        #define OD_6005_3_IMU_AccelerationRaw_z                     3
+
+/*6008 */
+        #define OD_6008_IMU_TemperatureRaw                          0x6008
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
 #define  CO_OD_FIRST_LAST_WORD     0x55 //Any value from 0x01 to 0xFE. If changed, EEPROM will be reinitialized.
+
+/***** Structure for RAM variables ********************************************/
+struct sCO_OD_RAM{
+               UNSIGNED32     FirstWord;
+
+/*1001      */ UNSIGNED8      errorRegister;
+/*1002      */ UNSIGNED32     manufacturerStatusRegister;
+/*1003      */ UNSIGNED32      preDefinedErrorField[8];
+/*1010      */ UNSIGNED32      storeParameters[1];
+/*1011      */ UNSIGNED32      restoreDefaultParameters[1];
+/*2010      */ UNSIGNED64     SCET;
+/*2011      */ UNSIGNED64     UTC;
+/*2100      */ OCTET_STRING   errorStatusBits[10];
+/*2103      */ UNSIGNED16     SYNCCounter;
+/*2104      */ UNSIGNED16     SYNCTime;
+/*2107      */ UNSIGNED16      sensors[3];
+/*2108      */ INTEGER16       temperature[1];
+/*2109      */ INTEGER16       voltage[1];
+/*6000      */ OD_IMU_RotationAvg_t IMU_RotationAvg;
+/*6001      */ OD_IMU_AccelerationAvg_t IMU_AccelerationAvg;
+/*6002      */ INTEGER16      IMU_Temperature;
+/*6003      */ OD_IMU_RotationRaw_t IMU_RotationRaw;
+/*6005      */ OD_IMU_AccelerationRaw_t IMU_AccelerationRaw;
+/*6008      */ INTEGER16      IMU_TemperatureRaw;
+
+               UNSIGNED32     LastWord;
+};
 
 /***** Structure for ROM variables ********************************************/
 struct sCO_OD_ROM{
@@ -520,41 +606,10 @@ struct sCO_OD_ROM{
                UNSIGNED32     LastWord;
 };
 
-/***** Structure for RAM variables ********************************************/
-struct sCO_OD_RAM{
-               UNSIGNED32     FirstWord;
-
-/*1001      */ UNSIGNED8      errorRegister;
-/*1002      */ UNSIGNED32     manufacturerStatusRegister;
-/*1003      */ UNSIGNED32      preDefinedErrorField[8];
-/*1010      */ UNSIGNED32      storeParameters[1];
-/*1011      */ UNSIGNED32      restoreDefaultParameters[1];
-/*2010      */ UNSIGNED64     SCET;
-/*2011      */ UNSIGNED64     UTC;
-/*2100      */ OCTET_STRING   errorStatusBits[10];
-/*2103      */ UNSIGNED16     SYNCCounter;
-/*2104      */ UNSIGNED16     SYNCTime;
-/*2107      */ UNSIGNED16      sensors[3];
-/*2108      */ INTEGER16       temperature[1];
-/*2109      */ INTEGER16       voltage[1];
-
-               UNSIGNED32     LastWord;
-};
-
-/***** Structure for EEPROM variables ********************************************/
-struct sCO_OD_EEPROM{
-               UNSIGNED32     FirstWord;
-
-
-               UNSIGNED32     LastWord;
-};
-
 /***** Declaration of Object Dictionary variables *****************************/
-extern struct sCO_OD_ROM CO_OD_ROM;
-
 extern struct sCO_OD_RAM CO_OD_RAM;
 
-extern struct sCO_OD_EEPROM CO_OD_EEPROM;
+extern struct sCO_OD_ROM CO_OD_ROM;
 
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
@@ -697,6 +752,24 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
         #define OD_voltage                                          CO_OD_RAM.voltage
         #define ODL_voltage_arrayLength                             1
         #define ODA_voltage_MCU_VDDA                                0
+
+/*6000, Data Type: IMU_RotationAvg_t */
+        #define OD_IMU_RotationAvg                                  CO_OD_RAM.IMU_RotationAvg
+
+/*6001, Data Type: IMU_AccelerationAvg_t */
+        #define OD_IMU_AccelerationAvg                              CO_OD_RAM.IMU_AccelerationAvg
+
+/*6002, Data Type: INTEGER16 */
+        #define OD_IMU_Temperature                                  CO_OD_RAM.IMU_Temperature
+
+/*6003, Data Type: IMU_RotationRaw_t */
+        #define OD_IMU_RotationRaw                                  CO_OD_RAM.IMU_RotationRaw
+
+/*6005, Data Type: IMU_AccelerationRaw_t */
+        #define OD_IMU_AccelerationRaw                              CO_OD_RAM.IMU_AccelerationRaw
+
+/*6008, Data Type: INTEGER16 */
+        #define OD_IMU_TemperatureRaw                               CO_OD_RAM.IMU_TemperatureRaw
 
 #endif
 // clang-format on

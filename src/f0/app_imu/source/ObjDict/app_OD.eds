@@ -4,18 +4,18 @@ FileVersion=0
 FileRevision=0
 LastEDS=
 EDSVersion=4.0
-Description=OreSat Template Application Object Dictionary
+Description=OreSat IMU Application Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=5:18PM
-ModificationDate=02-10-2020
-ModifiedBy=
+ModificationTime=4:14PM
+ModificationDate=12-29-2020
+ModifiedBy=Ryan Meidick
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat Template
+ProductName=OreSat IMU
 ProductNumber=0
 RevisionNumber=0
 BaudRate_10=1
@@ -35,7 +35,6 @@ GroupMessaging=0
 NrOfRXPDO=4
 NrOfTXPDO=4
 LSS_Supported=0
-;LSS_Type=Server
 
 [DummyUsage]
 Dummy0001=0
@@ -125,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=34
+SupportedObjects=40
 1=0x1002
 2=0x1003
 3=0x1005
@@ -160,6 +159,12 @@ SupportedObjects=34
 32=0x1A02
 33=0x1A03
 34=0x1F80
+35=0x6000
+36=0x6001
+37=0x6002
+38=0x6003
+39=0x6005
+40=0x6008
 
 [1002]
 ParameterName=Manufacturer status register
@@ -1660,6 +1665,192 @@ DataType=0x0007
 AccessType=rw
 DefaultValue=0x00000000
 PDOMapping=0
+
+[6000]
+ParameterName=IMU Rotation avg
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x4
+
+[6000sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6000sub1]
+ParameterName=Pitch
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub2]
+ParameterName=Yaw
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub3]
+ParameterName=Roll
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001]
+ParameterName=IMU Acceleration avg
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x4
+
+[6001sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6001sub1]
+ParameterName=X
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub2]
+ParameterName=Y
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub3]
+ParameterName=Z
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6002]
+ParameterName=IMU Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6003]
+ParameterName=IMU Rotation raw
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x4
+
+[6003sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6003sub1]
+ParameterName=Pitch
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6003sub2]
+ParameterName=Yaw
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6003sub3]
+ParameterName=Roll
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6005]
+ParameterName=IMU Acceleration raw
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x4
+
+[6005sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6005sub1]
+ParameterName=X
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6005sub2]
+ParameterName=Y
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6005sub3]
+ParameterName=Z
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6008]
+ParameterName=IMU Temperature raw
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
 
 [ManufacturerObjects]
 SupportedObjects=11
