@@ -59,13 +59,6 @@ typedef struct {
     const char              *name;
 } radio_profile_t;
 
-typedef struct {
-    radio_dev_t             *radio_devices;
-    radio_profile_t         *radio_profiles;
-    synth_dev_t             *synth_devices;
-    objects_fifo_t          *pdu_fifo;
-} radio_config_t;
-
 /*===========================================================================*/
 /* Macros.                                                                   */
 /*===========================================================================*/
@@ -77,10 +70,6 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void radio_init(void);
-void radio_start(radio_config_t *radio_config);
-void radio_stop(void);
 
 #ifdef __cplusplus
 }

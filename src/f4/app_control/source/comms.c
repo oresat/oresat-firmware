@@ -383,13 +383,6 @@ synth_dev_t synth_devices[] = {
     {NULL, NULL, ""},
 };
 
-static radio_config_t radio_config = {
-    .radio_devices = radio_devices,
-    .radio_profiles = radio_profiles,
-    .synth_devices = synth_devices,
-    .pdu_fifo = &pdu_fifo,
-};
-
 static thread_t *rx_tp = NULL;
 static thread_t *beacon_tp = NULL;
 
@@ -411,7 +404,7 @@ THD_FUNCTION(radio_rx, arg) {
     chThdExit(MSG_OK);
 }
 
-THD_WORKING_AREA(radio_beacon_wa, 0x400);
+THD_WORKING_AREA(radio_beacon_wa, 0x800);
 THD_FUNCTION(radio_beacon, arg) {
     (void)arg;
     uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
@@ -450,13 +443,27 @@ THD_FUNCTION(radio_beacon, arg) {
 
 void comms_init(void)
 {
+    /* Initialize PDU FIFO */
     chFifoObjectInit(&pdu_fifo, RADIO_PDU_SIZE, RADIO_PDU_COUNT, pdu_fifo_buf, pdu_fifo_msgs);
-    radio_init();
+
+    /* Initialize radio systems */
+    for (int i = 0; radio_devices[i].devp != NULL; i++) {
+        ax5043ObjectInit(radio_devices[i].devp);
+    }
+    for (int i = 0; synth_devices[i].devp != NULL; i++) {
+        si41xxObjectInit(synth_devices[i].devp);
+    }
 }
 
 void comms_start(void)
 {
-    radio_start(&radio_config);
+    /* Start radio systems */
+    for (int i = 0; radio_devices[i].devp != NULL; i++) {
+        ax5043Start(radio_devices[i].devp, radio_devices[i].cfgp);
+    }
+    for (int i = 0; synth_devices[i].devp != NULL; i++) {
+        si41xxStart(synth_devices[i].devp, synth_devices[i].cfgp);
+    }
 
     rx_tp = chThdCreateStatic(radio_rx_wa, sizeof(radio_rx_wa), NORMALPRIO, radio_rx, NULL);
 
@@ -466,7 +473,9 @@ void comms_start(void)
 
 void comms_stop(void)
 {
-    radio_stop();
+    for (int i = 0; radio_devices[i].devp != NULL; i++) {
+        ax5043Stop(radio_devices[i].devp);
+    }
 
     chThdTerminate(rx_tp);
     chThdWait(rx_tp);

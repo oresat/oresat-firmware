@@ -11,6 +11,7 @@ THD_FUNCTION(c3, arg)
     (void)arg;
 
     while (!chThdShouldTerminateX()) {
+        chThdSleepMilliseconds(10000);
     }
 
     chThdExit(MSG_OK);
