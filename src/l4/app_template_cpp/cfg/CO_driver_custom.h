@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-/* TODO: These should be in CO_OD.h, but libedssharp does not support this yet */
-#define CO_NO_GFC 0
-#define CO_NO_SRDO 0
 
 #ifdef __cplusplus
 }

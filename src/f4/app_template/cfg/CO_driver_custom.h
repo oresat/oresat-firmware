@@ -5,15 +5,13 @@
 extern "C" {
 #endif
 
-/* TODO: These should be in CO_OD.h, but libedssharp does not support this yet */
-#define CO_NO_GFC 0
-#define CO_NO_SRDO 0
-
-#define CO_CONFIG_SDO_CLI (CO_CONFIG_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_FLAG_TIMERNEXT | \
+#define CO_CONFIG_SDO_CLI (CO_CONFIG_SDO_CLI_ENABLE | \
                            CO_CONFIG_SDO_CLI_SEGMENTED | \
                            CO_CONFIG_SDO_CLI_BLOCK | \
-                           CO_CONFIG_SDO_CLI_LOCAL)
+                           CO_CONFIG_SDO_CLI_LOCAL | \
+                           CO_CONFIG_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_FLAG_TIMERNEXT | \
+                           CO_CONFIG_FLAG_OD_DYNAMIC)
 
 #ifdef __cplusplus
 }
