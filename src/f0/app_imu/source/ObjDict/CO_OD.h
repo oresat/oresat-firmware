@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-98-g0425f94
+    libedssharp Object Dictionary Editor v0.8-119-gc3a898f
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -36,25 +36,10 @@
 
    typedef domain_t     DOMAIN;
 
-#ifndef timeOfDay_t
-    typedef union {
-        unsigned long long ullValue;
-        struct {
-            unsigned long ms:28;
-            unsigned reserved:4;
-            unsigned days:16;
-            unsigned reserved2:16;
-        };
-    }timeOfDay_t;
-#endif
-
-    typedef timeOfDay_t TIME_OF_DAY;
-    typedef timeOfDay_t TIME_DIFFERENCE;
-
 
 /*******************************************************************************
    FILE INFO:
-      FileName:     app_OD.xdd
+      FileName:     app.xdd
       FileVersion:  0
       CreationTime: 2:51PM
       CreationDate: 08-12-2019
@@ -552,16 +537,39 @@
 struct sCO_OD_RAM{
                UNSIGNED32     FirstWord;
 
+/*1000      */ UNSIGNED32     deviceType;
 /*1001      */ UNSIGNED8      errorRegister;
 /*1002      */ UNSIGNED32     manufacturerStatusRegister;
 /*1003      */ UNSIGNED32      preDefinedErrorField[8];
+/*1005      */ UNSIGNED32     COB_ID_SYNCMessage;
+/*1006      */ UNSIGNED32     communicationCyclePeriod;
+/*1007      */ UNSIGNED32     synchronousWindowLength;
+/*1008      */ VISIBLE_STRING manufacturerDeviceName[11];
+/*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
+/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
 /*1010      */ UNSIGNED32      storeParameters[1];
 /*1011      */ UNSIGNED32      restoreDefaultParameters[1];
+/*1014      */ UNSIGNED32     COB_ID_EMCY;
+/*1015      */ UNSIGNED16     inhibitTimeEMCY;
+/*1016      */ UNSIGNED32      consumerHeartbeatTime[4];
+/*1017      */ UNSIGNED16     producerHeartbeatTime;
+/*1018      */ OD_identity_t   identity;
+/*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
+/*1029      */ UNSIGNED8       errorBehavior[6];
+/*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
+/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[4];
+/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[4];
+/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[4];
+/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[4];
+/*1F80      */ UNSIGNED32     NMTStartup;
 /*2010      */ UNSIGNED64     SCET;
 /*2011      */ UNSIGNED64     UTC;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
+/*2101      */ UNSIGNED8      CANNodeID;
+/*2102      */ UNSIGNED16     CANBitRate;
 /*2103      */ UNSIGNED16     SYNCCounter;
 /*2104      */ UNSIGNED16     SYNCTime;
+/*2106      */ UNSIGNED16      calibration[3];
 /*2107      */ UNSIGNED16      sensors[3];
 /*2108      */ INTEGER16       temperature[1];
 /*2109      */ INTEGER16       voltage[1];
@@ -579,29 +587,14 @@ struct sCO_OD_RAM{
 struct sCO_OD_ROM{
                UNSIGNED32     FirstWord;
 
-/*1000      */ UNSIGNED32     deviceType;
-/*1005      */ UNSIGNED32     COB_ID_SYNCMessage;
-/*1006      */ UNSIGNED32     communicationCyclePeriod;
-/*1007      */ UNSIGNED32     synchronousWindowLength;
-/*1008      */ VISIBLE_STRING manufacturerDeviceName[11];
-/*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
-/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
-/*1014      */ UNSIGNED32     COB_ID_EMCY;
-/*1015      */ UNSIGNED16     inhibitTimeEMCY;
-/*1016      */ UNSIGNED32      consumerHeartbeatTime[4];
-/*1017      */ UNSIGNED16     producerHeartbeatTime;
-/*1018      */ OD_identity_t   identity;
-/*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
-/*1029      */ UNSIGNED8       errorBehavior[6];
-/*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
-/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[4];
-/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[4];
-/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[4];
-/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[4];
-/*1F80      */ UNSIGNED32     NMTStartup;
-/*2101      */ UNSIGNED8      CANNodeID;
-/*2102      */ UNSIGNED16     CANBitRate;
-/*2106      */ UNSIGNED16      calibration[3];
+
+               UNSIGNED32     LastWord;
+};
+
+/***** Structure for EEPROM variables ********************************************/
+struct sCO_OD_EEPROM{
+               UNSIGNED32     FirstWord;
+
 
                UNSIGNED32     LastWord;
 };
@@ -611,11 +604,13 @@ extern struct sCO_OD_RAM CO_OD_RAM;
 
 extern struct sCO_OD_ROM CO_OD_ROM;
 
+extern struct sCO_OD_EEPROM CO_OD_EEPROM;
+
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
 *******************************************************************************/
 /*1000, Data Type: UNSIGNED32 */
-        #define OD_deviceType                                       CO_OD_ROM.deviceType
+        #define OD_deviceType                                       CO_OD_RAM.deviceType
 
 /*1001, Data Type: UNSIGNED8 */
         #define OD_errorRegister                                    CO_OD_RAM.errorRegister
@@ -629,24 +624,24 @@ extern struct sCO_OD_ROM CO_OD_ROM;
         #define ODA_preDefinedErrorField_standardErrorField         0
 
 /*1005, Data Type: UNSIGNED32 */
-        #define OD_COB_ID_SYNCMessage                               CO_OD_ROM.COB_ID_SYNCMessage
+        #define OD_COB_ID_SYNCMessage                               CO_OD_RAM.COB_ID_SYNCMessage
 
 /*1006, Data Type: UNSIGNED32 */
-        #define OD_communicationCyclePeriod                         CO_OD_ROM.communicationCyclePeriod
+        #define OD_communicationCyclePeriod                         CO_OD_RAM.communicationCyclePeriod
 
 /*1007, Data Type: UNSIGNED32 */
-        #define OD_synchronousWindowLength                          CO_OD_ROM.synchronousWindowLength
+        #define OD_synchronousWindowLength                          CO_OD_RAM.synchronousWindowLength
 
 /*1008, Data Type: VISIBLE_STRING */
-        #define OD_manufacturerDeviceName                           CO_OD_ROM.manufacturerDeviceName
+        #define OD_manufacturerDeviceName                           CO_OD_RAM.manufacturerDeviceName
         #define ODL_manufacturerDeviceName_stringLength             11
 
 /*1009, Data Type: VISIBLE_STRING */
-        #define OD_manufacturerHardwareVersion                      CO_OD_ROM.manufacturerHardwareVersion
+        #define OD_manufacturerHardwareVersion                      CO_OD_RAM.manufacturerHardwareVersion
         #define ODL_manufacturerHardwareVersion_stringLength        3
 
 /*100A, Data Type: VISIBLE_STRING */
-        #define OD_manufacturerSoftwareVersion                      CO_OD_ROM.manufacturerSoftwareVersion
+        #define OD_manufacturerSoftwareVersion                      CO_OD_RAM.manufacturerSoftwareVersion
         #define ODL_manufacturerSoftwareVersion_stringLength        5
 
 /*1010, Data Type: UNSIGNED32, Array[1] */
@@ -660,27 +655,27 @@ extern struct sCO_OD_ROM CO_OD_ROM;
         #define ODA_restoreDefaultParameters_restoreAllDefaultParameters 0
 
 /*1014, Data Type: UNSIGNED32 */
-        #define OD_COB_ID_EMCY                                      CO_OD_ROM.COB_ID_EMCY
+        #define OD_COB_ID_EMCY                                      CO_OD_RAM.COB_ID_EMCY
 
 /*1015, Data Type: UNSIGNED16 */
-        #define OD_inhibitTimeEMCY                                  CO_OD_ROM.inhibitTimeEMCY
+        #define OD_inhibitTimeEMCY                                  CO_OD_RAM.inhibitTimeEMCY
 
 /*1016, Data Type: UNSIGNED32, Array[4] */
-        #define OD_consumerHeartbeatTime                            CO_OD_ROM.consumerHeartbeatTime
+        #define OD_consumerHeartbeatTime                            CO_OD_RAM.consumerHeartbeatTime
         #define ODL_consumerHeartbeatTime_arrayLength               4
         #define ODA_consumerHeartbeatTime_consumerHeartbeatTime     0
 
 /*1017, Data Type: UNSIGNED16 */
-        #define OD_producerHeartbeatTime                            CO_OD_ROM.producerHeartbeatTime
+        #define OD_producerHeartbeatTime                            CO_OD_RAM.producerHeartbeatTime
 
 /*1018, Data Type: identity_t */
-        #define OD_identity                                         CO_OD_ROM.identity
+        #define OD_identity                                         CO_OD_RAM.identity
 
 /*1019, Data Type: UNSIGNED8 */
-        #define OD_synchronousCounterOverflowValue                  CO_OD_ROM.synchronousCounterOverflowValue
+        #define OD_synchronousCounterOverflowValue                  CO_OD_RAM.synchronousCounterOverflowValue
 
 /*1029, Data Type: UNSIGNED8, Array[6] */
-        #define OD_errorBehavior                                    CO_OD_ROM.errorBehavior
+        #define OD_errorBehavior                                    CO_OD_RAM.errorBehavior
         #define ODL_errorBehavior_arrayLength                       6
         #define ODA_errorBehavior_communication                     0
         #define ODA_errorBehavior_communicationOther                1
@@ -690,22 +685,22 @@ extern struct sCO_OD_ROM CO_OD_ROM;
         #define ODA_errorBehavior_manufacturerSpecific              5
 
 /*1200, Data Type: SDOServerParameter_t */
-        #define OD_SDOServerParameter                               CO_OD_ROM.SDOServerParameter
+        #define OD_SDOServerParameter                               CO_OD_RAM.SDOServerParameter
 
 /*1400, Data Type: RPDOCommunicationParameter_t */
-        #define OD_RPDOCommunicationParameter                       CO_OD_ROM.RPDOCommunicationParameter
+        #define OD_RPDOCommunicationParameter                       CO_OD_RAM.RPDOCommunicationParameter
 
 /*1600, Data Type: RPDOMappingParameter_t */
-        #define OD_RPDOMappingParameter                             CO_OD_ROM.RPDOMappingParameter
+        #define OD_RPDOMappingParameter                             CO_OD_RAM.RPDOMappingParameter
 
 /*1800, Data Type: TPDOCommunicationParameter_t */
-        #define OD_TPDOCommunicationParameter                       CO_OD_ROM.TPDOCommunicationParameter
+        #define OD_TPDOCommunicationParameter                       CO_OD_RAM.TPDOCommunicationParameter
 
 /*1A00, Data Type: TPDOMappingParameter_t */
-        #define OD_TPDOMappingParameter                             CO_OD_ROM.TPDOMappingParameter
+        #define OD_TPDOMappingParameter                             CO_OD_RAM.TPDOMappingParameter
 
 /*1F80, Data Type: UNSIGNED32 */
-        #define OD_NMTStartup                                       CO_OD_ROM.NMTStartup
+        #define OD_NMTStartup                                       CO_OD_RAM.NMTStartup
 
 /*2010, Data Type: UNSIGNED64 */
         #define OD_SCET                                             CO_OD_RAM.SCET
@@ -718,10 +713,10 @@ extern struct sCO_OD_ROM CO_OD_ROM;
         #define ODL_errorStatusBits_stringLength                    10
 
 /*2101, Data Type: UNSIGNED8 */
-        #define OD_CANNodeID                                        CO_OD_ROM.CANNodeID
+        #define OD_CANNodeID                                        CO_OD_RAM.CANNodeID
 
 /*2102, Data Type: UNSIGNED16 */
-        #define OD_CANBitRate                                       CO_OD_ROM.CANBitRate
+        #define OD_CANBitRate                                       CO_OD_RAM.CANBitRate
 
 /*2103, Data Type: UNSIGNED16 */
         #define OD_SYNCCounter                                      CO_OD_RAM.SYNCCounter
@@ -730,7 +725,7 @@ extern struct sCO_OD_ROM CO_OD_ROM;
         #define OD_SYNCTime                                         CO_OD_RAM.SYNCTime
 
 /*2106, Data Type: UNSIGNED16, Array[3] */
-        #define OD_calibration                                      CO_OD_ROM.calibration
+        #define OD_calibration                                      CO_OD_RAM.calibration
         #define ODL_calibration_arrayLength                         3
         #define ODA_calibration_TS_CAL1                             0
         #define ODA_calibration_TS_CAL2                             1
