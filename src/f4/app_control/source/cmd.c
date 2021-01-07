@@ -11,6 +11,8 @@
 #include "mmc.h"
 #include "test_mmc.h"
 #include "test_radio.h"
+#include "deployer.h"
+#include "test_deploy.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -422,6 +424,7 @@ static const ShellCommand commands[] = {
     {"time", cmd_time},
     {"lfs", cmd_lfs},
     {"state", cmd_state},
+    {"deploy", cmd_deploy},
     {NULL, NULL}
 };
 
