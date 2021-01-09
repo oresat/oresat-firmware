@@ -1,0 +1,13 @@
+==========================================
+==========================================
+FW Header: [CRC:0xE357D622; SIZE:5764; FLAGS:0x0]
+reading program section
+received image size: 5764
+validating new FW image...
+FW download suceeded!
+download FW image suceeded!
+starting update process!
+BASE: 0x20007800
+INIT: 0x0800B08C
+END: 0x20007B90
+SIZE: 0x00000390

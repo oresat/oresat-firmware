@@ -12,10 +12,7 @@ print(sys.argv)
 ser = Serial("/dev/ttyACM0", 115200)
 
 # the FW image program section file is the first arg, 
-fw_prog = open(sys.argv[1], 'rb').read()
-
-# the FW image vectors section file is the second arg
-fw_vectors = open(sys.argv[2], 'rb' ).read()
+fw_img = open(sys.argv[1], 'rb').read()
 
 # thread_exit flags that the thread should exit
 thread_exit = 0
@@ -54,40 +51,23 @@ crc_func = crcmod.mkCrcFun(0x104C11DB7, initCrc=0xffffffff, rev=False, xorOut=0x
 
 # large buffer size with odd number of bytes
 #buffer_size = (1<<15) + 1223
-
 #data = bytearray(buffer_size)
 
-fw_prog_len = len(fw_prog)
-fw_vectors_len = len(fw_vectors)
-
-print("FW Image Program Size: ", fw_prog_len)
-print("FW Image Vectors Size: ", fw_vectors_len)
-
-# fill up the byte array with values 0-255
-#random.seed(1)
-#for i in range(buffer_size):
-#    data[i] = random.randint(0, 255)
+fw_img_len = len(fw_img)
 
 # CRC the fw image
-prog_crc = crc_func(fw_prog)
-vectors_crc = crc_func(fw_vectors)
+fw_crc = crc_func(fw_img)
+
+print("FW Image Program Size: ", fw_img_len)
+print("FW CRC: ", hex(fw_crc)) 
 
 # get the image CRC, length, and flags as bytes
-prog_crc_b = prog_crc.to_bytes(4, 'little')
-vectors_crc_b = vectors_crc.to_bytes(4, 'little')
-prog_len_b = fw_prog_len.to_bytes(4, 'little')
-vectors_len_b = fw_vectors_len.to_bytes(4, 'little')
+fw_crc_b = fw_crc.to_bytes(4, 'little')
+fw_len_b = fw_img_len.to_bytes(4, 'little')
 flags_b = int(0).to_bytes(4, 'little')
 
 # package the bytes into a struct
-fw_header = bytearray(prog_crc_b + vectors_crc_b + prog_len_b + vectors_len_b + flags_b)
-
-# CRC the first 3 entries in the struct
-header_crc = crc_func(fw_header)
-
-# add header CRC bytes to struct too
-header_crc_b = header_crc.to_bytes(4, 'little')
-fw_header = fw_header + header_crc_b
+fw_header = bytearray(fw_crc_b + fw_len_b + flags_b)
 
 # write the FW header struct bytes
 n = ser.write(fw_header)
@@ -95,23 +75,16 @@ n = ser.write(fw_header)
 # wait a sec for the uC to parse and CRC it
 time.sleep(0.2)
 
-# write the FW vectors section
-n = ser.write(fw_vectors)
-print("wrote {} bytes of vectors".format(n))
-
-# wait a sec for the uC to parse and CRC it
-time.sleep(0.2)
-
 sent = 0
-while sent < len(fw_prog):
+while sent < len(fw_img):
     # buffer length is 2048, unless there are less than
     # that many bytes left in the buffer
     buf_len = 2048
-    if (fw_prog_len - sent) < 2048:
-        buf_len = fw_prog_len - sent
+    if (fw_img_len - sent) < 2048:
+        buf_len = fw_img_len - sent
 
     # send the byte array
-    n = ser.write(fw_prog[sent:sent+buf_len])
+    n = ser.write(fw_img[sent:sent+buf_len])
     print("wrote {} bytes of program".format(n))
 
     sent += n
