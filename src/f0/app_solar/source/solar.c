@@ -8,21 +8,22 @@
 #define DAC_VDDA_UV            3333000  /* 3.333 V. Chgange to 3.0 v when powered from debug board */
 
 /* Defines for MPPT algorithm iteration speed */
-#define SLEEP_MS               8
+#define SLEEP_MS               2
 
 /* Defines for MPPT algorithm that changes with each solar cell variant
  * Things to note
  * Negative step size needs to be greater as the curve falls quickly.
  * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
  */
-#define MIN_DP_DI              4000     /* The most important piece. This keeps the point to the left of MPP. */
+#define MIN_DP_DI              0000     /* The most important piece. This keeps the point to the left of MPP. */
 #define NVE_STEP_SIZE          3500     /* Fixed -ve step size */
-#define CURR_THRES_SENS        80       /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
+#define CURR_THRES_SENS        0        /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
 #define MAX_STEP_SIZE          10000    /* Maximum step size for variable step IC. */
-#define STEP_SIZE_FACTOR       1400     /* Posive step factor. */
+#define STEP_SIZE_FACTOR       2000     /* Posive step factor. */
 #define NVE_STEP_SIZE_FACTOR   4        /* Negative step factor. This is multipled with Positive step factor */
-#define MIN_PV_CURRENT         10000    /* Minimum current drawn from PV cells */
+#define MIN_PV_CURRENT         00000    /* Minimum current drawn from PV cells */
 #define MAX_PV_CURRENT         500000   /* Maximum current drawn from PV cells */
+#define MIN_PV_POWER           50000    /* Minimum power drawn from PV cells */
 
 
 
@@ -135,7 +136,7 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
 
     /* Start VSIC MPPT Algorithm */
     /* Handles sudden decrease in illumination */
-    if (curr < (8 * i_in)/10) {
+    if ((curr < (8 * i_in)/10) && (pwr < MIN_PV_POWER)) {
         i_in = (8*curr)/10;
         if (i_in < MIN_PV_CURRENT) {
             i_in = MIN_PV_CURRENT;
@@ -186,11 +187,12 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
     prev_curr = curr;
     prev_pwr  = pwr;
 
-    /* Bounds checks for current */
-    if (i_in < MIN_PV_CURRENT) {
-        i_in = MIN_PV_CURRENT;
-    } else if (i_in > MAX_PV_CURRENT) {
+    /* Bounds checks for current and power*/
+    if (i_in > MAX_PV_CURRENT) {
         i_in = MAX_PV_CURRENT;
+    }
+    if (pwr < MIN_PV_POWER) {
+      i_in += MAX_STEP_SIZE;
     }
     return i_in;
 }
