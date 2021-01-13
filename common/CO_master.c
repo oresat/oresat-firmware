@@ -88,7 +88,7 @@ void sdo_init(void)
     }
 }
 
-thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subindex, size_t size, bool (*buf_cb)(struct sdocli *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg), void *buf_cb_arg)
+thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subindex, size_t size, buffer_cb_t buf_cb, void *buf_cb_arg)
 {
     int i;
 
