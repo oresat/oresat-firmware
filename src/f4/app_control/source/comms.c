@@ -1,5 +1,8 @@
+#include <stdio.h>
+
 #include "ch.h"
 #include "hal.h"
+#include "time_sync.h"
 #include "comms.h"
 #include "uslp.h"
 
@@ -411,7 +414,7 @@ THD_FUNCTION(radio_beacon, arg) {
                          'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
                          0x03, 0xF0};                                                        /* UI Frame, No protocol ID                 */
     uint8_t net_hdr[] = {':'};                                                               /* APRS Message                             */
-    char telem_data[] = "KJ7SAT - Test beacon from AX5043 driver";
+    char telem_data[256];
     uint8_t buf[512];
 
     pdu_t pdu = {
@@ -426,6 +429,8 @@ THD_FUNCTION(radio_beacon, arg) {
     };
 
     while (!chThdShouldTerminateX()) {
+        time_t unix_time = get_time_unix(NULL);
+        pdu.data_len = sprintf(telem_data, "KJ7SAT - Test beacon from AX5043 driver. %s", ctime(&unix_time));
         /* TODO: CW Beacon */
         /*ax5043_SetProfile(&uhf, uhf_cw);*/
         /*ax5043TX(&uhf, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);*/
