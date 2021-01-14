@@ -391,12 +391,15 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "status")) {
         chprintf(chp, "C3 State: %c\r\n", c3_state);
-    } else if (!strcmp(argv[0], "standby")) {
-        c3_state = STANDBY;
-        comms_beacon(false);
-    } else if (!strcmp(argv[0], "beacon")) {
-        c3_state = BEACON;
-        comms_beacon(true);
+    } else if (!strcmp(argv[0], "tx") && argc > 1) {
+        strtoul(argv[1], NULL, 0);
+
+    } else if (!strcmp(argv[0], "bat") && argc > 1) {
+        if (argv[1][0] == 't') {
+
+        } else {
+
+        }
     } else {
         goto state_usage;
     }
@@ -405,9 +408,9 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
 
 state_usage:
     chprintf(chp,  "Usage: state <command>\r\n"
-                   "    status:     Get current system state\r\n"
-                   "    standby:    Enter standby mode\r\n"
-                   "    beacon:     Enter beacon mode\r\n"
+                   "    status:         Get current system state\r\n"
+                   "    tx <timeout>:   Enable TX for <timeout> seconds\r\n"
+                   "    bat <t/f>:      Override battery good state\r\n"
                    "\r\n");
     return;
 }
