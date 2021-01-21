@@ -1,4 +1,4 @@
-#include "oresat.h"
+#include "CO_threads.h"
 #include "CO_master.h"
 
 #define SDOCLI_TIMEOUT 1000
