@@ -12,22 +12,26 @@ static thread_t *em_tp;
 static thread_t *pdo_sync_tp;
 static thread_t *hbcons_tp;
 
-
 /* General purpose CANopen callback to wake up data processing threads */
 void process_cb(void *thread)
 {
     syssts_t sts;
     sts = chSysGetStatusAndLockX();
     /* Signal processing thread from critical section */
-    chEvtSignalI((thread_t *)thread, CO_EVT_WAKEUP);
+    chEvtSignalI(thread, CO_EVT_WAKEUP);
     chSysRestoreStatusX(sts);
 }
 
+#if CO_NO_SDO_CLIENT > 0
 /* CANopen SDO client thread */
-THD_FUNCTION(sdo_client_test, arg)
+/* TODO: Implement CO_master code here */
+THD_FUNCTION(sdo_client_wip, arg)
 {
     CO_SDOclient_t *SDOclient = arg;
     systime_t prev_time;
+    CO_SDO_return_t ret = CO_SDO_RT_waitingResponse;
+    CO_SDO_abortCode_t abort_code = CO_SDO_AB_NONE;
+    bool abort = false;
 
     /* Register the callback function to wake up thread when message received */
     CO_SDOclient_initCallbackPre(SDOclient, chThdGetSelfX(), process_cb);
@@ -36,7 +40,27 @@ THD_FUNCTION(sdo_client_test, arg)
     while (!chThdShouldTerminateX()) {
         uint32_t timeout = ((typeof(timeout))-1);
 
+        if (SDOclient->state & CO_SDO_ST_FLAG_DOWNLOAD) {
+            do {
+                ret = CO_SDOclientDownload(SDOclient,
+                        TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                        abort,          /* TODO: Implement logic for this */
+                        //false,          /* TODO: Implement logic for this */
+                        &abort_code,    /* TODO: Implement logic for this */
+                        NULL,           /* TODO: Implement logic for this */
+                        &timeout);
+            } while (ret == CO_SDO_RT_blockDownldInProgress);
+        } else if (SDOclient->state & CO_SDO_ST_FLAG_UPLOAD) {
+            ret = CO_SDOclientUpload(SDOclient,
+                    TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                    //abort,          /* TODO: Implement logic for this */
+                    &abort_code,    /* TODO: Implement logic for this */
+                    NULL,           /* TODO: Implement logic for this */
+                    NULL,           /* TODO: Implement logic for this */
+                    &timeout);
+        } else if (SDOclient->state == CO_SDO_ST_ABORT) {
 
+        }
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
@@ -44,6 +68,7 @@ THD_FUNCTION(sdo_client_test, arg)
     CO_SDOclient_initCallbackPre(SDOclient, NULL, NULL);
     chThdExit(MSG_OK);
 }
+#endif
 
 /* CANopen SDO server thread */
 THD_FUNCTION(sdo_server, arg)
