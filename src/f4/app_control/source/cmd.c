@@ -61,6 +61,47 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
 }
 
 /*===========================================================================*/
+/* OreSat CAN Bus NMT                                                        */
+/*===========================================================================*/
+void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    uint8_t node_id = 0;
+
+    if (argc < 1) {
+        goto nmt_usage;
+    }
+
+    if (argc > 1) {
+        node_id = strtoul(argv[1], NULL, 0);
+    }
+
+    if (!strcmp(argv[0], "op")) {
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, node_id);
+    } else if (!strcmp(argv[0], "preop")) {
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_PRE_OPERATIONAL, node_id);
+    } else if (!strcmp(argv[0], "stop")) {
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_STOPPED, node_id);
+    } else if (!strcmp(argv[0], "resetcomms")) {
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_COMMUNICATION, node_id);
+    } else if (!strcmp(argv[0], "resetnode")) {
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_NODE, node_id);
+    } else {
+        goto nmt_usage;
+    }
+    return;
+
+nmt_usage:
+    chprintf(chp,  "Usage: nmt <command> <node_id>\r\n"
+                   "    op:         Set device operational\r\n"
+                   "    preop:      Set device pre-operational\r\n"
+                   "    stop:       Stop device\r\n"
+                   "    resetcomms: Reset CAN communications on device\r\n"
+                   "    resetnode:  Reset device\r\n"
+                   "\r\n");
+    return;
+}
+
+/*===========================================================================*/
 /* OreSat CAN Bus SDO Client                                                 */
 /*===========================================================================*/
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
@@ -292,7 +333,7 @@ time_usage:
 }
 
 /*===========================================================================*/
-/* OreSat CAN Bus SDO Client                                                 */
+/* OreSat LFS Operations                                                     */
 /*===========================================================================*/
 void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
 {
@@ -377,7 +418,12 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
     return;
 
 lfs_usage:
-    chprintf(chp,  "Usage: lfs <command>\r\n");
+    chprintf(chp,  "Usage: lfs <command> <path>\r\n"
+                   "    ls:     List directories\r\n"
+                   "    mkdir:  Make a directory\r\n"
+                   "    rm:     Delete file or directory\r\n"
+                   "    cat:    Dump contents of file\r\n"
+                   "\r\n");
     return;
 }
 
@@ -419,13 +465,14 @@ state_usage:
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
-    {"radio", cmd_radio},
-    {"synth", cmd_synth},
+    {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
     {"lfs", cmd_lfs},
+    {"radio", cmd_radio},
+    {"synth", cmd_synth},
     {"state", cmd_state},
     {"deploy", cmd_deploy},
     {NULL, NULL}
