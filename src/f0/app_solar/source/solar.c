@@ -1,6 +1,7 @@
 #include "solar.h"
 #include "ina226.h"
 #include "CANopen.h"
+#include "chprintf.h"
 
 /* Defines for INA226 */
 #define CURR_LSB               20       /* 20uA/bit */
@@ -206,6 +207,7 @@ THD_FUNCTION(solar, arg)
     int32_t current;
     uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
+    int i, j;
 
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
@@ -234,6 +236,13 @@ THD_FUNCTION(solar, arg)
         i_in = calc_mppt(voltage, current, power);
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
+        if (j >= 500){
+          chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+          chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
+          j=0;
+        }
+        j++;
+        i++;
     }
 
     /* Stop drivers */
