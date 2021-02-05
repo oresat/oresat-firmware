@@ -1,13 +1,13 @@
 /**
- * @file    ina226.h
- * @brief   INA226 Power Monitor.
+ * @file    tmp101.h
+ * @brief   TMP101 Power Monitor.
  *
- * @addtogroup INA226
+ * @addtogroup TMP101
  * @ingroup ORESAT
  * @{
  */
-#ifndef _INA226_H_
-#define _INA226_H_
+#ifndef _TMP101_H_
+#define _TMP101_H_
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -18,204 +18,204 @@
  * @{
  */
 /**
- * @brief   INA226 Driver version string.
+ * @brief   TMP101 Driver version string.
  */
-#define INA226_VERSION                      "1.0.0"
+#define TMP101_VERSION                      "1.0.0"
 
 /**
- * @brief   INA226 Driver version major number.
+ * @brief   TMP101 Driver version major number.
  */
-#define INA226_MAJOR                        1
+#define TMP101_MAJOR                        1
 
 /**
- * @brief   INA226 Driver version minor number.
+ * @brief   TMP101 Driver version minor number.
  */
-#define INA226_MINOR                        0
+#define TMP101_MINOR                        0
 
 /**
- * @brief   INA226 Driver version patch number.
+ * @brief   TMP101 Driver version patch number.
  */
-#define INA226_PATCH                        0
+#define TMP101_PATCH                        0
 /** @} */
 
 /**
- * @name    INA226 Register Addresses
+ * @name    TMP101 Register Addresses
  * @{
  */
-#define INA226_AD_CONFIG                    0x00U
-#define INA226_AD_SHUNT                     0x01U
-#define INA226_AD_VBUS                      0x02U
-#define INA226_AD_POWER                     0x03U
-#define INA226_AD_CURRENT                   0x04U
-#define INA226_AD_CAL                       0x05U
-#define INA226_AD_ME                        0x06U
-#define INA226_AD_LIM                       0x07U
-#define INA226_AD_MFG_ID                    0xFEU
-#define INA226_AD_DIE_ID                    0xFFU
+#define TMP101_AD_CONFIG                    0x00U
+#define TMP101_AD_SHUNT                     0x01U
+#define TMP101_AD_VBUS                      0x02U
+#define TMP101_AD_POWER                     0x03U
+#define TMP101_AD_CURRENT                   0x04U
+#define TMP101_AD_CAL                       0x05U
+#define TMP101_AD_ME                        0x06U
+#define TMP101_AD_LIM                       0x07U
+#define TMP101_AD_MFG_ID                    0xFEU
+#define TMP101_AD_DIE_ID                    0xFFU
 /** @} */
 
 /**
- * @name    INA226 Configuration register fields
+ * @name    TMP101 Configuration register fields
  * @{
  */
-#define INA226_CONFIG_MODE_Pos              (0U)
-#define INA226_CONFIG_MODE_Msk              (0x7U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_MODE                  INA226_CONFIG_MODE_Msk
-#define INA226_CONFIG_MODE_SHDN             (0x0U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_MODE_SHUNT            (0x1U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_MODE_VBUS             (0x2U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_MODE_SHUNT_VBUS       (0x3U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_MODE_CONT             (0x4U << INA226_CONFIG_MODE_Pos)
-#define INA226_CONFIG_VSHCT_Pos             (3U)
-#define INA226_CONFIG_VSHCT_Msk             (0x7U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT                 INA226_CONFIG_VSHCT_Msk
-#define INA226_CONFIG_VSHCT_140US           (0x0U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_204US           (0x1U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_332US           (0x2U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_588US           (0x3U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_1100US          (0x4U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_2116US          (0x5U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_4156US          (0x6U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VSHCT_8224US          (0x7U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_Pos            (6U)
-#define INA226_CONFIG_VBUSCT_Msk            (0x7U << INA226_CONFIG_VBUSCT_Pos)
-#define INA226_CONFIG_VBUSCT                INA226_CONFIG_VBUSCT_Msk
-#define INA226_CONFIG_VBUSCT_140US          (0x0U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_204US          (0x1U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_332US          (0x2U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_588US          (0x3U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_1100US         (0x4U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_2116US         (0x5U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_4156US         (0x6U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_VBUSCT_8224US         (0x7U << INA226_CONFIG_VSHCT_Pos)
-#define INA226_CONFIG_AVG_Pos               (9U)
-#define INA226_CONFIG_AVG_Msk               (0x7U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG                   INA226_CONFIG_AVG_Msk
-#define INA226_CONFIG_AVG_1                 (0x0U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_4                 (0x1U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_16                (0x2U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_64                (0x3U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_128               (0x4U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_256               (0x5U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_512               (0x6U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_AVG_1024              (0x7U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_RST_Pos               (15U)
-#define INA226_CONFIG_RST_Msk               (0x1U << INA226_CONFIG_RST_Pos)
-#define INA226_CONFIG_RST                   INA226_CONFIG_RST_Msk
+#define TMP101_CONFIG_MODE_Pos              (0U)
+#define TMP101_CONFIG_MODE_Msk              (0x7U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_MODE                  TMP101_CONFIG_MODE_Msk
+#define TMP101_CONFIG_MODE_SHDN             (0x0U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_MODE_SHUNT            (0x1U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_MODE_VBUS             (0x2U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_MODE_SHUNT_VBUS       (0x3U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_MODE_CONT             (0x4U << TMP101_CONFIG_MODE_Pos)
+#define TMP101_CONFIG_VSHCT_Pos             (3U)
+#define TMP101_CONFIG_VSHCT_Msk             (0x7U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT                 TMP101_CONFIG_VSHCT_Msk
+#define TMP101_CONFIG_VSHCT_140US           (0x0U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_204US           (0x1U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_332US           (0x2U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_588US           (0x3U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_1100US          (0x4U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_2116US          (0x5U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_4156US          (0x6U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VSHCT_8224US          (0x7U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_Pos            (6U)
+#define TMP101_CONFIG_VBUSCT_Msk            (0x7U << TMP101_CONFIG_VBUSCT_Pos)
+#define TMP101_CONFIG_VBUSCT                TMP101_CONFIG_VBUSCT_Msk
+#define TMP101_CONFIG_VBUSCT_140US          (0x0U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_204US          (0x1U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_332US          (0x2U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_588US          (0x3U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_1100US         (0x4U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_2116US         (0x5U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_4156US         (0x6U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_VBUSCT_8224US         (0x7U << TMP101_CONFIG_VSHCT_Pos)
+#define TMP101_CONFIG_AVG_Pos               (9U)
+#define TMP101_CONFIG_AVG_Msk               (0x7U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG                   TMP101_CONFIG_AVG_Msk
+#define TMP101_CONFIG_AVG_1                 (0x0U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_4                 (0x1U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_16                (0x2U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_64                (0x3U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_128               (0x4U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_256               (0x5U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_512               (0x6U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_AVG_1024              (0x7U << TMP101_CONFIG_AVG_Pos)
+#define TMP101_CONFIG_RST_Pos               (15U)
+#define TMP101_CONFIG_RST_Msk               (0x1U << TMP101_CONFIG_RST_Pos)
+#define TMP101_CONFIG_RST                   TMP101_CONFIG_RST_Msk
 /** @} */
 
 /**
- * @name    INA226 Shunt Voltage register fields
+ * @name    TMP101 Shunt Voltage register fields
  * @{
  */
-#define INA226_SHUNT_Pos                    (0U)
-#define INA226_SHUNT_Msk                    (0xFFFFU << INA226_SHUNT_Pos)
-#define INA226_SHUNT                        INA226_SHUNT_Msk
+#define TMP101_SHUNT_Pos                    (0U)
+#define TMP101_SHUNT_Msk                    (0xFFFFU << TMP101_SHUNT_Pos)
+#define TMP101_SHUNT                        TMP101_SHUNT_Msk
 /** @} */
 
 /**
- * @name    INA226 VBUS Voltage register fields
+ * @name    TMP101 VBUS Voltage register fields
  * @{
  */
-#define INA226_VBUS_Pos                     (0U)
-#define INA226_VBUS_Msk                     (0x7FFFU << INA226_VBUS_Pos)
-#define INA226_VBUS                         INA226_VBUS_Msk
+#define TMP101_VBUS_Pos                     (0U)
+#define TMP101_VBUS_Msk                     (0x7FFFU << TMP101_VBUS_Pos)
+#define TMP101_VBUS                         TMP101_VBUS_Msk
 /** @} */
 
 /**
- * @name    INA226 Power register fields
+ * @name    TMP101 Power register fields
  * @{
  */
-#define INA226_POWER_Pos                    (0U)
-#define INA226_POWER_Msk                    (0xFFFFU << INA226_POWER_Pos)
-#define INA226_POWER                        INA226_POWER_Msk
+#define TMP101_POWER_Pos                    (0U)
+#define TMP101_POWER_Msk                    (0xFFFFU << TMP101_POWER_Pos)
+#define TMP101_POWER                        TMP101_POWER_Msk
 /** @} */
 
 /**
- * @name    INA226 Current register fields
+ * @name    TMP101 Current register fields
  * @{
  */
-#define INA226_CURRENT_Pos                  (0U)
-#define INA226_CURRENT_Msk                  (0xFFFFU << INA226_CURRENT_Pos)
-#define INA226_CURRENT                      INA226_CURRENT_Msk
+#define TMP101_CURRENT_Pos                  (0U)
+#define TMP101_CURRENT_Msk                  (0xFFFFU << TMP101_CURRENT_Pos)
+#define TMP101_CURRENT                      TMP101_CURRENT_Msk
 /** @} */
 
 /**
- * @name    INA226 Calibration register fields
+ * @name    TMP101 Calibration register fields
  * @{
  */
-#define INA226_CAL_Pos                      (0U)
-#define INA226_CAL_Msk                      (0x7FFFU << INA226_CAL_Pos)
-#define INA226_CAL                          INA226_CAL_Msk
+#define TMP101_CAL_Pos                      (0U)
+#define TMP101_CAL_Msk                      (0x7FFFU << TMP101_CAL_Pos)
+#define TMP101_CAL                          TMP101_CAL_Msk
 /** @} */
 
 /**
- * @name    INA226 Alert Mask/Enable register fields
+ * @name    TMP101 Alert Mask/Enable register fields
  * @{
  */
-#define INA226_ME_LEN_Pos                   (0U)
-#define INA226_ME_LEN_Msk                   (0x1U << INA226_ME_LEN_Pos)
-#define INA226_ME_LEN                       INA226_ME_LEN_Msk
-#define INA226_ME_APOL_Pos                  (1U)
-#define INA226_ME_APOL_Msk                  (0x1U << INA226_ME_APOL_Pos)
-#define INA226_ME_APOL                      INA226_ME_APOL_Msk
-#define INA226_ME_OVF_Pos                   (2U)
-#define INA226_ME_OVF_Msk                   (0x1U << INA226_ME_OVF_Pos)
-#define INA226_ME_OVF                       INA226_ME_OVF_Msk
-#define INA226_ME_CVRF_Pos                  (3U)
-#define INA226_ME_CVRF_Msk                  (0x1U << INA226_ME_CVRF_Pos)
-#define INA226_ME_CVRF                      INA226_ME_CVRF_Msk
-#define INA226_ME_AFF_Pos                   (4U)
-#define INA226_ME_AFF_Msk                   (0x1U << INA226_ME_AFF_Pos)
-#define INA226_ME_AFF                       INA226_ME_AFF_Msk
-#define INA226_ME_CNVR_Pos                  (10U)
-#define INA226_ME_CNVR_Msk                  (0x1U << INA226_ME_CNVR_Pos)
-#define INA226_ME_CNVR                      INA226_ME_CNVR_Msk
-#define INA226_ME_POL_Pos                   (11U)
-#define INA226_ME_POL_Msk                   (0x1U << INA226_ME_POL_Pos)
-#define INA226_ME_POL                       INA226_ME_POL_Msk
-#define INA226_ME_BUL_Pos                   (12U)
-#define INA226_ME_BUL_Msk                   (0x1U << INA226_ME_BUL_Pos)
-#define INA226_ME_BUL                       INA226_ME_BUL_Msk
-#define INA226_ME_BOL_Pos                   (13U)
-#define INA226_ME_BOL_Msk                   (0x1U << INA226_ME_BOL_Pos)
-#define INA226_ME_BOL                       INA226_ME_BOL_Msk
-#define INA226_ME_SUL_Pos                   (14U)
-#define INA226_ME_SUL_Msk                   (0x1U << INA226_ME_SUL_Pos)
-#define INA226_ME_SUL                       INA226_ME_SUL_Msk
-#define INA226_ME_SOL_Pos                   (15U)
-#define INA226_ME_SOL_Msk                   (0x1U << INA226_ME_SOL_Pos)
-#define INA226_ME_SOL                       INA226_ME_SOL_Msk
+#define TMP101_ME_LEN_Pos                   (0U)
+#define TMP101_ME_LEN_Msk                   (0x1U << TMP101_ME_LEN_Pos)
+#define TMP101_ME_LEN                       TMP101_ME_LEN_Msk
+#define TMP101_ME_APOL_Pos                  (1U)
+#define TMP101_ME_APOL_Msk                  (0x1U << TMP101_ME_APOL_Pos)
+#define TMP101_ME_APOL                      TMP101_ME_APOL_Msk
+#define TMP101_ME_OVF_Pos                   (2U)
+#define TMP101_ME_OVF_Msk                   (0x1U << TMP101_ME_OVF_Pos)
+#define TMP101_ME_OVF                       TMP101_ME_OVF_Msk
+#define TMP101_ME_CVRF_Pos                  (3U)
+#define TMP101_ME_CVRF_Msk                  (0x1U << TMP101_ME_CVRF_Pos)
+#define TMP101_ME_CVRF                      TMP101_ME_CVRF_Msk
+#define TMP101_ME_AFF_Pos                   (4U)
+#define TMP101_ME_AFF_Msk                   (0x1U << TMP101_ME_AFF_Pos)
+#define TMP101_ME_AFF                       TMP101_ME_AFF_Msk
+#define TMP101_ME_CNVR_Pos                  (10U)
+#define TMP101_ME_CNVR_Msk                  (0x1U << TMP101_ME_CNVR_Pos)
+#define TMP101_ME_CNVR                      TMP101_ME_CNVR_Msk
+#define TMP101_ME_POL_Pos                   (11U)
+#define TMP101_ME_POL_Msk                   (0x1U << TMP101_ME_POL_Pos)
+#define TMP101_ME_POL                       TMP101_ME_POL_Msk
+#define TMP101_ME_BUL_Pos                   (12U)
+#define TMP101_ME_BUL_Msk                   (0x1U << TMP101_ME_BUL_Pos)
+#define TMP101_ME_BUL                       TMP101_ME_BUL_Msk
+#define TMP101_ME_BOL_Pos                   (13U)
+#define TMP101_ME_BOL_Msk                   (0x1U << TMP101_ME_BOL_Pos)
+#define TMP101_ME_BOL                       TMP101_ME_BOL_Msk
+#define TMP101_ME_SUL_Pos                   (14U)
+#define TMP101_ME_SUL_Msk                   (0x1U << TMP101_ME_SUL_Pos)
+#define TMP101_ME_SUL                       TMP101_ME_SUL_Msk
+#define TMP101_ME_SOL_Pos                   (15U)
+#define TMP101_ME_SOL_Msk                   (0x1U << TMP101_ME_SOL_Pos)
+#define TMP101_ME_SOL                       TMP101_ME_SOL_Msk
 /** @} */
 
 /**
- * @name    INA226 Alert Limit register fields
+ * @name    TMP101 Alert Limit register fields
  * @{
  */
-#define INA226_LIM_Pos                      (0U)
-#define INA226_LIM_Msk                      (0xFFFFU << INA226_LIM_Pos)
-#define INA226_LIM                          INA226_LIM_Msk
+#define TMP101_LIM_Pos                      (0U)
+#define TMP101_LIM_Msk                      (0xFFFFU << TMP101_LIM_Pos)
+#define TMP101_LIM                          TMP101_LIM_Msk
 /** @} */
 
 /**
- * @name    INA226 Manufacturer ID register fields
+ * @name    TMP101 Manufacturer ID register fields
  * @{
  */
-#define INA226_MFG_ID_Pos                   (0U)
-#define INA226_MFG_ID_Msk                   (0xFFFFU << INA226_MFG_ID_Pos)
-#define INA226_MFG_ID                       INA226_MFG_ID_Msk
+#define TMP101_MFG_ID_Pos                   (0U)
+#define TMP101_MFG_ID_Msk                   (0xFFFFU << TMP101_MFG_ID_Pos)
+#define TMP101_MFG_ID                       TMP101_MFG_ID_Msk
 /** @} */
 
 /**
- * @name    INA226 Die ID register fields
+ * @name    TMP101 Die ID register fields
  * @{
  */
-#define INA226_DIE_ID_RID_Pos               (0U)
-#define INA226_DIE_ID_RID_Msk               (0xFU << INA226_DIE_ID_RID_Pos)
-#define INA226_DIE_ID_RID                   INA226_DIE_ID_RID_Msk
-#define INA226_DIE_ID_DID_Pos               (4U)
-#define INA226_DIE_ID_DID_Msk               (0xFFFU << INA226_DIE_ID_DID_Pos)
-#define INA226_DIE_ID_DID                   INA226_DIE_ID_DID_Msk
+#define TMP101_DIE_ID_RID_Pos               (0U)
+#define TMP101_DIE_ID_RID_Msk               (0xFU << TMP101_DIE_ID_RID_Pos)
+#define TMP101_DIE_ID_RID                   TMP101_DIE_ID_RID_Msk
+#define TMP101_DIE_ID_DID_Pos               (4U)
+#define TMP101_DIE_ID_DID_Msk               (0xFFFU << TMP101_DIE_ID_DID_Pos)
+#define TMP101_DIE_ID_DID                   TMP101_DIE_ID_DID_Msk
 /** @} */
 
 /*===========================================================================*/
@@ -227,22 +227,22 @@
  * @{
  */
 /**
- * @brief   INA226 I2C interface switch.
+ * @brief   TMP101 I2C interface switch.
  * @details If set to @p TRUE the support for I2C is included.
  * @note    The default is @p TRUE.
  */
-#if !defined(INA226_USE_I2C) || defined(__DOXYGEN__)
-#define INA226_USE_I2C                      TRUE
+#if !defined(TMP101_USE_I2C) || defined(__DOXYGEN__)
+#define TMP101_USE_I2C                      TRUE
 #endif
 
 /**
- * @brief   INA226 shared I2C switch.
+ * @brief   TMP101 shared I2C switch.
  * @details If set to @p TRUE the device acquires I2C bus ownership
  *          on each transaction.
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
-#if !defined(INA226_SHARED_I2C) || defined(__DOXYGEN__)
-#define INA226_SHARED_I2C                   FALSE
+#if !defined(TMP101_SHARED_I2C) || defined(__DOXYGEN__)
+#define TMP101_SHARED_I2C                   FALSE
 #endif
 /** @} */
 
@@ -250,12 +250,12 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-#if INA226_USE_I2C && !HAL_USE_I2C
-#error "INA226_USE_I2C requires HAL_USE_I2C"
+#if TMP101_USE_I2C && !HAL_USE_I2C
+#error "TMP101_USE_I2C requires HAL_USE_I2C"
 #endif
 
-#if INA226_SHARED_I2C && !I2C_USE_MUTUAL_EXCLUSION
-#error "INA226_SHARED_I2C requires I2C_USE_MUTUAL_EXCLUSION"
+#if TMP101_SHARED_I2C && !I2C_USE_MUTUAL_EXCLUSION
+#error "TMP101_SHARED_I2C requires I2C_USE_MUTUAL_EXCLUSION"
 #endif
 
 /*===========================================================================*/
@@ -263,92 +263,92 @@
 /*===========================================================================*/
 
 /**
- * @name    INA226 data structures and types.
+ * @name    TMP101 data structures and types.
  * @{
  */
 /**
- * @brief Structure representing a INA226 driver.
+ * @brief Structure representing a TMP101 driver.
  */
-typedef struct INA226Driver INA226Driver;
+typedef struct TMP101Driver TMP101Driver;
 
 /**
  * @brief   Driver state machine possible states.
  */
 typedef enum {
-    INA226_UNINIT = 0,                  /**< Not initialized.                 */
-    INA226_STOP = 1,                    /**< Stopped.                         */
-    INA226_READY = 2,                   /**< Ready.                           */
-} ina226_state_t;
+    TMP101_UNINIT = 0,                  /**< Not initialized.                 */
+    TMP101_STOP = 1,                    /**< Stopped.                         */
+    TMP101_READY = 2,                   /**< Ready.                           */
+} tmp101_state_t;
 
 /**
- * @brief   INA226 configuration structure.
+ * @brief   TMP101 configuration structure.
  */
 typedef struct {
-#if (INA226_USE_I2C) || defined(__DOXYGEN__)
+#if (TMP101_USE_I2C) || defined(__DOXYGEN__)
     /**
-     * @brief I2C driver associated with this INA226.
+     * @brief I2C driver associated with this TMP101.
      */
     I2CDriver                   *i2cp;
     /**
-     * @brief I2C configuration associated with this INA226.
+     * @brief I2C configuration associated with this TMP101.
      */
     const I2CConfig             *i2ccfg;
     /**
-     * @brief INA226 Slave Address
+     * @brief TMP101 Slave Address
      */
     i2caddr_t                   saddr;
-#endif /* INA226_USE_I2C */
+#endif /* TMP101_USE_I2C */
     /**
-     * @brief INA226 configuration reg value
+     * @brief TMP101 configuration reg value
      */
     uint16_t                    cfg;
     /**
-     * @brief INA226 calibration reg value
+     * @brief TMP101 calibration reg value
      */
     uint16_t                    cal;
     /**
      * @brief Optional Current LSB value for use in calculations
      */
     uint16_t                    curr_lsb;
-} INA226Config;
+} TMP101Config;
 
 /**
- * @brief   @p INA226 specific methods.
+ * @brief   @p TMP101 specific methods.
  */
-#define _ina226_methods_alone
+#define _tmp101_methods_alone
 
 /**
- * @brief   @p INA226 specific methods with inherited ones.
+ * @brief   @p TMP101 specific methods with inherited ones.
  */
-#define _ina226_methods                                                     \
+#define _tmp101_methods                                                     \
     _base_object_methods
 
 /**
  * @extends BaseObjectVMT
  *
- * @brief   @p INA226 virtual methods table.
+ * @brief   @p TMP101 virtual methods table.
  */
-struct INA226VMT {
-    _ina226_methods
+struct TMP101VMT {
+    _tmp101_methods
 };
 
 /**
- * @brief   @p INA226Driver specific data.
+ * @brief   @p TMP101Driver specific data.
  */
-#define _ina226_data                                                        \
+#define _tmp101_data                                                        \
     _base_object_data                                                       \
     /* Driver state.*/                                                      \
-    ina226_state_t              state;                                      \
+    tmp101_state_t              state;                                      \
     /* Current configuration data.*/                                        \
-    const INA226Config          *config;
+    const TMP101Config          *config;
 
 /**
- * @brief INA226 Power Monitor class.
+ * @brief TMP101 Power Monitor class.
  */
-struct INA226Driver {
+struct TMP101Driver {
     /** @brief Virtual Methods Table.*/
-    const struct INA226VMT     *vmt;
-    _ina226_data
+    const struct TMP101VMT     *vmt;
+    _tmp101_data
 };
 
 /** @} */
@@ -364,19 +364,19 @@ struct INA226Driver {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void ina226ObjectInit(INA226Driver *devp);
-void ina226Start(INA226Driver *devp, const INA226Config *config);
-void ina226Stop(INA226Driver *devp);
-void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg);
-int32_t ina226ReadShunt(INA226Driver *devp);
-uint32_t ina226ReadVBUS(INA226Driver *devp);
-int32_t ina226ReadCurrent(INA226Driver *devp);
-uint32_t ina226ReadPower(INA226Driver *devp);
+void tmp101ObjectInit(TMP101Driver *devp);
+void tmp101Start(TMP101Driver *devp, const TMP101Config *config);
+void tmp101Stop(TMP101Driver *devp);
+void tmp101SetAlert(TMP101Driver *devp, uint16_t alert_me, uint16_t alert_lim);
+uint16_t tmp101ReadRaw(TMP101Driver *devp, uint8_t reg);
+int32_t tmp101ReadShunt(TMP101Driver *devp);
+uint32_t tmp101ReadVBUS(TMP101Driver *devp);
+int32_t tmp101ReadCurrent(TMP101Driver *devp);
+uint32_t tmp101ReadPower(TMP101Driver *devp);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _INA226_H_ */
+#endif /* _TMP101_H_ */
 
 /** @} */
