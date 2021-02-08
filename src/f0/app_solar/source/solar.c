@@ -198,6 +198,14 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
     return i_in;
 }
 
+// 2021-02-07 - first draft read temperature routine
+bool read_tmp101an_temperature_v1(uint8_t* buffer_tx, uint8_t* buffer_rx)
+{
+
+}
+
+
+
 /* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
@@ -208,6 +216,18 @@ THD_FUNCTION(solar, arg)
     uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
     int i, j;
+
+// 2021-02-07 - these two byte arrays will be passed to a development
+//  routine, to confirm we can talk with the TMP101AN sensors of the
+//  solar board.  When that's working we'll move these and the dev'
+//  code over to the TMP101AN driver source file.  That will be the
+//  first step to honor and conform to the object oritented device
+//  driver encapsulation that's already expressed in the Oresat firmware
+//  project - TMH
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    uint8_t tmp101an_buf_tx[2] = {0};
+    uint8_t tmp101an_buf_rx[5] = {0};
+
 
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);

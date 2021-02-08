@@ -1,6 +1,6 @@
 /**
  * @file    tmp101.h
- * @brief   TMP101 Power Monitor.
+ * @brief   TMP101AN temperature sensor driver
  *
  * @addtogroup TMP101
  * @ingroup ORESAT
@@ -38,21 +38,19 @@
 #define TMP101_PATCH                        0
 /** @} */
 
+
 /**
  * @name    TMP101 Register Addresses
  * @{
  */
-#define TMP101_AD_CONFIG                    0x00U
-#define TMP101_AD_SHUNT                     0x01U
-#define TMP101_AD_VBUS                      0x02U
-#define TMP101_AD_POWER                     0x03U
-#define TMP101_AD_CURRENT                   0x04U
-#define TMP101_AD_CAL                       0x05U
-#define TMP101_AD_ME                        0x06U
-#define TMP101_AD_LIM                       0x07U
-#define TMP101_AD_MFG_ID                    0xFEU
-#define TMP101_AD_DIE_ID                    0xFFU
+#define TMP101_TEMPERATURE_READING          0x00U
+#define TMP101_CONFIGURATION                0x01U
+#define TMP101_TEMP_SETPOINT_LOW            0x10U
+#define TMP101_TEMP_SETPOINT_HIGH           0x11U
 /** @} */
+
+#define WORK_IN_PROGRESS__TMP101AN_DRIVER
+#ifndef WORK_IN_PROGRESS__TMP101AN_DRIVER
 
 /**
  * @name    TMP101 Configuration register fields
@@ -123,7 +121,7 @@
 /** @} */
 
 /**
- * @name    TMP101 Power register fields
+ * @name    TMP101AN temperature sensor register fields
  * @{
  */
 #define TMP101_POWER_Pos                    (0U)
@@ -191,7 +189,7 @@
 /**
  * @name    TMP101 Alert Limit register fields
  * @{
- */
+ 
 #define TMP101_LIM_Pos                      (0U)
 #define TMP101_LIM_Msk                      (0xFFFFU << TMP101_LIM_Pos)
 #define TMP101_LIM                          TMP101_LIM_Msk
@@ -218,6 +216,9 @@
 #define TMP101_DIE_ID_DID                   TMP101_DIE_ID_DID_Msk
 /** @} */
 
+#endif // TMP101AN work removing unneeded template code - TMH
+
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -242,7 +243,7 @@
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
 #if !defined(TMP101_SHARED_I2C) || defined(__DOXYGEN__)
-#define TMP101_SHARED_I2C                   FALSE
+#define TMP101_SHARED_I2C                   TRUE
 #endif
 /** @} */
 
@@ -298,18 +299,19 @@ typedef struct {
      */
     i2caddr_t                   saddr;
 #endif /* TMP101_USE_I2C */
-    /**
-     * @brief TMP101 configuration reg value
-     */
-    uint16_t                    cfg;
-    /**
-     * @brief TMP101 calibration reg value
-     */
-    uint16_t                    cal;
-    /**
-     * @brief Optional Current LSB value for use in calculations
-     */
-    uint16_t                    curr_lsb;
+//    /**
+//     * @brief TMP101 configuration reg value
+//     */
+//    uint16_t                    cfg;
+
+//    /**
+//     * @brief TMP101 calibration reg value
+//     */
+//    uint16_t                    cal;
+//    /**
+//     * @brief Optional Current LSB value for use in calculations
+//     */
+//    uint16_t                    curr_lsb;
 } TMP101Config;
 
 /**
@@ -343,7 +345,7 @@ struct TMP101VMT {
     const TMP101Config          *config;
 
 /**
- * @brief TMP101 Power Monitor class.
+ * @brief TMP101AN temperature sensor class.
  */
 struct TMP101Driver {
     /** @brief Virtual Methods Table.*/
@@ -367,12 +369,14 @@ extern "C" {
 void tmp101ObjectInit(TMP101Driver *devp);
 void tmp101Start(TMP101Driver *devp, const TMP101Config *config);
 void tmp101Stop(TMP101Driver *devp);
-void tmp101SetAlert(TMP101Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-uint16_t tmp101ReadRaw(TMP101Driver *devp, uint8_t reg);
-int32_t tmp101ReadShunt(TMP101Driver *devp);
-uint32_t tmp101ReadVBUS(TMP101Driver *devp);
-int32_t tmp101ReadCurrent(TMP101Driver *devp);
-uint32_t tmp101ReadPower(TMP101Driver *devp);
+
+// void tmp101SetAlert(TMP101Driver *devp, uint16_t alert_me, uint16_t alert_lim);
+// uint16_t tmp101ReadRaw(TMP101Driver *devp, uint8_t reg);
+// int32_t tmp101ReadShunt(TMP101Driver *devp);
+// uint32_t tmp101ReadVBUS(TMP101Driver *devp);
+// int32_t tmp101ReadCurrent(TMP101Driver *devp);
+// uint32_t tmp101ReadPower(TMP101Driver *devp);
+
 #ifdef __cplusplus
 }
 #endif

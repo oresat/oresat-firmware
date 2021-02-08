@@ -8,7 +8,7 @@
  */
 
 #include "hal.h"
-#include "tmp101.h"
+#include "tmp101an.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -83,7 +83,7 @@ static const struct TMP101VMT vmt_device = {
 };
 
 /*===========================================================================*/
-/* Driver exported functions.                                                */
+/* - SECTION - Driver exported functions.                                    */
 /*===========================================================================*/
 
 /**
@@ -100,6 +100,10 @@ void tmp101ObjectInit(TMP101Driver *devp) {
 
     devp->state = TMP101_STOP;
 }
+
+
+
+#if (0) // 2021-02-07
 
 /**
  * @brief   Configures and activates TMP101 Complex Driver peripheral.
@@ -126,6 +130,7 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
 #endif /* TMP101_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
+
     buf.reg = TMP101_AD_CONFIG;
     buf.value = __REVSH(TMP101_CONFIG_RST);
     tmp101I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
@@ -145,6 +150,7 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
 #endif /* TMP101_SHARED_I2C */
 #endif /* TMP101_USE_I2C */
     devp->state = TMP101_READY;
+
 }
 
 /**
@@ -325,5 +331,7 @@ uint32_t tmp101ReadPower(TMP101Driver *devp) {
 
     return power;
 }
+
+#endif // 2021-02-07
 
 /** @} */
