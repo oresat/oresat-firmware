@@ -9,6 +9,8 @@
 #ifndef _TMP101_H_
 #define _TMP101_H_
 
+#include <chprintf.h>
+
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
@@ -43,11 +45,24 @@
  * @name    TMP101 Register Addresses
  * @{
  */
-#define TMP101_TEMPERATURE_READING          0x00U
-#define TMP101_CONFIGURATION                0x01U
-#define TMP101_TEMP_SETPOINT_LOW            0x10U
-#define TMP101_TEMP_SETPOINT_HIGH           0x11U
+#define TMP101_REG_TEMPERATURE_READING      0x00U
+#define TMP101_REG_CONFIGURATION            0x01U
+#define TMP101_REG_TEMP_SETPOINT_LOW        0x10U
+#define TMP101_REG_TEMP_SETPOINT_HIGH       0x11U
 /** @} */
+
+
+// ORESAT_TASK_001 - add temperature sensor driver:
+// 2021-02-08 MON - first steps temperature reading
+#define OPTION_SENSOR_01 (1)
+#define OPTION_SENSOR_02 (2)
+
+#define I2C_ADDR_SENSOR_01 (0x48)
+#define I2C_ADDR_SENSOR_02 (0x4A)
+
+
+
+
 
 #define WORK_IN_PROGRESS__TMP101AN_DRIVER
 #ifndef WORK_IN_PROGRESS__TMP101AN_DRIVER
@@ -189,7 +204,7 @@
 /**
  * @name    TMP101 Alert Limit register fields
  * @{
- 
+ */ 
 #define TMP101_LIM_Pos                      (0U)
 #define TMP101_LIM_Msk                      (0xFFFFU << TMP101_LIM_Pos)
 #define TMP101_LIM                          TMP101_LIM_Msk
@@ -376,6 +391,9 @@ void tmp101Stop(TMP101Driver *devp);
 // uint32_t tmp101ReadVBUS(TMP101Driver *devp);
 // int32_t tmp101ReadCurrent(TMP101Driver *devp);
 // uint32_t tmp101ReadPower(TMP101Driver *devp);
+
+//bool read_tmp101an_temperature_v1(uint32_t option);
+bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
 
 #ifdef __cplusplus
 }

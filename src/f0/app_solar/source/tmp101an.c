@@ -103,7 +103,6 @@ void tmp101ObjectInit(TMP101Driver *devp) {
 
 
 
-#if (0) // 2021-02-07
 
 /**
  * @brief   Configures and activates TMP101 Complex Driver peripheral.
@@ -124,6 +123,7 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
     devp->config = config;
 
     /* Configuring common registers.*/
+#if (0)
 #if TMP101_USE_I2C
 #if TMP101_SHARED_I2C
     i2cAcquireBus(config->i2cp);
@@ -149,6 +149,7 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
     i2cReleaseBus(config->i2cp);
 #endif /* TMP101_SHARED_I2C */
 #endif /* TMP101_USE_I2C */
+#endif // (0)
     devp->state = TMP101_READY;
 
 }
@@ -168,6 +169,7 @@ void tmp101Stop(TMP101Driver *devp) {
             "tmp101Stop(), invalid state");
 
     if (devp->state == TMP101_READY) {
+#if (0) // ORESAT_TASK_001
 #if TMP101_USE_I2C
 #if TMP101_SHARED_I2C
         i2cAcquireBus(devp->config->i2cp);
@@ -184,9 +186,13 @@ void tmp101Stop(TMP101Driver *devp) {
         i2cReleaseBus(devp->config->i2cp);
 #endif /* TMP101_SHARED_I2C */
 #endif /* TMP101_USE_I2C */
+#endif // ORESAT_TASK_001
     }
     devp->state = TMP101_STOP;
 }
+
+
+#if (0) // 2021-02-07, not ready to use any of these and some need to be removed for TMP101AN driver class:
 
 /**
  * @brief   Sets TMP101 Alert type and value
@@ -333,5 +339,56 @@ uint32_t tmp101ReadPower(TMP101Driver *devp) {
 }
 
 #endif // 2021-02-07
+
+
+
+// 2021-02-07 - first draft read temperature routine
+
+// bool read_tmp101an_temperature_v1(uint32_t option)
+bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
+{
+// 2021-02-07 - these two byte arrays will be passed to a development
+//  routine, to confirm we can talk with the TMP101AN sensors of the
+//  solar board.  When that's working we'll move these and the dev'
+//  code over to the TMP101AN driver source file.  That will be the
+//  first step to honor and conform to the object oritented device
+//  driver encapsulation that's already expressed in the Oresat firmware
+//  project - TMH
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    uint8_t buffer_tx[2] = {0};
+    uint8_t buffer_rx[5] = {0};
+
+    msg_t i2c_result = MSG_OK;
+
+    chprintf((BaseSequentialStream *) &SD2, "stub temperature reading routine:\r\n");
+
+    chprintf((BaseSequentialStream *) &SD2, "called with option %u,\r\n", option);
+
+// Values chosen per TMP101AN datasheet:
+    buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
+    buffer_tx[1] = ( I2C_ADDR_SENSOR_01 & 0x00000001 );
+// Clear first two bytes of receive buffer, as temperature reading has 12 bits spanning two bytes:
+    buffer_rx[0] = 0;
+    buffer_rx[1] = 0;
+
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+
+    i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, I2C_ADDR_SENSOR_01, buffer_tx, 2, buffer_rx, 2, TIME_INFINITE);
+
+    i2cReleaseBus(devp->config->i2cp);
+
+    chprintf((BaseSequentialStream *) &SD2, "temperature reg bytes back hold %u and %u.\r\n\r\n",
+      buffer_rx[0], buffer_rx[1]);
+
+    if ( i2c_result == MSG_OK )
+        return true;
+    else
+        return true;
+
+}
+
+
+
 
 /** @} */

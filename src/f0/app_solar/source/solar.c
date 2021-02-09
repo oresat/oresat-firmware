@@ -3,6 +3,9 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
+#include "tmp101an.h"
+
+
 /* Defines for INA226 */
 #define CURR_LSB               20       /* 20uA/bit */
 #define RSENSE                 100      /* 0.1 ohm  */
@@ -25,8 +28,6 @@
 #define MIN_PV_CURRENT         00000    /* Minimum current drawn from PV cells */
 #define MAX_PV_CURRENT         500000   /* Maximum current drawn from PV cells */
 #define MIN_PV_POWER           50000    /* Minimum power drawn from PV cells */
-
-
 
 static const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -64,6 +65,24 @@ static const DACConfig dac1cfg = {
 };
 
 static INA226Driver ina226dev;
+
+
+//----------------------------------------------------------------------
+// ORESAT_TASK_001 - add temperature sensor driver:
+
+static const TMP101Config tmp101anconfig =
+{
+    &I2CD2,
+    &i2cconfig,
+    I2C_ADDR_SENSOR_01 
+};
+
+static TMP101Driver tmp101andev;
+
+//
+//----------------------------------------------------------------------
+
+
 
 /**
  * @brief control DAC output in microvolts.
@@ -198,12 +217,6 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
     return i_in;
 }
 
-// 2021-02-07 - first draft read temperature routine
-bool read_tmp101an_temperature_v1(uint8_t* buffer_tx, uint8_t* buffer_rx)
-{
-
-}
-
 
 
 /* Main solar management thread */
@@ -217,27 +230,19 @@ THD_FUNCTION(solar, arg)
     uint32_t i_in=0;
     int i, j;
 
-// 2021-02-07 - these two byte arrays will be passed to a development
-//  routine, to confirm we can talk with the TMP101AN sensors of the
-//  solar board.  When that's working we'll move these and the dev'
-//  code over to the TMP101AN driver source file.  That will be the
-//  first step to honor and conform to the object oritented device
-//  driver encapsulation that's already expressed in the Oresat firmware
-//  project - TMH
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    uint8_t tmp101an_buf_tx[2] = {0};
-    uint8_t tmp101an_buf_rx[5] = {0};
-
-
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
     dacStart(&DACD1, &dac1cfg);
     ina226Start(&ina226dev, &ina226config);
 
+    tmp101ObjectInit(&tmp101andev);
+    tmp101Start(&tmp101andev, &tmp101anconfig);
+
     /* Start up LT1618 */
     palSetLine(LINE_LT1618_EN);
 
-    while(!chThdShouldTerminateX()){
+    while(!chThdShouldTerminateX())
+    {
         chThdSleepMilliseconds(SLEEP_MS);
 
         /* Get present values */
@@ -256,11 +261,18 @@ THD_FUNCTION(solar, arg)
         i_in = calc_mppt(voltage, current, power);
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
+
         if (j >= 500){
-          chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
-          chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
-          j=0;
+            chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+            chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
+            j = 0;
         }
+
+        if (j == 10)
+        {
+            read_tmp101an_temperature_v1(&tmp101andev, 1);
+        }
+
         j++;
         i++;
     }
