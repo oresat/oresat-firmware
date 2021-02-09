@@ -262,13 +262,13 @@ THD_FUNCTION(solar, arg)
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
 
-        if (j >= 500){
+        if (j >= 600){
             chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
             chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
             j = 0;
         }
 
-        if (j == 10)
+        if (j == 300)
         {
             read_tmp101an_temperature_v1(&tmp101andev, 1);
         }
