@@ -377,22 +377,23 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     buffer_rx[1] = 0;
 
 
-    chprintf((BaseSequentialStream *) &SD2, "stub temperature reading routine:\r\n");
-    chprintf((BaseSequentialStream *) &SD2, "writing to sensor %02X,\r\n\r\n", sensor_addr);
+//    chprintf((BaseSequentialStream *) &SD2, "stub temperature reading routine:\r\n");
+    chprintf((BaseSequentialStream *) &SD2, "reading temperature sensor %02X . . .\r\n", sensor_addr);
 
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
     i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, buffer_rx, 2, TIME_INFINITE);
-
     i2c_flags = i2cGetErrors(devp->config->i2cp);
-
     i2cReleaseBus(devp->config->i2cp);
 
-    chprintf((BaseSequentialStream *) &SD2, "temperature reg bytes back hold %u and %u.\r\n",
+    chprintf((BaseSequentialStream *) &SD2, "temperature reg bytes back hold %u and %u.\r\n\r\n",
       buffer_rx[0], buffer_rx[1]);
-    chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result);
-    chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags);
+
+    if ( i2c_result != 0 )
+        { chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result); }
+    if ( i2c_flags != 0 )
+        { chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags); }
 
 
     if ( i2c_result == MSG_OK )

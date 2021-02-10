@@ -75,7 +75,13 @@ static const TMP101Config config_for_temp_sensor_01 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_01
+    I2C_ADDR_SENSOR_01,
+
+    0, // temperature present in degrees C
+    0, // minimum temperature reading
+    0, // maximum
+    0, // average
+   {0} // n readings used to calculate average
 };
 
 static TMP101Driver device_driver_for_temp_sensor_01;
@@ -85,7 +91,13 @@ static const TMP101Config config_for_temp_sensor_02 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_02
+    I2C_ADDR_SENSOR_02,
+
+    0, // temperature present in degrees C
+    0, // minimum temperature reading
+    0, // maximum
+    0, // average
+   {0} // n readings used to calculate average
 };
 
 static TMP101Driver device_driver_for_temp_sensor_02;
@@ -289,7 +301,7 @@ THD_FUNCTION(solar, arg)
 
         if ( j >= SOLAR_MAIN_THREAD_ITERNATIONS_ROLL_OVER_VALUE ) {
             chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
-            chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
+            chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n\r\n", i_in, iadj_uv);
             j = 0;
         }
 

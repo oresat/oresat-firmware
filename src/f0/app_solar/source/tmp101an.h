@@ -60,178 +60,8 @@
 #define I2C_ADDR_SENSOR_01 (0x48)
 #define I2C_ADDR_SENSOR_02 (0x4A)
 
+#define TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE (10)
 
-
-
-
-#define WORK_IN_PROGRESS__TMP101AN_DRIVER   // <-- Ted defining this symbol to skip INA226 specific code
-#ifndef WORK_IN_PROGRESS__TMP101AN_DRIVER
-
-/**
- * @name    TMP101 Configuration register fields
- * @{
- */
-#define TMP101_CONFIG_MODE_Pos              (0U)
-#define TMP101_CONFIG_MODE_Msk              (0x7U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_MODE                  TMP101_CONFIG_MODE_Msk
-#define TMP101_CONFIG_MODE_SHDN             (0x0U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_MODE_SHUNT            (0x1U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_MODE_VBUS             (0x2U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_MODE_SHUNT_VBUS       (0x3U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_MODE_CONT             (0x4U << TMP101_CONFIG_MODE_Pos)
-#define TMP101_CONFIG_VSHCT_Pos             (3U)
-#define TMP101_CONFIG_VSHCT_Msk             (0x7U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT                 TMP101_CONFIG_VSHCT_Msk
-#define TMP101_CONFIG_VSHCT_140US           (0x0U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_204US           (0x1U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_332US           (0x2U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_588US           (0x3U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_1100US          (0x4U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_2116US          (0x5U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_4156US          (0x6U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VSHCT_8224US          (0x7U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_Pos            (6U)
-#define TMP101_CONFIG_VBUSCT_Msk            (0x7U << TMP101_CONFIG_VBUSCT_Pos)
-#define TMP101_CONFIG_VBUSCT                TMP101_CONFIG_VBUSCT_Msk
-#define TMP101_CONFIG_VBUSCT_140US          (0x0U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_204US          (0x1U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_332US          (0x2U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_588US          (0x3U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_1100US         (0x4U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_2116US         (0x5U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_4156US         (0x6U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_VBUSCT_8224US         (0x7U << TMP101_CONFIG_VSHCT_Pos)
-#define TMP101_CONFIG_AVG_Pos               (9U)
-#define TMP101_CONFIG_AVG_Msk               (0x7U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG                   TMP101_CONFIG_AVG_Msk
-#define TMP101_CONFIG_AVG_1                 (0x0U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_4                 (0x1U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_16                (0x2U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_64                (0x3U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_128               (0x4U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_256               (0x5U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_512               (0x6U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_AVG_1024              (0x7U << TMP101_CONFIG_AVG_Pos)
-#define TMP101_CONFIG_RST_Pos               (15U)
-#define TMP101_CONFIG_RST_Msk               (0x1U << TMP101_CONFIG_RST_Pos)
-#define TMP101_CONFIG_RST                   TMP101_CONFIG_RST_Msk
-/** @} */
-
-/**
- * @name    TMP101 Shunt Voltage register fields
- * @{
- */
-#define TMP101_SHUNT_Pos                    (0U)
-#define TMP101_SHUNT_Msk                    (0xFFFFU << TMP101_SHUNT_Pos)
-#define TMP101_SHUNT                        TMP101_SHUNT_Msk
-/** @} */
-
-/**
- * @name    TMP101 VBUS Voltage register fields
- * @{
- */
-#define TMP101_VBUS_Pos                     (0U)
-#define TMP101_VBUS_Msk                     (0x7FFFU << TMP101_VBUS_Pos)
-#define TMP101_VBUS                         TMP101_VBUS_Msk
-/** @} */
-
-/**
- * @name    TMP101AN temperature sensor register fields
- * @{
- */
-#define TMP101_POWER_Pos                    (0U)
-#define TMP101_POWER_Msk                    (0xFFFFU << TMP101_POWER_Pos)
-#define TMP101_POWER                        TMP101_POWER_Msk
-/** @} */
-
-/**
- * @name    TMP101 Current register fields
- * @{
- */
-#define TMP101_CURRENT_Pos                  (0U)
-#define TMP101_CURRENT_Msk                  (0xFFFFU << TMP101_CURRENT_Pos)
-#define TMP101_CURRENT                      TMP101_CURRENT_Msk
-/** @} */
-
-/**
- * @name    TMP101 Calibration register fields
- * @{
- */
-#define TMP101_CAL_Pos                      (0U)
-#define TMP101_CAL_Msk                      (0x7FFFU << TMP101_CAL_Pos)
-#define TMP101_CAL                          TMP101_CAL_Msk
-/** @} */
-
-/**
- * @name    TMP101 Alert Mask/Enable register fields
- * @{
- */
-#define TMP101_ME_LEN_Pos                   (0U)
-#define TMP101_ME_LEN_Msk                   (0x1U << TMP101_ME_LEN_Pos)
-#define TMP101_ME_LEN                       TMP101_ME_LEN_Msk
-#define TMP101_ME_APOL_Pos                  (1U)
-#define TMP101_ME_APOL_Msk                  (0x1U << TMP101_ME_APOL_Pos)
-#define TMP101_ME_APOL                      TMP101_ME_APOL_Msk
-#define TMP101_ME_OVF_Pos                   (2U)
-#define TMP101_ME_OVF_Msk                   (0x1U << TMP101_ME_OVF_Pos)
-#define TMP101_ME_OVF                       TMP101_ME_OVF_Msk
-#define TMP101_ME_CVRF_Pos                  (3U)
-#define TMP101_ME_CVRF_Msk                  (0x1U << TMP101_ME_CVRF_Pos)
-#define TMP101_ME_CVRF                      TMP101_ME_CVRF_Msk
-#define TMP101_ME_AFF_Pos                   (4U)
-#define TMP101_ME_AFF_Msk                   (0x1U << TMP101_ME_AFF_Pos)
-#define TMP101_ME_AFF                       TMP101_ME_AFF_Msk
-#define TMP101_ME_CNVR_Pos                  (10U)
-#define TMP101_ME_CNVR_Msk                  (0x1U << TMP101_ME_CNVR_Pos)
-#define TMP101_ME_CNVR                      TMP101_ME_CNVR_Msk
-#define TMP101_ME_POL_Pos                   (11U)
-#define TMP101_ME_POL_Msk                   (0x1U << TMP101_ME_POL_Pos)
-#define TMP101_ME_POL                       TMP101_ME_POL_Msk
-#define TMP101_ME_BUL_Pos                   (12U)
-#define TMP101_ME_BUL_Msk                   (0x1U << TMP101_ME_BUL_Pos)
-#define TMP101_ME_BUL                       TMP101_ME_BUL_Msk
-#define TMP101_ME_BOL_Pos                   (13U)
-#define TMP101_ME_BOL_Msk                   (0x1U << TMP101_ME_BOL_Pos)
-#define TMP101_ME_BOL                       TMP101_ME_BOL_Msk
-#define TMP101_ME_SUL_Pos                   (14U)
-#define TMP101_ME_SUL_Msk                   (0x1U << TMP101_ME_SUL_Pos)
-#define TMP101_ME_SUL                       TMP101_ME_SUL_Msk
-#define TMP101_ME_SOL_Pos                   (15U)
-#define TMP101_ME_SOL_Msk                   (0x1U << TMP101_ME_SOL_Pos)
-#define TMP101_ME_SOL                       TMP101_ME_SOL_Msk
-/** @} */
-
-/**
- * @name    TMP101 Alert Limit register fields
- * @{
- */ 
-#define TMP101_LIM_Pos                      (0U)
-#define TMP101_LIM_Msk                      (0xFFFFU << TMP101_LIM_Pos)
-#define TMP101_LIM                          TMP101_LIM_Msk
-/** @} */
-
-/**
- * @name    TMP101 Manufacturer ID register fields
- * @{
- */
-#define TMP101_MFG_ID_Pos                   (0U)
-#define TMP101_MFG_ID_Msk                   (0xFFFFU << TMP101_MFG_ID_Pos)
-#define TMP101_MFG_ID                       TMP101_MFG_ID_Msk
-/** @} */
-
-/**
- * @name    TMP101 Die ID register fields
- * @{
- */
-#define TMP101_DIE_ID_RID_Pos               (0U)
-#define TMP101_DIE_ID_RID_Msk               (0xFU << TMP101_DIE_ID_RID_Pos)
-#define TMP101_DIE_ID_RID                   TMP101_DIE_ID_RID_Msk
-#define TMP101_DIE_ID_DID_Pos               (4U)
-#define TMP101_DIE_ID_DID_Msk               (0xFFFU << TMP101_DIE_ID_DID_Pos)
-#define TMP101_DIE_ID_DID                   TMP101_DIE_ID_DID_Msk
-/** @} */
-
-#endif // TMP101AN work removing unneeded template code - TMH
 
 
 /*===========================================================================*/
@@ -296,9 +126,11 @@ typedef enum {
     TMP101_READY = 2,                   /**< Ready.                           */
 } tmp101_state_t;
 
+
 /**
  * @brief   TMP101 configuration structure.
  */
+
 typedef struct {
 #if (TMP101_USE_I2C) || defined(__DOXYGEN__)
     /**
@@ -314,19 +146,17 @@ typedef struct {
      */
     i2caddr_t                   saddr;
 #endif /* TMP101_USE_I2C */
-//    /**
-//     * @brief TMP101 configuration reg value
-//     */
-//    uint16_t                    cfg;
 
-//    /**
-//     * @brief TMP101 calibration reg value
-//     */
-//    uint16_t                    cal;
-//    /**
-//     * @brief Optional Current LSB value for use in calculations
-//     */
-//    uint16_t                    curr_lsb;
+    /**
+     * @brief TMP101AN temperature reading variables, temperature present, min, max, average
+     */
+    uint16_t                    temperature_present_in_C;
+    uint16_t                    temperature_min;
+    uint16_t                    temperature_max;
+    uint16_t                    temperature_average;
+
+    uint16_t                    temperature_readings[TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE]; 
+
 } TMP101Config;
 
 /**
@@ -392,7 +222,6 @@ void tmp101Stop(TMP101Driver *devp);
 // int32_t tmp101ReadCurrent(TMP101Driver *devp);
 // uint32_t tmp101ReadPower(TMP101Driver *devp);
 
-//bool read_tmp101an_temperature_v1(uint32_t option);
 bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
 
 #ifdef __cplusplus
