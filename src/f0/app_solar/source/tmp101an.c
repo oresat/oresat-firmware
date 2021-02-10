@@ -361,11 +361,16 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     msg_t i2c_result = MSG_OK;
     i2cflags_t i2c_flags = 0;
 
-    uint8_t sensor_addr = I2C_ADDR_SENSOR_02;
+    uint8_t sensor_addr = I2C_ADDR_SENSOR_01;
+
+    if (option == 2)
+    {
+        sensor_addr = I2C_ADDR_SENSOR_02;
+    }
 
 // Values chosen per TMP101AN datasheet:
     buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
-    buffer_tx[1] = ( sensor_addr & 0x00000001 );
+    buffer_tx[1] = 0;
 // Clear first two bytes of receive buffer, as temperature reading has 12 bits spanning two bytes:
     buffer_rx[0] = 0;
     buffer_rx[1] = 0;
@@ -377,10 +382,8 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
-//    i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 2, buffer_rx, 2, TIME_INFINITE);
     i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, buffer_rx, 2, TIME_INFINITE);
 
-// i2cflags_t i2cGetErrors(I2CDriver *i2cp) {
     i2c_flags = i2cGetErrors(devp->config->i2cp);
 
     i2cReleaseBus(devp->config->i2cp);
