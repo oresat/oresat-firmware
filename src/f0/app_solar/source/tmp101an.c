@@ -361,11 +361,12 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     msg_t i2c_result = MSG_OK;
     i2cflags_t i2c_flags = 0;
 
-    uint8_t sensor_addr = I2C_ADDR_SENSOR_01;
+//    uint8_t sensor_addr = I2C_ADDR_SENSOR_01;
+    uint8_t sensor_addr = devp->config->saddr;
 
     if (option == 2)
     {
-        sensor_addr = I2C_ADDR_SENSOR_02;
+        // option parameter not yet used - TMH
     }
 
 // Values chosen per TMP101AN datasheet:

@@ -68,19 +68,39 @@ static INA226Driver ina226dev;
 
 
 //----------------------------------------------------------------------
-// ORESAT_TASK_001 - add temperature sensor driver:
+// ORESAT_TASK_001 - add temperature sensor drivers, two instances
+//  of Oresat styled structures used in OOP manner:
 
-static const TMP101Config tmp101anconfig =
+static const TMP101Config config_for_temp_sensor_01 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_01 
+    I2C_ADDR_SENSOR_01
 };
 
-static TMP101Driver tmp101andev;
+static TMP101Driver device_driver_for_temp_sensor_01;
+
+
+static const TMP101Config config_for_temp_sensor_02 =
+{
+    &I2CD2,
+    &i2cconfig,
+    I2C_ADDR_SENSOR_02
+};
+
+static TMP101Driver device_driver_for_temp_sensor_02;
 
 //
 //----------------------------------------------------------------------
+
+
+// ORESAT_TASK_002 - pound define solar primary thread iterations
+//  counter, max value at which to roll over.  This step interim to
+//  to creating a separate thread to manage temperature readings:
+
+#define SOLAR_MAIN_THREAD_ITERNATIONS_ROLL_OVER_VALUE (600)
+#define SOLAR_MAIN_THREAD_READ_TEMP_SENSOR_01_AT (200)
+#define SOLAR_MAIN_THREAD_READ_TEMP_SENSOR_02_AT (400)
 
 
 
@@ -235,8 +255,13 @@ THD_FUNCTION(solar, arg)
     dacStart(&DACD1, &dac1cfg);
     ina226Start(&ina226dev, &ina226config);
 
-    tmp101ObjectInit(&tmp101andev);
-    tmp101Start(&tmp101andev, &tmp101anconfig);
+// ORESAT_TASK_001 - bring up temperature sensor device objects:
+    tmp101ObjectInit(&device_driver_for_temp_sensor_01);
+    tmp101Start(&device_driver_for_temp_sensor_01, &config_for_temp_sensor_01);
+
+    tmp101ObjectInit(&device_driver_for_temp_sensor_02);
+    tmp101Start(&device_driver_for_temp_sensor_02, &config_for_temp_sensor_02);
+
 
     /* Start up LT1618 */
     palSetLine(LINE_LT1618_EN);
@@ -262,15 +287,20 @@ THD_FUNCTION(solar, arg)
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
 
-        if (j >= 600){
+        if ( j >= SOLAR_MAIN_THREAD_ITERNATIONS_ROLL_OVER_VALUE ) {
             chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
             chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
             j = 0;
         }
 
-        if (j == 300)
+        if ( j == SOLAR_MAIN_THREAD_READ_TEMP_SENSOR_01_AT )
         {
-            read_tmp101an_temperature_v1(&tmp101andev, 1);
+            read_tmp101an_temperature_v1(&device_driver_for_temp_sensor_01, 1);
+        }
+
+        if ( j == SOLAR_MAIN_THREAD_READ_TEMP_SENSOR_02_AT )
+        {
+            read_tmp101an_temperature_v1(&device_driver_for_temp_sensor_02, 2);
         }
 
         j++;

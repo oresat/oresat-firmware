@@ -64,7 +64,7 @@
 
 
 
-#define WORK_IN_PROGRESS__TMP101AN_DRIVER
+#define WORK_IN_PROGRESS__TMP101AN_DRIVER   // <-- Ted defining this symbol to skip INA226 specific code
 #ifndef WORK_IN_PROGRESS__TMP101AN_DRIVER
 
 /**
