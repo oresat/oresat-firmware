@@ -436,16 +436,19 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         goto state_usage;
     }
     if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "C3 State: %c\r\n", c3_state);
+        chprintf(chp, "C3 State:  %c\r\n", c3_state);
+        chprintf(chp, "TX Enable: %s\r\n", (tx_enable ? "TRUE" : "FALSE"));
+        chprintf(chp, "Bat Good:  %s\r\n", (bat_good ? "TRUE" : "FALSE"));
+        chprintf(chp, "EDL Mode:  %s\r\n", (edl ? "TRUE" : "FALSE"));
     } else if (!strcmp(argv[0], "tx") && argc > 1) {
-        strtoul(argv[1], NULL, 0);
-
+        tx_enable = (argv[1][0] == 't');
+        chEvtSignal(c3_tp, C3_EVENT_TX);
     } else if (!strcmp(argv[0], "bat") && argc > 1) {
-        if (argv[1][0] == 't') {
-
-        } else {
-
-        }
+        bat_good = (argv[1][0] == 't');
+        chEvtSignal(c3_tp, C3_EVENT_BAT);
+    } else if (!strcmp(argv[0], "edl") && argc > 1) {
+        edl = (argv[1][0] == 't');
+        chEvtSignal(c3_tp, C3_EVENT_EDL);
     } else {
         goto state_usage;
     }
@@ -455,8 +458,9 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
 state_usage:
     chprintf(chp,  "Usage: state <command>\r\n"
                    "    status:         Get current system state\r\n"
-                   "    tx <timeout>:   Enable TX for <timeout> seconds\r\n"
+                   "    tx <t/f>:       Override TX enable state\r\n"
                    "    bat <t/f>:      Override battery good state\r\n"
+                   "    edl <t/f>:      Override EDL state\r\n"
                    "\r\n");
     return;
 }

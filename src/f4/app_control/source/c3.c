@@ -1,10 +1,12 @@
 #include "c3.h"
 #include "comms.h"
 
-#define C3_EVENT_TIMER                      EVENT_MASK(0)
-#define C3_EVENT_TX                         EVENT_MASK(1)
-#define C3_EVENT_BAT                        EVENT_MASK(2)
-#define C3_EVENT_EDL                        EVENT_MASK(3)
+/* Placeholder variables for satellite state from object dictionary */
+/* TODO: Switch to actual OD variables */
+bool timeout_complete = true;
+bool tx_enable = false;
+bool bat_good = false;
+bool edl = false;
 
 /* Global State Variables */
 c3_state_t c3_state = PREDEPLOY;
@@ -21,8 +23,7 @@ THD_FUNCTION(c3, arg)
     while (!chThdShouldTerminateX()) {
         switch (c3_state) {
         case PREDEPLOY:
-            /* TODO: Check for timer elapsed condition */
-            if (1) {
+            if (timeout_complete) {
                 c3_state = DEPLOY;
             } else {
                 chEvtWaitAny(C3_EVENT_TIMER);
@@ -35,9 +36,9 @@ THD_FUNCTION(c3, arg)
         case STANDBY:
             comms_beacon(false);
 
-            if (0) {
+            if (edl) {
                 c3_state = EDL;
-            } else if (0) {
+            } else if (tx_enable && bat_good) {
                 c3_state = BEACON;
             } else {
                 chEvtWaitAny(C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
@@ -46,9 +47,9 @@ THD_FUNCTION(c3, arg)
         case BEACON:
             comms_beacon(true);
 
-            if (0) {
+            if (edl) {
                 c3_state = EDL;
-            } else if (0) {
+            } else if (!tx_enable || !bat_good) {
                 c3_state = STANDBY;
             } else {
                 chEvtWaitAny(C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
@@ -57,10 +58,12 @@ THD_FUNCTION(c3, arg)
         case EDL:
             comms_beacon(false);
 
-            if (0) {
-                c3_state = STANDBY;
-            } else if (0) {
-                c3_state = BEACON;
+            if (!edl) {
+                if (tx_enable && bat_good) {
+                    c3_state = BEACON;
+                } else {
+                    c3_state = STANDBY;
+                }
             } else {
                 chEvtWaitAny(C3_EVENT_EDL);
             }
