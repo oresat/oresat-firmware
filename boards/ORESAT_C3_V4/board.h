@@ -71,7 +71,7 @@
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
 #define GPIOA_SPI1_MOSI             7U
-#define GPIOA_RTC_PWROFF            8U
+#define GPIOA_I2C_PWROFF            8U
 #define GPIOA_CAN1_SILENT           9U
 #define GPIOA_CAN1_SHDN             10U
 #define GPIOA_CAN1_RX               11U
@@ -142,11 +142,11 @@
 #define GPIOE_PIN8                  8U
 #define GPIOE_PIN9                  9U
 #define GPIOE_PIN10                 10U
-#define GPIOE_PIN11                 11U
+#define GPIOE_TOT_OUT               11U
 #define GPIOE_PIN12                 12U
-#define GPIOE_PIN13                 13U
-#define GPIOE_PIN14                 14U
-#define GPIOE_PIN15                 15U
+#define GPIOE_LNA_ENABLE            13U
+#define GPIOE_PA_ENABLE             14U
+#define GPIOE_TOT_CLEAR             15U
 
 #define GPIOF_PIN0                  0U
 #define GPIOF_PIN1                  1U
@@ -220,7 +220,7 @@
  * IO lines assignments.
  */
 #define LINE_SPI1_MISO              PAL_LINE(GPIOA, 6U)
-#define LINE_RTC_PWROFF             PAL_LINE(GPIOA, 8U)
+#define LINE_I2C_PWROFF             PAL_LINE(GPIOA, 8U)
 #define LINE_CAN1_SILENT            PAL_LINE(GPIOA, 9U)
 #define LINE_CAN1_SHDN              PAL_LINE(GPIOA, 10U)
 #define LINE_CAN2_SHDN              PAL_LINE(GPIOB, 4U)
@@ -242,6 +242,10 @@
 #define LINE_FIRE_TURN_2            PAL_LINE(GPIOE, 2U)
 #define LINE_FIRE_HELI_2            PAL_LINE(GPIOE, 3U)
 #define LINE_MMC_PWR                PAL_LINE(GPIOE, 7U)
+#define LINE_TOT_OUT                PAL_LINE(GPIOE, 11U)
+#define LINE_LNA_ENABLE             PAL_LINE(GPIOE, 13U)
+#define LINE_PA_ENABLE              PAL_LINE(GPIOE, 14U)
+#define LINE_TOT_CLEAR              PAL_LINE(GPIOE, 15U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -292,7 +296,7 @@
  * PA5  - SPI1_SCK                  (alternate 5).
  * PA6  - SPI1_MISO                 (alternate 5).
  * PA7  - SPI1_MOSI                 (alternate 5).
- * PA8  - RTC_PWROFF                (output pushpull).
+ * PA8  - I2C_PWROFF                (output pushpull).
  * PA9  - CAN1_SILENT               (output pushpull).
  * PA10 - CAN1_SHDN                 (output pushpull).
  * PA11 - CAN1_RX                   (alternate 9).
@@ -309,7 +313,7 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_SCK) |   \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MISO) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_SPI1_MOSI) |  \
-                                     PIN_MODE_OUTPUT(GPIOA_RTC_PWROFF) |    \
+                                     PIN_MODE_OUTPUT(GPIOA_I2C_PWROFF) |    \
                                      PIN_MODE_OUTPUT(GPIOA_CAN1_SILENT) |   \
                                      PIN_MODE_OUTPUT(GPIOA_CAN1_SHDN) |     \
                                      PIN_MODE_ALTERNATE(GPIOA_CAN1_RX) |    \
@@ -325,7 +329,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_SCK) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MISO) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_SPI1_MOSI) |  \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_RTC_PWROFF) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_I2C_PWROFF) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_SILENT) |\
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_SHDN) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN1_RX) |    \
@@ -341,7 +345,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_SCK) |      \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MISO) |     \
                                      PIN_OSPEED_HIGH(GPIOA_SPI1_MOSI) |     \
-                                     PIN_OSPEED_HIGH(GPIOA_RTC_PWROFF) |    \
+                                     PIN_OSPEED_HIGH(GPIOA_I2C_PWROFF) |    \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_SILENT) |   \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_SHDN) |     \
                                      PIN_OSPEED_HIGH(GPIOA_CAN1_RX) |       \
@@ -357,7 +361,7 @@
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_SCK) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_MISO) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_SPI1_MOSI) |  \
-                                     PIN_PUPDR_FLOATING(GPIOA_RTC_PWROFF) | \
+                                     PIN_PUPDR_FLOATING(GPIOA_I2C_PWROFF) | \
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_SILENT) |\
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_SHDN) |  \
                                      PIN_PUPDR_FLOATING(GPIOA_CAN1_RX) |    \
@@ -373,7 +377,7 @@
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MOSI) |        \
-                                     PIN_ODR_HIGH(GPIOA_RTC_PWROFF) |       \
+                                     PIN_ODR_HIGH(GPIOA_I2C_PWROFF) |       \
                                      PIN_ODR_LOW(GPIOA_CAN1_SILENT) |       \
                                      PIN_ODR_LOW(GPIOA_CAN1_SHDN) |         \
                                      PIN_ODR_HIGH(GPIOA_CAN1_RX) |          \
@@ -389,7 +393,7 @@
                                      PIN_AFIO_AF(GPIOA_SPI1_SCK, 5U) |      \
                                      PIN_AFIO_AF(GPIOA_SPI1_MISO, 5U) |     \
                                      PIN_AFIO_AF(GPIOA_SPI1_MOSI, 5U))
-#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_RTC_PWROFF, 0U) |    \
+#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_I2C_PWROFF, 0U) |    \
                                      PIN_AFIO_AF(GPIOA_CAN1_SILENT, 0U) |   \
                                      PIN_AFIO_AF(GPIOA_CAN1_SHDN, 0U) |     \
                                      PIN_AFIO_AF(GPIOA_CAN1_RX, 9U) |       \
@@ -763,11 +767,11 @@
  * PE8  - PIN8                      (analog).
  * PE9  - PIN9                      (analog).
  * PE10 - PIN10                     (analog).
- * PE11 - PIN11                     (analog).
+ * PE11 - TOT_OUT                   (input).
  * PE12 - PIN12                     (analog).
- * PE13 - PIN13                     (analog).
- * PE14 - PIN14                     (analog).
- * PE15 - PIN15                     (analog).
+ * PE13 - LNA_ENABLE                (output pushpull).
+ * PE14 - PA_ENABLE                 (output pushpull).
+ * PE15 - TOT_CLEAR                 (output pushpull).
  */
 #define VAL_GPIOE_MODER             (PIN_MODE_INPUT(GPIOE_OPD_FAULT) |      \
                                      PIN_MODE_OUTPUT(GPIOE_WDT) |           \
@@ -780,11 +784,11 @@
                                      PIN_MODE_ANALOG(GPIOE_PIN8) |          \
                                      PIN_MODE_ANALOG(GPIOE_PIN9) |          \
                                      PIN_MODE_ANALOG(GPIOE_PIN10) |         \
-                                     PIN_MODE_ANALOG(GPIOE_PIN11) |         \
+                                     PIN_MODE_INPUT(GPIOE_TOT_OUT) |        \
                                      PIN_MODE_ANALOG(GPIOE_PIN12) |         \
-                                     PIN_MODE_ANALOG(GPIOE_PIN13) |         \
-                                     PIN_MODE_ANALOG(GPIOE_PIN14) |         \
-                                     PIN_MODE_ANALOG(GPIOE_PIN15))
+                                     PIN_MODE_OUTPUT(GPIOE_LNA_ENABLE) |    \
+                                     PIN_MODE_OUTPUT(GPIOE_PA_ENABLE) |     \
+                                     PIN_MODE_OUTPUT(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOE_OPD_FAULT) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOE_WDT) |        \
                                      PIN_OTYPE_PUSHPULL(GPIOE_FIRE_TURN_2) |\
@@ -796,11 +800,11 @@
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN9) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN10) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOE_PIN11) |      \
+                                     PIN_OTYPE_PUSHPULL(GPIOE_TOT_OUT) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOE_PIN12) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOE_PIN13) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOE_PIN14) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOE_PIN15))
+                                     PIN_OTYPE_PUSHPULL(GPIOE_LNA_ENABLE) | \
+                                     PIN_OTYPE_PUSHPULL(GPIOE_PA_ENABLE) |  \
+                                     PIN_OTYPE_PUSHPULL(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_OSPEEDR           (PIN_OSPEED_HIGH(GPIOE_OPD_FAULT) |     \
                                      PIN_OSPEED_HIGH(GPIOE_WDT) |           \
                                      PIN_OSPEED_HIGH(GPIOE_FIRE_TURN_2) |   \
@@ -812,11 +816,11 @@
                                      PIN_OSPEED_HIGH(GPIOE_PIN8) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN9) |          \
                                      PIN_OSPEED_HIGH(GPIOE_PIN10) |         \
-                                     PIN_OSPEED_HIGH(GPIOE_PIN11) |         \
+                                     PIN_OSPEED_HIGH(GPIOE_TOT_OUT) |       \
                                      PIN_OSPEED_HIGH(GPIOE_PIN12) |         \
-                                     PIN_OSPEED_HIGH(GPIOE_PIN13) |         \
-                                     PIN_OSPEED_HIGH(GPIOE_PIN14) |         \
-                                     PIN_OSPEED_HIGH(GPIOE_PIN15))
+                                     PIN_OSPEED_HIGH(GPIOE_LNA_ENABLE) |    \
+                                     PIN_OSPEED_HIGH(GPIOE_PA_ENABLE) |     \
+                                     PIN_OSPEED_HIGH(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_PUPDR             (PIN_PUPDR_FLOATING(GPIOE_OPD_FAULT) |  \
                                      PIN_PUPDR_FLOATING(GPIOE_WDT) |        \
                                      PIN_PUPDR_FLOATING(GPIOE_FIRE_TURN_2) |\
@@ -828,11 +832,11 @@
                                      PIN_PUPDR_FLOATING(GPIOE_PIN8) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN9) |       \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN10) |      \
-                                     PIN_PUPDR_FLOATING(GPIOE_PIN11) |      \
+                                     PIN_PUPDR_FLOATING(GPIOE_TOT_OUT) |    \
                                      PIN_PUPDR_FLOATING(GPIOE_PIN12) |      \
-                                     PIN_PUPDR_FLOATING(GPIOE_PIN13) |      \
-                                     PIN_PUPDR_FLOATING(GPIOE_PIN14) |      \
-                                     PIN_PUPDR_FLOATING(GPIOE_PIN15))
+                                     PIN_PUPDR_FLOATING(GPIOE_LNA_ENABLE) | \
+                                     PIN_PUPDR_FLOATING(GPIOE_PA_ENABLE) |  \
+                                     PIN_PUPDR_FLOATING(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_ODR               (PIN_ODR_HIGH(GPIOE_OPD_FAULT) |        \
                                      PIN_ODR_LOW(GPIOE_WDT) |               \
                                      PIN_ODR_LOW(GPIOE_FIRE_TURN_2) |       \
@@ -844,11 +848,11 @@
                                      PIN_ODR_HIGH(GPIOE_PIN8) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN9) |             \
                                      PIN_ODR_HIGH(GPIOE_PIN10) |            \
-                                     PIN_ODR_HIGH(GPIOE_PIN11) |            \
+                                     PIN_ODR_HIGH(GPIOE_TOT_OUT) |          \
                                      PIN_ODR_HIGH(GPIOE_PIN12) |            \
-                                     PIN_ODR_HIGH(GPIOE_PIN13) |            \
-                                     PIN_ODR_HIGH(GPIOE_PIN14) |            \
-                                     PIN_ODR_HIGH(GPIOE_PIN15))
+                                     PIN_ODR_HIGH(GPIOE_LNA_ENABLE) |       \
+                                     PIN_ODR_LOW(GPIOE_PA_ENABLE) |         \
+                                     PIN_ODR_HIGH(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_AFRL              (PIN_AFIO_AF(GPIOE_OPD_FAULT, 0U) |     \
                                      PIN_AFIO_AF(GPIOE_WDT, 0U) |           \
                                      PIN_AFIO_AF(GPIOE_FIRE_TURN_2, 0U) |   \
@@ -860,11 +864,11 @@
 #define VAL_GPIOE_AFRH              (PIN_AFIO_AF(GPIOE_PIN8, 0U) |          \
                                      PIN_AFIO_AF(GPIOE_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOE_PIN10, 0U) |         \
-                                     PIN_AFIO_AF(GPIOE_PIN11, 0U) |         \
+                                     PIN_AFIO_AF(GPIOE_TOT_OUT, 0U) |       \
                                      PIN_AFIO_AF(GPIOE_PIN12, 0U) |         \
-                                     PIN_AFIO_AF(GPIOE_PIN13, 0U) |         \
-                                     PIN_AFIO_AF(GPIOE_PIN14, 0U) |         \
-                                     PIN_AFIO_AF(GPIOE_PIN15, 0U))
+                                     PIN_AFIO_AF(GPIOE_LNA_ENABLE, 0U) |    \
+                                     PIN_AFIO_AF(GPIOE_PA_ENABLE, 0U) |     \
+                                     PIN_AFIO_AF(GPIOE_TOT_CLEAR, 0U))
 
 /*
  * GPIOF setup:
