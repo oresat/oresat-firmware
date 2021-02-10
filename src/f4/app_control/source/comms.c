@@ -18,30 +18,26 @@ static uint8_t pdu_fifo_buf[RADIO_PDU_COUNT][RADIO_PDU_SIZE];
 
 static const SPIConfig lband_spicfg = {
     false,
-    NULL,                                   // Operation complete callback
+    NULL,                                   /* Operation complete callback */
     LINE_LBAND_CS,
-    // SPI cr1 data                         (see 446 ref man.)
-    SPI_CR1_SPE     |                       // SPI enable
-    SPI_CR1_MSTR    |                       // Master
-    //SPI_CR1_BR_2    |
-    SPI_CR1_BR_1    |
-    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
+    // SPI_CR1
+    SPI_CR1_SPE     |                       /* SPI enable */
+    SPI_CR1_MSTR    |                       /* Master */
+    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
     SPI_CR1_SSM,
-    0, // SPI_CR2_SSOE,
+    0,
 };
 
 static const SPIConfig uhf_spicfg = {
     false,
-    NULL,                                   // Operation complete callback
+    NULL,                                   /* Operation complete callback */
     LINE_UHF_CS,
-    // SPI cr1 data                         (see 446 ref man.)
-    SPI_CR1_SPE     |                       // SPI enable
-    SPI_CR1_MSTR    |                       // Master
-    //SPI_CR1_BR_2    |
-    SPI_CR1_BR_1    |
-    SPI_CR1_BR_0   |                        // fpclk/16  approx 5Mhz? BR = 0x011
+    // SPI_CR1
+    SPI_CR1_SPE     |                       /* SPI enable */
+    SPI_CR1_MSTR    |                       /* Master */
+    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
     SPI_CR1_SSM,
-    0, // SPI_CR2_SSOE,
+    0,
 };
 
 static const ax5043_profile_t lband_eng[] = {
