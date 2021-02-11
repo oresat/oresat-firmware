@@ -76,13 +76,14 @@ static const TMP101Config config_for_temp_sensor_01 =
     &I2CD2,
     &i2cconfig,
     I2C_ADDR_SENSOR_01,
-
+/*
     0,  // temperature present in degrees C
     0,  // minimum temperature reading
     0,  // maximum
     0,  // average
    {0}, // n readings used to calculate average
     0   // index to array of temperature readings
+*/
 };
 
 static TMP101Driver device_driver_for_temp_sensor_01;
@@ -94,12 +95,14 @@ static const TMP101Config config_for_temp_sensor_02 =
     &i2cconfig,
     I2C_ADDR_SENSOR_02,
 
+/*
     0,  // temperature present in degrees C
     0,  // minimum temperature reading
     0,  // maximum
     0,  // average
    {0}, // n readings used to calculate average
     0   // index to array of temperature readings
+*/
 };
 
 static TMP101Driver device_driver_for_temp_sensor_02;

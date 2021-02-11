@@ -60,8 +60,6 @@
 #define I2C_ADDR_SENSOR_01 (0x48)
 #define I2C_ADDR_SENSOR_02 (0x4A)
 
-#define TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE (10)
-
 
 
 /*===========================================================================*/
@@ -146,25 +144,6 @@ typedef struct {
      */
     i2caddr_t           saddr;
 #endif /* TMP101_USE_I2C */
-
-    /**
-     * @brief TMP101AN temperature reading variables, temperature present, min, max, average
-     */
-    uint16_t            temperature_present_in_C;
-    uint16_t            temperature_min;
-    uint16_t            temperature_max;
-    uint16_t            temperature_average;
-
-    /**
-     * @brief array of temperature readings for averaging purpose
-     */
-    uint16_t            temperature_readings[TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE]; 
-
-    /**
-     * @brief index to array of temperature readings for updating purpose
-     */
-    uint16_t            readings_index;
-
 } TMP101Config;
 
 /**
