@@ -361,7 +361,6 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     msg_t i2c_result = MSG_OK;
     i2cflags_t i2c_flags = 0;
 
-//    uint8_t sensor_addr = I2C_ADDR_SENSOR_01;
     uint8_t sensor_addr = devp->config->saddr;
 
     if (option == 2)
@@ -372,12 +371,12 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
 // Values chosen per TMP101AN datasheet:
     buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
     buffer_tx[1] = 0;
+
 // Clear first two bytes of receive buffer, as temperature reading has 12 bits spanning two bytes:
     buffer_rx[0] = 0;
     buffer_rx[1] = 0;
 
 
-//    chprintf((BaseSequentialStream *) &SD2, "stub temperature reading routine:\r\n");
     chprintf((BaseSequentialStream *) &SD2, "reading temperature sensor %02X . . .\r\n", sensor_addr);
 
     i2cAcquireBus(devp->config->i2cp);
@@ -395,6 +394,8 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     if ( i2c_flags != 0 )
         { chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags); }
 
+// Compiler error:  cannot write to instantiating code's memory, as on next line - TMH:
+//    devp->config->temperature_present_in_C = (( buffer_rx[0] << 4 ) | ( buffer_rx[0] >> 4 ));
 
     if ( i2c_result == MSG_OK )
         return true;

@@ -136,26 +136,34 @@ typedef struct {
     /**
      * @brief I2C driver associated with this TMP101.
      */
-    I2CDriver                   *i2cp;
+    I2CDriver           *i2cp;
     /**
      * @brief I2C configuration associated with this TMP101.
      */
-    const I2CConfig             *i2ccfg;
+    const I2CConfig     *i2ccfg;
     /**
      * @brief TMP101 Slave Address
      */
-    i2caddr_t                   saddr;
+    i2caddr_t           saddr;
 #endif /* TMP101_USE_I2C */
 
     /**
      * @brief TMP101AN temperature reading variables, temperature present, min, max, average
      */
-    uint16_t                    temperature_present_in_C;
-    uint16_t                    temperature_min;
-    uint16_t                    temperature_max;
-    uint16_t                    temperature_average;
+    uint16_t            temperature_present_in_C;
+    uint16_t            temperature_min;
+    uint16_t            temperature_max;
+    uint16_t            temperature_average;
 
-    uint16_t                    temperature_readings[TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE]; 
+    /**
+     * @brief array of temperature readings for averaging purpose
+     */
+    uint16_t            temperature_readings[TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE]; 
+
+    /**
+     * @brief index to array of temperature readings for updating purpose
+     */
+    uint16_t            readings_index;
 
 } TMP101Config;
 
