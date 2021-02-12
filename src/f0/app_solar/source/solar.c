@@ -75,15 +75,7 @@ static const TMP101Config config_for_temp_sensor_01 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_01,
-/*
-    0,  // temperature present in degrees C
-    0,  // minimum temperature reading
-    0,  // maximum
-    0,  // average
-   {0}, // n readings used to calculate average
-    0   // index to array of temperature readings
-*/
+    I2C_ADDR_SENSOR_01
 };
 
 static TMP101Driver device_driver_for_temp_sensor_01;
@@ -93,16 +85,7 @@ static const TMP101Config config_for_temp_sensor_02 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_02,
-
-/*
-    0,  // temperature present in degrees C
-    0,  // minimum temperature reading
-    0,  // maximum
-    0,  // average
-   {0}, // n readings used to calculate average
-    0   // index to array of temperature readings
-*/
+    I2C_ADDR_SENSOR_02
 };
 
 static TMP101Driver device_driver_for_temp_sensor_02;
@@ -310,6 +293,7 @@ THD_FUNCTION(solar, arg)
             j = 0;
         }
 
+/*
         if ( j == SOLAR_MAIN_THREAD_READ_TEMP_SENSOR_01_AT )
         {
             read_tmp101an_temperature_v1(&device_driver_for_temp_sensor_01, 1);
@@ -319,7 +303,7 @@ THD_FUNCTION(solar, arg)
         {
             read_tmp101an_temperature_v1(&device_driver_for_temp_sensor_02, 2);
         }
-
+*/
         j++;
         i++;
     }

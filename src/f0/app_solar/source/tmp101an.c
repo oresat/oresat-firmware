@@ -377,7 +377,9 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     buffer_rx[1] = 0;
 
 
+#ifdef DIAG_ON__TMP101AN
     chprintf((BaseSequentialStream *) &SD2, "reading temperature sensor %02X . . .\r\n", sensor_addr);
+#endif
 
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
@@ -386,8 +388,10 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     i2c_flags = i2cGetErrors(devp->config->i2cp);
     i2cReleaseBus(devp->config->i2cp);
 
+#ifdef DIAG_ON__TMP101AN
     chprintf((BaseSequentialStream *) &SD2, "temperature reg bytes back hold %u and %u.\r\n\r\n",
       buffer_rx[0], buffer_rx[1]);
+#endif
 
     if ( i2c_result != 0 )
         { chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result); }
