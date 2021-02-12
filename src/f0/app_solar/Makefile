@@ -166,7 +166,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DINA226_SHARED_I2C
 
 # Define ASM defines here
 UADEFS =
