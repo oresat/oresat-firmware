@@ -43,58 +43,61 @@ void process_cb(void *thread)
 }
 
 /* CANopen SDO server thread */
-THD_FUNCTION(sdo_server, SDO)
+THD_FUNCTION(sdo_server, arg)
 {
+    CO_SDO_t *SDO = arg;
     systime_t prev_time;
 
     /* Register the callback function to wake up thread when message received */
-    CO_SDO_initCallbackPre((CO_SDO_t *)SDO, chThdGetSelfX(), process_cb);
+    CO_SDO_initCallbackPre(SDO, chThdGetSelfX(), process_cb);
 
     prev_time = chVTGetSystemTime();
     while (!chThdShouldTerminateX()) {
         uint32_t timeout = ((typeof(timeout))-1);
 
-        CO_SDO_process((CO_SDO_t *)SDO, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
+        CO_SDO_process(SDO, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
-    CO_SDO_initCallbackPre((CO_SDO_t *)SDO, NULL, NULL);
+    CO_SDO_initCallbackPre(SDO, NULL, NULL);
     chThdExit(MSG_OK);
 }
 
 /* CANopen Emergency thread */
-THD_FUNCTION(em_worker, emPr)
+THD_FUNCTION(em_worker, arg)
 {
+    CO_EMpr_t *emPr = arg;
     systime_t prev_time;
 
     /* Register the callback function to wake up thread when message received */
-    CO_EM_initCallbackPre(((CO_EMpr_t *)emPr)->em, chThdGetSelfX(), process_cb);
+    CO_EM_initCallbackPre(emPr->em, chThdGetSelfX(), process_cb);
 
     prev_time = chVTGetSystemTime();
     while (!chThdShouldTerminateX()) {
         uint32_t timeout = ((typeof(timeout))-1);
 
-        CO_EM_process((CO_EMpr_t *)emPr, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
+        CO_EM_process(emPr, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), OD_inhibitTimeEMCY, &timeout);
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
-    CO_EM_initCallbackPre(((CO_EMpr_t *)emPr)->em, NULL, NULL);
+    CO_EM_initCallbackPre(emPr->em, NULL, NULL);
     chThdExit(MSG_OK);
 }
 
 /* CANopen PDO/SYNC worker thread */
-THD_FUNCTION(pdo_sync_worker, co)
+THD_FUNCTION(pdo_sync_worker, arg)
 {
+    CO_t *co = arg;
     systime_t prev_time;
 
     /* Register the callback function to wake up thread when message received */
-    CO_SYNC_initCallbackPre(((CO_t *)co)->SYNC, chThdGetSelfX(), process_cb);
+    CO_SYNC_initCallbackPre(co->SYNC, chThdGetSelfX(), process_cb);
     for (int i = 0; i < CO_NO_RPDO; i++) {
-        CO_RPDO_initCallbackPre(((CO_t *)co)->RPDO[i], chThdGetSelfX(), process_cb);
+        CO_RPDO_initCallbackPre(co->RPDO[i], chThdGetSelfX(), process_cb);
     }
 
     prev_time = chVTGetSystemTime();
@@ -105,43 +108,44 @@ THD_FUNCTION(pdo_sync_worker, co)
         /* Trigger sensors */
         sensors_trig();
         /* Process SYNC */
-        syncWas = CO_process_SYNC((CO_t *)co,
+        syncWas = CO_process_SYNC(co,
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
         /* Read inputs */
-        CO_process_RPDO((CO_t *)co, syncWas);
+        CO_process_RPDO(co, syncWas);
         /* Write outputs */
-        CO_process_TPDO((CO_t *)co, syncWas,
+        CO_process_TPDO(co, syncWas,
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
-    CO_SYNC_initCallbackPre(((CO_t *)co)->SYNC, NULL, NULL);
+    CO_SYNC_initCallbackPre(co->SYNC, NULL, NULL);
     for (int i = 0; i < CO_NO_RPDO; i++) {
-        CO_RPDO_initCallbackPre(((CO_t *)co)->RPDO[i], NULL, NULL);
+        CO_RPDO_initCallbackPre(co->RPDO[i], NULL, NULL);
     }
     chThdExit(MSG_OK);
 }
 
 /* CANopen Heartbeat Consumer thread */
-THD_FUNCTION(hb_cons, HBcons)
+THD_FUNCTION(hb_cons, arg)
 {
+    CO_HBconsumer_t *HBcons = arg;
     systime_t prev_time;
 
     /* Register the callback function to wake up thread when message received */
-    CO_HBconsumer_initCallbackPre((CO_HBconsumer_t *)HBcons, chThdGetSelfX(), process_cb);
+    CO_HBconsumer_initCallbackPre(HBcons, chThdGetSelfX(), process_cb);
 
     prev_time = chVTGetSystemTime();
     while (!chThdShouldTerminateX()) {
         uint32_t timeout = ((typeof(timeout))-1);
 
-        CO_HBconsumer_process((CO_HBconsumer_t *)HBcons, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
+        CO_HBconsumer_process(HBcons, (CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL || CO->NMT->operatingState == CO_NMT_OPERATIONAL),
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(ALL_EVENTS, TIME_US2I(timeout));
     }
-    CO_HBconsumer_initCallbackPre((CO_HBconsumer_t *)HBcons, NULL, NULL);
+    CO_HBconsumer_initCallbackPre(HBcons, NULL, NULL);
     chThdExit(MSG_OK);
 }
 
@@ -182,13 +186,9 @@ void oresat_start(oresat_config_t *config)
 
     /* Set configuration values */
     /* If node ID is not overridden, use default node ID */
-    if (config->node_id != ORESAT_DEFAULT_ID && config->node_id <= 0x7F) {
+    if (config->node_id == ORESAT_DEFAULT_ID) {
         /* TODO: Implement Node ID system properly */
-        OD_CANNodeID = config->node_id;
     }
-
-    /* Set bitrate from provided config */
-    OD_CANBitRate = config->bitrate;
 
     /* Get thread ID for main thread and set priority to max */
     oresat_tp = chThdGetSelfX();
@@ -199,9 +199,9 @@ void oresat_start(oresat_config_t *config)
 
     while (reset != CO_RESET_APP) {
         /* Initialize CANopen Subsystem */
-        err = CO_CANinit(config, OD_CANBitRate);
+        err = CO_CANinit(config, config->bitrate);
         chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
-        err = CO_CANopenInit(OD_CANNodeID);
+        err = CO_CANopenInit(config->node_id);
         chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInit failed");
 
         /* Register events */

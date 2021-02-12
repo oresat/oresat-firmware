@@ -170,14 +170,17 @@ username@hostname:openocd-git on  master [!?]
 ➜
 ```
 
-## Debian
-Debian's packages are named as follows:
+## Debian (and derivatives)
+The packages needed for Debian are as follows:
 ```
-apt install gcc-arm-none-eabi gdb-arm-none-eabi
+apt install build-essentials gcc-arm-none-eabi gdb-arm-none-eabi
 ```
 
-OpenOCD must be built with the following options:
+OpenOCD can be built as follows:
 ```
+git clone https://git.code.sf.net/p/openocd/code openocd
+cd openocd
+./bootstrap
 ./configure --enable-maintainer-mode --disable-werror --enable-stlink
 make
 ```
