@@ -90,6 +90,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
     switch (sensor_addr)
     {
         case I2C_ADDR_SENSOR_01:
+chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_01_index, latest_reading);
             readings_sensor_01[readings_sensor_01_index] = latest_reading;
             ++readings_sensor_01_index;
             if ( readings_sensor_01_index >= TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE )
@@ -99,6 +100,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
             break;
 
         case I2C_ADDR_SENSOR_02:
+chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_02_index, latest_reading);
             readings_sensor_02[readings_sensor_02_index] = latest_reading;
             ++readings_sensor_02_index;
             if ( readings_sensor_02_index >= TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE )
@@ -108,6 +110,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
             break;
 
         default:
+chprintf((BaseSequentialStream *) &SD2, "WARNING - unrecognized sensor address %02X\r\n", sensor_addr);
             routine_status = false;  // got invalid temperature sensor I2C address
     }
 
