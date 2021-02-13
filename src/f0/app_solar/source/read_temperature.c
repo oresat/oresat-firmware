@@ -90,7 +90,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
     switch (sensor_addr)
     {
         case I2C_ADDR_SENSOR_01:
-chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_01_index, latest_reading);
+chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_01_index, latest_reading);
             readings_sensor_01[readings_sensor_01_index] = latest_reading;
             ++readings_sensor_01_index;
             if ( readings_sensor_01_index >= TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE )
@@ -100,7 +100,7 @@ chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\
             break;
 
         case I2C_ADDR_SENSOR_02:
-chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_02_index, latest_reading);
+chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_02_index, latest_reading);
             readings_sensor_02[readings_sensor_02_index] = latest_reading;
             ++readings_sensor_02_index;
             if ( readings_sensor_02_index >= TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE )
@@ -110,7 +110,7 @@ chprintf((BaseSequentialStream *) &SD2, "from sensor %02X storing rdg %u = %u\r\
             break;
 
         default:
-chprintf((BaseSequentialStream *) &SD2, "WARNING - unrecognized sensor address %02X\r\n", sensor_addr);
+chprintf((BaseSequentialStream *) &SD2, "WARNING - unrecognized sensor address 0x%02X\r\n", sensor_addr);
             routine_status = false;  // got invalid temperature sensor I2C address
     }
 
@@ -164,13 +164,7 @@ THD_FUNCTION(read_temperature, arg)
 
     while (!chThdShouldTerminateX())
     {
-        chprintf((BaseSequentialStream *) &SD2, "calling for temp' reading...\r\n");
-
-//        read_tmp101an_temperature_v1(&device_driver_for_temp_sensor_01, 1);
         read_tmp101an_temperature_v2(&device_driver_for_temp_sensor_01, byte_array);
-
-        chprintf((BaseSequentialStream *) &SD2, "back from sensor reading call,\r\n");
-        chThdSleepMilliseconds(SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS);
 
 // 2021-02-12 - Ted observes that first byte typically returned in range
 //  17..31, and second byte either 0 or 128.  This indicates that TMP101AN
@@ -178,8 +172,13 @@ THD_FUNCTION(read_temperature, arg)
 //  12 bit resolution.  Shifts on following line convert two bytes into a
 //  properly scaled 16 bit value:
         latest_reading = ((byte_array[0] << 4) | (byte_array[1] >> 4));
-
         store_reading(device_driver_for_temp_sensor_01.config->saddr, latest_reading);
+        chThdSleepMilliseconds(500);
+
+        read_tmp101an_temperature_v2(&device_driver_for_temp_sensor_02, byte_array);
+        latest_reading = ((byte_array[0] << 4) | (byte_array[1] >> 4));
+        store_reading(device_driver_for_temp_sensor_02.config->saddr, latest_reading);
+        chThdSleepMilliseconds(SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS);
     }
 
     palClearLine(LINE_LED);
