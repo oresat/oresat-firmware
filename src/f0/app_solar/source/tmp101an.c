@@ -14,6 +14,10 @@
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
 
+#define DIAG_ON__TMP101AN
+
+
+
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -168,183 +172,15 @@ void tmp101Stop(TMP101Driver *devp) {
     osalDbgAssert((devp->state == TMP101_STOP) || (devp->state == TMP101_READY),
             "tmp101Stop(), invalid state");
 
-    if (devp->state == TMP101_READY) {
-#if (0) // ORESAT_TASK_001
-#if TMP101_USE_I2C
-#if TMP101_SHARED_I2C
-        i2cAcquireBus(devp->config->i2cp);
-        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* TMP101_SHARED_I2C */
-
-        /* Reset to input.*/
-        buf.reg = TMP101_AD_CONFIG;
-        buf.value = __REVSH(TMP101_CONFIG_RST);
-        tmp101I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-
-        i2cStop(devp->config->i2cp);
-#if TMP101_SHARED_I2C
-        i2cReleaseBus(devp->config->i2cp);
-#endif /* TMP101_SHARED_I2C */
-#endif /* TMP101_USE_I2C */
-#endif // ORESAT_TASK_001
-    }
+//    if (devp->state == TMP101_READY) {
+//    }
     devp->state = TMP101_STOP;
 }
-
-
-#if (0) // 2021-02-07, not ready to use any of these and some need to be removed for TMP101AN driver class:
-
-/**
- * @brief   Sets TMP101 Alert type and value
- *
- * @param[in] devp       pointer to the @p TMP101Driver object
- * @param[in] alert_me   the value to write to Mask/Enable register (0 to disable)
- * @param[in] alert_lim  the value to write to Alert Limit register
- *
- * @api
- */
-void tmp101SetAlert(TMP101Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == TMP101_READY,
-            "tmp101SetAlert(), invalid state");
-
-#if TMP101_USE_I2C
-#if TMP101_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* TMP101_SHARED_I2C */
-
-    buf.reg = TMP101_AD_LIM;
-    buf.value = __REVSH(alert_lim);
-    tmp101I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-    buf.reg = TMP101_AD_ME;
-    buf.value = __REVSH(alert_me);
-    tmp101I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-
-#if TMP101_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* TMP101_SHARED_I2C */
-#endif /* TMP101_USE_I2C */
-}
-
-/**
- * @brief   Reads TMP101 Register as raw value.
- *
- * @param[in] devp       pointer to the @p TMP101Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-uint16_t tmp101ReadRaw(TMP101Driver *devp, uint8_t reg) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == TMP101_READY,
-            "tmp101ReadRaw(), invalid state");
-
-#if TMP101_USE_I2C
-#if TMP101_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* TMP101_SHARED_I2C */
-
-    buf.reg = reg;
-    tmp101I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
-
-#if TMP101_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* TMP101_SHARED_I2C */
-#endif /* TMP101_USE_I2C */
-    return __REVSH(buf.value);
-}
-
-/**
- * @brief   Reads TMP101 Shunt voltage.
- *
- * @param[in] devp       Pointer to the @p TMP101Driver object
- * @return               Shunt voltage in 1uV increments
- *
- * @api
- */
-int32_t tmp101ReadShunt(TMP101Driver *devp) {
-    int32_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = ((int16_t)tmp101ReadRaw(devp, TMP101_AD_SHUNT) * 25)/10;
-
-    return voltage;
-}
-
-/**
- * @brief   Reads TMP101 VBUS voltage.
- *
- * @param[in] devp       pointer to the @p TMP101Driver object
- * @return               VBUS voltage in 1uV increments
- *
- * @api
- */
-uint32_t tmp101ReadVBUS(TMP101Driver *devp) {
-    uint32_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = tmp101ReadRaw(devp, TMP101_AD_VBUS) * 1250;
-
-    return voltage;
-}
-
-/**
- * @brief   Reads TMP101 Current.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p TMP101Driver object
- * @return               Current in increments of @p curr_lsb
- *
- * @api
- */
-int32_t tmp101ReadCurrent(TMP101Driver *devp) {
-    int32_t current;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "tmp101ReadCurrent(): invalid curr_lsb value");
-
-    current = (int16_t)tmp101ReadRaw(devp, TMP101_AD_CURRENT) * devp->config->curr_lsb;
-
-    return current;
-}
-
-/**
- * @brief   Reads TMP101 Power.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p TMP101Driver object
- * @return               Power in increments of @p curr_lsb * 25V
- *
- * @api
- */
-uint32_t tmp101ReadPower(TMP101Driver *devp) {
-    uint32_t power;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "tmp101ReadCurrent(): invalid curr_lsb value");
-
-    power = tmp101ReadRaw(devp, TMP101_AD_POWER) * devp->config->curr_lsb * 25;
-
-    return power;
-}
-
-#endif // 2021-02-07
 
 
 
 // 2021-02-07 - first draft read temperature routine
 
-// bool read_tmp101an_temperature_v1(uint32_t option)
 bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
 {
 // 2021-02-07 - these two byte arrays will be passed to a development
@@ -408,6 +244,42 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
 
 }
 
+
+
+//----------------------------------------------------------------------
+// @brief   routine to read TMP101AN temperature sensor, and return two-
+//          two-byte reading
+//----------------------------------------------------------------------
+msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array)
+{
+    msg_t i2c_result = MSG_OK;
+    i2cflags_t i2c_flags = 0;
+    uint8_t sensor_addr = devp->config->saddr;
+    uint8_t buffer_tx[2] = {0};
+// TMP101AN readings are 12 bits wide so we store reading in short int:
+    uint16_t reading = 0;
+
+// Values chosen per TMP101AN datasheet:
+    buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
+    buffer_tx[1] = 0;
+
+// Prepare for I2C transaction:
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+
+    i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, byte_array, 2, TIME_INFINITE);
+
+    i2c_flags = i2cGetErrors(devp->config->i2cp);
+    i2cReleaseBus(devp->config->i2cp);
+
+// TO BE optional warning code to report I2C bus errors:
+    if ( i2c_result != 0 )
+        { chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result); }
+    if ( i2c_flags != 0 )
+        { chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags); }
+
+    return i2c_result;
+}
 
 
 

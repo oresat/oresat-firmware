@@ -211,6 +211,8 @@ void tmp101Stop(TMP101Driver *devp);
 
 bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
 
+msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array);
+
 #ifdef __cplusplus
 }
 #endif
