@@ -21,9 +21,9 @@
 //----------------------------------------------------------------------
 
 #define SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS (4000)
+#define DELAY_BETWEEN_TEMP_READINGS_IN_MS (50)
 #define TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE (10)
 #define SIZE_OF_TMP101AN_READING_REGISTER_IN_BYTES (2)
-
 
 
 //----------------------------------------------------------------------
@@ -115,8 +115,46 @@ chprintf((BaseSequentialStream *) &SD2, "WARNING - unrecognized sensor address 0
     }
 
     return routine_status;
-}
 
+} // end routine store_reading()
+
+
+
+bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
+{
+    bool routine_status = true;
+
+    switch (sensor_addr)
+    {
+        case I2C_ADDR_SENSOR_01:
+            if ( latest_reading < reading_sensor_01_min )
+            {
+                reading_sensor_01_min = latest_reading;
+            }
+            if ( latest_reading > reading_sensor_01_min )
+            {
+                reading_sensor_01_max = latest_reading;
+            }
+            break;
+
+        case I2C_ADDR_SENSOR_02:
+            if ( latest_reading < reading_sensor_02_min )
+            {
+                reading_sensor_02_min = latest_reading;
+            }
+            if ( latest_reading < reading_sensor_02_min )
+            {
+                reading_sensor_02_max = latest_reading;
+            }
+            break;
+
+        default:
+            routine_status = false;  // got invalid temperature sensor I2C address
+    }
+
+    return routine_status;
+
+} // end routine store_reading()
 
 
 //----------------------------------------------------------------------
@@ -164,21 +202,28 @@ THD_FUNCTION(read_temperature, arg)
 
     while (!chThdShouldTerminateX())
     {
-        read_tmp101an_temperature_v2(&device_driver_for_temp_sensor_01, byte_array);
-
-// 2021-02-12 - Ted observes that first byte typically returned in range
+// 2021-02-12 - Ted observes that when reading TMP101AN register bytes of
+//  the latest temperature reading, the first byte typically returns in range
 //  17..31, and second byte either 0 or 128.  This indicates that TMP101AN
 //  default A/D resolution is nine (9) bits.  Can be configured for up to
-//  12 bit resolution.  Shifts on following line convert two bytes into a
-//  properly scaled 16 bit value:
+//  12 bit resolution.  Four bits in the two byte register always read zero.
+//  Bit-wise shifting on line assigning temperature to variable 'latest_reading'
+//  converts sensor bytes into correctly scaled 16-bit integer:
+        read_tmp101an_temperature_v2(&device_driver_for_temp_sensor_01, byte_array);
+
         latest_reading = ((byte_array[0] << 4) | (byte_array[1] >> 4));
+
         store_reading(device_driver_for_temp_sensor_01.config->saddr, latest_reading);
-        chThdSleepMilliseconds(500);
+        update_min_max_temperature(device_driver_for_temp_sensor_01.config->saddr, latest_reading);
+//        update_average_temperature(device_driver_for_temp_sensor_01.config->saddr);
+        chThdSleepMilliseconds(DELAY_BETWEEN_TEMP_READINGS_IN_MS);
+
 
         read_tmp101an_temperature_v2(&device_driver_for_temp_sensor_02, byte_array);
         latest_reading = ((byte_array[0] << 4) | (byte_array[1] >> 4));
         store_reading(device_driver_for_temp_sensor_02.config->saddr, latest_reading);
-        chThdSleepMilliseconds(SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS);
+
+        chThdSleepMilliseconds(SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS - DELAY_BETWEEN_TEMP_READINGS_IN_MS);
     }
 
     palClearLine(LINE_LED);
