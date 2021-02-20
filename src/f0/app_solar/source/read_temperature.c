@@ -149,7 +149,7 @@ bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
             {
                 reading_sensor_02_min = latest_reading;
             }
-            if ( latest_reading < reading_sensor_02_min )
+            if ( latest_reading > reading_sensor_02_min )
             {
                 reading_sensor_02_max = latest_reading;
             }
@@ -170,8 +170,6 @@ bool update_average_temperature(uint8_t sensor_addr)
     bool routine_status = false;
     uint16_t i = 0;
     uint32_t sum_of_readings = 0;
-//static uint16_t readings_sensor_01_count = 0;
-//static uint16_t readings_sensor_02_count = 0;
 
     switch (sensor_addr)
     {
@@ -182,6 +180,7 @@ bool update_average_temperature(uint8_t sensor_addr)
                 while ( i > 0 )
                 {
                     sum_of_readings += readings_sensor_01[(i - 1)];
+                    i--;
                 }
                 reading_sensor_01_average = ((sum_of_readings * MULTIPLIER_TO_RETAIN_TENTHS) / readings_sensor_01_count);
                 routine_status = true;
@@ -195,6 +194,7 @@ bool update_average_temperature(uint8_t sensor_addr)
                 while ( i > 0 )
                 {
                     sum_of_readings += readings_sensor_02[(i - 1)];
+                    i--;
                 }
                 reading_sensor_02_average = ((sum_of_readings * MULTIPLIER_TO_RETAIN_TENTHS) / readings_sensor_02_count);
                 routine_status = true;
