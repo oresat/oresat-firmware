@@ -68,7 +68,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* Initialize WDT worker thread */
-    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
+    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), HIGHPRIO, wdt, NULL, true);
     reg_worker(&wdt_worker);
 
     /* Initialize C3 worker thread */
@@ -107,6 +107,10 @@ static void app_init(void)
  */
 int main(void)
 {
+    /* Immediately start a WDT thread */
+    chSysInit();
+    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), HIGHPRIO, wdt, NULL);
+
     // Initialize and start
     oresat_init();
     app_init();
