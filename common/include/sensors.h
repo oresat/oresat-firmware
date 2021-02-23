@@ -46,6 +46,10 @@ extern "C" {
 #define ADC_REG_CFG             ADC_CFGR_CONT,                                      /* CFGR     */  \
                                 0,                                                  /* CFGR2    */  \
                                 ADC_TR(0, 4095),                                    /* TR1      */  \
+                                0,                                                  /* TR2      */  \
+                                0,                                                  /* TR3      */  \
+                                0,                                                  /* AWD2CR   */  \
+                                0,                                                  /* AWD3CR   */  \
                                 {                                                   /* SMPR[2]  */  \
                                     0,                                                              \
                                     ADC_SMPR2_SMP_AN16(ADC_SMPR_SMP_47P5)                           \
