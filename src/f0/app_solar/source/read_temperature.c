@@ -211,6 +211,33 @@ bool update_average_temperature(uint8_t sensor_addr)
 
 
 
+bool convert_reading_to_degrees_c(uint16_t reading)
+{
+// 2021-02-19 FRI - from TMP101AN datasheet:
+//   0x7FF =    128 C
+//   0x190 =     25 C
+//   0x004 =   0.25 C
+//   0x000 =      0 C
+//   0xFFC =  -0.25 C
+//   0xE70 =    -25 C
+//   0x800 =   -128 C
+
+// So given that 0x190 or 400 corresponds to 25 C, each differential of
+// value one (1) represents 0.0625 degrees C.  Accuracy of sensor likely
+// much less than this, but step wise difference is about 0.063 C.
+//
+// Also appears that MSB is sign bit.  When sign bit is set we must
+// compute temperature as 0x1000 - reading and use signed integer.  Hmm,
+// we may just be able to scale these values and use signed integers
+// as is, once we confirm that C implements signed integers in 2's
+// compliment mode.  Wikipedia article says ARM processors use 2's
+// compliment as do many other contemporary cerca 2021 processor families.
+
+
+}
+
+
+
 bool report_temperature_stats(uint8_t sensor_addr)
 {
     bool routine_status = true;
