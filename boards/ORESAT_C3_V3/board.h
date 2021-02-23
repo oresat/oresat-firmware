@@ -73,7 +73,7 @@
 #define GPIOA_SPI1_SCK              5U
 #define GPIOA_SPI1_MISO             6U
 #define GPIOA_SPI1_MOSI             7U
-#define GPIOA_PIN8               8U
+#define GPIOA_PIN8                  8U
 #define GPIOA_CAN1_SILENT           9U
 #define GPIOA_CAN1_SHDN             10U
 #define GPIOA_CAN1_RX               11U
