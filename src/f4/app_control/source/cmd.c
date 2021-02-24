@@ -4,6 +4,7 @@
 
 #include "cmd.h"
 #include "c3.h"
+#include "fw.h"
 #include "comms.h"
 #include "opd.h"
 #include "CO_master.h"
@@ -372,7 +373,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "?    ");
             }
-            chprintf(chp, "%s\r\n", info.name);
+            chprintf(chp, "%s %u\r\n", info.name, info.size);
         } while (err > 0);
         err = lfs_dir_close(&lfs, &dir);
         if (err < 0) {
@@ -449,6 +450,8 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "edl") && argc > 1) {
         edl = (argv[1][0] == 't');
         chEvtSignal(c3_tp, C3_EVENT_EDL);
+    } else if (!strcmp(argv[0], "reset")) {
+        NVIC_SystemReset();
     } else {
         goto state_usage;
     }
@@ -461,6 +464,7 @@ state_usage:
                    "    tx <t/f>:       Override TX enable state\r\n"
                    "    bat <t/f>:      Override battery good state\r\n"
                    "    edl <t/f>:      Override EDL state\r\n"
+                   "    reset:          Reset C3\r\n"
                    "\r\n");
     return;
 }
@@ -469,6 +473,7 @@ state_usage:
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
+    {"fw", cmd_fw},
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
     {"opd", cmd_opd},
