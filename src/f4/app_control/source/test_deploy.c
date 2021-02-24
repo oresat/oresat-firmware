@@ -1,7 +1,5 @@
 #include <string.h>
 
-#include "ch.h"
-#include "hal.h"
 #include "test_deploy.h"
 #include "chprintf.h"
 #include "deployer.h"
