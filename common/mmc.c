@@ -109,6 +109,7 @@ int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, voi
 
     /* Read data from block */
     if (blkRead(sdcp, block, buf, 1) != HAL_SUCCESS) {
+        free(buf);
         return LFS_ERR_IO;
     }
 
@@ -146,6 +147,7 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
 
     /* Write data to block */
     if (blkWrite(sdcp, block, buf, 1) != HAL_SUCCESS) {
+        free(buf);
         return LFS_ERR_IO;
     }
 
@@ -172,8 +174,12 @@ int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
 
     /* Write data to block */
     if (blkWrite(sdcp, block, buf, 1) != HAL_SUCCESS) {
+        free(buf);
         return LFS_ERR_IO;
     }
+
+    /* Free temporary buffer */
+    free(buf);
 
     return LFS_ERR_OK;
 }

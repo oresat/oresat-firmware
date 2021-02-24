@@ -402,10 +402,36 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
         err = lfs_file_read(&lfs, &file, buf, BUF_SIZE - 1);
         if (err < 0) {
             chprintf(chp, "Error in lfs_file_read: %d\r\n", err);
+            lfs_file_close(&lfs, &file);
             return;
         }
         buf[err] = '\0';
         chprintf(chp, "%s\r\n", buf);
+
+        err = lfs_file_close(&lfs, &file);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_close: %d\r\n", err);
+            return;
+        }
+    } else if (!strcmp(argv[0], "hexdump")) {
+        err = lfs_file_open(&lfs, &file, argv[1], LFS_O_RDONLY);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_open: %d\r\n", err);
+            return;
+        }
+
+        err = lfs_file_read(&lfs, &file, buf, BUF_SIZE - 1);
+        if (err < 0) {
+            chprintf(chp, "Error in lfs_file_read: %d\r\n", err);
+            lfs_file_close(&lfs, &file);
+            return;
+        }
+        buf[err] = '\0';
+        for (uint32_t i = 0; i < BUF_SIZE; i++) {
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
+            chprintf(chp, " %02X", buf[i]);
+        }
+        chprintf(chp, "\r\n");
 
         err = lfs_file_close(&lfs, &file);
         if (err < 0) {
@@ -420,10 +446,11 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
 
 lfs_usage:
     chprintf(chp,  "Usage: lfs <command> <path>\r\n"
-                   "    ls:     List directories\r\n"
-                   "    mkdir:  Make a directory\r\n"
-                   "    rm:     Delete file or directory\r\n"
-                   "    cat:    Dump contents of file\r\n"
+                   "    ls:         List directories\r\n"
+                   "    mkdir:      Make a directory\r\n"
+                   "    rm:         Delete file or directory\r\n"
+                   "    cat:        Dump 255 bytes of file as string\r\n"
+                   "    hexdump:    Dump 255 bytes of file as hex\r\n"
                    "\r\n");
     return;
 }

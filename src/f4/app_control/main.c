@@ -97,9 +97,6 @@ static void app_init(void)
     shellInit();
 #endif
     sdStart(&SD3, NULL);
-
-    /* Configure SCET time object */
-    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
 }
 
 /**
@@ -107,10 +104,6 @@ static void app_init(void)
  */
 int main(void)
 {
-    /* Immediately start a WDT thread */
-    chSysInit();
-    chThdCreateStatic(wdt_wa, sizeof(wdt_wa), HIGHPRIO, wdt, NULL);
-
     // Initialize and start
     oresat_init();
     app_init();
