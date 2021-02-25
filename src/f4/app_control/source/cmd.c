@@ -66,6 +66,7 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
 /*===========================================================================*/
 void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
 {
+    CO_ReturnError_t err;
     uint8_t node_id = 0;
 
     if (argc < 1) {
@@ -77,17 +78,20 @@ void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     if (!strcmp(argv[0], "op")) {
-        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, node_id);
+        err = CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, node_id);
     } else if (!strcmp(argv[0], "preop")) {
-        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_PRE_OPERATIONAL, node_id);
+        err = CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_PRE_OPERATIONAL, node_id);
     } else if (!strcmp(argv[0], "stop")) {
-        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_STOPPED, node_id);
+        err = CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_STOPPED, node_id);
     } else if (!strcmp(argv[0], "resetcomms")) {
-        CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_COMMUNICATION, node_id);
+        err = CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_COMMUNICATION, node_id);
     } else if (!strcmp(argv[0], "resetnode")) {
-        CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_NODE, node_id);
+        err = CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_NODE, node_id);
     } else {
         goto nmt_usage;
+    }
+    if (err != CO_ERROR_NO) {
+        chprintf(chp, "Error executing NMT command: %d\r\n", err);
     }
     return;
 
@@ -373,13 +377,14 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             } else {
                 chprintf(chp, "?    ");
             }
-            chprintf(chp, "%s %u\r\n", info.name, info.size);
+            chprintf(chp, "%8u %s\r\n", info.size, info.name);
         } while (err > 0);
         err = lfs_dir_close(&lfs, &dir);
         if (err < 0) {
             chprintf(chp, "Error in lfs_dir_close: %d\r\n", err);
             return;
         }
+        chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "mkdir")) {
         err = lfs_mkdir(&lfs, argv[1]);
         if (err < 0) {

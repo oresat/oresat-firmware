@@ -15,6 +15,12 @@ static const SDCConfig sdccfg = {
 unpacked_mmc_cid_t mmc_cid;
 unpacked_mmc_csd_t mmc_csd;
 
+/* LFS utility functions */
+int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size);
+int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size);
+int mmc_erase(const struct lfs_config *cfg, lfs_block_t block);
+int mmc_sync(const struct lfs_config *cfg);
+
 /*
  * LFS object and configuration.
  */
@@ -50,7 +56,7 @@ int mmc_enable(void)
     sdcStart(SDC, &sdccfg);
 
     /* Connect to eMMC device */
-    if (blkConnect(SDC)) {
+    if (sdcConnect(SDC)) {
         sdcStop(SDC);
         palSetLine(LINE_MMC_PWR);
         return LFS_ERR_IO;
@@ -88,7 +94,7 @@ void mmc_disable(void)
 }
 
 /*===========================================================================*/
-/* LFS Support Functions                                                     */
+/* LFS Utility Functions                                                     */
 /*===========================================================================*/
 int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
 {
