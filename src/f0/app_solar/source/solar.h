@@ -12,5 +12,7 @@ extern const I2CConfig i2cconfig;
 /* Solar application thread prototypes */
 extern THD_WORKING_AREA(solar_wa, 0x400);
 extern THD_FUNCTION(solar, arg);
+extern THD_WORKING_AREA(read_temperature_wa, 0x200);
+extern THD_FUNCTION(read_temperature, arg);
 
 #endif

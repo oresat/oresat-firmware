@@ -22,7 +22,6 @@
 #include "oresat.h"
 #include "solar.h"
 #include "blink.h"
-#include "read_temperature.h"
 
 static worker_t worker1;
 static worker_t worker2;

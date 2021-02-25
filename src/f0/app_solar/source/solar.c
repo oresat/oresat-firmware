@@ -3,9 +3,6 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
-#include "tmp101an.h"
-
-
 /* Defines for INA226 */
 #define CURR_LSB                20       /* 20uA/bit */
 #define RSENSE                  100      /* 0.1 ohm  */
@@ -213,8 +210,7 @@ THD_FUNCTION(solar, arg)
     /* Start up LT1618 */
     palSetLine(LINE_LT1618_EN);
 
-    while(!chThdShouldTerminateX())
-    {
+    while (!chThdShouldTerminateX()) {
         chThdSleepMilliseconds(SLEEP_MS);
 
         /* Get present values */

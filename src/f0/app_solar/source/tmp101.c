@@ -8,7 +8,7 @@
  */
 
 #include "hal.h"
-#include "tmp101an.h"
+#include "tmp101.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */

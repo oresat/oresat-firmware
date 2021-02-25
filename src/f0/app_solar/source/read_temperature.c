@@ -8,9 +8,9 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "chprintf.h"          // for serial debugging
-#include "tmp101an.h"          // driver for Texas Instruments' TMP101AN temperature sensor
-#include "read_temperature.h"
+#include "solar.h"
+#include "tmp101.h"             // driver for Texas Instruments' TMP101AN temperature sensor
+#include "chprintf.h"           // for serial debugging
 
 #include <string.h>
 
@@ -35,15 +35,6 @@
 //----------------------------------------------------------------------
 
 // Peripheral structures first, configuration and driver:
-
-static const I2CConfig i2cconfig = {
-    STM32_TIMINGR_PRESC(0xBU) |
-    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
-    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
-    0,
-    0
-};
-
 
 static const TMP101Config config_for_temp_sensor_01 =
 {
@@ -279,7 +270,7 @@ bool initialize_temperature_sensor_device_objects(void)
 
 
 
-THD_WORKING_AREA(read_temperature_wa, WORKING_AREA_SIZE_FOR_READ_TEMPERATURE_THREAD);
+THD_WORKING_AREA(read_temperature_wa, 0x200);
 THD_FUNCTION(read_temperature, arg)
 {
     (void)arg;
