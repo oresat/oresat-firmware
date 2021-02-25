@@ -117,7 +117,7 @@ void tmp101ObjectInit(TMP101Driver *devp) {
  * @api
  */
 void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
-    i2cbuf_t buf;
+//    i2cbuf_t buf;
 
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == TMP101_STOP) ||
@@ -127,33 +127,10 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
     devp->config = config;
 
     /* Configuring common registers.*/
-#if (0)
-#if TMP101_USE_I2C
-#if TMP101_SHARED_I2C
-    i2cAcquireBus(config->i2cp);
-#endif /* TMP101_SHARED_I2C */
 
-    i2cStart(config->i2cp, config->i2ccfg);
+// 2020-02-24 Note - as of this date no common registers to configure
+//  for TMP101AN sensors.
 
-    buf.reg = TMP101_AD_CONFIG;
-    buf.value = __REVSH(TMP101_CONFIG_RST);
-    tmp101I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    do {
-        tmp101I2CReadRegister(config->i2cp, config->saddr, TMP101_AD_CONFIG,
-                                                buf.data, sizeof(buf.data));
-    } while (buf.data[0] & 0x80U); /* While still resetting */
-    buf.reg = TMP101_AD_CONFIG;
-    buf.value = __REVSH(config->cfg);
-    tmp101I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    buf.reg = TMP101_AD_CAL;
-    buf.value = __REVSH(config->cal);
-    tmp101I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-
-#if TMP101_SHARED_I2C
-    i2cReleaseBus(config->i2cp);
-#endif /* TMP101_SHARED_I2C */
-#endif /* TMP101_USE_I2C */
-#endif // (0)
     devp->state = TMP101_READY;
 
 }
@@ -166,7 +143,7 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
  * @api
  */
 void tmp101Stop(TMP101Driver *devp) {
-    i2cbuf_t buf;
+//    i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == TMP101_STOP) || (devp->state == TMP101_READY),
@@ -256,8 +233,6 @@ msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array)
     i2cflags_t i2c_flags = 0;
     uint8_t sensor_addr = devp->config->saddr;
     uint8_t buffer_tx[2] = {0};
-// TMP101AN readings are 12 bits wide so we store reading in short int:
-    uint16_t reading = 0;
 
 // Values chosen per TMP101AN datasheet:
     buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;

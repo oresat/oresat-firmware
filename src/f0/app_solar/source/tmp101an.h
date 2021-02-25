@@ -51,6 +51,22 @@
 #define TMP101_REG_TEMP_SETPOINT_HIGH       0x11U
 /** @} */
 
+/**
+ * @name    TMP101AN configuration register bit-wise format - TI datasheet table 8.
+ * @note    OS bit written to start one-shot measurement, read to obtain sensor comparator mode.
+ * @{
+ */
+#define TMP101AN__CONFIGURE_SHUT_DOWN__SD              (1 << 0)
+#define TMP101AN__CONFIGURE_THERMOSTAT_MODE__TM        (1 << 1)
+#define TMP101AN__CONFIGURE_ALERT_OUTPUT_POLARITY__POL (1 << 2)
+#define TMP101AN__CONFIGURE_FAULT_COUNT_TO_ALERT__F0   (1 << 3)
+#define TMP101AN__CONFIGURE_FAULT_COUNT_TO_ALERT__F1   (1 << 4)
+#define TMP101AN__CONFIGURE_CONVERTER_RESOLUTION__R0   (1 << 5)
+#define TMP101AN__CONFIGURE_CONVERTER_RESOLUTION__R1   (1 << 6)
+#define TMP101AN__CONFIGURE_ONE_SHOT__OS               (1 << 7)
+/** @} */
+
+
 
 // ORESAT_TASK_001 - add temperature sensor driver:
 // 2021-02-08 MON - first steps temperature reading
@@ -117,6 +133,7 @@ typedef struct TMP101Driver TMP101Driver;
 
 /**
  * @brief   Driver state machine possible states.
+ * @question   2020-02-24 Should this enum be adapted per the configuration options of the TMP101AN?  - TMH
  */
 typedef enum {
     TMP101_UNINIT = 0,                  /**< Not initialized.                 */
@@ -202,13 +219,8 @@ void tmp101ObjectInit(TMP101Driver *devp);
 void tmp101Start(TMP101Driver *devp, const TMP101Config *config);
 void tmp101Stop(TMP101Driver *devp);
 
-// void tmp101SetAlert(TMP101Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-// uint16_t tmp101ReadRaw(TMP101Driver *devp, uint8_t reg);
-// int32_t tmp101ReadShunt(TMP101Driver *devp);
-// uint32_t tmp101ReadVBUS(TMP101Driver *devp);
-// int32_t tmp101ReadCurrent(TMP101Driver *devp);
-// uint32_t tmp101ReadPower(TMP101Driver *devp);
-
+// 2021-02-24 - Probably can remove the following first version 'read temperature' routine,
+//  confirm with team:
 bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
 
 msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array);
