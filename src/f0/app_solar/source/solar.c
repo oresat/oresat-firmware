@@ -189,8 +189,6 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
     return i_in;
 }
 
-
-
 /* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
