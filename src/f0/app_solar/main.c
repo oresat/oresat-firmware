@@ -26,6 +26,14 @@
 static worker_t worker1;
 static worker_t worker2;
 
+const I2CConfig i2cconfig = {
+    STM32_TIMINGR_PRESC(0xBU) |
+    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
+    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
+    0,
+    0
+};
+
 static oresat_config_t oresat_conf = {
     &CAND1,
     0x04,

@@ -4,37 +4,28 @@
 #include "chprintf.h"
 
 /* Defines for INA226 */
-#define CURR_LSB               20       /* 20uA/bit */
-#define RSENSE                 100      /* 0.1 ohm  */
-#define DAC_VDDA_UV            3333000  /* 3.333 V. Chgange to 3.0 v when powered from debug board */
+#define CURR_LSB                20       /* 20uA/bit */
+#define RSENSE                  100      /* 0.1 ohm  */
+#define DAC_VDDA_UV             3333000  /* 3.333 V. Chgange to 3.0 v when powered from debug board */
 
 /* Defines for MPPT algorithm iteration speed */
-#define SLEEP_MS               2
+#define SLEEP_MS                2
+#define DEBUG_ITERATIONS        500
 
 /* Defines for MPPT algorithm that changes with each solar cell variant
  * Things to note
  * Negative step size needs to be greater as the curve falls quickly.
  * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
  */
-#define MIN_DP_DI              0000     /* The most important piece. This keeps the point to the left of MPP. */
-#define NVE_STEP_SIZE          3500     /* Fixed -ve step size */
-#define CURR_THRES_SENS        0        /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
-#define MAX_STEP_SIZE          10000    /* Maximum step size for variable step IC. */
-#define STEP_SIZE_FACTOR       2000     /* Posive step factor. */
-#define NVE_STEP_SIZE_FACTOR   4        /* Negative step factor. This is multipled with Positive step factor */
-#define MIN_PV_CURRENT         00000    /* Minimum current drawn from PV cells */
-#define MAX_PV_CURRENT         500000   /* Maximum current drawn from PV cells */
-#define MIN_PV_POWER           50000    /* Minimum power drawn from PV cells */
-
-
-
-static const I2CConfig i2cconfig = {
-    STM32_TIMINGR_PRESC(0xBU) |
-    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
-    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
-    0,
-    0
-};
+#define MIN_DP_DI               0        /* The most important piece. This keeps the point to the left of MPP. */
+#define NVE_STEP_SIZE           3500     /* Fixed -ve step size */
+#define CURR_THRES_SENS         0        /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
+#define MAX_STEP_SIZE           10000    /* Maximum step size for variable step IC. */
+#define STEP_SIZE_FACTOR        2000     /* Posive step factor. */
+#define NVE_STEP_SIZE_FACTOR    4        /* Negative step factor. This is multipled with Positive step factor */
+#define MIN_PV_CURRENT          0        /* Minimum current drawn from PV cells */
+#define MAX_PV_CURRENT          500000   /* Maximum current drawn from PV cells */
+#define MIN_PV_POWER            50000    /* Minimum power drawn from PV cells */
 
 /* Based on INA226 datasheet, page 15, Equation (2)
  * CURR_LSB = Max Current / 2^15
@@ -207,7 +198,7 @@ THD_FUNCTION(solar, arg)
     int32_t current;
     uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
-    int i, j;
+    int i = 0;
 
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
@@ -236,13 +227,10 @@ THD_FUNCTION(solar, arg)
         i_in = calc_mppt(voltage, current, power);
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
-        if (j >= 500){
-          chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n",i, voltage, current, power);
+        if ((++i % 500) == 0){
+          chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n", i, voltage, current, power);
           chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
-          j=0;
         }
-        j++;
-        i++;
     }
 
     /* Stop drivers */
