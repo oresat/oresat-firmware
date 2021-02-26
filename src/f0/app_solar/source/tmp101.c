@@ -1,6 +1,6 @@
 /**
  * @file    tmp101.c
- * @brief   TMP101 Digital to Analog Converter.
+ * @brief   TMP101 temperature sensor
  *
  * @addtogroup TMP101
  * @ingrup ORESAT
