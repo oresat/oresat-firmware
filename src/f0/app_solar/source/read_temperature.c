@@ -9,30 +9,30 @@
 #include "ch.h"
 #include "hal.h"
 #include "solar.h"
-#include "tmp101.h"             // driver for Texas Instruments' TMP101AN temperature sensor
+#include "tmp101.h"             // driver for Texas Instruments' TMP101 temperature sensor
 #include "chprintf.h"           // for serial debugging
 
 #include <string.h>
 
 
 
-//----------------------------------------------------------------------
-// - SECTION - pound defines
-//----------------------------------------------------------------------
+/*===========================================================================*/
+/* pound defines                                                             */
+/*===========================================================================*/
 
 #define SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS (4000)
 #define DELAY_BETWEEN_TEMP_READINGS_IN_MS (50)
 
-#define SIZE_OF_TMP101AN_READING_REGISTER_IN_BYTES (2)
+#define SIZE_OF_TMP101_READING_REGISTER_IN_BYTES (2)
 
 #define TEMPERATURE_READING_SAMPLE_SIZE_TO_AVERAGE (10)
 #define MULTIPLIER_TO_RETAIN_TENTHS (10)
 
 
 
-//----------------------------------------------------------------------
-// - SECTION - file scoped vars and structures
-//----------------------------------------------------------------------
+/*===========================================================================*/
+/* file scoped vars and structures                                           */
+/*===========================================================================*/
 
 // Peripheral structures first, configuration and driver:
 
@@ -40,7 +40,7 @@ static const TMP101Config config_for_temp_sensor_01 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_01
+    TMP101_ADDR_SENSOR_01
 };
 
 static TMP101Driver device_driver_for_temp_sensor_01;
@@ -49,7 +49,7 @@ static const TMP101Config config_for_temp_sensor_02 =
 {
     &I2CD2,
     &i2cconfig,
-    I2C_ADDR_SENSOR_02
+    TMP101_ADDR_SENSOR_02
 };
 
 static TMP101Driver device_driver_for_temp_sensor_02;
@@ -77,9 +77,9 @@ static uint32_t reading_sensor_02_average = 0;
 
 
 
-//----------------------------------------------------------------------
-// - SECTION - private functions
-//----------------------------------------------------------------------
+/*===========================================================================*/
+/* private functions                                                         */
+/*===========================================================================*/
 
 bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
 {
@@ -87,7 +87,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
 
     switch (sensor_addr)
     {
-        case I2C_ADDR_SENSOR_01:
+        case TMP101_ADDR_SENSOR_01:
 chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_01_index, latest_reading);
             readings_sensor_01[readings_sensor_01_index] = latest_reading;
             ++readings_sensor_01_index;
@@ -97,7 +97,7 @@ chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\
                 { ++readings_sensor_01_count; }
             break;
 
-        case I2C_ADDR_SENSOR_02:
+        case TMP101_ADDR_SENSOR_02:
 chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_02_index, latest_reading);
             readings_sensor_02[readings_sensor_02_index] = latest_reading;
             ++readings_sensor_02_index;
@@ -124,7 +124,7 @@ bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
 
     switch (sensor_addr)
     {
-        case I2C_ADDR_SENSOR_01:
+        case TMP101_ADDR_SENSOR_01:
             if ( latest_reading < reading_sensor_01_min )
             {
                 reading_sensor_01_min = latest_reading;
@@ -135,7 +135,7 @@ bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
             }
             break;
 
-        case I2C_ADDR_SENSOR_02:
+        case TMP101_ADDR_SENSOR_02:
             if ( latest_reading < reading_sensor_02_min )
             {
                 reading_sensor_02_min = latest_reading;
@@ -164,7 +164,7 @@ bool update_average_temperature(uint8_t sensor_addr)
 
     switch (sensor_addr)
     {
-        case I2C_ADDR_SENSOR_01:
+        case TMP101_ADDR_SENSOR_01:
             if ( readings_sensor_01_count > 0 )
             {
                 i = readings_sensor_01_count;
@@ -178,7 +178,7 @@ bool update_average_temperature(uint8_t sensor_addr)
             }
             break;
 
-        case I2C_ADDR_SENSOR_02:
+        case TMP101_ADDR_SENSOR_02:
             if ( readings_sensor_02_count > 0 )
             {
                 i = readings_sensor_02_count;
@@ -204,7 +204,7 @@ bool update_average_temperature(uint8_t sensor_addr)
 
 bool convert_reading_to_degrees_c(uint16_t reading)
 {
-// 2021-02-19 FRI - from TMP101AN datasheet:
+// 2021-02-19 FRI - from TMP101 datasheet:
 //   0x7FF =    128 C
 //   0x190 =     25 C
 //   0x004 =   0.25 C
@@ -224,7 +224,9 @@ bool convert_reading_to_degrees_c(uint16_t reading)
 // compliment mode.  Wikipedia article says ARM processors use 2's
 // compliment as do many other contemporary cerca 2021 processor families.
 
+    if (reading == 0) { }
 
+    return true;
 }
 
 
@@ -235,12 +237,12 @@ bool report_temperature_stats(uint8_t sensor_addr)
 
     switch (sensor_addr)
     {
-        case I2C_ADDR_SENSOR_01:
+        case TMP101_ADDR_SENSOR_01:
             chprintf((BaseSequentialStream *) &SD2, "temp sensor 01 min, max, average:  %u, %u, %u\r\n",
               reading_sensor_01_min, reading_sensor_01_max, reading_sensor_01_average);
             break;
 
-        case I2C_ADDR_SENSOR_02:
+        case TMP101_ADDR_SENSOR_02:
             chprintf((BaseSequentialStream *) &SD2, "temp sensor 02 min, max, average:  %u, %u, %u\r\n",
               reading_sensor_02_min, reading_sensor_02_max, reading_sensor_02_average);
             break;
@@ -253,9 +255,9 @@ bool report_temperature_stats(uint8_t sensor_addr)
 
 
 
-//----------------------------------------------------------------------
-// - SECTION - public functions
-//----------------------------------------------------------------------
+/*===========================================================================*/
+/* public functions                                                          */
+/*===========================================================================*/
 
 bool initialize_temperature_sensor_device_objects(void)
 {
@@ -275,15 +277,15 @@ THD_FUNCTION(read_temperature, arg)
 {
     (void)arg;
 
-    uint8_t byte_array[SIZE_OF_TMP101AN_READING_REGISTER_IN_BYTES];
+    uint8_t byte_array[SIZE_OF_TMP101_READING_REGISTER_IN_BYTES];
 
     uint16_t latest_reading = 0;
 
-    memset(byte_array, 0, SIZE_OF_TMP101AN_READING_REGISTER_IN_BYTES);
+    memset(byte_array, 0, SIZE_OF_TMP101_READING_REGISTER_IN_BYTES);
 
 //    chprintf((BaseSequentialStream *) &SD2, "stub code in new thread:\r\n");
 
-    chprintf((BaseSequentialStream *) &SD2, "initializing TMP101AN driver instances...\r\n");
+    chprintf((BaseSequentialStream *) &SD2, "initializing TMP101 driver instances...\r\n");
     tmp101ObjectInit(&device_driver_for_temp_sensor_01);
     tmp101Start(&device_driver_for_temp_sensor_01, &config_for_temp_sensor_01);
     tmp101ObjectInit(&device_driver_for_temp_sensor_02);
@@ -298,9 +300,9 @@ THD_FUNCTION(read_temperature, arg)
 
     while (!chThdShouldTerminateX())
     {
-// 2021-02-12 - Ted observes that when reading TMP101AN register bytes of
+// 2021-02-12 - Ted observes that when reading TMP101 register bytes of
 //  the latest temperature reading, the first byte typically returns in range
-//  17..31, and second byte either 0 or 128.  This indicates that TMP101AN
+//  17..31, and second byte either 0 or 128.  This indicates that TMP101
 //  default A/D resolution is nine (9) bits.  Can be configured for up to
 //  12 bit resolution.  Four bits in the two byte register always read zero.
 //  Bit-wise shifting on line assigning temperature to variable 'latest_reading'

@@ -55,10 +55,7 @@ static void app_init(void)
     reg_worker(&worker2);
     reg_worker(&worker3);
 
-    /* Start up debug output */
-    sdStart(&SD2, NULL);
-
-//    reg_worker(&worker3);
+  sdStart(&SD2, NULL);
 }
 
 /**

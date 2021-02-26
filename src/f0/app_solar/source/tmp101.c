@@ -14,10 +14,6 @@
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
 
-// #define DIAG_ON__TMP101AN
-
-
-
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -87,7 +83,7 @@ static const struct TMP101VMT vmt_device = {
 };
 
 /*===========================================================================*/
-/* - SECTION - Driver exported functions.                                    */
+/* Driver exported functions.                                                */
 /*===========================================================================*/
 
 /**
@@ -181,9 +177,9 @@ void tmp101Stop(TMP101Driver *devp) {
 bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
 {
 // 2021-02-07 - these two byte arrays will be passed to a development
-//  routine, to confirm we can talk with the TMP101AN sensors of the
+//  routine, to confirm we can talk with the TMP101 sensors of the
 //  solar board.  When that's working we'll move these and the dev'
-//  code over to the TMP101AN driver source file.  That will be the
+//  code over to the TMP101 driver source file.  That will be the
 //  first step to honor and conform to the object oritented device
 //  driver encapsulation that's already expressed in the Oresat firmware
 //  project - TMH
@@ -201,7 +197,7 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
         // option parameter not yet used - TMH
     }
 
-// Values chosen per TMP101AN datasheet:
+// Values chosen per TMP101 datasheet:
     buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
     buffer_tx[1] = 0;
 
@@ -241,7 +237,7 @@ msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array)
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
-    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, TMP101_REG_TEMPERATURE_READING, byte_array, 2);
+    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, TMP101_REG_TEMPERATURE, byte_array, 2);
 
     i2cReleaseBus(devp->config->i2cp);
 #endif /* TMP101_SHARED_I2C */

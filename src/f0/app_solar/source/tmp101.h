@@ -1,6 +1,6 @@
 /**
  * @file    tmp101.h
- * @brief   TMP101AN temperature sensor driver
+ * @brief   TMP101 temperature sensor driver
  *
  * @addtogroup TMP101
  * @ingroup ORESAT
@@ -8,8 +8,6 @@
  */
 #ifndef _TMP101_H_
 #define _TMP101_H_
-
-#include <chprintf.h>
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -45,37 +43,26 @@
  * @name    TMP101 Register Addresses
  * @{
  */
-#define TMP101_REG_TEMPERATURE_READING      0x00U
+#define TMP101_REG_TEMPERATURE              0x00U
 #define TMP101_REG_CONFIGURATION            0x01U
 #define TMP101_REG_TEMP_SETPOINT_LOW        0x10U
 #define TMP101_REG_TEMP_SETPOINT_HIGH       0x11U
 /** @} */
 
 /**
- * @name    TMP101AN configuration register bit-wise format - TI datasheet table 8.
+ * @name    TMP101 configuration register bit-wise format - TI datasheet table 8.
  * @note    OS bit written to start one-shot measurement, read to obtain sensor comparator mode.
  * @{
  */
-#define TMP101AN__CONFIGURE_SHUT_DOWN__SD              (1 << 0)
-#define TMP101AN__CONFIGURE_THERMOSTAT_MODE__TM        (1 << 1)
-#define TMP101AN__CONFIGURE_ALERT_OUTPUT_POLARITY__POL (1 << 2)
-#define TMP101AN__CONFIGURE_FAULT_COUNT_TO_ALERT__F0   (1 << 3)
-#define TMP101AN__CONFIGURE_FAULT_COUNT_TO_ALERT__F1   (1 << 4)
-#define TMP101AN__CONFIGURE_CONVERTER_RESOLUTION__R0   (1 << 5)
-#define TMP101AN__CONFIGURE_CONVERTER_RESOLUTION__R1   (1 << 6)
-#define TMP101AN__CONFIGURE_ONE_SHOT__OS               (1 << 7)
+#define TMP101__CONFIGURE_SHUT_DOWN__SD              (1 << 0)
+#define TMP101__CONFIGURE_THERMOSTAT_MODE__TM        (1 << 1)
+#define TMP101__CONFIGURE_ALERT_OUTPUT_POLARITY__POL (1 << 2)
+#define TMP101__CONFIGURE_FAULT_COUNT_TO_ALERT__F0   (1 << 3)
+#define TMP101__CONFIGURE_FAULT_COUNT_TO_ALERT__F1   (1 << 4)
+#define TMP101__CONFIGURE_CONVERTER_RESOLUTION__R0   (1 << 5)
+#define TMP101__CONFIGURE_CONVERTER_RESOLUTION__R1   (1 << 6)
+#define TMP101__CONFIGURE_ONE_SHOT__OS               (1 << 7)
 /** @} */
-
-
-
-// ORESAT_TASK_001 - add temperature sensor driver:
-// 2021-02-08 MON - first steps temperature reading
-#define OPTION_SENSOR_01 (1)
-#define OPTION_SENSOR_02 (2)
-
-#define I2C_ADDR_SENSOR_01 (0x48)
-#define I2C_ADDR_SENSOR_02 (0x4A)
-
 
 
 /*===========================================================================*/
@@ -102,7 +89,7 @@
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
 #if !defined(TMP101_SHARED_I2C) || defined(__DOXYGEN__)
-#define TMP101_SHARED_I2C                   TRUE
+#define TMP101_SHARED_I2C                   FALSE
 #endif
 /** @} */
 
@@ -133,7 +120,7 @@ typedef struct TMP101Driver TMP101Driver;
 
 /**
  * @brief   Driver state machine possible states.
- * @question   2020-02-24 Should this enum be adapted per the configuration options of the TMP101AN?  - TMH
+ * @question   2020-02-24 Should this enum be adapted per the configuration options of the TMP101?  - TMH
  */
 typedef enum {
     TMP101_UNINIT = 0,                  /**< Not initialized.                 */
@@ -194,7 +181,7 @@ struct TMP101VMT {
     const TMP101Config          *config;
 
 /**
- * @brief TMP101AN temperature sensor class.
+ * @brief TMP101 temperature sensor class.
  */
 struct TMP101Driver {
     /** @brief Virtual Methods Table.*/
