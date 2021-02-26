@@ -14,7 +14,7 @@
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
 
-#define DIAG_ON__TMP101AN
+// #define DIAG_ON__TMP101AN
 
 
 
@@ -126,10 +126,19 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
 
     devp->config = config;
 
-    /* Configuring common registers.*/
+    /* Configuring common registers, or at minimum start I2C bus. */
 
-// 2020-02-24 Note - as of this date no common registers to configure
-//  for TMP101AN sensors.
+#if TMP101_USE_I2C
+#if TMP101_SHARED_I2C
+    i2cAcquireBus(config->i2cp);
+
+#endif /* TMP101_SHARED_I2C */
+    i2cStart(config->i2cp, config->i2ccfg);
+
+#if TMP101_SHARED_I2C
+    i2cReleaseBus(config->i2cp);
+#endif /* TMP101_SHARED_I2C */
+#endif /* TMP101_USE_I2C */
 
     devp->state = TMP101_READY;
 
@@ -149,15 +158,26 @@ void tmp101Stop(TMP101Driver *devp) {
     osalDbgAssert((devp->state == TMP101_STOP) || (devp->state == TMP101_READY),
             "tmp101Stop(), invalid state");
 
-//    if (devp->state == TMP101_READY) {
-//    }
+    if (devp->state == TMP101_READY) {
+#if TMP101_USE_I2C
+#if TMP101_SHARED_I2C
+        i2cAcquireBus(devp->config->i2cp);
+        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* TMP101_SHARED_I2C */
+        i2cStop(devp->config->i2cp);
+#if TMP101_SHARED_I2C
+        i2cReleaseBus(devp->config->i2cp);
+#endif /* TMP101_SHARED_I2C */
+#endif /* TMP101_USE_I2C */
+    }
+
     devp->state = TMP101_STOP;
 }
 
 
 
 // 2021-02-07 - first draft read temperature routine
-
+#if (0)
 bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
 {
 // 2021-02-07 - these two byte arrays will be passed to a development
@@ -189,30 +209,14 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
     buffer_rx[0] = 0;
     buffer_rx[1] = 0;
 
-
-#ifdef DIAG_ON__TMP101AN
-    chprintf((BaseSequentialStream *) &SD2, "reading temperature sensor %02X . . .\r\n", sensor_addr);
-#endif
-
+#if TMP101_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
     i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, buffer_rx, 2, TIME_INFINITE);
     i2c_flags = i2cGetErrors(devp->config->i2cp);
     i2cReleaseBus(devp->config->i2cp);
-
-#ifdef DIAG_ON__TMP101AN
-    chprintf((BaseSequentialStream *) &SD2, "temperature reg bytes back hold %u and %u.\r\n\r\n",
-      buffer_rx[0], buffer_rx[1]);
-#endif
-
-    if ( i2c_result != 0 )
-        { chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result); }
-    if ( i2c_flags != 0 )
-        { chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags); }
-
-// Compiler error:  cannot write to instantiating code's memory, as on next line - TMH:
-//    devp->config->temperature_present_in_C = (( buffer_rx[0] << 4 ) | ( buffer_rx[0] >> 4 ));
+#endif /* TMP101_SHARED_I2C */
 
     if ( i2c_result == MSG_OK )
         return true;
@@ -220,38 +224,27 @@ bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
         return true;
 
 }
-
+#endif // (0)
 
 
 //----------------------------------------------------------------------
-// @brief   routine to read TMP101AN temperature sensor, and return two-
+// @brief   routine to read TMP101 temperature sensor, and return a
 //          two-byte reading
 //----------------------------------------------------------------------
 msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array)
 {
     msg_t i2c_result = MSG_OK;
-    i2cflags_t i2c_flags = 0;
     uint8_t sensor_addr = devp->config->saddr;
-    uint8_t buffer_tx[2] = {0};
-
-// Values chosen per TMP101AN datasheet:
-    buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
-    buffer_tx[1] = 0;
 
 // Prepare for I2C transaction:
+#if TMP101_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
-    i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, byte_array, 2, TIME_INFINITE);
+    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, TMP101_REG_TEMPERATURE_READING, byte_array, 2);
 
-    i2c_flags = i2cGetErrors(devp->config->i2cp);
     i2cReleaseBus(devp->config->i2cp);
-
-// TO BE optional warning code to report I2C bus errors:
-    if ( i2c_result != 0 )
-        { chprintf((BaseSequentialStream *) &SD2, "i2c_result holds %ld.\r\n", i2c_result); }
-    if ( i2c_flags != 0 )
-        { chprintf((BaseSequentialStream *) &SD2, "i2c_flags holds %ld.\r\n\r\n", i2c_flags); }
+#endif /* TMP101_SHARED_I2C */
 
     return i2c_result;
 }
