@@ -22,10 +22,14 @@
 /* Project header files */
 #include "oresat.h"
 #include "wdt.h"
+#include "c3.h"
 #include "opd.h"
+#include "comms.h"
 #include "time_sync.h"
-#include "command.h"
 #include "CO_master.h"
+#ifdef SHELL_ENABLE
+#include "cmd.h"
+#endif
 
 /*
 static const oresat_node_t nodes[] = {
@@ -46,13 +50,11 @@ static const oresat_node_t nodes[] = {
 };
 */
 
-/*
- * Working area for driver.
- */
-
-
 static worker_t wdt_worker;
+static worker_t c3_worker;
+#ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+#endif
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -66,26 +68,35 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* Initialize WDT worker thread */
-    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
+    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), HIGHPRIO, wdt, NULL, true);
     reg_worker(&wdt_worker);
 
+    /* Initialize C3 worker thread */
+    init_worker(&c3_worker, "C3", c3_wa, sizeof(c3_wa), NORMALPRIO, c3, NULL, true);
+    reg_worker(&c3_worker);
+
     /* Initialize shell worker thread */
+#ifdef SHELL_ENABLE
     init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
     reg_worker(&cmd_worker);
+#endif
 
     /* Initialize OPD */
     opd_init();
-    /*opd_start();*/
+    opd_start();
 
     /* Initialize SDO client */
     sdo_init();
 
-    /* Initialize shell and start serial interface */
-    shellInit();
-    sdStart(&SD3, NULL);
+    /* Initialize and start radio systems */
+    comms_init();
+    comms_start();
 
-    /* Configure SCET time object */
-    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
+    /* Initialize shell and start serial interface */
+#ifdef SHELL_ENABLE
+    shellInit();
+#endif
+    sdStart(&SD3, NULL);
 }
 
 /**

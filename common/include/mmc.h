@@ -18,12 +18,6 @@ extern struct lfs_config lfscfg;
 int mmc_enable(void);
 void mmc_disable(void);
 
-/* LFS support functions */
-int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size);
-int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size);
-int mmc_erase(const struct lfs_config *cfg, lfs_block_t block);
-int mmc_sync(const struct lfs_config *cfg);
-
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
