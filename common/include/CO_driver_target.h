@@ -63,10 +63,7 @@ extern "C" {
 
 #ifndef CO_CONFIG_EM
 #define CO_CONFIG_EM (CO_CONFIG_EM_PRODUCER | \
-                      CO_CONFIG_EM_PROD_CONFIGURABLE | \
-                      CO_CONFIG_EM_PROD_INHIBIT | \
                       CO_CONFIG_EM_HISTORY | \
-                      CO_CONFIG_EM_STATUS_BITS | \
                       CO_CONFIG_EM_CONSUMER | \
                       CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
@@ -108,6 +105,10 @@ extern "C" {
                        CO_CONFIG_TPDO_CALLS_EXTENSION | \
                        CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
                        CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
+#endif
+
+#ifndef CO_CONFIG_LEDS
+#define CO_CONFIG_LEDS 0
 #endif
 
 #ifndef CO_CONFIG_GFC
