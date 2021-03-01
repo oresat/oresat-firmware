@@ -13,22 +13,6 @@ extern "C" {
                            CO_CONFIG_FLAG_TIMERNEXT | \
                            CO_CONFIG_FLAG_OD_DYNAMIC)
 
-#define CO_CONFIG_GTW (CO_CONFIG_GTW_ASCII | \
-                       CO_CONFIG_GTW_ASCII_SDO | \
-                       CO_CONFIG_GTW_ASCII_NMT | \
-                       CO_CONFIG_GTW_ASCII_LOG | \
-                       CO_CONFIG_GTW_ASCII_ERROR_DESC | \
-                       CO_CONFIG_GTW_ASCII_PRINT_HELP)
-#define CO_CONFIG_GTW_BLOCK_DL_LOOP 1
-#define CO_CONFIG_GTWA_COMM_BUF_SIZE 2000
-#define CO_CONFIG_GTWA_LOG_BUF_SIZE 2000
-
-#define CO_CONFIG_FIFO (CO_CONFIG_FIFO_ENABLE | \
-                        CO_CONFIG_FIFO_ALT_READ | \
-                        CO_CONFIG_FIFO_CRC16_CCITT | \
-                        CO_CONFIG_FIFO_ASCII_COMMANDS | \
-                        CO_CONFIG_FIFO_ASCII_DATATYPES)
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

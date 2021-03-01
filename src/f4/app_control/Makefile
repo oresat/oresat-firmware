@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -87,7 +87,7 @@ PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_C3_V3
+BOARD     = ORESAT_C3_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -111,6 +111,7 @@ include $(PROJ_SRC)/opd.mk
 include $(PROJ_SRC)/time_sync.mk
 include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/littlefs.mk
+include $(PROJ_SRC)/radio.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -134,7 +135,7 @@ include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
+LDSCRIPT= $(STARTUPLD)/STM32F429xI.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -171,7 +172,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C -DLFS_CONFIG=lfs_util_custom.h
+UDEFS = -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C=TRUE -DAX5043_SHARED_SPI=TRUE -DSI41XX_DEVICE=SI4112 -DLFS_CONFIG=lfs_util_custom.h -DSTM32_FLASH_DUAL_BANK_PERMANENT=TRUE
 
 # Define ASM defines here
 UADEFS =
