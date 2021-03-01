@@ -18,7 +18,7 @@ ifeq ($(USE_CPPOPT),)
   USE_CPPOPT = -fno-rtti
 endif
 
-# Enable this if you want the linker to remove unused code and data.
+# Enable this if you want the linker to remove unused code and data
 ifeq ($(USE_LINK_GC),)
   USE_LINK_GC = yes
 endif
@@ -28,9 +28,14 @@ ifeq ($(USE_LDOPT),)
   USE_LDOPT = 
 endif
 
-# Enable this if you want link time optimizations (LTO).
+# Enable this if you want link time optimizations (LTO)
 ifeq ($(USE_LTO),)
   USE_LTO = yes
+endif
+
+# If enabled, this option allows to compile the application in THUMB mode.
+ifeq ($(USE_THUMB),)
+  USE_THUMB = yes
 endif
 
 # Enable this if you want to see the full log while compiling.
@@ -55,13 +60,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x200
+  USE_PROCESS_STACKSIZE = 0x400
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x400
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -69,58 +74,53 @@ ifeq ($(USE_FPU),)
   USE_FPU = no
 endif
 
-# FPU-related options.
-ifeq ($(USE_FPU_OPT),)
-  USE_FPU_OPT = -mfloat-abi=$(USE_FPU) -mfpu=fpv4-sp-d16
-endif
-
 #
 # Architecture or project specific options
 ##############################################################################
 
 ##############################################################################
-# Project, target, sources and paths
+# Project, sources and paths
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = APP_SI41XX
 
-# Target settings.
-MCU       = cortex-m0
-BOARD     = PROTOCARD_V4
+# Define board here
+BOARD     = ST_NUCLEO64_F446RE
 
-#Project sources.
+#Project sources
 PROJ_ROOT = ../../..
 APP_ROOT  = .
-PROJ_SRC  = $(PROJ_ROOT)/common
+
+# Imported source files and paths
+CHIBIOS   = $(PROJ_ROOT)/ChibiOS
+PROJ_SRC = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
 
-# Imported source files and paths.
-CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
-CONFDIR  := $(APP_ROOT)/cfg
-BUILDDIR := $(APP_ROOT)/build
-DEPDIR   := $(APP_ROOT)/.dep
-
-#Board specific directories.
+#Board specific directories
+CONFDIR   = conf
+BUILDDIR  = $(APP_ROOT)/build
+DEPDIR    = $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# Project specific files.
-include $(PROJ_SRC)/oresat.mk
-
+# Project specific files
+include $(PROJ_SRC)/common.mk
+#shell files
+include $(CHIBIOS)/os/various/shell/shell.mk
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
-include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
+include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/hal/ports/STM32/STM32F0xx/platform.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
 include $(BOARDDIR)/board.mk
-include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
+include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
-# Auto-build files in ./source recursively.
+include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
+# Auto-build files recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
 include $(CHIBIOS)/test/lib/test.mk
@@ -129,7 +129,7 @@ include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -141,23 +141,73 @@ CSRC = $(ALLCSRC) \
 # setting.
 CPPSRC = $(ALLCPPSRC)
 
-# List ASM source files here.
-ASMSRC = $(ALLASMSRC)
+# C sources to be compiled in ARM mode regardless of the global setting.
+# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
+#       option that results in lower performance and larger code size.
+ACSRC =
 
-# List ASM with preprocessor source files here.
+# C++ sources to be compiled in ARM mode regardless of the global setting.
+# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
+#       option that results in lower performance and larger code size.
+ACPPSRC =
+
+# C sources to be compiled in THUMB mode regardless of the global setting.
+# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
+#       option that results in lower performance and larger code size.
+TCSRC =
+
+# C sources to be compiled in THUMB mode regardless of the global setting.
+# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
+#       option that results in lower performance and larger code size.
+TCPPSRC =
+
+# List ASM source files here
+ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
-# Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+INCDIR = $(ALLINC) $(TESTINC) $(CONFDIR)
 
-# Define C warning options here.
+#
+# Project, sources and paths
+##############################################################################
+
+##############################################################################
+# Compiler settings
+#
+
+MCU  = cortex-m4
+
+#TRGT = arm-elf-
+TRGT = arm-none-eabi-
+CC   = $(TRGT)gcc
+CPPC = $(TRGT)g++
+# Enable loading with g++ only if you need C++ runtime support.
+# NOTE: You can use C++ even without C++ support if you are careful. C++
+#       runtime support makes code size explode.
+LD   = $(TRGT)gcc
+#LD   = $(TRGT)g++
+CP   = $(TRGT)objcopy
+AS   = $(TRGT)gcc -x assembler-with-cpp
+AR   = $(TRGT)ar
+OD   = $(TRGT)objdump
+SZ   = $(TRGT)size
+HEX  = $(CP) -O ihex
+BIN  = $(CP) -O binary
+
+# ARM-specific options here
+AOPT =
+
+# THUMB-specific options here
+TOPT = -mthumb -DTHUMB
+
+# Define C warning options here
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
 
-# Define C++ warning options here.
+# Define C++ warning options here
 CPPWARN = -Wall -Wextra -Wundef
 
 #
-# Project, target, sources and paths
+# Compiler settings
 ##############################################################################
 
 ##############################################################################
@@ -180,26 +230,9 @@ ULIBDIR = $(PROJ_SRC)
 ULIBS =
 
 #
-# End of user section
+# End of user defines
 ##############################################################################
-
-##############################################################################
-# Common rules
-#
 
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
-include $(RULESPATH)/arm-none-eabi.mk
 include $(RULESPATH)/rules.mk
 include $(TOOLCHAIN)/toolchain.mk
-
-#
-# Common rules
-##############################################################################
-
-##############################################################################
-# Custom rules
-#
-
-#
-# Custom rules
-##############################################################################

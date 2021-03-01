@@ -5,7 +5,6 @@ CANOPEN_SRC  = $(PROJ_ROOT)/ext/CANopenNode
 
 # List of all CANopen sources
 CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                  \
-               $(CANOPEN_SRC)/301/CO_ODinterface.c      \
                $(CANOPEN_SRC)/301/CO_SDOserver.c        \
                $(CANOPEN_SRC)/301/CO_Emergency.c        \
                $(CANOPEN_SRC)/301/CO_NMT_Heartbeat.c    \
