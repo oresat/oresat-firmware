@@ -63,26 +63,6 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         ax5043Idle(devp);
     } else if (!strcmp(argv[0], "rx")) {
         ax5043RX(devp, false, false);
-    } else if (!strcmp(argv[0], "tx")) {
-        uint8_t mac_hdr[] = {'S' << 1, 'P' << 1, 'A' << 1, 'C' << 1, 'E' << 1, ' ' << 1, 0x60U,  /* APRS Destination                         */
-                             'K' << 1, 'J' << 1, '7' << 1, 'S' << 1, 'A' << 1, 'T' << 1, 0x61U,  /* APRS Source                              */
-                             0x03, 0xF0};                                                        /* UI Frame, No protocol ID                 */
-        uint8_t net_hdr[] = {':'};                                                               /* APRS Message                             */
-        char str[] = "KJ7SAT - Test transmission from AX5043 driver.";
-        uint8_t buf[512];
-        pdu_t pdu = {
-            .net_hdr = net_hdr,
-            .net_len = sizeof(net_hdr),
-            .mac_hdr = mac_hdr,
-            .mac_len = sizeof(mac_hdr),
-            .data = str,
-            .data_len = sizeof(str),
-            .buf = buf,
-            .buf_max = sizeof(buf),
-        };
-
-        pdu_gen(&pdu);
-        ax5043TX(devp, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);
     } else if (!strcmp(argv[0], "dump")) {
         chprintf(chp, "\r\n");
         for (int i = 0; i < 0x1000; i++) {
@@ -107,14 +87,10 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             chprintf(chp, "OK\r\n");
         }
-    } else if (!strcmp(argv[0], "profile") && argc > 1) {
-        if (!strcmp(argv[1], "list")) {
-            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
-                chprintf(chp, "%u:\t%s\r\n", i, radio_profiles[i].name);
-            }
-            chprintf(chp, "\r\n");
-            return;
-        } else {
+    } else if (!strcmp(argv[0], "getfreq")) {
+        chprintf(chp, "Current frequency is %u\r\n", ax5043GetFreq(devp));
+    } else if (!strcmp(argv[0], "profile")) {
+        if (argc > 1) {
             uint32_t i, index;
             /* Find max index */
             for (i = 0; radio_profiles[i].profile != NULL; i++);
@@ -125,7 +101,23 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             }
             ax5043SetProfile(devp, radio_profiles[index].profile);
             return;
+        } else {
+            const ax5043_profile_t *profile;
+            profile = ax5043GetProfile(devp);
+            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
+                if (radio_profiles[i].profile == profile) {
+                    chprintf(chp, "Current profile is %s\r\n", radio_profiles[i].name);
+                }
+            }
+            chprintf(chp, "Available profiles:\r\n");
+            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
+                chprintf(chp, "%u:\t%s\r\n", i, radio_profiles[i].name);
+            }
+            chprintf(chp, "\r\n");
+            return;
         }
+    } else if (!strcmp(argv[0], "rssi")) {
+        chprintf(chp, "RSSI: %u\r\nBackground RSSI: %u\r\n", ax5043GetRSSI(devp), ax5043GetBGNDRSSI(devp));
     } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
@@ -177,12 +169,15 @@ radio_usage:
                   "\r\n"
                   "    start:       Start AX5043 device\r\n"
                   "    stop:        Stop AX5043 device\r\n"
-                  "    tx:          Test transmission with APRS data\r\n"
                   "    setfreq <freq> [vcor] [chan_b]:\r\n"
                   "                 Sets frequency of channel A/B to <freq>\r\n"
                   "                 Optionally provide VCOR. [chan_b] specifies channel B\r\n"
-                  "    profile list|<num>:\r\n"
-                  "                 List the profiles or set the profile to <num> as shown by 'list'\r\n"
+                  "    getfreq:     Get the current frequency in use\r\n"
+                  "    profile [num]:\r\n"
+                  "                 Print current profile and list available profiles,\r\n"
+                  "                 or set the profile to [num] if provided\r\n"
+                  "\r\n"
+                  "    rssi:        Get the current RSSI value\r\n"
                   "\r\n"
                   "    read<reg> <type>:\r\n"
                   "                 Read <reg> where <type> is u8|u16|u24|u32\r\n"
@@ -194,6 +189,9 @@ radio_usage:
     return;
 }
 
+/*===========================================================================*/
+/* OreSat Synthesizer Control                                                */
+/*===========================================================================*/
 void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[])
 {
     static SI41XXDriver *devp = NULL;
@@ -270,6 +268,95 @@ synth_usage:
                   "    freq <freq>: Sets frequency of IF output to <freq>\r\n"
                   "    ifdiv <div>: Sets IF output divider to <div> (1,2,4,8)\r\n"
                   "    status:      Print PLL lock status\r\n"
+                  "\r\n");
+    return;
+}
+
+/*===========================================================================*/
+/* OreSat RF Path Control                                                    */
+/*===========================================================================*/
+void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto rf_usage;
+    }
+
+    if (!strcmp(argv[0], "pa") && argc > 1) {
+        if (!strcmp(argv[1], "enable")) {
+            palSetLine(LINE_PA_ENABLE);
+        } else if (!strcmp(argv[1], "disable")) {
+            palClearLine(LINE_PA_ENABLE);
+        }
+    } else if (!strcmp(argv[0], "lna") && argc > 1) {
+        if (!strcmp(argv[1], "enable")) {
+            palSetLine(LINE_LNA_ENABLE);
+        } else if (!strcmp(argv[1], "disable")) {
+            palClearLine(LINE_LNA_ENABLE);
+        }
+    } else if (!strcmp(argv[0], "totclear")) {
+        palSetLine(LINE_TOT_CLEAR);
+        palClearLine(LINE_TOT_CLEAR);
+    } else if (!strcmp(argv[0], "status")) {
+        chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n\r\n",
+                (palReadLine(LINE_PA_ENABLE) ? "ENABLED" : "DISABLED"),
+                (palReadLine(LINE_LNA_ENABLE) ? "ENABLED" : "DISABLED"),
+                (palReadLine(LINE_TOT_OUT) ? "ENABLED" : "DISABLED"));
+    } else {
+        goto rf_usage;
+    }
+
+    return;
+rf_usage:
+    chprintf(chp, "\r\n"
+                  "Usage: rf <cmd>\r\n"
+                  "    pa <enable/disable>:\r\n"
+                  "         Enable or Disable the PA\r\n"
+                  "    lna <enable/disable>:\r\n"
+                  "         Enable or Disable the LNA\r\n"
+                  "    totclear\r\n"
+                  "         Clear the Time Out Timer\r\n"
+                  "    status\r\n"
+                  "         RF path status\r\n"
+                  "\r\n");
+    return;
+}
+
+/*===========================================================================*/
+/* OreSat RF System Test                                                     */
+/*===========================================================================*/
+void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto rftest_usage;
+    }
+
+    palClearLine(LINE_LNA_ENABLE);
+    palSetLine(LINE_PA_ENABLE);
+
+    if (!strcmp(argv[0], "test1")) {
+    } else if (!strcmp(argv[0], "test2")) {
+    } else if (!strcmp(argv[0], "test3")) {
+    } else if (!strcmp(argv[0], "test4")) {
+    } else {
+        palSetLine(LINE_LNA_ENABLE);
+        palClearLine(LINE_PA_ENABLE);
+        goto rftest_usage;
+    }
+
+    palSetLine(LINE_LNA_ENABLE);
+    palClearLine(LINE_PA_ENABLE);
+    return;
+rftest_usage:
+    chprintf(chp, "\r\n"
+                  "Usage: rftest <cmd>\r\n"
+                  "    test1:\r\n"
+                  "         Executes RF Test 1\r\n"
+                  "    test2:\r\n"
+                  "         Executes RF Test 2\r\n"
+                  "    test3:\r\n"
+                  "         Executes RF Test 3\r\n"
+                  "    test4:\r\n"
+                  "         Executes RF Test 4\r\n"
                   "\r\n");
     return;
 }
