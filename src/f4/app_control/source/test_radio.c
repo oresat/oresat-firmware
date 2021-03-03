@@ -295,6 +295,7 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
         }
     } else if (!strcmp(argv[0], "totclear")) {
         palSetLine(LINE_TOT_CLEAR);
+        chThdSleepMicroseconds(10);
         palClearLine(LINE_TOT_CLEAR);
     } else if (!strcmp(argv[0], "status")) {
         chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n\r\n",
