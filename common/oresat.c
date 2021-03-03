@@ -106,7 +106,7 @@ THD_FUNCTION(pdo_sync_worker, arg)
         uint32_t timeout = ((typeof(timeout))-1);
 
         /* Trigger sensors */
-        sensors_trig();
+        /*sensors_trig();*/
         /* Process SYNC */
         syncWas = CO_process_SYNC(co,
                 TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);

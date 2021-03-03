@@ -7,9 +7,57 @@
 #include "si41xx.h"
 #include "chprintf.h"
 
+#define PA_CHANNELS 3
+#define PA_SAMPLES 16
+
 extern radio_dev_t radio_devices[];
 extern radio_profile_t radio_profiles[];
 extern synth_dev_t synth_devices[];
+
+static adcsample_t pa_pwr[PA_CHANNELS * PA_SAMPLES];
+static adcsample_t pa_fwd_avg = 0, pa_rev_avg = 0, pa_therm_avg = 0;
+
+static void  adccallback(ADCDriver *adcp) {
+    uint32_t start, end;
+    adcsample_t fwd_sum = 0, rev_sum = 0, therm_sum = 0;
+    if (adcIsBufferComplete(adcp)) {
+        start = PA_SAMPLES / 2;
+        end = PA_SAMPLES;
+    } else {
+        start = 0;
+        end = PA_SAMPLES / 2;
+    }
+    for (uint32_t i = start; i < end; i++) {
+        therm_sum += pa_pwr[i + 0];
+        fwd_sum += pa_pwr[i + 0];
+        rev_sum += pa_pwr[i + 1];
+    }
+    pa_therm_avg = therm_sum / (PA_SAMPLES / 2);
+    pa_fwd_avg = fwd_sum / (PA_SAMPLES / 2);
+    pa_rev_avg = rev_sum / (PA_SAMPLES / 2);
+}
+
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+    (void)adcp;
+    (void)err;
+}
+
+static const ADCConversionGroup pa_pwr_cfg = {
+    FALSE,
+    PA_CHANNELS,
+    adccallback,
+    adcerrorcallback,
+    0,                                                                      /* CR1 */
+    ADC_CR2_SWSTART,                                                        /* CR2 */
+    ADC_SMPR1_SMP_AN15(ADC_SAMPLE_480) | ADC_SMPR1_SMP_AN14(ADC_SAMPLE_480),/* SMPR1 */
+    ADC_SMPR2_SMP_AN4(ADC_SAMPLE_480),                                      /* SMPR2 */
+    0,                                                                      /* HTR */
+    0,                                                                      /* LTR */
+    0,                                                                      /* SQR1 */
+    0,                                                                      /* SQR2 */
+    ADC_SQR3_SQ3_N(ADC_CHANNEL_IN15) | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN14) |   /* SQR3 */
+    ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)
+};
 
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
@@ -297,11 +345,17 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
         palSetLine(LINE_TOT_CLEAR);
         chThdSleepMicroseconds(10);
         palClearLine(LINE_TOT_CLEAR);
+    } else if (!strcmp(argv[0], "startmeasure")) {
+        adcStartConversion(&ADCD1, &pa_pwr_cfg, pa_pwr, PA_SAMPLES);
+    } else if (!strcmp(argv[0], "stopmeasure")) {
+        adcStopConversion(&ADCD1);
     } else if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n\r\n",
+        chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n"
+                      "PA THERM AVG: %u\r\nPA FWD AVG: %u\r\nPA REV AVG: %u\r\n\r\n",
                 (palReadLine(LINE_PA_ENABLE) ? "ENABLED" : "DISABLED"),
                 (palReadLine(LINE_LNA_ENABLE) ? "ENABLED" : "DISABLED"),
-                (palReadLine(LINE_TOT_OUT) ? "ENABLED" : "DISABLED"));
+                (palReadLine(LINE_TOT_OUT) ? "ENABLED" : "DISABLED"),
+                pa_therm_avg, pa_fwd_avg, pa_rev_avg);
     } else {
         goto rf_usage;
     }
@@ -316,6 +370,10 @@ rf_usage:
                   "         Enable or Disable the LNA\r\n"
                   "    totclear\r\n"
                   "         Clear the Time Out Timer\r\n"
+                  "    startmeasure\r\n"
+                  "         Start a continuous measure of PA PWR\r\n"
+                  "    stopmeasure\r\n"
+                  "         Stop measure of PA PWR\r\n"
                   "    status\r\n"
                   "         RF path status\r\n"
                   "\r\n");
