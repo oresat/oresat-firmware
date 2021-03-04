@@ -63,7 +63,7 @@ THD_FUNCTION(sdo_client_wip, arg)
         }
 
         prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_SDOclient_initCallbackPre(SDOclient, NULL, NULL);
     chThdExit(MSG_OK);
@@ -86,7 +86,7 @@ THD_FUNCTION(sdo_server, arg)
         CO_SDO_process(SDO, CO_OPERATIONAL, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_SDO_initCallbackPre(SDO, NULL, NULL);
     chThdExit(MSG_OK);
@@ -108,7 +108,7 @@ THD_FUNCTION(em, arg)
         CO_EM_process(emPr, CO_OPERATIONAL, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), OD_inhibitTimeEMCY, &timeout);
 
         prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_EM_initCallbackPre(emPr->em, NULL, NULL);
     chThdExit(MSG_OK);
@@ -142,7 +142,7 @@ THD_FUNCTION(pdo_sync, arg)
         CO_process_TPDO(co, syncWas, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_SYNC_initCallbackPre(co->SYNC, NULL, NULL);
     for (int i = 0; i < CO_NO_RPDO; i++) {
@@ -167,7 +167,7 @@ THD_FUNCTION(hb_cons, arg)
         CO_HBconsumer_process(HBcons, CO_OPERATIONAL, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
 
         prev_time = chVTGetSystemTime();
-        chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_HBconsumer_initCallbackPre(HBcons, NULL, NULL);
     chThdExit(MSG_OK);
@@ -215,7 +215,7 @@ THD_FUNCTION(nmt, arg)
         }
 
         prev_time = chVTGetSystemTime();
-        events = chEvtWaitAnyTimeout(CO_EVT_WAKEUP || CO_EVT_TERMINATE, TIME_US2I(timeout));
+        events = chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
         if (events & CO_EVT_TERMINATE) {
             reset = CO_RESET_APP;
         }
