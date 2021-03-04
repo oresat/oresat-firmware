@@ -514,6 +514,8 @@ static const ShellCommand commands[] = {
     {"lfs", cmd_lfs},
     {"radio", cmd_radio},
     {"synth", cmd_synth},
+    {"rf", cmd_rf},
+    {"rftest", cmd_rftest},
     {"state", cmd_state},
     {"deploy", cmd_deploy},
     {NULL, NULL}
