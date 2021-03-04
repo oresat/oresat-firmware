@@ -59,7 +59,7 @@ typedef union __attribute__((packed)) {
  * @return                  AX5043 status bits
  * @notapi
  */
-ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const void *txbuf, void *rxbuf, size_t n) {
     spibuf_t sendbuf;
     spibuf_t recvbuf;
 
@@ -612,7 +612,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
  *
  * @api
  */
-void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -708,7 +708,7 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         /* Once there's enough free space, write the data chunk and commit */
         ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
         ax5043Exchange(devp, AX5043_REG_FIFODATA, true, (uint8_t*)(&data), NULL, sizeof(data));
-        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &buf[offset], NULL, write_len);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &((uint8_t*)buf)[offset], NULL, write_len);
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
 
         len -= write_len;
@@ -758,7 +758,7 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
  *
  * @api
  */
-void ax5043TXRaw(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -828,7 +828,7 @@ void ax5043TXRaw(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t tota
 
         /* Once there's enough free space, write the data chunk and commit */
         ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
-        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &buf[offset], NULL, write_len);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &((uint8_t*)buf)[offset], NULL, write_len);
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
 
         len -= write_len;
@@ -1047,7 +1047,7 @@ uint32_t ax5043GetFreq(AX5043Driver *devp) {
  *
  * @api
  */
-void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len) {
+void ax5043SetPreamble(AX5043Driver *devp, const void *preamble, size_t len) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(len <= 256, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
 
@@ -1063,7 +1063,7 @@ void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len) 
  * @return                  Pointer to the current preamble.
  * @api
  */
-const uint8_t *ax5043GetPreamble(AX5043Driver *devp) {
+const void *ax5043GetPreamble(AX5043Driver *devp) {
     return devp->preamble;
 }
 
@@ -1076,7 +1076,7 @@ const uint8_t *ax5043GetPreamble(AX5043Driver *devp) {
  *
  * @api
  */
-void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len) {
+void ax5043SetPostamble(AX5043Driver *devp, const void *postamble, size_t len) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(len <= 256, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
 
@@ -1092,32 +1092,8 @@ void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len
  * @return                  Pointer to the current postamble.
  * @api
  */
-const uint8_t *ax5043GetPostamble(AX5043Driver *devp) {
+const void *ax5043GetPostamble(AX5043Driver *devp) {
     return devp->postamble;
-}
-
-/**
- * @brief   Gets the current RSSI value from the device.
- *
- * @param[in]   devp        Pointer to the @p AX5043Driver object.
- *
- * @return                  Current RSSI value in dB.
- * @api
- */
-uint8_t ax5043GetRSSI(AX5043Driver *devp) {
-    return ax5043ReadU8(devp, AX5043_REG_RSSI);
-}
-
-/**
- * @brief   Gets the current Background Noise RSSI value from the device.
- *
- * @param[in]   devp        Pointer to the @p AX5043Driver object.
- *
- * @return                  Current Background RSSI value in dB.
- * @api
- */
-uint8_t ax5043GetBGNDRSSI(AX5043Driver *devp) {
-    return ax5043ReadU8(devp, AX5043_REG_BGNDRSSI);
 }
 
 /**
@@ -1135,7 +1111,7 @@ uint8_t ax5043GetBGNDRSSI(AX5043Driver *devp) {
  * @return                  AX5043 status bits
  * @api
  */
-ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const void *txbuf, void *rxbuf, size_t n) {
     SPIDriver *spip = NULL;
     ax5043_status_t status = 0;
 
