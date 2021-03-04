@@ -7,34 +7,39 @@
 #include "si41xx.h"
 #include "chprintf.h"
 
-#define PA_CHANNELS 3
-#define PA_SAMPLES 16
+#define PA_SAMPLES 8
 
 extern radio_dev_t radio_devices[];
 extern radio_profile_t radio_profiles[];
 extern synth_dev_t synth_devices[];
 
-static adcsample_t pa_pwr[PA_CHANNELS * PA_SAMPLES];
-static adcsample_t pa_fwd_avg = 0, pa_rev_avg = 0, pa_therm_avg = 0;
+typedef struct {
+    adcsample_t therm;
+    adcsample_t fwd;
+    adcsample_t rev;
+} pa_samples_t;
+
+static pa_samples_t pa_samples[PA_SAMPLES * 2];
+static pa_samples_t pa_avg = {0};
 
 static void  adccallback(ADCDriver *adcp) {
     uint32_t start, end;
-    adcsample_t fwd_sum = 0, rev_sum = 0, therm_sum = 0;
+    pa_samples_t pa_sum = {0};
     if (adcIsBufferComplete(adcp)) {
-        start = PA_SAMPLES / 2;
-        end = PA_SAMPLES;
+        start = PA_SAMPLES;
+        end = PA_SAMPLES * 2;
     } else {
         start = 0;
-        end = PA_SAMPLES / 2;
+        end = PA_SAMPLES;
     }
     for (uint32_t i = start; i < end; i++) {
-        therm_sum += pa_pwr[i + 0];
-        fwd_sum += pa_pwr[i + 0];
-        rev_sum += pa_pwr[i + 1];
+        pa_sum.therm += pa_samples[i].therm;
+        pa_sum.fwd += pa_samples[i].fwd;
+        pa_sum.rev += pa_samples[i].rev;
     }
-    pa_therm_avg = therm_sum / (PA_SAMPLES / 2);
-    pa_fwd_avg = fwd_sum / (PA_SAMPLES / 2);
-    pa_rev_avg = rev_sum / (PA_SAMPLES / 2);
+    pa_avg.therm = pa_sum.therm / PA_SAMPLES;
+    pa_avg.fwd = pa_sum.fwd / PA_SAMPLES;
+    pa_avg.rev = pa_sum.rev / PA_SAMPLES;
 }
 
 static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
@@ -43,8 +48,8 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
 }
 
 static const ADCConversionGroup pa_pwr_cfg = {
-    FALSE,
-    PA_CHANNELS,
+    TRUE,
+    sizeof(pa_samples_t) / sizeof(adcsample_t),
     adccallback,
     adcerrorcallback,
     0,                                                                      /* CR1 */
@@ -345,9 +350,9 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
         palSetLine(LINE_TOT_CLEAR);
         chThdSleepMicroseconds(10);
         palClearLine(LINE_TOT_CLEAR);
-    } else if (!strcmp(argv[0], "startmeasure")) {
-        adcStartConversion(&ADCD1, &pa_pwr_cfg, pa_pwr, PA_SAMPLES);
-    } else if (!strcmp(argv[0], "stopmeasure")) {
+    } else if (!strcmp(argv[0], "start")) {
+        adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
+    } else if (!strcmp(argv[0], "stop")) {
         adcStopConversion(&ADCD1);
     } else if (!strcmp(argv[0], "status")) {
         chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n"
@@ -355,7 +360,7 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
                 (palReadLine(LINE_PA_ENABLE) ? "ENABLED" : "DISABLED"),
                 (palReadLine(LINE_LNA_ENABLE) ? "ENABLED" : "DISABLED"),
                 (palReadLine(LINE_TOT_OUT) ? "ENABLED" : "DISABLED"),
-                pa_therm_avg, pa_fwd_avg, pa_rev_avg);
+                pa_avg.therm, pa_avg.fwd, pa_avg.rev);
     } else {
         goto rf_usage;
     }
@@ -370,10 +375,10 @@ rf_usage:
                   "         Enable or Disable the LNA\r\n"
                   "    totclear\r\n"
                   "         Clear the Time Out Timer\r\n"
-                  "    startmeasure\r\n"
-                  "         Start a continuous measure of PA PWR\r\n"
-                  "    stopmeasure\r\n"
-                  "         Stop measure of PA PWR\r\n"
+                  "    start\r\n"
+                  "         Start a continuous measure of PA PWR and THERM\r\n"
+                  "    stop\r\n"
+                  "         Stop measure of PA PWR and THERM\r\n"
                   "    status\r\n"
                   "         RF path status\r\n"
                   "\r\n");
@@ -383,6 +388,19 @@ rf_usage:
 /*===========================================================================*/
 /* OreSat RF System Test                                                     */
 /*===========================================================================*/
+static const ax5043_chunk_repeatdata_t cw = {
+    .header = AX5043_CHUNKCMD_REPEATDATA | _VAL2FLD(AX5043_FIFOCHUNK_SIZE, 3),
+    .flags = AX5043_CHUNK_REPEATDATA_UNENC | AX5043_CHUNK_REPEATDATA_NOCRC,
+    .repeatcnt = 0xFF,
+    .data = 0xFF,
+};
+
+size_t tx_cb(void *arg)
+{
+    (void)arg;
+    return sizeof(cw);
+}
+
 void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
 {
     if (argc < 1) {
@@ -391,31 +409,33 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
 
     palClearLine(LINE_LNA_ENABLE);
     palSetLine(LINE_PA_ENABLE);
+    ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, 0);
+    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 1);
 
-    if (!strcmp(argv[0], "test1")) {
-    } else if (!strcmp(argv[0], "test2")) {
-    } else if (!strcmp(argv[0], "test3")) {
-    } else if (!strcmp(argv[0], "test4")) {
+    if (!strcmp(argv[0], "cw") && argc > 2) {
+        uint16_t txpwr = strtoul(argv[1], NULL, 0);
+        uint32_t cnt = strtoul(argv[2], NULL, 0);
+        if (cnt == 0)  cnt = 1;
+        ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, txpwr);
+        adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
+        ax5043TXRaw(radio_devices[1].devp, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
+        adcStopConversion(&ADCD1);
     } else {
-        palSetLine(LINE_LNA_ENABLE);
+        ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
         palClearLine(LINE_PA_ENABLE);
+        palSetLine(LINE_LNA_ENABLE);
         goto rftest_usage;
     }
 
-    palSetLine(LINE_LNA_ENABLE);
+    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
     palClearLine(LINE_PA_ENABLE);
+    palSetLine(LINE_LNA_ENABLE);
     return;
 rftest_usage:
     chprintf(chp, "\r\n"
                   "Usage: rftest <cmd>\r\n"
-                  "    test1:\r\n"
-                  "         Executes RF Test 1\r\n"
-                  "    test2:\r\n"
-                  "         Executes RF Test 2\r\n"
-                  "    test3:\r\n"
-                  "         Executes RF Test 3\r\n"
-                  "    test4:\r\n"
-                  "         Executes RF Test 4\r\n"
+                  "    cw <txpwr> <cnt>:\r\n"
+                  "         Transmit CW with <txpwr> for <cnt> iterations of a CW REPEATDATA buffer\r\n"
                   "\r\n");
     return;
 }

@@ -682,7 +682,7 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         if (len == 0 && tx_cb) {
             len = tx_cb(tx_cb_arg);
             offset = 0;
-            osalDbgAssert(len == 0,
+            osalDbgAssert(len != 0,
                     "ax5043TX(), callback returned zero length");
             osalDbgAssert(transferred + len <= total_len,
                     "ax5043TX(), callback returned length exceeding total length");
@@ -817,7 +817,7 @@ void ax5043TXRaw(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t tota
         if (len == 0 && tx_cb) {
             len = tx_cb(tx_cb_arg);
             offset = 0;
-            osalDbgAssert(len == 0,
+            osalDbgAssert(len != 0,
                     "ax5043TX(), callback returned zero length");
             osalDbgAssert(transferred + len <= total_len,
                     "ax5043TX(), callback returned length exceeding total length");
