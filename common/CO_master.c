@@ -18,7 +18,7 @@ THD_FUNCTION(sdo_client_thd, arg)
     chDbgCheck(sdocli != NULL && sdocli->sdo_c != NULL && sdocli->buf_cb != NULL);
 
     /* Register the callback function to wake up thread when message received */
-    CO_SDOclient_initCallbackPre(sdocli->sdo_c, chThdGetSelfX(), process_cb);
+    /*CO_SDOclient_initCallbackPre(sdocli->sdo_c, chThdGetSelfX(), process_cb);*/
 
     prev_time = chVTGetSystemTime();
     while (!abort && ret > 0) {
@@ -37,13 +37,13 @@ THD_FUNCTION(sdo_client_thd, arg)
 
             /* While we have transmit buffers available, fill them */
             do {
-                ret = CO_SDOclientDownload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                        abort, &abort_code, &sdocli->size_transferred, &timeout);
+                /*ret = CO_SDOclientDownload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),*/
+                        /*abort, &abort_code, &sdocli->size_transferred, &timeout);*/
             } while (ret == CO_SDO_RT_blockDownldInProgress);
         } else if (sdocli->state == SDOCLI_ST_UPLOAD) {
             /* Upload (read) operation */
-            ret = CO_SDOclientUpload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                    &abort_code, &sdocli->size_transferred, &sdocli->size_indicated, &timeout);
+            /*ret = CO_SDOclientUpload(sdocli->sdo_c, TIME_I2US(chVTTimeElapsedSinceX(prev_time)),*/
+                    /*&abort_code, &sdocli->size_transferred, &sdocli->size_indicated, &timeout);*/
 
             /* Empty buffer if it is full */
             if (ret == CO_SDO_RT_uploadDataBufferFull) {

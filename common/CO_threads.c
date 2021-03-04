@@ -45,7 +45,7 @@ THD_FUNCTION(sdo_client_wip, arg)
                 ret = CO_SDOclientDownload(SDOclient,
                         TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
                         abort,          /* TODO: Implement logic for this */
-                        //false,          /* TODO: Implement logic for this */
+                        false,          /* TODO: Implement logic for this */
                         &abort_code,    /* TODO: Implement logic for this */
                         NULL,           /* TODO: Implement logic for this */
                         &timeout);
@@ -53,12 +53,12 @@ THD_FUNCTION(sdo_client_wip, arg)
         } else if (SDOclient->state & CO_SDO_ST_FLAG_UPLOAD) {
             ret = CO_SDOclientUpload(SDOclient,
                     TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                    //abort,          /* TODO: Implement logic for this */
+                    abort,          /* TODO: Implement logic for this */
                     &abort_code,    /* TODO: Implement logic for this */
                     NULL,           /* TODO: Implement logic for this */
                     NULL,           /* TODO: Implement logic for this */
                     &timeout);
-        } else if (SDOclient->state == CO_SDO_ST_ABORT) {
+        } else {
 
         }
 
