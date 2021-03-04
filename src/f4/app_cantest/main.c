@@ -21,8 +21,10 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "command.h"
 #include "time_sync.h"
+#ifdef SHELL_ENABLE
+#include "cmd.h"
+#endif
 
 /*
 static const oresat_node_t nodes[] = {
@@ -43,7 +45,9 @@ static const oresat_node_t nodes[] = {
 };
 */
 
+#ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+#endif
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -56,16 +60,18 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* Initialize shell and start serial interface */
-    shellInit();
-    sdStart(&SD2, NULL);
 
-    /* Start up the shell */
+    /* Initialize shell worker thread */
+#ifdef SHELL_ENABLE
     init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
     reg_worker(&cmd_worker);
+#endif
 
-    /* Configure SCET time object */
-    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
+    /* Initialize shell and start serial interface */
+#ifdef SHELL_ENABLE
+    shellInit();
+#endif
+    sdStart(&SD3, NULL);
 }
 
 /**

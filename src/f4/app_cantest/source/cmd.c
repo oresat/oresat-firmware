@@ -2,7 +2,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "command.h"
+#include "cmd.h"
 #include "time_sync.h"
 #include "chprintf.h"
 #include "shell.h"
@@ -12,9 +12,10 @@ static thread_t *shell_tp;
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
-size_t gtwa_read_cb(void *chp, const char *buf, size_t count)
+size_t gtwa_read_cb(void *chp, const char *buf, size_t count, uint8_t *conn_ok)
 {
     size_t written;
+    (void)conn_ok;
 
     written = streamWrite((BaseSequentialStream *)chp, (const unsigned char *)buf, count);
 
@@ -126,7 +127,7 @@ static const ShellCommand commands[] = {
 static char histbuf[SHELL_MAX_HIST_BUFF];
 
 static const ShellConfig shell_cfg = {
-    (BaseSequentialStream *)&SD2,
+    (BaseSequentialStream *)&SD3,
     commands,
     histbuf,
     sizeof(histbuf),
