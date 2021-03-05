@@ -1,14 +1,14 @@
 [FileInfo]
 FileName=app.eds
 FileVersion=0
-FileRevision=0
+FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat Master Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=9:32AM
+ModificationTime=10:08AM
 ModificationDate=03-05-2021
 ModifiedBy=
 
@@ -528,7 +528,7 @@ ObjectType=0x7
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1019]
