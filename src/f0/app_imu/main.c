@@ -23,8 +23,24 @@
 #include "blink.h"
 #include "imu.h"
 
-static worker_t worker1;
-static worker_t worker2;
+static worker_t blink_worker;
+static thread_descriptor_t blink_desc = {
+    .name = "Blink",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = blink,
+    .arg = NULL
+};
+static worker_t imu_worker;
+static thread_descriptor_t imu_desc = {
+    .name = "IMU",
+    .wbase = THD_WORKING_AREA_BASE(imu_wa),
+    .wend = THD_WORKING_AREA_END(imu_wa),
+    .prio = NORMALPRIO,
+    .funcp = imu,
+    .arg = NULL
+};
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -38,10 +54,8 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
-    reg_worker(&worker1);
-    init_worker(&worker2, "IMU test thread", imu_wa, sizeof(imu_wa), NORMALPRIO, imu, NULL, true);
-    reg_worker(&worker2);
+    reg_worker(&blink_worker, &blink_desc, false, true);
+    reg_worker(&imu_worker, &imu_desc, false, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
