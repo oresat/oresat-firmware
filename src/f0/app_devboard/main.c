@@ -23,6 +23,14 @@
 #include "blink.h"
 
 static worker_t worker1;
+static thread_descriptor_t worker1_desc = {
+    .name = "Example blinky thread",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = blink,
+    .arg = NULL
+};
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -36,8 +44,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, false);
-    reg_worker(&worker1);
+    reg_worker(&worker1, &worker1_desc, false, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);

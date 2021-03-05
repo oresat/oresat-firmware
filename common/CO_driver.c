@@ -28,6 +28,7 @@
 
 #include "301/CO_driver.h"
 #include "can_hw.h"
+#include "oresat.h"
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
@@ -324,9 +325,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
         } else {
             /* not bus off */
             /* recalculate CANerrorStatus, first clear some flags */
-            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF |
-                                CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE |
-                                CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE);
+            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF | CO_CAN_ERR_WARN_PASSIVE);
 
             /* rx bus warning or passive */
             if (rxErrors >= 128) {
@@ -370,6 +369,10 @@ void CO_CANerr_cb(CANDriver *canp, uint32_t flags)
     CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
     can = CANmodule->cand->can;
     status = CANmodule->CANerrorStatus;
+
+    /* TODO: Remove these when implemented. Suppressing warnings. */
+    (void)can;
+    (void)flags;
 
     CANmodule->CANerrorStatus = status;
 }
