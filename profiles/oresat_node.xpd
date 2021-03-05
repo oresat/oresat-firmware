@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-01-28" fileModificationTime="14:19:26.3369190-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-03-04" fileModificationTime="18:48:11.3557710-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -79,7 +79,7 @@
             <q1:subrange lowerLimit="0" upperLimit="8" />
             <UDINT />
           </q1:array>
-          <q1:array name="Error behavior object" uniqueID="UID_ARR_1029">
+          <q1:array name="Error behavior" uniqueID="UID_ARR_1029">
             <q1:subrange lowerLimit="0" upperLimit="2" />
             <USINT />
           </q1:array>
@@ -132,10 +132,10 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_120000">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID client to server (rx)" uniqueID="UID_RECSUB_120001">
+            <q1:varDeclaration name="COB-ID client to server" uniqueID="UID_RECSUB_120001">
               <UDINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID server to client (tx)" uniqueID="UID_RECSUB_120002">
+            <q1:varDeclaration name="COB-ID server to client" uniqueID="UID_RECSUB_120002">
               <UDINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -157,10 +157,10 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_128000">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID client to server (tx)" uniqueID="UID_RECSUB_128001">
+            <q1:varDeclaration name="COB-ID client to server" uniqueID="UID_RECSUB_128001">
               <UDINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID server to client (rx)" uniqueID="UID_RECSUB_128002">
+            <q1:varDeclaration name="COB-ID server to client" uniqueID="UID_RECSUB_128002">
               <UDINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Node-ID of the SDO server" uniqueID="UID_RECSUB_128003">
@@ -868,17 +868,6 @@
             <UDINT />
             <q1:defaultValue value="0x00000001" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1012" access="readWrite">
-            <description lang="en">* bit 31: If set, CANopen device consumes TIME message
-* bit 30: If set, CANopen device produces TIME message
-* bit 11-29: set to 0
-* bit 0-10: 11-bit CAN-ID</description>
-            <UDINT />
-            <q1:defaultValue value="0x00000100" />
-            <q1:property name="CO_disabled" value="true" />
-            <q1:property name="CO_countLabel" value="TIME" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1014" access="readWrite">
             <description lang="en">* bit 31: If set, EMCY does NOT exist / is NOT valid
 * bit 11-30: set to 0
@@ -1181,7 +1170,6 @@
 * Value 0x01: on error do nothing
 * Value 0x02: on error change to NMT state Stopped</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1029" />
-            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_102900">
@@ -1212,12 +1200,12 @@
             <q1:defaultValue value="2" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_120001">
-            <label lang="en">COB-ID client to server (rx)</label>
+            <label lang="en">COB-ID client to server</label>
             <UDINT />
             <q1:defaultValue value="0x600+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_120002">
-            <label lang="en">COB-ID server to client (tx)</label>
+            <label lang="en">COB-ID server to client</label>
             <UDINT />
             <q1:defaultValue value="0x580+$NODEID" />
           </q1:parameter>
@@ -1271,12 +1259,12 @@
             <q1:defaultValue value="0x03" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_128001" access="readWrite">
-            <label lang="en">COB-ID client to server (tx)</label>
+            <label lang="en">COB-ID client to server</label>
             <UDINT />
             <q1:defaultValue value="0x80000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_128002" access="readWrite">
-            <label lang="en">COB-ID server to client (rx)</label>
+            <label lang="en">COB-ID server to client</label>
             <UDINT />
             <q1:defaultValue value="0x80000000" />
           </q1:parameter>
@@ -2289,6 +2277,12 @@
             <UDINT />
             <q1:defaultValue value="0x00000000" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_1F80" access="readWrite">
+            <description lang="en">This object configures the start-up behavior of a device that is able to perform the NMT.</description>
+            <UDINT />
+            <q1:defaultValue value="0x00000008" />
+            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_2000">
             <description lang="en">CAN Bus redundancy management as defined in ECSS-E-ST-50-15C</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_2000" />
@@ -2479,7 +2473,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModificationDate="2021-01-28" fileModificationTime="14:19:26.3369190-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModificationDate="2021-03-04" fileModificationTime="18:48:11.3557710-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2516,7 +2510,6 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="03" name="Restore application default parameters" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_101103" />
             <CANopenSubObject subIndex="04" name="Restore manufacturer defined default parameters" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_101104" />
           </CANopenObject>
-          <CANopenObject index="1012" name="COB-ID time stamp object" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1012" />
           <CANopenObject index="1014" name="COB-ID EMCY" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1014" />
           <CANopenObject index="1015" name="Inhibit time EMCY" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1015" />
           <CANopenObject index="1016" name="Consumer heartbeat time" objectType="8" uniqueIDRef="UID_OBJ_1016" subNumber="9">
@@ -2580,15 +2573,15 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="07" name="Emergency consumer 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102807" />
             <CANopenSubObject subIndex="08" name="Emergency consumer 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102808" />
           </CANopenObject>
-          <CANopenObject index="1029" name="Error behavior object" objectType="8" uniqueIDRef="UID_OBJ_1029" subNumber="3">
+          <CANopenObject index="1029" name="Error behavior" objectType="8" uniqueIDRef="UID_OBJ_1029" subNumber="3">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102900" />
             <CANopenSubObject subIndex="01" name="Communication error" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102901" />
             <CANopenSubObject subIndex="02" name="Profile- or manufacturer-specific error" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102902" />
           </CANopenObject>
           <CANopenObject index="1200" name="SDO server parameter" objectType="9" uniqueIDRef="UID_OBJ_1200" subNumber="3">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_120000" />
-            <CANopenSubObject subIndex="01" name="COB-ID client to server (rx)" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_120001" />
-            <CANopenSubObject subIndex="02" name="COB-ID server to client (tx)" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_120002" />
+            <CANopenSubObject subIndex="01" name="COB-ID client to server" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_120001" />
+            <CANopenSubObject subIndex="02" name="COB-ID server to client" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_120002" />
           </CANopenObject>
           <CANopenObject index="1201" name="SDO server parameter" objectType="9" uniqueIDRef="UID_OBJ_1201" subNumber="4">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_120100" />
@@ -2598,8 +2591,8 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           </CANopenObject>
           <CANopenObject index="1280" name="SDO client parameter" objectType="9" uniqueIDRef="UID_OBJ_1280" subNumber="4">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_128000" />
-            <CANopenSubObject subIndex="01" name="COB-ID client to server (tx)" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_128001" />
-            <CANopenSubObject subIndex="02" name="COB-ID server to client (rx)" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_128002" />
+            <CANopenSubObject subIndex="01" name="COB-ID client to server" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_128001" />
+            <CANopenSubObject subIndex="02" name="COB-ID server to client" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_128002" />
             <CANopenSubObject subIndex="03" name="Node-ID of the SDO server" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_128003" />
           </CANopenObject>
           <CANopenObject index="1400" name="RPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1400" subNumber="4">
@@ -2782,6 +2775,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0407" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0408" />
           </CANopenObject>
+          <CANopenObject index="1F80" name="NMTStartup" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1F80" />
           <CANopenObject index="2000" name="BUS Management" objectType="9" uniqueIDRef="UID_OBJ_2000" subNumber="5">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200000" />
             <CANopenSubObject subIndex="01" name="Bdefault" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200001" />
