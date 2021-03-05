@@ -217,9 +217,9 @@ THD_FUNCTION(solar, arg)
         power   = ina226ReadPower(&ina226dev);   /* Power in increments of uW */
 
         /* Set OD entries to raw values */
-        OD_solarPanel.voltage = ina226ReadRaw(&ina226dev, INA226_AD_VBUS);
-        OD_solarPanel.current = (int16_t)ina226ReadRaw(&ina226dev, INA226_AD_CURRENT);
-        OD_solarPanel.power   = ina226ReadRaw(&ina226dev, INA226_AD_POWER);
+        OD_PV_Power.voltage = ina226ReadRaw(&ina226dev, INA226_AD_VBUS);
+        OD_PV_Power.current = (int16_t)ina226ReadRaw(&ina226dev, INA226_AD_CURRENT);
+        OD_PV_Power.power   = ina226ReadRaw(&ina226dev, INA226_AD_POWER);
 
         /* Calculate max input current drawn from solar cells.
          * This is used to calculate iadj.
