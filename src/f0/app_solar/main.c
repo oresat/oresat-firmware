@@ -41,13 +41,13 @@ static thread_descriptor_t solar_desc = {
     .funcp = solar,
     .arg = NULL
 };
-static worker_t read_temperature_worker;
-static thread_descriptor_t read_temperature_desc = {
-    .name = "Read Temperature",
-    .wbase = THD_WORKING_AREA_BASE(read_temperature_wa),
-    .wend = THD_WORKING_AREA_END(read_temperature_wa),
+static worker_t sensor_mon_worker;
+static thread_descriptor_t sensor_mon_desc = {
+    .name = "Sensor Monitor",
+    .wbase = THD_WORKING_AREA_BASE(sensor_mon_wa),
+    .wend = THD_WORKING_AREA_END(sensor_mon_wa),
     .prio = NORMALPRIO,
-    .funcp = read_temperature,
+    .funcp = sensor_mon,
     .arg = NULL
 };
 
@@ -73,9 +73,10 @@ static void app_init(void)
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
     reg_worker(&solar_worker, &solar_desc, true, true);
-    reg_worker(&read_temperature_worker, &read_temperature_desc, true, true);
+    reg_worker(&sensor_mon_worker, &sensor_mon_desc, true, true);
 
-  sdStart(&SD2, NULL);
+    /* Start up debug output */
+    sdStart(&SD2, NULL);
 }
 
 /**

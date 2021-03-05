@@ -1,7 +1,7 @@
 /**
 *  @project Oresat-1 solar board firmware
 *
-*  @file read_temperature.c
+*  @file sensor_mon.c
 *
 *  @authors and contributors
 **/
@@ -272,8 +272,8 @@ bool initialize_temperature_sensor_device_objects(void)
 
 
 
-THD_WORKING_AREA(read_temperature_wa, 0x200);
-THD_FUNCTION(read_temperature, arg)
+THD_WORKING_AREA(sensor_mon_wa, 0x200);
+THD_FUNCTION(sensor_mon, arg)
 {
     (void)arg;
 
