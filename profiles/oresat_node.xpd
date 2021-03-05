@@ -15,14 +15,14 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="13:51:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-03-05" fileModificationTime="10:06:18.4082570-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-03-05" fileModificationTime="10:03:34.6083760-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
-        <q1:productName>OreSat Template</q1:productName>
+        <q1:productName>OreSat Node</q1:productName>
         <q1:productID>0</q1:productID>
         <q1:productText>
-          <description lang="en">OreSat Template Application Object Dictionary</description>
+          <description lang="en">OreSat Node Default Profile</description>
         </q1:productText>
         <q1:version versionType="SW">0</q1:version>
         <q1:version versionType="FW">0</q1:version>
@@ -398,9 +398,6 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180003">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180004">
-              <USINT />
-            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180005">
               <UINT />
             </q1:varDeclaration>
@@ -420,9 +417,6 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180103">
               <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180104">
-              <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180105">
               <UINT />
@@ -444,9 +438,6 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180203">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180204">
-              <USINT />
-            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180205">
               <UINT />
             </q1:varDeclaration>
@@ -467,9 +458,6 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180303">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180304">
-              <USINT />
-            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180305">
               <UINT />
             </q1:varDeclaration>
@@ -489,9 +477,6 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180403">
               <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180404">
-              <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180405">
               <UINT />
@@ -1803,11 +1788,6 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180004">
-            <label lang="en">compatibility entry</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180005" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
@@ -1857,11 +1837,6 @@
           <q1:parameter uniqueID="UID_SUB_180103" access="readWrite">
             <label lang="en">Inhibit time</label>
             <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180104">
-            <label lang="en">compatibility entry</label>
-            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180105" access="readWrite">
@@ -1915,11 +1890,6 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180204">
-            <label lang="en">compatibility entry</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180205" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
@@ -1969,11 +1939,6 @@
           <q1:parameter uniqueID="UID_SUB_180303" access="readWrite">
             <label lang="en">Inhibit time</label>
             <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180304">
-            <label lang="en">compatibility entry</label>
-            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180305" access="readWrite">
@@ -2026,11 +1991,6 @@
           <q1:parameter uniqueID="UID_SUB_180403" access="readWrite">
             <label lang="en">Inhibit time</label>
             <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180404">
-            <label lang="en">compatibility entry</label>
-            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180405" access="readWrite">
@@ -2525,7 +2485,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="13:51:00.0000000-08:00" fileModificationDate="2021-03-05" fileModificationTime="10:06:18.4082570-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="oresat_node.xpd" fileCreator="Miles Simpson" fileCreationDate="2021-01-27" fileCreationTime="08:44:52.0000000-08:00" fileModificationDate="2021-03-05" fileModificationTime="10:03:34.6083760-08:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2733,48 +2693,43 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160407" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160408" />
           </CANopenObject>
-          <CANopenObject index="1800" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1800" subNumber="7">
+          <CANopenObject index="1800" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1800" subNumber="6">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180000" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180001" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180002" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180003" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180004" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180005" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180006" />
           </CANopenObject>
-          <CANopenObject index="1801" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1801" subNumber="7">
+          <CANopenObject index="1801" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1801" subNumber="6">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180100" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180101" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180102" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180103" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180104" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180105" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180106" />
           </CANopenObject>
-          <CANopenObject index="1802" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1802" subNumber="7">
+          <CANopenObject index="1802" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1802" subNumber="6">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180200" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180201" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180202" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180203" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180204" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180205" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180206" />
           </CANopenObject>
-          <CANopenObject index="1803" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1803" subNumber="7">
+          <CANopenObject index="1803" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1803" subNumber="6">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180300" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180301" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180302" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180303" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180304" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180305" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180306" />
           </CANopenObject>
-          <CANopenObject index="1804" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1804" subNumber="7">
+          <CANopenObject index="1804" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1804" subNumber="6">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180400" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180401" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180402" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180403" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180404" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180405" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180406" />
           </CANopenObject>
@@ -2862,12 +2817,12 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         </q2:CANopenObjectList>
         <dummyUsage>
           <dummy entry="Dummy0001=0" />
-          <dummy entry="Dummy0002=0" />
-          <dummy entry="Dummy0003=0" />
-          <dummy entry="Dummy0004=0" />
-          <dummy entry="Dummy0005=0" />
-          <dummy entry="Dummy0006=0" />
-          <dummy entry="Dummy0007=0" />
+          <dummy entry="Dummy0002=1" />
+          <dummy entry="Dummy0003=1" />
+          <dummy entry="Dummy0004=1" />
+          <dummy entry="Dummy0005=1" />
+          <dummy entry="Dummy0006=1" />
+          <dummy entry="Dummy0007=1" />
         </dummyUsage>
       </ApplicationLayers>
       <TransportLayers>
@@ -2885,7 +2840,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         </PhysicalLayer>
       </TransportLayers>
       <NetworkManagement>
-        <CANopenGeneralFeatures granularity="0" nrOfRxPDO="4" nrOfTxPDO="4" />
+        <CANopenGeneralFeatures granularity="8" nrOfRxPDO="4" nrOfTxPDO="4" />
         <CANopenMasterFeatures />
       </NetworkManagement>
     </ProfileBody>

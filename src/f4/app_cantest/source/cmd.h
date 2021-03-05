@@ -1,5 +1,5 @@
-#ifndef _COMMAND_H_
-#define _COMMAND_H_
+#ifndef _CMD_H_
+#define _CMD_H_
 
 #include "ch.h"
 #include "hal.h"

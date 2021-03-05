@@ -390,6 +390,8 @@ THD_FUNCTION(radio_rx, arg) {
     (void)arg;
     uint8_t *pdu;
 
+    chRegSetThreadName("EDL RX");
+
     while (!chThdShouldTerminateX()) {
         if (chFifoReceiveObjectTimeout(&pdu_fifo, (void**)&pdu, TIME_MS2I(1000)) != MSG_OK) {
             continue;

@@ -23,20 +23,16 @@
  */
 
 
-#ifndef CO_DRIVER_TARGET
-#define CO_DRIVER_TARGET
+#ifndef CO_DRIVER_TARGET_H
+#define CO_DRIVER_TARGET_H
 
 /* This file contains device and application specific definitions.
  * It is included from CO_driver.h, which contains documentation
- * for definitions below. */
+ * for common definitions below. */
 
 #include "ch.h"
 #include "hal.h"
-#include "oresat.h"
-
-#ifdef CO_DRIVER_CUSTOM
 #include "CO_driver_custom.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,36 +40,38 @@ extern "C" {
 
 /* Stack configuration override default values.
  * For more information see file CO_config.h. */
+#define CO_USE_GLOBALS
+#define CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE CO_CONFIG_FLAG_CALLBACK_PRE
+#define CO_CONFIG_GLOBAL_FLAG_TIMERNEXT CO_CONFIG_FLAG_TIMERNEXT
+
 #ifndef CO_CONFIG_NMT
 #define CO_CONFIG_NMT (CO_CONFIG_NMT_CALLBACK_CHANGE | \
-                       CO_CONFIG_NMT_MASTER | \
-                       CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT)
+                       CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_HB_CONS
 #define CO_CONFIG_HB_CONS (CO_CONFIG_HB_CONS_ENABLE | \
                            CO_CONFIG_HB_CONS_CALLBACK_MULTI | \
                            CO_CONFIG_HB_CONS_QUERY_FUNCT | \
-                           CO_CONFIG_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_FLAG_TIMERNEXT)
+                           CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_EM
 #define CO_CONFIG_EM (CO_CONFIG_EM_PRODUCER | \
                       CO_CONFIG_EM_HISTORY | \
                       CO_CONFIG_EM_CONSUMER | \
-                      CO_CONFIG_FLAG_CALLBACK_PRE | \
-                      CO_CONFIG_FLAG_TIMERNEXT | \
-                      CO_CONFIG_FLAG_OD_DYNAMIC)
+                      CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                      CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_SDO_SRV
 #define CO_CONFIG_SDO_SRV (CO_CONFIG_SDO_SRV_SEGMENTED | \
                            CO_CONFIG_SDO_SRV_BLOCK | \
-                           CO_CONFIG_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_FLAG_TIMERNEXT | \
-                           CO_CONFIG_FLAG_OD_DYNAMIC)
+                           CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                           CO_CONFIG_GLOBAL_FLAG_TIMERNEXT | \
+                           CO_CONFIG_GLOBAL_FLAG_OD_DYNAMIC)
 #endif
 
 #ifndef CO_CONFIG_SDO_SRV_BUFFER_SIZE
@@ -84,10 +82,6 @@ extern "C" {
 #define CO_CONFIG_SDO_CLI 0
 #endif
 
-#ifndef CO_CONFIG_SDO_CLI_BUFFER_SIZE
-#define CO_CONFIG_SDO_CLI_BUFFER_SIZE 1000
-#endif
-
 #ifndef CO_CONFIG_TIME
 #define CO_CONFIG_TIME 0
 #endif
@@ -95,8 +89,9 @@ extern "C" {
 #ifndef CO_CONFIG_SYNC
 #define CO_CONFIG_SYNC (CO_CONFIG_SYNC_ENABLE | \
                         CO_CONFIG_SYNC_PRODUCER | \
-                        CO_CONFIG_FLAG_CALLBACK_PRE | \
-                        CO_CONFIG_FLAG_TIMERNEXT)
+                        CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                        CO_CONFIG_GLOBAL_FLAG_TIMERNEXT | \
+                        CO_CONFIG_GLOBAL_FLAG_OD_DYNAMIC)
 #endif
 
 #ifndef CO_CONFIG_PDO
@@ -105,8 +100,8 @@ extern "C" {
                        CO_CONFIG_PDO_SYNC_ENABLE | \
                        CO_CONFIG_RPDO_CALLS_EXTENSION | \
                        CO_CONFIG_TPDO_CALLS_EXTENSION | \
-                       CO_CONFIG_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_FLAG_TIMERNEXT)
+                       CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
+                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
 #endif
 
 #ifndef CO_CONFIG_LEDS
@@ -156,7 +151,7 @@ extern "C" {
 /* NULL is defined in stddef.h */
 /* true and false are defined in stdbool.h */
 /* int8_t to uint64_t are defined in stdint.h */
-typedef unsigned char           bool_t;
+typedef uint_fast8_t            bool_t;
 typedef float                   float32_t;
 typedef double                  float64_t;
 typedef char                    char_t;
@@ -291,4 +286,4 @@ extern mutex_t od_mutex;
 }
 #endif /* __cplusplus */
 
-#endif /* CO_DRIVER_TARGET */
+#endif /* CO_DRIVER_TARGET_H */

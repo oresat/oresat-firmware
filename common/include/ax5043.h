@@ -2816,12 +2816,12 @@ typedef struct{
     /**
      * @brief Preamble pointer and length
      */
-    const uint8_t               *preamble;
+    const void                  *preamble;
     size_t                      preamble_len;
     /**
      * @brief Postamble pointer and length
      */
-    const uint8_t               *postamble;
+    const void                  *postamble;
     size_t                      postamble_len;
 } AX5043Config;
 
@@ -2845,11 +2845,14 @@ struct AX5043Driver {
     /* RX worker thread */
     thread_t                    *rx_worker;
 
+    /* Currently active profile */
+    const ax5043_profile_t      *profile;
+
     /* Preamble buffer and length */
-    const uint8_t               *preamble;
+    const void                  *preamble;
     size_t                      preamble_len;
     /* Postamble buffer and length */
-    const uint8_t               *postamble;
+    const void                  *postamble;
     size_t                      postamble_len;
 
     /* Last VCOR returned from ranging */
@@ -2888,14 +2891,19 @@ void ax5043Stop(AX5043Driver *devp);
 
 void ax5043Idle(AX5043Driver *devp);
 void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor);
-void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
+const ax5043_profile_t *ax5043GetProfile(AX5043Driver *devp);
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b);
-void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len);
-void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len);
+uint32_t ax5043GetFreq(AX5043Driver *devp);
+void ax5043SetPreamble(AX5043Driver *devp, const void *preamble, size_t len);
+const void *ax5043GetPreamble(AX5043Driver *devp);
+void ax5043SetPostamble(AX5043Driver *devp, const void *postamble, size_t len);
+const void *ax5043GetPostamble(AX5043Driver *devp);
 
-ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n);
+ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const void *txbuf, void *rxbuf, size_t n);
 ax5043_status_t ax5043GetStatus(AX5043Driver *devp);
 uint8_t ax5043ReadU8(AX5043Driver *devp, uint16_t reg);
 uint16_t ax5043ReadU16(AX5043Driver *devp, uint16_t reg);

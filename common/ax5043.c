@@ -59,7 +59,7 @@ typedef union __attribute__((packed)) {
  * @return                  AX5043 status bits
  * @notapi
  */
-ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, const void *txbuf, void *rxbuf, size_t n) {
     spibuf_t sendbuf;
     spibuf_t recvbuf;
 
@@ -412,6 +412,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     devp->config = config;
     devp->error = AX5043_ERR_NOERROR;
+    devp->profile = config->profile;
     devp->preamble = config->preamble;
     devp->preamble_len = config->preamble_len;
     devp->postamble = config->postamble;
@@ -611,7 +612,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
  *
  * @api
  */
-void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -621,6 +622,8 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
                    (devp->state == AX5043_WOR) ||
                    (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
     osalDbgAssert(total_len != 0, "ax5043TX(), invalid total length");
+    osalDbgAssert(tx_cb != NULL || len == total_len,
+            "ax5043TX(), no callback when len != total_len");
 
     devp->error = AX5043_ERR_NOERROR;
 
@@ -668,9 +671,6 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
     }
 
-    osalDbgAssert(tx_cb != NULL || len == total_len,
-            "ax5043TX(), no callback when len != total_len");
-
     size_t transferred = 0;
     size_t offset = 0;
     ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, AX5043_FIFO_WRITE_LEN);
@@ -682,7 +682,7 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         if (len == 0 && tx_cb) {
             len = tx_cb(tx_cb_arg);
             offset = 0;
-            osalDbgAssert(len == 0,
+            osalDbgAssert(len != 0,
                     "ax5043TX(), callback returned zero length");
             osalDbgAssert(transferred + len <= total_len,
                     "ax5043TX(), callback returned length exceeding total length");
@@ -708,7 +708,7 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
         /* Once there's enough free space, write the data chunk and commit */
         ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
         ax5043Exchange(devp, AX5043_REG_FIFODATA, true, (uint8_t*)(&data), NULL, sizeof(data));
-        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &buf[offset], NULL, write_len);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &((uint8_t*)buf)[offset], NULL, write_len);
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
 
         len -= write_len;
@@ -746,6 +746,116 @@ void ax5043TX(AX5043Driver *devp, const uint8_t *buf, size_t len, size_t total_l
 }
 
 /**
+ * @brief   Puts AX5043 into raw transmit mode.
+ *
+ * @param[in]  devp         Pointer to the @p AX5043Driver object.
+ * @param[in]  buf          Transmit FIFO buffer.
+ * @param[in]  len          Initial length provided in the buffer.
+ * @param[in]  total_len    Total length of data to be transmitted.
+ * @param[in]  tx_cb        Optional transmit buffer fill callback.
+ * @param[in]  tx_cb_arg    Optional transmit buffer fill callback argument.
+ * @param[in]  chan_b       Use channel B if true.
+ *
+ * @api
+ */
+void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+    ax5043_state_t prev_state;
+    bool prev_chan;
+
+    osalDbgCheck(devp != NULL && buf != NULL);
+    osalDbgAssert(((devp->state == AX5043_READY) ||
+                   (devp->state == AX5043_RX) ||
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043TXRaw(), invalid state");
+    osalDbgAssert(total_len != 0, "ax5043TXRaw(), invalid total length");
+    osalDbgAssert(tx_cb != NULL || len == total_len,
+            "ax5043TXRaw(), no callback when len != total_len");
+
+    devp->error = AX5043_ERR_NOERROR;
+
+    /* Record previous state and enter idle state */
+    prev_state = devp->state;
+    prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+    ax5043Idle(devp);
+
+    /* Set Frequency Selection */
+    uint32_t freq;
+    uint8_t pllloop = ax5043ReadU8(devp, AX5043_REG_PLLLOOP);
+    if (chan_b) {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQB), devp->config->xtal_freq);
+        pllloop |= AX5043_PLLLOOP_FREQSEL;
+    } else {
+        freq = AX5043_REG_TO_FREQ(ax5043ReadU32(devp, AX5043_REG_FREQA), devp->config->xtal_freq);
+        pllloop &= ~AX5043_PLLLOOP_FREQSEL;
+    }
+    ax5043WriteU8(devp, AX5043_REG_PLLLOOP, pllloop);
+    ax5043SetRFDIV(devp, freq);
+
+    /* Activate synthesizer to lock PLL */
+    /* TODO: Can we base this on an interrupt instead of a delay? */
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_SYNTH);
+    chThdSleepMicroseconds(1);
+    if (!(ax5043GetStatus(devp) & AX5043_STATUS_PLL_LOCK)) {
+        ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+        devp->error = AX5043_ERR_LOCKLOST;
+        return;
+    }
+    /* Clear FIFO */
+    ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
+
+    /* Activate TX */
+    ax5043SetPWRMode(devp, AX5043_PWRMODE_TX_FULL);
+    devp->state = AX5043_TX;
+
+    size_t transferred = 0;
+    size_t offset = 0;
+    ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, AX5043_FIFO_WRITE_LEN);
+    while (transferred < total_len) {
+        size_t write_len;
+
+        /* Refill buffer if needed */
+        if (len == 0 && tx_cb) {
+            len = tx_cb(tx_cb_arg);
+            offset = 0;
+            osalDbgAssert(len != 0,
+                    "ax5043TX(), callback returned zero length");
+            osalDbgAssert(transferred + len <= total_len,
+                    "ax5043TX(), callback returned length exceeding total length");
+        }
+
+        /* Determine length of data chunk write */
+        write_len = (len < AX5043_FIFO_WRITE_LEN ? len : AX5043_FIFO_WRITE_LEN);
+
+        /* Once there's enough free space, write the data chunk and commit */
+        ax5043WaitIRQ(devp, AX5043_IRQ_FIFOTHRFREE, TIME_INFINITE);
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, true, &((uint8_t*)buf)[offset], NULL, write_len);
+        ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_COMMIT);
+
+        len -= write_len;
+        offset += write_len;
+        transferred += write_len;
+    }
+
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, AX5043_RADIOEVENT_DONE);
+    ax5043WaitIRQ(devp, AX5043_IRQ_RADIOCTRL, TIME_INFINITE);
+    ax5043WriteU16(devp, AX5043_REG_RADIOEVENTMASK, 0x0000U);
+    ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
+
+    /* Return to original state */
+    switch (prev_state) {
+    case AX5043_RX:
+        ax5043RX(devp, prev_chan, false);
+        break;
+    case AX5043_WOR:
+        ax5043RX(devp, prev_chan, true);
+        break;
+    case AX5043_READY:
+    default:
+        ax5043Idle(devp);
+    }
+}
+
+/**
  * @brief   Sets register values from a profile.
  *
  * @param[in]   devp        Pointer to the @p AX5043Driver object.
@@ -759,6 +869,8 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
 
     osalDbgCheck(devp != NULL && devp->config != NULL);
     osalDbgAssert((devp->state != AX5043_UNINIT), "ax5043SetProfile(), invalid state");
+
+    devp->profile = profile;
 
     /* Record previous state and enter idle state */
     prev_state = devp->state;
@@ -804,6 +916,18 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
 }
 
 /**
+ * @brief   Gets the currently active profile.
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ *
+ * @return                  Pointer to the current profile.
+ * @api
+ */
+const ax5043_profile_t *ax5043GetProfile(AX5043Driver *devp) {
+    return devp->profile;
+}
+
+/**
  * @brief   Sets Carrier Frequency on an AX5043 device.
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
@@ -811,7 +935,7 @@ void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile) {
  * @param[in]  vcor         VCO Range value. Set to 0 if unknown.
  * @param[in]  chan_b       Set channel B frequency if true, channel A otherwise.
  *
- * @return                  Corrected VCOR for given frequency
+ * @return                  Corrected VCOR for given frequency.
  * @api
  */
 uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan_b) {
@@ -900,6 +1024,21 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
 }
 
 /**
+ * @brief   Gets the current frequency.
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ *
+ * @return                  The frequency in Hz.
+ * @api
+ */
+uint32_t ax5043GetFreq(AX5043Driver *devp) {
+    bool chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
+    uint16_t freq_reg = (chan ? AX5043_REG_FREQB : AX5043_REG_FREQA);
+
+    return AX5043_REG_TO_FREQ(ax5043ReadU32(devp, freq_reg), devp->config->xtal_freq);
+}
+
+/**
  * @brief   Sets Preamble pointer and length for AX5043 transmission  operations.
  *
  * @param[in]  devp         Pointer to the @p AX5043Driver object.
@@ -908,12 +1047,24 @@ uint8_t ax5043SetFreq(AX5043Driver *devp, uint32_t freq, uint8_t vcor, bool chan
  *
  * @api
  */
-void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len) {
+void ax5043SetPreamble(AX5043Driver *devp, const void *preamble, size_t len) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(len <= 256, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
 
     devp->preamble = preamble;
     devp->preamble_len = len;
+}
+
+/**
+ * @brief   Gets the currently active preamble.
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ *
+ * @return                  Pointer to the current preamble.
+ * @api
+ */
+const void *ax5043GetPreamble(AX5043Driver *devp) {
+    return devp->preamble;
 }
 
 /**
@@ -925,12 +1076,24 @@ void ax5043SetPreamble(AX5043Driver *devp, const uint8_t *preamble, size_t len) 
  *
  * @api
  */
-void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len) {
+void ax5043SetPostamble(AX5043Driver *devp, const void *postamble, size_t len) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(len <= 256, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
 
     devp->postamble = postamble;
     devp->postamble_len = len;
+}
+
+/**
+ * @brief   Gets the currently active postamble.
+ *
+ * @param[in]   devp        Pointer to the @p AX5043Driver object.
+ *
+ * @return                  Pointer to the current postamble.
+ * @api
+ */
+const void *ax5043GetPostamble(AX5043Driver *devp) {
+    return devp->postamble;
 }
 
 /**
@@ -948,7 +1111,7 @@ void ax5043SetPostamble(AX5043Driver *devp, const uint8_t *postamble, size_t len
  * @return                  AX5043 status bits
  * @api
  */
-ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const uint8_t *txbuf, uint8_t *rxbuf, size_t n) {
+ax5043_status_t ax5043Exchange(AX5043Driver *devp, uint16_t reg, bool write, const void *txbuf, void *rxbuf, size_t n) {
     SPIDriver *spip = NULL;
     ax5043_status_t status = 0;
 

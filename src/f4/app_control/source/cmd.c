@@ -21,7 +21,7 @@
 
 struct cb_arg {
     lfs_file_t file;
-    char buf[BUF_SIZE];
+    uint8_t buf[BUF_SIZE];
 };
 
 static thread_t *shell_tp;
@@ -507,13 +507,15 @@ state_usage:
 static const ShellCommand commands[] = {
     {"fw", cmd_fw},
     {"nmt", cmd_nmt},
-    {"sdo", cmd_sdo},
+    /*{"sdo", cmd_sdo},*/
     {"opd", cmd_opd},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
     {"lfs", cmd_lfs},
     {"radio", cmd_radio},
     {"synth", cmd_synth},
+    {"rf", cmd_rf},
+    {"rftest", cmd_rftest},
     {"state", cmd_state},
     {"deploy", cmd_deploy},
     {NULL, NULL}
