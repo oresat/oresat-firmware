@@ -47,6 +47,14 @@ static const oresat_node_t nodes[] = {
 
 #ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+static thread_descriptor_t cmd_desc = {
+    .name = "Shell",
+    .wbase = THD_WORKING_AREA_BASE(cmd_wa),
+    .wend = THD_WORKING_AREA_END(cmd_wa),
+    .prio = NORMALPRIO,
+    .funcp = cmd,
+    .arg = NULL
+};
 #endif
 
 static oresat_config_t oresat_conf = {
@@ -63,8 +71,7 @@ static void app_init(void)
 
     /* Initialize shell worker thread */
 #ifdef SHELL_ENABLE
-    init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
-    reg_worker(&cmd_worker);
+    reg_worker(&cmd_worker, &cmd_desc, true, true);
 #endif
 
     /* Initialize shell and start serial interface */

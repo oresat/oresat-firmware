@@ -26,6 +26,7 @@ void oresat_init(void)
 
 void oresat_start(oresat_config_t *config)
 {
+    thread_t *thread_mgr_tp;
     /* TODO: Sanity checks */
 
     /* Set configuration values */
@@ -37,8 +38,8 @@ void oresat_start(oresat_config_t *config)
     /* Set priority to max */
     chThdSetPriority(HIGHPRIO);
 
-    /* Start critical worker threads */
-    start_crit_workers();
+    /* Start worker thread manager */
+    thread_mgr_tp = chThdCreateStatic(thread_mgr_wa, sizeof(thread_mgr_wa), HIGHPRIO, thread_mgr, NULL);
 
     /* Initialize CANopen Subsystem */
     CO_init(config, config->node_id, config->bitrate);
@@ -46,8 +47,9 @@ void oresat_start(oresat_config_t *config)
     /* Run CO subsystem */
     CO_run(CO);
 
-    /* Stop all workers, including critical ones  */
-    stop_workers(true);
+    /* Stop worker thread manager */
+    chEvtSignal(thread_mgr_tp, EVENT_MASK(1));
+    chThdWait(thread_mgr_tp);
 
     /* Deinitialize CO stack */
     CO_delete(config);

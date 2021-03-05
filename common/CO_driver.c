@@ -28,6 +28,7 @@
 
 #include "301/CO_driver.h"
 #include "can_hw.h"
+#include "oresat.h"
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 

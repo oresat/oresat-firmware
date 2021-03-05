@@ -12,6 +12,8 @@ static thread_t *em_tp;
 static thread_t *pdo_sync_tp;
 static thread_t *hbcons_tp;
 
+event_source_t nmt_event;
+
 /* General purpose CANopen callback to wake up data processing threads */
 void process_cb(void *thread)
 {
@@ -20,6 +22,15 @@ void process_cb(void *thread)
     /* Signal processing thread from critical section */
     chEvtSignalI(thread, CO_EVT_WAKEUP);
     chSysRestoreStatusX(sts);
+}
+
+void nmt_change_cb(CO_NMT_internalState_t state)
+{
+    syssts_t sts;
+    sts = chSysGetStatusAndLockX();
+    chEvtBroadcastFlagsI(&nmt_event, state);
+    chSysRestoreStatusX(sts);
+
 }
 
 #if CO_NO_SDO_CLIENT > 0
@@ -114,7 +125,7 @@ THD_FUNCTION(em, arg)
     chThdExit(MSG_OK);
 }
 
-/* CANopen PDO/SYNC worker thread */
+/* CANopen PDO/SYNC thread */
 THD_FUNCTION(pdo_sync, arg)
 {
     CO_t *co = arg;
@@ -183,6 +194,8 @@ THD_FUNCTION(nmt, arg)
 
     /* Register the callback function to wake up thread when message received */
     CO_NMT_initCallbackPre(CO->NMT, chThdGetSelfX(), process_cb);
+    /* Register the callback function for NMT state changes */
+    CO_NMT_initCallbackChanged(CO->NMT, nmt_change_cb);
 
     /* Start CANopen threads */
     /* TODO: Optimize stack usage */
@@ -208,12 +221,6 @@ THD_FUNCTION(nmt, arg)
         if (reset != CO_RESET_NOT)
             continue;
 
-        if (CO->NMT->operatingState == CO_NMT_OPERATIONAL) {
-            start_workers();
-        } else {
-            stop_workers(false);
-        }
-
         prev_time = chVTGetSystemTime();
         events = chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
         if (events & CO_EVT_TERMINATE) {
@@ -222,6 +229,10 @@ THD_FUNCTION(nmt, arg)
     }
 
     /* Shutting down */
+    /* Unregister callbacks */
+    CO_NMT_initCallbackChanged(CO->NMT, NULL);
+    CO_NMT_initCallbackPre(CO->NMT, NULL, NULL);
+
     /* Terminate CANopen threads */
     for (int i = 0; i < CO_NO_SDO_SERVER; i++) {
         chThdTerminate(sdo_tp[i]);
@@ -242,7 +253,7 @@ THD_FUNCTION(nmt, arg)
     chThdWait(pdo_sync_tp);
     chThdWait(hbcons_tp);
 
-    CO_NMT_initCallbackPre(CO->NMT, NULL, NULL);
+    /* Terminate and return reset value */
     chThdExit(reset);
 }
 
@@ -253,6 +264,7 @@ void CO_init(void *CANptr, uint8_t node_id, uint16_t bitrate)
     chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
     err = CO_CANopenInit(node_id);
     chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInit failed");
+    chEvtObjectInit(&nmt_event);
 }
 
 void CO_run(CO_t *CO)

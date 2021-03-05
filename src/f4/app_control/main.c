@@ -51,9 +51,33 @@ static const oresat_node_t nodes[] = {
 */
 
 static worker_t wdt_worker;
+static thread_descriptor_t wdt_desc = {
+    .name = "WDT",
+    .wbase = THD_WORKING_AREA_BASE(wdt_wa),
+    .wend = THD_WORKING_AREA_END(wdt_wa),
+    .prio = HIGHPRIO,
+    .funcp = wdt,
+    .arg = NULL
+};
 static worker_t c3_worker;
+static thread_descriptor_t c3_desc = {
+    .name = "C3",
+    .wbase = THD_WORKING_AREA_BASE(c3_wa),
+    .wend = THD_WORKING_AREA_END(c3_wa),
+    .prio = NORMALPRIO,
+    .funcp = c3,
+    .arg = NULL
+};
 #ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+static thread_descriptor_t cmd_desc = {
+    .name = "Shell",
+    .wbase = THD_WORKING_AREA_BASE(cmd_wa),
+    .wend = THD_WORKING_AREA_END(cmd_wa),
+    .prio = NORMALPRIO,
+    .funcp = cmd,
+    .arg = NULL
+};
 #endif
 
 static oresat_config_t oresat_conf = {
@@ -67,18 +91,15 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* Initialize WDT worker thread */
-    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), HIGHPRIO, wdt, NULL, true);
-    reg_worker(&wdt_worker);
+    /* Register WDT worker thread */
+    reg_worker(&wdt_worker, &wdt_desc, true, true);
 
-    /* Initialize C3 worker thread */
-    init_worker(&c3_worker, "C3", c3_wa, sizeof(c3_wa), NORMALPRIO, c3, NULL, true);
-    reg_worker(&c3_worker);
+    /* Register C3 worker thread */
+    reg_worker(&c3_worker, &c3_desc, true, true);
 
-    /* Initialize shell worker thread */
 #ifdef SHELL_ENABLE
-    init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
-    reg_worker(&cmd_worker);
+    /* Register shell worker thread */
+    reg_worker(&cmd_worker, &cmd_desc, true, true);
 #endif
 
     /* Initialize OPD */

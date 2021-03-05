@@ -32,11 +32,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "oresat.h"
-
-#ifdef CO_DRIVER_CUSTOM
 #include "CO_driver_custom.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +40,7 @@ extern "C" {
 
 /* Stack configuration override default values.
  * For more information see file CO_config.h. */
+#define CO_USE_GLOBALS
 #define CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE CO_CONFIG_FLAG_CALLBACK_PRE
 #define CO_CONFIG_GLOBAL_FLAG_TIMERNEXT CO_CONFIG_FLAG_TIMERNEXT
 
