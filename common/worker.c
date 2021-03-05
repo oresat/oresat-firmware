@@ -100,6 +100,9 @@ THD_FUNCTION(thread_mgr, arg)
     (void)arg;
     event_listener_t nmt_el;
 
+    /* Set thread name */
+    chRegSetThreadName("Worker Manager");
+
     /* Register on the NMT state change event */
     chEvtRegisterMaskWithFlags(&nmt_event, &nmt_el, WRK_EVT_NMT, ALL_EVENTS);
 
