@@ -40,7 +40,7 @@ static const TMP101Config config_for_temp_sensor_01 =
 {
     &I2CD2,
     &i2cconfig,
-    TMP101_ADDR_SENSOR_01
+    TMP101_SADDR_SENSOR_01
 };
 
 static TMP101Driver device_driver_for_temp_sensor_01;
@@ -49,7 +49,7 @@ static const TMP101Config config_for_temp_sensor_02 =
 {
     &I2CD2,
     &i2cconfig,
-    TMP101_ADDR_SENSOR_02
+    TMP101_SADDR_SENSOR_02
 };
 
 static TMP101Driver device_driver_for_temp_sensor_02;
@@ -87,7 +87,7 @@ bool store_reading(uint8_t sensor_addr, uint16_t latest_reading)
 
     switch (sensor_addr)
     {
-        case TMP101_ADDR_SENSOR_01:
+        case TMP101_SADDR_SENSOR_01:
 chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_01_index, latest_reading);
             readings_sensor_01[readings_sensor_01_index] = latest_reading;
             ++readings_sensor_01_index;
@@ -97,7 +97,7 @@ chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\
                 { ++readings_sensor_01_count; }
             break;
 
-        case TMP101_ADDR_SENSOR_02:
+        case TMP101_SADDR_SENSOR_02:
 chprintf((BaseSequentialStream *) &SD2, "from sensor 0x%02X storing rdg %u = %u\r\n", sensor_addr, readings_sensor_02_index, latest_reading);
             readings_sensor_02[readings_sensor_02_index] = latest_reading;
             ++readings_sensor_02_index;
@@ -124,7 +124,7 @@ bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
 
     switch (sensor_addr)
     {
-        case TMP101_ADDR_SENSOR_01:
+        case TMP101_SADDR_SENSOR_01:
             if ( latest_reading < reading_sensor_01_min )
             {
                 reading_sensor_01_min = latest_reading;
@@ -135,7 +135,7 @@ bool update_min_max_temperature(uint8_t sensor_addr, uint16_t latest_reading)
             }
             break;
 
-        case TMP101_ADDR_SENSOR_02:
+        case TMP101_SADDR_SENSOR_02:
             if ( latest_reading < reading_sensor_02_min )
             {
                 reading_sensor_02_min = latest_reading;
@@ -164,7 +164,7 @@ bool update_average_temperature(uint8_t sensor_addr)
 
     switch (sensor_addr)
     {
-        case TMP101_ADDR_SENSOR_01:
+        case TMP101_SADDR_SENSOR_01:
             if ( readings_sensor_01_count > 0 )
             {
                 i = readings_sensor_01_count;
@@ -178,7 +178,7 @@ bool update_average_temperature(uint8_t sensor_addr)
             }
             break;
 
-        case TMP101_ADDR_SENSOR_02:
+        case TMP101_SADDR_SENSOR_02:
             if ( readings_sensor_02_count > 0 )
             {
                 i = readings_sensor_02_count;
@@ -237,12 +237,12 @@ bool report_temperature_stats(uint8_t sensor_addr)
 
     switch (sensor_addr)
     {
-        case TMP101_ADDR_SENSOR_01:
+        case TMP101_SADDR_SENSOR_01:
             chprintf((BaseSequentialStream *) &SD2, "temp sensor 01 min, max, average:  %u, %u, %u\r\n",
               reading_sensor_01_min, reading_sensor_01_max, reading_sensor_01_average);
             break;
 
-        case TMP101_ADDR_SENSOR_02:
+        case TMP101_SADDR_SENSOR_02:
             chprintf((BaseSequentialStream *) &SD2, "temp sensor 02 min, max, average:  %u, %u, %u\r\n",
               reading_sensor_02_min, reading_sensor_02_max, reading_sensor_02_average);
             break;
