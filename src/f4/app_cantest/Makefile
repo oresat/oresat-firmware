@@ -87,7 +87,7 @@ PROJECT   = app_cantest
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_F446RE
+BOARD     = ORESAT_C3_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -132,7 +132,7 @@ include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
+LDSCRIPT= $(STARTUPLD)/STM32F429xI.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -169,7 +169,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C
+UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE
 
 # Define ASM defines here
 UADEFS =

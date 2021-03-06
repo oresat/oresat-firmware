@@ -1,8 +1,8 @@
 #include "ch.h"
 #include "hal.h"
 
-#include "sensors.h"
 #include "CANopen.h"
+#include "sensors.h"
 
 typedef struct {
     adcsample_t ts;
@@ -15,16 +15,16 @@ static void sensors_cb(ADCDriver *adcp)
 {
     sensors_t *sensors = (sensors_t*)adcp->samples;
     int16_t temperature;
-    int16_t voltage;
+    int16_t vdda;
 
-    voltage = VREFINT_CAL_VOLT * VREFINT_CAL / sensors->vrefint;
-    temperature = ((sensors->ts * VREFINT_CAL * 10 / sensors->vrefint) - TS_CAL1 * 10);
-    temperature = temperature * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2 - TS_CAL1) + TS_CAL1_TEMP * 10;
+    vdda = VREFINT_CAL_VOLT * VREFINT_CAL_VAL / sensors->vrefint;
+    temperature = ((sensors->ts * VREFINT_CAL_VAL * 10 / sensors->vrefint) - TS_CAL1_VAL * 10);
+    temperature = temperature * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2_VAL - TS_CAL1_VAL) + TS_CAL1_TEMP * 10;
 
-    OD_sensors[ODA_sensors_MCU_Temperature] = sensors->ts;
-    OD_sensors[ODA_sensors_MCU_VREFINT] = sensors->vrefint;
-    OD_temperature[ODA_temperature_MCU_Junction] = temperature;
-    OD_voltage[ODA_voltage_MCU_VDDA] = voltage;
+    OD_MCU_Sensors.temperatureRaw = sensors->ts;
+    OD_MCU_Sensors.VREFINT_Raw = sensors->vrefint;
+    OD_MCU_Sensors.temperatureRaw = temperature;
+    OD_MCU_Sensors.VREFINT_Raw = vdda;
 }
 
 static void sensors_err_cb(ADCDriver *adcp, adcerror_t err)
@@ -45,9 +45,9 @@ void sensors_init(void)
 {
     adcStart(&ADCD1, NULL);
     ADC_ENABLE_SENSORS(&ADCD1);
-    OD_calibration[ODA_calibration_TS_CAL1] = TS_CAL1;
-    OD_calibration[ODA_calibration_TS_CAL2] = TS_CAL2;
-    OD_calibration[ODA_calibration_VREFINT_CAL] = VREFINT_CAL;
+    OD_MCU_Calibration.TS_CAL1 = TS_CAL1_VAL;
+    OD_MCU_Calibration.TS_CAL2 = TS_CAL2_VAL;
+    OD_MCU_Calibration.VREFINT_CAL = VREFINT_CAL_VAL;
 }
 
 void sensors_trig(void)
