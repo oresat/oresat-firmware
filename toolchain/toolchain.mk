@@ -1,4 +1,5 @@
 APP_HEXFILE = $(BUILDDIR)/$(PROJECT).hex
+APP_CRC_BIN_FILE = $(BUILDDIR)/$(PROJECT).crc32.bin
 GDB_ELF = $(BUILDDIR)/$(PROJECT).elf
 OOCD_CFG = oocd.cfg
 GDB_OOCD_CFG = gdboocd.cmd
@@ -9,6 +10,9 @@ write: $(APP_HEXFILE) write_ocd
 
 write_ocd:
 	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "hla_serial $(SERIAL); program $(APP_HEXFILE) verify reset exit"
+
+write_crc:
+	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "hla_serial $(SERIAL); program $(APP_CRC_BIN_FILE) verify reset exit 0x800A000"
 
 write_stl:
 	st-flash --serial=$(SERIAL_RAW) --reset --format ihex write $(APP_HEXFILE)

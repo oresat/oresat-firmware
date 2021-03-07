@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = app_bootloader
 
 # Target settings.
 MCU       = cortex-m0
@@ -106,7 +106,7 @@ DEPDIR   := $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
-include $(PROJ_SRC)/oresat.mk
+#include $(PROJ_SRC)/oresat.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -129,7 +129,8 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+#LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+LDSCRIPT= ../../../ld/STM32F091xC-bootloader.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

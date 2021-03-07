@@ -17,10 +17,15 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
+
 
 /* Project header files */
 #include "oresat.h"
+#include "oresat_f0.h"
+#include <string.h>
 #include "blink.h"
+
 
 static worker_t worker1;
 
@@ -41,6 +46,7 @@ static void app_init(void)
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
+    chprintf(DEBUG_SD, "\r\nInitiaized debug output...\r\n");
 }
 
 /**
@@ -48,9 +54,22 @@ static void app_init(void)
  */
 int main(void)
 {
-    // Initialize and start
-    oresat_init();
+    oresat_init2(true);
     app_init();
+
+    chprintf((BaseSequentialStream *) &SD2, "\r\n===================================================\r\n"); chThdSleepMilliseconds(30);
+
+    chprintf(DEBUG_SD, "running oresat_start()\r\n"); chThdSleepMilliseconds(30);
     oresat_start(&oresat_conf);
+
+    chprintf(DEBUG_SD, "running main() long loop\r\n"); chThdSleepMilliseconds(30);
+    while(1) {
+    	chThdSleepMilliseconds(1000);
+    }
     return 0;
 }
+
+
+
+
+

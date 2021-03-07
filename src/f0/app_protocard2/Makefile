@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = app_protocard2
 
 # Target settings.
 MCU       = cortex-m0
@@ -129,7 +129,8 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+#LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+LDSCRIPT= ../../../ld/STM32F091xC-firmware.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -199,6 +200,10 @@ include $(TOOLCHAIN)/toolchain.mk
 ##############################################################################
 # Custom rules
 #
+
+DATE=$(shell date +%Y%m%d)
+POST_MAKE_ALL_RULE_HOOK:
+	python3 ../pack_firmware_image.py ./build/$(PROJECT).bin ./build/$(PROJECT).crc32.bin $(DATE)
 
 #
 # Custom rules
