@@ -852,7 +852,7 @@
                                      PIN_ODR_HIGH(GPIOE_PIN12) |            \
                                      PIN_ODR_HIGH(GPIOE_LNA_ENABLE) |       \
                                      PIN_ODR_LOW(GPIOE_PA_ENABLE) |         \
-                                     PIN_ODR_HIGH(GPIOE_TOT_CLEAR))
+                                     PIN_ODR_LOW(GPIOE_TOT_CLEAR))
 #define VAL_GPIOE_AFRL              (PIN_AFIO_AF(GPIOE_OPD_FAULT, 0U) |     \
                                      PIN_AFIO_AF(GPIOE_WDT, 0U) |           \
                                      PIN_AFIO_AF(GPIOE_FIRE_TURN_2, 0U) |   \

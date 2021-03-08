@@ -2,7 +2,9 @@
 #include "sensors.h"
 #include "CO_threads.h"
 
-void oresat_init(void)
+CANDriver *cand;
+
+void oresat_init(oresat_config_t *config)
 {
     /*
      * System initializations.
@@ -17,17 +19,8 @@ void oresat_init(void)
     /* Init sensors */
     sensors_init();
 
-    /* Setup CANopen subsystem */
-    CO_ReturnError_t err = CO_new(NULL);
-    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
-
-    return;
-}
-
-void oresat_start(oresat_config_t *config)
-{
-    thread_t *thread_mgr_tp;
-    /* TODO: Sanity checks */
+    /* Record the config being used */
+    cand = config->cand;
 
     /* Set configuration values */
     /* If node ID is not overridden, use default node ID */
@@ -35,24 +28,36 @@ void oresat_start(oresat_config_t *config)
         /* TODO: Implement Node ID system properly */
     }
 
+    /* Initialize CANopen Subsystem */
+    CO_init(cand, config->node_id, config->bitrate);
+
+    return;
+}
+
+void oresat_start(void)
+{
+    thread_t *thread_mgr_tp;
+    /* TODO: Sanity checks */
+
     /* Set priority to max */
     chThdSetPriority(HIGHPRIO);
 
+    /* Start the sensors */
+    sensors_start();
+
     /* Start worker thread manager */
     thread_mgr_tp = chThdCreateStatic(thread_mgr_wa, sizeof(thread_mgr_wa), HIGHPRIO, thread_mgr, NULL);
-
-    /* Initialize CANopen Subsystem */
-    CO_init(config, config->node_id, config->bitrate);
 
     /* Run CO subsystem */
     CO_run(CO);
 
     /* Stop worker thread manager */
+    /* TODO: Use common event mask macro */
     chEvtSignal(thread_mgr_tp, EVENT_MASK(1));
     chThdWait(thread_mgr_tp);
 
     /* Deinitialize CO stack */
-    CO_delete(config);
+    CO_delete(cand);
 
     /* Initiate System Reset */
     NVIC_SystemReset();

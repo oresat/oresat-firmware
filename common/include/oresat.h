@@ -21,8 +21,8 @@ typedef struct {
 } oresat_config_t;
 
 /* OreSat initialization and main process */
-void oresat_init(void);
-void oresat_start(oresat_config_t *config);
+void oresat_init(oresat_config_t *config);
+void oresat_start(void);
 
 #ifdef __cplusplus
 }
