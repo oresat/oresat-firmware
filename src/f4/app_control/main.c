@@ -25,7 +25,7 @@
 #include "c3.h"
 #include "opd.h"
 #include "comms.h"
-#include "time_sync.h"
+#include "rtc.h"
 #include "CO_master.h"
 #ifdef SHELL_ENABLE
 #include "cmd.h"

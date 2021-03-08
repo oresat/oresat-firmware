@@ -21,7 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "time_sync.h"
+#include "rtc.h"
 #ifdef SHELL_ENABLE
 #include "cmd.h"
 #endif

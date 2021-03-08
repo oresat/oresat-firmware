@@ -8,7 +8,7 @@
 #include "comms.h"
 #include "opd.h"
 #include "CO_master.h"
-#include "time_sync.h"
+#include "rtc.h"
 #include "mmc.h"
 #include "test_mmc.h"
 #include "test_radio.h"

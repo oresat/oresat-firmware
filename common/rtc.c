@@ -1,4 +1,4 @@
-#include "time_sync.h"
+#include "rtc.h"
 
 void get_time_tm(struct tm *tim, uint32_t *msec)
 {
