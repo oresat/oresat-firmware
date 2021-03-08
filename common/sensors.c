@@ -43,16 +43,16 @@ static ADCConversionGroup adcgrpcfg = {
 
 void sensors_init(void)
 {
-    adcStart(&ADCD1, NULL);
     ADC_ENABLE_SENSORS(&ADCD1);
     OD_MCU_Calibration.TS_CAL1 = TS_CAL1_VAL;
     OD_MCU_Calibration.TS_CAL2 = TS_CAL2_VAL;
     OD_MCU_Calibration.VREFINT_CAL = VREFINT_CAL_VAL;
 }
 
-void sensors_trig(void)
+void sensors_start(void)
 {
     adcAcquireBus(&ADCD1);
-    adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)(&sensors), sizeof(sensors)/sizeof(sensors_t));
+    adcStart(&ADCD1, NULL);
+    /*adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)(&sensors), sizeof(sensors)/sizeof(sensors_t));*/
     adcReleaseBus(&ADCD1);
 }

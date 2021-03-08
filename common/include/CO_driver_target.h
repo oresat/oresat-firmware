@@ -232,8 +232,7 @@ typedef struct {
 
 /* CAN module object */
 typedef struct {
-    void               *CANptr;
-    CANDriver          *cand;           /* CANDriver for ChibiOS */
+    CANDriver          *CANptr;
     CANConfig           cancfg;         /* CANConfig for ChibiOS */
     event_source_t      rx_event;       /* Receive event */
     CO_CANrx_t         *rxArray;        /* From CO_CANmodule_init() */

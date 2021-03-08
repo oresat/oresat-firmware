@@ -75,8 +75,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init();
+    oresat_init(&oresat_conf);
     app_init();
-    oresat_start(&oresat_conf);
+    oresat_start();
     return 0;
 }
