@@ -8,8 +8,8 @@ Description=OreSat Master Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:08AM
-ModificationDate=03-05-2021
+ModificationTime=3:34PM
+ModificationDate=03-07-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=39
+SupportedObjects=41
 1=0x1002
 2=0x1003
 3=0x1005
@@ -164,6 +164,8 @@ SupportedObjects=39
 37=0x1F81
 38=0x1F82
 39=0x1F89
+40=0x6000
+41=0x6001
 
 [1002]
 ParameterName=Manufacturer status register
@@ -4216,6 +4218,59 @@ ObjectType=0x7
 DataType=0x0007
 AccessType=rw
 DefaultValue=
+PDOMapping=0
+
+[6000]
+ParameterName=C3 State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0009
+AccessType=ro
+HighLimit=F
+LowLimit=B
+DefaultValue=B
+PDOMapping=0
+
+[6001]
+ParameterName=TX Control
+ObjectType=0x9
+;StorageLocation=PERSIST_APP
+SubNumber=0x4
+
+[6001sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6001sub1]
+ParameterName=Enabled
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rw
+DefaultValue=1
+PDOMapping=0
+
+[6001sub2]
+ParameterName=TX Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=20160
+PDOMapping=0
+
+[6001sub3]
+ParameterName=Beacon Interval
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=10000
 PDOMapping=0
 
 [ManufacturerObjects]

@@ -43,6 +43,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2020*/ {0x3L, 0x00, 0x00, 0x00},
 /*2021*/ {0x6L, 0x0, 0x00, 0x00, 0x00, 0x00, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
+/*6000*/ {'B'},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -116,6 +117,16 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
            CO_OD_FIRST_LAST_WORD,
 
 /*2000*/ {0x4L, 0x0L, 0x0L, 0x0L, 0x0L},
+
+           CO_OD_FIRST_LAST_WORD,
+};
+
+
+/***** Definition for PERSIST_APP variables *******************************************/
+struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP = {
+           CO_OD_FIRST_LAST_WORD,
+
+/*6001*/ {0x3L, 1, 0x4EC0L, 0x2710L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -339,6 +350,13 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
            {(void*)&CO_OD_RAM.MCU_Sensors.VBAT_Raw, 0xA6, 0x2 },
 };
 
+/*0x6001*/ const CO_OD_entryRecord_t OD_record6001[4] = {
+           {(void*)&CO_OD_PERSIST_APP.TX_Control.highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_APP.TX_Control.enabled, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_APP.TX_Control.TX_Timeout, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_APP.TX_Control.beaconInterval, 0x8F, 0x4 },
+};
+
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
@@ -391,5 +409,7 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2020, 0x03, 0x00,  0, (void*)&OD_record2020},
 {0x2021, 0x06, 0x00,  0, (void*)&OD_record2021},
 {0x2100, 0x00, 0x06, 10, (void*)&CO_OD_RAM.errorStatusBits},
+{0x6000, 0x00, 0x06,  1, (void*)&CO_OD_RAM.C3State},
+{0x6001, 0x03, 0x00,  0, (void*)&OD_record6001},
 };
 // clang-format on
