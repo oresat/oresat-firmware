@@ -51,7 +51,7 @@
    DEVICE INFO:
       VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    OreSat Master Template
+      ProductName:    OreSat C3
       ProductNumber:  0
 *******************************************************************************/
 

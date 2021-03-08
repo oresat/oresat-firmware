@@ -15,14 +15,14 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-03-07" fileModificationTime="17:18:39.1133930-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-03-07" fileModificationTime="17:26:32.5723390-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
-        <q1:productName>OreSat Master Template</q1:productName>
+        <q1:productName>OreSat C3</q1:productName>
         <q1:productID>0</q1:productID>
         <q1:productText>
-          <description lang="en">OreSat Master Node Object Dictionary</description>
+          <description lang="en">OreSat C3 Node Object Dictionary</description>
         </q1:productText>
         <q1:version versionType="SW">0</q1:version>
         <q1:version versionType="FW">0</q1:version>
@@ -3606,7 +3606,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           <q1:parameter uniqueID="UID_SUB_600101" access="readWrite">
             <label lang="en">Enabled</label>
             <BOOL />
-            <q1:defaultValue value="1" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600102" access="readWrite">
             <description lang="en">Transmit timeout in seconds.
@@ -3637,7 +3637,7 @@ Determines how long the device will maintain TX enabled after receiving an enabl
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2021-03-07" fileModificationTime="17:18:39.1133930-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2021-03-07" fileModificationTime="17:26:32.5723390-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

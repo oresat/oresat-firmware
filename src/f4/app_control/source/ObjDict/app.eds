@@ -4,18 +4,18 @@ FileVersion=0
 FileRevision=1
 LastEDS=
 EDSVersion=4.0
-Description=OreSat Master Node Object Dictionary
+Description=OreSat C3 Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=3:34PM
+ModificationTime=5:26PM
 ModificationDate=03-07-2021
 ModifiedBy=
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat Master Template
+ProductName=OreSat C3
 ProductNumber=0
 RevisionNumber=0
 BaudRate_10=1
@@ -4252,7 +4252,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0001
 AccessType=rw
-DefaultValue=1
+DefaultValue=0
 PDOMapping=0
 
 [6001sub2]
