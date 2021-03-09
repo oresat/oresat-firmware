@@ -15,7 +15,7 @@
 */
 
 /*
- * ST32F439xI memory setup.
+ * ST32F429xI memory setup.
  * Note: Use of ram1, ram2 and ram3 is mutually exclusive with use of ram0.
  */
 MEMORY
