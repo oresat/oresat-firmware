@@ -23,8 +23,32 @@
 #include "solar.h"
 #include "blink.h"
 
-static worker_t worker1;
-static worker_t worker2;
+static worker_t blink_worker;
+static thread_descriptor_t blink_desc = {
+    .name = "Blink",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = blink,
+    .arg = NULL
+};
+static worker_t solar_worker;
+static thread_descriptor_t solar_desc = {
+    .name = "Solar MPPT",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = solar,
+    .arg = NULL
+};
+
+const I2CConfig i2cconfig = {
+    STM32_TIMINGR_PRESC(0xBU) |
+    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
+    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
+    0,
+    0
+};
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -38,10 +62,8 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Blink", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
-    init_worker(&worker2, "Solar Application", solar_wa, sizeof(solar_wa), NORMALPRIO, solar, NULL, true);
-    reg_worker(&worker1);
-    reg_worker(&worker2);
+    reg_worker(&blink_worker, &blink_desc, false, true);
+    reg_worker(&solar_worker, &solar_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
@@ -53,8 +75,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init();
+    oresat_init(&oresat_conf);
     app_init();
-    oresat_start(&oresat_conf);
+    oresat_start();
     return 0;
 }
