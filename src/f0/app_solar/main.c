@@ -35,8 +35,8 @@ static thread_descriptor_t blink_desc = {
 static worker_t solar_worker;
 static thread_descriptor_t solar_desc = {
     .name = "Solar MPPT",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
+    .wbase = THD_WORKING_AREA_BASE(solar_wa),
+    .wend = THD_WORKING_AREA_END(solar_wa),
     .prio = NORMALPRIO,
     .funcp = solar,
     .arg = NULL
