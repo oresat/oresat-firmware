@@ -51,7 +51,7 @@
    DEVICE INFO:
       VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    OreSat Master Template
+      ProductName:    OreSat C3
       ProductNumber:  0
 *******************************************************************************/
 
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             48
+   #define CO_OD_NoOfElements             50
 
 
 /*******************************************************************************
@@ -173,6 +173,12 @@
                UNSIGNED16     VREFINT_Raw;
                UNSIGNED16     VBAT_Raw;
                }              OD_MCU_Sensors_t;
+/*6001      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               BOOLEAN        enabled;
+               UNSIGNED32     TX_Timeout;
+               UNSIGNED32     beaconInterval;
+               }              OD_TX_Control_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -795,6 +801,17 @@
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
 
+/*6000 */
+        #define OD_6000_C3State                                     0x6000
+
+/*6001 */
+        #define OD_6001_TX_Control                                  0x6001
+
+        #define OD_6001_0_TX_Control_maxSubIndex                    0
+        #define OD_6001_1_TX_Control_enabled                        1
+        #define OD_6001_2_TX_Control_TX_Timeout                     2
+        #define OD_6001_3_TX_Control_beaconInterval                 3
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -815,6 +832,7 @@ struct sCO_OD_RAM{
 /*2020      */ OD_MCU_Calibration_t MCU_Calibration;
 /*2021      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
+/*6000      */ VISIBLE_STRING C3State[1];
 
                UNSIGNED32     LastWord;
 };
@@ -876,6 +894,15 @@ struct sCO_OD_PERSIST_MFR{
                UNSIGNED32     LastWord;
 };
 
+/***** Structure for PERSIST_APP variables ********************************************/
+struct sCO_OD_PERSIST_APP{
+               UNSIGNED32     FirstWord;
+
+/*6001      */ OD_TX_Control_t TX_Control;
+
+               UNSIGNED32     LastWord;
+};
+
 /***** Declaration of Object Dictionary variables *****************************/
 extern struct sCO_OD_RAM CO_OD_RAM;
 
@@ -886,6 +913,8 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
 
 extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
+
+extern struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP;
 
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
@@ -1031,6 +1060,13 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 /*2100, Data Type: OCTET_STRING */
         #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
         #define ODL_errorStatusBits_stringLength                    10
+
+/*6000, Data Type: VISIBLE_STRING */
+        #define OD_C3State                                          CO_OD_RAM.C3State
+        #define ODL_C3State_stringLength                            1
+
+/*6001, Data Type: TX_Control_t */
+        #define OD_TX_Control                                       CO_OD_PERSIST_APP.TX_Control
 
 #endif
 // clang-format on
