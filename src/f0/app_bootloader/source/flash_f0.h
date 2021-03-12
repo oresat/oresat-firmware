@@ -61,21 +61,21 @@ typedef uint8_t flashpage_t;
  * @brief Get the size of @p sector.
  * @return @p sector size in bytes.
  */
-size_t flashPageSize(flashpage_t page);
+size_t flashPageSizeF091(flashpage_t page);
 
 /**
  * @brief Get the beginning address of @p sector.
  * @param sector Sector to retrieve the beginning address of.
  * @return First address (inclusive) of @p sector.
  */
-flashaddr_t flashPageBegin(flashpage_t page);
+flashaddr_t flashPageBeginF091(flashpage_t page);
 
 /**
  * @brief Get the end address of @p sector.
  * @param sector Sector to retrieve the end address of.
  * @return End address (exclusive) of @p sector (i.e. beginning address of the next sector).
  */
-flashaddr_t flashPageEnd(flashpage_t page);
+flashaddr_t flashPageEndF091(flashpage_t page);
 
 /**
  * @brief Get the sector containing @p address.
@@ -83,7 +83,7 @@ flashaddr_t flashPageEnd(flashpage_t page);
  * @param address Address to be searched for.
  * @return Sector containing @p address.
  */
-flashpage_t flashPageAt(flashaddr_t address);
+flashpage_t flashPageAtF091(flashaddr_t address);
 
 /**
  * @brief Erase the flash @p sector.
@@ -95,7 +95,7 @@ flashpage_t flashPageAt(flashaddr_t address);
  * @return FLASH_RETURN_BAD_FLASH       Flash cell error.
  * @return FLASH_RETURN_NO_PERMISSION   Access denied.
  */
-int flashPageErase(flashpage_t page);
+int flashPageEraseF091(flashpage_t page);
 
 /**
  * @brief Erase the sectors containing the span of @p size bytes starting at @p address.
@@ -111,7 +111,7 @@ int flashPageErase(flashpage_t page);
  * @return FLASH_RETURN_BAD_FLASH       Flash cell error.
  * @return FLASH_RETURN_NO_PERMISSION   Access denied.
  */
-int flashErase(flashaddr_t address, size_t size);
+int flashEraseF091(flashaddr_t address, size_t size);
 
 /**
  * @brief Check if the @p size bytes of flash memory starting at @p address are erased.
@@ -121,7 +121,7 @@ int flashErase(flashaddr_t address, size_t size);
  * @return TRUE Memory is already erased.
  * @return FALSE Memory is not erased.
  */
-bool_t flashIsErased(flashaddr_t address, size_t size);
+bool_t flashIsErasedF091(flashaddr_t address, size_t size);
 
 /**
  * @brief Check if the data in @p buffer are identical to the one in flash memory.
@@ -153,7 +153,7 @@ int flashRead2(flashaddr_t address, char* buffer, size_t size);
  * @return FLASH_RETURN_SUCCESS         No error.
  * @return FLASH_RETURN_NO_PERMISSION   Access denied.
  */
-int flashWrite(flashaddr_t address, const uint8_t* buffer, size_t size);
+int flashWriteF091(flashaddr_t address, const uint8_t* buffer, size_t size);
 
 #ifdef __cplusplus
 }

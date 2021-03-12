@@ -1,7 +1,7 @@
 #include "flash_f0.h"
 #include <string.h>
 
-size_t flashPageSize(flashpage_t sector)
+size_t flashPageSizeF091(flashpage_t sector)
 {
 	if( sector <= FLASH_PAGE_COUNT ) {
 		return(STM32F093_FLASH_PAGE_SIZE);
@@ -10,26 +10,26 @@ size_t flashPageSize(flashpage_t sector)
     return 0;
 }
 
-flashaddr_t flashPageBegin(flashpage_t page)
+flashaddr_t flashPageBeginF091(flashpage_t page)
 {
     flashaddr_t address = FLASH_BASE;
     while (page > 0)
     {
         --page;
-        address += flashPageSize(page);
+        address += flashPageSizeF091(page);
     }
     return address;
 }
 
-flashaddr_t flashPageEnd(flashpage_t page)
+flashaddr_t flashPageEndF091(flashpage_t page)
 {
-    return flashPageBegin(page + 1);
+    return flashPageBeginF091(page + 1);
 }
 
-flashpage_t flashPageAt(flashaddr_t address)
+flashpage_t flashPageAtF091(flashaddr_t address)
 {
     flashpage_t page_number = 0;
-    while (address >= flashPageEnd(page_number))
+    while (address >= flashPageEndF091(page_number))
         ++page_number;
     return page_number;
 }
@@ -65,7 +65,7 @@ static bool_t flashUnlock(void)
  */
 #define flashLock() { FLASH->CR |= FLASH_CR_LOCK; }
 
-int flashPageErase(flashpage_t page_number)
+int flashPageEraseF091(flashpage_t page_number)
 {
     /* Unlock flash for write access */
     if(flashUnlock() == CH_FAILED)
@@ -91,29 +91,29 @@ int flashPageErase(flashpage_t page_number)
     flashLock();
 
     /* Check deleted sector for errors */
-    if (flashIsErased(flashPageBegin(page_number), flashPageSize(page_number)) == FALSE)
+    if (flashIsErasedF091(flashPageBeginF091(page_number), flashPageSizeF091(page_number)) == FALSE)
         return FLASH_RETURN_BAD_FLASH;  /* Sector is not empty despite the erase cycle! */
 
     /* Successfully deleted sector */
     return FLASH_RETURN_SUCCESS;
 }
 
-int flashErase(flashaddr_t address, size_t size)
+int flashEraseF091(flashaddr_t address, size_t size)
 {
     while (size > 0)
     {
-        flashpage_t page = flashPageAt(address);
-        int err = flashPageErase(page);
+        flashpage_t page = flashPageAtF091(address);
+        int err = flashPageEraseF091(page);
         if (err != FLASH_RETURN_SUCCESS)
             return err;
-        address = flashPageEnd(page);
-        size -= flashPageSize(page);
+        address = flashPageEndF091(page);
+        size -= flashPageSizeF091(page);
     }
 
     return FLASH_RETURN_SUCCESS;
 }
 
-bool_t flashIsErased(flashaddr_t address, size_t size)
+bool_t flashIsErasedF091(flashaddr_t address, size_t size)
 {
     /* Check for default set bits in the flash memory
      * For efficiency, compare flashdata_t values as much as possible,
@@ -166,7 +166,7 @@ int flashRead2(flashaddr_t address, char* buffer, size_t size)
     return FLASH_RETURN_SUCCESS;
 }
 
-static void flashWriteData(flashaddr_t address, const flashdata_t data)
+static void flashWriteDataF091(flashaddr_t address, const flashdata_t data)
 {
     /* Enter flash programming mode */
     FLASH->CR |= FLASH_CR_PG;
@@ -181,7 +181,7 @@ static void flashWriteData(flashaddr_t address, const flashdata_t data)
     FLASH->CR &= ~FLASH_CR_PG;
 }
 
-int flashWrite(flashaddr_t address, const uint8_t* buffer, size_t size)
+int flashWriteF091(flashaddr_t address, const uint8_t* buffer, size_t size)
 {
     /* Unlock flash for write access */
     if(flashUnlock() == CH_FAILED)
@@ -212,7 +212,7 @@ int flashWrite(flashaddr_t address, const uint8_t* buffer, size_t size)
         memcpy((char*)&tmp + alignOffset, buffer, chunkSize);
 
         /* Write the new data in flash */
-        flashWriteData(alignedFlashAddress, tmp);
+        flashWriteDataF091(alignedFlashAddress, tmp);
 
         /* Advance */
         address += chunkSize;
@@ -225,7 +225,7 @@ int flashWrite(flashaddr_t address, const uint8_t* buffer, size_t size)
      * copied requires special treatment. */
     while (size >= sizeof(flashdata_t))
     {
-        flashWriteData(address, *(const flashdata_t*)buffer);
+        flashWriteDataF091(address, *(const flashdata_t*)buffer);
         address += sizeof(flashdata_t);
         buffer += sizeof(flashdata_t);
         size -= sizeof(flashdata_t);
@@ -239,7 +239,7 @@ int flashWrite(flashaddr_t address, const uint8_t* buffer, size_t size)
     {
         flashdata_t tmp = *(volatile flashdata_t*)address;
         memcpy(&tmp, buffer, size);
-        flashWriteData(address, tmp);
+        flashWriteDataF091(address, tmp);
     }
 
     /* Lock flash again */
