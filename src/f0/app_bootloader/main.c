@@ -540,6 +540,7 @@ int main(void)
 	extern int __flash0_end__;
 	chprintf(DEBUG_SD, "Bootloader __flash0_base__ = 0x%X\r\n", (uint8_t *) &__flash0_base__);
 	chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%X\r\n", (uint8_t *) &__flash0_end__);
+	chThdSleepMilliseconds(50);
 
 #if 0
 	for(int i = 0; i < 140; i++ ) {
@@ -547,9 +548,11 @@ int main(void)
 	}
 #endif
 
+	chprintf(DEBUG_SD, "Checking firmware validity...\r\n"); chThdSleepMilliseconds(50);
+
     bool is_firmware_a_valid = reset_handler_hook(true);
     is_firmware_a_valid = false;
-    chprintf(DEBUG_SD, "Current is_firmware_a_valid = %u\r\n", is_firmware_a_valid);
+    chprintf(DEBUG_SD, "Current is_firmware_a_valid = %u\r\n", is_firmware_a_valid);chThdSleepMilliseconds(20);
     oresat_can_bootloader(is_firmware_a_valid);
 
     if( is_firmware_a_valid ) {
