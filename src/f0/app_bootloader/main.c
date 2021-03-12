@@ -299,7 +299,7 @@ void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 				chprintf(DEBUG_SD, "Failed to transmit response - 1.\r\n");
 			}
 
-			for(int i = 0; i < sizeof(cmd_list); i++ ) {
+			for(uint32_t i = 0; i < sizeof(cmd_list); i++ ) {
 				can_bootloader_init_frame(&reply_msg, command_sid, 1);
 				reply_msg.data8[0] = cmd_list[i];
 				if( (tx_r = can_bootloader_transmit(&reply_msg)) != MSG_OK ) {
@@ -537,6 +537,11 @@ int main(void)
 	extern int __flash0_end__;
 	chprintf(DEBUG_SD, "Bootloader __flash0_base__ = 0x%X\r\n", (uint8_t *) &__flash0_base__);
 	chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%X\r\n", (uint8_t *) &__flash0_end__);
+
+	extern stkalign_t __main_thread_stack_base__;
+	extern stkalign_t __main_thread_stack_end__;
+	chprintf(DEBUG_SD, "Stack size: %u\r\n", ((uint8_t *) &__main_thread_stack_end__) - ((uint8_t *) &__main_thread_stack_base__));
+
 	chThdSleepMilliseconds(50);
 
 #if 0

@@ -48,6 +48,17 @@ static void app_init(void)
  */
 int main(void)
 {
+    halInit();
+    chSysInit();
+
+	 palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
+
+	while (1) {
+		palToggleLine(LINE_LED);
+		chThdSleepMilliseconds(500);
+	}
+
+
     // Initialize and start
     oresat_init();
     app_init();
