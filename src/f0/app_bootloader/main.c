@@ -26,6 +26,8 @@
 
 #define SCB_AIRCR_SYSRESETREQ                        (1 << 2)
 
+#define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
+#define BOOTLOADER_VERSION                           0xAB
 #define CAN_DRIVER                                   &CAND1
 #define CAN_ANNOUNCE_MAGIC_NUMBER                    0x04030201
 #define STM32_BOOTLOADER_CAN_ACK                     0x79
@@ -83,6 +85,10 @@ const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_c
 			return ("ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY");
 		case ORESAT_BOOTLOADER_CAN_COMMAND_ERASE:
 			return ("ORESAT_BOOTLOADER_CAN_COMMAND_ERASE");
+		case STM32_BOOTLOADER_CAN_ACK:
+			return("ACK");
+		case STM32_BOOTLOADER_CAN_NACK:
+			return("NACK");
 	}
 	return ("???");
 }
@@ -102,7 +108,9 @@ void soft_reset_cortex_m0(void) {
 	}
 }
 
-
+/**
+ * @return True if the key meta-data fields of the firmware image are reasonable and valid. False other wise
+ */
 bool validate_firmware_meta_data(const uint32_t length, const uint32_t expected_crc32) {
 	if (length == 0|| expected_crc32 == 0 || length == UINT32_MAX || expected_crc32 == UINT32_MAX) {
 		return (false);
@@ -115,7 +123,13 @@ bool validate_firmware_meta_data(const uint32_t length, const uint32_t expected_
 	return (true);
 }
 
-
+/**
+ * @param *base_address Memory address at which the firmware metadata is located
+ * @param length Number of bytes to CRC
+ * @param expected_crc32 Expected CRC value of memory
+ *
+ * @return True if the CRC of flash matche, false otherwise
+ */
 bool validate_firmware_image(void *base_address, const uint32_t length, const uint32_t expected_crc32) {
 	if( ! validate_firmware_meta_data(length, expected_crc32) ) {
 		return(false);
@@ -130,8 +144,17 @@ bool validate_firmware_image(void *base_address, const uint32_t length, const ui
 	return(true);
 }
 
+void branch_to_firmware_image(void) {
+	chSysDisable();
 
-bool check_firmware_crc_and_branch(const bool print_only) {
+	__set_MSP(*(uint32_t*) ORESAT_F0_FIRMWARE_CODE_ADDRESS);
+	(*(void (**)()) (ORESAT_F0_FIRMWARE_CODE_ADDRESS + 4))();
+}
+
+/**
+ *  @return true if the firmware image is valid, false otherwise
+ */
+bool check_firmware_crc_and_branch(const bool print_serial_output) {
 	const uint32_t firmware_expected_crc    = *((uint32_t *) ORESAT_F0_FIRMWARE_CRC_ADDRESS);
 	const uint32_t firmware_expected_length = *((uint32_t *) ORESAT_F0_FIRMWARE_LENGTH_ADDRESS);
 	const uint32_t firmware_version = *((uint32_t *) ORESAT_F0_FIRMWARE_VERSION_ADDRESS);
@@ -139,7 +162,7 @@ bool check_firmware_crc_and_branch(const bool print_only) {
 
 	const bool is_firmware_valid = validate_firmware_image((void*) ORESAT_F0_FIRMWARE_LENGTH_ADDRESS, firmware_expected_length, firmware_expected_crc);
 
-	if( print_only ) {
+	if( print_serial_output ) {
 		chprintf(DEBUG_SD, "firmware_expected_crc = 0x%X\r\n", firmware_expected_crc);
 		chprintf(DEBUG_SD, "firmware_expected_length = %u\r\n", firmware_expected_length);
 		if( firmware_metadata_valid ) {
@@ -148,17 +171,9 @@ bool check_firmware_crc_and_branch(const bool print_only) {
 		chprintf(DEBUG_SD, "firmware_version = %u\r\n", firmware_version);
 		chprintf(DEBUG_SD, "firmware_metadata_valid = %u\r\n", firmware_metadata_valid);
 		chprintf(DEBUG_SD, "is_firmware_valid = %u\r\n", is_firmware_valid);
-
-		return(is_firmware_valid);
 	}
 
-	if( is_firmware_valid ) {
-		chSysDisable();
-
-		__set_MSP(*(uint32_t*) ORESAT_F0_FIRMWARE_CODE_ADDRESS);
-		(*(void (**)()) (ORESAT_F0_FIRMWARE_CODE_ADDRESS + 4))();
-	}
-	return(false);
+	return(is_firmware_valid);
 }
 
 
@@ -192,6 +207,12 @@ void can_bootloader_init_frame(CANTxFrame *msg, const uint32_t sid, const uint32
 	msg->DLC = dlc;
 }
 
+/**
+ * Sends a ACK or NACK to the host to indicate success or failure of a given CAN command
+ *
+ * @sid The command ID for which this ack/nack is with respect.
+ * @ack_flag ture if an ACK is to be sent, false if a NACK is to be sent
+ */
 bool can_bootloader_send_ack_nack(const uint32_t sid, const bool ack_flag) {
 	msg_t tx_r;
 	CANTxFrame tx_msg;
@@ -218,6 +239,9 @@ bool can_bootloader_send_nack(const uint32_t sid) {
 	return(can_bootloader_send_ack_nack(sid, false));
 }
 
+/**
+ * @return true if the page_number can be erased, false otherwise
+ */
 bool is_flash_page_eraseable(const uint8_t page_number) {
 	extern int __flash0_end__;
 	uint32_t *bootloader_end_flash = (uint32_t *) &__flash0_end__;
@@ -232,6 +256,9 @@ bool is_flash_page_eraseable(const uint8_t page_number) {
 	return(false);
 }
 
+/**
+ * @return true if the given flash address can be written to, false otherwise.
+ */
 bool is_flash_write_address_valid(const uint8_t *address) {
 	extern int __flash0_base__;
 	extern int __flash0_end__;
@@ -270,7 +297,6 @@ bool is_flash_write_address_range_valid(const uint8_t *address, const uint32_t l
 	return(true);
 }
 
-#define    BOOTLOADER_VERSION      0xAB
 
 void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 	msg_t tx_r;
@@ -294,7 +320,7 @@ void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 					ORESAT_BOOTLOADER_CAN_COMMAND_ERASE };
 
 			can_bootloader_init_frame(&reply_msg, command_sid, 1);
-			reply_msg.data8[0] = sizeof(cmd_list); //number of tx messages sent below
+			reply_msg.data8[0] = sizeof(cmd_list) - 1; //number of tx messages sent below
 			if( (tx_r = can_bootloader_transmit(&reply_msg)) != MSG_OK ) {
 				chprintf(DEBUG_SD, "Failed to transmit response - 1.\r\n");
 			}
@@ -313,7 +339,7 @@ void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 		case ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY:
 		{
 			const uint8_t *address_to_read_from = (uint8_t *) ((rx_msg->data8[0] << 24) | (rx_msg->data8[1] << 16) | (rx_msg->data8[2] << 8) | rx_msg->data8[3]);
-			const uint8_t number_of_bytes_to_read = rx_msg->data8[4];
+			const uint8_t number_of_bytes_to_read = rx_msg->data8[4] + 1;
 
 			chprintf(DEBUG_SD, "Address to read from: 0x%X\r\n", address_to_read_from);
 			chprintf(DEBUG_SD, "Number of bytes to read: %u\r\n", number_of_bytes_to_read);
@@ -409,13 +435,15 @@ void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 			break;
 		case ORESAT_BOOTLOADER_CAN_COMMAND_ERASE:
 		{
-			const uint32_t number_of_pages_to_erase = rx_msg->DLC;
+			//const uint32_t number_of_pages_to_erase = rx_msg->DLC;
+			const uint32_t number_of_pages_to_erase = rx_msg->data8[0] + 1;
 			chprintf(DEBUG_SD, "number_of_pages_to_erase = %u\r\n", number_of_pages_to_erase);
 
 			can_bootloader_send_ack(command_sid);
 
-			for(uint32_t i = 0; i < number_of_pages_to_erase; i++ ) {
+			for(uint32_t i = 1; i <= number_of_pages_to_erase && i < 8; i++ ) {
 				int error_count = 0;
+
 				const uint32_t page_number_to_erase = rx_msg->data8[i];
 				if( is_flash_page_eraseable(page_number_to_erase) ) {
 					chprintf(DEBUG_SD, "Erasing page number = %u\r\n", page_number_to_erase);
@@ -449,6 +477,7 @@ void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
 }
 
 void can_bootloader_announce_presence_on_bus(void) {
+
 	CANTxFrame txmsg;
 	memset(&txmsg, 0, sizeof(txmsg));
 	txmsg.SID = 0;
@@ -456,6 +485,7 @@ void can_bootloader_announce_presence_on_bus(void) {
 	txmsg.data32[0] = 0x04030201;
 	txmsg.data32[1] = *cpu_unique_id_low;
 
+	chprintf(DEBUG_SD, "Bootloader announcing presence on bus...\r\n");
 	can_bootloader_transmit(&txmsg);
 }
 
@@ -484,23 +514,25 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
 	bool got_stay_bootloader_frame = false;
 
+	const uint32_t ms_threshold = 3000;
 	while ( true ) {
 		if( is_firmware_a_valid ) {
-			if( (! got_stay_bootloader_frame) && ((TIME_I2MS(chVTGetSystemTime())) - start_time) >= 3000 ) {
+			if( (! got_stay_bootloader_frame) && ((TIME_I2MS(chVTGetSystemTime())) - start_time) >= ms_threshold ) {
+				chprintf(DEBUG_SD, "No CAN frame after %u ms, reseting and running main firmware...\r\n", ms_threshold);
 				break;
 			}
 		}
 
 		const msg_t r = can_bootloader_receive2(&rxmsg, CAN_RECEIVE_TIMEOUT_LONG);
 		if( r == MSG_OK ) {
-			if( rxmsg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && rxmsg.DLC == 8 ) {
-				if( rxmsg.data32[0] == *cpu_unique_id_low && rxmsg.data32[1] == CAN_ANNOUNCE_MAGIC_NUMBER ) {
-					//Host will TX a reply frame with the magic number and CPU unique ID values swapped to indicaet this node should stay in bootloader mode
-					got_stay_bootloader_frame = true;
+			if( ! got_stay_bootloader_frame ) {
+				if( rxmsg.SID == BOOTLOADER_EXPECTED_FIRST_FRAME_ID && rxmsg.DLC == 8 ) {
+					if( rxmsg.data32[0] == *cpu_unique_id_low && rxmsg.data32[1] == CAN_ANNOUNCE_MAGIC_NUMBER ) {
+						//Host will TX a reply frame with the magic number and CPU unique ID values swapped to indicaet this node should stay in bootloader mode
+						got_stay_bootloader_frame = true;
+					}
 				}
-			}
-
-			if( got_stay_bootloader_frame ) {
+			} else {
 				can_bootloader_handle_fram(&rxmsg);
 			}
 		} else {
@@ -522,7 +554,9 @@ int main(void)
 		//We specifically want to branch to the firmware image with the CPU as close to out of reset mode as possible.
 		*bootloader_magic_number_pointer = 0;
 		__DSB();
-		check_firmware_crc_and_branch(false);
+		if( check_firmware_crc_and_branch(false) ) {
+			branch_to_firmware_image();
+		}
 	}
 
 	//Note: none of this actually gets run because the __reset_handler_hook branchs to either the A or B firmware images
