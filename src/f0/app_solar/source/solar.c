@@ -201,6 +201,7 @@ THD_FUNCTION(solar, arg)
     uint32_t delta_power = 0;
     uint32_t voltage_previous_read = 0;
     uint32_t delta_voltage = 0;
+#define VREF_STEP_IN_MICROVOLTS (100)
 
     int32_t current;
     uint32_t iadj_uv = 1500000;
@@ -259,10 +260,12 @@ THD_FUNCTION(solar, arg)
                 if ( delta_voltage > 0 )
                 {
                     // increase vref
+                    iadj_uv += VREF_STEP_IN_MICROVOLTS;
                 }
                 else
                 {
                     // decrease vref
+                    iadj_uv -= VREF_STEP_IN_MICROVOLTS;
                 }
             }
             else
@@ -270,20 +273,25 @@ THD_FUNCTION(solar, arg)
                 if ( delta_voltage > 0 )
                 {
                     // decrease vref
+                    iadj_uv -= VREF_STEP_IN_MICROVOLTS;
                 }
                 else
                 {
                     // increase vref
+                    iadj_uv += VREF_STEP_IN_MICROVOLTS;
                 }
             }
         }
+
+        dacPutMicrovolts(&DACD1, 0, iadj_uv);
 
         voltage_previous_read = voltage;
         power_previous_read = power;
 
 
-        if ((++i % 500000) == 0){
-          chprintf((BaseSequentialStream *) &SD2, "- MARK - mppt work\r\n");
+        if ((++i % 200) == 0){
+          chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
+          chprintf((BaseSequentialStream *) &SD2, "iadj_uv now = %u, power = %u\r\n", iadj_uv, power);
         }
     }
 
