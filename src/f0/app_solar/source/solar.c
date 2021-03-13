@@ -195,6 +195,13 @@ THD_FUNCTION(solar, arg)
 {
     (void)arg;
     uint32_t voltage, power;
+
+// ORESAT_TASK_002_MPPT_WORK - Ted adding following Perturb And Observe variables:
+    uint32_t power_previous_read = 0;
+    uint32_t delta_power = 0;
+    uint32_t voltage_previous_read = 0;
+    uint32_t delta_voltage = 0;
+
     int32_t current;
     uint32_t iadj_uv = 1500000;
     uint32_t i_in=0;
@@ -209,6 +216,7 @@ THD_FUNCTION(solar, arg)
     palSetLine(LINE_LT1618_EN);
 
     while(!chThdShouldTerminateX()){
+#if ( 0 )
         chThdSleepMilliseconds(SLEEP_MS);
 
         /* Get present values */
@@ -230,6 +238,52 @@ THD_FUNCTION(solar, arg)
         if ((++i % 500) == 0){
           chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n", i, voltage, current, power);
           chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
+        }
+#endif // (0)
+
+// Perturb and Observe algorithm:
+
+        power = ina226ReadPower(&ina226dev);   /* Power in increments of uW */
+        voltage = ina226ReadVBUS(&ina226dev);    /* VBUS voltage in uV */
+
+        delta_power = (power - power_previous_read);
+        delta_voltage = (voltage - voltage_previous_read);
+
+        if ( delta_power == 0 ) {
+            // make no change
+        }
+        else
+        {
+            if ( delta_power > 0 )
+            {
+                if ( delta_voltage > 0 )
+                {
+                    // increase vref
+                }
+                else
+                {
+                    // decrease vref
+                }
+            }
+            else
+            {
+                if ( delta_voltage > 0 )
+                {
+                    // decrease vref
+                }
+                else
+                {
+                    // increase vref
+                }
+            }
+        }
+
+        voltage_previous_read = voltage;
+        power_previous_read = power;
+
+
+        if ((++i % 500000) == 0){
+          chprintf((BaseSequentialStream *) &SD2, "- MARK - mppt work\r\n");
         }
     }
 
