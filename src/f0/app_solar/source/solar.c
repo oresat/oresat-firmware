@@ -201,7 +201,8 @@ THD_FUNCTION(solar, arg)
     uint32_t delta_power = 0;
     uint32_t voltage_previous_read = 0;
     uint32_t delta_voltage = 0;
-#define VREF_STEP_IN_MICROVOLTS (100)
+#define VREF_STEP_IN_MICROVOLTS (15)
+    uint32_t k = 0;  // loop iteration
 
     int32_t current;
     uint32_t iadj_uv = 1500000;
@@ -236,11 +237,11 @@ THD_FUNCTION(solar, arg)
         i_in = calc_mppt(voltage, current, power);
         iadj_uv = calc_iadj(i_in);
         dacPutMicrovolts(&DACD1, 0, iadj_uv);
-        if ((++i % 500) == 0){
+        if ((++i % 200) == 0){
           chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n", i, voltage, current, power);
           chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
         }
-#endif // (0)
+#else
 
 // Perturb and Observe algorithm:
 
@@ -287,13 +288,16 @@ THD_FUNCTION(solar, arg)
 
         voltage_previous_read = voltage;
         power_previous_read = power;
-
+        k++;
 
         if ((++i % 200) == 0){
           chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
-          chprintf((BaseSequentialStream *) &SD2, "iadj_uv now = %u, power = %u\r\n", iadj_uv, power);
+          chprintf((BaseSequentialStream *) &SD2, "at loop iteration %u iadj_uv now = %u, power = %u\r\n",
+            k, iadj_uv, power);
         }
-    }
+#endif // (0)
+
+    } // end while thread should run loop
 
     /* Stop drivers */
     dacStop(&DACD1);
