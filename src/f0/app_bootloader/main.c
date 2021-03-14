@@ -23,15 +23,13 @@
 #include "crc32.h"
 #include <string.h>
 #include "flash_f0.h"
+#include "can_bootloader_api.h"
 
 #define SCB_AIRCR_SYSRESETREQ                        (1 << 2)
 
-#define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
 #define BOOTLOADER_VERSION                           0xAB
 #define CAN_DRIVER                                   &CAND1
-#define CAN_ANNOUNCE_MAGIC_NUMBER                    0x04030201
-#define STM32_BOOTLOADER_CAN_ACK                     0x79
-#define STM32_BOOTLOADER_CAN_NACK                    0x1F
+
 #define CAN_RECEIVE_TIMEOUT                          TIME_MS2I(150)
 #define CAN_RECEIVE_TIMEOUT_LONG                     TIME_MS2I(500)
 #define CAN_TRANSMIT_TIMEOUT                         TIME_MS2I(150)
@@ -40,22 +38,6 @@
 
 //Memory address at the 31k mark, not allocated or cleared by CRT of hte OS due to linker script specifying RAM as 31k instead of the full 32k
 volatile uint32_t *bootloader_magic_number_pointer = (uint32_t *) 0x20007C00;
-
-
-typedef enum {
-	ORESAT_BOOTLOADER_CAN_COMMAND_GET = 0x00,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_GET_VERSION = 0x01,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_GET_ID = 0x02,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_SPEED = 0x03,
-	ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY = 0x11,
-	ORESAT_BOOTLOADER_CAN_COMMAND_GO = 0x21,
-	ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY = 0x31,
-	ORESAT_BOOTLOADER_CAN_COMMAND_ERASE = 0x43,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_PROTECT = 0x63,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_UNPROTECT = 0x73,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_READOUT_PROTECT = 0x82,
-	//ORESAT_BOOTLOADER_CAN_COMMAND_READOUT_UNPROTECT = 0x92
-} oresat_bootloader_can_command_t;
 
 uint32_t *cpu_unique_id_low = (uint32_t *) 0x1FFFF7AC;
 uint8_t bootloader_temp_write_buffer[TEMP_WRITE_BUFFER_SIZE]; //Spec says maximum of 2048 bytes needed for buffer
@@ -72,27 +54,6 @@ const char* msg_t_to_str(const msg_t v) {
 
   return ("MSG_???");
 }
-
-const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v) {
-	switch (v) {
-		case ORESAT_BOOTLOADER_CAN_COMMAND_GET:
-			return ("ORESAT_BOOTLOADER_CAN_COMMAND_GET");
-		case ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY:
-			return ("ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY");
-		case ORESAT_BOOTLOADER_CAN_COMMAND_GO:
-			return ("ORESAT_BOOTLOADER_CAN_COMMAND_GO");
-		case ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY:
-			return ("ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY");
-		case ORESAT_BOOTLOADER_CAN_COMMAND_ERASE:
-			return ("ORESAT_BOOTLOADER_CAN_COMMAND_ERASE");
-		case STM32_BOOTLOADER_CAN_ACK:
-			return("ACK");
-		case STM32_BOOTLOADER_CAN_NACK:
-			return("NACK");
-	}
-	return ("???");
-}
-
 
 void soft_reset_cortex_m0(void) {
 	canStop(CAN_DRIVER);
@@ -179,22 +140,35 @@ bool check_firmware_crc_and_branch(const bool print_serial_output) {
 
 msg_t can_bootloader_transmit(CANTxFrame *msg) {
 	const msg_t r = canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, msg, CAN_TRANSMIT_TIMEOUT);
+	if( r == MSG_OK ) {
+		can_api_print_tx_frame(DEBUG_SD, msg, "", " - SUCCESS");
+	} else {
+		can_api_print_tx_frame(DEBUG_SD, msg, "", " - FAIL");
+	}
 	chThdSleepMilliseconds(20);
 	return(r);
 }
 
 msg_t can_bootloader_receive(CANRxFrame *msg) {
-	return(canReceive(CAN_DRIVER, CAN_ANY_MAILBOX, msg, CAN_RECEIVE_TIMEOUT));
+	msg_t r = canReceive(CAN_DRIVER, CAN_ANY_MAILBOX, msg, CAN_RECEIVE_TIMEOUT);
+	if( r == MSG_OK ) {
+		can_api_print_rx_frame(DEBUG_SD, msg, "", "");
+	}
+	return(r);
 }
 
 msg_t can_bootloader_receive2(CANRxFrame *msg, sysinterval_t timeout) {
 	const msg_t r = canReceive(CAN_DRIVER, CAN_ANY_MAILBOX, msg, timeout);
 	if( r == MSG_OK ) {
+#if 1
+		can_api_print_rx_frame(DEBUG_SD, msg, "", "");
+#else
 		chprintf(DEBUG_SD, "CAN RX: SID = 0x%X DLC = %u [", msg->SID, msg->DLC);
 		for(int i = 0; i < msg->DLC && i < 8; i++ ) {
 			chprintf(DEBUG_SD, " 0x%X", msg->data8[i]);
 		}
 		chprintf(DEBUG_SD, " ]\r\n");
+#endif
 	}
 	return(r);
 }
