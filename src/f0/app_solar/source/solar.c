@@ -201,12 +201,18 @@ THD_FUNCTION(solar, arg)
     uint32_t delta_power = 0;
     uint32_t voltage_previous_read = 0;
     uint32_t delta_voltage = 0;
-#define VREF_STEP_IN_MICROVOLTS (15)
+#define VREF_STEP_IN_MICROVOLTS (80)
+#define POWER_READINGS_RING_BUFFER_SIZE (10)
     uint32_t k = 0;  // loop iteration
 
-    int32_t current;
+    uint32_t power_reading_sub_k[POWER_READINGS_RING_BUFFER_SIZE] = {0};
+    uint32_t delta_power_sub_k[POWER_READINGS_RING_BUFFER_SIZE] = {0};
+    memset (power_reading_sub_k, 0, (sizeof(uint32_t) * POWER_READINGS_RING_BUFFER_SIZE));
+    memset (delta_power_sub_k, 0, (sizeof(uint32_t) * POWER_READINGS_RING_BUFFER_SIZE));
+
+//    int32_t current;
     uint32_t iadj_uv = 1500000;
-    uint32_t i_in=0;
+//    uint32_t i_in=0;
     int i = 0;
 
     /* Start up drivers */
@@ -290,7 +296,7 @@ THD_FUNCTION(solar, arg)
         power_previous_read = power;
         k++;
 
-        if ((++i % 200) == 0){
+        if ((++i % 400) == 0){
           chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
           chprintf((BaseSequentialStream *) &SD2, "at loop iteration %u iadj_uv now = %u, power = %u\r\n",
             k, iadj_uv, power);
@@ -308,3 +314,23 @@ THD_FUNCTION(solar, arg)
 
     chThdExit(MSG_OK);
 }
+
+
+
+
+//----------------------------------------------------------------------
+// 
+// 2021-03-14 Sunday
+// Some observations on Perturb And Observe algorithm, first draft:
+//   *  there seems to be jitter in the power readings, though we're only dumping every 200th reading
+//   *  power measured in micro-watts, with resolution or step of 500 microwatts, 1/2 mW
+//   *  power behavior over time with first draft alorithm rises to ~0.3 watts then drops suddenly, does not recover
+//
+// Some thoughts on Perturb And Observer:
+//   *  we can take multiple power readings and store them in a ring buffer before adjusting control voltage 'Vref'
+//   *  we can store Vref and associated highest power reading, to use to recover from drop off
+//   *  we can look for successive rises and falls in power over n readings
+//   *  we can look for average rise and fall of power over n readings
+//   *  we can keep a ring buffer of avarage power delta over m sets of n readings
+// 
+//----------------------------------------------------------------------
