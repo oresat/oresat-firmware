@@ -27,6 +27,9 @@
 #define MAX_PV_CURRENT          500000   /* Maximum current drawn from PV cells */
 #define MIN_PV_POWER            50000    /* Minimum power drawn from PV cells */
 
+// Used in Perturb And Observe (PAO) algorithm:
+#define VREF_STEP_IN_MICROVOLTS (20)
+
 /* Based on INA226 datasheet, page 15, Equation (2)
  * CURR_LSB = Max Current / 2^15
  * So, with CURR_LSB = 20 uA/bit, Max current = 655 mA
@@ -189,31 +192,131 @@ int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
     return i_in;
 }
 
+
+
+uint32_t average_of_n_readings(uint32_t readings[], uint32_t count_of_readings)
+{
+    uint32_t i = 0;
+    uint32_t sum = 0;
+
+    for (i = 0; i < count_of_readings; i++) {
+        sum += readings[i];
+    }
+    return (sum / count_of_readings);
+}
+
+
+
+uint32_t adjust_vref(int32_t delta_power, int32_t delta_voltage, uint32_t iadj_uv)
+{
+
+        if ( delta_power == 0 ) {
+            // make no change
+        }
+        else
+        {
+            if ( delta_power > 0 )
+            {
+                if ( delta_voltage > 0 )
+                {
+//                    chprintf((BaseSequentialStream *) &SD2, "pos delta power, pos delta voltage - iadj ^^^\r\n");
+                    // increase vref
+                    iadj_uv += VREF_STEP_IN_MICROVOLTS;
+                }
+                else
+                {
+//                    chprintf((BaseSequentialStream *) &SD2, "pos delta power, neg delta voltage - iadj vvv,\r\n");
+                    // decrease vref
+                    iadj_uv -= VREF_STEP_IN_MICROVOLTS;
+                }
+            }
+            else
+            {
+                if ( delta_voltage > 0 )
+                {
+//                    chprintf((BaseSequentialStream *) &SD2, "neg delta power, pos delta voltage - iadj vvv\r\n");
+                    // decrease vref
+                    iadj_uv -= VREF_STEP_IN_MICROVOLTS;
+                }
+                else
+                {
+//                    chprintf((BaseSequentialStream *) &SD2, "neg delta power, neg delta voltage - iadj ^^^\r\n");
+                    // increase vref
+                    iadj_uv += VREF_STEP_IN_MICROVOLTS;
+                }
+            }
+        }
+
+// Bound current adjusting voltage to 1.6V per solar board schematic:
+        if ( iadj_uv > 1600000 ) {
+            iadj_uv = 1600000;
+        }
+
+        dacPutMicrovolts(&DACD1, 0, iadj_uv);
+
+    return iadj_uv;
+
+}
+
+
+
 /* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
+// --- LOCAL VAR BEGIN ---
     (void)arg;
     uint32_t voltage, power;
 
 // ORESAT_TASK_002_MPPT_WORK - Ted adding following Perturb And Observe variables:
-    uint32_t power_previous_read = 0;
-    uint32_t delta_power = 0;
-    uint32_t voltage_previous_read = 0;
-    uint32_t delta_voltage = 0;
-#define VREF_STEP_IN_MICROVOLTS (80)
-#define POWER_READINGS_RING_BUFFER_SIZE (10)
-    uint32_t k = 0;  // loop iteration
 
-    uint32_t power_reading_sub_k[POWER_READINGS_RING_BUFFER_SIZE] = {0};
-    uint32_t delta_power_sub_k[POWER_READINGS_RING_BUFFER_SIZE] = {0};
-    memset (power_reading_sub_k, 0, (sizeof(uint32_t) * POWER_READINGS_RING_BUFFER_SIZE));
-    memset (delta_power_sub_k, 0, (sizeof(uint32_t) * POWER_READINGS_RING_BUFFER_SIZE));
+// #define PAO_VERSION_1
+#define PAO_VERSION_2
+
+    uint32_t loop_iteration = 0;  // loop iteration
+    uint32_t k = 0;  // power readings index
+    int32_t delta_power = 0;
+    int32_t delta_voltage = 0;
+
+#ifdef PAO_VERSION_1
+    uint32_t power_previous_read = 0;
+    uint32_t voltage_previous_read = 0;
+#endif
+
+#ifdef PAO_VERSION_2
+#define READINGS_RING_BUFFER_SIZE (10)
+#define AVERAGES_RING_BUFFER_SIZE (10)
+    uint32_t power_reading_sub_[READINGS_RING_BUFFER_SIZE] = {0};
+//    uint32_t delta_power_sub_[READINGS_RING_BUFFER_SIZE] = {0};
+    uint32_t voltage_reading_sub_[READINGS_RING_BUFFER_SIZE] = {0};
+//    uint32_t delta_voltage_sub_[READINGS_RING_BUFFER_SIZE] = {0};
+    uint32_t average_power_sub_[AVERAGES_RING_BUFFER_SIZE] = {0};
+    uint32_t average_voltage_sub_[AVERAGES_RING_BUFFER_SIZE] = {0};
+
+    memset (power_reading_sub_, 0, (sizeof(uint32_t) * READINGS_RING_BUFFER_SIZE));
+//    memset (delta_power_sub_, 0, (sizeof(uint32_t) * READINGS_RING_BUFFER_SIZE));
+    memset (voltage_reading_sub_, 0, (sizeof(uint32_t) * READINGS_RING_BUFFER_SIZE));
+//    memset (delta_voltage_sub_, 0, (sizeof(uint32_t) * READINGS_RING_BUFFER_SIZE));
+    memset (average_power_sub_, 0, (sizeof(uint32_t) * AVERAGES_RING_BUFFER_SIZE));
+    memset (average_voltage_sub_, 0, (sizeof(uint32_t) * AVERAGES_RING_BUFFER_SIZE));
+
+    uint8_t reading_sets_taken = 0;  // allows us to skip a test on first loop iteration
+
+    uint32_t l = 0;  // index to averaged power values
+
+    uint32_t average_power_present = 0;
+    uint32_t average_voltage_present = 0;
+
+    uint32_t highest_power_reading = 0;
+    uint32_t highest_power_control_voltage = 0;
+    uint32_t highest_average_power_reading = 0;
+#endif 
 
 //    int32_t current;
     uint32_t iadj_uv = 1500000;
 //    uint32_t i_in=0;
     int i = 0;
+// --- LOCAL VAR END ---
 
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
@@ -249,11 +352,11 @@ THD_FUNCTION(solar, arg)
         }
 #else
 
-// Perturb and Observe algorithm:
-
         power = ina226ReadPower(&ina226dev);   /* Power in increments of uW */
         voltage = ina226ReadVBUS(&ina226dev);    /* VBUS voltage in uV */
 
+// Perturb and Observe algorithm draft 1:
+#ifdef PAO_VERSION_1
         delta_power = (power - power_previous_read);
         delta_voltage = (voltage - voltage_previous_read);
 
@@ -294,12 +397,87 @@ THD_FUNCTION(solar, arg)
 
         voltage_previous_read = voltage;
         power_previous_read = power;
-        k++;
+        loop_iteration++;
+#endif // end if compiling PAO first draft implementation
 
-        if ((++i % 400) == 0){
-          chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
-          chprintf((BaseSequentialStream *) &SD2, "at loop iteration %u iadj_uv now = %u, power = %u\r\n",
-            k, iadj_uv, power);
+#ifdef PAO_VERSION_2
+// We've just read power and voltage of the solar circuit from the INA226 part,
+// so let's store those readings:
+
+        power_reading_sub_[k] = power;
+        voltage_reading_sub_[k] = voltage;
+        k++;
+        loop_iteration++;
+
+// Track maximum power observed, to use in case power drops a lot suddenly (see note 2 below):
+//        chprintf((BaseSequentialStream *) &SD2, "power = %u uV, highest power = %u uV\r\n",
+//          power, highest_power_reading);
+        if ( power > highest_power_reading ) {
+            highest_power_reading = power;
+            highest_power_control_voltage = iadj_uv;
+        }
+
+        if ( k > READINGS_RING_BUFFER_SIZE )
+        {
+            k = 0;
+// find average power of latest n readings:
+            average_power_present = average_of_n_readings(power_reading_sub_, READINGS_RING_BUFFER_SIZE); 
+            average_power_sub_[l] = average_power_present;
+
+            average_voltage_present = average_of_n_readings(voltage_reading_sub_, READINGS_RING_BUFFER_SIZE);
+            average_voltage_sub_[l] = average_voltage_present;
+
+// (2) We may instead prefer to track highest averaged power from given set of n power readings:
+            if ( average_power_present > highest_average_power_reading ) {
+                highest_average_power_reading = average_power_present;
+                chprintf((BaseSequentialStream *) &SD2, "latest averaged power = %u uV, highest averaged power = %u uV\r\n",
+                  average_power_present, highest_average_power_reading);
+            }
+
+            l++;
+            if ( l > AVERAGES_RING_BUFFER_SIZE ) {
+                l = 0;
+//                chprintf((BaseSequentialStream *) &SD2, "average power ring buffer just wrapped around to zero,\r\n");
+            }
+
+// - STEP - determine change in power
+// If we have only one set of power readings, skip the normal tests comparing past and present
+// average power:
+            if ( reading_sets_taken == 0 ) {
+                reading_sets_taken++;
+            }
+            else {
+                ( l > 0 ) ?
+                ( delta_power = average_power_sub_[l] - average_power_sub_[l - 1] ) :
+                ( delta_power = average_power_sub_[l] - average_power_sub_[AVERAGES_RING_BUFFER_SIZE] );
+
+                ( l > 0 ) ?
+                ( delta_voltage = average_voltage_sub_[l] - average_voltage_sub_[l - 1] ) :
+                ( delta_voltage = average_voltage_sub_[l] - average_voltage_sub_[AVERAGES_RING_BUFFER_SIZE] );
+
+// find count of positive power deltas, count of negative power deltas:
+// --- NOT YET IMPLEMENTED - TMH ---
+
+// - STEP - adjust controlling voltage to switching supply based solar array load
+//                chprintf((BaseSequentialStream *) &SD2, "delta power = %d, delta voltage - %d\r\n", delta_power, delta_voltage);
+                iadj_uv = adjust_vref(delta_power, delta_voltage, iadj_uv);
+
+//                power = average_power_sub_[l];
+            }
+        }
+#endif // end if compiling PAO second draft implementation
+
+
+        if ((++i % 400) == 0) {
+            chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
+#ifdef PAO_VERSION_1
+            chprintf((BaseSequentialStream *) &SD2, "at loop iteration %u iadj_uv now = %u, power = %u\r\n",
+              loop_iteration, iadj_uv, power);
+#endif
+#ifdef PAO_VERSION_2
+            chprintf((BaseSequentialStream *) &SD2, "loop %u:  iadj_uv = %u, power = %u, high power = %u, high averaged power = %u\r\n",
+              loop_iteration, iadj_uv, average_power_present, highest_power_reading, highest_average_power_reading);
+#endif
         }
 #endif // (0)
 
