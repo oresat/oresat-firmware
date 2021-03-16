@@ -51,7 +51,7 @@
  * @brief   Enables the CAN subsystem.
  */
 #if !defined(HAL_USE_CAN) || defined(__DOXYGEN__)
-#define HAL_USE_CAN                         FALSE
+#define HAL_USE_CAN                         TRUE
 #endif
 
 /**
@@ -401,7 +401,7 @@
  *          default configuration.
  */
 #if !defined(SERIAL_DEFAULT_BITRATE) || defined(__DOXYGEN__)
-#define SERIAL_DEFAULT_BITRATE              38400
+#define SERIAL_DEFAULT_BITRATE              115200
 #endif
 
 /**

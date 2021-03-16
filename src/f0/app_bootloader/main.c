@@ -466,12 +466,14 @@ void can_bootloader_announce_presence_on_bus(void) {
 void can_bootloader_run(const bool is_firmware_a_valid) {
 	CANConfig cancfg;
 	memset(&cancfg, 0, sizeof(cancfg));
+	// Tool for calculating STM32 bit timing: http://www.bittiming.can-wiki.info/
 	cancfg.btr = CAN_BTR(1000);
     cancfg.mcr = (
             /* MCR (Master Control Register) */
             CAN_MCR_ABOM      |     //Automatic Bus-Off Management
             CAN_MCR_AWUM      |     //Automatic Wakeup Mode
-            CAN_MCR_TXFP      );    //Transmit FIFO Priority
+            CAN_MCR_TXFP      |     //Transmit FIFO Priority
+            0 /*CAN_MCR_NART*/   );       // No Automatic Retransmission
 
 
     chprintf(DEBUG_SD, "Initializing CAN peripheral with MCR = 0x%X\r\n", cancfg.mcr);
@@ -488,6 +490,8 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
 	bool got_stay_bootloader_frame = false;
 
+	palSetLineMode(LINE_LED, PAL_MODE_OUTPUT_PUSHPULL);
+
 	const uint32_t ms_threshold = 3000;
 	while ( true ) {
 		if( is_firmware_a_valid ) {
@@ -496,6 +500,10 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 				break;
 			}
 		}
+
+
+
+	    palToggleLine(LINE_LED);
 
 		const msg_t r = can_bootloader_receive2(&rxmsg, CAN_RECEIVE_TIMEOUT_LONG);
 		if( r == MSG_OK ) {
@@ -512,6 +520,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 		} else {
 			if( r == MSG_TIMEOUT ) {
 				chprintf(DEBUG_SD, ".");
+				can_bootloader_announce_presence_on_bus();
 			} else {
 				chprintf(DEBUG_SD, "Error receiving CAN frame: %s\r\n", msg_t_to_str(r));
 			}

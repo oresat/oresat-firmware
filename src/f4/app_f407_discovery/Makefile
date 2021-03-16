@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_blinky
+PROJECT   = app_f407_discovery
 
 # Target settings.
 MCU       = cortex-m4
@@ -136,6 +136,7 @@ LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
+       ../../../common/can_bootloader_api.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global

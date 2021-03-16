@@ -1,9 +1,12 @@
 #ifndef COMMON_INCLUDE_CAN_BOOTLOADER_API_H_
 #define COMMON_INCLUDE_CAN_BOOTLOADER_API_H_
+#include "ch.h"
+#include "hal.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 
 #define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
@@ -31,6 +34,7 @@ typedef enum {
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v);
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg);
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
+msg_t can_api_receive(CANDriver *canp, CANRxFrame *msg, const uint32_t timeout_ms, BaseSequentialStream *chp);
 
 #ifdef __cplusplus
 }
