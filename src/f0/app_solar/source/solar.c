@@ -29,6 +29,8 @@
 
 // Used in Perturb And Observe (PAO) algorithm:
 #define VREF_STEP_IN_MICROVOLTS (20)
+#define DIAG_REPORT_EVERY_N_LOOP_ITERATIONS (800)
+
 
 /* Based on INA226 datasheet, page 15, Equation (2)
  * CURR_LSB = Max Current / 2^15
@@ -303,6 +305,7 @@ THD_FUNCTION(solar, arg)
     uint8_t reading_sets_taken = 0;  // allows us to skip a test on first loop iteration
 
     uint32_t l = 0;  // index to averaged power values
+    uint32_t running_count_average_powers_stored = 0;
 
     uint32_t average_power_present = 0;
     uint32_t average_voltage_present = 0;
@@ -435,6 +438,7 @@ THD_FUNCTION(solar, arg)
             }
 
             l++;
+            running_count_average_powers_stored++;
             if ( l > AVERAGES_RING_BUFFER_SIZE ) {
                 l = 0;
 //                chprintf((BaseSequentialStream *) &SD2, "average power ring buffer just wrapped around to zero,\r\n");
@@ -468,15 +472,18 @@ THD_FUNCTION(solar, arg)
 #endif // end if compiling PAO second draft implementation
 
 
-        if ((++i % 400) == 0) {
+        if ((++i % DIAG_REPORT_EVERY_N_LOOP_ITERATIONS) == 0) {
             chprintf((BaseSequentialStream *) &SD2, "- MARK -\r\n");
 #ifdef PAO_VERSION_1
             chprintf((BaseSequentialStream *) &SD2, "at loop iteration %u iadj_uv now = %u, power = %u\r\n",
               loop_iteration, iadj_uv, power);
 #endif
 #ifdef PAO_VERSION_2
-            chprintf((BaseSequentialStream *) &SD2, "loop %u:  iadj_uv = %u, power = %u, high power = %u, high averaged power = %u\r\n",
-              loop_iteration, iadj_uv, average_power_present, highest_power_reading, highest_average_power_reading);
+//            chprintf((BaseSequentialStream *) &SD2, "loop %u:  iadj_uv = %u, power = %u, high power = %u, high averaged power = %u\r\n",
+//              loop_iteration, iadj_uv, average_power_present, highest_power_reading, highest_average_power_reading);
+            chprintf((BaseSequentialStream *) &SD2, "loop %u:  ave powers stored = %u, iadj_uv = %u, power = %u, high power = %u, high averaged power = %u\r\n",
+              loop_iteration, running_count_average_powers_stored,
+              iadj_uv, average_power_present, highest_power_reading, highest_average_power_reading);
 #endif
         }
 #endif // (0)
