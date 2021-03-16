@@ -19,7 +19,6 @@
 #include "rt_test_root.h"
 #include "oslib_test_root.h"
 #include "chprintf.h"
-#include "can_bootloader_api.h"
 #include "string.h"
 #include "can_bootloader_api.h"
 
@@ -105,6 +104,8 @@ int main(void) {
   chprintf(DEBUG_SD, "Done starting CAN peripheral\r\n");
 
 
+
+  can_bootloader_test(CAN_DRIVER, DEBUG_SD);
   /*
    * Creates the example thread.
    */
@@ -122,9 +123,9 @@ int main(void) {
 	  tx_msg.DLC = 8;
 	  memset(&tx_msg.data8, 0x55, sizeof(tx_msg.data8));
 
-	  can_api_print_tx_frame(DEBUG_SD, &tx_msg, "", "");
+	  //can_api_print_tx_frame(DEBUG_SD, &tx_msg, "", "");
 
-	  canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, &tx_msg, TIME_MS2I(150));
+	  //canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, &tx_msg, TIME_MS2I(150));
 #endif
 
 #if 1

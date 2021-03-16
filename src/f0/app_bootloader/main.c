@@ -490,7 +490,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
 	bool got_stay_bootloader_frame = false;
 
-	palSetLineMode(LINE_LED, PAL_MODE_OUTPUT_PUSHPULL);
+	//palSetLineMode(LINE_LED, PAL_MODE_OUTPUT_PUSHPULL);
 
 	const uint32_t ms_threshold = 3000;
 	while ( true ) {
@@ -501,9 +501,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 			}
 		}
 
-
-
-	    palToggleLine(LINE_LED);
+	    //palToggleLine(LINE_LED);
 
 		const msg_t r = can_bootloader_receive2(&rxmsg, CAN_RECEIVE_TIMEOUT_LONG);
 		if( r == MSG_OK ) {
@@ -511,6 +509,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 				if( rxmsg.SID == BOOTLOADER_EXPECTED_FIRST_FRAME_ID && rxmsg.DLC == 8 ) {
 					if( rxmsg.data32[0] == *cpu_unique_id_low && rxmsg.data32[1] == CAN_ANNOUNCE_MAGIC_NUMBER ) {
 						//Host will TX a reply frame with the magic number and CPU unique ID values swapped to indicaet this node should stay in bootloader mode
+						chprintf(DEBUG_SD, "RXed frame to stay in bootloader mode...\r\n");
 						got_stay_bootloader_frame = true;
 					}
 				}
@@ -520,7 +519,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 		} else {
 			if( r == MSG_TIMEOUT ) {
 				chprintf(DEBUG_SD, ".");
-				can_bootloader_announce_presence_on_bus();
+				//can_bootloader_announce_presence_on_bus();
 			} else {
 				chprintf(DEBUG_SD, "Error receiving CAN frame: %s\r\n", msg_t_to_str(r));
 			}
