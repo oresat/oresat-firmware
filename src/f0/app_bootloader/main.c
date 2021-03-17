@@ -24,6 +24,7 @@
 #include <string.h>
 #include "flash_f0.h"
 #include "can_bootloader_api.h"
+#include "oresat_misc.h"
 
 #define SCB_AIRCR_SYSRESETREQ                        (1 << 2)
 
@@ -42,18 +43,7 @@ volatile uint32_t *bootloader_magic_number_pointer = (uint32_t *) 0x20007C00;
 uint32_t *cpu_unique_id_low = (uint32_t *) 0x1FFFF7AC;
 uint8_t bootloader_temp_write_buffer[TEMP_WRITE_BUFFER_SIZE]; //Spec says maximum of 2048 bytes needed for buffer
 
-const char* msg_t_to_str(const msg_t v) {
-  switch (v) {
-    case MSG_OK:
-      return ("MSG_OK");
-    case MSG_TIMEOUT:
-      return ("MSG_TIMEOUT");
-    case MSG_RESET:
-      return ("MSG_RESET");
-  }
-
-  return ("MSG_???");
-}
+#define DEBUG_SD    (BaseSequentialStream *)          &SD2
 
 void soft_reset_cortex_m0(void) {
 	canStop(CAN_DRIVER);

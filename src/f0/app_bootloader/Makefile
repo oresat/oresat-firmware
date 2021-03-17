@@ -137,6 +137,7 @@ LDSCRIPT= ../../../ld/STM32F091xC-bootloader.ld
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
        ../../../common/can_bootloader_api.c \
+       ../../../common/oresat_misc.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global

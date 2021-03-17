@@ -21,6 +21,7 @@
 #include "chprintf.h"
 #include "string.h"
 #include "can_bootloader_api.h"
+#include "oresat_f0.h"
 
 #define DEBUG_SD    (BaseSequentialStream *) &SD2
 
@@ -43,6 +44,19 @@ static THD_FUNCTION(Thread1, arg) {
 #define   CAN_DRIVER  &CAND1
 
 #define   CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(11)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
+
+
+uint32_t test_read_function(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes) {
+	chprintf(DEBUG_SD, "Calling test_read_function(%u, x, %u)\r\n", offset, number_of_bytes);
+
+	uint32_t dest_index = 0;
+	for(; dest_index < number_of_bytes; dest_index++ ) {
+		dest_buffer[dest_index] = (offset + dest_index) % 0xFF;
+	}
+
+	return(dest_index);
+}
+
 
 /*
  * Application entry point.
@@ -105,18 +119,23 @@ int main(void) {
 
 
 
-  can_bootloader_test(CAN_DRIVER, DEBUG_SD);
+  //can_bootloader_test(CAN_DRIVER, DEBUG_SD);
   /*
    * Creates the example thread.
    */
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+
+
+  firmware_read_function_ptr_t read_function_pointer = &test_read_function;
+  bool rr = oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, 1500, read_function_pointer, DEBUG_SD);
+
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
    * sleeping in a loop and check the button state.
    */
   while (true) {
-#if 1
+#if 0
 	  CANTxFrame tx_msg;
 	  memset(&tx_msg, 0, sizeof(tx_msg));
 	  tx_msg.SID = 0x55;
@@ -133,7 +152,7 @@ int main(void) {
 	  memset(&rx_msg, 0, sizeof(rx_msg));
 	  chprintf(DEBUG_SD, "CAN State: %u\r\n", CAND2.state);
 	  chprintf(DEBUG_SD, "Attempting CAN RX....\r\n");
-	  msg_t r = can_api_receive(CAN_DRIVER, &rx_msg, 1000, DEBUG_SD);
+	  can_api_receive(CAN_DRIVER, &rx_msg, 1000, DEBUG_SD);
 #endif
 
 

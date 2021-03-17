@@ -3,6 +3,7 @@
 #include "chprintf.h"
 #include "can_bootloader_api.h"
 #include "string.h"
+#include "oresat_f0.h"
 
 
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg) {
@@ -51,6 +52,15 @@ msg_t can_api_receive(CANDriver *canp, CANRxFrame *msg, const uint32_t timeout_m
 	return(r);
 }
 
+void can_api_purge_rx_buffer(CANDriver *canp, BaseSequentialStream *chp) {
+	CANRxFrame msg;
+	for(int i = 0; i < 10; i++ ) {
+		if( can_api_receive(canp, &msg, 2, chp) != MSG_OK ) {
+			break;
+		}
+	}
+
+}
 
 msg_t can_api_transmit(CANDriver *canp, CANTxFrame *msg, const uint32_t timeout_ms, BaseSequentialStream *chp) {
 	const msg_t r = canTransmit(canp, CAN_ANY_MAILBOX, msg, TIME_MS2I(timeout_ms));
@@ -122,6 +132,8 @@ bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, co
 		return(false);
 	}
 
+	can_api_purge_rx_buffer(canp, chp);
+
 	msg_t r = 0;
 
 	CANTxFrame tx_msg;
@@ -159,8 +171,6 @@ bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, co
 				dest_buffer[dest_buffer_index] = rx_msg.data8[j];
 				dest_buffer_index++;
 			}
-		} else {
-
 		}
 	}
 
@@ -325,6 +335,191 @@ bool can_bootloader_test(CANDriver *canp, BaseSequentialStream *chp) {
 }
 
 
+
+
+/*
+bool oresat_firmware_update_m0_write_sector(CANDriver *canp, const uint32_t base_address, const uint8_t *src_data, const uint32_t num_bytes_to_write, BaseSequentialStream *chp) {
+
+	const uint32_t page_number = (base_address - 0x0800000) / 2048;
+
+	if (!can_bootloader_erase_page(canp, page_number, chp)) {
+		return(false);
+	}
+
+
+
+	uint32_t temp_idx = 0;
+
+	//write the data
+	while( temp_idx < num_bytes_to_write) {
+		uint32_t num_bytes_for_this_write = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+		if( (temp_idx + num_bytes_for_this_write) > num_bytes_to_write ) {
+			num_bytes_for_this_write = num_bytes_to_write - temp_idx;
+		}
+
+		if( ! can_bootloader_write_memory(canp, base_address + temp_idx, &src_data[temp_idx], num_bytes_for_this_write, chp) ) {
+			return(false);
+		}
+
+		temp_idx += M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+	}
+
+
+	//verify the data
+	temp_idx = 0;
+	while( temp_idx < num_bytes_to_write) {
+		uint32_t num_bytes_for_this_read = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+		if( (temp_idx + num_bytes_for_this_read) > num_bytes_to_write ) {
+			num_bytes_for_this_read = num_bytes_to_write - temp_idx;
+		}
+
+		//bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, BaseSequentialStream *chp) {
+
+		if( ! can_bootloader_read_data(canp, base_address + temp_idx, num_bytes_for_this_read, m0_firmware_temp_buffer, sizeof(m0_firmware_temp_buffer), chp) ) {
+			return(false);
+		}
+
+		for(uint32_t read_idx = 0; read_idx < num_bytes_for_this_read; num_bytes_for_this_read++ ) {
+			if( m0_firmware_temp_buffer[read_idx] != src_data[temp_idx + read_idx] ) {
+				chprintf(chp, "Verification failed at byte offset %u, 0x%X != 0x%X\r\n", read_idx, m0_firmware_temp_buffer[read_idx], src_data[temp_idx + read_idx]);
+				return(false);
+			}
+		}
+
+		temp_idx += num_bytes_for_this_read;
+	}
+
+
+	return(true);
+}
+*/
+
+
+bool can_bootloader_erase_page_reliable(CANDriver *canp, const uint32_t page_number, BaseSequentialStream *chp) {
+	return(can_bootloader_erase_page(canp, page_number, chp));
+}
+
+
+bool can_bootloader_write_memory_reliable(CANDriver *canp, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, BaseSequentialStream *chp) {
+	return(can_bootloader_write_memory(canp, memory_address, src_buffer, num_bytes, chp));
+}
+
+bool can_bootloader_read_data_reliable(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, BaseSequentialStream *chp) {
+	return(can_bootloader_read_data(canp, memory_address, num_bytes_to_read, dest_buffer, dest_buffer_length, chp));
+}
+
+
+bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, BaseSequentialStream *chp)
+{
+	chprintf(chp, "Verifying %u bytes at address 0x%X\r\n", num_bytes, base_memory_address);
+
+	uint8_t temp_buff[16];
+
+	uint32_t current_offset = 0;
+	//uint32_t current_offset2 = 0;
+	while(current_offset < num_bytes) {
+		if( ! can_bootloader_read_data_reliable(canp, base_memory_address + current_offset, sizeof(temp_buff), temp_buff, sizeof(temp_buff), chp)) {
+			return(false);
+		}
+#if 0
+		for(uint32_t i = 0; i < sizeof(temp_buff) && current_offset2 < num_bytes; i++ ) {
+			chprintf(chp, "0x%X    0x%X\r\n", src_buffer[current_offset2], temp_buff[i]);
+			current_offset2++;
+		}
+#endif
+
+		for(uint32_t i = 0; i < sizeof(temp_buff) && current_offset < num_bytes; i++ ) {
+			if( src_buffer[current_offset] != temp_buff[i] ) {
+				chprintf(chp, "ERROR: Failed verification! 0x%X != 0x%X, %u, %u\r\n", src_buffer[current_offset], temp_buff[i], current_offset, i);
+				return(false);
+			}
+
+			current_offset++;
+		}
+	}
+
+	return(true);
+}
+
+
+
+#define M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE     64
+uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
+
+
+bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, const uint32_t low_cpu_id, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer, BaseSequentialStream *chp) {
+	if( ! can_bootloader_initiate(canp, chp) ) {
+		chprintf(chp, "Failed to put node into bootloader mode...\r\n");
+		return(false);
+	}
+
+
+	uint32_t temp_address = base_address;
+	while(temp_address <= (base_address + total_firmware_length_bytes) ) {
+		const uint32_t page_number = (temp_address - ORESAT_F0_FLASH_START_ADDRESS) / ORESAT_F0_FLASH_PAGE_SIZE;
+
+		if( ! can_bootloader_erase_page_reliable(canp, page_number, chp) ) {
+			return(false);
+		}
+
+		temp_address += ORESAT_F0_FLASH_PAGE_SIZE;
+	}
+
+
+	uint32_t current_file_offset = 0;
+
+	while (current_file_offset < total_firmware_length_bytes) {
+		uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+		if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
+			bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
+			if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
+				bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+			}
+		}
+
+		if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+			return(false);
+		}
+
+		if( ! can_bootloader_write_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, chp) ) {
+			return(false);
+		}
+
+		current_file_offset += bytes_to_write_to_flash;
+	}
+
+
+
+
+	current_file_offset = 0;
+
+	while (current_file_offset < total_firmware_length_bytes) {
+		uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+		if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
+			bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
+			if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
+				bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+			}
+		}
+
+		if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+			return(false);
+		}
+
+		if( ! can_bootloader_verify_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, chp) ) {
+			return(false);
+		}
+
+		current_file_offset += bytes_to_write_to_flash;
+	}
+
+
+
+
+	chprintf(chp, "\r\nSuccessfully wrote and verified firmware image to remote MCU device...\r\n\r\n");
+
+	return(true);
+}
 
 
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v) {

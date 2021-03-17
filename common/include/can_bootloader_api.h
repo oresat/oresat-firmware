@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-
+#define ORESAT_F0_FLASH_PAGE_SIZE                     2048
 
 #define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
 #define CAN_ANNOUNCE_MAGIC_NUMBER                    0x04030201
@@ -31,6 +31,10 @@ typedef enum {
 } oresat_bootloader_can_command_t;
 
 
+typedef uint32_t (*firmware_read_function_ptr_t)(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes);
+
+
+bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, const uint32_t low_cpu_id, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer, BaseSequentialStream *chp);
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v);
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg);
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
