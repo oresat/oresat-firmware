@@ -33,13 +33,34 @@ typedef enum {
 
 typedef uint32_t (*firmware_read_function_ptr_t)(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes);
 
+typedef struct {
+	CANDriver *canp;
+	BaseSequentialStream *chp;//debug stream
+	uint32_t low_cpu_id;
 
-bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, const uint32_t low_cpu_id, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer, BaseSequentialStream *chp);
+	uint32_t read_fail_count;
+	uint32_t write_fail_count;
+	uint32_t erase_fail_count;
+	uint32_t verify_fail_count;
+	uint32_t ack_count;
+	uint32_t nack_count;
+	uint32_t unknown_count;
+	uint32_t can_tx_fail_count;
+	uint32_t initiate_connection_count;
+	uint32_t connection_verify_fail;
+} can_bootloader_config_t;
+
+
+void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config);
+bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer);
+
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v);
+
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg);
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
-msg_t can_api_receive(CANDriver *canp, CANRxFrame *msg, const uint32_t timeout_ms, BaseSequentialStream *chp);
-bool can_bootloader_test(CANDriver *canp, const uint32_t low_cpu_id, BaseSequentialStream *chp);
+msg_t can_api_receive(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms);
+
+bool can_bootloader_test(can_bootloader_config_t *can_bl_config);
 
 #ifdef __cplusplus
 }

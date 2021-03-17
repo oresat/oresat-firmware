@@ -140,7 +140,6 @@ int main(void) {
   chprintf(DEBUG_SD, "Done starting CAN peripheral\r\n");
 
 
-
   //can_bootloader_test(CAN_DRIVER, DEBUG_SD);
   /*
    * Creates the example thread.
@@ -148,11 +147,19 @@ int main(void) {
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
 
-  firmware_read_function_ptr_t read_function_pointer = &test_read_function;
-  //oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, 172, read_function_pointer, DEBUG_SD);
+  can_bootloader_config_t can_bl_config;
+  memset(&can_bl_config, 0, sizeof(can_bl_config));
+  can_bl_config.canp = CAN_DRIVER;
+  can_bl_config.chp = DEBUG_SD;
+  can_bl_config.low_cpu_id = 0x01020304;
 
-  oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, app_protocard2_crc32_bin_len, firmware_blob_read_function, DEBUG_SD);
 
+  //firmware_read_function_ptr_t read_function_pointer = &test_read_function;
+  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 172, test_read_function);
+
+  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+
+  print_can_bootloader_config_t(&can_bl_config);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
@@ -176,7 +183,7 @@ int main(void) {
 	  memset(&rx_msg, 0, sizeof(rx_msg));
 	  chprintf(DEBUG_SD, "CAN State: %u\r\n", CAND2.state);
 	  chprintf(DEBUG_SD, "Attempting CAN RX....\r\n");
-	  can_api_receive(CAN_DRIVER, &rx_msg, 1000, DEBUG_SD);
+	  can_api_receive(&can_bl_config, &rx_msg, 1000);
 #endif
 
 
