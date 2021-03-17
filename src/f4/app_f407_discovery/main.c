@@ -23,6 +23,8 @@
 #include "can_bootloader_api.h"
 #include "oresat_f0.h"
 
+#include "firmware_blob.h"
+
 #define DEBUG_SD    (BaseSequentialStream *) &SD2
 
 /*
@@ -45,6 +47,26 @@ static THD_FUNCTION(Thread1, arg) {
 
 #define   CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(11)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
 
+
+
+// xxd -i app_protocard2.crc32.bin > ../../../f4/app_f407_discovery/firmware_blob.h
+/*
+ * This is an example of reading source firmware image data from an in-memory buffer, but this function could be implemented
+ * to open a file from a file system, seek to an offset in the file, read some data into dest_buffer and close the file.
+ */
+uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes) {
+	uint32_t dest_index = 0;
+
+	for(; dest_index < number_of_bytes; dest_index++ ) {
+		if( (offset + dest_index) < app_protocard2_crc32_bin_len ) {
+			dest_buffer[dest_index] = app_protocard2_crc32_bin[offset + dest_index];
+		} else {
+			break;
+		}
+	}
+
+	return(dest_index);
+}
 
 uint32_t test_read_function(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes) {
 	chprintf(DEBUG_SD, "Calling test_read_function(%u, x, %u)\r\n", offset, number_of_bytes);
@@ -127,7 +149,9 @@ int main(void) {
 
 
   firmware_read_function_ptr_t read_function_pointer = &test_read_function;
-  bool rr = oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, 1500, read_function_pointer, DEBUG_SD);
+  //oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, 172, read_function_pointer, DEBUG_SD);
+
+  oresat_firmware_update_m0(CAN_DRIVER, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 0x01020304, app_protocard2_crc32_bin_len, firmware_blob_read_function, DEBUG_SD);
 
 
   /*

@@ -39,7 +39,7 @@ const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_c
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg);
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
 msg_t can_api_receive(CANDriver *canp, CANRxFrame *msg, const uint32_t timeout_ms, BaseSequentialStream *chp);
-bool can_bootloader_test(CANDriver *canp, BaseSequentialStream *chp);
+bool can_bootloader_test(CANDriver *canp, const uint32_t low_cpu_id, BaseSequentialStream *chp);
 
 #ifdef __cplusplus
 }

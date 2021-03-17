@@ -6,6 +6,9 @@
 #include "oresat_f0.h"
 
 
+#define DEFAULT_RETRY_LIMIT     3
+
+
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg) {
 	chprintf(chp, "RX Frame: %s ", pre_msg);
 
@@ -54,12 +57,11 @@ msg_t can_api_receive(CANDriver *canp, CANRxFrame *msg, const uint32_t timeout_m
 
 void can_api_purge_rx_buffer(CANDriver *canp, BaseSequentialStream *chp) {
 	CANRxFrame msg;
-	for(int i = 0; i < 10; i++ ) {
-		if( can_api_receive(canp, &msg, 2, chp) != MSG_OK ) {
-			break;
+	for(int i = 0; i < 3; i++ ) {
+		if( can_api_receive(canp, &msg, 5, chp) != MSG_OK ) {
+			//break;
 		}
 	}
-
 }
 
 msg_t can_api_transmit(CANDriver *canp, CANTxFrame *msg, const uint32_t timeout_ms, BaseSequentialStream *chp) {
@@ -73,10 +75,10 @@ msg_t can_api_transmit(CANDriver *canp, CANTxFrame *msg, const uint32_t timeout_
 }
 
 
-bool can_bootloader_initiate(CANDriver *canp, BaseSequentialStream *chp) {
+bool can_bootloader_initiate(CANDriver *canp, const uint32_t timeout_ms, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
 	CANRxFrame msg;
 	memset(&msg, 0, sizeof(msg));
-	msg_t r = can_api_receive(canp, &msg, 3000, chp);
+	msg_t r = can_api_receive(canp, &msg, timeout_ms, chp);
 	if( r == MSG_OK ) {
 		if( msg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && msg.DLC == 8 ) {
 			if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
@@ -132,7 +134,7 @@ bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, co
 		return(false);
 	}
 
-	can_api_purge_rx_buffer(canp, chp);
+	//can_api_purge_rx_buffer(canp, chp);
 
 	msg_t r = 0;
 
@@ -296,8 +298,8 @@ bool can_bootloader_go(CANDriver *canp, const uint32_t memory_address, BaseSeque
 }
 
 
-bool can_bootloader_test(CANDriver *canp, BaseSequentialStream *chp) {
-	if( ! can_bootloader_initiate(canp, chp) ) {
+bool can_bootloader_test(CANDriver *canp, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
+	if( ! can_bootloader_initiate(canp, 4000, low_cpu_id, chp) ) {
 		chprintf(chp, "Failed to put node into bootloader mode...\r\n");
 		return(false);
 	}
@@ -334,82 +336,85 @@ bool can_bootloader_test(CANDriver *canp, BaseSequentialStream *chp) {
 	return(true);
 }
 
+bool can_bootloader_check_communication(CANDriver *canp, BaseSequentialStream *chp) {
+	can_api_purge_rx_buffer(canp, chp);
 
+	uint8_t trash_buffer[8];
 
-
-/*
-bool oresat_firmware_update_m0_write_sector(CANDriver *canp, const uint32_t base_address, const uint8_t *src_data, const uint32_t num_bytes_to_write, BaseSequentialStream *chp) {
-
-	const uint32_t page_number = (base_address - 0x0800000) / 2048;
-
-	if (!can_bootloader_erase_page(canp, page_number, chp)) {
+	if( ! can_bootloader_read_data(canp, ORESAT_F0_FIRMWARE_CRC_ADDRESS, sizeof(trash_buffer), trash_buffer, sizeof(trash_buffer), chp)) {
 		return(false);
 	}
 
-
-
-	uint32_t temp_idx = 0;
-
-	//write the data
-	while( temp_idx < num_bytes_to_write) {
-		uint32_t num_bytes_for_this_write = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-		if( (temp_idx + num_bytes_for_this_write) > num_bytes_to_write ) {
-			num_bytes_for_this_write = num_bytes_to_write - temp_idx;
-		}
-
-		if( ! can_bootloader_write_memory(canp, base_address + temp_idx, &src_data[temp_idx], num_bytes_for_this_write, chp) ) {
-			return(false);
-		}
-
-		temp_idx += M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-	}
-
-
-	//verify the data
-	temp_idx = 0;
-	while( temp_idx < num_bytes_to_write) {
-		uint32_t num_bytes_for_this_read = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-		if( (temp_idx + num_bytes_for_this_read) > num_bytes_to_write ) {
-			num_bytes_for_this_read = num_bytes_to_write - temp_idx;
-		}
-
-		//bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, BaseSequentialStream *chp) {
-
-		if( ! can_bootloader_read_data(canp, base_address + temp_idx, num_bytes_for_this_read, m0_firmware_temp_buffer, sizeof(m0_firmware_temp_buffer), chp) ) {
-			return(false);
-		}
-
-		for(uint32_t read_idx = 0; read_idx < num_bytes_for_this_read; num_bytes_for_this_read++ ) {
-			if( m0_firmware_temp_buffer[read_idx] != src_data[temp_idx + read_idx] ) {
-				chprintf(chp, "Verification failed at byte offset %u, 0x%X != 0x%X\r\n", read_idx, m0_firmware_temp_buffer[read_idx], src_data[temp_idx + read_idx]);
-				return(false);
-			}
-		}
-
-		temp_idx += num_bytes_for_this_read;
-	}
-
-
 	return(true);
 }
-*/
 
+/**
+ * Verify and re-initiate the connection to the M0 cpu if it powered off mid process
+ */
+bool can_bootloader_verify_retry_connection(CANDriver *canp, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
+	for(int i = 0; i < 5; i++ ) {
+		if( can_bootloader_check_communication(canp, chp) ) {
+			return(true);
+		} else {
+			if( can_bootloader_initiate(canp, 15000, low_cpu_id, chp) ) {
+				return(true);
+			}
+		}
+	}
 
-bool can_bootloader_erase_page_reliable(CANDriver *canp, const uint32_t page_number, BaseSequentialStream *chp) {
-	return(can_bootloader_erase_page(canp, page_number, chp));
+	return(false);
+}
+
+/**
+ * Wrapped to deal with solar cards that power on and off at variable times.
+ */
+bool can_bootloader_erase_page_reliable(CANDriver *canp, const uint32_t page_number, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
+	for (int i = 0; i < DEFAULT_RETRY_LIMIT; i++) {
+		if(can_bootloader_erase_page(canp, page_number, chp)) {
+			return (true);
+		}
+		if( ! can_bootloader_verify_retry_connection(canp, low_cpu_id, chp) ) {
+			return(false);
+		}
+	}
+
+	return (false);
+}
+
+/**
+ * Wrapped to deal with solar cards that power on and off at variable times.
+ */
+bool can_bootloader_write_memory_reliable(CANDriver *canp, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
+	for (int i = 0; i < DEFAULT_RETRY_LIMIT; i++) {
+		if (can_bootloader_write_memory(canp, memory_address, src_buffer, num_bytes, chp)) {
+			return (true);
+		}
+		if( ! can_bootloader_verify_retry_connection(canp, low_cpu_id, chp) ) {
+			return(false);
+		}
+	}
+
+	return (false);
+}
+
+/**
+ * Wrapped to deal with solar cards that power on and off at variable times.
+ */
+bool can_bootloader_read_data_reliable(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, const uint32_t low_cpu_id, BaseSequentialStream *chp) {
+	for (int i = 0; i < DEFAULT_RETRY_LIMIT; i++) {
+		if(can_bootloader_read_data(canp, memory_address, num_bytes_to_read, dest_buffer, dest_buffer_length, chp)) {
+			return(true);
+		}
+		if( ! can_bootloader_verify_retry_connection(canp, low_cpu_id, chp) ) {
+			return(false);
+		}
+	}
+
+	return(false);
 }
 
 
-bool can_bootloader_write_memory_reliable(CANDriver *canp, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, BaseSequentialStream *chp) {
-	return(can_bootloader_write_memory(canp, memory_address, src_buffer, num_bytes, chp));
-}
-
-bool can_bootloader_read_data_reliable(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, BaseSequentialStream *chp) {
-	return(can_bootloader_read_data(canp, memory_address, num_bytes_to_read, dest_buffer, dest_buffer_length, chp));
-}
-
-
-bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, BaseSequentialStream *chp)
+bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_memory_address, const uint8_t *src_buffer, const uint32_t num_bytes, const uint32_t low_cpu_id, BaseSequentialStream *chp)
 {
 	chprintf(chp, "Verifying %u bytes at address 0x%X\r\n", num_bytes, base_memory_address);
 
@@ -418,7 +423,7 @@ bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_
 	uint32_t current_offset = 0;
 	//uint32_t current_offset2 = 0;
 	while(current_offset < num_bytes) {
-		if( ! can_bootloader_read_data_reliable(canp, base_memory_address + current_offset, sizeof(temp_buff), temp_buff, sizeof(temp_buff), chp)) {
+		if( ! can_bootloader_read_data_reliable(canp, base_memory_address + current_offset, sizeof(temp_buff), temp_buff, sizeof(temp_buff), low_cpu_id, chp)) {
 			return(false);
 		}
 #if 0
@@ -428,7 +433,7 @@ bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_
 		}
 #endif
 
-		for(uint32_t i = 0; i < sizeof(temp_buff) && current_offset < num_bytes; i++ ) {
+		for( uint32_t i = 0; i < sizeof(temp_buff) && current_offset < num_bytes; i++ ) {
 			if( src_buffer[current_offset] != temp_buff[i] ) {
 				chprintf(chp, "ERROR: Failed verification! 0x%X != 0x%X, %u, %u\r\n", src_buffer[current_offset], temp_buff[i], current_offset, i);
 				return(false);
@@ -442,13 +447,12 @@ bool can_bootloader_verify_memory_reliable(CANDriver *canp, const uint32_t base_
 }
 
 
-
 #define M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE     64
 uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
 
 
 bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, const uint32_t low_cpu_id, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer, BaseSequentialStream *chp) {
-	if( ! can_bootloader_initiate(canp, chp) ) {
+	if( ! can_bootloader_initiate(canp, 5000, low_cpu_id, chp) ) {
 		chprintf(chp, "Failed to put node into bootloader mode...\r\n");
 		return(false);
 	}
@@ -458,7 +462,7 @@ bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, con
 	while(temp_address <= (base_address + total_firmware_length_bytes) ) {
 		const uint32_t page_number = (temp_address - ORESAT_F0_FLASH_START_ADDRESS) / ORESAT_F0_FLASH_PAGE_SIZE;
 
-		if( ! can_bootloader_erase_page_reliable(canp, page_number, chp) ) {
+		if( ! can_bootloader_erase_page_reliable(canp, page_number, low_cpu_id, chp) ) {
 			return(false);
 		}
 
@@ -481,14 +485,12 @@ bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, con
 			return(false);
 		}
 
-		if( ! can_bootloader_write_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, chp) ) {
+		if( ! can_bootloader_write_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, low_cpu_id, chp) ) {
 			return(false);
 		}
 
 		current_file_offset += bytes_to_write_to_flash;
 	}
-
-
 
 
 	current_file_offset = 0;
@@ -506,15 +508,14 @@ bool oresat_firmware_update_m0(CANDriver *canp, const uint32_t base_address, con
 			return(false);
 		}
 
-		if( ! can_bootloader_verify_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, chp) ) {
+		if( ! can_bootloader_verify_memory_reliable(canp, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash, low_cpu_id, chp) ) {
 			return(false);
 		}
 
 		current_file_offset += bytes_to_write_to_flash;
 	}
 
-
-
+	can_bootloader_go(canp, ORESAT_F0_FIRMWARE_CODE_ADDRESS, chp);
 
 	chprintf(chp, "\r\nSuccessfully wrote and verified firmware image to remote MCU device...\r\n\r\n");
 
