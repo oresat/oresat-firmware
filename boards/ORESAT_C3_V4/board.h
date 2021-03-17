@@ -377,7 +377,7 @@
                                      PIN_ODR_HIGH(GPIOA_SPI1_SCK) |         \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MISO) |        \
                                      PIN_ODR_HIGH(GPIOA_SPI1_MOSI) |        \
-                                     PIN_ODR_HIGH(GPIOA_I2C_PWROFF) |       \
+                                     PIN_ODR_LOW(GPIOA_I2C_PWROFF) |        \
                                      PIN_ODR_LOW(GPIOA_CAN1_SILENT) |       \
                                      PIN_ODR_LOW(GPIOA_CAN1_SHDN) |         \
                                      PIN_ODR_HIGH(GPIOA_CAN1_RX) |          \

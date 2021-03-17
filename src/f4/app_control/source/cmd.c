@@ -502,6 +502,51 @@ state_usage:
 }
 
 /*===========================================================================*/
+/* OreSat C3 FRAM                                                            */
+/*===========================================================================*/
+void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto fram_usage;
+    }
+    if (!strcmp(argv[0], "read") && argc > 2) {
+        uint16_t offset = strtoul(argv[1], NULL, 0);
+        size_t len = strtoul(argv[2], NULL, 0);
+        uint8_t *buf = calloc(len, sizeof(uint8_t));
+        I2CConfig i2cconfig = {
+            OPMODE_I2C,
+            100000,
+            STD_DUTY_CYCLE,
+        };
+        i2cStart(&I2CD2, &i2cconfig);
+        i2cAcquireBus(&I2CD2);
+        i2cMasterTransmit(&I2CD2, 0x50, (uint8_t*)(&offset), sizeof(offset), buf, len);
+        i2cReleaseBus(&I2CD2);
+        i2cStop(&I2CD2);
+
+        for (uint32_t i = 0; i < len; i++) {
+            if (i % 0x10) chprintf(chp, "\r\n%04X:", i);
+            chprintf(chp, " %02X", buf[i]);
+        }
+
+        free(buf);
+    } else if (!strcmp(argv[0], "write") && argc > 3) {
+        chprintf(chp, "Unimplemented\r\n");
+    } else {
+        goto fram_usage;
+    }
+
+    return;
+
+fram_usage:
+    chprintf(chp,  "Usage: fram <command>\r\n"
+                   "    read <offset> <len>:\r\n"
+                   "        Read starting at <offset> for <len> bytes\r\n"
+                   "\r\n");
+    return;
+}
+
+/*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
@@ -517,6 +562,7 @@ static const ShellCommand commands[] = {
     {"rf", cmd_rf},
     {"rftest", cmd_rftest},
     {"state", cmd_state},
+    {"fram", cmd_fram},
     {"deploy", cmd_deploy},
     {NULL, NULL}
 };
