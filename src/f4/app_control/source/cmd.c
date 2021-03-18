@@ -324,7 +324,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             goto time_usage;
         }
     } else if (!strcmp(argv[0], "raw")) {
-        rtcGetTime(&RTCD1, &timespec);
+        rtcGetTime(rtcp, &timespec);
         chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
     } else {
         goto time_usage;
@@ -525,9 +525,10 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
         i2cStop(&I2CD2);
 
         for (uint32_t i = 0; i < len; i++) {
-            if (i % 0x10) chprintf(chp, "\r\n%04X:", i);
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
             chprintf(chp, " %02X", buf[i]);
         }
+        chprintf(chp, "\r\n");
 
         free(buf);
     } else if (!strcmp(argv[0], "write") && argc > 3) {
