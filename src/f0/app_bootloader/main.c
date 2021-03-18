@@ -449,7 +449,7 @@ void can_bootloader_announce_presence_on_bus(void) {
 	txmsg.data32[0] = 0x04030201;
 	txmsg.data32[1] = *cpu_unique_id_low;
 
-	chprintf(DEBUG_SD, "Bootloader announcing presence on bus...\r\n");
+	chprintf(DEBUG_SD, "\r\nBootloader announcing presence on bus...\r\n");
 	can_bootloader_transmit(&txmsg);
 }
 
@@ -474,24 +474,32 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 	canStart(CAN_DRIVER, &cancfg);
 	chprintf(DEBUG_SD, "Done starting CAN peripheral\r\n");
 
+	systime_t last_announcement_time_ms = TIME_I2MS(chVTGetSystemTime());
 	can_bootloader_announce_presence_on_bus();
 
 	CANRxFrame rxmsg;
 	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
 	bool got_stay_bootloader_frame = false;
 
-	//palSetLineMode(LINE_LED, PAL_MODE_OUTPUT_PUSHPULL);
 
-	const uint32_t ms_threshold = 3000;
+	const uint32_t bootloader_timeout_threshold_ms = 3000;
 	while ( true ) {
 		if( is_firmware_a_valid ) {
-			if( (! got_stay_bootloader_frame) && ((TIME_I2MS(chVTGetSystemTime())) - start_time) >= ms_threshold ) {
-				chprintf(DEBUG_SD, "No CAN frame after %u ms, reseting and running main firmware...\r\n", ms_threshold);
+			if( (! got_stay_bootloader_frame) && ((TIME_I2MS(chVTGetSystemTime())) - start_time) >= bootloader_timeout_threshold_ms ) {
+				chprintf(DEBUG_SD, "No CAN frame after %u ms, reseting and running main firmware...\r\n", bootloader_timeout_threshold_ms);
 				break;
 			}
-		}
+		} else {
+			if( ! got_stay_bootloader_frame ) {
+				//Re-announce presence on the bus every 5 seconds if the firmware image is specifically invalid
+				const systime_t now_time_ms = TIME_I2MS(chVTGetSystemTime());
 
-	    //palToggleLine(LINE_LED);
+				if( now_time_ms < last_announcement_time_ms || (now_time_ms - last_announcement_time_ms) > 5000 ) {
+					last_announcement_time_ms = now_time_ms;
+					can_bootloader_announce_presence_on_bus();
+				}
+			}
+		}
 
 		const msg_t r = can_bootloader_receive2(&rxmsg, CAN_RECEIVE_TIMEOUT_LONG);
 		if( r == MSG_OK ) {
@@ -509,7 +517,6 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 		} else {
 			if( r == MSG_TIMEOUT ) {
 				chprintf(DEBUG_SD, ".");
-				//can_bootloader_announce_presence_on_bus();
 			} else {
 				chprintf(DEBUG_SD, "Error receiving CAN frame: %s\r\n", msg_t_to_str(r));
 			}

@@ -151,13 +151,12 @@ int main(void) {
   memset(&can_bl_config, 0, sizeof(can_bl_config));
   can_bl_config.canp = CAN_DRIVER;
   can_bl_config.chp = DEBUG_SD;
-  can_bl_config.low_cpu_id = 0x01020304;
+  can_bl_config.low_cpu_id = 0x1D000800;
 
 
-  //firmware_read_function_ptr_t read_function_pointer = &test_read_function;
-  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 172, test_read_function);
+  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 1024, test_read_function);
 
-  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
 

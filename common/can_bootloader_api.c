@@ -15,7 +15,7 @@ void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
 	chprintf(chp, "can_bootloader_config_t:\r\n");
-	chprintf(chp, "  low_cpu_id:                   %u\r\n", can_bl_config->low_cpu_id);
+	chprintf(chp, "  low_cpu_id:                   0x%X\r\n", can_bl_config->low_cpu_id);
 	chprintf(chp, "  read_fail_count:              %u\r\n", can_bl_config->read_fail_count);
 	chprintf(chp, "  write_fail_count:             %u\r\n", can_bl_config->write_fail_count);
 	chprintf(chp, "  erase_fail_count:             %u\r\n", can_bl_config->erase_fail_count);
@@ -109,26 +109,35 @@ bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint3
 	msg_t r = can_api_receive(can_bl_config, &msg, timeout_ms);
 	if( r == MSG_OK ) {
 		if( msg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && msg.DLC == 8 ) {
-			if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
-				CANTxFrame tx_msg;
-				memset(&tx_msg, 0, sizeof(tx_msg));
-				tx_msg.SID = BOOTLOADER_EXPECTED_FIRST_FRAME_ID;
-				tx_msg.DLC = 8;
-				tx_msg.data8[0] = msg.data8[4];
-				tx_msg.data8[1] = msg.data8[5];
-				tx_msg.data8[2] = msg.data8[6];
-				tx_msg.data8[3] = msg.data8[7];
-				tx_msg.data8[4] = 0x01;
-				tx_msg.data8[5] = 0x02;
-				tx_msg.data8[6] = 0x03;
-				tx_msg.data8[7] = 0x04;
 
-				r = can_api_transmit(can_bl_config, &tx_msg, 100);
-				if( r == MSG_OK ) {
-					chprintf(chp, "Successfully put remote node into bootloader mode...\r\n");
-					can_bl_config->initiate_connection_count++;
-					return(true);
+			if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
+				const uint32_t remote_low_cpu_id = (msg.data8[4] << 24) | (msg.data8[5] << 16) | (msg.data8[6] << 8) | (msg.data8[7] << 0);
+				chprintf(chp, "Remote CPU ID Low = 0x%X\r\n", remote_low_cpu_id);
+
+				if( can_bl_config->low_cpu_id == 0 || remote_low_cpu_id == can_bl_config->low_cpu_id ) {
+					CANTxFrame tx_msg;
+					memset(&tx_msg, 0, sizeof(tx_msg));
+					tx_msg.SID = BOOTLOADER_EXPECTED_FIRST_FRAME_ID;
+					tx_msg.DLC = 8;
+					tx_msg.data8[0] = msg.data8[4];
+					tx_msg.data8[1] = msg.data8[5];
+					tx_msg.data8[2] = msg.data8[6];
+					tx_msg.data8[3] = msg.data8[7];
+					tx_msg.data8[4] = 0x01;
+					tx_msg.data8[5] = 0x02;
+					tx_msg.data8[6] = 0x03;
+					tx_msg.data8[7] = 0x04;
+
+					r = can_api_transmit(can_bl_config, &tx_msg, 100);
+					if( r == MSG_OK ) {
+						chprintf(chp, "Successfully put remote node into bootloader mode...\r\n");
+						can_bl_config->initiate_connection_count++;
+						return(true);
+					}
+				} else {
+					chprintf(chp, "Remote CPU ID did not match target CPU ID: 0x%X != 0x%X\r\n", can_bl_config->low_cpu_id, remote_low_cpu_id);
 				}
+
 			}
 		}
 	} else {
