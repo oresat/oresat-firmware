@@ -566,7 +566,7 @@ int main(void)
 	chprintf(DEBUG_SD, "Checking firmware validity...\r\n"); chThdSleepMilliseconds(50);
 
     bool is_firmware_a_valid = check_firmware_crc_and_branch(true);
-    is_firmware_a_valid = false;
+    //is_firmware_a_valid = false;
     chprintf(DEBUG_SD, "Current is_firmware_a_valid = %u\r\n", is_firmware_a_valid);chThdSleepMilliseconds(20);
     can_bootloader_run(is_firmware_a_valid);
 

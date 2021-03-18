@@ -204,6 +204,10 @@ include $(TOOLCHAIN)/toolchain.mk
 DATE=$(shell date +%Y%m%d)
 POST_MAKE_ALL_RULE_HOOK:
 	python3 ../pack_firmware_image.py ./build/$(PROJECT).bin ./build/$(PROJECT).crc32.bin $(DATE)
+	@# Convert the crc32 bin file to a hex file that can be written to the STM32F0 with 'make write'
+	srec_cat ./build/$(PROJECT).crc32.bin -binary -offset 0x0800A000 -o ./build/$(PROJECT).bin.hex -Intel -Line_Length 44
+	mv ./build/$(PROJECT).hex ./build/$(PROJECT).origional.hex
+	cp ./build/$(PROJECT).bin.hex ./build/$(PROJECT).hex
 
 #
 # Custom rules

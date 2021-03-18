@@ -35,6 +35,8 @@ static oresat_config_t oresat_conf = {
     ORESAT_DEFAULT_BITRATE
 };
 
+#define DEBUG_SD    (BaseSequentialStream *)          &SD2
+
 /**
  * @brief App Initialization
  */
