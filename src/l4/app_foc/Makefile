@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_foc # Field-Oriented Control
+PROJECT   = app_foc
 
 # Target settings.
 MCU       = cortex-m4
