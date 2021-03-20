@@ -442,15 +442,23 @@ int fs_format(FSDriver *fsp)
 {
     /* Sanity checks */
     osalDbgCheck(fsp != NULL);
-    osalDbgAssert((fsp->state == FS_OFFLINE) || (fsp->state == FS_ONLINE),
+    osalDbgAssert((fsp->state != FS_UNINIT) && (fsp->state != FS_STOP),
             "fs_format(), invalid state");
 
     fs_state_t last_state;
     fsp->err = LFS_ERR_OK;
     last_state = fsp->state;
 
+    /* Unmount volume if currently mounted */
+    if (fsp->state == FS_MOUNTED) {
+        fsp->err = fs_unmount(fsp);
+        if (fsp->err != LFS_ERR_OK) {
+            return fsp->err;
+        }
+    }
+
     /* Enable eMMC if not already enabled */
-    if (last_state == FS_OFFLINE) {
+    if (fsp->state == FS_OFFLINE) {
         fsp->err = mmc_enable(fsp);
         if (fsp->err != LFS_ERR_OK) {
             return fsp->err;
@@ -460,9 +468,11 @@ int fs_format(FSDriver *fsp)
     /* Format LFS file system */
     fsp->err = lfs_format(&fsp->lfs, &fsp->lfscfg);
     if (fsp->err == LFS_ERR_OK) {
-        /* Restore eMMC state */
+        /* Restore state */
         if (last_state == FS_OFFLINE) {
             fsp->err = mmc_disable(fsp);
+        } else if (last_state == FS_MOUNTED) {
+            fsp->err = fs_mount(fsp, false);
         }
     }
 
