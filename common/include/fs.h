@@ -113,16 +113,16 @@ struct FSDriver {
     unpacked_mmc_cid_t          mmc_cid;
     /* MMC CSD field */
     unpacked_mmc_csd_t          mmc_csd;
+    /* Guarded file pool */
+    guarded_memory_pool_t       file_pool;
+    lfs_file_t                  file[FS_MAX_FILES];
+    /* TODO: Implement static file buffers */
     /* Read buffer */
     uint8_t                     read_buf[FS_CACHE_SIZE];
     /* Program buffer */
     uint8_t                     prog_buf[FS_CACHE_SIZE];
     /* Lookahead buffer */
     uint8_t                     lookahead_buf[FS_LOOKAHEAD_SIZE];
-    /* Guarded file pool */
-    guarded_memory_pool_t       file_pool;
-    lfs_file_t                  file[FS_MAX_FILES];
-    /* TODO: Implement static file buffers */
 };
 
 /** @} */
