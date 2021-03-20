@@ -327,8 +327,6 @@ void *fs_alloc_file(FSDriver *fsp)
 {
     /* Sanity checks */
     osalDbgCheck(fsp != NULL);
-    osalDbgAssert((fsp->state == FS_OFFLINE) || (fsp->state == FS_ONLINE),
-            "fs_alloc_file(), invalid state");
 
     void *fp = NULL;
     fsp->err = LFS_ERR_OK;
@@ -345,8 +343,6 @@ void fs_free_file(FSDriver *fsp, void *fp)
 {
     /* Sanity checks */
     osalDbgCheck(fsp != NULL && fp != NULL);
-    osalDbgAssert((fsp->state == FS_MOUNTED),
-            "fs_free_file(), invalid state");
 
     chGuardedPoolFree(&fsp->file_pool, fp);
 }
