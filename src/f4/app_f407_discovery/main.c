@@ -162,17 +162,14 @@ int main(void) {
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
 
+  const uint32_t low_cpuid_of_protoboard = 0x1D000800;
   can_bootloader_config_t can_bl_config;
-  memset(&can_bl_config, 0, sizeof(can_bl_config));
-  can_bl_config.canp = CAN_DRIVER;
-  can_bl_config.chp = DEBUG_SD;
-  can_bl_config.low_cpu_id = 0x1D000800;
-
+  can_api_init_can_bootloader_config_t(&can_bl_config, CAN_DRIVER, DEBUG_SD, low_cpuid_of_protoboard);
 
   //test_garbage_can_transmit();
-  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
+  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
 
-  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
 

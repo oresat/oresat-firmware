@@ -51,6 +51,7 @@ typedef struct {
 	uint32_t connection_verify_fail;
 } can_bootloader_config_t;
 
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id);
 
 void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config);
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer);

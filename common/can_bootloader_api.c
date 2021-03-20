@@ -11,6 +11,19 @@
 uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
 
 
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id) {
+	if (can_bl_config == NULL) {
+		return (false);
+	}
+	memset(can_bl_config, 0, sizeof(*can_bl_config));
+
+	can_bl_config->canp = canp;
+	can_bl_config->chp = chp;
+	can_bl_config->low_cpu_id = low_cpu_id;
+
+	return (true);
+}
+
 void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
