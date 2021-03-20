@@ -79,6 +79,21 @@ uint32_t test_read_function(const uint32_t offset, uint8_t *dest_buffer, const u
 	return(dest_index);
 }
 
+void test_garbage_can_transmit(void) {
+	while(1) {
+		CANTxFrame tx_msg;
+		memset(&tx_msg, 0, sizeof(tx_msg));
+		tx_msg.SID = 0x55;
+		tx_msg.DLC = 8;
+		memset(&tx_msg.data8, 0x55, sizeof(tx_msg.data8));
+
+		can_api_print_tx_frame(DEBUG_SD, &tx_msg, "", "");
+
+		canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, &tx_msg, TIME_MS2I(150));
+		chThdSleepMilliseconds(1000);
+	}
+}
+
 
 /*
  * Application entry point.
@@ -154,9 +169,10 @@ int main(void) {
   can_bl_config.low_cpu_id = 0x1D000800;
 
 
-  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 1024, test_read_function);
+  //test_garbage_can_transmit();
+  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
 
-  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
 

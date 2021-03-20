@@ -13,6 +13,7 @@ extern "C" {
 #define CAN_ANNOUNCE_MAGIC_NUMBER                    0x04030201
 #define STM32_BOOTLOADER_CAN_ACK                     0x79
 #define STM32_BOOTLOADER_CAN_NACK                    0x1F
+#define CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID     0x04
 
 
 typedef enum {

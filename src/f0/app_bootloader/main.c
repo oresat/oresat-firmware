@@ -262,7 +262,7 @@ bool is_flash_write_address_range_valid(const uint8_t *address, const uint32_t l
 }
 
 
-void can_bootloader_handle_fram(CANRxFrame *rx_msg) {
+void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 	msg_t tx_r;
 	const uint32_t command_sid = rx_msg->SID;
 	chprintf(DEBUG_SD, "Handling frame SID 0x%X %s\r\n", command_sid, oresat_bootloader_can_command_t_to_str(command_sid));
@@ -453,6 +453,19 @@ void can_bootloader_announce_presence_on_bus(void) {
 	can_bootloader_transmit(&txmsg);
 }
 
+
+
+/*0b100 - Data with EID or (0b110 - RemoteFrame with EID)*/
+//#define set_can_eid_data(x) ((x << 3)|0b100)
+
+/*0b110 - Mask enable for EID/SID and DATA/RTR*/
+//#define set_can_eid_mask(x) ((x << 3)|0b110)
+
+
+#define set_can_sid_data(x) ((x << 21) | 0b000)
+#define set_can_sid_mask(x) ((x << 21) | 0b000)
+
+
 void can_bootloader_run(const bool is_firmware_a_valid) {
 	CANConfig cancfg;
 	memset(&cancfg, 0, sizeof(cancfg));
@@ -469,8 +482,37 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
     chprintf(DEBUG_SD, "Initializing CAN peripheral with MCR = 0x%X\r\n", cancfg.mcr);
     chprintf(DEBUG_SD, "Initializing CAN peripheral with BTR = 0x%X\r\n", cancfg.btr);
 
+
+    /*
+	  *The same manner we can set up to 14 filters (STM32F103)
+	  *For example to use 2 EID Data filter to 2 CAN RX FIFO:
+	  */
+	  //Set filers #1-#2 for eid = 0x01234567 || eid = 0x01234568
+
+    //  http://forum.chibios.org/viewtopic.php?t=4079
+    /* see hal_can_lld.h for definition of CANFilter struct. */
+
+#define NUM_CAN_FILTERS     8
+
+	CANFilter can_filter_12[NUM_CAN_FILTERS] = {\
+	  /*{<filter bank number>, <mode>, <scale>, <assignment, FIFO0 or FIFO1>, <register 1>, <register 2>}  */ \
+	  {0, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_GET), set_can_sid_mask(0x7FF)},\
+	  {1, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY), set_can_sid_mask(0x7FF)},\
+	  {2, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_GO), set_can_sid_mask(0x7FF)},\
+	  {3, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY), set_can_sid_mask(0x7FF)},\
+	  {4, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_ERASE), set_can_sid_mask(0x7FF)},\
+	  {5, 0, 1, 0, set_can_sid_data(CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID), set_can_sid_mask(0x7FF)},\
+	  {6, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_ACK), set_can_sid_mask(0x7FF)},\
+	  {7, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_NACK), set_can_sid_mask(0x7FF)},\
+	};
+
+#if 1
+	//Set 4 filters from total 14(0xE)
+	canSTM32SetFilters(CAN_DRIVER, 0, NUM_CAN_FILTERS, &can_filter_12[0]);
+#else
 	/* Put CAN module in normal mode */
 	canSTM32SetFilters(CAN_DRIVER, 0, 0, NULL);
+#endif
 	canStart(CAN_DRIVER, &cancfg);
 	chprintf(DEBUG_SD, "Done starting CAN peripheral\r\n");
 
@@ -512,7 +554,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
 					}
 				}
 			} else {
-				can_bootloader_handle_fram(&rxmsg);
+				can_bootloader_handle_frame(&rxmsg);
 			}
 		} else {
 			if( r == MSG_TIMEOUT ) {

@@ -289,7 +289,7 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
 	uint32_t idx = 0;
 	while(1) {
 		memset(&tx_msg, 0, sizeof(tx_msg));
-		tx_msg.SID = 0x04;
+		tx_msg.SID = CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID;
 
 		while( idx < num_bytes && tx_msg.DLC < 8 ) {
 			tx_msg.data8[tx_msg.DLC] = src_buffer[idx];
