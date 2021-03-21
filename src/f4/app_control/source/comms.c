@@ -5,12 +5,11 @@
 #include "time_sync.h"
 #include "comms.h"
 #include "uslp.h"
+#include "CANopen.h"
 
 #define XTAL_CLK                            16000000
 #define RADIO_PDU_COUNT                     8U
 #define RADIO_PDU_SIZE                      512U
-
-#define BEACON_MS                           10000U
 
 static objects_fifo_t pdu_fifo;
 static msg_t pdu_fifo_msgs[RADIO_PDU_COUNT];
@@ -438,7 +437,7 @@ THD_FUNCTION(radio_beacon, arg) {
         ax5043SetProfile(&uhf, uhf_ax25);
         ax5043TX(&uhf, pdu.buf, pdu.buf_len, pdu.buf_len, NULL, NULL, false);
 
-        chThdSleepMilliseconds(BEACON_MS);
+        chThdSleepMilliseconds(OD_TX_Control.beaconInterval);
     }
 
     chThdExit(MSG_OK);

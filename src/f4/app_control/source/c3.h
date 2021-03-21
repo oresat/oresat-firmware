@@ -24,18 +24,18 @@ typedef struct {
     eventmask_t         events;
 } c3_fsm_t;
 
-#define C3_EVENT_TIMER                      EVENT_MASK(0)
-#define C3_EVENT_TX                         EVENT_MASK(1)
-#define C3_EVENT_BAT                        EVENT_MASK(2)
-#define C3_EVENT_EDL                        EVENT_MASK(3)
+#define C3_EVENT_WAKEUP                     EVENT_MASK(0)
+#define C3_EVENT_TERMINATE                  EVENT_MASK(1)
+#define C3_EVENT_TIMER                      EVENT_MASK(2)
+#define C3_EVENT_TX                         EVENT_MASK(3)
+#define C3_EVENT_BAT                        EVENT_MASK(4)
+#define C3_EVENT_EDL                        EVENT_MASK(5)
 
-extern c3_state_t c3_state;
 extern thread_t *c3_tp;
 
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
 extern bool timeout_complete;
-extern bool tx_enable;
 extern bool bat_good;
 extern bool edl;
 

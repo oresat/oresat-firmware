@@ -72,7 +72,7 @@ extern "C" {
 #define VREFINT_CAL_VAL         (*((uint16_t*)VREFINT_CAL_BASE))
 
 void sensors_init(void);
-void sensors_trig(void);
+void sensors_start(void);
 
 #ifdef __cplusplus
 }

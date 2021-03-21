@@ -142,9 +142,6 @@ THD_FUNCTION(pdo_sync, arg)
         uint32_t timeout = ((typeof(timeout))-1);
         bool_t syncWas;
 
-        /* Trigger sensors */
-        /* TODO: Re-enable or fix sensors */
-        /*sensors_trig();*/
         /* Process SYNC */
         syncWas = CO_process_SYNC(co, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
         /* Read inputs */
@@ -257,9 +254,11 @@ THD_FUNCTION(nmt, arg)
     chThdExit(reset);
 }
 
-void CO_init(void *CANptr, uint8_t node_id, uint16_t bitrate)
+void CO_init(CANDriver *CANptr, uint8_t node_id, uint16_t bitrate)
 {
     CO_ReturnError_t err;
+    err = CO_new(NULL);
+    chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
     err = CO_CANinit(CANptr, bitrate);
     chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
     err = CO_CANopenInit(node_id);
