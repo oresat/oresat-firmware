@@ -202,7 +202,6 @@ uint16_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg) {
     i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
-
     osalDbgAssert(devp->state == MAX17205_READY,
             "max17205ReadRaw(), invalid state");
 
@@ -235,7 +234,6 @@ void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
     i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
-
     osalDbgAssert(devp->state == MAX17205_READY,
             "max17205WriteRaw(), invalid state");
 
@@ -253,6 +251,99 @@ void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
     i2cReleaseBus(devp->config->i2cp);
 #endif /* MAX17205_SHARED_I2C */
 #endif /* MAX17205_USE_I2C */
+}
+
+/**
+ * @brief   Reads an MAX17205 capacity value from a register in mAh.
+ * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline uint16_t max17205ReadCapacity(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 5000U / MAX17205_REG2RSENSE(max17205ReadRaw(devp, MAX17205_AD_NRSENSE));
+}
+
+/**
+ * @brief   Reads an MAX17205 percentage value from a register in 0.001% increments.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline uint16_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 1000U / 256U;
+}
+
+/**
+ * @brief   Reads an MAX17205 voltage value from a register in uV.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline uint16_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 78125U / 1000U;
+}
+
+/**
+ * @brief   Reads an MAX17205 current value from a register in mA.
+ * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline int16_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg)
+{
+    return (int16_t)max17205ReadRaw(devp, reg) * 15625 / MAX17205_REG2RSENSE(max17205ReadRaw(devp, MAX17205_AD_NRSENSE));
+}
+
+/**
+ * @brief   Reads an MAX17205 temperature value from a register in 0.001C increments.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline int16_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg)
+{
+    return (int16_t)max17205ReadRaw(devp, reg) * 1000U / 256U;
+}
+
+/**
+ * @brief   Reads an MAX17205 resistance value from a register in mOhms.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline uint16_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 1000U / 4096U;
+}
+
+/**
+ * @brief   Reads an MAX17205 time value from a register in seconds.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+inline uint32_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 5625U / 1000;
 }
 
 /** @} */

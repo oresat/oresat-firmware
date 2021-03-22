@@ -51,11 +51,6 @@
 #define MAX17205_AD(reg)                    (reg & 0xFFU)
 
 /**
- * @brief   MAX17205 Register Value Verification
- */
-#define MAX17205_SETVAL(reg, val)           (((uint16_t)(val) & ~ (reg ## _PermMsk)) | reg ## _PermSet)
-
-/**
  * @name    MAX17205 Register Addresses
  * @{
  */
@@ -1161,6 +1156,13 @@ struct MAX17205Driver {
 /* Driver macros.                                                            */
 /*===========================================================================*/
 
+/**
+ * @brief   MAX17205 Register Value Verification
+ */
+#define MAX17205_SETVAL(reg, val)           (((uint16_t)(val) & ~ (reg ## _PermMsk)) | reg ## _PermSet)
+#define MAX17205_RSENSE2REG(val)            ((uint16_t)(val / 10U))
+#define MAX17205_REG2RSENSE(val)            ((uint16_t)(val * 10U))
+
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
@@ -1171,8 +1173,16 @@ extern "C" {
 void max17205ObjectInit(MAX17205Driver *devp);
 void max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
+
 uint16_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg);
 void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value);
+
+uint16_t max17205ReadCapacity(MAX17205Driver *devp, uint16_t reg);
+uint16_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg);
+uint16_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg);
+int16_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg);
+int16_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg);
+uint32_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg);
 #ifdef __cplusplus
 }
 #endif

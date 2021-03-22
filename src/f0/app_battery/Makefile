@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_battery_v1
+PROJECT   = app_battery
 
 # Target settings.
 MCU       = cortex-m0
