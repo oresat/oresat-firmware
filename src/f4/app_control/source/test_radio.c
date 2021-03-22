@@ -347,9 +347,9 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
             palClearLine(LINE_LNA_ENABLE);
         }
     } else if (!strcmp(argv[0], "totclear")) {
-        palSetLine(LINE_TOT_CLEAR);
+        palSetLine(LINE_TOT_RESET);
         chThdSleepMicroseconds(10);
-        palClearLine(LINE_TOT_CLEAR);
+        palClearLine(LINE_TOT_RESET);
     } else if (!strcmp(argv[0], "start")) {
         adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
     } else if (!strcmp(argv[0], "stop")) {
@@ -359,7 +359,7 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
                       "PA THERM AVG: %u\r\nPA FWD AVG: %u\r\nPA REV AVG: %u\r\n\r\n",
                 (palReadLine(LINE_PA_ENABLE) ? "ENABLED" : "DISABLED"),
                 (palReadLine(LINE_LNA_ENABLE) ? "ENABLED" : "DISABLED"),
-                (palReadLine(LINE_TOT_OUT) ? "ENABLED" : "DISABLED"),
+                (palReadLine(LINE_TOT_STATE) ? "NOT TRIPPED" : "TRIPPED"),
                 pa_avg.therm, pa_avg.fwd, pa_avg.rev);
     } else {
         goto rf_usage;
