@@ -22,10 +22,14 @@
 /* Project header files */
 #include "oresat.h"
 #include "wdt.h"
+#include "c3.h"
 #include "opd.h"
-#include "time_sync.h"
-#include "command.h"
+#include "comms.h"
+#include "rtc.h"
 #include "CO_master.h"
+#ifdef SHELL_ENABLE
+#include "cmd.h"
+#endif
 
 /*
 static const oresat_node_t nodes[] = {
@@ -46,13 +50,35 @@ static const oresat_node_t nodes[] = {
 };
 */
 
-/*
- * Working area for driver.
- */
-
-
 static worker_t wdt_worker;
+static thread_descriptor_t wdt_desc = {
+    .name = "WDT",
+    .wbase = THD_WORKING_AREA_BASE(wdt_wa),
+    .wend = THD_WORKING_AREA_END(wdt_wa),
+    .prio = HIGHPRIO,
+    .funcp = wdt,
+    .arg = NULL
+};
+static worker_t c3_worker;
+static thread_descriptor_t c3_desc = {
+    .name = "C3",
+    .wbase = THD_WORKING_AREA_BASE(c3_wa),
+    .wend = THD_WORKING_AREA_END(c3_wa),
+    .prio = NORMALPRIO,
+    .funcp = c3,
+    .arg = NULL
+};
+#ifdef SHELL_ENABLE
 static worker_t cmd_worker;
+static thread_descriptor_t cmd_desc = {
+    .name = "Shell",
+    .wbase = THD_WORKING_AREA_BASE(cmd_wa),
+    .wend = THD_WORKING_AREA_END(cmd_wa),
+    .prio = NORMALPRIO,
+    .funcp = cmd,
+    .arg = NULL
+};
+#endif
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -65,27 +91,33 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* Initialize WDT worker thread */
-    init_worker(&wdt_worker, "WDT", wdt_wa, sizeof(wdt_wa), NORMALPRIO, wdt, NULL, true);
-    reg_worker(&wdt_worker);
+    /* Register WDT worker thread */
+    reg_worker(&wdt_worker, &wdt_desc, true, true);
 
-    /* Initialize shell worker thread */
-    init_worker(&cmd_worker, "Shell", cmd_wa, sizeof(cmd_wa), NORMALPRIO, cmd, NULL, true);
-    reg_worker(&cmd_worker);
+    /* Register C3 worker thread */
+    reg_worker(&c3_worker, &c3_desc, true, true);
+
+#ifdef SHELL_ENABLE
+    /* Register shell worker thread */
+    reg_worker(&cmd_worker, &cmd_desc, true, true);
+#endif
 
     /* Initialize OPD */
     opd_init();
-    /*opd_start();*/
+    opd_start();
 
     /* Initialize SDO client */
     sdo_init();
 
-    /* Initialize shell and start serial interface */
-    shellInit();
-    sdStart(&SD3, NULL);
+    /* Initialize and start radio systems */
+    comms_init();
+    comms_start();
 
-    /* Configure SCET time object */
-    CO_OD_configure(CO->SDO[0], OD_2010_SCET, OD_SCET_Func, NULL, 0, 0);
+    /* Initialize shell and start serial interface */
+#ifdef SHELL_ENABLE
+    shellInit();
+#endif
+    sdStart(&SD3, NULL);
 }
 
 /**
@@ -94,8 +126,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init();
+    oresat_init(&oresat_conf);
     app_init();
-    oresat_start(&oresat_conf);
+    oresat_start();
     return 0;
 }

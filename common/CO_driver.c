@@ -43,26 +43,26 @@ void CO_CANerr_cb(CANDriver *canp, uint32_t flags);
 void CO_CANsetConfigurationMode(void *CANptr)
 {
     /* Put CAN module in configuration mode */
-    canStop(((oresat_config_t*)CANptr)->cand);
+    canStop(CANptr);
 }
 
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 {
     /* Put CAN module in normal mode */
-    canSTM32SetFilters(CANmodule->cand, 0, CANmodule->useCANrxFilters,
+    canSTM32SetFilters(CANmodule->CANptr, 0, CANmodule->useCANrxFilters,
             CANmodule->canFilters);
-    canStart(CANmodule->cand, &CANmodule->cancfg);
+    canStart(CANmodule->CANptr, &CANmodule->cancfg);
     CANmodule->CANnormal = true;
 }
 
 /******************************************************************************/
 void CO_CANsetFilters(CO_CANmodule_t *CANmodule)
 {
-    canStop(CANmodule->cand);
-    canSTM32SetFilters(CANmodule->cand, 0, CANmodule->useCANrxFilters,
+    canStop(CANmodule->CANptr);
+    canSTM32SetFilters(CANmodule->CANptr, 0, CANmodule->useCANrxFilters,
             CANmodule->canFilters);
-    canStart(CANmodule->cand, &CANmodule->cancfg);
+    canStart(CANmodule->CANptr, &CANmodule->cancfg);
 }
 
 /******************************************************************************/
@@ -84,10 +84,9 @@ CO_ReturnError_t CO_CANmodule_init(
 
     /* Configure object variables */
     CANmodule->CANptr = CANptr;
-    CANmodule->cand = ((oresat_config_t*)CANptr)->cand;
-    CANmodule->cand->rxfull_cb = CO_CANrx_cb;
-    CANmodule->cand->txempty_cb = CO_CANtx_cb;
-    CANmodule->cand->error_cb = CO_CANerr_cb;
+    CANmodule->CANptr->rxfull_cb = CO_CANrx_cb;
+    CANmodule->CANptr->txempty_cb = CO_CANtx_cb;
+    CANmodule->CANptr->error_cb = CO_CANerr_cb;
     chEvtObjectInit(&CANmodule->rx_event);
     CANmodule->rxArray = rxArray;
     CANmodule->rxSize = rxSize;
@@ -146,7 +145,7 @@ CO_ReturnError_t CO_CANmodule_init(
 void CO_CANmodule_disable(CO_CANmodule_t *CANmodule)
 {
     /* turn off the module */
-    canStop(CANmodule->cand);
+    canStop(CANmodule->CANptr);
 }
 
 
@@ -247,7 +246,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
     CO_LOCK_CAN_SEND();
     /* If CAN TX buffer is free, attempt to send it */
     if (CANmodule->CANtxCount == 0 &&
-            !canTryTransmitI(CANmodule->cand, CAN_ANY_MAILBOX, &buffer->txFrame)) {
+            !canTryTransmitI(CANmodule->CANptr, CAN_ANY_MAILBOX, &buffer->txFrame)) {
         CANmodule->bufferInhibitFlag = buffer->syncFlag;
     } else {
         /* If no buffer is free, message will be sent by interrupt */
@@ -304,7 +303,7 @@ void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule)
 
 void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
 {
-    CAN_TypeDef *can = CANmodule->cand->can;
+    CAN_TypeDef *can = CANmodule->CANptr->can;
     uint32_t err;
     uint8_t rxErrors, txErrors;
 
@@ -324,9 +323,7 @@ void CO_CANmodule_process(CO_CANmodule_t *CANmodule)
         } else {
             /* not bus off */
             /* recalculate CANerrorStatus, first clear some flags */
-            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF |
-                                CO_CAN_ERRRX_WARNING | CO_CAN_ERRRX_PASSIVE |
-                                CO_CAN_ERRTX_WARNING | CO_CAN_ERRTX_PASSIVE);
+            status &= 0xFFFF ^ (CO_CAN_ERRTX_BUS_OFF | CO_CAN_ERR_WARN_PASSIVE);
 
             /* rx bus warning or passive */
             if (rxErrors >= 128) {
@@ -368,8 +365,12 @@ void CO_CANerr_cb(CANDriver *canp, uint32_t flags)
     uint16_t            status;
 
     CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
-    can = CANmodule->cand->can;
     status = CANmodule->CANerrorStatus;
+    can = canp->can;
+
+    /* TODO: Remove these when implemented. Suppressing warnings. */
+    (void)can;
+    (void)flags;
 
     CANmodule->CANerrorStatus = status;
 }

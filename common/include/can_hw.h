@@ -22,8 +22,8 @@ extern "C" {
 // ~87.5% sample point 1Mbps based on 48MHz APB Clock
 #define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(12)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
 #elif defined(STM32F4xx_MCUCONF)
-// ~87.5% sample point 1Mbps based on 45MHz APB1 Clock
-#define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(11)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
+// ~87.5% sample point 1Mbps based on 42MHz APB1 Clock
+#define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(10)|CAN_BTR_TS2(1)|CAN_BTR_BRP((3000/n)-1))
 #elif defined(STM32L4xx_MCUCONF)
 // ~87.5% sample point 1Mbps based on 80MHz APB1 Clock
 #define CAN_BTR(n) (CAN_BTR_SJW(0)|CAN_BTR_TS1(12)|CAN_BTR_TS2(1)|CAN_BTR_BRP((5000/n)-1))

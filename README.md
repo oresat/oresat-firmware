@@ -78,8 +78,8 @@ Tools required:
 * make
 * arm-none-eabi-gcc
 * arm-none-eabi-gdb   (may require a symlink to gdb-multiarch on Debian systems)
-* stlink              (Preferred method of programming/debugging)
-* openocd             (Optional, not required if stlink tools installed)
+* openocd             (Required, this is how we program and debug things)
+* stlink              (Gets udev rules up and running, may be helpful)
 
 PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
 package managers is several years old. You MUST build it from source for it

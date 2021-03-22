@@ -67,12 +67,12 @@ extern "C" {
 #error "No Sensors Config for this MCU"
 #endif
 
-#define TS_CAL1                 (*((uint16_t*)TS_CAL1_BASE))
-#define TS_CAL2                 (*((uint16_t*)TS_CAL2_BASE))
-#define VREFINT_CAL             (*((uint16_t*)VREFINT_CAL_BASE))
+#define TS_CAL1_VAL             (*((uint16_t*)TS_CAL1_BASE))
+#define TS_CAL2_VAL             (*((uint16_t*)TS_CAL2_BASE))
+#define VREFINT_CAL_VAL         (*((uint16_t*)VREFINT_CAL_BASE))
 
 void sensors_init(void);
-void sensors_trig(void);
+void sensors_start(void);
 
 #ifdef __cplusplus
 }
