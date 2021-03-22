@@ -1,5 +1,4 @@
 #include "batt.h"
-#include "ObjDict/CO_OD.h"
 #include "max17205.h"
 #include "CANopen.h"
 
@@ -61,7 +60,7 @@ THD_FUNCTION(batt, arg)
         } else {
             /*palClearLine(LINE_FASTCHG);*/
         }
-        
+
         /* capacity */
         OD_battery.fullCapacity = MAX17205_STD_CAPACITY(max17205ReadRaw(&max17205dev, MAX17205_AD_FULLCAP));
         OD_battery.availableCapacity = MAX17205_STD_CAPACITY(max17205ReadRaw(&max17205dev, MAX17205_AD_AVCAP));

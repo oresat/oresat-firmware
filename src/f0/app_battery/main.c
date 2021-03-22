@@ -23,6 +23,14 @@
 #include "batt.h"
 
 static worker_t battery_worker;
+static thread_descriptor_t battery_worker_desc = {
+    .name = "Battery management thread",
+    .wbase = THD_WORKING_AREA_BASE(batt_wa),
+    .wend = THD_WORKING_AREA_END(batt_wa),
+    .prio = NORMALPRIO,
+    .funcp = batt,
+    .arg = NULL
+};
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -36,8 +44,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&battery_worker, "Battery monitoring thread", batt_wa, sizeof(batt_wa), NORMALPRIO, batt, NULL, true);
-    reg_worker(&battery_worker);
+    reg_worker(&battery_worker, &battery_worker_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
@@ -49,8 +56,8 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
-    oresat_init();
+    oresat_init(&oresat_conf);
     app_init();
-    oresat_start(&oresat_conf);
+    oresat_start();
     return 0;
 }
