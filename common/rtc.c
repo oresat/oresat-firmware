@@ -1,10 +1,39 @@
 #include "rtc.h"
 
+RTCDriver *rtcp = &RTCD1;
+
+RTCAlarm    alarm_a;
+RTCAlarm    alarm_b;
+RTCWakeup   wakeupspec;
+
+static void alarmcb(RTCDriver *rtcp, rtcevent_t event)
+{
+    switch (event) {
+    case RTC_EVENT_ALARM_A:
+        break;
+    case RTC_EVENT_ALARM_B:
+        break;
+    case RTC_EVENT_TS:
+        break;
+    case RTC_EVENT_TS_OVF:
+        break;
+    case RTC_EVENT_WAKEUP:
+        break;
+    default:
+        break;
+    }
+}
+
+void rtc_init(void)
+{
+    rtcSetCallback(rtcp, alarmcb);
+}
+
 void get_time_tm(struct tm *tim, uint32_t *msec)
 {
     RTCDateTime timespec;
 
-    rtcGetTime(&RTCD1, &timespec);
+    rtcGetTime(rtcp, &timespec);
     rtcConvertDateTimeToStructTm(&timespec, tim, msec);
 }
 
@@ -13,7 +42,7 @@ void set_time_tm(const struct tm *tim, uint32_t msec)
     RTCDateTime timespec;
 
     rtcConvertStructTmToDateTime(tim, msec, &timespec);
-    rtcSetTime(&RTCD1, &timespec);
+    rtcSetTime(rtcp, &timespec);
 }
 
 time_t get_time_unix(uint32_t *msec)
@@ -50,7 +79,7 @@ void get_time_utc(time_utc_t *utc)
     RTCDateTime timespec;
     struct tm tim;
 
-    rtcGetTime(&RTCD1, &timespec);
+    rtcGetTime(rtcp, &timespec);
     rtcConvertDateTimeToStructTm(&timespec, &tim, NULL);
     mktime(&tim);
 

@@ -9,7 +9,7 @@
 #include "opd.h"
 #include "CO_master.h"
 #include "rtc.h"
-#include "mmc.h"
+#include "fs.h"
 #include "test_mmc.h"
 #include "test_radio.h"
 #include "deployer.h"
@@ -20,7 +20,7 @@
 #define BUF_SIZE 256
 
 struct cb_arg {
-    lfs_file_t file;
+    lfs_file_t *file;
     uint8_t buf[BUF_SIZE];
 };
 
@@ -29,6 +29,7 @@ static thread_t *shell_tp;
 /*===========================================================================*/
 /* Support functions                                                         */
 /*===========================================================================*/
+/*
 bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abort_code, void *arg)
 {
     struct cb_arg *data = arg;
@@ -42,7 +43,7 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
     if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
         space = CO_fifo_getSpace(&sdocli->sdo_c->bufFifo);
         do {
-            size = lfs_file_read(&lfs, &data->file, data->buf, lfs_min(space, BUF_SIZE));
+            size = file_read(&FSD1, data->file, data->buf, lfs_min(space, BUF_SIZE));
             if (size < 0) {
                 *abort_code = CO_SDO_AB_NO_DATA;
                 return true;
@@ -53,13 +54,14 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
         if (ret == CO_SDO_RT_uploadDataBufferFull || ret == CO_SDO_RT_ok_communicationEnd) {
             do {
                 size = CO_SDOclientUploadBufRead(sdocli->sdo_c, data->buf, BUF_SIZE);
-                lfs_file_write(&lfs, &data->file, data->buf, size);
+                file_write(&FSD1, data->file, data->buf, size);
             } while (size);
         }
     }
 
     return false;
 }
+*/
 
 /*===========================================================================*/
 /* OreSat CAN Bus NMT                                                        */
@@ -109,6 +111,7 @@ nmt_usage:
 /*===========================================================================*/
 /* OreSat CAN Bus SDO Client                                                 */
 /*===========================================================================*/
+/*
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 {
     struct cb_arg data;
@@ -121,23 +124,18 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
     if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
         goto sdo_usage;
     }
-    if (SDC->state != BLK_READY) {
-        chprintf(chp, "Error: Please enable eMMC first\r\n");
-        return;
-    }
 
-    /* Set variables from provided values */
     node_id = strtoul(argv[1], NULL, 0);
     index = strtoul(argv[2], NULL, 0);
     subindex = strtoul(argv[3], NULL, 0);
 
-    err = lfs_file_open(&lfs, &data.file, argv[4], LFS_O_RDWR | LFS_O_CREAT);
-    if (err) {
+    data.file = file_open(&FSD1, argv[4], LFS_O_RDWR | LFS_O_CREAT);
+    if (data.file == NULL) {
         chprintf(chp, "Error in file open: %d\r\n", err);
         goto sdo_usage;
     }
     if (argv[0][0] == 'w') {
-        size = lfs_file_size(&lfs, &data.file);
+        size = file_size(&FSD1, data.file);
     }
 
     chprintf(chp, "Initiating transfer... ");
@@ -147,7 +145,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
         return;
     }
     chThdWait(tp);
-    lfs_file_close(&lfs, &data.file);
+    file_close(&FSD1, data.file);
     chprintf(chp, "Done!\r\n");
     return;
 
@@ -155,6 +153,7 @@ sdo_usage:
     chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
     return;
 }
+*/
 
 /*===========================================================================*/
 /* OreSat Power Domain Control                                               */
@@ -324,7 +323,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
             goto time_usage;
         }
     } else if (!strcmp(argv[0], "raw")) {
-        rtcGetTime(&RTCD1, &timespec);
+        rtcGetTime(rtcp, &timespec);
         chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
     } else {
         goto time_usage;
@@ -343,30 +342,22 @@ time_usage:
 void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
 {
     int err;
-    lfs_file_t file;
-    lfs_dir_t dir;
+    lfs_file_t *file;
+    lfs_dir_t *dir;
     struct lfs_info info;
     char buf[BUF_SIZE];
 
-    if (argc < 2) {
-        goto lfs_usage;
-    }
-    if (SDC->state != BLK_READY) {
-        chprintf(chp, "Error: Please enable eMMC first\r\n");
-        return;
-    }
-
-    if (!strcmp(argv[0], "ls")) {
-        err = lfs_dir_open(&lfs, &dir, argv[1]);
-        if (err < 0) {
-            chprintf(chp, "Error in lfs_dir_open: %d\r\n", err);
+    if (!strcmp(argv[0], "ls") && argc > 1) {
+        dir = dir_open(&FSD1, argv[1]);
+        if (dir == NULL) {
+            chprintf(chp, "Error in dir_open: %d\r\n", FSD1.err);
             return;
         }
         do {
-            err = lfs_dir_read(&lfs, &dir, &info);
+            err = dir_read(&FSD1, dir, &info);
             if (err <= 0) {
                 if (err < 0) {
-                    chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
+                    chprintf(chp, "Error in dir_read: %d\r\n", err);
                 }
                 continue;
             }
@@ -379,56 +370,56 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             }
             chprintf(chp, "%8u %s\r\n", info.size, info.name);
         } while (err > 0);
-        err = lfs_dir_close(&lfs, &dir);
+        err = dir_close(&FSD1, dir);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_dir_close: %d\r\n", err);
+            chprintf(chp, "Error in dir_close: %d\r\n", err);
             return;
         }
         chprintf(chp, "\r\n");
-    } else if (!strcmp(argv[0], "mkdir")) {
-        err = lfs_mkdir(&lfs, argv[1]);
+    } else if (!strcmp(argv[0], "mkdir") && argc > 1) {
+        err = fs_mkdir(&FSD1, argv[1]);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_mkdir: %d\r\n");
+            chprintf(chp, "Error in fs_mkdir: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "rm")) {
-        err = lfs_remove(&lfs, argv[1]);
+    } else if (!strcmp(argv[0], "rm") && argc > 1) {
+        err = fs_remove(&FSD1, argv[1]);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_remove: %d\r\n");
+            chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "cat")) {
-        err = lfs_file_open(&lfs, &file, argv[1], LFS_O_RDONLY);
-        if (err < 0) {
-            chprintf(chp, "Error in lfs_file_open: %d\r\n", err);
+    } else if (!strcmp(argv[0], "cat") && argc > 1) {
+        file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
+        if (file == NULL) {
+            chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
             return;
         }
 
-        err = lfs_file_read(&lfs, &file, buf, BUF_SIZE - 1);
+        err = file_read(&FSD1, file, buf, BUF_SIZE - 1);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_file_read: %d\r\n", err);
-            lfs_file_close(&lfs, &file);
+            chprintf(chp, "Error in file_read: %d\r\n", err);
+            file_close(&FSD1, file);
             return;
         }
         buf[err] = '\0';
         chprintf(chp, "%s\r\n", buf);
 
-        err = lfs_file_close(&lfs, &file);
+        err = file_close(&FSD1, file);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_file_close: %d\r\n", err);
+            chprintf(chp, "Error in file_close: %d\r\n", err);
             return;
         }
-    } else if (!strcmp(argv[0], "hexdump")) {
-        err = lfs_file_open(&lfs, &file, argv[1], LFS_O_RDONLY);
-        if (err < 0) {
-            chprintf(chp, "Error in lfs_file_open: %d\r\n", err);
+    } else if (!strcmp(argv[0], "hexdump") && argc > 1) {
+        file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
+        if (file == NULL) {
+            chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
             return;
         }
 
-        err = lfs_file_read(&lfs, &file, buf, BUF_SIZE - 1);
+        err = file_read(&FSD1, file, buf, BUF_SIZE - 1);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_file_read: %d\r\n", err);
-            lfs_file_close(&lfs, &file);
+            chprintf(chp, "Error in file_read: %d\r\n", err);
+            file_close(&FSD1, file);
             return;
         }
         buf[err] = '\0';
@@ -438,11 +429,41 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
         }
         chprintf(chp, "\r\n");
 
-        err = lfs_file_close(&lfs, &file);
+        err = file_close(&FSD1, file);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_file_close: %d\r\n", err);
+            chprintf(chp, "Error in file_close: %d\r\n", err);
             return;
         }
+    } else if (!strcmp(argv[0], "mount")) {
+        int err;
+
+        chprintf(chp, "Attempting to mount LFS...\r\n");
+        err = fs_mount(&FSD1, false);
+        if (err < 0) {
+            chprintf(chp, "Mount failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "unmount")) {
+        int err;
+
+        chprintf(chp, "Attempting to unmount LFS...\r\n");
+        err = fs_unmount(&FSD1);
+        if (err < 0) {
+            chprintf(chp, "Unmount failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "format")) {
+        int err;
+
+        chprintf(chp, "Attempting to format LFS...\r\n");
+        err = fs_format(&FSD1);
+        if (err < 0) {
+            chprintf(chp, "Format failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
     } else {
         goto lfs_usage;
     }
@@ -456,6 +477,10 @@ lfs_usage:
                    "    rm:         Delete file or directory\r\n"
                    "    cat:        Dump 255 bytes of file as string\r\n"
                    "    hexdump:    Dump 255 bytes of file as hex\r\n"
+                   "\r\n"
+                   "    mount:      Mount LFS\r\n"
+                   "    unmount:    Unmount LFS\r\n"
+                   "    format:     Format eMMC for LFS\r\n"
                    "\r\n");
     return;
 }
@@ -502,6 +527,52 @@ state_usage:
 }
 
 /*===========================================================================*/
+/* OreSat C3 FRAM                                                            */
+/*===========================================================================*/
+void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto fram_usage;
+    }
+    if (!strcmp(argv[0], "read") && argc > 2) {
+        uint16_t offset = strtoul(argv[1], NULL, 0);
+        size_t len = strtoul(argv[2], NULL, 0);
+        uint8_t *buf = calloc(len, sizeof(uint8_t));
+        I2CConfig i2cconfig = {
+            OPMODE_I2C,
+            100000,
+            STD_DUTY_CYCLE,
+        };
+        i2cStart(&I2CD2, &i2cconfig);
+        i2cAcquireBus(&I2CD2);
+        i2cMasterTransmit(&I2CD2, 0x50, (uint8_t*)(&offset), sizeof(offset), buf, len);
+        i2cReleaseBus(&I2CD2);
+        i2cStop(&I2CD2);
+
+        for (uint32_t i = 0; i < len; i++) {
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
+            chprintf(chp, " %02X", buf[i]);
+        }
+        chprintf(chp, "\r\n");
+
+        free(buf);
+    } else if (!strcmp(argv[0], "write") && argc > 3) {
+        chprintf(chp, "Unimplemented\r\n");
+    } else {
+        goto fram_usage;
+    }
+
+    return;
+
+fram_usage:
+    chprintf(chp,  "Usage: fram <command>\r\n"
+                   "    read <offset> <len>:\r\n"
+                   "        Read starting at <offset> for <len> bytes\r\n"
+                   "\r\n");
+    return;
+}
+
+/*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
@@ -517,6 +588,7 @@ static const ShellCommand commands[] = {
     {"rf", cmd_rf},
     {"rftest", cmd_rftest},
     {"state", cmd_state},
+    {"fram", cmd_fram},
     {"deploy", cmd_deploy},
     {NULL, NULL}
 };
