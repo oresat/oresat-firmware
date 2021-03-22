@@ -15,6 +15,8 @@
 #include "ch.h"
 #include "hal.h"
 
+#define LFS_THREADSAFE
+
 #ifndef LFS_NO_MALLOC
 #include <stdlib.h>
 #endif

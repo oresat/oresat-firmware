@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "fw.h"
-#include "mmc.h"
+#include "fs.h"
 #include "chprintf.h"
 
 #define FLASH_OPTKEY1                       0x08192A3BU
@@ -20,13 +20,14 @@ uint8_t buf[BUF_SIZE];
 
 int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t len)
 {
-    lfs_file_t file;
+    lfs_file_t *file;
     int err;
 
-    err = lfs_file_open(&lfs, &file, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
-    if (err) {
-        return err;
+    file = file_open(&FSD1, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
+    if (file == NULL) {
+        return FSD1.err;
     }
+
     do {
         ssize_t n = len;
         if (n > BUF_SIZE) {
@@ -37,7 +38,7 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
         if (err != FLASH_NO_ERROR) {
             break;
         }
-        n = lfs_file_write(&lfs, &file, buf, n);
+        n = file_write(&FSD1, file, buf, n);
         if (n < 0) {
             err = n;
             break;
@@ -47,22 +48,22 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
         len -= n;
     } while (len);
 
-    lfs_file_close(&lfs, &file);
+    err = file_close(&FSD1, file);
     return err;
 }
 
 int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
 {
-    lfs_file_t file;
+    lfs_file_t *file;
     ssize_t n;
     int err;
 
-    err = lfs_file_open(&lfs, &file, filename, LFS_O_RDONLY);
-    if (err) {
-        return err;
+    file = file_open(&FSD1, filename, LFS_O_RDONLY);
+    if (file == NULL) {
+        return FSD1.err;
     }
 
-    while ((n = lfs_file_read(&lfs, &file, buf, BUF_SIZE)) > 0) {
+    while ((n = file_read(&FSD1, file, buf, BUF_SIZE)) > 0) {
         err = flashProgram(eflp, offset, n, buf);
         if (err != FLASH_NO_ERROR) {
             break;
@@ -73,7 +74,7 @@ int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
         err = n;
     }
 
-    lfs_file_close(&lfs, &file);
+    err = file_close(&FSD1, file);
     return err;
 }
 

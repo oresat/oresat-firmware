@@ -4,9 +4,13 @@
 #include "hal.h"
 #include "test_mmc.h"
 #include "chprintf.h"
-#include "mmc.h"
+#include "fs.h"
 
 #define SDC_BURST_SIZE      16
+#define SDC                 (FSD1.config->sdcp)
+
+int mmc_enable(FSDriver *fsp);
+int mmc_disable(FSDriver *fsp);
 
 /* Buffer for block read/write operations, note that extra bytes are
    allocated in order to support unaligned operations.*/
@@ -27,10 +31,6 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
                        "    enable:             Enable eMMC subsystem\r\n"
                        "    disable:            Disable eMMC subsystem\r\n"
                        "\r\n"
-                       "    mount:              Mount LFS\r\n"
-                       "    unmount:            Unmount LFS\r\n"
-                       "    format:             Format eMMC for LFS\r\n"
-                       "\r\n"
                        "    testread:           Test read functionality\r\n"
                        "    testwrite:          Test write functionality\r\n"
                        "    testall:            Test all functionality\r\n");
@@ -42,14 +42,10 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
         chprintf(chp, "Enabling eMMC... ");
 
         /* Attempt to enable eMMC subsystem */
-        err = mmc_enable();
+        err = mmc_enable(&FSD1);
         if (err) {
-            if (SDC->state != BLK_STOP) {
-                chprintf(chp, "LFS mount failed: %d\r\n", err);
-            } else {
-                chprintf(chp, "failed\r\n");
-                return;
-            }
+            chprintf(chp, "failed with code %d\r\n", err);
+            return;
         }
 
         /* Print details of the device */
@@ -63,50 +59,18 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         return;
     } else if (strcmp(argv[0], "disable") == 0) {
+        int err;
         chprintf(chp, "Disabling eMMC... ");
 
         /* Disable eMMC subsystem */
-        mmc_disable();
+        err = mmc_disable(&FSD1);
+        if (err) {
+            chprintf(chp, "failed with code %d\r\n", err);
+            return;
+        }
 
         chprintf(chp, "OK\r\n");
         return;
-    }
-
-    if (SDC->state != BLK_READY) {
-        chprintf(chp, "Error: Please enable eMMC subsystem first\r\n");
-        return;
-    }
-
-    if (!strcmp(argv[0], "mount")) {
-        int err;
-
-        chprintf(chp, "Attempting to mount LFS...\r\n");
-        err = lfs_mount(&lfs, &lfscfg);
-        if (err < 0) {
-            chprintf(chp, "Mount failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "unmount")) {
-        int err;
-
-        chprintf(chp, "Attempting to unmount LFS...\r\n");
-        err = lfs_unmount(&lfs);
-        if (err < 0) {
-            chprintf(chp, "Unmount failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "format")) {
-        int err;
-
-        chprintf(chp, "Attempting to format LFS...\r\n");
-        err = lfs_format(&lfs, &lfscfg);
-        if (err < 0) {
-            chprintf(chp, "Format failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
     }
 
     /* The test is performed in the middle of the flash area.*/
