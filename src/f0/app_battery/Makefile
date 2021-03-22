@@ -87,7 +87,7 @@ PROJECT   = app_battery_v1
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = BATTERY_V1
+BOARD     = BATTERY_V2
 
 #Project sources.
 PROJ_ROOT = ../../..
