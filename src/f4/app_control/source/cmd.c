@@ -20,7 +20,7 @@
 #define BUF_SIZE 256
 
 struct cb_arg {
-    lfs_file_t file;
+    lfs_file_t *file;
     uint8_t buf[BUF_SIZE];
 };
 
@@ -43,7 +43,7 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
     if (sdocli->state == SDOCLI_ST_DOWNLOAD) {
         space = CO_fifo_getSpace(&sdocli->sdo_c->bufFifo);
         do {
-            size = lfs_file_read(&lfs, &data->file, data->buf, lfs_min(space, BUF_SIZE));
+            size = file_read(&FSD1, data->file, data->buf, lfs_min(space, BUF_SIZE));
             if (size < 0) {
                 *abort_code = CO_SDO_AB_NO_DATA;
                 return true;
@@ -54,7 +54,7 @@ bool sdo_file_cb(sdocli_t *sdocli, CO_SDO_return_t ret, CO_SDO_abortCode_t *abor
         if (ret == CO_SDO_RT_uploadDataBufferFull || ret == CO_SDO_RT_ok_communicationEnd) {
             do {
                 size = CO_SDOclientUploadBufRead(sdocli->sdo_c, data->buf, BUF_SIZE);
-                lfs_file_write(&lfs, &data->file, data->buf, size);
+                file_write(&FSD1, data->file, data->buf, size);
             } while (size);
         }
     }
@@ -129,13 +129,13 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
     index = strtoul(argv[2], NULL, 0);
     subindex = strtoul(argv[3], NULL, 0);
 
-    err = fs_file_open(&lfs, &data.file, argv[4], LFS_O_RDWR | LFS_O_CREAT);
-    if (err) {
+    data.file = file_open(&FSD1, argv[4], LFS_O_RDWR | LFS_O_CREAT);
+    if (data.file == NULL) {
         chprintf(chp, "Error in file open: %d\r\n", err);
         goto sdo_usage;
     }
     if (argv[0][0] == 'w') {
-        size = lfs_file_size(&lfs, &data.file);
+        size = file_size(&FSD1, data.file);
     }
 
     chprintf(chp, "Initiating transfer... ");
@@ -145,7 +145,7 @@ void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
         return;
     }
     chThdWait(tp);
-    lfs_file_close(&lfs, &data.file);
+    file_close(&FSD1, data.file);
     chprintf(chp, "Done!\r\n");
     return;
 
@@ -343,7 +343,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
 {
     int err;
     lfs_file_t *file;
-    lfs_dir_t dir;
+    lfs_dir_t *dir;
     struct lfs_info info;
     char buf[BUF_SIZE];
 
@@ -352,16 +352,16 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     if (!strcmp(argv[0], "ls")) {
-        err = lfs_dir_open(&FSD1.lfs, &dir, argv[1]);
-        if (err < 0) {
-            chprintf(chp, "Error in lfs_dir_open: %d\r\n", err);
+        dir = dir_open(&FSD1, argv[1]);
+        if (dir == NULL) {
+            chprintf(chp, "Error in dir_open: %d\r\n", FSD1.err);
             return;
         }
         do {
-            err = lfs_dir_read(&FSD1.lfs, &dir, &info);
+            err = dir_read(&FSD1, dir, &info);
             if (err <= 0) {
                 if (err < 0) {
-                    chprintf(chp, "Error in lfs_dir_read: %d\r\n", err);
+                    chprintf(chp, "Error in dir_read: %d\r\n", err);
                 }
                 continue;
             }
@@ -374,22 +374,22 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             }
             chprintf(chp, "%8u %s\r\n", info.size, info.name);
         } while (err > 0);
-        err = lfs_dir_close(&FSD1.lfs, &dir);
+        err = dir_close(&FSD1, dir);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_dir_close: %d\r\n", err);
+            chprintf(chp, "Error in dir_close: %d\r\n", err);
             return;
         }
         chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "mkdir")) {
-        err = lfs_mkdir(&FSD1.lfs, argv[1]);
+        err = fs_mkdir(&FSD1, argv[1]);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_mkdir: %d\r\n");
+            chprintf(chp, "Error in fs_mkdir: %d\r\n");
             return;
         }
     } else if (!strcmp(argv[0], "rm")) {
         err = fs_remove(&FSD1, argv[1]);
         if (err < 0) {
-            chprintf(chp, "Error in lfs_remove: %d\r\n");
+            chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
     } else if (!strcmp(argv[0], "cat")) {

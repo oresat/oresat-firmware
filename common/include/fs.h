@@ -41,8 +41,8 @@
 /**
  * @brief   Maximum number of files open
  */
-#if !defined(FS_MAX_FILES) || defined(__DOXYGEN__)
-#define FS_MAX_FILES                        (4U)
+#if !defined(FS_MAX_HANDLERS) || defined(__DOXYGEN__)
+#define FS_MAX_HANDLERS                     (4U)
 #endif
 
 /** @} */
@@ -115,7 +115,10 @@ struct FSDriver {
     unpacked_mmc_csd_t          mmc_csd;
     /* Guarded file pool */
     guarded_memory_pool_t       file_pool;
-    lfs_file_t                  file[FS_MAX_FILES];
+    lfs_file_t                  file[FS_MAX_HANDLERS];
+    /* Guarded dir pool */
+    guarded_memory_pool_t       dir_pool;
+    lfs_file_t                  dir[FS_MAX_HANDLERS];
     /* TODO: Implement static file buffers */
     /* Read buffer */
     uint8_t                     read_buf[FS_CACHE_SIZE];
@@ -171,6 +174,13 @@ int file_rewind(FSDriver *fsp, lfs_file_t *file);
 lfs_soff_t file_size(FSDriver *fsp, lfs_file_t *file);
 
 /* Directory operations */
+int fs_mkdir(FSDriver *fsp, const char *path);
+lfs_dir_t *dir_open(FSDriver *fsp, const char *path);
+int dir_close(FSDriver *fsp, lfs_dir_t *dir);
+int dir_read(FSDriver *fsp, lfs_dir_t *dir, struct lfs_info *info);
+int dir_seek(FSDriver *fsp, lfs_dir_t *dir, lfs_soff_t off);
+lfs_soff_t dir_tell(FSDriver *fsp, lfs_dir_t *dir);
+int dir_rewind(FSDriver *fsp, lfs_dir_t *dir);
 
 #ifdef __cplusplus
 }

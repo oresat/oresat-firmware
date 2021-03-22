@@ -37,7 +37,7 @@ FSDriver FSD1;
  *
  * @param[in]  cfg      Pointer to the LFS configuration
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_lock(const struct lfs_config *cfg)
@@ -57,7 +57,7 @@ int mmc_lock(const struct lfs_config *cfg)
  *
  * @param[in]  cfg      Pointer to the LFS configuration
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_unlock(const struct lfs_config *cfg)
@@ -82,7 +82,7 @@ int mmc_unlock(const struct lfs_config *cfg)
  * @param[out] buffer   Pointer to an output buffer
  * @param[in]  size     Number of consecutive bytes to read
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
@@ -121,7 +121,7 @@ int mmc_read(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, voi
  * @param[in]  buffer   Pointer to an input buffer
  * @param[in]  size     Number of consecutive bytes to program
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size)
@@ -160,7 +160,7 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
  * @param[in]  cfg      Pointer to the LFS configuration
  * @param[in]  block    The block to read from
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
@@ -191,7 +191,7 @@ int mmc_erase(const struct lfs_config *cfg, lfs_block_t block)
  *
  * @param[in]  cfg      Pointer to the LFS configuration
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_sync(const struct lfs_config *cfg)
@@ -214,7 +214,7 @@ int mmc_sync(const struct lfs_config *cfg)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_enable(FSDriver *fsp)
@@ -265,7 +265,7 @@ int mmc_enable(FSDriver *fsp)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 int mmc_disable(FSDriver *fsp)
@@ -296,7 +296,7 @@ int mmc_disable(FSDriver *fsp)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 static inline int fs_access_start(FSDriver *fsp)
@@ -312,7 +312,7 @@ static inline int fs_access_start(FSDriver *fsp)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @notapi
  */
 static inline int fs_access_end(FSDriver *fsp)
@@ -328,23 +328,47 @@ void *fs_alloc_file(FSDriver *fsp)
     /* Sanity checks */
     osalDbgCheck(fsp != NULL);
 
-    void *fp = NULL;
+    void *file = NULL;
     fsp->err = LFS_ERR_OK;
 
-    fp = chGuardedPoolAllocTimeout(&fsp->file_pool, TIME_IMMEDIATE);
-    if (fp == NULL) {
+    file = chGuardedPoolAllocTimeout(&fsp->file_pool, TIME_IMMEDIATE);
+    if (file == NULL) {
         fsp->err = LFS_ERR_NOMEM;
     }
 
-    return fp;
+    return file;
 }
 
-void fs_free_file(FSDriver *fsp, void *fp)
+void fs_free_file(FSDriver *fsp, void *file)
 {
     /* Sanity checks */
-    osalDbgCheck(fsp != NULL && fp != NULL);
+    osalDbgCheck(fsp != NULL && file != NULL);
 
-    chGuardedPoolFree(&fsp->file_pool, fp);
+    chGuardedPoolFree(&fsp->file_pool, file);
+}
+
+lfs_dir_t *fs_alloc_dir(FSDriver *fsp)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL);
+
+    void *dir = NULL;
+    fsp->err = LFS_ERR_OK;
+
+    dir = chGuardedPoolAllocTimeout(&fsp->dir_pool, TIME_IMMEDIATE);
+    if (dir == NULL) {
+        fsp->err = LFS_ERR_NOMEM;
+    }
+
+    return dir;
+}
+
+void fs_free_dir(FSDriver *fsp, lfs_dir_t *dir)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL);
+
+    chGuardedPoolFree(&fsp->dir_pool, dir);
 }
 
 /*===========================================================================*/
@@ -388,7 +412,9 @@ void fs_init(FSDriver *fsp)
 
     chMtxObjectInit(&fsp->mutex);
     chGuardedPoolObjectInitAligned(&fsp->file_pool, sizeof(lfs_file_t), PORT_NATURAL_ALIGN);
-    chGuardedPoolLoadArray(&fsp->file_pool, fsp->file, FS_MAX_FILES);
+    chGuardedPoolLoadArray(&fsp->file_pool, fsp->file, FS_MAX_HANDLERS);
+    chGuardedPoolObjectInitAligned(&fsp->dir_pool, sizeof(lfs_dir_t), PORT_NATURAL_ALIGN);
+    chGuardedPoolLoadArray(&fsp->dir_pool, fsp->dir, FS_MAX_HANDLERS);
 
     fsp->state                  = FS_STOP;
 }
@@ -435,7 +461,7 @@ void fs_stop(FSDriver *fsp)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_format(FSDriver *fsp)
@@ -485,7 +511,7 @@ int fs_format(FSDriver *fsp)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  format   Format the volume if unable to mount
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_mount(FSDriver *fsp, bool format)
@@ -526,7 +552,7 @@ int fs_mount(FSDriver *fsp, bool format)
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_unmount(FSDriver *fsp)
@@ -560,7 +586,7 @@ int fs_unmount(FSDriver *fsp)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  path     Pathname
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_remove(FSDriver *fsp, const char *path)
@@ -591,7 +617,7 @@ int fs_remove(FSDriver *fsp, const char *path)
  * @param[in]  oldpath  Old pathname
  * @param[in]  newpath  New pathname
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_rename(FSDriver *fsp, const char *oldpath, const char *newpath)
@@ -622,7 +648,7 @@ int fs_rename(FSDriver *fsp, const char *oldpath, const char *newpath)
  * @param[in]  path     Pathname
  * @param[out] info     Info structure to fill out
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_stat(FSDriver *fsp, const char *path, struct lfs_info *info)
@@ -695,7 +721,7 @@ lfs_ssize_t fs_getattr(FSDriver *fsp, const char *path, uint8_t type, void *buff
  * @param[out] buffer   The buffer to write the attribute to
  * @param[in]  size     Maximum size of buffer
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_setattr(FSDriver *fsp, const char *path, uint8_t type, const void *buffer, lfs_size_t size)
@@ -726,7 +752,7 @@ int fs_setattr(FSDriver *fsp, const char *path, uint8_t type, const void *buffer
  * @param[in]  path     Pathname
  * @param[in]  type     Attribute type
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int fs_removeattr(FSDriver *fsp, const char *path, uint8_t type)
@@ -789,7 +815,7 @@ lfs_file_t *file_open(FSDriver *fsp, const char *path, int flags)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  file     Open file pointer to close
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int file_close(FSDriver *fsp, lfs_file_t *file)
@@ -818,7 +844,7 @@ int file_close(FSDriver *fsp, lfs_file_t *file)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  file     Open file pointer
  *
- * @return              Offset position or negative error code
+ * @return              Negative error code on failure
  * @api
  */
 int file_sync(FSDriver *fsp, lfs_file_t *file)
@@ -826,7 +852,7 @@ int file_sync(FSDriver *fsp, lfs_file_t *file)
     /* Sanity checks */
     osalDbgCheck(fsp != NULL && file != NULL);
     osalDbgAssert(fsp->state == FS_MOUNTED,
-            "file_read(), invalid state");
+            "file_sync(), invalid state");
 
     fsp->err = lfs_file_sync(&fsp->lfs, file);
 
@@ -841,7 +867,7 @@ int file_sync(FSDriver *fsp, lfs_file_t *file)
  * @param[out] buffer   Buffer to read into
  * @param[in]  size     Maximum number of bytes to read
  *
- * @return              Offset position or negative error code
+ * @return              Offset position or negative error code on failure
  * @api
  */
 lfs_ssize_t file_read(FSDriver *fsp, lfs_file_t *file, void *buffer, lfs_size_t size)
@@ -870,7 +896,7 @@ lfs_ssize_t file_read(FSDriver *fsp, lfs_file_t *file, void *buffer, lfs_size_t 
  * @param[in]  buffer   Buffer to write from
  * @param[in]  size     Maximum number of bytes to write
  *
- * @return              Offset position or negative error code
+ * @return              Offset position or negative error code on failure
  * @api
  */
 lfs_ssize_t file_write(FSDriver *fsp, lfs_file_t *file, const void *buffer, lfs_size_t size)
@@ -899,7 +925,7 @@ lfs_ssize_t file_write(FSDriver *fsp, lfs_file_t *file, const void *buffer, lfs_
  * @param[in]  off      Offset to seek to
  * @param[in]  whence   Where to start offset at
  *
- * @return              Offset position or negative error code
+ * @return              Offset position or negative error code on failure
  * @api
  */
 lfs_soff_t file_seek(FSDriver *fsp, lfs_file_t *file, lfs_soff_t off, int whence)
@@ -927,7 +953,7 @@ lfs_soff_t file_seek(FSDriver *fsp, lfs_file_t *file, lfs_soff_t off, int whence
  * @param[in]  file     Open file pointer
  * @param[in]  size     Size to truncate to
  *
- * @return              The operation status
+ * @return              Negative error code on failure
  * @api
  */
 int file_truncate(FSDriver *fsp, lfs_file_t *file, lfs_soff_t size)
@@ -948,7 +974,7 @@ int file_truncate(FSDriver *fsp, lfs_file_t *file, lfs_soff_t size)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  file     Open file pointer
  *
- * @return              Offset position or negative error code
+ * @return              Offset position or negative error code on failure
  * @api
  */
 lfs_soff_t file_tell(FSDriver *fsp, lfs_file_t *file)
@@ -975,7 +1001,7 @@ lfs_soff_t file_tell(FSDriver *fsp, lfs_file_t *file)
  * @param[in]  fsp      Pointer to the @p FSDriver object
  * @param[in]  file     Open file pointer
  *
- * @return              Offset position or negative error code
+ * @return              Negative error code on failure
  * @api
  */
 int file_rewind(FSDriver *fsp, lfs_file_t *file)
@@ -1015,6 +1041,196 @@ lfs_soff_t file_size(FSDriver *fsp, lfs_file_t *file)
     }
 
     return off;
+}
+
+/**
+ * @brief   Create a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  path     Pathname
+ *
+ * @return              Negative error code on failure
+ * @api
+ */
+int fs_mkdir(FSDriver *fsp, const char *path)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL);
+    osalDbgAssert((fsp->state != FS_UNINIT) && (fsp->state != FS_STOP),
+            "fs_mkdir(), invalid state");
+
+    fsp->err = fs_access_start(fsp);
+    if (fsp->err != LFS_ERR_OK) {
+        return fsp->err;
+    }
+
+    fsp->err = lfs_mkdir(&fsp->lfs, path);
+    if (fsp->err != LFS_ERR_OK) {
+        return fsp->err;
+    }
+
+    fsp->err = fs_access_end(fsp);
+    return fsp->err;
+}
+
+/**
+ * @brief   Opens a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  path     Pathname of the directory
+ *
+ * @return              Directory handler pointer
+ * @api
+ */
+lfs_dir_t *dir_open(FSDriver *fsp, const char *path)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL);
+    osalDbgAssert((fsp->state != FS_UNINIT) && (fsp->state != FS_STOP),
+            "dir_open(), invalid state");
+
+    lfs_dir_t *dir = NULL;
+
+    fsp->err = fs_access_start(fsp);
+    if (fsp->err != LFS_ERR_OK) {
+        return NULL;
+    }
+
+    dir = fs_alloc_dir(fsp);
+
+    if (dir != NULL) {
+        fsp->err = lfs_dir_open(&fsp->lfs, dir, path);
+    }
+
+    return dir;
+}
+
+/**
+ * @brief   Closes a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  dir      Open directory pointer to close
+ *
+ * @return              Negative error code on failure
+ * @api
+ */
+int dir_close(FSDriver *fsp, lfs_dir_t *dir)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "dir_close(), invalid state");
+
+    fsp->err = LFS_ERR_OK;
+
+    fsp->err = lfs_dir_close(&fsp->lfs, dir);
+    if (fsp->err != LFS_ERR_OK) {
+        return fsp->err;
+    }
+
+    fs_free_dir(fsp, dir);
+
+    fsp->err = fs_access_end(fsp);
+    return fsp->err;
+}
+
+/**
+ * @brief   Reads from a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  dir      Open directory pointer
+ * @param[out] info     Info struct to read next entry into
+ *
+ * @return              Positive value on success, 0 at end of directory
+ *                      or negative error code on failure
+ * @api
+ */
+int dir_read(FSDriver *fsp, lfs_dir_t *dir, struct lfs_info *info)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL && info != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "dir_read(), invalid state");
+
+    int ret;
+    fsp->err = LFS_ERR_OK;
+
+    ret = lfs_dir_read(&fsp->lfs, dir, info);
+    if (ret < 0) {
+        fsp->err = ret;
+    }
+
+    return ret;
+}
+
+/**
+ * @brief   Seeks in a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  dir      Open directory pointer
+ * @param[in]  off      Offset to seek to (as told by dir_tell)
+ *
+ * @return              Negative error code on failure
+ * @api
+ */
+int dir_seek(FSDriver *fsp, lfs_dir_t *dir, lfs_soff_t off)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "dir_seek(), invalid state");
+
+    fsp->err = lfs_dir_seek(&fsp->lfs, dir, off);
+
+    return fsp->err;
+}
+
+/**
+ * @brief   Return position in a directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  dir      Open directory pointer
+ *
+ * @return              Offset position or negative error code on failure
+ * @api
+ */
+lfs_soff_t dir_tell(FSDriver *fsp, lfs_dir_t *dir)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "dir_tell(), invalid state");
+
+    lfs_soff_t off;
+    fsp->err = LFS_ERR_OK;
+
+    off = lfs_dir_tell(&fsp->lfs, dir);
+    if (off < 0) {
+        fsp->err = off;
+    }
+
+    return off;
+}
+
+/**
+ * @brief   Set position to start of directory.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  dir      Open directory pointer
+ *
+ * @return              Negative error code on failure
+ * @api
+ */
+int dir_rewind(FSDriver *fsp, lfs_dir_t *dir)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && dir != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "dir_rewind(), invalid state");
+
+    fsp->err = lfs_dir_rewind(&fsp->lfs, dir);
+
+    return fsp->err;
 }
 
 /** @} */
