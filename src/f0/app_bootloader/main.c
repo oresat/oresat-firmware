@@ -303,7 +303,7 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 		case ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY:
 		{
 			const uint8_t *address_to_read_from = (uint8_t *) ((rx_msg->data8[0] << 24) | (rx_msg->data8[1] << 16) | (rx_msg->data8[2] << 8) | rx_msg->data8[3]);
-			const uint8_t number_of_bytes_to_read = rx_msg->data8[4];
+			const uint8_t number_of_bytes_to_read = rx_msg->data8[4] + 1;
 
 			chprintf(DEBUG_SD, "Address to read from: 0x%X\r\n", address_to_read_from);
 			chprintf(DEBUG_SD, "Number of bytes to read: %u\r\n", number_of_bytes_to_read);

@@ -10,8 +10,19 @@
 #define M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE     64
 uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
 
+#define STM32_BOOTLOADER_TEST_CODE    0
 
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id) {
+/**
+ * Used to fully initialize a can_bootloader_config_t structure.
+ *
+ * @param *canp Pointer to can driver object
+ * @param *chp Pointer to debug output serial stream
+ * @param low_cpu_id Use for matching to the lower order 32 bits of the unique CPU id of a given M0 node.
+ * @param stm32_bootloader_mode Flag to indicate if the target is at stm32 CAN bootloader rather then an ORESAT bootloader (stm32 bootloader not currently supported)
+ *
+ * @return true on success, false otherwise.
+ */
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode) {
 	if (can_bl_config == NULL) {
 		return (false);
 	}
@@ -20,6 +31,7 @@ bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config
 	can_bl_config->canp = canp;
 	can_bl_config->chp = chp;
 	can_bl_config->low_cpu_id = low_cpu_id;
+	can_bl_config->stm32_bootloader_mode = stm32_bootloader_mode;
 
 	return (true);
 }
@@ -29,6 +41,7 @@ void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config) {
 
 	chprintf(chp, "can_bootloader_config_t:\r\n");
 	chprintf(chp, "  low_cpu_id:                   0x%X\r\n", can_bl_config->low_cpu_id);
+	chprintf(chp, "  stm32_bootloader_mode:        %u\r\n", can_bl_config->stm32_bootloader_mode);
 	chprintf(chp, "  read_fail_count:              %u\r\n", can_bl_config->read_fail_count);
 	chprintf(chp, "  write_fail_count:             %u\r\n", can_bl_config->write_fail_count);
 	chprintf(chp, "  erase_fail_count:             %u\r\n", can_bl_config->erase_fail_count);
@@ -79,21 +92,30 @@ void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const ch
 }
 
 
-msg_t can_api_receive(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms) {
+msg_t can_api_receive2(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms, const char *pre_msg, const char *post_msg) {
 	CANDriver *canp = can_bl_config->canp;
 	BaseSequentialStream *chp = can_bl_config->chp;
 
 	msg_t r = canReceive(canp, CAN_ANY_MAILBOX, msg, TIME_MS2I(timeout_ms));
 	if( r == MSG_OK ) {
-		can_api_print_rx_frame(chp, msg, "", "");
+		can_api_print_rx_frame(chp, msg, pre_msg, post_msg);
 	}
 	return(r);
 }
 
+msg_t can_api_receive(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms) {
+	return(can_api_receive2(can_bl_config, msg, timeout_ms, "", ""));
+}
+
 void can_api_purge_rx_buffer(can_bootloader_config_t *can_bl_config) {
 	CANRxFrame msg;
+	uint32_t timeout = 5;
+	if( can_bl_config->stm32_bootloader_mode ) {
+		timeout = 50;
+	}
+
 	for(int i = 0; i < 3; i++ ) {
-		if( can_api_receive(can_bl_config, &msg, 5) != MSG_OK ) {
+		if( can_api_receive2(can_bl_config, &msg, timeout, "", "PURGED") != MSG_OK ) {
 			//break;
 		}
 	}
@@ -113,48 +135,106 @@ msg_t can_api_transmit(can_bootloader_config_t *can_bl_config, CANTxFrame *msg, 
 	return(r);
 }
 
+#if STM32_BOOTLOADER_TEST_CODE
+bool can_bootloader_tx_garbage_frame(can_bootloader_config_t *can_bl_config) {
+	if( ! can_bl_config->stm32_bootloader_mode ) {
+		return(true);
+	}
+
+	CANTxFrame msg;
+	memset(&msg, 0, sizeof(msg));
+	msg.SID = 0x99;
+	if( can_api_transmit(can_bl_config, &msg, 100) == MSG_OK ) {
+		return(true);
+	}
+
+	return(false);
+}
+#endif
+
 
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
-	CANRxFrame msg;
-	memset(&msg, 0, sizeof(msg));
-	msg_t r = can_api_receive(can_bl_config, &msg, timeout_ms);
-	if( r == MSG_OK ) {
-		if( msg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && msg.DLC == 8 ) {
+	if( can_bl_config->stm32_bootloader_mode ) {
+		//Note: The STM32 bootloader expects the CAN peripheral bitrate to be configured to 125kbit.
+		const uint32_t rx_read_timeout_ms = 50;
+		const uint32_t max_retrys = timeout_ms / rx_read_timeout_ms;
 
-			if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
-				const uint32_t remote_low_cpu_id = (msg.data8[4] << 24) | (msg.data8[5] << 16) | (msg.data8[6] << 8) | (msg.data8[7] << 0);
-				chprintf(chp, "Remote CPU ID Low = 0x%X\r\n", remote_low_cpu_id);
+		for(uint32_t retry_count = 0; retry_count < max_retrys; retry_count++ ) {
+			CANTxFrame tx_msg;
+			memset(&tx_msg, 0, sizeof(tx_msg));
+			tx_msg.SID = STM32_BOOTLOADER_CAN_ACK;
+			tx_msg.DLC = 8;
+			memset(&tx_msg.data8[0], 0x55, sizeof(tx_msg.data8));
 
-				if( can_bl_config->low_cpu_id == 0 || remote_low_cpu_id == can_bl_config->low_cpu_id ) {
-					CANTxFrame tx_msg;
-					memset(&tx_msg, 0, sizeof(tx_msg));
-					tx_msg.SID = BOOTLOADER_EXPECTED_FIRST_FRAME_ID;
-					tx_msg.DLC = 8;
-					tx_msg.data8[0] = msg.data8[4];
-					tx_msg.data8[1] = msg.data8[5];
-					tx_msg.data8[2] = msg.data8[6];
-					tx_msg.data8[3] = msg.data8[7];
-					tx_msg.data8[4] = 0x01;
-					tx_msg.data8[5] = 0x02;
-					tx_msg.data8[6] = 0x03;
-					tx_msg.data8[7] = 0x04;
+			msg_t r = can_api_transmit(can_bl_config, &tx_msg, 50);
 
-					r = can_api_transmit(can_bl_config, &tx_msg, 100);
-					if( r == MSG_OK ) {
-						chprintf(chp, "Successfully put remote node into bootloader mode...\r\n");
-						can_bl_config->initiate_connection_count++;
+			if( r == MSG_OK ) {
+				chprintf(chp, "Sent STM32 CAN bootloader initialization frame...\r\n");
+				CANRxFrame msg;
+				memset(&msg, 0, sizeof(msg));
+				r = can_api_receive(can_bl_config, &msg, rx_read_timeout_ms);
+
+				if( r == MSG_OK ) {
+					chprintf(chp, "Got response from STM32 CAN bootloader...\r\n");
+					can_api_print_rx_frame(chp, &msg, "", "");
+					if( msg.SID == STM32_BOOTLOADER_CAN_ACK ) {
+						chprintf(chp, "Successfully put remote STM32 devices into CAN bootloader mode!\r\n");
+						//chThdSleepMilliseconds(5000);
 						return(true);
 					}
+					break;
+
 				} else {
-					chprintf(chp, "Remote CPU ID did not match target CPU ID: 0x%X != 0x%X\r\n", can_bl_config->low_cpu_id, remote_low_cpu_id);
+					chprintf(chp, "No response from STM32 CAN bootloader...\r\n");
 				}
 
+			} else {
+				chprintf(chp, "Failed to send STM32 CAN bootloader initialization frame...\r\n");
 			}
 		}
+
 	} else {
-		chprintf(chp, "Failed to receive CAN frame to initiate CAN bootloader on a device...\r\n");
+		CANRxFrame msg;
+		memset(&msg, 0, sizeof(msg));
+		msg_t r = can_api_receive(can_bl_config, &msg, timeout_ms);
+		if( r == MSG_OK ) {
+			if( msg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && msg.DLC == 8 ) {
+
+				if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
+					const uint32_t remote_low_cpu_id = (msg.data8[4] << 24) | (msg.data8[5] << 16) | (msg.data8[6] << 8) | (msg.data8[7] << 0);
+					chprintf(chp, "Remote CPU ID Low = 0x%X\r\n", remote_low_cpu_id);
+
+					if( can_bl_config->low_cpu_id == 0 || remote_low_cpu_id == can_bl_config->low_cpu_id ) {
+						CANTxFrame tx_msg;
+						memset(&tx_msg, 0, sizeof(tx_msg));
+						tx_msg.SID = BOOTLOADER_EXPECTED_FIRST_FRAME_ID;
+						tx_msg.DLC = 8;
+						tx_msg.data8[0] = msg.data8[4];
+						tx_msg.data8[1] = msg.data8[5];
+						tx_msg.data8[2] = msg.data8[6];
+						tx_msg.data8[3] = msg.data8[7];
+						tx_msg.data8[4] = 0x01;
+						tx_msg.data8[5] = 0x02;
+						tx_msg.data8[6] = 0x03;
+						tx_msg.data8[7] = 0x04;
+
+						r = can_api_transmit(can_bl_config, &tx_msg, 100);
+						if( r == MSG_OK ) {
+							chprintf(chp, "Successfully put remote node into bootloader mode...\r\n");
+							can_bl_config->initiate_connection_count++;
+							return(true);
+						}
+					} else {
+						chprintf(chp, "Remote CPU ID did not match target CPU ID: 0x%X != 0x%X\r\n", can_bl_config->low_cpu_id, remote_low_cpu_id);
+					}
+
+				}
+			}
+		} else {
+			chprintf(chp, "Failed to receive CAN frame to initiate CAN bootloader on a device...\r\n");
+		}
 	}
 	return(false);
 }
@@ -165,31 +245,52 @@ bool can_bootloader_wait_for_ack(can_bootloader_config_t *can_bl_config, const u
 	CANRxFrame rx_msg;
 	memset(&rx_msg, 0, sizeof(rx_msg));
 
-	msg_t r = can_api_receive(can_bl_config, &rx_msg, 1000);
-	if( r == MSG_OK ) {
-		if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_ACK ) {
-			can_api_print_rx_frame(chp, &rx_msg, "", " - ACK");
-			can_bl_config->ack_count++;
-		} else if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_NACK ) {
-			can_api_print_rx_frame(chp, &rx_msg, "", " - NACK");
-			can_bl_config->nack_count++;
-		} else {
-			can_api_print_rx_frame(chp, &rx_msg, "", " - UNKNOWN");
-			can_bl_config->unknown_count++;
-		}
+	for(uint32_t retry_count = 0; retry_count < 3; retry_count++) {
+		msg_t r = can_api_receive2(can_bl_config, &rx_msg, 1000, "", "expecting ACK/NACK");
+		if( r == MSG_OK ) {
+			if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_ACK ) {
+				can_api_print_rx_frame(chp, &rx_msg, "", " - got ACK");
+				can_bl_config->ack_count++;
+				return(true);
+			} else if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_NACK ) {
+				can_api_print_rx_frame(chp, &rx_msg, "", " - got NACK");
+				can_bl_config->nack_count++;
+				return(true);
+			} else {
+				can_api_print_rx_frame(chp, &rx_msg, "", " - UNKNOWN");
+				can_bl_config->unknown_count++;
+			}
 
-		return(true);
-	} else {
-		chprintf(chp, "Failed to get CAN frame while waiting for ACK/NACK\r\n");
+		} else {
+			chprintf(chp, "Failed to get CAN frame while waiting for ACK/NACK for 0x%X\r\n", sid_match);
+		}
 	}
 	return(false);
 }
 
+#if STM32_BOOTLOADER_TEST_CODE
+bool can_bootloader_wait_for_ack_with_garbage(can_bootloader_config_t *can_bl_config, const uint32_t sid_match) {
+	if( can_bl_config->stm32_bootloader_mode ) {
+		for(int i = 0; i < 5; i++ ) {
+			if( can_bootloader_wait_for_ack(can_bl_config, sid_match) ) {
+				return(true);
+			}
+			can_bootloader_tx_garbage_frame(can_bl_config);
+		}
+	} else {
+		return(can_bootloader_wait_for_ack_with_garbage(can_bl_config, sid_match));
+	}
+
+	return(false);
+}
+#endif
+
+
 bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
-
 	//can_api_purge_rx_buffer(canp, chp);
+	chprintf(chp, "\r\ncan_bootloader_read_data(0x%X, %u)\r\n", memory_address, num_bytes_to_read);
 
 	msg_t r = 0;
 
@@ -201,7 +302,7 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
 	tx_msg.data8[1] = (memory_address >> 16) & 0xFF;
 	tx_msg.data8[2] = (memory_address >> 8) & 0xFF;
 	tx_msg.data8[3] = (memory_address >> 0) & 0xFF;
-	tx_msg.data8[4] = num_bytes_to_read;
+	tx_msg.data8[4] = num_bytes_to_read - 1;
 
 	if( (r = can_api_transmit(can_bl_config, &tx_msg, 100)) != MSG_OK ) {
 		return(false);
@@ -250,6 +351,7 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
 bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uint32_t page_number) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
+	chprintf(chp, "\r\ncan_bootloader_erase_page(%u)\r\n", page_number);
 	msg_t r = 0;
 
 	CANTxFrame tx_msg;
@@ -266,9 +368,13 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
 	if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_ERASE) ) {
 		return(false);
 	}
+
+
 	if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_ERASE) ) {
 		return(false);
 	}
+
+	//can_api_purge_rx_buffer(can_bl_config);
 
 	chprintf(chp, "Successfully erased page %u on remote device\r\n", page_number);
 	return(true);
@@ -277,6 +383,8 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
 
 bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes) {
 	BaseSequentialStream *chp = can_bl_config->chp;
+
+	chprintf(chp, "\r\ncan_bootloader_write_memory(., 0x%X, ., %u)\r\n", memory_address, num_bytes);
 
 	msg_t r = 0;
 
@@ -295,6 +403,7 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
 		return(false);
 	}
 	if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY) ) {
+		chprintf(chp, "Failed waiting for ACK in can_bootloader_write_memory()\r\n");
 		return(false);
 	}
 
@@ -315,6 +424,7 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
 				return(false);
 			}
 			if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY) ) {
+				chprintf(chp, "Failed waiting for ACK in can_bootloader_write_memory() - 2\r\n");
 				return(false);
 			}
 		} else {
@@ -323,6 +433,7 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
 	}
 
 	if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY) ) {
+		chprintf(chp, "Failed waiting for ACK in can_bootloader_write_memory() - 3\r\n");
 		return(false);
 	}
 
@@ -363,13 +474,28 @@ bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
 		chprintf(chp, "Failed to put node into bootloader mode...\r\n");
 		return(false);
 	}
+	uint32_t test_memory_address = 0x800A000;
+	if( can_bl_config->stm32_bootloader_mode ) {
+		test_memory_address = 0x8000000;
+	}
+
 	//bool can_bootloader_read_data(CANDriver *canp, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length, BaseSequentialStream *chp) {
 	static uint8_t temp_buffer[128];
 	if( ! can_bootloader_read_data(can_bl_config, 0x8000000, 4, temp_buffer, sizeof(temp_buffer)) ) {
 		return(false);
 	}
 
-	if( ! can_bootloader_erase_page(can_bl_config, 20) ) {
+	if( can_bl_config->stm32_bootloader_mode ) {
+		if( ! can_bootloader_erase_page(can_bl_config, 0) ) {
+			return(false);
+		}
+	} else {
+		if( ! can_bootloader_erase_page(can_bl_config, 20) ) {
+			return(false);
+		}
+	}
+
+	if( ! can_bootloader_read_data(can_bl_config, 0x8000000, 4, temp_buffer, sizeof(temp_buffer)) ) {
 		return(false);
 	}
 
@@ -381,17 +507,23 @@ bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
 	temp_buffer[5] = 0x0E;
 	temp_buffer[6] = 0x0E;
 	temp_buffer[7] = 0x0F;
-	if( ! can_bootloader_write_memory(can_bl_config, 0x800A000, temp_buffer, 8) ) {
+	if( ! can_bootloader_write_memory(can_bl_config, test_memory_address, temp_buffer, 4) ) {
 		return(false);
 	}
 
-	if( ! can_bootloader_read_data(can_bl_config, 0x800A000, 16, temp_buffer, sizeof(temp_buffer)) ) {
+	if( ! can_bootloader_read_data(can_bl_config, 0x8000000, 4, temp_buffer, sizeof(temp_buffer)) ) {
 		return(false);
 	}
 
-	if( ! can_bootloader_go(can_bl_config, 0x800A000) ) {
+#if 0
+	if( ! can_bootloader_read_data(can_bl_config, test_memory_address, 16, temp_buffer, sizeof(temp_buffer)) ) {
 		return(false);
 	}
+
+	if( ! can_bootloader_go(can_bl_config, test_memory_address) ) {
+		return(false);
+	}
+#endif
 
 	return(true);
 }
@@ -527,7 +659,12 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 
 	uint32_t temp_address = base_address;
 	while(temp_address <= (base_address + total_firmware_length_bytes) ) {
-		const uint32_t page_number = (temp_address - ORESAT_F0_FLASH_START_ADDRESS) / ORESAT_F0_FLASH_PAGE_SIZE;
+		uint32_t page_number = (temp_address - ORESAT_F0_FLASH_START_ADDRESS) / ORESAT_F0_FLASH_PAGE_SIZE;
+		if( can_bl_config->stm32_bootloader_mode )  {
+			//proxy for STM32F407 CPU
+			page_number = 0;
+		}
+
 
 		if( ! can_bootloader_erase_page_reliable(can_bl_config, page_number) ) {
 			return(false);

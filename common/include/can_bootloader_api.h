@@ -10,6 +10,7 @@ extern "C" {
 #define ORESAT_F0_FLASH_PAGE_SIZE                     2048
 
 #define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
+#define STM32_BOOTLOADER_SYNCHRONIZATION_SID         0x79
 #define CAN_ANNOUNCE_MAGIC_NUMBER                    0x04030201
 #define STM32_BOOTLOADER_CAN_ACK                     0x79
 #define STM32_BOOTLOADER_CAN_NACK                    0x1F
@@ -38,6 +39,7 @@ typedef struct {
 	CANDriver *canp;
 	BaseSequentialStream *chp;//debug stream
 	uint32_t low_cpu_id;
+	bool stm32_bootloader_mode;
 
 	uint32_t read_fail_count;
 	uint32_t write_fail_count;
@@ -51,8 +53,9 @@ typedef struct {
 	uint32_t connection_verify_fail;
 } can_bootloader_config_t;
 
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id);
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode);
 
+bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms);
 void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config);
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer);
 

@@ -132,14 +132,22 @@ int main(void) {
   CANConfig cancfg;
   memset(&cancfg, 0, sizeof(cancfg));
 
+
+#define TARGET_STM32_BOOTLOADER       0
+
+
+  //http://www.bittiming.can-wiki.info/
+#if TARGET_STM32_BOOTLOADER
+  cancfg.btr = (CAN_BTR_SJW(0) | CAN_BTR_TS1(12) | CAN_BTR_TS2(1) | CAN_BTR_BRP(20));
+#else
   cancfg.btr = (CAN_BTR_SJW(0) | CAN_BTR_TS1(10) | CAN_BTR_TS2(1) | CAN_BTR_BRP(2));
+#endif
   cancfg.mcr = (
 		  /* MCR (Master Control Register) */
 		  CAN_MCR_ABOM      |     //Automatic Bus-Off Management
 		  CAN_MCR_AWUM      |     //Automatic Wakeup Mode
 		  CAN_MCR_TXFP      |     //Transmit FIFO Priority
-		  CAN_MCR_NART/*CAN_MCR_NART*/   );       // No Automatic Retransmission
-
+		  0/*CAN_MCR_NART*/   );       // No Automatic Retransmission
 
   chprintf(DEBUG_SD, "Initializing CAN peripheral with MCR = 0x%X\r\n", cancfg.mcr);
   chprintf(DEBUG_SD, "Initializing CAN peripheral with BTR = 0x%X\r\n", cancfg.btr);
@@ -161,15 +169,24 @@ int main(void) {
    */
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
+#if TARGET_STM32_BOOTLOADER
+  can_bootloader_config_t can_bl_config;
+  can_api_init_can_bootloader_config_t(&can_bl_config, CAN_DRIVER, DEBUG_SD, 0, true);
 
+  //can_bootloader_initiate(&can_bl_config, 3000);
+  //can_bootloader_test(&can_bl_config);
+  oresat_firmware_update_m0(&can_bl_config, 0x08000000, 16, test_read_function);
+
+#else
   const uint32_t low_cpuid_of_protoboard = 0x1D000800;
   can_bootloader_config_t can_bl_config;
-  can_api_init_can_bootloader_config_t(&can_bl_config, CAN_DRIVER, DEBUG_SD, low_cpuid_of_protoboard);
+  can_api_init_can_bootloader_config_t(&can_bl_config, CAN_DRIVER, DEBUG_SD, low_cpuid_of_protoboard, false);
 
   //test_garbage_can_transmit();
-  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
+  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
 
-  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
+#endif
 
   print_can_bootloader_config_t(&can_bl_config);
 
@@ -181,19 +198,20 @@ int main(void) {
 #if 0
 	  CANTxFrame tx_msg;
 	  memset(&tx_msg, 0, sizeof(tx_msg));
-	  tx_msg.SID = 0x55;
+	  tx_msg.SID = 0x79;
 	  tx_msg.DLC = 8;
 	  memset(&tx_msg.data8, 0x55, sizeof(tx_msg.data8));
 
-	  //can_api_print_tx_frame(DEBUG_SD, &tx_msg, "", "");
+	  can_api_print_tx_frame(DEBUG_SD, &tx_msg, "TXing: ", "");
 
-	  //canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, &tx_msg, TIME_MS2I(150));
+	  canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, &tx_msg, TIME_MS2I(150));
+
 #endif
 
-#if 1
+#if 0
 	  CANRxFrame rx_msg;
 	  memset(&rx_msg, 0, sizeof(rx_msg));
-	  chprintf(DEBUG_SD, "CAN State: %u\r\n", CAND2.state);
+	  chprintf(DEBUG_SD, "CAN State: %u\r\n", (CAN_DRIVER)->state);
 	  chprintf(DEBUG_SD, "Attempting CAN RX....\r\n");
 	  can_api_receive(&can_bl_config, &rx_msg, 1000);
 #endif

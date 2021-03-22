@@ -225,7 +225,7 @@ def test_can_bootloader_client(bus, is_407_cpu=True):
 
 
 
-if( True ):
+if( False ):
     rx_msg = None
     bitrate = 1000000
 
@@ -248,7 +248,7 @@ if( True ):
             test_can_bootloader_client(bus, False)
 else:
     bitrate = 125000
-    bus = can.interface.Bus(bustype='slcan', channel='/dev/ttyACM0', bitrate=bitrate)
+    bus = can.interface.Bus(bustype='slcan', channel='/dev/ttyACM1', bitrate=bitrate)
 
     for i in range(0, 99999):
         msg = can.Message(arbitration_id=BOOTLOADER_EXPECTED_FIRST_FRAME_ID, data=[0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA], is_extended_id=False)
