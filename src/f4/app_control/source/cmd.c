@@ -347,11 +347,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
     struct lfs_info info;
     char buf[BUF_SIZE];
 
-    if (argc < 2) {
-        goto lfs_usage;
-    }
-
-    if (!strcmp(argv[0], "ls")) {
+    if (!strcmp(argv[0], "ls") && argc > 1) {
         dir = dir_open(&FSD1, argv[1]);
         if (dir == NULL) {
             chprintf(chp, "Error in dir_open: %d\r\n", FSD1.err);
@@ -380,19 +376,19 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "\r\n");
-    } else if (!strcmp(argv[0], "mkdir")) {
+    } else if (!strcmp(argv[0], "mkdir") && argc > 1) {
         err = fs_mkdir(&FSD1, argv[1]);
         if (err < 0) {
             chprintf(chp, "Error in fs_mkdir: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "rm")) {
+    } else if (!strcmp(argv[0], "rm") && argc > 1) {
         err = fs_remove(&FSD1, argv[1]);
         if (err < 0) {
             chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "cat")) {
+    } else if (!strcmp(argv[0], "cat") && argc > 1) {
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
             chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
@@ -413,7 +409,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in file_close: %d\r\n", err);
             return;
         }
-    } else if (!strcmp(argv[0], "hexdump")) {
+    } else if (!strcmp(argv[0], "hexdump") && argc > 1) {
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
             chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
@@ -438,6 +434,36 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in file_close: %d\r\n", err);
             return;
         }
+    } else if (!strcmp(argv[0], "mount")) {
+        int err;
+
+        chprintf(chp, "Attempting to mount LFS...\r\n");
+        err = fs_mount(&FSD1, false);
+        if (err < 0) {
+            chprintf(chp, "Mount failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "unmount")) {
+        int err;
+
+        chprintf(chp, "Attempting to unmount LFS...\r\n");
+        err = fs_unmount(&FSD1);
+        if (err < 0) {
+            chprintf(chp, "Unmount failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
+    } else if (!strcmp(argv[0], "format")) {
+        int err;
+
+        chprintf(chp, "Attempting to format LFS...\r\n");
+        err = fs_format(&FSD1);
+        if (err < 0) {
+            chprintf(chp, "Format failed: %d\r\n", err);
+            return;
+        }
+        chprintf(chp, "OK\r\n");
     } else {
         goto lfs_usage;
     }
@@ -451,6 +477,10 @@ lfs_usage:
                    "    rm:         Delete file or directory\r\n"
                    "    cat:        Dump 255 bytes of file as string\r\n"
                    "    hexdump:    Dump 255 bytes of file as hex\r\n"
+                   "\r\n"
+                   "    mount:      Mount LFS\r\n"
+                   "    unmount:    Unmount LFS\r\n"
+                   "    format:     Format eMMC for LFS\r\n"
                    "\r\n");
     return;
 }

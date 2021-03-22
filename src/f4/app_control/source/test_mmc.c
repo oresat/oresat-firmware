@@ -31,10 +31,6 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
                        "    enable:             Enable eMMC subsystem\r\n"
                        "    disable:            Disable eMMC subsystem\r\n"
                        "\r\n"
-                       "    mount:              Mount LFS\r\n"
-                       "    unmount:            Unmount LFS\r\n"
-                       "    format:             Format eMMC for LFS\r\n"
-                       "\r\n"
                        "    testread:           Test read functionality\r\n"
                        "    testwrite:          Test write functionality\r\n"
                        "    testall:            Test all functionality\r\n");
@@ -75,36 +71,6 @@ void cmd_mmc(BaseSequentialStream *chp, int argc, char *argv[]) {
 
         chprintf(chp, "OK\r\n");
         return;
-    } else if (!strcmp(argv[0], "mount")) {
-        int err;
-
-        chprintf(chp, "Attempting to mount LFS...\r\n");
-        err = fs_mount(&FSD1, false);
-        if (err < 0) {
-            chprintf(chp, "Mount failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "unmount")) {
-        int err;
-
-        chprintf(chp, "Attempting to unmount LFS...\r\n");
-        err = fs_unmount(&FSD1);
-        if (err < 0) {
-            chprintf(chp, "Unmount failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "format")) {
-        int err;
-
-        chprintf(chp, "Attempting to format LFS...\r\n");
-        err = fs_format(&FSD1);
-        if (err < 0) {
-            chprintf(chp, "Format failed: %d\r\n", err);
-            return;
-        }
-        chprintf(chp, "OK\r\n");
     }
 
     /* The test is performed in the middle of the flash area.*/
