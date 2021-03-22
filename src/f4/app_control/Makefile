@@ -87,7 +87,7 @@ PROJECT   = app_control
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_C3_V4
+BOARD     = ORESAT_C3_V5
 
 #Project sources.
 PROJ_ROOT = ../../..
