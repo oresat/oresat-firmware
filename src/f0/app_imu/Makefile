@@ -87,7 +87,7 @@ PROJECT   = app_imu
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = ST_NUCLEO64_F091RC
+BOARD     = ORESAT_ACS_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
