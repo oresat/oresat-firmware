@@ -35,8 +35,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_ORESAT_ACS_V4
-#define BOARD_NAME                  "OreSat ACS V4.x"
+#define BOARD_ORESAT_RWB_V4
+#define BOARD_NAME                  "OreSat RWB V4.x"
 
 /*
  * Board oscillators-related settings.

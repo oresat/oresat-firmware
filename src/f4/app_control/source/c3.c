@@ -1,10 +1,12 @@
 #include "c3.h"
+#include "rtc.h"
 #include "comms.h"
 #include "CANopen.h"
 
+#define PREDEPLOY_TIMEOUT                   2700000 /* 45 Minutes in ms */
+
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
-bool timeout_complete = true;
 bool bat_good = true;
 bool edl = false;
 
@@ -20,11 +22,19 @@ THD_FUNCTION(c3, arg)
     c3_tp = chThdGetSelfX();
 
     while (!chThdShouldTerminateX()) {
+        RTCDateTime timespec;
+        rtcGetTime(rtcp, &timespec);
+
         switch (OD_C3State[0]) {
         case PREDEPLOY:
-            if (timeout_complete) {
+            /* Check if pre-deployment timeout has occured */
+            if (1) {
+                /* Ready to deploy */
+                /* TODO: Start state tracking */
                 OD_C3State[0] = DEPLOY;
             } else {
+                /* Must wait for pre-deployment timeout */
+                /* TODO: Set alarm */
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TIMER);
             }
             break;

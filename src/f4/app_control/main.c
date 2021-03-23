@@ -23,9 +23,10 @@
 #include "oresat.h"
 #include "wdt.h"
 #include "c3.h"
+#include "fs.h"
 #include "opd.h"
 #include "comms.h"
-#include "time_sync.h"
+#include "rtc.h"
 #include "CO_master.h"
 #ifdef SHELL_ENABLE
 #include "cmd.h"
@@ -50,6 +51,17 @@ static const oresat_node_t nodes[] = {
 };
 */
 
+#ifdef SHELL_ENABLE
+static worker_t cmd_worker;
+static thread_descriptor_t cmd_desc = {
+    .name = "Shell",
+    .wbase = THD_WORKING_AREA_BASE(cmd_wa),
+    .wend = THD_WORKING_AREA_END(cmd_wa),
+    .prio = NORMALPRIO,
+    .funcp = cmd,
+    .arg = NULL
+};
+#endif
 static worker_t wdt_worker;
 static thread_descriptor_t wdt_desc = {
     .name = "WDT",
@@ -68,17 +80,6 @@ static thread_descriptor_t c3_desc = {
     .funcp = c3,
     .arg = NULL
 };
-#ifdef SHELL_ENABLE
-static worker_t cmd_worker;
-static thread_descriptor_t cmd_desc = {
-    .name = "Shell",
-    .wbase = THD_WORKING_AREA_BASE(cmd_wa),
-    .wend = THD_WORKING_AREA_END(cmd_wa),
-    .prio = NORMALPRIO,
-    .funcp = cmd,
-    .arg = NULL
-};
-#endif
 
 static oresat_config_t oresat_conf = {
     &CAND1,
@@ -86,21 +87,32 @@ static oresat_config_t oresat_conf = {
     ORESAT_DEFAULT_BITRATE
 };
 
+static SDCConfig sdccfg = {
+    .bus_width = SDC_MODE_4BIT,
+};
+
+static FSConfig fscfg = {
+    .sdcp = &SDCD1,
+    .sdccfg = &sdccfg,
+    .mmc_pwr = LINE_MMC_PWR,
+};
+
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-    /* Register WDT worker thread */
-    reg_worker(&wdt_worker, &wdt_desc, true, true);
-
-    /* Register C3 worker thread */
-    reg_worker(&c3_worker, &c3_desc, true, true);
-
 #ifdef SHELL_ENABLE
+    /* Initialize shell and start serial interface */
+    shellInit();
+    sdStart(&SD3, NULL);
     /* Register shell worker thread */
     reg_worker(&cmd_worker, &cmd_desc, true, true);
 #endif
+
+    /* Prepare filesystem */
+    fs_init(&FSD1);
+    fs_start(&FSD1, &fscfg);
 
     /* Initialize OPD */
     opd_init();
@@ -113,11 +125,10 @@ static void app_init(void)
     comms_init();
     comms_start();
 
-    /* Initialize shell and start serial interface */
-#ifdef SHELL_ENABLE
-    shellInit();
-#endif
-    sdStart(&SD3, NULL);
+    /* Register WDT and C3 worker thread */
+    reg_worker(&wdt_worker, &wdt_desc, true, true);
+    reg_worker(&c3_worker, &c3_desc, true, true);
+
 }
 
 /**
