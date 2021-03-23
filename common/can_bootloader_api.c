@@ -152,7 +152,11 @@ bool can_bootloader_tx_garbage_frame(can_bootloader_config_t *can_bl_config) {
 }
 #endif
 
-
+/**
+ * Used to put the M0 bootloader or STM32 bootloader into actual bootloader mode such that the device can be flashed.
+ *
+ * @return true if the remote device was put into bootloader mode, false otherwise.
+ */
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -239,6 +243,13 @@ bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint3
 	return(false);
 }
 
+/**
+ * Used to wait for an ACK or NACK from the remote bootloader.
+ *
+ * @param sid_match The command SID to for which we are expecting to read an ACK for.
+ *
+ * @return true if ACK for the given SID was received, false if a NACK or unknown frame was received.
+ */
 bool can_bootloader_wait_for_ack(can_bootloader_config_t *can_bl_config, const uint32_t sid_match) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -255,7 +266,7 @@ bool can_bootloader_wait_for_ack(can_bootloader_config_t *can_bl_config, const u
 			} else if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_NACK ) {
 				can_api_print_rx_frame(chp, &rx_msg, "", " - got NACK");
 				can_bl_config->nack_count++;
-				return(true);
+				return(false);
 			} else {
 				can_api_print_rx_frame(chp, &rx_msg, "", " - UNKNOWN");
 				can_bl_config->unknown_count++;
@@ -285,7 +296,16 @@ bool can_bootloader_wait_for_ack_with_garbage(can_bootloader_config_t *can_bl_co
 }
 #endif
 
-
+/**
+ * Reads data from a given address from the remote device that is in bootloader mode.
+ *
+ * @param memory_addres The base memory address to start reading data from
+ * @param num_bytes_to_read The number of bytes to read.
+ * @param *dest_buffer The destination buffer into which to store the data.
+ * @param dest_buffer_length The maximum length of the destination buffer.
+ *
+ * @return true If data was successfully read, false otherwise.
+ */
 bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint32_t memory_address, const uint32_t num_bytes_to_read, uint8_t *dest_buffer, const uint32_t dest_buffer_length) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -347,7 +367,13 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
 	return(true);
 }
 
-
+/**
+ * Erases a given page (sometimes also refered to as sector, depending on the device type) of flash on the remote device.
+ *
+ * @page_number The page number of flash to be erased.
+ *
+ * @return true on success, false otherwise.
+ */
 bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uint32_t page_number) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -380,7 +406,15 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
 	return(true);
 }
 
-
+/**
+ * Writes to flash memory on the remote device.
+ *
+ * @param memory_address Base memory address to start writing to.
+ * @param *src_buffer The data to be written to flash on the remote device.
+ * @param num_bytes The number of bytes to write
+ *
+ * @return true on success, false otherwise.
+ */
 bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -442,7 +476,11 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
 	return(true);
 }
 
-
+/**
+ * Causes the remote device to start executing code from the given address. For M0 based bootloaders, this just causes a reset.
+ *
+ * @return true on success, false otherwise.
+ */
 bool can_bootloader_go(can_bootloader_config_t *can_bl_config, const uint32_t memory_address) {
 	msg_t r = 0;
 
@@ -466,7 +504,9 @@ bool can_bootloader_go(can_bootloader_config_t *can_bl_config, const uint32_t me
 	return(true);
 }
 
-
+/**
+ * Function for development and testing of this API.
+ */
 bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -528,6 +568,11 @@ bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
 	return(true);
 }
 
+/**
+ * Used to validate communication to a remote bootloader device.
+ *
+ * @return true if the remote device is responding in bootloader mode, false otherwise.
+ */
 bool can_bootloader_check_communication(can_bootloader_config_t *can_bl_config) {
 	can_api_purge_rx_buffer(can_bl_config);
 
@@ -612,7 +657,9 @@ bool can_bootloader_read_data_reliable(can_bootloader_config_t *can_bl_config, c
 	return(false);
 }
 
-
+/**
+ * Wrapped to deal with solar cards that power on and off at variable times.
+ */
 bool can_bootloader_verify_memory_reliable(can_bootloader_config_t *can_bl_config, const uint32_t base_memory_address, const uint8_t *src_buffer, const uint32_t num_bytes)
 {
 	BaseSequentialStream *chp = can_bl_config->chp;
@@ -647,7 +694,15 @@ bool can_bootloader_verify_memory_reliable(can_bootloader_config_t *can_bl_confi
 	return(true);
 }
 
-
+/**
+ * Upates firmware on an M0 node
+ *
+ * @param base_address Address from which to start the firmware update
+ * @param total_firmware_length_bytes Number of bytes to write
+ * @param read_function_pointer Function pointer that will return chuncks of data from a given offset and length to be written to the remote device.
+ *
+ * @return true upon success, false otherwise.
+ */
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer) {
 	BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -726,7 +781,9 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 	return(true);
 }
 
-
+/**
+ * Helper function for enum to string mapping
+ */
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v) {
 	switch (v) {
 		case ORESAT_BOOTLOADER_CAN_COMMAND_GET:

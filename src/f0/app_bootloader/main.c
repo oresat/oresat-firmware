@@ -261,7 +261,9 @@ bool is_flash_write_address_range_valid(const uint8_t *address, const uint32_t l
 	return(true);
 }
 
-
+/**
+ * Handles an incoming CAN frame with it's coresponding commands and actions.
+ */
 void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 	msg_t tx_r;
 	const uint32_t command_sid = rx_msg->SID;
@@ -441,7 +443,6 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 }
 
 void can_bootloader_announce_presence_on_bus(void) {
-
 	CANTxFrame txmsg;
 	memset(&txmsg, 0, sizeof(txmsg));
 	txmsg.SID = 0;
@@ -486,11 +487,9 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
     /*
 	  *The same manner we can set up to 14 filters (STM32F103)
 	  *For example to use 2 EID Data filter to 2 CAN RX FIFO:
+	  * http://forum.chibios.org/viewtopic.php?t=4079
+	  * see hal_can_lld.h for definition of CANFilter struct.
 	  */
-	  //Set filers #1-#2 for eid = 0x01234567 || eid = 0x01234568
-
-    //  http://forum.chibios.org/viewtopic.php?t=4079
-    /* see hal_can_lld.h for definition of CANFilter struct. */
 
 #define NUM_CAN_FILTERS     8
 
