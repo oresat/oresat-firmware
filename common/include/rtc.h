@@ -55,7 +55,7 @@ void rtcGetTimeUTC(time_utc_t *utc);
 void rtcSetTimeUTC(const time_utc_t *utc);
 
 uint32_t rtcEncodeAlarm(const RTCDateTime *timespec, uint32_t flags);
-uint32_t rtcEncodeElapsedAlarm(int days, int hours, int minutes, int seconds);
+uint32_t rtcEncodeRelAlarm(const RTCDateTime *timespec, int days, int hours, int minutes, int seconds);
 
 CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg);
 CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg);

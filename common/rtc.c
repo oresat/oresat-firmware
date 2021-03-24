@@ -194,8 +194,9 @@ uint32_t rtcEncodeAlarm(const RTCDateTime *timespec, uint32_t flags)
 }
 
 /**
- * @brief   Generates ALRMxR register value for elapsed time
+ * @brief   Generates ALRMxR register value for time relative to timespec
  *
+ * @param[in]  timespec     Pointer to a @p RTCDateTime structure
  * @param[in]  days         Days to elapse
  * @param[in]  hours        Hours to elapse
  * @param[in]  minutes      Minutes to elapse
@@ -204,13 +205,13 @@ uint32_t rtcEncodeAlarm(const RTCDateTime *timespec, uint32_t flags)
  * @return                  The ALRMxR register encoding.
  * @api
  */
-uint32_t rtcEncodeElapsedAlarm(int days, int hours, int minutes, int seconds)
+uint32_t rtcEncodeRelAlarm(const RTCDateTime *timespec, int days, int hours, int minutes, int seconds)
 {
     RTCDateTime alarm_timespec;
     struct tm tim;
 
     /* Get current time */
-    rtcGetTimeTm(&tim, NULL);
+    rtcConvertDateTimeToStructTm(timespec, &tim, NULL);
     /* Add offsets for desired elapsed time */
     tim.tm_yday += days;
     tim.tm_hour += hours;

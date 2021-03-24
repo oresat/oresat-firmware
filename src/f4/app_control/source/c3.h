@@ -6,10 +6,9 @@
 
 #define C3_EVENT_WAKEUP                     EVENT_MASK(0)
 #define C3_EVENT_TERMINATE                  EVENT_MASK(1)
-#define C3_EVENT_TIMER                      EVENT_MASK(2)
-#define C3_EVENT_TX                         EVENT_MASK(3)
-#define C3_EVENT_BAT                        EVENT_MASK(4)
-#define C3_EVENT_EDL                        EVENT_MASK(5)
+#define C3_EVENT_TX                         EVENT_MASK(2)
+#define C3_EVENT_BAT                        EVENT_MASK(3)
+#define C3_EVENT_EDL                        EVENT_MASK(4)
 
 typedef enum {
     PREDEPLOY           = 'B',

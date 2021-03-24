@@ -327,7 +327,17 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
         }
     } else if (!strcmp(argv[0], "raw")) {
         rtcGetTime(&RTCD1, &timespec);
-        chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n", timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
+        chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n",
+                      timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
+    } else if (!strcmp(argv[0], "status")) {
+        chprintf(chp, "Date:    %08X\r\n"
+                      "Time:    %08X\r\n"
+                      "Wakeup:  %08X\r\n"
+                      "Alarm A: %08X (%s)\r\n"
+                      "Alarm B: %08X (%s)\r\n",
+                      RTCD1.rtc->DR, RTCD1.rtc->TR, RTCD1.rtc->WUTR,
+                      RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
+                      RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else {
         goto time_usage;
     }
