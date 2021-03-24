@@ -23,6 +23,7 @@
 #include "oresat.h"
 #include "wdt.h"
 #include "c3.h"
+#include "fm24cl64b.h"
 #include "fs.h"
 #include "opd.h"
 #include "comms.h"
@@ -81,10 +82,16 @@ static thread_descriptor_t c3_desc = {
     .arg = NULL
 };
 
-static oresat_config_t oresat_conf = {
-    &CAND1,
-    0x01,
-    ORESAT_DEFAULT_BITRATE
+static I2CConfig i2ccfg = {
+    OPMODE_I2C,
+    100000,
+    STD_DUTY_CYCLE,
+};
+
+static FM24CL64BConfig framcfg = {
+    .i2cp = &I2CD2,
+    .i2ccfg = &i2ccfg,
+    .saddr = 0x50,
 };
 
 static SDCConfig sdccfg = {
@@ -95,6 +102,12 @@ static FSConfig fscfg = {
     .sdcp = &SDCD1,
     .sdccfg = &sdccfg,
     .mmc_pwr = LINE_MMC_PWR,
+};
+
+static oresat_config_t oresat_conf = {
+    &CAND1,
+    0x01,
+    ORESAT_DEFAULT_BITRATE
 };
 
 /**
@@ -109,6 +122,10 @@ static void app_init(void)
     /* Register shell worker thread */
     reg_worker(&cmd_worker, &cmd_desc, true, true);
 #endif
+
+    /* Initialize FRAM */
+    fm24cl64bObjectInit(&FRAMD1);
+    fm24cl64bStart(&FRAMD1, &framcfg);
 
     /* Prepare filesystem */
     fs_init(&FSD1);

@@ -9,6 +9,7 @@
 #include "opd.h"
 #include "CO_master.h"
 #include "rtc.h"
+#include "fm24cl64b.h"
 #include "fs.h"
 #include "test_mmc.h"
 #include "test_radio.h"
@@ -548,19 +549,11 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
         goto fram_usage;
     }
     if (!strcmp(argv[0], "read") && argc > 2) {
-        uint16_t offset = strtoul(argv[1], NULL, 0);
+        uint16_t addr = strtoul(argv[1], NULL, 0);
         size_t len = strtoul(argv[2], NULL, 0);
         uint8_t *buf = calloc(len, sizeof(uint8_t));
-        I2CConfig i2cconfig = {
-            OPMODE_I2C,
-            100000,
-            STD_DUTY_CYCLE,
-        };
-        i2cStart(&I2CD2, &i2cconfig);
-        i2cAcquireBus(&I2CD2);
-        i2cMasterTransmit(&I2CD2, 0x50, (uint8_t*)(&offset), sizeof(offset), buf, len);
-        i2cReleaseBus(&I2CD2);
-        i2cStop(&I2CD2);
+
+        fm24cl64bRead(&FRAMD1, addr, buf, len);
 
         for (uint32_t i = 0; i < len; i++) {
             if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
@@ -579,8 +572,8 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
 
 fram_usage:
     chprintf(chp,  "Usage: fram <command>\r\n"
-                   "    read <offset> <len>:\r\n"
-                   "        Read starting at <offset> for <len> bytes\r\n"
+                   "    read <addr> <len>:\r\n"
+                   "        Read starting at <addr> for <len> bytes\r\n"
                    "\r\n");
     return;
 }

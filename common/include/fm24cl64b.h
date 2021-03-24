@@ -172,6 +172,8 @@ struct FM24CL64BDriver {
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern FM24CL64BDriver FRAMD1;
+
 void fm24cl64bObjectInit(FM24CL64BDriver *devp);
 void fm24cl64bStart(FM24CL64BDriver *devp, const FM24CL64BConfig *config);
 void fm24cl64bStop(FM24CL64BDriver *devp);
