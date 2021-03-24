@@ -9,7 +9,7 @@
 #include "opd.h"
 #include "CO_master.h"
 #include "rtc.h"
-#include "fm24cl64b.h"
+#include "fram.h"
 #include "fs.h"
 #include "test_mmc.h"
 #include "test_radio.h"
@@ -553,7 +553,7 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
         size_t len = strtoul(argv[2], NULL, 0);
         uint8_t *buf = calloc(len, sizeof(uint8_t));
 
-        fm24cl64bRead(&FRAMD1, addr, buf, len);
+        framRead(&FRAMD1, addr, buf, len);
 
         for (uint32_t i = 0; i < len; i++) {
             if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);

@@ -23,7 +23,7 @@
 #include "oresat.h"
 #include "wdt.h"
 #include "c3.h"
-#include "fm24cl64b.h"
+#include "fram.h"
 #include "fs.h"
 #include "opd.h"
 #include "comms.h"
@@ -88,7 +88,7 @@ static I2CConfig i2ccfg = {
     STD_DUTY_CYCLE,
 };
 
-static FM24CL64BConfig framcfg = {
+static FRAMConfig framcfg = {
     .i2cp = &I2CD2,
     .i2ccfg = &i2ccfg,
     .saddr = 0x50,
@@ -124,8 +124,8 @@ static void app_init(void)
 #endif
 
     /* Initialize FRAM */
-    fm24cl64bObjectInit(&FRAMD1);
-    fm24cl64bStart(&FRAMD1, &framcfg);
+    framObjectInit(&FRAMD1);
+    framStart(&FRAMD1, &framcfg);
 
     /* Prepare filesystem */
     fs_init(&FSD1);
