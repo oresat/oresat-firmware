@@ -4,7 +4,7 @@
 #include "CANopen.h"
 
 #define CHIBIOS_EPOCH                       315532800U  /* ChibiOS Epoch in Unix Time */
-#define PREDEPLOY_TIMEOUT                   45U         /* Deployment timeout in minutes */
+#define PREDEPLOY_TIMEOUT                   2700U       /* Deployment timeout in seconds */
 
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
@@ -52,14 +52,14 @@ THD_FUNCTION(c3, arg)
         switch (OD_C3State[0]) {
         case PREDEPLOY:
             /* Check if pre-deployment timeout has occured */
-            if (difftime(CHIBIOS_EPOCH, rtcGetTimeUnix(NULL) > PREDEPLOY_TIMEOUT)) {
+            if (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) > PREDEPLOY_TIMEOUT) {
                 /* Ready to deploy */
                 rtcSetAlarm(&RTCD1, 0, NULL);
                 /* TODO: Start state tracking */
                 OD_C3State[0] = DEPLOY;
             } else {
                 /* Must wait for pre-deployment timeout */
-                rtc_state.alarm_a.alrmr = rtcEncodeElapsedAlarm(0, 0, PREDEPLOY_TIMEOUT, 0);
+                rtc_state.alarm_a.alrmr = rtcEncodeElapsedAlarm(0, 0, 0, PREDEPLOY_TIMEOUT);
                 rtcSetAlarm(&RTCD1, 0, &rtc_state.alarm_a);
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TIMER);
             }

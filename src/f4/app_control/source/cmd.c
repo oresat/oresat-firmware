@@ -295,7 +295,7 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
         if (!strcmp(argv[1], "get")) {
             unix_time = rtcGetTimeUnix(&msec);
             chprintf(chp, "UNIX Time: %d\r\n"
-                          "Date:      %s",
+                          "Date:      %s\r\n",
                           unix_time, ctime(&unix_time));
         } else if (!strcmp(argv[1], "set") && argc > 2) {
             rtcSetTimeUnix(strtoul(argv[2], NULL, 0), 0);
