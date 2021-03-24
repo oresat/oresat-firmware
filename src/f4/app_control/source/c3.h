@@ -32,12 +32,11 @@ typedef struct {
 } c3_fsm_t;
 
 typedef struct {
-    RTCDateTime         timestamp;
-    RTCAlarm            rtc_alarm_a;
-    RTCAlarm            rtc_alarm_b;
-} c3_persist_t;
-
-extern thread_t *c3_tp;
+    RTCDateTime timestamp;
+    RTCAlarm    alarm_a;
+    RTCAlarm    alarm_b;
+    RTCWakeup   wakeup;
+} rtc_state_t;
 
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */

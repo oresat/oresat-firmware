@@ -426,7 +426,7 @@ THD_FUNCTION(radio_beacon, arg) {
     };
 
     while (!chThdShouldTerminateX()) {
-        time_t unix_time = get_time_unix(NULL);
+        time_t unix_time = rtcGetTimeUnix(NULL);
         pdu.data_len = sprintf(telem_data, "KJ7SAT - Test beacon from AX5043 driver. %s", ctime(&unix_time));
         /* TODO: CW Beacon */
         /*ax5043_SetProfile(&uhf, uhf_cw);*/

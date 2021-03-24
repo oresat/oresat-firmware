@@ -3,7 +3,8 @@
 #include "comms.h"
 #include "CANopen.h"
 
-#define PREDEPLOY_TIMEOUT                   2700000 /* 45 Minutes in ms */
+#define CHIBIOS_EPOCH                       315532800U  /* ChibiOS Epoch in Unix Time */
+#define PREDEPLOY_TIMEOUT                   45U         /* Deployment timeout in minutes */
 
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
@@ -12,6 +13,31 @@ bool edl = false;
 
 /* Global State Variables */
 thread_t *c3_tp;
+rtc_state_t rtc_state;
+
+/**
+ * @brief   Alarm event callback
+ *
+ * @param[in]  rtcp     Pointer to @p RTCDriver instance
+ * @param[in]  event    Alarm event
+ *
+ * @notapi
+ */
+static void alarmcb(RTCDriver *rtcp, rtcevent_t event)
+{
+    (void)rtcp;
+    switch (event) {
+    case RTC_EVENT_ALARM_A:
+        chEvtSignalI(c3_tp, C3_EVENT_TIMER);
+        break;
+    case RTC_EVENT_ALARM_B:
+        break;
+    case RTC_EVENT_WAKEUP:
+        break;
+    default:
+        break;
+    }
+}
 
 /* Main Command, Communications, and Control Thread */
 THD_WORKING_AREA(c3_wa, 0x400);
@@ -20,21 +46,21 @@ THD_FUNCTION(c3, arg)
     (void)arg;
 
     c3_tp = chThdGetSelfX();
+    rtcSetCallback(&RTCD1, alarmcb);
 
     while (!chThdShouldTerminateX()) {
-        RTCDateTime timespec;
-        rtcGetTime(rtcp, &timespec);
-
         switch (OD_C3State[0]) {
         case PREDEPLOY:
             /* Check if pre-deployment timeout has occured */
-            if (1) {
+            if (difftime(CHIBIOS_EPOCH, rtcGetTimeUnix(NULL) > PREDEPLOY_TIMEOUT)) {
                 /* Ready to deploy */
+                rtcSetAlarm(&RTCD1, 0, NULL);
                 /* TODO: Start state tracking */
                 OD_C3State[0] = DEPLOY;
             } else {
                 /* Must wait for pre-deployment timeout */
-                /* TODO: Set alarm */
+                rtc_state.alarm_a.alrmr = rtcEncodeElapsedAlarm(0, 0, PREDEPLOY_TIMEOUT, 0);
+                rtcSetAlarm(&RTCD1, 0, &rtc_state.alarm_a);
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TIMER);
             }
             break;
@@ -83,5 +109,6 @@ THD_FUNCTION(c3, arg)
         };
     }
 
+    rtcSetCallback(&RTCD1, NULL);
     chThdExit(MSG_OK);
 }
