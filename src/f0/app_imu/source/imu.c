@@ -31,12 +31,40 @@ THD_FUNCTION(imu, arg)
 {
     (void)arg;
 
+// 2021-03-24 - dev work de TMH:
+    uint32_t iterations = 0;
+    systime_t current_time = 0;
+    uint8_t bmi088_chip_id = 0;
+    uint8_t power_status = 0;
+    uint8_t interrupt_status = 0;
+
+
     /* Initialize and start the BMI088 IMU sensor */
     bmi088ObjectInit(&imudev);
     bmi088Start(&imudev, &imucfg);
 
+    chThdSleepMilliseconds(50);
+
+//    accEnable(&imudev, 0x04);  // start accelerometer, per BMI088 datasheet page 34, covers register 0x7D
+
     while (!chThdShouldTerminateX()) {
-        chprintf(CHP, "Test!\r\n");
+        iterations++;
+        current_time = chVTGetSystemTime();
+
+        if ((iterations % 10) == 0) {
+            chprintf(CHP, "Test of IMU dev' code, loop iteration %u system time %u\r\n", iterations, (uint32_t)current_time);
+        }
+
+        if ((iterations % 10) == 0) {
+            bmi088_chip_id = bmi088ReadChipId(&imudev);
+            chprintf(CHP, "BMI088 ID is %u\r\n", bmi088_chip_id);
+            power_status = readPwrCtrlReg(&imudev);
+            chprintf(CHP, "power status is %u\r\n", power_status);
+
+            interrupt_status = bmi088ReadIntStat(&imudev);
+            chprintf(CHP, "interrupt status is %u\r\n", interrupt_status);
+        }
+
         chThdSleepMilliseconds(250);
     }
 

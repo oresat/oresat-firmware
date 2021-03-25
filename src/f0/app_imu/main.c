@@ -44,7 +44,7 @@ static thread_descriptor_t imu_desc = {
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-    ORESAT_DEFAULT_ID,
+    0x7f, // ORESAT_DEFAULT_ID,
     ORESAT_DEFAULT_BITRATE
 };
 
