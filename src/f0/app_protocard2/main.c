@@ -31,7 +31,7 @@ static worker_t worker1;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-	ORESAT_PROTOCARD_NODE_ID,
+	ORESAT_DEFAULT_ID,
     ORESAT_DEFAULT_BITRATE
 };
 

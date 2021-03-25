@@ -2,13 +2,11 @@
 #include "events.h"
 #include "sensors.h"
 #include "CANopen.h"
-#include "oresat_f0.h"
 
 typedef enum {
     ORESAT_NMT_NONOPERATIONAL,
     ORESAT_NMT_OPERATIONAL,
 } oresat_eventid_t;
-
 
 evreg_t event_registry;
 thread_t *oresat_tp;
@@ -151,8 +149,8 @@ THD_FUNCTION(hb_cons, arg)
     chThdExit(MSG_OK);
 }
 
-
-void oresat_init(void) {
+void oresat_init(void)
+{
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers
@@ -160,11 +158,6 @@ void oresat_init(void) {
      * - Kernel initialization, the main() function becomes a thread and the
      *   RTOS is active.
      */
-	/*
-    if( copy_vectors ) {
-    	setup_vectors();
-    }
-    */
     halInit();
     chSysInit();
 
@@ -196,6 +189,7 @@ void oresat_start(oresat_config_t *config)
     if (config->node_id == ORESAT_DEFAULT_ID) {
         /* TODO: Implement Node ID system properly */
     }
+
     /* Get thread ID for main thread and set priority to max */
     oresat_tp = chThdGetSelfX();
     chThdSetPriority(HIGHPRIO);

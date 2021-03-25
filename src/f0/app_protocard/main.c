@@ -26,7 +26,7 @@ static worker_t worker1;
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-	ORESAT_PROTOCARD_NODE_ID,
+    ORESAT_DEFAULT_ID,
     ORESAT_DEFAULT_BITRATE
 };
 
@@ -36,7 +36,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
+    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, false);
     reg_worker(&worker1);
 
     /* Start up debug output */
@@ -48,17 +48,6 @@ static void app_init(void)
  */
 int main(void)
 {
-    halInit();
-    chSysInit();
-
-	 palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
-
-	while (1) {
-		palToggleLine(LINE_LED);
-		chThdSleepMilliseconds(500);
-	}
-
-
     // Initialize and start
     oresat_init();
     app_init();
