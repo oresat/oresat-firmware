@@ -26,12 +26,19 @@
 #include <string.h>
 #include "blink.h"
 
-
 static worker_t worker1;
+static thread_descriptor_t worker1_desc = {
+    .name = "Example blinky thread",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = blink,
+    .arg = NULL
+};
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-	ORESAT_DEFAULT_ID,
+    ORESAT_DEFAULT_ID,
     ORESAT_DEFAULT_BITRATE
 };
 
@@ -43,8 +50,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    init_worker(&worker1, "Example blinky thread", blink_wa, sizeof(blink_wa), NORMALPRIO, blink, NULL, true);
-    reg_worker(&worker1);
+    reg_worker(&worker1, &worker1_desc, false, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
@@ -56,14 +62,15 @@ static void app_init(void)
  */
 int main(void)
 {
+    // Initialize and start
 	setup_f0_vectors();
-    oresat_init();
+    oresat_init(&oresat_conf);
     app_init();
 
     chprintf((BaseSequentialStream *) &SD2, "\r\n===================================================\r\n"); chThdSleepMilliseconds(30);
 
     chprintf(DEBUG_SD, "running oresat_start()\r\n"); chThdSleepMilliseconds(30);
-    oresat_start(&oresat_conf);
+    oresat_start();
 
     chprintf(DEBUG_SD, "running main() long loop\r\n"); chThdSleepMilliseconds(30);
     while(1) {
@@ -71,8 +78,3 @@ int main(void)
     }
     return 0;
 }
-
-
-
-
-

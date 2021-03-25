@@ -167,7 +167,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DCO_VERSION_MAJOR=2
 
 # Define ASM defines here
 UADEFS =
