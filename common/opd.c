@@ -2,6 +2,7 @@
 #include "max7310.h"
 #include "opd.h"
 
+#define OPD_RESET_TIME      250
 #define OPD_I2C_TRIES       3
 
 static struct {
@@ -132,7 +133,7 @@ int opd_reset(i2caddr_t addr)
     }
 
     max7310SetPin(&opd_dev[addr].dev, OPD_CB_RESET);
-    chThdSleepMilliseconds(100);
+    chThdSleepMilliseconds(OPD_RESET_TIME);
     max7310ClearPin(&opd_dev[addr].dev, OPD_CB_RESET);
     return 0;
 }

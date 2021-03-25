@@ -1,60 +1,86 @@
 #include "worker.h"
+#include "CO_threads.h"
 
+#define WRK_EVT_WAKEUP      EVENT_MASK(0)
+#define WRK_EVT_TERMINATE   EVENT_MASK(1)
+#define WRK_EVT_NMT         EVENT_MASK(2)
+
+static CO_NMT_internalState_t state;
 static worker_t *workers = NULL;
 
-void init_worker(worker_t *worker, const char *name, void *wa, size_t wa_size, tprio_t prio, tfunc_t funcp, void *arg, bool critical)
+void reg_worker(worker_t *wp, thread_descriptor_t *desc, bool critical, bool autostart)
 {
-    worker->tp = NULL;
-    worker->next = NULL;
-    worker->prev = NULL;
-    worker->critical = critical;
-    worker->desc.name = name;
-    worker->desc.wbase = THD_WORKING_AREA_BASE(wa);
-    worker->desc.wend = THD_WORKING_AREA_END(wa + wa_size);
-    worker->desc.prio = prio;
-    worker->desc.funcp = funcp;
-    worker->desc.arg = arg;
-}
+    osalDbgCheck(wp != NULL);
 
-void reg_worker(worker_t *worker)
-{
-    osalDbgCheck(worker != NULL);
+    wp->desc = desc;
+    wp->critical = critical;
+    wp->autostart = autostart;
+    wp->tp = NULL;
 
     if (workers != NULL) {
-        worker->next = workers;
-        workers->prev = worker;
-    }
-    workers = worker;
-}
-
-void unreg_worker(worker_t *worker)
-{
-    osalDbgCheck(worker != NULL);
-
-    if (worker->next != NULL) {
-        worker->next->prev = worker->prev;
-    }
-    if (worker->prev != NULL) {
-        worker->prev->next = worker->next;
+        wp->next = workers;
+        workers->prev = wp;
     } else {
-        workers = worker->next;
+        wp->next = NULL;
+        wp->prev = NULL;
+    }
+    workers = wp;
+}
+
+void unreg_worker(worker_t *wp)
+{
+    osalDbgCheck(wp != NULL);
+
+    if (wp->next != NULL) {
+        wp->next->prev = wp->prev;
+    }
+    if (wp->prev != NULL) {
+        wp->prev->next = wp->next;
+    } else {
+        workers = wp->next;
     }
 }
 
-void start_crit_workers(void)
+thread_t *start_worker(worker_t *wp)
 {
-    for (worker_t *wp = workers; wp; wp = wp->next) {
-        if (wp->tp == NULL && wp->critical) {
-            wp->tp = chThdCreate(&wp->desc);
+    osalDbgCheck(wp != NULL);
+
+    /* Verify worker is registered */
+    worker_t *wp_check;
+    for (wp_check = workers; wp_check != wp && wp_check; wp_check = wp_check->next);
+    if (!wp_check) {
+        /* If not, return NULL */
+        return NULL;
+    }
+
+    /* Start if operational or critical */
+    if (state == CO_NMT_OPERATIONAL || wp->critical) {
+        if (wp->tp == NULL) {
+            wp->tp = chThdCreate(wp->desc);
         }
     }
+    return wp->tp;
+}
+
+msg_t stop_worker(worker_t *wp)
+{
+    msg_t ret;
+
+    osalDbgCheck(wp != NULL);
+
+    if (wp->tp) {
+        chThdTerminate(wp->tp);
+        ret = chThdWait(wp->tp);
+        wp->tp = NULL;
+    }
+    return ret;
 }
 
 void start_workers(void)
 {
     for (worker_t *wp = workers; wp; wp = wp->next) {
-        if (wp->tp == NULL) {
-            wp->tp = chThdCreate(&wp->desc);
+        if (wp->autostart) {
+            start_worker(wp);
         }
     }
 }
@@ -62,10 +88,44 @@ void start_workers(void)
 void stop_workers(bool stop_crit)
 {
     for (worker_t *wp = workers; wp; wp = wp->next) {
-        if (wp->tp && (!wp->critical || stop_crit)) {
-            chThdTerminate(wp->tp);
-            chThdWait(wp->tp);
-            wp->tp = NULL;
+        if (!wp->critical || stop_crit) {
+            stop_worker(wp);
         }
     }
+}
+
+THD_WORKING_AREA(thread_mgr_wa, 0x100);
+THD_FUNCTION(thread_mgr, arg)
+{
+    (void)arg;
+    event_listener_t nmt_el;
+
+    /* Set thread name */
+    chRegSetThreadName("Worker Manager");
+
+    /* Register on the NMT state change event */
+    chEvtRegisterMaskWithFlags(&nmt_event, &nmt_el, WRK_EVT_NMT, ALL_EVENTS);
+
+    /* Start critical workers */
+    start_workers();
+
+    while (!chThdShouldTerminateX()) {
+        if (chEvtWaitAny(WRK_EVT_WAKEUP | WRK_EVT_TERMINATE | WRK_EVT_NMT) & WRK_EVT_NMT) {
+            /* If NMT state event, handle state change */
+            state = chEvtGetAndClearFlags(&nmt_el);
+            if (state == CO_NMT_OPERATIONAL) {
+                /* Operational state, start all workers */
+                start_workers();
+            } else {
+                /* Non-operational, stop the non-critical workers */
+                stop_workers(false);
+            }
+        }
+    }
+
+    /* Shutting down, terminate all workers */
+    stop_workers(true);
+
+    chEvtUnregister(&nmt_event, &nmt_el);
+    chThdExit(MSG_OK);
 }
