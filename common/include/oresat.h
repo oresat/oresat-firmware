@@ -29,7 +29,6 @@ void process_cb(void *thread);
 
 /* OreSat initialization and main process */
 void oresat_init(void);
-void oresat_init2(const bool copy_vectors);
 void oresat_start(oresat_config_t *config);
 
 #ifdef __cplusplus

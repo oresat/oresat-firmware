@@ -17,6 +17,7 @@
 extern "C" {
 #endif
 
+void setup_f0_vectors(void);
 
 #ifdef __cplusplus
 }

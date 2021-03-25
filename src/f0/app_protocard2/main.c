@@ -56,7 +56,8 @@ static void app_init(void)
  */
 int main(void)
 {
-    oresat_init2(true);
+	setup_f0_vectors();
+    oresat_init();
     app_init();
 
     chprintf((BaseSequentialStream *) &SD2, "\r\n===================================================\r\n"); chThdSleepMilliseconds(30);
