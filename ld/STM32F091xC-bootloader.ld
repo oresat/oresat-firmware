@@ -19,8 +19,8 @@
  */
 MEMORY
 {
-    flash0 (rx) : org = 0x08000000, len = 40k
-    flash1 (rx) : org = 0x00000000, len = 0
+    flash0 (rx) : org = 0x08000000, len = 40k   /* Bootloader   */
+    flash1 (rx) : org = 0x0800A400, len = 199k  /* Application  */
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
     flash4 (rx) : org = 0x00000000, len = 0
@@ -28,7 +28,7 @@ MEMORY
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
     ram0   (wx) : org = 0x20000000, len = 32k
-    ram1   (wx) : org = 0x00000000, len = 0
+    ram1   (wx) : org = 0x20000400, len = 31k
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0
     ram4   (wx) : org = 0x00000000, len = 0

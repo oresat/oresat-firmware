@@ -19,8 +19,8 @@
  */
 MEMORY
 {
-    flash0 (rx) : org = 0x08000000, len = 128k
-    flash1 (rx) : org = 0x08020000, len = 128k
+    flash0 (rx) : org = 0x08000000, len = 40k   /* Bootloader   */
+    flash1 (rx) : org = 0x0800A400, len = 199k  /* Application  */
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
     flash4 (rx) : org = 0x00000000, len = 0
@@ -28,7 +28,7 @@ MEMORY
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
     ram0   (wx) : org = 0x20000000, len = 32k
-    ram1   (wx) : org = 0x00000000, len = 0
+    ram1   (wx) : org = 0x20000400, len = 31k
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0
     ram4   (wx) : org = 0x00000000, len = 0
@@ -41,45 +41,45 @@ MEMORY
    and a load region (_LMA suffix).*/
 
 /* Flash region to be used for exception vectors.*/
-REGION_ALIAS("VECTORS_FLASH", flash0);
-REGION_ALIAS("VECTORS_FLASH_LMA", flash0);
+REGION_ALIAS("VECTORS_FLASH", flash1);
+REGION_ALIAS("VECTORS_FLASH_LMA", flash1);
 
 /* Flash region to be used for constructors and destructors.*/
-REGION_ALIAS("XTORS_FLASH", flash0);
-REGION_ALIAS("XTORS_FLASH_LMA", flash0);
+REGION_ALIAS("XTORS_FLASH", flash1);
+REGION_ALIAS("XTORS_FLASH_LMA", flash1);
 
 /* Flash region to be used for code text.*/
-REGION_ALIAS("TEXT_FLASH", flash0);
-REGION_ALIAS("TEXT_FLASH_LMA", flash0);
+REGION_ALIAS("TEXT_FLASH", flash1);
+REGION_ALIAS("TEXT_FLASH_LMA", flash1);
 
 /* Flash region to be used for read only data.*/
-REGION_ALIAS("RODATA_FLASH", flash0);
-REGION_ALIAS("RODATA_FLASH_LMA", flash0);
+REGION_ALIAS("RODATA_FLASH", flash1);
+REGION_ALIAS("RODATA_FLASH_LMA", flash1);
 
 /* Flash region to be used for various.*/
-REGION_ALIAS("VARIOUS_FLASH", flash0);
-REGION_ALIAS("VARIOUS_FLASH_LMA", flash0);
+REGION_ALIAS("VARIOUS_FLASH", flash1);
+REGION_ALIAS("VARIOUS_FLASH_LMA", flash1);
 
 /* Flash region to be used for RAM(n) initialization data.*/
-REGION_ALIAS("RAM_INIT_FLASH_LMA", flash0);
+REGION_ALIAS("RAM_INIT_FLASH_LMA", flash1);
 
 /* RAM region to be used for Main stack. This stack accommodates the processing
    of all exceptions and interrupts.*/
-REGION_ALIAS("MAIN_STACK_RAM", ram0);
+REGION_ALIAS("MAIN_STACK_RAM", ram1);
 
 /* RAM region to be used for the process stack. This is the stack used by
    the main() function.*/
-REGION_ALIAS("PROCESS_STACK_RAM", ram0);
+REGION_ALIAS("PROCESS_STACK_RAM", ram1);
 
 /* RAM region to be used for data segment.*/
-REGION_ALIAS("DATA_RAM", ram0);
-REGION_ALIAS("DATA_RAM_LMA", flash0);
+REGION_ALIAS("DATA_RAM", ram1);
+REGION_ALIAS("DATA_RAM_LMA", flash1);
 
 /* RAM region to be used for BSS segment.*/
-REGION_ALIAS("BSS_RAM", ram0);
+REGION_ALIAS("BSS_RAM", ram1);
 
 /* RAM region to be used for the default heap.*/
-REGION_ALIAS("HEAP_RAM", ram0);
+REGION_ALIAS("HEAP_RAM", ram1);
 
 /* Generic rules inclusion.*/
 INCLUDE rules.ld
