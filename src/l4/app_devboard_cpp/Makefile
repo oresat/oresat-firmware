@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template_cpp
+PROJECT   = app_devboard_cpp
 
 # Target settings.
 MCU       = cortex-m4
