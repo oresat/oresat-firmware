@@ -1,11 +1,7 @@
-#ifndef COMMON_INCLUDE_CAN_BOOTLOADER_API_H_
-#define COMMON_INCLUDE_CAN_BOOTLOADER_API_H_
+#ifndef _CAN_BOOTLOADER_H_
+#define _CAN_BOOTLOADER_H_
 #include "ch.h"
 #include "hal.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define ORESAT_F0_FLASH_PAGE_SIZE                     2048
 
@@ -53,6 +49,10 @@ typedef struct {
 	uint32_t connection_verify_fail;
 } can_bootloader_config_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode);
 
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms);
@@ -69,5 +69,5 @@ bool can_bootloader_test(can_bootloader_config_t *can_bl_config);
 
 #ifdef __cplusplus
 }
-#endif /*__cplusplus*/
-#endif /* COMMON_INCLUDE_CAN_BOOTLOADER_API_H_ */
+#endif /* __cplusplus */
+#endif /* _CAN_BOOTLOADER_H_ */

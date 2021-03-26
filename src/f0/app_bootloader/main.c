@@ -23,10 +23,8 @@
 #include "crc32.h"
 #include <string.h>
 #include "flash_f0.h"
-#include "can_bootloader_api.h"
-#include "oresat_misc.h"
-
-#define SCB_AIRCR_SYSRESETREQ                        (1 << 2)
+#include "can_bootloader.h"
+#include "util.h"
 
 #define BOOTLOADER_VERSION                           0xAB
 #define CAN_DRIVER                                   &CAND1
@@ -40,7 +38,7 @@
 //Memory address at the 31k mark, not allocated or cleared by CRT of hte OS due to linker script specifying RAM as 31k instead of the full 32k
 volatile uint32_t *bootloader_magic_number_pointer = (uint32_t *) 0x20007C00;
 
-uint32_t *cpu_unique_id_low = (uint32_t *) 0x1FFFF7AC;
+uint32_t *cpu_unique_id_low = (uint32_t *)UID_BASE;
 uint8_t bootloader_temp_write_buffer[TEMP_WRITE_BUFFER_SIZE]; //Spec says maximum of 2048 bytes needed for buffer
 
 #define DEBUG_SD    (BaseSequentialStream *)          &SD2
@@ -51,12 +49,7 @@ void soft_reset_cortex_m0(void) {
 
 	chSysDisable();
 
-	__DSB();
-	SCB->AIRCR = ((0x5FA << 16) | SCB_AIRCR_SYSRESETREQ);
-	__DSB();
-
-	while (1) {
-	}
+	NVIC_SystemReset();
 }
 
 /**
@@ -64,14 +57,14 @@ void soft_reset_cortex_m0(void) {
  */
 bool validate_firmware_meta_data(const uint32_t length, const uint32_t expected_crc32) {
 	if (length == 0|| expected_crc32 == 0 || length == UINT32_MAX || expected_crc32 == UINT32_MAX) {
-		return (false);
+		return false;
 	}
 
 	if( length >= ORESAT_F0_FIRMWARE_MAXIMUM_LENGTH) {
-		return(false);
+		return false;
 	}
 
-	return (true);
+	return true;
 }
 
 /**
@@ -83,16 +76,16 @@ bool validate_firmware_meta_data(const uint32_t length, const uint32_t expected_
  */
 bool validate_firmware_image(void *base_address, const uint32_t length, const uint32_t expected_crc32) {
 	if( ! validate_firmware_meta_data(length, expected_crc32) ) {
-		return(false);
+		return false;
 	}
 
 	const uint32_t crc_of_flash_data = crc32(0, base_address, length);
 
 	if( crc_of_flash_data != expected_crc32 ) {
-		return(false);
+		return false;
 	}
 
-	return(true);
+	return true;
 }
 
 void branch_to_firmware_image(void) {
@@ -188,9 +181,9 @@ bool can_bootloader_send_ack_nack(const uint32_t sid, const bool ack_flag) {
 	}
 
 	if( (tx_r = can_bootloader_transmit(&tx_msg)) != MSG_OK ) {
-		return(false);
+		return false;
 	}
-	return(true);
+	return true;
 }
 
 bool can_bootloader_send_ack(const uint32_t sid) {
@@ -207,58 +200,40 @@ bool can_bootloader_send_nack(const uint32_t sid) {
  * @return true if the page_number can be erased, false otherwise
  */
 bool is_flash_page_eraseable(const uint8_t page_number) {
-	extern int __flash0_end__;
 	uint32_t *bootloader_end_flash = (uint32_t *) &__flash0_end__;
 	uint32_t last_bootloader_page_number = ((((uint32_t)bootloader_end_flash) - 0x08000000) / STM32F093_FLASH_PAGE_SIZE) - 1;
 
 	//chprintf(DEBUG_SD, "last_bootloader_page_number = %u\r\n", last_bootloader_page_number);
 
 	if( page_number > last_bootloader_page_number && page_number <= FLASH_PAGE_COUNT) {
-		return(true);
+		return true;
 	}
 
-	return(false);
+	return false;
 }
 
 /**
  * @return true if the given flash address can be written to, false otherwise.
  */
 bool is_flash_write_address_valid(const uint8_t *address) {
-	extern int __flash0_base__;
-	extern int __flash0_end__;
-	uint8_t *bootloader_start_flash = (uint8_t *) &__flash0_base__;
-	uint8_t *bootloader_end_flash = (uint8_t *) &__flash0_end__;
+	uint8_t *application_start_flash = (uint8_t *) &__flash1_base__;
+	uint8_t *application_end_flash = (uint8_t *) &__flash1_end__;
 
-	if( address >= bootloader_start_flash && address < bootloader_end_flash ) {
-		//Disallow writes to flash where the bootloader is stored
-		return(false);
+	if( address >= application_start_flash && address < application_end_flash ) {
+		return true;
 	}
 
-	extern int __ram0_base__;
-	extern int __ram0_end__;
-
-	uint8_t *ram_start = (uint8_t *) &__ram0_base__;
-	uint8_t *ram_end = (uint8_t *) &__ram0_end__;
-	if( address >= ram_start && address < ram_end ) {
-		//Disallow writes to RAM as it will corrupt the execution of the bootloader
-		return(false);
-	}
-
-	if( address >= bootloader_end_flash && address <= ((uint8_t *) 0x0803FFFF) ) {
-		return(true);
-	}
-
-	return(false);
+	return false;
 }
 
 bool is_flash_write_address_range_valid(const uint8_t *address, const uint32_t length) {
 	if( ! is_flash_write_address_valid(address) ) {
-		return(false);
+		return false;
 	}
 	if( ! is_flash_write_address_valid(address + length)) {
-		return(false);
+		return false;
 	}
-	return(true);
+	return true;
 }
 
 /**
@@ -587,10 +562,8 @@ int main(void)
     chprintf(DEBUG_SD, "\r\n=======================================\r\n");
     chprintf(DEBUG_SD, "Bootloader started...\r\n");
 
-	extern int __flash0_base__;
-	extern int __flash0_end__;
-	chprintf(DEBUG_SD, "Bootloader __flash0_base__ = 0x%X\r\n", (uint8_t *) &__flash0_base__);
-	chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%X\r\n", (uint8_t *) &__flash0_end__);
+	chprintf(DEBUG_SD, "Bootloader __flash0_base__ = 0x%08X\r\n", (uint8_t *) &__flash0_base__);
+	chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%08X\r\n", (uint8_t *) &__flash0_end__);
 
 	extern stkalign_t __main_thread_stack_base__;
 	extern stkalign_t __main_thread_stack_end__;

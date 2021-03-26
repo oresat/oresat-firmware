@@ -23,7 +23,6 @@
 /* Project header files */
 #include "oresat.h"
 #include "oresat_f0.h"
-#include <string.h>
 #include "blink.h"
 
 static worker_t worker1;

@@ -20,7 +20,7 @@
 #include "oslib_test_root.h"
 #include "chprintf.h"
 #include "string.h"
-#include "can_bootloader_api.h"
+#include "can_bootloader.h"
 #include "oresat_f0.h"
 
 #include "firmware_blob.h"
