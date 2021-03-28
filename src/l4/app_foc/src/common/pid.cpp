@@ -10,13 +10,13 @@ PIDController::PIDController(float P, float I, float D, float ramp, float limit)
     , error_prev(0.0)
     , output_prev(0.0)
 {
-    timestamp_prev = _micros();
+    timestamp_prev = micros(); //ARDUINO_MAYBE
 }
 
 // PID controller function
 float PIDController::operator() (float error){
     // calculate the time from the last call
-    unsigned long timestamp_now = _micros();
+    unsigned long timestamp_now = micros(); //ARDUINO_MAYBE
     float Ts = (timestamp_now - timestamp_prev) * 1e-6;
     // quick fix for strange cases (micros overflow)
     if(Ts <= 0 || Ts > 0.5) Ts = 1e-3; 
@@ -30,7 +30,7 @@ float PIDController::operator() (float error){
     // u_ik = u_ik_1  + I*Ts/2*(ek + ek_1)
     float integral = integral_prev + I*Ts*0.5*(error + error_prev);
     // antiwindup - limit the output
-    integral = _constrain(integral, -limit, limit);
+    integral = _constrain(integral, -limit, limit); //ARDUINO_MAYBE
     // Discrete derivation
     // u_dk = D(ek - ek_1)/Ts
     float derivative = D*(error - error_prev)/Ts;
@@ -38,7 +38,7 @@ float PIDController::operator() (float error){
     // sum all the components
     float output = proportional + integral + derivative;
     // antiwindup - limit the output variable
-    output = _constrain(output, -limit, limit);
+    output = _constrain(output, -limit, limit); //ARDUINO_MAYBE
 
     // limit the acceleration by ramping the output
     float output_rate = (output - output_prev)/Ts;
