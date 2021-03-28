@@ -18,6 +18,9 @@
 #include "ch.h"
 #include "hal.h"
 
+//#include <SimpleFOC.h>
+
+
 int main(void)
 {
     /*
