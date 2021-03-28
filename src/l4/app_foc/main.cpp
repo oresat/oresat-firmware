@@ -19,6 +19,8 @@
 #include "hal.h"
 
 //#include <SimpleFOC.h>
+#include "src/common/foc_utils.h"
+#include "src/common/lowpass_filter.h"
 
 
 int main(void)
