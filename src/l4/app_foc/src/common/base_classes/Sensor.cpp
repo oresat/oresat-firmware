@@ -1,6 +1,6 @@
 #include "Sensor.h"
 #include "../foc_utils.h"
-#include "../time_utils.h"
+//#include "../time_utils.h"
 
  /** 
  * returns 0 if it does need search for absolute zero
@@ -15,7 +15,7 @@ int Sensor::needsSearch(){
 float Sensor::getVelocity(){
 
     // calculate sample time
-    unsigned long now_us = _micros();
+    unsigned long now_us = micros(); //ARDUINO_MAYBE
     float Ts = (now_us - velocity_calc_timestamp)*1e-6;
     // quick fix for strange cases (micros overflow)
     if(Ts <= 0 || Ts > 0.5) Ts = 1e-3; 

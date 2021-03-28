@@ -22,6 +22,7 @@
 #include "src/common/foc_utils.h"
 #include "src/common/lowpass_filter.h"
 #include "src/common/pid.h"
+#include "src/common/base_classes/Sensor.h"
 
 
 int main(void)
