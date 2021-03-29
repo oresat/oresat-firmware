@@ -141,8 +141,8 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
 
 // 2021-03-25 -
-    uint8_t chipId = bmi088ReadChipId(devp);
-    if ( chipId == 0 ) { }
+//    uint8_t chipId = bmi088ReadChipId(devp);
+//    if ( chipId == 0 ) { }
 
 
 #if BMI088_SHARED_I2C

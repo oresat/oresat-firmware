@@ -439,8 +439,8 @@
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_FAULT) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_EN) |     \
                                      PIN_PUPDR_FLOATING(GPIOB_MAG_READY) |  \
-                                     PIN_PUPDR_FLOATING(GPIOB_I2C1_SCL) |   \
-                                     PIN_PUPDR_FLOATING(GPIOB_I2C1_SDA) |   \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C1_SCL) |   \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C1_SDA) |   \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN8) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN9) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN10) |      \

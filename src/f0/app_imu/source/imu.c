@@ -37,15 +37,21 @@ THD_FUNCTION(imu, arg)
     uint8_t bmi088_chip_id = 0;
     uint8_t power_status = 0;
     uint8_t interrupt_status = 0;
+    uint8_t acc_inx = 0;
 
 
     /* Initialize and start the BMI088 IMU sensor */
     bmi088ObjectInit(&imudev);
     bmi088Start(&imudev, &imucfg);
 
+
+// 2021-03-27 -
+    chThdSleepMilliseconds(1);
+// 2021-03-26 FRI - unsure but do we need to send command to start accelerometer measurements? - TMH:
+    accEnable(&imudev, 0x04);  // start accelerometer, per BMI088 datasheet page 34, covers register 0x7D
+
     chThdSleepMilliseconds(50);
 
-//    accEnable(&imudev, 0x04);  // start accelerometer, per BMI088 datasheet page 34, covers register 0x7D
 
     while (!chThdShouldTerminateX()) {
         iterations++;
@@ -58,11 +64,14 @@ THD_FUNCTION(imu, arg)
         if ((iterations % 10) == 0) {
             bmi088_chip_id = bmi088ReadChipId(&imudev);
             chprintf(CHP, "BMI088 ID is %u\r\n", bmi088_chip_id);
-            power_status = readPwrCtrlReg(&imudev);
-            chprintf(CHP, "power status is %u\r\n", power_status);
-
+//            power_status = readPwrCtrlReg(&imudev);
+//            chprintf(CHP, "power status is %u\r\n", power_status);
+//
             interrupt_status = bmi088ReadIntStat(&imudev);
             chprintf(CHP, "interrupt status is %u\r\n", interrupt_status);
+
+            acc_inx = bmi088ReadAccInX(&imudev);
+            chprintf(CHP, "InX reading is %u\r\n", acc_inx);
         }
 
         chThdSleepMilliseconds(250);
