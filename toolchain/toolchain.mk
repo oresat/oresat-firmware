@@ -6,7 +6,7 @@ GDB_OOCD_CFG = gdboocd.cmd
 GDB_STL_CFG = gdbstl.cmd
 SERIAL_RAW != echo -e "$(SERIAL)"
 
-write: $(APP_HEXFILE) write_ocd
+write: $(OUTFILES) write_ocd
 
 write_ocd:
 	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "hla_serial $(SERIAL); program $(APP_HEXFILE) verify reset exit"

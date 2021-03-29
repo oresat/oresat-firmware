@@ -107,6 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/oresat_f0.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -190,6 +191,7 @@ ULIBS =
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
 include $(RULESPATH)/arm-none-eabi.mk
 include $(RULESPATH)/rules.mk
+include $(TOOLCHAIN)/bootloader_f0.mk
 include $(TOOLCHAIN)/toolchain.mk
 
 #

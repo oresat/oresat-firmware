@@ -20,6 +20,7 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "oresat_f0.h"
 #include "blink.h"
 
 static worker_t worker1;
@@ -56,6 +57,7 @@ static void app_init(void)
 int main(void)
 {
     // Initialize and start
+    setup_f0_vectors();
     oresat_init(&oresat_conf);
     app_init();
     oresat_start();
