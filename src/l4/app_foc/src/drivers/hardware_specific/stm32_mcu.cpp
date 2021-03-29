@@ -28,10 +28,11 @@ void _setPwm(int ulPin, uint32_t value, int resolution)
 
 
 // init pin pwm 
-HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin)
+HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin) //stm32duino_MAYBE
 {
-  PinName pin = digitalPinToPinName(ulPin);
+  PinName pin = digitalPinToPinName(ulPin); //stm32duino_MAYBE
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
+  //STM32_Standard_Peripherals_Library_MAYBE
   
   uint32_t index = get_timer_index(Instance);
   if (HardwareTimer_Handle[index] == NULL) {
