@@ -74,13 +74,13 @@ float FOCMotor::electricalAngle(){
  */
 // function implementing the monitor_port setter
 void FOCMotor::useMonitoring(Print &print){
-  monitor_port = &print; //operate on the address of print
-  if(monitor_port ) monitor_port->println(F("MOT: Monitor enabled!"));
+  monitor_port = &print; //operate on the address of print  //ARDUINO_MAYBE
+  if(monitor_port ) monitor_port->println(F("MOT: Monitor enabled!")); //ARDUINO_MAYBE
 }
 
 // utility function intended to be used with serial plotter to monitor motor variables
 // significantly slowing the execution down!!!!
-void FOCMotor::monitor() {
+void FOCMotor::monitor() {  //ARDUINO_TO_CHIBIOS
   if( !monitor_downsample || monitor_cnt++ < monitor_downsample ) return;
   monitor_cnt = 0;
   if(!monitor_port) return;

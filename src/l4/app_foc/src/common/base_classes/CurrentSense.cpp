@@ -36,7 +36,7 @@ float CurrentSense::getDCCurrent(float motor_electrical_angle){
 //   - using getPhaseCurrents internally
 DQCurrent_s CurrentSense::getFOCCurrents(float angle_el){
     // read current phase currents
-    PhaseCurrent_s current = getPhaseCurrents();
+    PhaseCurrent_s current = getPhaseCurrents(); //ARDUINO_MAYBE
 
     // calculate clarke transform
     float i_alpha, i_beta;

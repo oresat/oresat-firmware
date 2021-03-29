@@ -23,6 +23,12 @@
 #include "src/common/lowpass_filter.h"
 #include "src/common/pid.h"
 #include "src/common/base_classes/Sensor.h"
+#include "src/common/base_classes/BLDCDriver.h"
+#include "src/common/base_classes/CurrentSense.h"
+#include "src/common/base_classes/FOCMotor.h"
+
+
+
 
 
 int main(void)

@@ -1,11 +1,11 @@
 #ifndef FOCMOTOR_H
 #define FOCMOTOR_H
 
-#include "Arduino.h"
+//#include "Arduino.h"
 #include "Sensor.h"
 #include "CurrentSense.h"
 
-#include "../time_utils.h"
+//#include "../time_utils.h"
 #include "../foc_utils.h"
 #include "../defaults.h"
 #include "../pid.h"
@@ -22,7 +22,7 @@
 #define _MON_ANGLE  0b0000001 // monitor angle value
 
 /**
- *  Motiron control type
+ *  Motion control type
  */
 enum MotionControlType{
   torque,//!< Torque control
@@ -33,7 +33,7 @@ enum MotionControlType{
 };
 
 /**
- *  Motiron control type
+ *  Motion control type
  */
 enum TorqueControlType{
   voltage, //!< Torque control using voltage
@@ -186,13 +186,13 @@ class FOCMotor
      * 
      * @param serial Monitoring Serial class reference
      */
-    void useMonitoring(Print &serial);
+    //void useMonitoring(Print &serial);  //ARDUINO_TO_CHIBIOS
 
     /**
      * Utility function intended to be used with serial plotter to monitor motor variables
      * significantly slowing the execution down!!!!
      */
-    void monitor();
+    void monitor();  //ARDUNIO_MAYBE
     unsigned int monitor_downsample = DEF_MON_DOWNSMAPLE; //!< show monitor outputs each monitor_downsample calls 
     // initial monitoring will display target, voltage, velocity and angle
     uint8_t monitor_variables = _MON_TARGET | _MON_VOLT_Q | _MON_VEL | _MON_ANGLE; //!< Bit array holding the map of variables the user wants to monitor
@@ -210,7 +210,7 @@ class FOCMotor
     CurrentSense* current_sense; 
 
     // monitoring functions
-    Print* monitor_port; //!< Serial terminal variable if provided
+    //Print* monitor_port; //!< Serial terminal variable if provided  //ARDUINO_TO_CHIBIOS
   private:
     // monitor counting variable
     unsigned int monitor_cnt = 0 ; //!< counting variable
