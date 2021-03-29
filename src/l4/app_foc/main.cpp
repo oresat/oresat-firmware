@@ -25,7 +25,9 @@
 #include "src/common/base_classes/Sensor.h"
 #include "src/common/base_classes/BLDCDriver.h"
 #include "src/common/base_classes/CurrentSense.h"
-#include "src/common/base_classes/FOCMotor.h"
+#include "src/common/base_classes/FOCMotor.h"  // Need to fix
+#include "src/drivers/BLDCDriver6PWM.h"
+#include "src/drivers/hardware_api.h"
 
 
 
