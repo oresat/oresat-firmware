@@ -126,8 +126,11 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif /* BMI088_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    buf.reg = BMI088_AD_ACC_PWR_CONF;
-    buf.value = BMI088_AD_ACC_SOFTRESET;
+
+#if (0)
+// Following value assignment does not seem right per BMI088 datasheet - TMH:
+    buf.reg = BMI088_AD_ACC_PWR_CONF;     // this accelerometer register address is 0x7C
+    buf.value = BMI088_AD_ACC_SOFTRESET;  // this value defined as 0x7E, which is another register address not 0x00 nor 0x03.
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
     do {
         bmi088I2CReadRegister(config->i2cp, config->acc_saddr, BMI088_AD_ACC_PWR_CONF,
@@ -139,17 +142,29 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
     buf.reg = BMI088_AD_ACC_STATUS;
     buf.value = __REVSH(config->cal);
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
+#else
+    chThdSleepMilliseconds(1);            // per datasheet page 12, timing required for starting accelerometer aftet power up
+    buf.reg = BMI088_AD_ACC_PWR_CTRL;     // this accelerometer register address is 0x7D
+    buf.value = 0x04;                     // per BMI088 datasheet page 25
+    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
+    chThdSleepMilliseconds(50);
 
-// 2021-03-25 -
-//    uint8_t chipId = bmi088ReadChipId(devp);
-//    if ( chipId == 0 ) { }
-
+#endif
 
 #if BMI088_SHARED_I2C
     i2cReleaseBus(config->i2cp);
 #endif /* BMI088_SHARED_I2C */
 #endif /* BMI088_USE_I2C */
+
     devp->state = BMI088_READY;
+
+    uint8_t chip_id_accelerometer = 0;
+    chip_id_accelerometer =  bmi088ReadChipId(devp);
+    if ( chip_id_accelerometer == 0x1E ) {
+        chThdSleepMilliseconds(2);
+        chip_id_accelerometer =  bmi088ReadChipId(devp);
+    }
+
 }
 
 /**
@@ -227,6 +242,68 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
     return __REVSH(buf.value);
 }
 
+
+
+/**
+ * @brief   Reads BMI088 Register as raw 8 bit value.
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @param[in] saddr      slave address
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+uint8_t bmi088ReadRawU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg) {
+    i2cbuf_t buf;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == BMI088_READY,
+            "bmi088ReadRaw(), invalid state");
+#if BMI088_USE_I2C
+#if BMI088_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* BMI088_SHARED_I2C */
+    buf.reg = reg;
+    bmi088I2CReadRegister(devp->config->i2cp, saddr, buf.reg, buf.data, 1);
+#if BMI088_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* BMI088_SHARED_I2C */
+#endif /* BMI088_USE_I2C */
+    return buf.data[0];
+}
+
+
+/**
+ * @brief   Reads BMI088 Register as raw 16 bit value.
+ *
+ * @param[in] devp       pointer to the @p BMI088Driver object
+ * @param[in] saddr      slave address
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg) {
+    i2cbuf_t buf;
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == BMI088_READY,
+            "bmi088ReadRaw(), invalid state");
+#if BMI088_USE_I2C
+#if BMI088_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* BMI088_SHARED_I2C */
+    buf.reg = reg;
+    bmi088I2CReadRegister(devp->config->i2cp, saddr, buf.reg, buf.data, 2);
+#if BMI088_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* BMI088_SHARED_I2C */
+#endif /* BMI088_USE_I2C */
+    return buf.value;
+}
+
+
+
+
 /**
  * @brief   Soft Reset Command.
  *
@@ -294,10 +371,25 @@ uint8_t bmi088ReadChipId(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    chipId = bmi088ReadRaw(devp, BMI088_AD_ACC_CHIP_ID);
+    chipId = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_AD_ACC_CHIP_ID);
 
-    return chipId;    
+    return chipId;
 }
+
+
+
+uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp){
+    uint8_t chipId;
+
+    osalDbgCheck(devp != NULL);
+
+    chipId = bmi088ReadRawU8(devp, devp->config->gyro_saddr, BMI088_AD_ACC_CHIP_ID);
+
+    return chipId;
+}
+
+
+
 
 /**
  * @brief   Reads BMI088  Error Code Register.

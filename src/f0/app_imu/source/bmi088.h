@@ -40,7 +40,7 @@
 #define BMI088_SADDR                        0
 /** @} */
 #define BMI088_ACC_SADDR                    0x18u 
-#define BMI088_GYRO_SADDR 					0x68u
+#define BMI088_GYRO_SADDR                   0x68u
 /**
  * @name    BMI088 Accelerometer Register Addresses
  * @{
@@ -920,6 +920,13 @@ void accEnable(BMI088Driver *devp, uint8_t enable);
 uint8_t readPowerCtrlReg(BMI088Driver *devp);
 uint8_t bmi088ReadIntStat(BMI088Driver *devp);
 uint16_t bmi088ReadTemp(BMI088Driver *devp);
+
+
+// 2021-03-28 - 'imu-dev-003--accelerometer-chip-id-debug' branch work, observing gyro device ID via I2C:
+//uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp);
+uint8_t bmi088ReadRawU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
+uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
+
 
 #ifdef __cplusplus
 }
