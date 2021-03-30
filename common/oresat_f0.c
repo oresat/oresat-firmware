@@ -6,7 +6,7 @@
 /**
  * This function should be called on applications using the STM32F091xC-firmware.ld linker script and using the bootloader to run them.
  */
-void setup_f0_vectors(void) {
+void __late_init(void) {
 	/* Relocate by software the vector table to the internal SRAM at 0x20000000 ***/
 	/* Copy the vector table from the Flash (mapped at the base of the application
 	load address 0x08003000) to the base address of the SRAM at 0x20000000. */
