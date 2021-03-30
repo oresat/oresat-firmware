@@ -817,15 +817,15 @@ typedef enum {
 } bmi088_state_t;
 
 
-// 2021-03-30 -
+// 2021-03-30 - Note BMI088 accelerometer chip defaults to power 'off' and operating mode 'suspend'
 typedef enum {
     BMI088_ON = 4,
     BMI088_OFF = 0
 } bmi088_power_state_t;
 
 typedef enum {
-    BMI088_MODE_SUSPEND = 0,
-    BMI088_MODE_ACTIVE = 3
+    BMI088_MODE_ACTIVE = 0,
+    BMI088_MODE_SUSPEND = 3
 } bmi088_acc_operating_mode_t;
 
 
@@ -938,9 +938,13 @@ uint16_t bmi088ReadTemp(BMI088Driver *devp);
 
 // 2021-03-28 - 'imu-dev-003--accelerometer-chip-id-debug' branch work, observing gyro device ID via I2C:
 uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp);
+// 2021-03-29
 uint8_t bmi088ReadRawU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 
+// 2021-03-30
+void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state);
+void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
 
 #ifdef __cplusplus
 }
