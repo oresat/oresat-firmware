@@ -160,7 +160,7 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
     uint8_t chip_id_accelerometer = 0;
     chip_id_accelerometer =  bmi088ReadChipId(devp);
-    if ( chip_id_accelerometer == 0x1E ) {
+    if ( chip_id_accelerometer != 0x1E ) {
         chThdSleepMilliseconds(2);
         chip_id_accelerometer =  bmi088ReadChipId(devp);
     }
@@ -322,6 +322,8 @@ void bmi088SoftReset(BMI088Driver *devp, uint8_t softRst){
     bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));    
 }
 
+
+
 /**
  * @brief   Enable BMI088 Accelerometer.
  *
@@ -329,15 +331,33 @@ void bmi088SoftReset(BMI088Driver *devp, uint8_t softRst){
  * @param[in] enable     Value to write to enable: 4, to disable: 0;
  * @api
  */
-void accEnable(BMI088Driver *devp, uint8_t enable){
-    i2cbuf_t buf;
+void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state) {
+
+    uint8_t write_buffer[1];
 
     osalDbgCheck( devp != NULL );
     
-    buf.reg = BMI088_ACC_PWR_CTRL;
-    buf.value = enable;
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));
+    write_buffer[0] = BMI088_AD_ACC_PWR_CTRL;
+    write_buffer[1] = power_state;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, sizeof(write_buffer));
+    chThdSleepMilliseconds(50);   // Per datasheet page 12 - TMH
 }
+
+
+void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode) {
+
+    uint8_t write_buffer[1];
+
+    osalDbgCheck( devp != NULL );
+    
+    write_buffer[0] = BMI088_AD_ACC_PWR_CONF;
+    write_buffer[1] = operating_mode;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, sizeof(write_buffer));
+    chThdSleepMilliseconds(10);   // arbitrarily chosen, may not be needed - TMH
+}
+
+
+
 
 /**
  * @brief   Read Power Control Register BMI088 Accelerometer.
@@ -385,7 +405,7 @@ uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp){
 
     chipId = bmi088ReadRawU8(devp, devp->config->gyro_saddr, BMI088_AD_ACC_CHIP_ID);
 
-    return chipId;
+    return (uint8_t)chipId;
 }
 
 
