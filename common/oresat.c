@@ -25,7 +25,13 @@ void oresat_init(oresat_config_t *config)
     /* Set configuration values */
     /* If node ID is not overridden, use default node ID */
     if (config->node_id == ORESAT_DEFAULT_ID) {
-        /* TODO: Implement Node ID system properly */
+#if defined(STM32F0XX)
+        uint8_t node_id = ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos);
+        if (node_id <= 0x7F) {
+            config->node_id = node_id;
+        } else
+#endif
+            config->node_id = 0x7F;
     }
 
     /* Initialize CANopen Subsystem */
