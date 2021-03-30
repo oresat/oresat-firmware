@@ -126,7 +126,8 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
 struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP = {
            CO_OD_FIRST_LAST_WORD,
 
-/*6001*/ {0x3L, 0, 0x4EC0L, 0x2710L},
+/*6001*/ 0x0078L,
+/*6002*/ {0x3L, 0, 0x4EC0L, 0x2710L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -350,7 +351,7 @@ struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP = {
            {(void*)&CO_OD_RAM.MCU_Sensors.VBAT_Raw, 0xA6, 0x2 },
 };
 
-/*0x6001*/ const CO_OD_entryRecord_t OD_record6001[4] = {
+/*0x6002*/ const CO_OD_entryRecord_t OD_record6002[4] = {
            {(void*)&CO_OD_PERSIST_APP.TX_Control.highestSubIndexSupported, 0x07, 0x1 },
            {(void*)&CO_OD_PERSIST_APP.TX_Control.enabled, 0x0F, 0x1 },
            {(void*)&CO_OD_PERSIST_APP.TX_Control.TX_Timeout, 0x8F, 0x4 },
@@ -410,6 +411,7 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2021, 0x06, 0x00,  0, (void*)&OD_record2021},
 {0x2100, 0x00, 0x06, 10, (void*)&CO_OD_RAM.errorStatusBits},
 {0x6000, 0x00, 0x06,  1, (void*)&CO_OD_RAM.C3State},
-{0x6001, 0x03, 0x00,  0, (void*)&OD_record6001},
+{0x6001, 0x00, 0x8F,  4, (void*)&CO_OD_PERSIST_APP.preDeployTimeout},
+{0x6002, 0x03, 0x00,  0, (void*)&OD_record6002},
 };
 // clang-format on

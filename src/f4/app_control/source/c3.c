@@ -10,7 +10,6 @@
 /* TODO: Switch to actual OD variables */
 bool bat_good = true;
 bool edl = false;
-uint32_t predeploy_timeout = 2700;
 
 /* Global State Variables */
 thread_t *c3_tp;
@@ -104,13 +103,13 @@ THD_FUNCTION(c3, arg)
         switch (OD_C3State[0]) {
         case PREDEPLOY:
             /* Check if pre-deployment timeout has occured */
-            while (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < predeploy_timeout) {
+            while (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_preDeployTimeout) {
                 /* Must wait for pre-deployment timeout */
                 if ((RTCD1.rtc->CR & RTC_CR_ALRAE) == 0) {
                     /* ref_time is the ChibiOS epoch */
                     RTCDateTime ref_time;
                     rtcConvertUnixToDateTime(&ref_time, CHIBIOS_EPOCH, 0);
-                    rtc_state.alarm_a.alrmr = rtcEncodeRelAlarm(&ref_time, 0, 0, 0, predeploy_timeout);
+                    rtc_state.alarm_a.alrmr = rtcEncodeRelAlarm(&ref_time, 0, 0, 0, OD_preDeployTimeout);
                     rtcSetAlarm(&RTCD1, 0, &rtc_state.alarm_a);
                 }
                 event = chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE);

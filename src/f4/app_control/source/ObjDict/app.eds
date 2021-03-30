@@ -5,11 +5,11 @@ FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat C3 Node Object Dictionary
-CreationTime=11:18AM
+CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=5:26PM
-ModificationDate=03-07-2021
+ModificationTime=12:35PM
+ModificationDate=03-30-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=41
+SupportedObjects=42
 1=0x1002
 2=0x1003
 3=0x1005
@@ -166,6 +166,7 @@ SupportedObjects=41
 39=0x1F89
 40=0x6000
 41=0x6001
+42=0x6002
 
 [1002]
 ParameterName=Manufacturer status register
@@ -4232,12 +4233,21 @@ DefaultValue=B
 PDOMapping=0
 
 [6001]
+ParameterName=Pre-Deploy Timeout
+ObjectType=0x7
+;StorageLocation=PERSIST_APP
+DataType=0x0007
+AccessType=rw
+DefaultValue=120
+PDOMapping=0
+
+[6002]
 ParameterName=TX Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
 SubNumber=0x4
 
-[6001sub0]
+[6002sub0]
 ParameterName=Highest sub-index supported
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4246,7 +4256,7 @@ AccessType=ro
 DefaultValue=0x03
 PDOMapping=0
 
-[6001sub1]
+[6002sub1]
 ParameterName=Enabled
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4255,7 +4265,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[6001sub2]
+[6002sub2]
 ParameterName=TX Timeout
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4264,7 +4274,7 @@ AccessType=rw
 DefaultValue=20160
 PDOMapping=0
 
-[6001sub3]
+[6002sub3]
 ParameterName=Beacon Interval
 ObjectType=0x7
 ;StorageLocation=RAM
