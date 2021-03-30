@@ -124,7 +124,7 @@
  * ADC driver system settings.
  */
 #define STM32_ADC_COMPACT_SAMPLES           FALSE
-#define STM32_ADC_USE_ADC1                  FALSE
+#define STM32_ADC_USE_ADC1                  TRUE
 #define STM32_ADC_ADC1_DMA_STREAM           STM32_DMA_STREAM_ID(1, 1)
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
 #define STM32_ADC_ADC12_IRQ_PRIORITY        5

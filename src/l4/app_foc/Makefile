@@ -15,7 +15,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti
+  USE_CPPOPT = -std=gnu++11 -fno-exceptions -fno-rtti
 endif
 
 # Enable this if you want the linker to remove unused code and data.
@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_foc
+PROJECT   = app_template_cpp
 
 # Target settings.
 MCU       = cortex-m4
@@ -104,6 +104,9 @@ DEPDIR   := $(APP_ROOT)/.dep
 
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+# Project specific files.
+include $(PROJ_SRC)/oresat.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -131,12 +134,12 @@ LDSCRIPT= $(STARTUPLD)/STM32L452xE.ld
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CSRC = $(ALLCSRC) \
-       $(TESTSRC) 
+       $(TESTSRC)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
-          main.cpp
+	     main.cpp
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
@@ -162,7 +165,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DCO_VERSION_MAJOR=2
 
 # Define ASM defines here
 UADEFS =

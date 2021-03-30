@@ -18,40 +18,46 @@
 #include "ch.h"
 #include "hal.h"
 
-//#include <SimpleFOC.h>
-#include "src/common/foc_utils.h"
-#include "src/common/lowpass_filter.h"
-#include "src/common/pid.h"
-#include "src/common/base_classes/Sensor.h"
-#include "src/common/base_classes/BLDCDriver.h"
-#include "src/common/base_classes/CurrentSense.h"
-#include "src/common/base_classes/FOCMotor.h"  // Need to fix
-#include "src/drivers/BLDCDriver6PWM.h"
-#include "src/drivers/hardware_api.h"
+/* Project header files */
+#include "oresat.h"
+#include "blink.h"
 
+static worker_t worker1;
+static thread_descriptor_t worker1_desc = {
+    .name = "Example blinky thread",
+    .wbase = THD_WORKING_AREA_BASE(blink_wa),
+    .wend = THD_WORKING_AREA_END(blink_wa),
+    .prio = NORMALPRIO,
+    .funcp = blink,
+    .arg = NULL
+};
 
+static oresat_config_t oresat_conf = {
+    &CAND1,
+    ORESAT_DEFAULT_ID,
+    ORESAT_DEFAULT_BITRATE
+};
 
+/**
+ * @brief App Initialization
+ */
+static void app_init(void)
+{
+    /* App initialization */
+    reg_worker(&worker1, &worker1_desc, false, true);
 
+    /* Start up debug output */
+    sdStart(&LPSD1, NULL);
+}
 
+/**
+ * @brief Main Application
+ */
 int main(void)
 {
-    /*
-     * System initializations.
-     * - HAL initialization, this also initializes the configured device drivers
-     *   and performs the board-specific initializations.
-     * - Kernel initialization, the main() function becomes a thread and the
-     *   RTOS is active.
-     */
-    halInit();
-    chSysInit();
-
-    while (true)
-    {
-        palClearLine(LINE_LED);
-        chThdSleepMilliseconds(1000);
-        palSetLine(LINE_LED);
-        chThdSleepMilliseconds(1000);
-    }
-
+    // Initialize and start
+    oresat_init(&oresat_conf);
+    app_init();
+    oresat_start();
     return 0;
 }
