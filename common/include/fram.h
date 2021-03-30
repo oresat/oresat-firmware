@@ -38,6 +38,16 @@
 #define FRAM_PATCH                          0
 /** @} */
 
+/**
+ * @name    FRAM Properties
+ * @{
+ */
+/**
+ * @brief   FRAM size.
+ */
+#define FRAM_SIZE                           0x2000U
+/** @} */
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -179,6 +189,8 @@ void framStart(FRAMDriver *devp, const FRAMConfig *config);
 void framStop(FRAMDriver *devp);
 void framRead(FRAMDriver *devp, uint16_t addr, void *buf, size_t n);
 void framWrite(FRAMDriver *devp, uint16_t addr, void *buf, size_t n);
+void framErase(FRAMDriver *devp, uint16_t addr, size_t n);
+void framEraseAll(FRAMDriver *devp);
 #ifdef __cplusplus
 }
 #endif

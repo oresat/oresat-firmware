@@ -50,8 +50,8 @@ typedef union {
  * @return              the operation status.
  * @notapi
  */
-msg_t framI2CReadAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr,
-        uint8_t* rxbuf, size_t n) {
+msg_t framI2CReadAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr, uint8_t* rxbuf, size_t n)
+{
     addr = __REVSH(addr);
     return i2cMasterTransmitTimeout(i2cp, saddr, (uint8_t*)(&addr), sizeof(addr), rxbuf, n, TIME_INFINITE);
 }
@@ -68,8 +68,8 @@ msg_t framI2CReadAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr,
  * @return              the operation status.
  * @notapi
  */
-msg_t framI2CWriteAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr,
-        uint8_t *txbuf, size_t n) {
+msg_t framI2CWriteAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr, uint8_t *txbuf, size_t n)
+{
     i2cbuf_t i2cbuf;
     size_t size, offset = 0;
     msg_t ret;
@@ -78,7 +78,7 @@ msg_t framI2CWriteAddr(I2CDriver *i2cp, i2caddr_t saddr, uint16_t addr,
         size = (n < BLOCK_SIZE ? n : BLOCK_SIZE);
         i2cbuf.addr = __REVSH(addr + offset);
         memcpy(i2cbuf.data, &txbuf[offset], size);
-        ret = i2cMasterTransmitTimeout(i2cp, saddr, i2cbuf.buf, sizeof(i2cbuf.buf), NULL, 0, TIME_INFINITE);
+        ret = i2cMasterTransmitTimeout(i2cp, saddr, i2cbuf.buf, sizeof(addr) + n, NULL, 0, TIME_INFINITE);
         offset += size;
         n -= size;
     }
@@ -106,7 +106,8 @@ static const struct FRAMVMT vmt_device = {
  *
  * @init
  */
-void framObjectInit(FRAMDriver *devp) {
+void framObjectInit(FRAMDriver *devp)
+{
     devp->vmt = &vmt_device;
 
     devp->config = NULL;
@@ -122,7 +123,8 @@ void framObjectInit(FRAMDriver *devp) {
  *
  * @api
  */
-void framStart(FRAMDriver *devp, const FRAMConfig *config) {
+void framStart(FRAMDriver *devp, const FRAMConfig *config)
+{
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == FRAM_STOP) ||
             (devp->state == FRAM_READY),
@@ -152,7 +154,8 @@ void framStart(FRAMDriver *devp, const FRAMConfig *config) {
  *
  * @api
  */
-void framStop(FRAMDriver *devp) {
+void framStop(FRAMDriver *devp)
+{
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == FRAM_STOP) || (devp->state == FRAM_READY),
             "framStop(), invalid state");
@@ -184,10 +187,11 @@ void framStop(FRAMDriver *devp) {
  *
  * @api
  */
-void framRead(FRAMDriver *devp, uint16_t addr, void *buf, size_t n) {
+void framRead(FRAMDriver *devp, uint16_t addr, void *buf, size_t n)
+{
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == FRAM_READY,
-            "framReadRaw(), invalid state");
+            "framRead(), invalid state");
 
 #if FRAM_USE_I2C
 #if FRAM_SHARED_I2C
@@ -214,10 +218,11 @@ void framRead(FRAMDriver *devp, uint16_t addr, void *buf, size_t n) {
  *
  * @api
  */
-void framWrite(FRAMDriver *devp, uint16_t addr, void *buf, size_t n) {
+void framWrite(FRAMDriver *devp, uint16_t addr, void *buf, size_t n)
+{
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == FRAM_READY,
-            "framReadRaw(), invalid state");
+            "framWrite(), invalid state");
 
 #if FRAM_USE_I2C
 #if FRAM_SHARED_I2C
@@ -231,6 +236,60 @@ void framWrite(FRAMDriver *devp, uint16_t addr, void *buf, size_t n) {
     i2cReleaseBus(devp->config->i2cp);
 #endif /* FRAM_SHARED_I2C */
 #endif /* FRAM_USE_I2C */
+    return;
+}
+
+/**
+ * @brief   Erase FRAM memory.
+ *
+ * @param[in]  devp       pointer to the @p FRAMDriver object
+ * @param[in]  addr       the address to start erasing from
+ * @param[in]  n          number of bytes to erase
+ *
+ * @api
+ */
+void framErase(FRAMDriver *devp, uint16_t addr, size_t n)
+{
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == FRAM_READY,
+            "framErase(), invalid state");
+
+    uint8_t buf[BLOCK_SIZE] = {0};
+    size_t len, offset = addr;
+
+    while (n) {
+        len = (n < BLOCK_SIZE ? n : BLOCK_SIZE);
+        framWrite(devp, offset, buf, len);
+        offset += len;
+        n -= len;
+    }
+
+    return;
+}
+
+/**
+ * @brief   Erase ALL FRAM memory.
+ *
+ * @param[in]  devp       pointer to the @p FRAMDriver object
+ *
+ * @api
+ */
+void framEraseAll(FRAMDriver *devp)
+{
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == FRAM_READY,
+            "framErase(), invalid state");
+
+    uint8_t buf[BLOCK_SIZE] = {0};
+    size_t len, offset = 0, n = FRAM_SIZE;
+
+    while (n) {
+        len = (n < BLOCK_SIZE ? n : BLOCK_SIZE);
+        framWrite(devp, offset, buf, len);
+        offset += len;
+        n -= len;
+    }
+
     return;
 }
 

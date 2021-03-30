@@ -333,10 +333,11 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "status")) {
         chprintf(chp, "Date:    %08X\r\n"
                       "Time:    %08X\r\n"
-                      "Wakeup:  %08X\r\n"
+                      "Wakeup:  %08X (%s)\r\n"
                       "Alarm A: %08X (%s)\r\n"
                       "Alarm B: %08X (%s)\r\n",
-                      RTCD1.rtc->DR, RTCD1.rtc->TR, RTCD1.rtc->WUTR,
+                      RTCD1.rtc->DR, RTCD1.rtc->TR,
+                      RTCD1.rtc->WUTR, (RTCD1.rtc->CR & RTC_CR_WUTE ? "ENABLED" : "DISABLED"),
                       RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
                       RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else {
@@ -523,6 +524,8 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         chEvtSignal(c3_tp, C3_EVENT_EDL);
     } else if (!strcmp(argv[0], "reset")) {
         NVIC_SystemReset();
+    } else if (!strcmp(argv[0], "factoryreset")) {
+        factory_reset();
     } else {
         goto state_usage;
     }
@@ -535,7 +538,8 @@ state_usage:
                    "    tx <t/f>:       Override TX enable state\r\n"
                    "    bat <t/f>:      Override battery good state\r\n"
                    "    edl <t/f>:      Override EDL state\r\n"
-                   "    reset:          Reset C3\r\n"
+                   "    reset:          Soft reset C3\r\n"
+                   "    factoryreset:   Reset C3 to factory defaults\r\n"
                    "\r\n");
     return;
 }
@@ -556,7 +560,7 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
         framRead(&FRAMD1, addr, buf, len);
 
         for (uint32_t i = 0; i < len; i++) {
-            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i + addr);
             chprintf(chp, " %02X", buf[i]);
         }
         chprintf(chp, "\r\n");
@@ -564,6 +568,12 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
         free(buf);
     } else if (!strcmp(argv[0], "write") && argc > 3) {
         chprintf(chp, "Unimplemented\r\n");
+    } else if (!strcmp(argv[0], "erase") && argc > 2) {
+        uint16_t addr = strtoul(argv[1], NULL, 0);
+        size_t len = strtoul(argv[2], NULL, 0);
+        framErase(&FRAMD1, addr, len);
+    } else if (!strcmp(argv[0], "eraseall")) {
+        framEraseAll(&FRAMD1);
     } else {
         goto fram_usage;
     }
@@ -573,7 +583,11 @@ void cmd_fram(BaseSequentialStream *chp, int argc, char *argv[])
 fram_usage:
     chprintf(chp,  "Usage: fram <command>\r\n"
                    "    read <addr> <len>:\r\n"
-                   "        Read starting at <addr> for <len> bytes\r\n"
+                   "        Read <len> bytes starting at <addr>\r\n"
+                   "    erase <addr> <len>:\r\n"
+                   "        Erase (set to 0) <len> bytes starting at <addr>\r\n"
+                   "    eraseall\r\n"
+                   "        Erase (set to 0) entirety of FRAM\r\n"
                    "\r\n");
     return;
 }

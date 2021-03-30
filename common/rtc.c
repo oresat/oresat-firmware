@@ -1,6 +1,46 @@
 #include "rtc.h"
 
 /**
+ * @brief   Convert @p RTCDateTime to Unix time.
+ *
+ * @param[in]  timespec     Pointer to a @p RTCDateTime structure
+ * @param[out] msec         Pointer to milliseconds value or @p NULL
+ *
+ * @return                  Unix time
+ * @api
+ */
+time_t rtcConvertDateTimeToUnix(const RTCDateTime *timespec, uint32_t *msec)
+{
+    osalDbgCheck(timespec != NULL);
+    struct tm tim;
+
+    rtcConvertDateTimeToStructTm(timespec, &tim, msec);
+    return mktime(&tim);
+}
+
+/**
+ * @brief   Convert Unix time to @p RTCDateTime.
+ *
+ * @param[out] timespec     Pointer to a @p RTCDateTime structure
+ * @param[in]  unix_time    Unix time value
+ * @param[in]  msec         Milliseconds value
+ *
+ * @api
+ */
+void rtcConvertUnixToDateTime(RTCDateTime *timespec, time_t unix_time, uint32_t msec)
+{
+    osalDbgCheck(timespec != NULL);
+    struct tm tim;
+    struct tm *canary;
+
+    canary = gmtime_r(&unix_time, &tim);
+    osalDbgCheck(&tim == canary);
+
+    rtcConvertStructTmToDateTime(&tim, msec, timespec);
+    return;
+}
+
+/**
  * @brief   Get time as struct tm
  *
  * @param[out] tim          Pointer to struct tm to fill

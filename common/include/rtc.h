@@ -45,6 +45,9 @@ typedef union {
 extern "C" {
 #endif
 
+time_t rtcConvertDateTimeToUnix(const RTCDateTime *timespec, uint32_t *msec);
+void rtcConvertUnixToDateTime(RTCDateTime *timespec, time_t unix_time, uint32_t msec);
+
 void rtcGetTimeTm(struct tm *tim, uint32_t *msec);
 void rtcSetTimeTm(const struct tm *tim, uint32_t msec);
 time_t rtcGetTimeUnix(uint32_t *msec);

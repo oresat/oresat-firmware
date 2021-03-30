@@ -42,8 +42,11 @@ typedef struct {
 extern bool bat_good;
 extern bool edl;
 
-/* Main Command, Communications, and Control Thread Prototypes */
+/* Main Command, Communications, and Control Thread Prototype */
 extern THD_WORKING_AREA(c3_wa, 0x400);
 extern THD_FUNCTION(c3, arg);
+
+/* Support function prototypes */
+void factory_reset(void);
 
 #endif
