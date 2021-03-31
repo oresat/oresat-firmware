@@ -92,9 +92,9 @@ THD_FUNCTION(imu, arg)
             chThdSleepMilliseconds(10);
 #endif
             bmi088ObtainGyroscopesReadings(&imudev, gyroscope_readings_byte_array);
-            chprintf(CHP, "gyro X rate %d\r\n", (gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
-            chprintf(CHP, "gyro Y rate %d\r\n", (gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
-            chprintf(CHP, "gyro Z rate %d\r\n", (gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
+            chprintf(CHP, "gyro X rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
+            chprintf(CHP, "gyro Y rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
+            chprintf(CHP, "gyro Z rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
 
             chprintf(CHP, "\r\n");
         }

@@ -651,26 +651,26 @@ uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readi
 //    uint16_t gyro_rate_z = 0;
 
     union reading_union_t {
-      uint16_t as_uint16_type;
+      int16_t as_int16_type;
       uint8_t as_bytes[1];
     };
 
     union reading_union_t gyro_reading;
-    gyro_reading.as_uint16_type = 0;
+    gyro_reading.as_int16_type = 0;
 
     osalDbgCheck(devp != NULL);
 
-    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x02);
+    gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x02);
 //    gyro_rate_x = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[0] = gyro_reading.as_bytes[0];
     packed_readings[1] = gyro_reading.as_bytes[1];
 
-    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x04);
+    gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x04);
 //    gyro_rate_y = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[2] = gyro_reading.as_bytes[0];
     packed_readings[3] = gyro_reading.as_bytes[1];
 
-    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x06);
+    gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x06);
 //    gyro_rate_z = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[4] = gyro_reading.as_bytes[0];
     packed_readings[5] = gyro_reading.as_bytes[1];
