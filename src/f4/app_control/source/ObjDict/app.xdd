@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-03-30" fileModificationTime="12:35:32.0047320-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-03-31" fileModificationTime="08:30:58.6028290-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -707,17 +707,45 @@
               <UINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="TX Control" uniqueID="UID_REC_6002">
+          <q1:struct name="State Control" uniqueID="UID_REC_6001">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600100">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Save Interval" uniqueID="UID_RECSUB_600101">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Factory Reset" uniqueID="UID_RECSUB_600102">
+              <BOOL />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Deployment Control" uniqueID="UID_REC_6002">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600200">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Enabled" uniqueID="UID_RECSUB_600201">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="TX Timeout" uniqueID="UID_RECSUB_600202">
+            <q1:varDeclaration name="Timeout" uniqueID="UID_RECSUB_600201">
               <UDINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Beacon Interval" uniqueID="UID_RECSUB_600203">
+            <q1:varDeclaration name="Deployed" uniqueID="UID_RECSUB_600202">
+              <BOOL />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Actuation Time" uniqueID="UID_RECSUB_600203">
+              <UDINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Attempts" uniqueID="UID_RECSUB_600204">
+              <USINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="TX Control" uniqueID="UID_REC_6003">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600300">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Enabled" uniqueID="UID_RECSUB_600301">
+              <BOOL />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="TX Timeout" uniqueID="UID_RECSUB_600302">
+              <UDINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Beacon Interval" uniqueID="UID_RECSUB_600303">
               <UDINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -3593,37 +3621,83 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
               </q1:range>
             </q1:allowedValues>
           </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6001" access="readWrite">
-            <description lang="en">Pre-Deploy Timeout in Seconds
-
-Defines how long to wait before initiating antenna deployment and starting state tracking</description>
-            <UDINT />
-            <q1:defaultValue value="120" />
+          <q1:parameter uniqueID="UID_OBJ_6001">
+            <description lang="en">C3 State Control</description>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6001" />
             <q1:property name="CO_storageGroup" value="PERSIST_APP" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600100">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x02" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600101" access="readWrite">
+            <description lang="en">State saving interval in seconds</description>
+            <UINT />
+            <q1:defaultValue value="10" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600102" access="readWrite">
+            <description lang="en">Initiate factory reset when set to true</description>
+            <BOOL />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6002">
-            <description lang="en">Transmission control object</description>
+            <description lang="en">Antenna deployment control</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_6002" />
             <q1:property name="CO_storageGroup" value="PERSIST_APP" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600200">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x03" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600201" access="readWrite">
+            <description lang="en">Pre-Deploy Timeout in Seconds
+
+Defines how long to wait before initiating antenna deployment and starting state tracking</description>
+            <UDINT />
+            <q1:defaultValue value="120" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600202" access="readWrite">
+            <description lang="en">Antenna deployment state
+
+If true, skips antenna deployment attempt</description>
+            <BOOL />
+            <q1:defaultValue value="1" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600203" access="readWrite">
+            <description lang="en">Antenna deployer actuation time in ms</description>
+            <UDINT />
+            <q1:defaultValue value="1000" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600204" access="readWrite">
+            <description lang="en">Number of attempts to deploy antennas before continuing</description>
+            <USINT />
+            <q1:defaultValue value="3" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6003">
+            <description lang="en">Transmission control object</description>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6003" />
+            <q1:property name="CO_storageGroup" value="PERSIST_APP" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600300">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600301" access="readWrite">
             <label lang="en">Enabled</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600202" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_600302" access="readWrite">
             <description lang="en">Transmit timeout in seconds.
 
 Determines how long the device will maintain TX enabled after receiving an enable command before disabling it.</description>
             <UDINT />
             <q1:defaultValue value="20160" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600203" access="readWrite">
+          <q1:parameter uniqueID="UID_SUB_600303" access="readWrite">
             <description lang="en">Beacon interval in milliseconds.</description>
             <UDINT />
             <q1:defaultValue value="10000" />
@@ -3645,7 +3719,7 @@ Determines how long the device will maintain TX enabled after receiving an enabl
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-03-30" fileModificationTime="12:35:32.0047320-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-03-31" fileModificationTime="08:30:58.6028290-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -4241,12 +4315,23 @@ Determines how long the device will maintain TX enabled after receiving an enabl
           </CANopenObject>
           <CANopenObject index="2100" name="Error Status Bits" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2100" />
           <CANopenObject index="6000" name="C3 State" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6000" />
-          <CANopenObject index="6001" name="Pre-Deploy Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6001" />
-          <CANopenObject index="6002" name="TX Control" objectType="9" uniqueIDRef="UID_OBJ_6002" subNumber="4">
+          <CANopenObject index="6001" name="State Control" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="3">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600100" />
+            <CANopenSubObject subIndex="01" name="Save Interval" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600101" />
+            <CANopenSubObject subIndex="02" name="Factory Reset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600102" />
+          </CANopenObject>
+          <CANopenObject index="6002" name="Deployment Control" objectType="9" uniqueIDRef="UID_OBJ_6002" subNumber="5">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600200" />
-            <CANopenSubObject subIndex="01" name="Enabled" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600201" />
-            <CANopenSubObject subIndex="02" name="TX Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600202" />
-            <CANopenSubObject subIndex="03" name="Beacon Interval" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600203" />
+            <CANopenSubObject subIndex="01" name="Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600201" />
+            <CANopenSubObject subIndex="02" name="Deployed" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600202" />
+            <CANopenSubObject subIndex="03" name="Actuation Time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600203" />
+            <CANopenSubObject subIndex="04" name="Attempts" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600204" />
+          </CANopenObject>
+          <CANopenObject index="6003" name="TX Control" objectType="9" uniqueIDRef="UID_OBJ_6003" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600300" />
+            <CANopenSubObject subIndex="01" name="Enabled" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600301" />
+            <CANopenSubObject subIndex="02" name="TX Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600302" />
+            <CANopenSubObject subIndex="03" name="Beacon Interval" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600303" />
           </CANopenObject>
         </q2:CANopenObjectList>
         <dummyUsage>

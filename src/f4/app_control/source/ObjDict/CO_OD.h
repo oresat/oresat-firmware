@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             51
+   #define CO_OD_NoOfElements             52
 
 
 /*******************************************************************************
@@ -173,7 +173,19 @@
                UNSIGNED16     VREFINT_Raw;
                UNSIGNED16     VBAT_Raw;
                }              OD_MCU_Sensors_t;
+/*6001      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     saveInterval;
+               BOOLEAN        factoryReset;
+               }              OD_stateControl_t;
 /*6002      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     timeout;
+               BOOLEAN        deployed;
+               UNSIGNED32     actuationTime;
+               UNSIGNED8      attempts;
+               }              OD_deploymentControl_t;
+/*6003      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                BOOLEAN        enabled;
                UNSIGNED32     TX_Timeout;
@@ -805,15 +817,28 @@
         #define OD_6000_C3State                                     0x6000
 
 /*6001 */
-        #define OD_6001_preDeployTimeout                            0x6001
+        #define OD_6001_stateControl                                0x6001
+
+        #define OD_6001_0_stateControl_maxSubIndex                  0
+        #define OD_6001_1_stateControl_saveInterval                 1
+        #define OD_6001_2_stateControl_factoryReset                 2
 
 /*6002 */
-        #define OD_6002_TX_Control                                  0x6002
+        #define OD_6002_deploymentControl                           0x6002
 
-        #define OD_6002_0_TX_Control_maxSubIndex                    0
-        #define OD_6002_1_TX_Control_enabled                        1
-        #define OD_6002_2_TX_Control_TX_Timeout                     2
-        #define OD_6002_3_TX_Control_beaconInterval                 3
+        #define OD_6002_0_deploymentControl_maxSubIndex             0
+        #define OD_6002_1_deploymentControl_timeout                 1
+        #define OD_6002_2_deploymentControl_deployed                2
+        #define OD_6002_3_deploymentControl_actuationTime           3
+        #define OD_6002_4_deploymentControl_attempts                4
+
+/*6003 */
+        #define OD_6003_TX_Control                                  0x6003
+
+        #define OD_6003_0_TX_Control_maxSubIndex                    0
+        #define OD_6003_1_TX_Control_enabled                        1
+        #define OD_6003_2_TX_Control_TX_Timeout                     2
+        #define OD_6003_3_TX_Control_beaconInterval                 3
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -901,8 +926,9 @@ struct sCO_OD_PERSIST_MFR{
 struct sCO_OD_PERSIST_APP{
                UNSIGNED32     FirstWord;
 
-/*6001      */ UNSIGNED32     preDeployTimeout;
-/*6002      */ OD_TX_Control_t TX_Control;
+/*6001      */ OD_stateControl_t stateControl;
+/*6002      */ OD_deploymentControl_t deploymentControl;
+/*6003      */ OD_TX_Control_t TX_Control;
 
                UNSIGNED32     LastWord;
 };
@@ -1069,10 +1095,13 @@ extern struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP;
         #define OD_C3State                                          CO_OD_RAM.C3State
         #define ODL_C3State_stringLength                            1
 
-/*6001, Data Type: UNSIGNED32 */
-        #define OD_preDeployTimeout                                 CO_OD_PERSIST_APP.preDeployTimeout
+/*6001, Data Type: stateControl_t */
+        #define OD_stateControl                                     CO_OD_PERSIST_APP.stateControl
 
-/*6002, Data Type: TX_Control_t */
+/*6002, Data Type: deploymentControl_t */
+        #define OD_deploymentControl                                CO_OD_PERSIST_APP.deploymentControl
+
+/*6003, Data Type: TX_Control_t */
         #define OD_TX_Control                                       CO_OD_PERSIST_APP.TX_Control
 
 #endif

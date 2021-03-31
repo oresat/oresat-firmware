@@ -8,8 +8,8 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=12:35PM
-ModificationDate=03-30-2021
+ModificationTime=8:30AM
+ModificationDate=03-31-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=42
+SupportedObjects=43
 1=0x1002
 2=0x1003
 3=0x1005
@@ -167,6 +167,7 @@ SupportedObjects=42
 40=0x6000
 41=0x6001
 42=0x6002
+43=0x6003
 
 [1002]
 ParameterName=Manufacturer status register
@@ -4233,21 +4234,96 @@ DefaultValue=B
 PDOMapping=0
 
 [6001]
-ParameterName=Pre-Deploy Timeout
-ObjectType=0x7
+ParameterName=State Control
+ObjectType=0x9
 ;StorageLocation=PERSIST_APP
+SubNumber=0x3
+
+[6001sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x02
+PDOMapping=0
+
+[6001sub1]
+ParameterName=Save Interval
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10
+PDOMapping=0
+
+[6001sub2]
+ParameterName=Factory Reset
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6002]
+ParameterName=Deployment Control
+ObjectType=0x9
+;StorageLocation=PERSIST_APP
+SubNumber=0x5
+
+[6002sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x04
+PDOMapping=0
+
+[6002sub1]
+ParameterName=Timeout
+ObjectType=0x7
+;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
 DefaultValue=120
 PDOMapping=0
 
-[6002]
+[6002sub2]
+ParameterName=Deployed
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rw
+DefaultValue=1
+PDOMapping=0
+
+[6002sub3]
+ParameterName=Actuation Time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=1000
+PDOMapping=0
+
+[6002sub4]
+ParameterName=Attempts
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=3
+PDOMapping=0
+
+[6003]
 ParameterName=TX Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
 SubNumber=0x4
 
-[6002sub0]
+[6003sub0]
 ParameterName=Highest sub-index supported
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4256,7 +4332,7 @@ AccessType=ro
 DefaultValue=0x03
 PDOMapping=0
 
-[6002sub1]
+[6003sub1]
 ParameterName=Enabled
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4265,7 +4341,7 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[6002sub2]
+[6003sub2]
 ParameterName=TX Timeout
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4274,7 +4350,7 @@ AccessType=rw
 DefaultValue=20160
 PDOMapping=0
 
-[6002sub3]
+[6003sub3]
 ParameterName=Beacon Interval
 ObjectType=0x7
 ;StorageLocation=RAM

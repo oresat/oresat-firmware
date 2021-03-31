@@ -2,9 +2,11 @@
 #include "rtc.h"
 #include "fram.h"
 #include "comms.h"
+#include "deployer.h"
 #include "CANopen.h"
 
 #define CHIBIOS_EPOCH                       315532800U  /* ChibiOS Epoch in Unix Time */
+#define RTC_FRAM_ADDR                       0x0000U     /* FRAM address for RTC state */
 
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
@@ -53,7 +55,7 @@ static void rtcStateSave(void)
         rtcSTM32GetPeriodicWakeup(&RTCD1, &state.wakeup);
     }
     /* Write RTC state to FRAM */
-    framWrite(&FRAMD1, 0x0000, &state, sizeof(state));
+    framWrite(&FRAMD1, RTC_FRAM_ADDR, &state, sizeof(state));
     /* TODO: Backup/sync with external RTC */
 }
 
@@ -63,7 +65,7 @@ static void rtcStateRestore(void)
     time_t unix;
 
     /* Read the stored RTC state from FRAM */
-    framRead(&FRAMD1, 0x0000, &state, sizeof(state));
+    framRead(&FRAMD1, RTC_FRAM_ADDR, &state, sizeof(state));
     unix = rtcConvertDateTimeToUnix(&state.timestamp, NULL);
 
     /* TODO: Get RTC values from external RTC and reach quorum */
@@ -90,7 +92,6 @@ THD_FUNCTION(c3, arg)
 {
     (void)arg;
     rtc_state_t rtc_state;
-    eventmask_t event = 0;
 
     c3_tp = chThdGetSelfX();
     rtcSetCallback(&RTCD1, alarmcb);
@@ -103,30 +104,43 @@ THD_FUNCTION(c3, arg)
         switch (OD_C3State[0]) {
         case PREDEPLOY:
             /* Check if pre-deployment timeout has occured */
-            while (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_preDeployTimeout) {
+            if (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_deploymentControl.timeout) {
                 /* Must wait for pre-deployment timeout */
                 if ((RTCD1.rtc->CR & RTC_CR_ALRAE) == 0) {
+                    /* If alarm not already set, set alarm */
                     /* ref_time is the ChibiOS epoch */
                     RTCDateTime ref_time;
                     rtcConvertUnixToDateTime(&ref_time, CHIBIOS_EPOCH, 0);
-                    rtc_state.alarm_a.alrmr = rtcEncodeRelAlarm(&ref_time, 0, 0, 0, OD_preDeployTimeout);
+                    rtc_state.alarm_a.alrmr = rtcEncodeRelAlarm(&ref_time, 0, 0, 0, OD_deploymentControl.timeout);
                     rtcSetAlarm(&RTCD1, 0, &rtc_state.alarm_a);
                 }
-                event = chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE);
-                if (event & C3_EVENT_TERMINATE)
-                    break;
+                chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE);
+            } else {
+                /* Enter deploy state */
+                OD_C3State[0] = DEPLOY;
+                rtcSetAlarm(&RTCD1, 0, NULL);
             }
-
-            /* Ready to deploy */
-            rtcSetAlarm(&RTCD1, 0, NULL);
-            OD_C3State[0] = DEPLOY;
             break;
         case DEPLOY:
-            /* Set 9 + 1 second RTC wakeup alarm for state tracking */
-            rtc_state.wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | 9;
+            /* Set RTC wakeup alarm for state saving */
+            rtc_state.wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | OD_stateControl.saveInterval;
             rtcSTM32SetPeriodicWakeup(&RTCD1, &rtc_state.wakeup);
-            /* TODO: Deploy and test antennas */
-            OD_C3State[0] = STANDBY;
+
+            /* Initiate antenna deployment if needed */
+            static uint8_t attempts = 0;
+            if (!OD_deploymentControl.deployed && attempts < OD_deploymentControl.attempts) {
+                if (bat_good) {
+                    deploy_heli(OD_deploymentControl.actuationTime);
+                    deploy_turn(OD_deploymentControl.actuationTime);
+                    attempts++;
+                } else {
+                    chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_BAT);
+                }
+            } else {
+                /* Enter standy state */
+                OD_C3State[0] = STANDBY;
+                attempts = 0;
+            }
             break;
         case STANDBY:
             comms_beacon(false);
