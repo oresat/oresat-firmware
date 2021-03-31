@@ -38,7 +38,9 @@ THD_FUNCTION(imu, arg)
     uint8_t bmi088_gyro_chip_id = 0;
     uint8_t power_status = 0;
     uint8_t interrupt_status = 0;
-    uint8_t acc_inx = 0;
+    int16_t acc_inx = 0;
+    int16_t acc_iny = 0;
+    int16_t acc_inz = 0;
 
     uint8_t gyroscope_readings_byte_array[6];
 
@@ -60,6 +62,9 @@ THD_FUNCTION(imu, arg)
 
     chprintf(CHP, "setting filter and output data rate . . .\r\n");
     BMI088AccelerometerSetFilterAndODR(&imudev, 0x88); // Per datasheet, 0x88 = 4-fold oversampling and 100Hz output data rate
+
+    chprintf(CHP, "enabling positive acc' self test . . .\r\n");
+    BMI088AccelerometerSetSelfTestMode(&imudev, 0x0D);
 
     while (!chThdShouldTerminateX()) {
         iterations++;
@@ -88,7 +93,9 @@ THD_FUNCTION(imu, arg)
             chThdSleepMilliseconds(5);
 
             acc_inx = bmi088ReadAccInX(&imudev);
-            chprintf(CHP, "InX reading is %u\r\n", acc_inx);
+            acc_iny = bmi088ReadAccInY(&imudev);
+            acc_inz = bmi088ReadAccInZ(&imudev);
+            chprintf(CHP, "Acc readings X = %d, Y = %d, Z = %d\r\n", acc_inx, acc_iny, acc_inz);
             chThdSleepMilliseconds(10);
 #endif
             bmi088ObtainGyroscopesReadings(&imudev, gyroscope_readings_byte_array);

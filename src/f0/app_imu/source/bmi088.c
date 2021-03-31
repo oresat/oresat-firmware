@@ -221,6 +221,7 @@ void bmi088Stop(BMI088Driver *devp) {
  *
  * @api
  */
+#if ( 0 )
 uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
     i2cbuf_t buf;
 
@@ -243,6 +244,7 @@ uint16_t bmi088ReadRaw(BMI088Driver *devp, uint8_t reg) {
 #endif /* BMI088_USE_I2C */
     return __REVSH(buf.value);
 }
+#endif
 
 
 
@@ -259,7 +261,7 @@ uint8_t bmi088ReadRawU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg) {
     i2cbuf_t buf;
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == BMI088_READY,
-            "bmi088ReadRaw(), invalid state");
+            "bmi088ReadRawU8(), invalid state");
 #if BMI088_USE_I2C
 #if BMI088_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
@@ -288,7 +290,7 @@ uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg) {
     i2cbuf_t buf;
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == BMI088_READY,
-            "bmi088ReadRaw(), invalid state");
+            "bmi088ReadRawU16(), invalid state");
 #if BMI088_USE_I2C
 #if BMI088_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
@@ -375,6 +377,23 @@ void BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_a
 }
 
 
+// 0x00 self test disabled
+// 0x0D positive self test
+// 0x09 negative self test
+
+void BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_mode) {
+
+    uint8_t write_buffer[1];
+
+    osalDbgCheck( devp != NULL );
+    
+    write_buffer[0] = BMI088_ADDR_ACC_SELF_TEST;
+    write_buffer[1] = self_test_mode;
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, (sizeof(write_buffer) + 1));
+    chThdSleepMilliseconds(50);   // per BMI088 datasheet page 16 - TMH
+}
+
+
 
 /**
  * @brief   Read Power Control Register BMI088 Accelerometer.
@@ -390,7 +409,7 @@ uint8_t readPwrCtrlReg(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    powerStatus = bmi088ReadRaw(devp, BMI088_ACC_PWR_CTRL);
+    powerStatus = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_PWR_CTRL);
 
     return powerStatus;
 }
@@ -405,12 +424,14 @@ uint8_t readPwrCtrlReg(BMI088Driver *devp){
  */
 uint8_t bmi088ReadChipId(BMI088Driver *devp){
     uint8_t chipId;
+    uint8_t chipId2 = 0;
 
     osalDbgCheck(devp != NULL);
 
     chipId = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_CHIP_ID);
+    chipId2 = bmi088ReadRawU8(devp, 0x19, BMI088_ADDR_ACC_CHIP_ID);
 
-    return chipId;
+    return chipId2;
 }
 
 
@@ -422,7 +443,7 @@ uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp){
 
     chipId = bmi088ReadRawU8(devp, devp->config->gyro_saddr, BMI088_ADDR_ACC_CHIP_ID);
 
-    return (uint8_t)chipId;
+    return chipId;
 }
 
 
@@ -442,9 +463,9 @@ uint8_t bmi088ReadErrCode(BMI088Driver *devp){
 
      osalDbgCheck( devp != NULL);
      
-     errCode = bmi088ReadRaw(devp, BMI088_ACC_ERR_CODE);
-
-     return errCode;   
+     errCode = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_ERR_REG);
+// 0b00011101 == 0x1D <-- mask per BMI088 datasheet page 20
+     return (errCode & 0x1D);   // NEED to use pound define for this mask - TMH
 }
 
 /**
@@ -460,9 +481,9 @@ uint8_t bmi088ReadErrFatal(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    errFatal = bmi088ReadRaw(devp, BMI088_ACC_ERR_FATAL);
+    errFatal = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_ERR_REG);
 
-    return errFatal;
+    return (errFatal & 0x01);  // NEED to use pound define for this mask - TMH
 }
 
 /**
@@ -474,13 +495,13 @@ uint8_t bmi088ReadErrFatal(BMI088Driver *devp){
  * @api
  */
 uint8_t bmi088ReadAccStatus(BMI088Driver *devp){
-    uint8_t stat;
+    uint8_t status;
 
     osalDbgCheck(devp != NULL);
 
-    stat = bmi088ReadRaw(devp, BMI088_ACC_STATUS);
+    status = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_STATUS);
 
-    return stat;
+    return (status & 0x80);  // NEED to use pound define for this mask - TMH
 }
 
 /**
@@ -492,7 +513,7 @@ uint8_t bmi088ReadAccStatus(BMI088Driver *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccInX(BMI088Driver *devp){
+int16_t bmi088ReadAccInX(BMI088Driver *devp) {
     int16_t accXInMG;
     int16_t accXInt16;
     int8_t  accXLsb;
@@ -502,8 +523,8 @@ uint8_t bmi088ReadAccInX(BMI088Driver *devp){
 
     accXLsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_LSB);
     accXMsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_MSB);
-    accXInt16   = (accXMsb*256 + accXLsb);
-    accXInMG    = accXInt16/32768*1000*2*(0x41 + 1)*1.5;
+    accXInt16   = (accXMsb * 256 + accXLsb);
+    accXInMG    = accXInt16 / 32768 * 1000 * 2 * (0x41 + 1) * 1.5;
 
     return accXInMG;
 }
@@ -516,7 +537,7 @@ uint8_t bmi088ReadAccInX(BMI088Driver *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccInY(BMI088Driver *devp){
+int16_t bmi088ReadAccInY(BMI088Driver *devp){
     int16_t accYInMG;
     int16_t accYInt16;
     int8_t  accYLsb;
@@ -524,10 +545,10 @@ uint8_t bmi088ReadAccInY(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    accYLsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_LSB);
-    accYMsb     = bmi088ReadRaw(devp, BMI088_ACC_Y_MSB);
-    accYInt16   = (accYMsb*256 + accYLsb);
-    accYInMG    = accYInt16/32768*1000*2*(0x41 + 1)*1.5;
+    accYLsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_Y_LSB);
+    accYMsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_Y_MSB);
+    accYInt16   = (accYMsb * 256 + accYLsb);
+    accYInMG    = accYInt16 / 32768 * 1000 * 2 * (0x41 + 1) * 1.5;
 
     return accYInMG;
 }
@@ -540,7 +561,7 @@ uint8_t bmi088ReadAccInY(BMI088Driver *devp){
  *
  * @api
  */
-uint8_t bmi088ReadAccInZ(BMI088Driver *devp){
+int16_t bmi088ReadAccInZ(BMI088Driver *devp){
     int16_t accZInMG;
     int16_t accZInt16;
     int8_t  accZLsb;
@@ -548,8 +569,8 @@ uint8_t bmi088ReadAccInZ(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    accZLsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_LSB);
-    accZMsb     = bmi088ReadRaw(devp, BMI088_ACC_Z_MSB);
+    accZLsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_Z_LSB);
+    accZMsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_Z_LSB);
     accZInt16   = (accZMsb*256 + accZLsb);
     accZInMG    = accZInt16/32768*1000*2*(0x41 + 1)*1.5;
 
@@ -572,9 +593,9 @@ uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    sensorTime0 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_0);
-    sensorTime1 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_1);
-    sensorTime2 = bmi088ReadRaw(devp, BMI088_ACC_SENSOR_TIME_2);
+    sensorTime0 = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ACC_SENSOR_TIME_0);
+    sensorTime1 = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ACC_SENSOR_TIME_1);
+    sensorTime2 = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ACC_SENSOR_TIME_2);
     sensorTime  = (sensorTime2 << 16) | (sensorTime1 << 8) | sensorTime0;
 
     return sensorTime;
@@ -593,9 +614,9 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    DataReady = bmi088ReadRaw(devp, BMI088_ACC_INT_STAT_1);
+    DataReady = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_INT_STAT_1);
 
-    return DataReady;
+    return (DataReady & 0x80);
 }
 
 /**
@@ -607,7 +628,7 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp){
  * @api
  */
 
-  uint16_t bmi088ReadTemp(BMI088Driver *devp){
+uint16_t bmi088ReadTemp(BMI088Driver *devp){
     int16_t  temperature;
     uint16_t temp_uint11;
     int16_t  temp_int11;
@@ -646,10 +667,6 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp){
 
 uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings) {
 
-//    uint16_t gyro_rate_x = 0;
-//    uint16_t gyro_rate_y = 0;
-//    uint16_t gyro_rate_z = 0;
-
     union reading_union_t {
       int16_t as_int16_type;
       uint8_t as_bytes[1];
@@ -661,17 +678,14 @@ uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readi
     osalDbgCheck(devp != NULL);
 
     gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x02);
-//    gyro_rate_x = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[0] = gyro_reading.as_bytes[0];
     packed_readings[1] = gyro_reading.as_bytes[1];
 
     gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x04);
-//    gyro_rate_y = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[2] = gyro_reading.as_bytes[0];
     packed_readings[3] = gyro_reading.as_bytes[1];
 
     gyro_reading.as_int16_type = (int16_t)bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x06);
-//    gyro_rate_z = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
     packed_readings[4] = gyro_reading.as_bytes[0];
     packed_readings[5] = gyro_reading.as_bytes[1];
 

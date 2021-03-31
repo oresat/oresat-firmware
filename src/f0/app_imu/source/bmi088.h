@@ -64,7 +64,7 @@
 #define BMI088_ADDR_FIFO_LENGTH_0             0x24U
 #define BMI088_ADDR_TEMP_LSB                  0x23U
 #define BMI088_ADDR_TEMP_MSB                  0x22U
-#define BMI088_ADDR_ACC_INT_STAT_1            0x1DU
+#define BMI088_ADDR_ACC_INT_STAT_1            0x1DU  // needs bit mask, only bit 7 used
 #define BMI088_ADDR_SENSORTIME_2              0x1AU
 #define BMI088_ADDR_SENSORTIME_1              0x19U
 #define BMI088_ADDR_SENSORTIME_0              0x18U
@@ -74,8 +74,8 @@
 #define BMI088_ADDR_ACC_Y_LSB                 0x14U
 #define BMI088_ADDR_ACC_X_MSB                 0x13U
 #define BMI088_ADDR_ACC_X_LSB                 0x12U
-#define BMI088_ADDR_ACC_STATUS                0x03U
-#define BMI088_ADDR_ACC_ERR_REG               0x02U
+#define BMI088_ADDR_ACC_STATUS                0x03U  // needs bit mask, only bit 7 used
+#define BMI088_ADDR_ACC_ERR_REG               0x02U  // needs bit mask, only bits 4:2,0 used
 #define BMI088_ADDR_ACC_CHIP_ID               0x00U
 /** @} */
 
@@ -925,9 +925,11 @@ uint8_t bmi088ReadChipId(BMI088Driver *devp);
 uint8_t bmi088ReadErrCode(BMI088Driver *devp);
 uint8_t bmi088ReadErrFatal(BMI088Driver *devp);
 uint8_t bmi088ReadAccStatus(BMI088Driver *devp);
-uint8_t bmi088ReadAccInX(BMI088Driver *devp);
-uint8_t bmi088ReadAccInY(BMI088Driver *devp);
-uint8_t bmi088ReadAccInZ(BMI088Driver *devp);
+
+int16_t bmi088ReadAccInX(BMI088Driver *devp);
+int16_t bmi088ReadAccInY(BMI088Driver *devp);
+int16_t bmi088ReadAccInZ(BMI088Driver *devp);
+
 uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
 void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst);
 void accEnable(BMI088Driver *devp, uint8_t enable);
@@ -946,6 +948,7 @@ uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state);
 void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
 void BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr);
+void BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_mode);
 
 uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings);
 
