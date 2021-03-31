@@ -45,38 +45,38 @@
  * @name    BMI088 Accelerometer Register Addresses
  * @{
  */
-#define BMI088_AD_ACC_SOFTRESET             0x7EU
-#define BMI088_AD_ACC_PWR_CTRL              0x7DU
-#define BMI088_AD_ACC_PWR_CONF              0x7CU
-#define BMI088_AD_ACC_SELF_TEST             0x6DU
-#define BMI088_AD_INT_MAP_DATA              0x58U
-#define BMI088_AD_INT2_IO_CTRL              0x54U
-#define BMI088_AD_INT1_IO_CTRL              0x53U
-#define BMI088_AD_FIFO_CONFIG_1             0x49U
-#define BMI088_AD_FIFO_CONFIG_0             0x48U
-#define BMI088_AD_FIFO_WTM_1                0x47U
-#define BMI088_AD_FIFO_WTM_0                0x46U
-#define BMI088_AD_FIFO_DOWNS                0x45U 
-#define BMI088_AD_ACC_RANGE                 0x41U
-#define BMI088_AD_ACC_CONF                  0x40U
-#define BMI088_AD_FIFO_DATA                 0x26U
-#define BMI088_AD_FIFO_LENGTH_1             0x25U
-#define BMI088_AD_FIFO_LENGTH_0             0x24U
-#define BMI088_AD_TEMP_LSB                  0x23U
-#define BMI088_AD_TEMP_MSB                  0x22U
-#define BMI088_AD_ACC_INT_STAT_1            0x1DU
-#define BMI088_AD_SENSORTIME_2              0x1AU
-#define BMI088_AD_SENSORTIME_1              0x19U
-#define BMI088_AD_SENSORTIME_0              0x18U
-#define BMI088_AD_ACC_Z_MSB                 0x17U
-#define BMI088_AD_ACC_Z_LSB                 0x16U
-#define BMI088_AD_ACC_Y_MSB                 0x15U
-#define BMI088_AD_ACC_Y_LSB                 0x14U
-#define BMI088_AD_ACC_X_MSB                 0x13U
-#define BMI088_AD_ACC_X_LSB                 0x12U
-#define BMI088_AD_ACC_STATUS                0x03U
-#define BMI088_AD_ACC_ERR_REG               0x02U
-#define BMI088_AD_ACC_CHIP_ID               0x00U
+#define BMI088_ADDR_ACC_SOFTRESET             0x7EU
+#define BMI088_ADDR_ACC_PWR_CTRL              0x7DU
+#define BMI088_ADDR_ACC_PWR_CONF              0x7CU
+#define BMI088_ADDR_ACC_SELF_TEST             0x6DU
+#define BMI088_ADDR_INT_MAP_DATA              0x58U
+#define BMI088_ADDR_INT2_IO_CTRL              0x54U
+#define BMI088_ADDR_INT1_IO_CTRL              0x53U
+#define BMI088_ADDR_FIFO_CONFIG_1             0x49U
+#define BMI088_ADDR_FIFO_CONFIG_0             0x48U
+#define BMI088_ADDR_FIFO_WTM_1                0x47U
+#define BMI088_ADDR_FIFO_WTM_0                0x46U
+#define BMI088_ADDR_FIFO_DOWNS                0x45U 
+#define BMI088_ADDR_ACC_RANGE                 0x41U
+#define BMI088_ADDR_ACC_CONF                  0x40U
+#define BMI088_ADDR_FIFO_DATA                 0x26U
+#define BMI088_ADDR_FIFO_LENGTH_1             0x25U
+#define BMI088_ADDR_FIFO_LENGTH_0             0x24U
+#define BMI088_ADDR_TEMP_LSB                  0x23U
+#define BMI088_ADDR_TEMP_MSB                  0x22U
+#define BMI088_ADDR_ACC_INT_STAT_1            0x1DU
+#define BMI088_ADDR_SENSORTIME_2              0x1AU
+#define BMI088_ADDR_SENSORTIME_1              0x19U
+#define BMI088_ADDR_SENSORTIME_0              0x18U
+#define BMI088_ADDR_ACC_Z_MSB                 0x17U
+#define BMI088_ADDR_ACC_Z_LSB                 0x16U
+#define BMI088_ADDR_ACC_Y_MSB                 0x15U
+#define BMI088_ADDR_ACC_Y_LSB                 0x14U
+#define BMI088_ADDR_ACC_X_MSB                 0x13U
+#define BMI088_ADDR_ACC_X_LSB                 0x12U
+#define BMI088_ADDR_ACC_STATUS                0x03U
+#define BMI088_ADDR_ACC_ERR_REG               0x02U
+#define BMI088_ADDR_ACC_CHIP_ID               0x00U
 /** @} */
 
 /**
@@ -945,6 +945,9 @@ uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 // 2021-03-30
 void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state);
 void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
+void BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr);
+
+uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings);
 
 #ifdef __cplusplus
 }

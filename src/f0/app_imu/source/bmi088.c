@@ -69,6 +69,7 @@ msg_t bmi088I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  */
 msg_t bmi088I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
+    if (n != 2) { }
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
             TIME_INFINITE);
 }
@@ -110,7 +111,7 @@ void bmi088ObjectInit(BMI088Driver *devp) {
  * @api
  */
 void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
-    i2cbuf_t buf;
+//    i2cbuf_t buf;
 
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == BMI088_STOP) ||
@@ -129,25 +130,26 @@ void bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
 #if (0)
 // Following value assignment does not seem right per BMI088 datasheet - TMH:
-    buf.reg = BMI088_AD_ACC_PWR_CONF;     // this accelerometer register address is 0x7C
-    buf.value = BMI088_AD_ACC_SOFTRESET;  // this value defined as 0x7E, which is another register address not 0x00 nor 0x03.
+    buf.reg = BMI088_ADDR_ACC_PWR_CONF;     // this accelerometer register address is 0x7C
+    buf.value = BMI088_ADDR_ACC_SOFTRESET;  // this value defined as 0x7E, which is another register address not 0x00 nor 0x03.
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
     do {
-        bmi088I2CReadRegister(config->i2cp, config->acc_saddr, BMI088_AD_ACC_PWR_CONF,
+        bmi088I2CReadRegister(config->i2cp, config->acc_saddr, BMI088_ADDR_ACC_PWR_CONF,
                                                 buf.data, sizeof(buf.data));
     } while (buf.data[0] & 0x80U); /* While still resetting */
-    buf.reg = BMI088_AD_ACC_PWR_CONF;
+    buf.reg = BMI088_ADDR_ACC_PWR_CONF;
     buf.value = __REVSH(config->cfg);
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
-    buf.reg = BMI088_AD_ACC_STATUS;
+    buf.reg = BMI088_ADDR_ACC_STATUS;
     buf.value = __REVSH(config->cal);
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
 #else
-    chThdSleepMilliseconds(1);            // per datasheet page 12, timing required for starting accelerometer aftet power up
-    buf.reg = BMI088_AD_ACC_PWR_CTRL;     // this accelerometer register address is 0x7D
-    buf.value = 0x04;                     // per BMI088 datasheet page 25
-    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
-    chThdSleepMilliseconds(50);
+//    chThdSleepMilliseconds(1);            // per datasheet page 12, timing required for starting accelerometer aftet power up
+//    buf.reg = BMI088_ADDR_ACC_PWR_CTRL;     // this accelerometer register address is 0x7D
+//    buf.value = 0x04;                     // per BMI088 datasheet page 25
+//    bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
+//    chThdSleepMilliseconds(50);
+    BMI088AccelerometerPowerOnOrOff(devp, BMI088_ON);
 
 #endif
 
@@ -189,8 +191,8 @@ void bmi088Stop(BMI088Driver *devp) {
 #endif /* BMI088_SHARED_I2C */
 
         /* Reset to input.*/
-        buf.reg = BMI088_AD_ACC_PWR_CONF;
-        buf.value = __REVSH(BMI088_AD_ACC_SOFTRESET);
+        buf.reg = BMI088_ADDR_ACC_PWR_CONF;
+        buf.value = __REVSH(BMI088_ADDR_ACC_SOFTRESET);
         bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, buf.buf, sizeof(buf));
 
         i2cStop(devp->config->i2cp);
@@ -330,6 +332,9 @@ void bmi088SoftReset(BMI088Driver *devp, uint8_t softRst){
  * @param[in] devp       Pointer to the @p BMI088Driver object              
  * @param[in] enable     Value to write to enable: 4, to disable: 0;
  * @api
+ * @note   2021-03-30 Ted observes I2C lines only showing two bytes sent, saddr and
+ *         sensor register address, when sizeof(write_buffer) used as fourth
+ *         parameter in call to bmi088I2CWriteRegister() routine.
  */
 void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state) {
 
@@ -337,9 +342,9 @@ void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t po
 
     osalDbgCheck( devp != NULL );
     
-    write_buffer[0] = BMI088_AD_ACC_PWR_CTRL;
+    write_buffer[0] = BMI088_ADDR_ACC_PWR_CTRL;
     write_buffer[1] = power_state;
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, sizeof(write_buffer));
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, (sizeof(write_buffer) + 1));
     chThdSleepMilliseconds(50);   // Per datasheet page 12 - TMH
 }
 
@@ -350,12 +355,24 @@ void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating
 
     osalDbgCheck( devp != NULL );
     
-    write_buffer[0] = BMI088_AD_ACC_PWR_CONF;
+    write_buffer[0] = BMI088_ADDR_ACC_PWR_CONF;
     write_buffer[1] = operating_mode;
-    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, sizeof(write_buffer));
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, (sizeof(write_buffer) + 1));
     chThdSleepMilliseconds(10);   // arbitrarily chosen, may not be needed - TMH
 }
 
+
+void BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr) {
+
+    uint8_t write_buffer[1];
+
+    osalDbgCheck( devp != NULL );
+    
+    write_buffer[0] = BMI088_ADDR_ACC_CONF; // 0x40 per datasheet page 22
+    write_buffer[1] = (acc_filter_and_odr | 0x80);
+    bmi088I2CWriteRegister(devp->config->i2cp, devp->config->acc_saddr, write_buffer, (sizeof(write_buffer) + 1));
+    chThdSleepMilliseconds(10);   // arbitrarily chosen, may not be needed - TMH
+}
 
 
 
@@ -391,7 +408,7 @@ uint8_t bmi088ReadChipId(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    chipId = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_AD_ACC_CHIP_ID);
+    chipId = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_CHIP_ID);
 
     return chipId;
 }
@@ -403,13 +420,14 @@ uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    chipId = bmi088ReadRawU8(devp, devp->config->gyro_saddr, BMI088_AD_ACC_CHIP_ID);
+    chipId = bmi088ReadRawU8(devp, devp->config->gyro_saddr, BMI088_ADDR_ACC_CHIP_ID);
 
     return (uint8_t)chipId;
 }
 
 
 
+// --- SECTION ---
 
 /**
  * @brief   Reads BMI088  Error Code Register.
@@ -482,8 +500,8 @@ uint8_t bmi088ReadAccInX(BMI088Driver *devp){
 
     osalDbgCheck(devp != NULL);
 
-    accXLsb     = bmi088ReadRaw(devp, BMI088_ACC_X_LSB);
-    accXMsb     = bmi088ReadRaw(devp, BMI088_ACC_X_MSB);
+    accXLsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_LSB);
+    accXMsb     = bmi088ReadRawU8(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_MSB);
     accXInt16   = (accXMsb*256 + accXLsb);
     accXInMG    = accXInt16/32768*1000*2*(0x41 + 1)*1.5;
 
@@ -621,3 +639,43 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp){
  *
  * @api
  */
+
+
+
+// -- SECTION --  Gyroscope related routines
+
+uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings) {
+
+//    uint16_t gyro_rate_x = 0;
+//    uint16_t gyro_rate_y = 0;
+//    uint16_t gyro_rate_z = 0;
+
+    union reading_union_t {
+      uint16_t as_uint16_type;
+      uint8_t as_bytes[1];
+    };
+
+    union reading_union_t gyro_reading;
+    gyro_reading.as_uint16_type = 0;
+
+    osalDbgCheck(devp != NULL);
+
+    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x02);
+//    gyro_rate_x = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
+    packed_readings[0] = gyro_reading.as_bytes[0];
+    packed_readings[1] = gyro_reading.as_bytes[1];
+
+    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x04);
+//    gyro_rate_y = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
+    packed_readings[2] = gyro_reading.as_bytes[0];
+    packed_readings[3] = gyro_reading.as_bytes[1];
+
+    gyro_reading.as_uint16_type = bmi088ReadRawU16(devp, devp->config->gyro_saddr, 0x06);
+//    gyro_rate_z = gyro_reading.as_bytes[0] + (gyro_reading.as_bytes[1] * 0xFF);
+    packed_readings[4] = gyro_reading.as_bytes[0];
+    packed_readings[5] = gyro_reading.as_bytes[1];
+
+    return 1;
+}
+
+

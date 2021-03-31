@@ -40,6 +40,7 @@ THD_FUNCTION(imu, arg)
     uint8_t interrupt_status = 0;
     uint8_t acc_inx = 0;
 
+    uint8_t gyroscope_readings_byte_array[6];
 
     /* Initialize and start the BMI088 IMU sensor */
     bmi088ObjectInit(&imudev);
@@ -51,9 +52,14 @@ THD_FUNCTION(imu, arg)
     chprintf(CHP, "BMI088 first read, accelerometer ID is %u\r\n", bmi088_chip_id);
     chThdSleepMilliseconds(10);
 
+    chprintf(CHP, "powering on acc . . .\r\n");
     BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
 
+    chprintf(CHP, "setting acc mode to active . . .\r\n");
     BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
+
+    chprintf(CHP, "setting filter and output data rate . . .\r\n");
+    BMI088AccelerometerSetFilterAndODR(&imudev, 0x88); // Per datasheet, 0x88 = 4-fold oversampling and 100Hz output data rate
 
     while (!chThdShouldTerminateX()) {
         iterations++;
@@ -64,6 +70,7 @@ THD_FUNCTION(imu, arg)
         }
 
         if ((iterations % 10) == 0) {
+#if ( 1 )
             bmi088_chip_id = bmi088ReadChipId(&imudev);
             chprintf(CHP, "BMI088 accelerometer ID is %u\r\n", bmi088_chip_id);
             chThdSleepMilliseconds(1);
@@ -81,11 +88,15 @@ THD_FUNCTION(imu, arg)
             chThdSleepMilliseconds(5);
 
             acc_inx = bmi088ReadAccInX(&imudev);
-            chprintf(CHP, "InX reading is %u", acc_inx);
-            chThdSleepMilliseconds(5);
-/*
-*/
-            chprintf(CHP, "\r\n\r\n");
+            chprintf(CHP, "InX reading is %u\r\n", acc_inx);
+            chThdSleepMilliseconds(10);
+#endif
+            bmi088ObtainGyroscopesReadings(&imudev, gyroscope_readings_byte_array);
+            chprintf(CHP, "gyro X rate %d\r\n", (gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
+            chprintf(CHP, "gyro Y rate %d\r\n", (gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
+            chprintf(CHP, "gyro Z rate %d\r\n", (gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
+
+            chprintf(CHP, "\r\n");
         }
 
         chThdSleepMilliseconds(250);
