@@ -22,13 +22,15 @@
 #include "oresat.h"
 #include "blink.h"
 
+#include "MagneticSensorSPI.h"
+
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {
-    .name = "Example blinky thread",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
+    .name = "Magnetic sensor thread",
+    .wbase = THD_WORKING_AREA_BASE(sensor_wa),
+    .wend = THD_WORKING_AREA_END(sensor_wa),
     .prio = NORMALPRIO,
-    .funcp = blink,
+    .funcp = sensor,
     .arg = NULL
 };
 
@@ -44,7 +46,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker(&worker1, &worker1_desc, false, true);
+    reg_worker(&worker1, &worker1_desc, true, true);
 
     /* Start up debug output */
     sdStart(&LPSD1, NULL);
