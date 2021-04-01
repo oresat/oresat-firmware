@@ -226,11 +226,19 @@ THD_FUNCTION(rx_worker, arg) {
                     pdu_offset = 0;
                 }
 
-                /* Copy packet data */
                 osalDbgAssert(pdu != NULL, "rx_worker(), NULL PDU object");
-                osalDbgAssert(pdu_offset + data_len < devp->config->pdu_size, "rx_worker(), data exceeds PDU object size");
-                memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
-                pdu_offset += data_len;
+                if (pdu_offset + data_len < devp->config->pdu_size) {
+                    /* Copy packet data */
+                    memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
+                    pdu_offset += data_len;
+                } else {
+                    /* Length exceeds maximum PDU length, abort receive */
+                    uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
+                    reg |= AX5043_FRAMING_FABORT;
+                    ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
+                    chFifoReturnObject(pdu_fifo, pdu);
+                    pdu = NULL;
+                }
 
                 /* End of packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
