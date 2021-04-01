@@ -38,9 +38,12 @@ THD_FUNCTION(imu, arg)
     uint8_t bmi088_gyro_chip_id = 0;
     uint8_t power_status = 0;
     uint8_t interrupt_status = 0;
+
     int16_t acc_inx = 0;
     int16_t acc_iny = 0;
     int16_t acc_inz = 0;
+
+    uint8_t error_acc = 0;
 
     uint8_t gyroscope_readings_byte_array[6];
 
@@ -56,6 +59,7 @@ THD_FUNCTION(imu, arg)
 
     chprintf(CHP, "powering on acc . . .\r\n");
     BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
+    chThdSleepMilliseconds(50);
 
     chprintf(CHP, "setting acc mode to active . . .\r\n");
     BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
@@ -78,19 +82,23 @@ THD_FUNCTION(imu, arg)
 #if ( 1 )
             bmi088_chip_id = bmi088ReadChipId(&imudev);
             chprintf(CHP, "BMI088 accelerometer ID is %u\r\n", bmi088_chip_id);
-            chThdSleepMilliseconds(1);
+            chThdSleepMilliseconds(10);
 
             bmi088_gyro_chip_id = bmi088ReadGyrosChipId(&imudev);
             chprintf(CHP, "BMI088 gyroscope ID is %u\r\n", bmi088_gyro_chip_id);
-            chThdSleepMilliseconds(1);
+            chThdSleepMilliseconds(10);
 
 //            power_status = readPowerCtrlReg(&imudev);
 //            chprintf(CHP, "power status is %u\r\n", power_status);
 //            chThdSleepMilliseconds(5);
 
-            interrupt_status = bmi088ReadIntStat(&imudev);
-            chprintf(CHP, "interrupt status is %u\r\n", interrupt_status);
-            chThdSleepMilliseconds(5);
+//            interrupt_status = bmi088ReadIntStat(&imudev);
+//            chprintf(CHP, "interrupt status is %u\r\n", interrupt_status);
+//            chThdSleepMilliseconds(5);
+
+            error_acc = bmi088ReadErrCode(&imudev);
+            chprintf(CHP, "error code from BMI088 = %u\r\n", error_acc);
+            chThdSleepMilliseconds(10);
 
             acc_inx = bmi088ReadAccInX(&imudev);
             acc_iny = bmi088ReadAccInY(&imudev);
@@ -102,6 +110,12 @@ THD_FUNCTION(imu, arg)
             chprintf(CHP, "gyro X rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
             chprintf(CHP, "gyro Y rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
             chprintf(CHP, "gyro Z rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
+
+
+            if ((iterations % 50) == 5) {
+                chprintf(CHP, "powering on accelerometer again . . .\r\n");
+                BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
+            }
 
             chprintf(CHP, "\r\n");
         }
