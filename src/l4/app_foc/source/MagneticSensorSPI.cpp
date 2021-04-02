@@ -11,7 +11,7 @@ MagneticSensorSPIConfig_s AS5147_SPI = {
   .command_parity_bit = 15
 };
 
-
+/**********
 // MagneticSensorSPI(int cs, float _bit_resolution, int _angle_register)
 //  cs              - SPI chip select pin 
 //  _bit_resolution   sensor resolution bit number
@@ -31,13 +31,16 @@ MagneticSensorSPI::MagneticSensorSPI(int cs, float _bit_resolution, int _angle_r
   command_rw_bit = 14; // for backwards compatibilty
   data_start_bit = 13; // for backwards compatibilty
 }
+//*/
 
 MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   chip_select_pin = cs; 
   // angle read register of the magnetic sensor
   angle_register = config.angle_register ? config.angle_register : DEF_ANGLE_REGISTER;
   // register maximum value (counts per revolution)
-  cpr = pow(2, config.bit_resolution);
+  //cpr = pow(2, config.bit_resolution);
+  cpr = 1 << config.bit_resolution;
+
   spi_mode = config.spi_mode;
   clock_speed = config.clock_speed;
   bit_resolution = config.bit_resolution;
@@ -46,8 +49,6 @@ MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   command_rw_bit = config.command_rw_bit; // for backwards compatibilty
   data_start_bit = config.data_start_bit; // for backwards compatibilty
 
-  //from ACS project
-  uint16_t spi_rxbuf[2];  //receive buffer
 }
 
 
@@ -56,40 +57,40 @@ MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
 THD_WORKING_AREA(sensor_wa, 0x256); // 256 is arbitrary
 THD_FUNCTION(sensor, arg)
 {
-    (void)arg;
+  (void)arg;
+
+  // debug
+  palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
+  palSetLine(LINE_LED);
+
+  // not sure if this is the appropriate place to put this
+  MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
+  sensor.init();
+
+  while (!chThdShouldTerminateX()) {
+    //motor->spi_rxbuf[0] = 0;
+    spi_rxbuf[0] = 0;
+    spiSelect(&SPID1);                  // Select slave.
+
+    while(SPID1.state != SPI_READY) {}
+    //spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
+    spiReceive(&SPID1,1,spi_rxbuf); // Receive 1 frame (16 bits).
+    spiUnselect(&SPID1);                // Unselect slave.
 
     // debug
-    palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
-    palSetLine(LINE_LED);
+    palToggleLine(LINE_LED);
+    chThdSleepMilliseconds(500);
+  }
 
-    // not sure if this is the appropriate place to put this
-    MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
-    sensor.init();
-
-    while (!chThdShouldTerminateX()) {
-        //motor->spi_rxbuf[0] = 0;
-        spi_rxbuf[0] = 0;
-		spiSelect(&SPID1);                  // Select slave.
-
-		while(SPID1.state != SPI_READY) {}
-		//spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
-		spiReceive(&SPID1,1,spi_rxbuf); // Receive 1 frame (16 bits).
-		spiUnselect(&SPID1);                // Unselect slave.
-
-        // debug
-        palToggleLine(LINE_LED);
-        chThdSleepMilliseconds(500);
-    }
-
-    palClearLine(LINE_LED);
-    chThdExit(MSG_OK);
+  palClearLine(LINE_LED);
+  chThdExit(MSG_OK);
 }
 
 
 
-void MagneticSensorSPI::init(SPIClass* _spi){
+void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
-    spi = _spi;
+    //spi = _spi;
 
     //ChibiOS
     spiStart(&SPID1,&spicfg);           // Start driver.
@@ -225,10 +226,11 @@ word MagneticSensorSPI::read(word angle_register){
 
   word register_value;
 
-  spiSelect(&SPID1);                       // Select slave.
+  //from ACS project
+  spiSelect(&SPID1);                       // Select SPI device.
   while(SPID1.state != SPI_READY) {}
   spiReceive(&SPID1,1,register_value);     // Receive 1 frame (16 bits).
-  spiUnselect(&SPID1);                     // Unselect slave.
+  spiUnselect(&SPID1);                     // Unselect SPI device.
 
   
   register_value = register_value >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word

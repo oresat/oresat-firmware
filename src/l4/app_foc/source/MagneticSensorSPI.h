@@ -1,6 +1,8 @@
 #ifndef MAGNETICSENSORSPI_LIB_H
 #define MAGNETICSENSORSPI_LIB_H
 
+#include <cstdlib>
+
 #include "ch.h"
 #include "hal.h"
 
@@ -12,13 +14,26 @@
 
 #define DEF_ANGLE_REGISTER 0x3FFF
 
+// Copied from Arduino libraries
+#define SPI_MODE1 0x01
+typedef unsigned int word;
+typedef uint8_t byte;
+
+
+
 /* Example blinker thread prototypes */
 extern THD_WORKING_AREA(sensor_wa, 0x256);  // 256 is arbitrary
 extern THD_FUNCTION(sensor, arg);
 
+//from ACS project
+//maybe remove
+uint16_t spi_rxbuf[2];  //receive buffer
+
 
 /**
  * @brief Control structure used to configure the SPI driver
+ * 
+ * from ACS project
  *
  * GPIOA_SPI1_NSS is the pin used to initially select the SPI slave.
  * The mask for SPI Control Register 1 sets the frequency of data transfers
@@ -65,7 +80,7 @@ class MagneticSensorSPI: public Sensor{
     MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs);
 
     /** sensor initialise pins */
-    void init(SPIClass* _spi = &SPI);
+    void init( /* SPIClass* _spi = &SPI */ ); //ARDUINO
 
     // implementation of abstract functions of the Sensor class
     /** get current angle (rad) */
@@ -85,7 +100,7 @@ class MagneticSensorSPI: public Sensor{
     // spi variables
     int angle_register; //!< SPI angle register to read
     int chip_select_pin; //!< SPI chip select pin
-	  SPISettings settings; //!< SPI settings variable
+	  //SPISettings settings; //!< SPI settings variable  //ARDUINO
     // spi functions
     /** Stop SPI communication */
     void close(); 
@@ -115,7 +130,7 @@ class MagneticSensorSPI: public Sensor{
 
 
 
-    SPIClass* spi;
+    //SPIClass* spi;  //ARDUINO
 };
 
 
