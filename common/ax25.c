@@ -37,17 +37,17 @@ void ax25_send(pdu_t *pdu, void *arg)
     ax25_frame_t frame;
     const ax25_link_t *link = arg;
 
-    memcpy(frame.dest, link->dest, 6);
-    frame.dest_ssid = 0;
-    memcpy(frame.src, link->src, 6);
-    frame.src_ssid = 0;
-}
-
-void ax25_recv(const pdu_t *pdu, const void *next_hdr, void *arg)
-{
-    const ax25_frame_t *frame = pdu->buf;
-    const ax25_link_t *link = arg;
-
+    for (int i = 0; i < 6; i++) {
+        frame.dest[i] = link->dest[i] << 1;
+        frame.src[i] = link->src[i] << 1;
+    }
+    frame.dest_ssid = AX25_SSID(link->dest_ssid);
+    frame.src_ssid = AX25_SSID(link->src_ssid) | AX25_SSID_EXT;
+    frame.control = link->control;
+    pdu->mac_hdr = &frame;
+    if (link->phy_send) {
+        link->phy_send(pdu, 0, link->phy_arg);
+    }
 }
 
 /** @} */

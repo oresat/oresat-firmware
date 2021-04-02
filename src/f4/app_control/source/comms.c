@@ -4,6 +4,7 @@
 #include "hal.h"
 #include "rtc.h"
 #include "comms.h"
+#include "ax25.h"
 #include "uslp.h"
 #include "CANopen.h"
 
@@ -286,7 +287,7 @@ static const AX5043Config lbandcfg = {
     .irq            = LINE_LBAND_IRQ,
     .xtal_freq      = XTAL_CLK,
     .pdu_fifo       = &pdu_fifo,
-    .pdu_size       = RADIO_PDU_SIZE,
+    .pdu_max_size   = RADIO_PDU_SIZE,
     .profile        = lband_eng,
 };
 
@@ -297,7 +298,7 @@ static const AX5043Config uhfcfg = {
     .irq            = LINE_UHF_IRQ,
     .xtal_freq      = XTAL_CLK,
     .pdu_fifo       = &pdu_fifo,
-    .pdu_size       = RADIO_PDU_SIZE,
+    .pdu_max_size   = RADIO_PDU_SIZE,
     .profile        = uhf_eng,
     .preamble       = preamble,
     .preamble_len   = sizeof(preamble),
@@ -318,6 +319,14 @@ static SI41XXConfig synthcfg = {
 static AX5043Driver lband;
 static AX5043Driver uhf;
 static SI41XXDriver synth;
+
+static const ax25_link_t ax25 = {
+    .dest = "SPACE ",
+    .dest_ssid = 0,
+    .src = "KJ7SAT",
+    .src_ssid = 0,
+    .control = AX25_CTRL_UFRAME | _VAL2FLD(AX25_CTRL_U_FLD, AX25_UFRAME_UI),
+};
 
 static const uslp_pkt_t spp = {
     .pvn            = PVN_SPACE,

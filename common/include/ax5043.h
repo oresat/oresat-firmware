@@ -2805,7 +2805,7 @@ typedef struct{
     /**
      * @brief PDU Object maximum size
      */
-    size_t                      pdu_size;
+    size_t                      pdu_max_size;
     /**
      * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.

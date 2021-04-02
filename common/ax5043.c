@@ -20,6 +20,11 @@
 #define AX5043_EVENT_IRQ                    EVENT_MASK(0)
 #define AX5043_EVENT_TERMINATE              EVENT_MASK(1)
 
+/**
+ * @brief   ChibiOS Event masks for AX5043.
+ */
+#define AX5043_FIFO_SIZE                    256U
+
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -33,9 +38,9 @@ typedef union __attribute__((packed)) {
             uint16_t    reg;
             uint16_t    status;
         };
-        uint8_t         data[256];
+        uint8_t         data[AX5043_FIFO_SIZE];
     };
-    uint8_t             buf[256 + sizeof(uint16_t)];
+    uint8_t             buf[AX5043_FIFO_SIZE + sizeof(uint16_t)];
 } spibuf_t;
 
 /*===========================================================================*/
@@ -64,7 +69,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     spibuf_t recvbuf;
 
     /* Ensure we don't exceed 256 bytes of data */
-    n = (n <= 256 ? n : 256);
+    n = (n < AX5043_FIFO_SIZE ? n : AX5043_FIFO_SIZE);
 
     /* Set the register address to perform the transaction with */
     sendbuf.reg = __REVSH((reg & 0x0FFFU) | 0x7000U | (write << 15));
@@ -180,7 +185,7 @@ THD_FUNCTION(rx_worker, arg) {
     objects_fifo_t *pdu_fifo;
     ax5043_chunk_t *chunkp = NULL;
     uint8_t *pdu = NULL;
-    uint8_t buf[256];
+    uint8_t buf[AX5043_FIFO_SIZE];
     size_t fifo_len;
     size_t pdu_offset;
 
@@ -227,7 +232,7 @@ THD_FUNCTION(rx_worker, arg) {
                 }
 
                 osalDbgAssert(pdu != NULL, "rx_worker(), NULL PDU object");
-                if (pdu_offset + data_len < devp->config->pdu_size) {
+                if (pdu_offset + data_len < devp->config->pdu_max_size) {
                     /* Copy packet data */
                     memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
                     pdu_offset += data_len;
@@ -1057,7 +1062,7 @@ uint32_t ax5043GetFreq(AX5043Driver *devp) {
  */
 void ax5043SetPreamble(AX5043Driver *devp, const void *preamble, size_t len) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(len <= 256, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
+    osalDbgAssert(len <= AX5043_FIFO_SIZE, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
 
     devp->preamble = preamble;
     devp->preamble_len = len;
@@ -1086,7 +1091,7 @@ const void *ax5043GetPreamble(AX5043Driver *devp) {
  */
 void ax5043SetPostamble(AX5043Driver *devp, const void *postamble, size_t len) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(len <= 256, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
+    osalDbgAssert(len <= AX5043_FIFO_SIZE, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
 
     devp->postamble = postamble;
     devp->postamble_len = len;

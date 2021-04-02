@@ -40,12 +40,13 @@
 #define AX25_SSID_VAL_Pos                   (1U)
 #define AX25_SSID_VAL_Msk                   (0xFU << AX25_SSID_VAL_Pos)
 #define AX25_SSID_VAL                       AX25_SSID_VAL_Msk
-#define AX25_SSID_RES_Pos                   (5U)
-#define AX25_SSID_RES_Msk                   (0x3U << AX25_SSID_RES_Pos)
-#define AX25_SSID_RES                       AX25_SSID_RES_Msk
+#define AX25_SSID_RESERVED_Pos              (5U)
+#define AX25_SSID_RESERVED_Msk              (0x3U << AX25_SSID_RESERVED_Pos)
+#define AX25_SSID_RESERVED                  AX25_SSID_RESERVED_Msk
 #define AX25_SSID_CMD_RESP_Pos              (7U)
 #define AX25_SSID_CMD_RESP_Msk              (0x1U << AX25_SSID_CMD_RESP_Pos)
 #define AX25_SSID_CMD_RESP                  AX25_SSID_CMD_RESP_Msk
+#define AX25_SSID(ssid)                     (((ssid << AX25_SSID_VAL_Pos) & AX25_SSID_VAL_Msk) | AX25_SSID_RESERVED)
 /** @} */
 
 /**
@@ -112,7 +113,10 @@
  */
 typedef struct {
     char            dest[6];
+    uint8_t         dest_ssid;
     char            src[6];
+    uint8_t         src_ssid;
+    uint8_t         control;
     void            (*phy_send)(const void *pdu, size_t len, const void *phy_arg);
     const void      *phy_arg;
 } ax25_link_t;
@@ -149,7 +153,6 @@ typedef struct __attribute__((packed)) {
 extern "C" {
 #endif
 void ax25_send(pdu_t *pdu, void *arg);
-void ax25_recv(const pdu_t *pdu, const void *next_hdr, void *arg);
 
 #ifdef __cplusplus
 }
