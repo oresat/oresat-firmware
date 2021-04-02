@@ -45,6 +45,9 @@ MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   command_parity_bit = config.command_parity_bit; // for backwards compatibilty
   command_rw_bit = config.command_rw_bit; // for backwards compatibilty
   data_start_bit = config.data_start_bit; // for backwards compatibilty
+
+  //from ACS project
+  uint16_t spi_rxbuf[2];  //receive buffer
 }
 
 
@@ -55,15 +58,25 @@ THD_FUNCTION(sensor, arg)
 {
     (void)arg;
 
+    // debug
     palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
-    palSetLine(LINE_LED);  //debug
-
+    palSetLine(LINE_LED);
 
     // not sure if this is the appropriate place to put this
     MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
     sensor.init();
 
     while (!chThdShouldTerminateX()) {
+        //motor->spi_rxbuf[0] = 0;
+        spi_rxbuf[0] = 0;
+		spiSelect(&SPID1);                  // Select slave.
+
+		while(SPID1.state != SPI_READY) {}
+		//spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
+		spiReceive(&SPID1,1,spi_rxbuf); // Receive 1 frame (16 bits).
+		spiUnselect(&SPID1);                // Unselect slave.
+
+        // debug
         palToggleLine(LINE_LED);
         chThdSleepMilliseconds(500);
     }
@@ -76,8 +89,13 @@ THD_FUNCTION(sensor, arg)
 
 void MagneticSensorSPI::init(SPIClass* _spi){
 
-  spi = _spi;
+    spi = _spi;
 
+    //ChibiOS
+    spiStart(&SPID1,&spicfg);           // Start driver.
+    spiAcquireBus(&SPID1);              // Gain ownership of bus.
+
+    /************
 	// 1MHz clock (AMS should be able to accept up to 10MHz)
 	settings = SPISettings(clock_speed, MSBFIRST, spi_mode);
 
@@ -93,9 +111,13 @@ void MagneticSensorSPI::init(SPIClass* _spi){
 #endif
 
 	digitalWrite(chip_select_pin, HIGH);
+    //*/
+
 	// velocity calculation init
 	angle_prev = 0;
-	velocity_calc_timestamp = _micros(); 
+	//velocity_calc_timestamp = micros(); //ARDUINO
+    velocity_calc_timestamp = time_usecs_t(); //CHIBIOS_MAYBE
+
 
 	// full rotations tracking number
 	full_rotation_offset = 0;
@@ -126,7 +148,8 @@ float MagneticSensorSPI::getAngle(){
 // Shaft velocity calculation
 float MagneticSensorSPI::getVelocity(){
   // calculate sample time
-  unsigned long now_us = _micros();
+  //unsigned long now_us = micros();
+  unsigned long now_us = time_usecs_t(); //CHIBIOS_MAYBE
   float Ts = (now_us - velocity_calc_timestamp)*1e-6;
   // quick fix for strange cases (micros overflow)
   if(Ts <= 0 || Ts > 0.5) Ts = 1e-3; 
@@ -171,6 +194,7 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
   */
 word MagneticSensorSPI::read(word angle_register){
 
+  /**********
   word command = angle_register;
 
   if (command_rw_bit > 0) {
@@ -181,11 +205,6 @@ word MagneticSensorSPI::read(word angle_register){
   	command |= ((word)spiCalcEvenParity(command) << command_parity_bit);
   }
 
-#if !defined(_STM32_DEF_) // if not stm chips
-  //SPI - begin transaction
-  spi->beginTransaction(settings);
-#endif
-
   //Send the command
   digitalWrite(chip_select_pin, LOW);
   digitalWrite(chip_select_pin, LOW);
@@ -193,29 +212,30 @@ word MagneticSensorSPI::read(word angle_register){
   digitalWrite(chip_select_pin,HIGH);
   digitalWrite(chip_select_pin,HIGH);
   
-#if defined( ESP_H ) // if ESP32 board
-  delayMicroseconds(50);
-#else
   delayMicroseconds(10);
-#endif
   
+
   //Now read the response
-  digitalWrite(chip_select_pin, LOW);
+  digitalWrite(chip_select_pin, LOW); //ARDUINO
   digitalWrite(chip_select_pin, LOW);
   word register_value = spi->transfer16(0x00);
   digitalWrite(chip_select_pin, HIGH);
   digitalWrite(chip_select_pin,HIGH);
+  //*/
 
-#if !defined(_STM32_DEF_) // if not stm chips
-  //SPI - end transaction
-  spi->endTransaction();
-#endif
+  word register_value;
+
+  spiSelect(&SPID1);                       // Select slave.
+  while(SPID1.state != SPI_READY) {}
+  spiReceive(&SPID1,1,register_value);     // Receive 1 frame (16 bits).
+  spiUnselect(&SPID1);                     // Unselect slave.
+
   
   register_value = register_value >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
 
   const static word data_mask = 0xFFFF >> (16 - bit_resolution);
 
-	return register_value & data_mask;  // Return the data, stripping the non data (e.g parity) bits
+  return register_value & data_mask;  // Return the data, stripping the non data (e.g parity) bits
 }
 
 /**
@@ -223,5 +243,5 @@ word MagneticSensorSPI::read(word angle_register){
  * SPI has an internal SPI-device counter, for each init()-call the close() function must be called exactly 1 time
  */
 void MagneticSensorSPI::close(){
-	spi->end();
+	//spi->end();  //ARDUINO
 }
