@@ -75,3 +75,6 @@ dkms.conf
 ## Custom definitions
 # build dirs
 build*/
+
+# VS Code
+*.code-workspace
