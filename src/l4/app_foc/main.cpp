@@ -24,6 +24,20 @@
 
 #include "MagneticSensorSPI.h"
 
+//=== Serial configuration
+static SerialConfig serial_conf ={
+	115200,     //Baud rate
+	0,          //
+	0,          //
+	0,          //
+};
+
+/* This pointer to a sequential stream actually points to our serial driver.
+   To use the serial driver in chprintf we need to cast it and we are using
+   this variable to perform a cast only once. 
+   from https://www.playembedded.org/blog/vcp-stm32-chibios/ */
+static BaseSequentialStream* chp = (BaseSequentialStream*) &LPSD1;
+
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {
     .name = "Magnetic sensor thread",
@@ -45,11 +59,25 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
+    /* Start up debug output */
+    sdStart(&LPSD1, &serial_conf);
+
+    chprintf(chp, "test1");
+    chThdSleepMilliseconds(1000);
+    chprintf(chp, "test2");
+    chThdSleepMilliseconds(1000);
+    chprintf(chp, "test3");
+    chThdSleepMilliseconds(1000);
+    chprintf(chp, "test4");
+    chThdSleepMilliseconds(1000);
+    chprintf(chp, "test5");
+    chThdSleepMilliseconds(1000);
+
+    
     /* App initialization */
     reg_worker(&worker1, &worker1_desc, true, true);
 
-    /* Start up debug output */
-    sdStart(&LPSD1, NULL);
+    
 }
 
 /**

@@ -1,16 +1,5 @@
 #include "MagneticSensorSPI.h"
 
-/*
-// Temp fix
-// This should not be needed because this is already declared in:
-// ext/ChibiOS/os/various/cpp_wrappers/syscalls_cpp.cpp
-extern "C" { 
-  void __cxa_pure_virtual() {
-  osalSysHalt("Pure virtual function call.");
-  }
-}
-//*/
-
 /** Typical configuration for the 14bit AMS AS5147 magnetic sensor over SPI interface */
 MagneticSensorSPIConfig_s AS5147_SPI = {
   .spi_mode = SPI_MODE1,        // unused?
