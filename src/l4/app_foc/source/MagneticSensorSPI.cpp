@@ -46,6 +46,8 @@ THD_FUNCTION(sensor, arg)
   sensor.init();
 
   while (!chThdShouldTerminateX()) {
+
+    /*
     //motor->spi_rxbuf[0] = 0;
     spi_rxbuf[0] = 0;
     spiSelect(&SPID2);                  // Select slave.
@@ -54,6 +56,9 @@ THD_FUNCTION(sensor, arg)
     //spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
     spiReceive(&SPID2,1,spi_rxbuf); // Receive 1 frame (16 bits).
     spiUnselect(&SPID2);                // Unselect slave.
+    //*/
+
+    sensor.getAngle();
 
     // debug
     palToggleLine(LINE_LED);
@@ -68,34 +73,19 @@ THD_FUNCTION(sensor, arg)
 
 void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
-    //spi = _spi;
+  //spi = _spi;
 
-    //ChibiOS
-    spiStart(&SPID2,&spicfg);           // Start driver.
-    spiAcquireBus(&SPID2);              // Gain ownership of bus.
+  //ChibiOS
+  spiStart(&SPID2,&spicfg);           // Start driver.
+  spiAcquireBus(&SPID2);              // Gain ownership of bus.
 
-    /************
 	// 1MHz clock (AMS should be able to accept up to 10MHz)
-	settings = SPISettings(clock_speed, MSBFIRST, spi_mode);
-
-	//setup pins
-	pinMode(chip_select_pin, OUTPUT); //ARDUINO
-  
-	//SPI has an internal SPI-device counter, it is possible to call "begin()" from different devices
-	spi->begin();
-#ifndef ESP_H // if not ESP32 board
-	spi->setBitOrder(MSBFIRST); // Set the SPI_1 bit order
-	spi->setDataMode(spi_mode) ;
-	spi->setClockDivider(SPI_CLOCK_DIV8);
-#endif
-
-	digitalWrite(chip_select_pin, HIGH);
-    //*/
+	//spi->setClockDivider(SPI_CLOCK_DIV8);
 
 	// velocity calculation init
 	angle_prev = 0;
 	//velocity_calc_timestamp = micros(); //ARDUINO
-    velocity_calc_timestamp = time_usecs_t(); //CHIBIOS_MAYBE
+  velocity_calc_timestamp = time_usecs_t(); //CHIBIOS_MAYBE
 
 
 	// full rotations tracking number
@@ -147,7 +137,7 @@ float MagneticSensorSPI::getVelocity(){
 
 // function reading the raw counter of the magnetic sensor
 int MagneticSensorSPI::getRawCount(){
-	return (int)MagneticSensorSPI::read(angle_register);
+	return (int)MagneticSensorSPI::read( /* angle_register */ );
 }
 
 // SPI functions 
@@ -171,48 +161,14 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
   * Takes the address of the register as a 16 bit word
   * Returns the value of the register
   */
-word MagneticSensorSPI::read(word angle_register){
+word MagneticSensorSPI::read( /* word angle_register */ ){
 
-  /**********
-  word command = angle_register;
-
-  if (command_rw_bit > 0) {
-    command = angle_register | (1 << command_rw_bit);
-  }
-  if (command_parity_bit > 0) {
-   	//Add a parity bit on the the MSB
-  	command |= ((word)spiCalcEvenParity(command) << command_parity_bit);
-  }
-
-  //Send the command
-  digitalWrite(chip_select_pin, LOW);
-  digitalWrite(chip_select_pin, LOW);
-  spi->transfer16(command);
-  digitalWrite(chip_select_pin,HIGH);
-  digitalWrite(chip_select_pin,HIGH);
-  
-  delayMicroseconds(10);
-  
-
-  //Now read the response
-  digitalWrite(chip_select_pin, LOW); //ARDUINO
-  digitalWrite(chip_select_pin, LOW);
-  word register_value = spi->transfer16(0x00);
-  digitalWrite(chip_select_pin, HIGH);
-  digitalWrite(chip_select_pin,HIGH);
-  //*/
-
-  word register_value;
 
   //from ACS project
-  spiSelect(&SPID2);                       // Select SPI device.
+  spiSelect(&SPID2);                  // Select SPI device.
   while(SPID2.state != SPI_READY) {}
-  //spiReceive(&SPID2,1,register_value);     // Receive 1 frame (16 bits).
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
-  spiUnselect(&SPID2);                     // Unselect SPI device.
-
-  //memcpy(dest, src, length in bytes);
-  //memcpy(&register_value, spi_rxbuf, 2);
+  spiUnselect(&SPID2);                // Unselect SPI device.
 
   
   register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word

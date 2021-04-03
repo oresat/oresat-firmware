@@ -27,11 +27,6 @@ typedef uint8_t byte;
 extern THD_WORKING_AREA(sensor_wa, 0x256);  // 256 is arbitrary
 extern THD_FUNCTION(sensor, arg);
 
-//from ACS project
-//maybe remove
-uint16_t spi_rxbuf[2];  //receive buffer
-
-
 /**
  * @brief Control structure used to configure the SPI driver
  * 
@@ -74,13 +69,6 @@ class MagneticSensorSPI: public Sensor{
  public:
     /**
      *  MagneticSensorSPI class constructor
-     * @param cs  SPI chip select pin 
-     * @param bit_resolution   sensor resolution bit number
-     * @param angle_register  (optional) angle read register - default 0x3FFF
-     */
-    MagneticSensorSPI(int cs, float bit_resolution, int angle_register = 0);
-    /**
-     *  MagneticSensorSPI class constructor
      * @param config   SPI config
      * @param cs  SPI chip select pin
      */
@@ -112,7 +100,7 @@ class MagneticSensorSPI: public Sensor{
     /** Stop SPI communication */
     void close(); 
     /** Read one SPI register value */
-    word read(word angle_register);
+    word read( /* word angle_register */ );
     /** Calculate parity value  */
     byte spiCalcEvenParity(word value);
 
@@ -134,6 +122,14 @@ class MagneticSensorSPI: public Sensor{
     int command_parity_bit; //!< the bit where parity flag is stored in command
     int command_rw_bit; //!< the bit where read/write flag is stored in command
     int data_start_bit; //!< the the position of first bit
+
+    //from ACS project
+    //maybe remove
+    uint16_t spi_rxbuf[2];  //receive buffer
+
+    word register_value;
+
+
 
 
 
