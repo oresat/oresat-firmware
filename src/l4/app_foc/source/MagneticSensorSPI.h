@@ -14,11 +14,11 @@
 
 #define DEF_ANGLE_REGISTER 0x3FFF
 
+
 // Copied from Arduino libraries
 #define SPI_MODE1 0x01
 typedef unsigned int word;
 typedef uint8_t byte;
-
 
 
 /* Example blinker thread prototypes */
@@ -44,10 +44,14 @@ uint16_t spi_rxbuf[2];  //receive buffer
 static const SPIConfig spicfg = {
 	false,                                                  // Not using circular buffer.
 	NULL,                                                   // Not using operation complete callback.
-	GPIOA,                                                  // Chip select line.
-	GPIOA_SPI1_NSS,                                         // Chip select port.
+	GPIOB,                                                  // Chip select line.
+	GPIOB_SPI2_NSS,                                         // Chip select port.
 	SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,    // SPI Control Register 1 mask.
+                                                          // BR[2:0] = 111: Baud rate is fPCLK/256
+                                                          // CPHA = 1: Clock Phase is: second clock
+                                                          // transition is the first data capture edge
 	SPI_CR2_DS_0|SPI_CR2_DS_1|SPI_CR2_DS_2|SPI_CR2_DS_3,    // SPI Control Register 2 mask.
+                                                          // DS[3:0] = 1111: data size 16 bits
 };
 
 

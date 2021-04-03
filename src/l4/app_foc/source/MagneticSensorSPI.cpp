@@ -11,28 +11,6 @@ MagneticSensorSPIConfig_s AS5147_SPI = {
   .command_parity_bit = 15
 };
 
-/**********
-// MagneticSensorSPI(int cs, float _bit_resolution, int _angle_register)
-//  cs              - SPI chip select pin 
-//  _bit_resolution   sensor resolution bit number
-// _angle_register  - (optional) angle read register - default 0x3FFF
-MagneticSensorSPI::MagneticSensorSPI(int cs, float _bit_resolution, int _angle_register){
-  
-  chip_select_pin = cs; 
-  // angle read register of the magnetic sensor
-  angle_register = _angle_register ? _angle_register : DEF_ANGLE_REGISTER;
-  // register maximum value (counts per revolution)
-  cpr = pow(2,_bit_resolution);
-  spi_mode = SPI_MODE1;
-  clock_speed = 1000000;
-  bit_resolution = _bit_resolution;
-  
-  command_parity_bit = 15; // for backwards compatibilty
-  command_rw_bit = 14; // for backwards compatibilty
-  data_start_bit = 13; // for backwards compatibilty
-}
-//*/
-
 MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   chip_select_pin = cs; 
   // angle read register of the magnetic sensor
@@ -93,8 +71,8 @@ void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
     //spi = _spi;
 
     //ChibiOS
-    spiStart(&SPID1,&spicfg);           // Start driver.
-    spiAcquireBus(&SPID1);              // Gain ownership of bus.
+    spiStart(&SPID2,&spicfg);           // Start driver.
+    spiAcquireBus(&SPID2);              // Gain ownership of bus.
 
     /************
 	// 1MHz clock (AMS should be able to accept up to 10MHz)
@@ -227,10 +205,10 @@ word MagneticSensorSPI::read(word angle_register){
   word register_value;
 
   //from ACS project
-  spiSelect(&SPID1);                       // Select SPI device.
+  spiSelect(&SPID2);                       // Select SPI device.
   while(SPID1.state != SPI_READY) {}
-  spiReceive(&SPID1,1,register_value);     // Receive 1 frame (16 bits).
-  spiUnselect(&SPID1);                     // Unselect SPI device.
+  spiReceive(&SPID2,1,register_value);     // Receive 1 frame (16 bits).
+  spiUnselect(&SPID2);                     // Unselect SPI device.
 
   
   register_value = register_value >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
