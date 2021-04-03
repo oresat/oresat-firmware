@@ -3,6 +3,9 @@
 
 //#include "Arduino.h"
 
+#include <cstdlib>
+#include <cmath>
+
 // sign function
 #define _sign(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
 #define _round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))

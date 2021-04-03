@@ -1,6 +1,9 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#include "ch.h"
+#include "hal.h"
+
 /**
  *  Direction structure
  */

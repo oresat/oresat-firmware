@@ -48,12 +48,12 @@ THD_FUNCTION(sensor, arg)
   while (!chThdShouldTerminateX()) {
     //motor->spi_rxbuf[0] = 0;
     spi_rxbuf[0] = 0;
-    spiSelect(&SPID1);                  // Select slave.
+    spiSelect(&SPID2);                  // Select slave.
 
-    while(SPID1.state != SPI_READY) {}
+    while(SPID2.state != SPI_READY) {}
     //spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
-    spiReceive(&SPID1,1,spi_rxbuf); // Receive 1 frame (16 bits).
-    spiUnselect(&SPID1);                // Unselect slave.
+    spiReceive(&SPID2,1,spi_rxbuf); // Receive 1 frame (16 bits).
+    spiUnselect(&SPID2);                // Unselect slave.
 
     // debug
     palToggleLine(LINE_LED);
@@ -206,12 +206,16 @@ word MagneticSensorSPI::read(word angle_register){
 
   //from ACS project
   spiSelect(&SPID2);                       // Select SPI device.
-  while(SPID1.state != SPI_READY) {}
-  spiReceive(&SPID2,1,register_value);     // Receive 1 frame (16 bits).
+  while(SPID2.state != SPI_READY) {}
+  //spiReceive(&SPID2,1,register_value);     // Receive 1 frame (16 bits).
+  spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
   spiUnselect(&SPID2);                     // Unselect SPI device.
 
+  //memcpy(dest, src, length in bytes);
+  //memcpy(&register_value, spi_rxbuf, 2);
+
   
-  register_value = register_value >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
+  register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
 
   const static word data_mask = 0xFFFF >> (16 - bit_resolution);
 

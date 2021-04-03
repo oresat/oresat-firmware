@@ -15,7 +15,8 @@ int Sensor::needsSearch(){
 float Sensor::getVelocity(){
 
     // calculate sample time
-    unsigned long now_us = micros(); //ARDUINO_MAYBE
+    //unsigned long now_us = micros(); //ARDUINO_MAYBE
+    unsigned long now_us = time_usecs_t(); //CHIBIOS_MAYBE
     float Ts = (now_us - velocity_calc_timestamp)*1e-6;
     // quick fix for strange cases (micros overflow)
     if(Ts <= 0 || Ts > 0.5) Ts = 1e-3; 
