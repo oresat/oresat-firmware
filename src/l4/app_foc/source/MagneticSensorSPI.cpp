@@ -27,6 +27,9 @@ MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   command_rw_bit = config.command_rw_bit; // for backwards compatibilty
   data_start_bit = config.data_start_bit; // for backwards compatibilty
 
+  data_mask = 0xFFFF >> (16 - bit_resolution);
+
+
 }
 
 
@@ -74,6 +77,8 @@ THD_FUNCTION(sensor, arg)
 void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
   //spi = _spi;
+
+
 
   //ChibiOS
   spiStart(&SPID2,&spicfg);           // Start driver.
@@ -173,7 +178,7 @@ word MagneticSensorSPI::read( /* word angle_register */ ){
   
   register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
 
-  const static word data_mask = 0xFFFF >> (16 - bit_resolution);
+  //const static word data_mask = 0xFFFF >> (16 - bit_resolution);
 
   return register_value & data_mask;  // Return the data, stripping the non data (e.g parity) bits
 }

@@ -124,10 +124,11 @@ class MagneticSensorSPI: public Sensor{
     int data_start_bit; //!< the the position of first bit
 
     //from ACS project
-    //maybe remove
     uint16_t spi_rxbuf[2];  //receive buffer
 
     word register_value;
+
+    word data_mask;
 
 
 
