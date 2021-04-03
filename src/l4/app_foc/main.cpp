@@ -17,6 +17,7 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"
@@ -62,15 +63,7 @@ static void app_init(void)
     /* Start up debug output */
     sdStart(&LPSD1, &serial_conf);
 
-    chprintf(chp, "test1");
-    chThdSleepMilliseconds(1000);
-    chprintf(chp, "test2");
-    chThdSleepMilliseconds(1000);
-    chprintf(chp, "test3");
-    chThdSleepMilliseconds(1000);
-    chprintf(chp, "test4");
-    chThdSleepMilliseconds(1000);
-    chprintf(chp, "test5");
+    chprintf(chp, "\n\rapp_init() started\n\r");
     chThdSleepMilliseconds(1000);
 
     

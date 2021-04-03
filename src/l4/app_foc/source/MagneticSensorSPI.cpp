@@ -1,5 +1,12 @@
 #include "MagneticSensorSPI.h"
 
+/* This pointer to a sequential stream actually points to our serial driver.
+   To use the serial driver in chprintf we need to cast it and we are using
+   this variable to perform a cast only once. 
+   from https://www.playembedded.org/blog/vcp-stm32-chibios/ */
+static BaseSequentialStream* chp = (BaseSequentialStream*) &LPSD1;
+
+
 /** Typical configuration for the 14bit AMS AS5147 magnetic sensor over SPI interface */
 MagneticSensorSPIConfig_s AS5147_SPI = {
   .spi_mode = SPI_MODE1,        // unused?
@@ -42,6 +49,8 @@ THD_FUNCTION(sensor, arg)
   palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
   palSetLine(LINE_LED);
 
+  chprintf(chp, "made it into THD_FUNCTION\n\r");
+  chThdSleepMilliseconds(500);
   // not sure if this is the appropriate place to put this
   MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
   sensor.init();
@@ -68,9 +77,15 @@ void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
   //spi = _spi;
 
+  chprintf(chp, "made it into sensor.init()\n\r");
+  chThdSleepMilliseconds(500);
+
   //ChibiOS
   spiStart(&SPID2,&spicfg);           // Start driver.
   spiAcquireBus(&SPID2);              // Gain ownership of bus.
+
+  chprintf(chp, "made it past spiStart() and spiAcquireBus\n\r");
+  chThdSleepMilliseconds(500);
 
 	// 1MHz clock (AMS should be able to accept up to 10MHz)
 	//spi->setClockDivider(SPI_CLOCK_DIV8);
@@ -156,10 +171,21 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
   */
 word MagneticSensorSPI::read( /* word angle_register */ ){
 
+  chprintf(chp, "made it into sensor.read()\n\r");
+  chThdSleepMilliseconds(500);
+
   //from ACS project
   spiSelect(&SPID2);                  // Select SPI device.
   while(SPID2.state != SPI_READY) {}
+
+  chprintf(chp, "made it past while(SPID2.state != SPI_READY)\n\r");
+  chThdSleepMilliseconds(500);
+
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
+
+  chprintf(chp, "made it past spiReceieve \n\r");
+  chThdSleepMilliseconds(500);
+
   spiUnselect(&SPID2);                // Unselect SPI device.
   
   //this should shift data to the rightmost bits of the word
