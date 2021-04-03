@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template_cpp
+PROJECT   = app_foc
 
 # Target settings.
 MCU       = cortex-m4
@@ -127,6 +127,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 #include $(CHIBIOS)/test/rt/rt_test.mk
 #include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/cpp_wrappers/chcpp.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32L452xE.ld

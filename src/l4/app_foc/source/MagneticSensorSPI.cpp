@@ -1,35 +1,44 @@
 #include "MagneticSensorSPI.h"
 
+/*
+// Temp fix
+// This should not be needed because this is already declared in:
+// ext/ChibiOS/os/various/cpp_wrappers/syscalls_cpp.cpp
+extern "C" { 
+  void __cxa_pure_virtual() {
+  osalSysHalt("Pure virtual function call.");
+  }
+}
+//*/
+
 /** Typical configuration for the 14bit AMS AS5147 magnetic sensor over SPI interface */
 MagneticSensorSPIConfig_s AS5147_SPI = {
-  .spi_mode = SPI_MODE1,
-  .clock_speed = 1000000,
-  .bit_resolution = 14,
-  .angle_register = 0x3FFF,
-  .data_start_bit = 13, 
-  .command_rw_bit = 14,
-  .command_parity_bit = 15
+  .spi_mode = SPI_MODE1,        // unused?
+  .clock_speed = 1000000,       // unused?
+  .bit_resolution = 14,         // used for cpr, data_mask, register_value
+  .angle_register = 0x3FFF,     // unused (Instead, tie MOSI to +3.3V)
+  .data_start_bit = 13,         // used for register_value
+  .command_rw_bit = 14,         // unused?
+  .command_parity_bit = 15      // unused?
 };
 
 MagneticSensorSPI::MagneticSensorSPI(MagneticSensorSPIConfig_s config, int cs){
   chip_select_pin = cs; 
   // angle read register of the magnetic sensor
-  angle_register = config.angle_register ? config.angle_register : DEF_ANGLE_REGISTER;
+  //angle_register = config.angle_register ? config.angle_register : DEF_ANGLE_REGISTER;
   // register maximum value (counts per revolution)
   //cpr = pow(2, config.bit_resolution);
   cpr = 1 << config.bit_resolution;
 
-  spi_mode = config.spi_mode;
-  clock_speed = config.clock_speed;
+  //spi_mode = config.spi_mode;
+  //clock_speed = config.clock_speed;
   bit_resolution = config.bit_resolution;
   
-  command_parity_bit = config.command_parity_bit; // for backwards compatibilty
-  command_rw_bit = config.command_rw_bit; // for backwards compatibilty
+  //command_parity_bit = config.command_parity_bit; // for backwards compatibilty
+  //command_rw_bit = config.command_rw_bit; // for backwards compatibilty
   data_start_bit = config.data_start_bit; // for backwards compatibilty
 
   data_mask = 0xFFFF >> (16 - bit_resolution);
-
-
 }
 
 
@@ -50,23 +59,15 @@ THD_FUNCTION(sensor, arg)
 
   while (!chThdShouldTerminateX()) {
 
-    /*
-    //motor->spi_rxbuf[0] = 0;
-    spi_rxbuf[0] = 0;
-    spiSelect(&SPID2);                  // Select slave.
-
-    while(SPID2.state != SPI_READY) {}
-    //spiReceive(&SPID1,1,motor->spi_rxbuf); // Receive 1 frame (16 bits).
-    spiReceive(&SPID2,1,spi_rxbuf); // Receive 1 frame (16 bits).
-    spiUnselect(&SPID2);                // Unselect slave.
-    //*/
-
     sensor.getAngle();
 
     // debug
     palToggleLine(LINE_LED);
     chThdSleepMilliseconds(500);
   }
+
+  // does close get called automatically in some way?
+  //sensor.close();
 
   palClearLine(LINE_LED);
   chThdExit(MSG_OK);
@@ -77,8 +78,6 @@ THD_FUNCTION(sensor, arg)
 void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
   //spi = _spi;
-
-
 
   //ChibiOS
   spiStart(&SPID2,&spicfg);           // Start driver.
@@ -168,25 +167,24 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
   */
 word MagneticSensorSPI::read( /* word angle_register */ ){
 
-
   //from ACS project
   spiSelect(&SPID2);                  // Select SPI device.
   while(SPID2.state != SPI_READY) {}
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
   spiUnselect(&SPID2);                // Unselect SPI device.
-
   
-  register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  //this should shift data to the rightmost bits of the word
-
-  //const static word data_mask = 0xFFFF >> (16 - bit_resolution);
+  //this should shift data to the rightmost bits of the word
+  register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  
 
   return register_value & data_mask;  // Return the data, stripping the non data (e.g parity) bits
 }
 
 /**
  * Closes the SPI connection
- * SPI has an internal SPI-device counter, for each init()-call the close() function must be called exactly 1 time
  */
 void MagneticSensorSPI::close(){
 	//spi->end();  //ARDUINO
+
+  spiReleaseBus(&SPID2);              // Release ownership of bus.
+
 }

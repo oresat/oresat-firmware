@@ -42,7 +42,7 @@ static const SPIConfig spicfg = {
 	false,                                                  // Not using circular buffer.
 	NULL,                                                   // Not using operation complete callback.
 	GPIOB,                                                  // Chip select line.
-	//GPIOB_SPI2_NSS,                                         // Chip select port.
+	//GPIOB_SPI2_NSS,                                       // Chip select port.
   GPIOA_ARD_D10,
 	SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,    // SPI Control Register 1 mask.
                                                           // BR[2:0] = 111: Baud rate is fPCLK/256
@@ -125,10 +125,9 @@ class MagneticSensorSPI: public Sensor{
 
     //from ACS project
     uint16_t spi_rxbuf[2];  //receive buffer
+    word register_value;  // (word)spi_rxbuf;
 
-    word register_value;
-
-    word data_mask;
+    word data_mask;  //0xFFFF >> (16 - bit_resolution);
 
 
 
