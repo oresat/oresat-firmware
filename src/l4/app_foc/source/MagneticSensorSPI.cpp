@@ -61,8 +61,8 @@ THD_FUNCTION(sensor, arg)
       chprintf(chp, "Velocity: %f\n\r", sensor.getVelocity() );
 
     // debug
-    palToggleLine(LINE_LED);
-    chThdSleepMilliseconds(500);
+    //palToggleLine(LINE_LED);
+    //chThdSleepMilliseconds(500);
   }
 
   // does close get called automatically in some way?
@@ -95,15 +95,20 @@ void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
   palSetLineMode(GPIOB_SPI2_MISO,
                  PAL_MODE_ALTERNATE(5) |
                  PAL_STM32_OSPEED_HIGH);         // MISO.
-  //*/           
+  //*/  
 
+  
   palSetPadMode(GPIOB, GPIOB_SPI2_SCK,
-              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    /* New SCK */
+              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    // New SCK 
+  //*/ 
+  /*
   palSetPadMode(GPIOB, GPIOB_SPI2_MISO,
-              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    /* New MISO*/
+              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    // New MISO
+  //*/
+  /*
   palSetPadMode(GPIOB, GPIOB_PIN12,
-              PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGH); /* New CS*/
-
+              PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGH); // New CS
+  //*/
 
   //ChibiOS
   spiStart(&SPID2,&spicfg);           // Start driver.
@@ -197,19 +202,21 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
 word MagneticSensorSPI::read( /* word angle_register */ ){
 
   chprintf(chp, "made it into sensor.read()\n\r");
-  chThdSleepMilliseconds(500);
+  //chThdSleepMilliseconds(500);
 
   //from ACS project
   spiSelect(&SPID2);                  // Select SPI device.
   while(SPID2.state != SPI_READY) {}
 
-  chprintf(chp, "made it past while(SPID2.state != SPI_READY)\n\r");
-  chThdSleepMilliseconds(500);
+  //chprintf(chp, "made it past while(SPID2.state != SPI_READY)\n\r");
+  //chThdSleepMilliseconds(500);
 
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
 
-  chprintf(chp, "made it past spiReceieve (SPID2.state != SPI_READY)\n\r");
-  chThdSleepMilliseconds(500);
+  //chprintf(chp, "what is this? %d %f %x %u\n\r", spi_rxbuf, spi_rxbuf, spi_rxbuf, spi_rxbuf);
+
+  //chprintf(chp, "made it past spiReceieve (SPID2.state != SPI_READY)\n\r");
+  //chThdSleepMilliseconds(500);
 
   spiUnselect(&SPID2);                // Unselect SPI device.
   
