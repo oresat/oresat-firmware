@@ -18,6 +18,12 @@
 
 #define DEF_ANGLE_REGISTER 0x3FFF
 
+// test
+// this define enables float support in chprintf
+// overrides define in ext/ChibiOS/os/hal/lib/streams/chprintf.h
+// TODO: fix this
+#define CHPRINTF_USE_FLOAT          TRUE
+
 
 // Copied from Arduino libraries
 #define SPI_MODE1 0x01
@@ -45,7 +51,7 @@ static const SPIConfig spicfg = {
 	NULL,                                                   // Not using operation complete callback.
 	GPIOB,                                                  // Chip select line.
 	//GPIOB_SPI2_NSS,                                       // Chip select port.
-  GPIOA_ARD_D10,
+  GPIOB_PIN12,
 	SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,    // SPI Control Register 1 mask.
                                                           // BR[2:0] = 111: Baud rate is fPCLK/256
                                                           // CPHA = 1: Clock Phase is: second clock
@@ -53,7 +59,6 @@ static const SPIConfig spicfg = {
 	SPI_CR2_DS_0|SPI_CR2_DS_1|SPI_CR2_DS_2|SPI_CR2_DS_3,    // SPI Control Register 2 mask.
                                                           // DS[3:0] = 1111: data size 16 bits
 };
-
 
 struct MagneticSensorSPIConfig_s  {
   int spi_mode;

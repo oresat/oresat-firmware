@@ -57,7 +57,8 @@ THD_FUNCTION(sensor, arg)
 
   while (!chThdShouldTerminateX()) {
 
-    sensor.getAngle();
+      chprintf(chp, "Angle: %f\n\r", sensor.getAngle() );
+      chprintf(chp, "Velocity: %f\n\r", sensor.getVelocity() );
 
     // debug
     palToggleLine(LINE_LED);
@@ -79,6 +80,30 @@ void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
 
   chprintf(chp, "made it into sensor.init()\n\r");
   chThdSleepMilliseconds(500);
+
+  /*
+   * SPI2 I/O pins setup.
+   */
+
+  /*
+  palSetLineMode(GPIOB_PIN12,
+                 PAL_MODE_ALTERNATE(5) |
+                 PAL_STM32_OSPEED_HIGH);         // NSS.                
+  palSetLineMode(GPIOB_SPI2_SCK,
+                 PAL_MODE_ALTERNATE(5) |
+                 PAL_STM32_OSPEED_HIGH);         // SPI SCK.            
+  palSetLineMode(GPIOB_SPI2_MISO,
+                 PAL_MODE_ALTERNATE(5) |
+                 PAL_STM32_OSPEED_HIGH);         // MISO.
+  //*/           
+
+  palSetPadMode(GPIOB, GPIOB_SPI2_SCK,
+              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    /* New SCK */
+  palSetPadMode(GPIOB, GPIOB_SPI2_MISO,
+              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    /* New MISO*/
+  palSetPadMode(GPIOB, GPIOB_PIN12,
+              PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGH); /* New CS*/
+
 
   //ChibiOS
   spiStart(&SPID2,&spicfg);           // Start driver.
@@ -108,7 +133,7 @@ float MagneticSensorSPI::getAngle(){
   float angle_data = getRawCount(); 
 
   // tracking the number of rotations 
-  // in order to expand angle range form [0,2PI] 
+  // in order to expand angle range from [0,2PI] 
   // to basically infinity
   float d_angle = angle_data - angle_data_prev;
   // if overflow happened track it as full rotation
@@ -183,7 +208,7 @@ word MagneticSensorSPI::read( /* word angle_register */ ){
 
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
 
-  chprintf(chp, "made it past spiReceieve \n\r");
+  chprintf(chp, "made it past spiReceieve (SPID2.state != SPI_READY)\n\r");
   chThdSleepMilliseconds(500);
 
   spiUnselect(&SPID2);                // Unselect SPI device.
