@@ -18,12 +18,6 @@
 
 #define DEF_ANGLE_REGISTER 0x3FFF
 
-// test
-// this define enables float support in chprintf
-// overrides define in ext/ChibiOS/os/hal/lib/streams/chprintf.h
-// TODO: fix this
-//#define CHPRINTF_USE_FLOAT          TRUE
-
 
 // Copied from Arduino libraries
 #define SPI_MODE1 0x01
