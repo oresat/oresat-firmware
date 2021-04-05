@@ -44,7 +44,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker(&worker1, &worker1_desc, false, true);
+    reg_worker(&worker1, &worker1_desc, true, true);
 
     /* Start up debug output */
     sdStart(&LPSD1, NULL);
