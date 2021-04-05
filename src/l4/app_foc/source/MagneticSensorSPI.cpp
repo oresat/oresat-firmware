@@ -46,29 +46,34 @@ THD_FUNCTION(sensor, arg)
   (void)arg;
 
   // debug
-  palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
-  palSetLine(LINE_LED);
+  //palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
+  //palSetLine(LINE_LED);
 
   chprintf(chp, "made it into THD_FUNCTION\n\r");
   chThdSleepMilliseconds(500);
+
   // not sure if this is the appropriate place to put this
   MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
   sensor.init();
 
   while (!chThdShouldTerminateX()) {
 
-      chprintf(chp, "Angle: %f\n\r", sensor.getAngle() );
-      chprintf(chp, "Velocity: %f\n\r", sensor.getVelocity() );
+
+    chprintf(chp, "Angle: %f\n\r", sensor.getAngle() );
+    chprintf(chp, "Angle: %f\n\r", sensor.getAngle() );
+    chprintf(chp, "Velocity: %f\n\r", sensor.getVelocity() );
+    chprintf(chp, "\n\r");
 
     // debug
     //palToggleLine(LINE_LED);
-    //chThdSleepMilliseconds(500);
+
+    chThdSleepMilliseconds(100);
   }
 
   // does close get called automatically in some way?
   //sensor.close();
 
-  palClearLine(LINE_LED);
+  //palClearLine(LINE_LED);
   chThdExit(MSG_OK);
 }
 
@@ -101,12 +106,16 @@ void MagneticSensorSPI::init( /* SPIClass* _spi */ ){
   palSetPadMode(GPIOB, GPIOB_SPI2_SCK,
               PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    // New SCK 
   //*/ 
-  /*
+  
   palSetPadMode(GPIOB, GPIOB_SPI2_MISO,
               PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    // New MISO
   //*/
-  /*
-  palSetPadMode(GPIOB, GPIOB_PIN12,
+  
+  palSetPadMode(GPIOB, GPIOB_SPI2_MOSI,
+              PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGH);    // New MOSI
+  //*/
+  
+  palSetPadMode(GPIOA, GPIOA_PIN8,
               PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGH); // New CS
   //*/
 
@@ -201,7 +210,7 @@ byte MagneticSensorSPI::spiCalcEvenParity(word value){
   */
 word MagneticSensorSPI::read( /* word angle_register */ ){
 
-  chprintf(chp, "made it into sensor.read()\n\r");
+  //chprintf(chp, "made it into sensor.read()\n\r");
   //chThdSleepMilliseconds(500);
 
   //from ACS project
@@ -213,7 +222,7 @@ word MagneticSensorSPI::read( /* word angle_register */ ){
 
   spiReceive(&SPID2,1,spi_rxbuf);     // Receive 1 frame (16 bits).
 
-  //chprintf(chp, "what is this? %d %f %x %u\n\r", spi_rxbuf, spi_rxbuf, spi_rxbuf, spi_rxbuf);
+  chprintf(chp, "spi_rxbuf \t%d %f %x %u\n\r", spi_rxbuf, spi_rxbuf, spi_rxbuf, spi_rxbuf);
 
   //chprintf(chp, "made it past spiReceieve (SPID2.state != SPI_READY)\n\r");
   //chThdSleepMilliseconds(500);
@@ -222,6 +231,9 @@ word MagneticSensorSPI::read( /* word angle_register */ ){
   
   //this should shift data to the rightmost bits of the word
   register_value = (word)spi_rxbuf >> (1 + data_start_bit - bit_resolution);  
+
+  chprintf(chp, "register_value \t%d %f %x %u\n\r", register_value, register_value, register_value, register_value);
+
 
   return register_value & data_mask;  // Return the data, stripping the non data (e.g parity) bits
 }

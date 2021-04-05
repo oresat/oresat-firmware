@@ -49,11 +49,11 @@ extern THD_FUNCTION(sensor, arg);
 static const SPIConfig spicfg = {
 	false,                                                  // Not using circular buffer.
 	NULL,                                                   // Not using operation complete callback.
-	GPIOB,                                                  // Chip select line.
+	GPIOA,                                                  // Chip select line.
 	//GPIOB_SPI2_NSS,                                       // Chip select port.
-  GPIOB_PIN12,
-	//SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,    // SPI Control Register 1 mask.
-  SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_CPHA,
+  GPIOA_PIN8,
+	SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_BR_2|SPI_CR1_CPHA,    // SPI Control Register 1 mask.
+  //SPI_CR1_BR_0|SPI_CR1_BR_1|SPI_CR1_CPHA,
                                                           // BR[2:0] = 111: Baud rate is fPCLK/256
                                                           // CPHA = 1: Clock Phase is: second clock
                                                           // transition is the first data capture edge
