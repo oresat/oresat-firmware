@@ -5,6 +5,9 @@
 //#include "time_utils.h"
 #include "foc_utils.h"
 
+#include "ch.h"
+#include "hal.h"
+
 /**
  *  PID controller class
  */

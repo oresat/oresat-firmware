@@ -10,13 +10,16 @@ PIDController::PIDController(float P, float I, float D, float ramp, float limit)
     , error_prev(0.0)
     , output_prev(0.0)
 {
-    timestamp_prev = micros(); //ARDUINO_MAYBE
+    //timestamp_prev = micros(); //ARDUINO_MAYBE
+    timestamp_prev = time_usecs_t(); //CHIBIOS_MAYBE
+
 }
 
 // PID controller function
 float PIDController::operator() (float error){
     // calculate the time from the last call
-    unsigned long timestamp_now = micros(); //ARDUINO_MAYBE
+    //unsigned long timestamp_now = micros(); //ARDUINO_MAYBE
+    unsigned long timestamp_now = time_usecs_t(); //CHIBIOS_MAYBE
     float Ts = (timestamp_now - timestamp_prev) * 1e-6;
     // quick fix for strange cases (micros overflow)
     if(Ts <= 0 || Ts > 0.5) Ts = 1e-3; 
