@@ -1,17 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "test_radio.h"
-#include "comms.h"
 #include "radio.h"
-#include "ax5043.h"
-#include "si41xx.h"
 #include "chprintf.h"
 
 #define PA_SAMPLES 8
-
-extern radio_dev_t radio_devices[];
-extern radio_profile_t radio_profiles[];
-extern synth_dev_t synth_devices[];
 
 typedef struct {
     adcsample_t therm;

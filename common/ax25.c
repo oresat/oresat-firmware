@@ -32,22 +32,24 @@
 /* Exported functions.                                                       */
 /*===========================================================================*/
 
-void ax25_send(pdu_t *pdu, void *arg)
+void ax25_sdu(fb_t *fb, const void *arg)
 {
-    ax25_frame_t frame;
     const ax25_link_t *link = arg;
+    ax25_frame_t *mac_hdr;
+
+    mac_hdr = fb->mac_hdr = fb_push(fb, sizeof(ax25_frame_t));
+    if (mac_hdr == NULL) {
+        return;
+    }
 
     for (int i = 0; i < 6; i++) {
-        frame.dest[i] = link->dest[i] << 1;
-        frame.src[i] = link->src[i] << 1;
+        mac_hdr->dest[i] = link->dest[i] << 1;
+        mac_hdr->src[i] = link->src[i] << 1;
     }
-    frame.dest_ssid = AX25_SSID(link->dest_ssid);
-    frame.src_ssid = AX25_SSID(link->src_ssid) | AX25_SSID_EXT;
-    frame.control = link->control;
-    pdu->mac_hdr = &frame;
-    if (link->phy_send) {
-        link->phy_send(pdu, 0, link->phy_arg);
-    }
+    mac_hdr->dest_ssid = AX25_SSID(link->dest_ssid);
+    mac_hdr->src_ssid = AX25_SSID(link->src_ssid) | AX25_SSID_EXT;
+    mac_hdr->control = link->control;
+    mac_hdr->sid = link->sid;
 }
 
 /** @} */

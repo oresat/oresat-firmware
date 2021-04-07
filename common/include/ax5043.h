@@ -2795,18 +2795,6 @@ typedef struct{
      */
     uint32_t                    xtal_freq;
     /**
-     * @brief Radio Address
-     */
-    uint32_t                    addr;
-    /**
-     * @brief PDU Object FIFO pointer
-     */
-    objects_fifo_t              *pdu_fifo;
-    /**
-     * @brief PDU Object maximum size
-     */
-    size_t                      pdu_max_size;
-    /**
      * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.
      *        Certain registers may be overwritten later, either by

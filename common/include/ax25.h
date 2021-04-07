@@ -8,7 +8,7 @@
 #ifndef _AX25_H_
 #define _AX25_H_
 
-#include "pdu.h"
+#include "frame_buf.h"
 
 /*===========================================================================*/
 /* Constants.                                                                */
@@ -117,15 +117,9 @@ typedef struct {
     char            src[6];
     uint8_t         src_ssid;
     uint8_t         control;
-    void            (*phy_send)(const void *pdu, size_t len, const void *phy_arg);
-    const void      *phy_arg;
+    uint8_t         sid;
 } ax25_link_t;
 /** @} */
-
-typedef struct __attribute__((packed)) {
-    uint8_t         pid;
-    uint8_t         data[];
-} ax25_info_t;
 
 /**
  * @name    AX.25 frame data structure.
@@ -137,7 +131,7 @@ typedef struct __attribute__((packed)) {
     char            src[6];
     uint8_t         src_ssid;
     uint8_t         control;
-    uint8_t         data[];
+    uint8_t         sid;
 } ax25_frame_t;
 /** @} */
 
@@ -152,7 +146,7 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void ax25_send(pdu_t *pdu, void *arg);
+void ax25_sdu(fb_t *fb, const void *arg);
 
 #ifdef __cplusplus
 }

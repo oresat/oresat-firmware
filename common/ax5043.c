@@ -9,6 +9,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "ax5043.h"
+#include "frame_buf.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -182,16 +183,13 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
  */
 THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
-    objects_fifo_t *pdu_fifo;
     ax5043_chunk_t *chunkp = NULL;
-    uint8_t *pdu = NULL;
+    fb_t *fb = NULL;
     uint8_t buf[AX5043_FIFO_SIZE];
+    uint8_t *pos;
     size_t fifo_len;
-    size_t pdu_offset;
 
     osalDbgCheck(devp != NULL);
-
-    pdu_fifo = devp->config->pdu_fifo;
 
     while (!chThdShouldTerminateX()) {
         /* Wait for FIFO data */
@@ -224,31 +222,32 @@ THD_FUNCTION(rx_worker, arg) {
                 /* TODO: Handle error flags */
                 /* Start of new packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
-                    /* Acquire PDU object if needed */
-                    if (pdu == NULL) {
-                        pdu = chFifoTakeObjectTimeout(pdu_fifo, TIME_INFINITE);
+                    /* Acquire frame buffer object if needed */
+                    if (fb == NULL) {
+                        fb = fb_alloc(FB_MAX_LEN);
                     }
-                    pdu_offset = 0;
                 }
 
-                osalDbgAssert(pdu != NULL, "rx_worker(), NULL PDU object");
-                if (pdu_offset + data_len < devp->config->pdu_max_size) {
+                osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");
+                pos = fb_put(fb, data_len);
+                if (pos != NULL) {
                     /* Copy packet data */
-                    memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
-                    pdu_offset += data_len;
+                    memcpy(pos, chunkp->data.data, data_len);
                 } else {
-                    /* Length exceeds maximum PDU length, abort receive */
+                    /* Length exceeds maximum frame buffer length, abort receive */
                     uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
                     reg |= AX5043_FRAMING_FABORT;
                     ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
-                    chFifoReturnObject(pdu_fifo, pdu);
-                    pdu = NULL;
+                    fb_free(fb);
+                    fb = NULL;
                 }
 
                 /* End of packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
-                    chFifoSendObject(pdu_fifo, pdu);
-                    pdu = NULL;
+                    if (fb != NULL) {
+                        fb_post(fb);
+                        fb = NULL;
+                    }
                 }
                 break;
             case AX5043_CHUNKCMD_TIMER:
@@ -282,9 +281,9 @@ THD_FUNCTION(rx_worker, arg) {
         }
     }
 
-    if (pdu != NULL) {
-        chFifoReturnObject(pdu_fifo, pdu);
-        pdu = NULL;
+    if (fb != NULL) {
+        fb_free(fb);
+        fb = NULL;
     }
     chThdExit(MSG_OK);
 }

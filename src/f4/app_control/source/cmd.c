@@ -285,7 +285,6 @@ opd_usage:
 void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
 {
     RTCDateTime timespec;
-    time_t unix_time;
     uint32_t msec;
     time_scet_t scet;
     time_utc_t utc;
@@ -294,10 +293,11 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "unix")) {
         if (!strcmp(argv[1], "get")) {
-            unix_time = rtcGetTimeUnix(&msec);
+            time_t unix_time = rtcGetTimeUnix(&msec);
+            char *timestr = ctime(&unix_time);
             chprintf(chp, "UNIX Time: %d\r\n"
                           "Date:      %s\r\n",
-                          unix_time, ctime(&unix_time));
+                          unix_time, timestr);
         } else if (!strcmp(argv[1], "set") && argc > 2) {
             rtcSetTimeUnix(strtoul(argv[2], NULL, 0), 0);
         } else {
