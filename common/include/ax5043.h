@@ -2826,6 +2826,9 @@ struct AX5043Driver {
     /* Error state of device */
     ax5043_err_t                error;
 
+    /* TX state lock */
+    mutex_t                     tx_lock;
+
     /* IRQ worker thread */
     thread_t                    *irq_worker;
     /* IRQ event Source */

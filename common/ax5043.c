@@ -225,6 +225,7 @@ THD_FUNCTION(rx_worker, arg) {
                     /* Acquire frame buffer object if needed */
                     if (fb == NULL) {
                         fb = fb_alloc(FB_MAX_LEN);
+                        fb->phy_rx = devp;
                     }
                 }
 
@@ -397,6 +398,8 @@ void ax5043SetRFDIV(AX5043Driver *devp, uint32_t freq) {
  */
 void ax5043ObjectInit(AX5043Driver *devp) {
     devp->config = NULL;
+
+    chMtxObjectInit(&devp->tx_lock);
 
     devp->irq_worker = NULL;
     chEvtObjectInit(&devp->irq_event);
@@ -631,12 +634,12 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     osalDbgCheck(devp != NULL && buf != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
+                   (devp->state == AX5043_WOR)), "ax5043TX(), invalid state");
     osalDbgAssert(total_len != 0, "ax5043TX(), invalid total length");
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TX(), no callback when len != total_len");
 
+    chMtxLock(&devp->tx_lock);
     devp->error = AX5043_ERR_NOERROR;
 
     /* Record previous state and enter idle state */
@@ -755,6 +758,7 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     default:
         ax5043Idle(devp);
     }
+    chMtxUnlock(&devp->tx_lock);
 }
 
 /**
@@ -777,12 +781,12 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     osalDbgCheck(devp != NULL && buf != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR) ||
-                   (devp->state == AX5043_TX)), "ax5043TXRaw(), invalid state");
+                   (devp->state == AX5043_WOR)), "ax5043TXRaw(), invalid state");
     osalDbgAssert(total_len != 0, "ax5043TXRaw(), invalid total length");
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TXRaw(), no callback when len != total_len");
 
+    chMtxLock(&devp->tx_lock);
     devp->error = AX5043_ERR_NOERROR;
 
     /* Record previous state and enter idle state */
@@ -865,6 +869,7 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     default:
         ax5043Idle(devp);
     }
+    chMtxUnlock(&devp->tx_lock);
 }
 
 /**

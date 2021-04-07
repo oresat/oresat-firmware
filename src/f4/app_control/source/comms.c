@@ -8,7 +8,8 @@
 #include "uslp.h"
 #include "CANopen.h"
 
-#define XTAL_CLK                            16000000
+#define XTAL_CLK                            16000000U
+#define EDL_WORKERS                         2
 
 static const SPIConfig lband_spicfg = {
     false,
@@ -322,29 +323,8 @@ radio_profile_t radio_profiles[] = {
     {NULL, ""},
 };
 
-static thread_t *rx_tp = NULL;
+static thread_t *edl_tp[EDL_WORKERS] = {NULL};
 static thread_t *beacon_tp = NULL;
-
-THD_WORKING_AREA(radio_rx_wa, 0x400);
-THD_FUNCTION(radio_rx, arg) {
-    (void)arg;
-    fb_t *fb;
-
-    chRegSetThreadName("EDL RX");
-
-    while (!chThdShouldTerminateX()) {
-        fb = fb_get();
-        if (fb == NULL) {
-            continue;
-        }
-
-        /* TODO: Process received frame */
-
-        fb_free(fb);
-    }
-
-    chThdExit(MSG_OK);
-}
 
 THD_WORKING_AREA(radio_beacon_wa, 0x800);
 THD_FUNCTION(radio_beacon, arg) {
@@ -370,6 +350,25 @@ THD_FUNCTION(radio_beacon, arg) {
     chThdExit(MSG_OK);
 }
 
+THD_FUNCTION(edl_thd, arg)
+{
+    (void)arg;
+    fb_t *fb;
+
+    while (!chThdShouldTerminateX()) {
+        fb = fb_get();
+        if (fb == NULL) {
+            continue;
+        }
+
+        /* TODO: Process received frame */
+
+        fb_free(fb);
+    }
+
+    chThdExit(MSG_OK);
+}
+
 void comms_init(void)
 {
     radio_init();
@@ -378,7 +377,9 @@ void comms_init(void)
 void comms_start(void)
 {
     radio_start();
-    rx_tp = chThdCreateStatic(radio_rx_wa, sizeof(radio_rx_wa), NORMALPRIO, radio_rx, NULL);
+    for (int i = 0; i < EDL_WORKERS; i++) {
+        edl_tp[i] = chThdCreateFromHeap(NULL, 0x400, "EDL Worker", NORMALPRIO, edl_thd, NULL);
+    }
     ax5043RX(&lband, false, false);
     ax5043RX(&uhf, false, false);
 }
@@ -386,9 +387,11 @@ void comms_start(void)
 void comms_stop(void)
 {
     radio_stop();
-    chThdTerminate(rx_tp);
-    chThdWait(rx_tp);
-    rx_tp = NULL;
+    for (int i = 0; i < EDL_WORKERS; i++) {
+        chThdTerminate(edl_tp[i]);
+        chThdWait(edl_tp[i]);
+        edl_tp[i] = NULL;
+    }
 }
 
 void comms_beacon(bool enable)
