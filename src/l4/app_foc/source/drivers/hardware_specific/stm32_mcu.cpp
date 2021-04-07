@@ -1,3 +1,5 @@
+#include "ch.h"
+#include "hal.h"
 
 #include "../hardware_api.h"
 
@@ -17,6 +19,7 @@
 // setting pwm to hardware pin - instead analogWrite()
 void _setPwm(int ulPin, uint32_t value, int resolution)
 {
+  /* ARDUINO
   PinName pin = digitalPinToPinName(ulPin);
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
   uint32_t index = get_timer_index(Instance);
@@ -24,12 +27,14 @@ void _setPwm(int ulPin, uint32_t value, int resolution)
 
   uint32_t channel = STM_PIN_CHANNEL(pinmap_function(pin, PinMap_PWM));
   HT->setCaptureCompare(channel, value, (TimerCompareFormat_t)resolution);
+  //*/
 }
 
 
 // init pin pwm 
 HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin)
 {
+  /* ARDUINO
   PinName pin = digitalPinToPinName(ulPin);
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
   
@@ -46,6 +51,7 @@ HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin)
   HT->pause();
   HT->refresh();
   return HT;
+  //*/
 }
 
 
@@ -58,6 +64,7 @@ HardwareTimer* _initPinPWMHigh(uint32_t PWM_freq, int ulPin)
 // init low side pin
 HardwareTimer* _initPinPWMLow(uint32_t PWM_freq, int ulPin)
 {
+  /* ARDUINO
   PinName pin = digitalPinToPinName(ulPin);
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
   uint32_t index = get_timer_index(Instance);
@@ -84,12 +91,14 @@ HardwareTimer* _initPinPWMLow(uint32_t PWM_freq, int ulPin)
   HT->pause();
   HT->refresh();
   return HT;
+  //*/
 }
 
 
 // align the timers to end the init
 void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3)
 {
+  /* ARDUINO
   HT1->pause();
   HT1->refresh();
   HT2->pause();
@@ -99,11 +108,13 @@ void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3)
   HT1->resume();
   HT2->resume();
   HT3->resume();
+  //*/
 }
 
 // align the timers to end the init
 void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3,HardwareTimer *HT4)
 {
+  /* ARDUINO
   HT1->pause();
   HT1->refresh();
   HT2->pause();
@@ -116,11 +127,13 @@ void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3,Ha
   HT2->resume();
   HT3->resume();
   HT4->resume();
+  //*/
 }
 
 // configure hardware 6pwm interface only one timer with inverted channels
 HardwareTimer* _initHardware6PWMInterface(uint32_t PWM_freq, float dead_zone, int pinA_h, int pinA_l, int pinB_h, int pinB_l, int pinC_h, int pinC_l)
 {
+  /* ARDUINO
   PinName uhPinName = digitalPinToPinName(pinA_h);
   PinName ulPinName = digitalPinToPinName(pinA_l);
   PinName vhPinName = digitalPinToPinName(pinB_h);
@@ -157,115 +170,16 @@ HardwareTimer* _initHardware6PWMInterface(uint32_t PWM_freq, float dead_zone, in
   HT->refresh();
   HT->resume();  
   return HT;
+  //*/
 }
 
-
+/// NOTE: For app_foc, assume using hardware timer
 // returns 0 if each pair of pwm channels has same channel
 // returns 1 all the channels belong to the same timer - hardware inverted channels 
 // returns -1 if neither - avoid configuring - error!!!
 int _interfaceType(const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l){
-  PinName nameAH = digitalPinToPinName(pinA_h);
-  PinName nameAL = digitalPinToPinName(pinA_l);
-  PinName nameBH = digitalPinToPinName(pinB_h);
-  PinName nameBL = digitalPinToPinName(pinB_l);
-  PinName nameCH = digitalPinToPinName(pinC_h);
-  PinName nameCL = digitalPinToPinName(pinC_l);
-  int tim1 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameAH, PinMap_PWM));
-  int tim2 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameAL, PinMap_PWM));
-  int tim3 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameBH, PinMap_PWM));
-  int tim4 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameBL, PinMap_PWM));
-  int tim5 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameCH, PinMap_PWM));
-  int tim6 = get_timer_index((TIM_TypeDef *)pinmap_peripheral(nameCL, PinMap_PWM));
-  if(tim1 == tim2 && tim2==tim3 && tim3==tim4  && tim4==tim5 && tim5==tim6)
-    return _HARDWARE_6PWM; // hardware 6pwm interface - only on timer 
-  else if(tim1 == tim2 && tim3==tim4  && tim5==tim6)
-    return _SOFTWARE_6PWM; // software 6pwm interface - each pair of high-low side same timer
-  else
-    return _ERROR_6PWM; // might be error avoid configuration
+    return _HARDWARE_6PWM; // hardware 6pwm interface - only on timer
 }
-
-
-/*
-// function setting the high pwm frequency to the supplied pins
-// - Stepper motor - 2PWM setting
-// - hardware speciffic
-void _configure2PWM(long pwm_frequency,const int pinA, const int pinB) {
-  if( !pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
-  // center-aligned frequency is uses two periods
-  pwm_frequency *=2;
-
-  HardwareTimer* HT1 = _initPinPWM(pwm_frequency, pinA);
-  HardwareTimer* HT2 = _initPinPWM(pwm_frequency, pinB);
-  // allign the timers
-  _alignPWMTimers(HT1, HT2, HT2);
-}
-
-
-// function setting the high pwm frequency to the supplied pins
-// - BLDC motor - 3PWM setting
-// - hardware speciffic
-void _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) {
-  if( !pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
-  // center-aligned frequency is uses two periods
-  pwm_frequency *=2;
-
-  HardwareTimer* HT1 = _initPinPWM(pwm_frequency, pinA);
-  HardwareTimer* HT2 = _initPinPWM(pwm_frequency, pinB);
-  HardwareTimer* HT3 = _initPinPWM(pwm_frequency, pinC);
-  // allign the timers
-  _alignPWMTimers(HT1, HT2, HT3);
-}
-
-// function setting the high pwm frequency to the supplied pins
-// - Stepper motor - 4PWM setting
-// - hardware speciffic
-void _configure4PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC, const int pinD) {
-  if( !pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
-  else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to 50kHz max
-  // center-aligned frequency is uses two periods
-  pwm_frequency *=2;
-
-  HardwareTimer* HT1 = _initPinPWM(pwm_frequency, pinA);
-  HardwareTimer* HT2 = _initPinPWM(pwm_frequency, pinB);
-  HardwareTimer* HT3 = _initPinPWM(pwm_frequency, pinC);
-  HardwareTimer* HT4 = _initPinPWM(pwm_frequency, pinD); 
-  // allign the timers
-  _alignPWMTimers(HT1, HT2, HT3, HT4);
-}
-
-// function setting the pwm duty cycle to the hardware
-// - Stepper motor - 2PWM setting
-//- hardware speciffic
-void _writeDutyCycle2PWM(float dc_a,  float dc_b, int pinA, int pinB){
-  // transform duty cycle from [0,1] to [0,4095]
-  _setPwm(pinA, _PWM_RANGE*dc_a, _PWM_RESOLUTION);
-  _setPwm(pinB, _PWM_RANGE*dc_b, _PWM_RESOLUTION);
-}
-
-// function setting the pwm duty cycle to the hardware
-// - BLDC motor - 3PWM setting
-//- hardware speciffic
-void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, int pinA, int pinB, int pinC){
-  // transform duty cycle from [0,1] to [0,4095]
-  _setPwm(pinA, _PWM_RANGE*dc_a, _PWM_RESOLUTION);
-  _setPwm(pinB, _PWM_RANGE*dc_b, _PWM_RESOLUTION);
-  _setPwm(pinC, _PWM_RANGE*dc_c, _PWM_RESOLUTION);
-}
-
-
-// function setting the pwm duty cycle to the hardware
-// - Stepper motor - 4PWM setting
-//- hardware speciffic
-void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, int pin1A, int pin1B, int pin2A, int pin2B){
-  // transform duty cycle from [0,1] to [0,4095]
-  _setPwm(pin1A, _PWM_RANGE*dc_1a, _PWM_RESOLUTION);
-  _setPwm(pin1B, _PWM_RANGE*dc_1b, _PWM_RESOLUTION);
-  _setPwm(pin2A, _PWM_RANGE*dc_2a, _PWM_RESOLUTION);
-  _setPwm(pin2B, _PWM_RANGE*dc_2b, _PWM_RESOLUTION);
-}
-//*/
 
 
 
@@ -273,6 +187,14 @@ void _writeDutyCycle4PWM(float dc_1a,  float dc_1b, float dc_2a, float dc_2b, in
 // - BLDC driver - 6PWM setting
 // - hardware specific
 int _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l){
+    
+  // ChibiOS
+  // start timer 1
+  pwmStart(&PWMD1,&pwmRWcfg);
+  //pwmEnablePeriodicNotification(&PWMD1);  //TODO: what does this do?
+
+  
+  /* ARDUINO
   if( !pwm_frequency || !_isset(pwm_frequency) ) pwm_frequency = _PWM_FREQUENCY; // default frequency 25khz
   else pwm_frequency = _constrain(pwm_frequency, 0, _PWM_FREQUENCY_MAX); // constrain to |%0kHz max
   // center-aligned frequency is uses two periods
@@ -298,6 +220,7 @@ int _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const 
       _alignPWMTimers(HT1, HT2, HT3);
       break;
   }
+  //*/
   return 0; // success
 }
 
@@ -305,6 +228,20 @@ int _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const 
 // - BLDC driver - 6PWM setting
 // - hardware specific
 void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, float dead_zone, int pinA_h, int pinA_l, int pinB_h, int pinB_l, int pinC_h, int pinC_l){
+  
+  /// TODO: maybe fix this -- need to make sure that dc_a is equivalent to motor->u, etc.
+  // naive approach: PWM_PERCENTAGE_TO_WIDTH(&PWMD1,dc_a) etc.
+  // enable channels 1 through 3 on timer 1
+  pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,dc_a));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,dc_b));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,dc_c));
+	/*
+  pwmEnableChannel(&PWMD1,PWM_U,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->u));
+  pwmEnableChannel(&PWMD1,PWM_V,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->v));
+  pwmEnableChannel(&PWMD1,PWM_W,PWM_PERCENTAGE_TO_WIDTH(&PWMD1,motor->w));
+  //*/
+  
+  /* ARDUINO
   // find configuration
   int config = _interfaceType(pinA_h, pinA_l,  pinB_h, pinB_l, pinC_h, pinC_l);
   // set pwm accordingly
@@ -323,5 +260,6 @@ void _writeDutyCycle6PWM(float dc_a,  float dc_b, float dc_c, float dead_zone, i
       _setPwm(pinC_h, _constrain(dc_c - dead_zone/2, 0, 1)*_PWM_RANGE, _PWM_RESOLUTION);
       break;
   }
+  //*/
 }
 //#endif

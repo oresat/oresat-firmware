@@ -7,6 +7,18 @@
 #include "../common/defaults.h"
 #include "hardware_api.h"
 
+
+// copied from ACS project
+#define PWM_TIMER_FREQ	48e6 /// Hz
+#define PWM_FREQ				15e3 /// periods per sec
+#define PWM_PERIOD			PWM_TIMER_FREQ/PWM_FREQ 
+
+/// PWM signals
+#define PWM_U			0U
+#define PWM_V			1U
+#define PWM_W			2U
+
+
 /**
  6 pwm bldc driver class
 */

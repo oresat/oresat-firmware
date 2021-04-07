@@ -1,7 +1,7 @@
 #include "FOCMotor.h"
 
 /**
- * Default constructor - setting all variabels to default values
+ * Default constructor - setting all variables to default values
  */
 FOCMotor::FOCMotor()
 {
