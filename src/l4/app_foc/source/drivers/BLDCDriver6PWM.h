@@ -1,6 +1,9 @@
 #ifndef BLDCDriver6PWM_h
 #define BLDCDriver6PWM_h
 
+#include "ch.h"
+#include "hal.h"
+
 #include "../common/base_classes/BLDCDriver.h"
 #include "../common/foc_utils.h"
 //#include "../common/time_utils.h"

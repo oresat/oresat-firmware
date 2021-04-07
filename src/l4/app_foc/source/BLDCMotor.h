@@ -1,6 +1,11 @@
 #ifndef BLDCMotor_h
 #define BLDCMotor_h
 
+/* ChibiOS header files */
+#include "ch.h"
+#include "hal.h"
+#include "chprintf.h"
+
 //#include "Arduino.h"
 #include "common/base_classes/FOCMotor.h"
 #include "common/base_classes/Sensor.h"

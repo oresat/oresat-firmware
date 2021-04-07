@@ -1,5 +1,7 @@
 #include "BLDCMotor.h"
 
+#define DEBUG     TRUE
+
 // BLDCMotor( int pp , float R)
 // - pp            - pole pair number
 // - R             - motor phase resistance
@@ -24,7 +26,9 @@ void BLDCMotor::linkDriver(BLDCDriver* _driver) {
 
 // init hardware pins
 void BLDCMotor::init() {
-  if(monitor_port) monitor_port->println(F("MOT: Init"));
+
+  chprintf(chp, "MOT: Init\n\r");
+  //if(monitor_port) monitor_port->println(F("MOT: Init"));
 
   // if no current sensing and the user has set the phase resistance of the motor use current limit to calculate the voltage limit
   if( !current_sense && _isset(phase_resistance)) {
@@ -51,7 +55,9 @@ void BLDCMotor::init() {
 
   _delay(500);
   // enable motor
-  if(monitor_port) monitor_port->println(F("MOT: Enable driver."));
+
+  if(DEBUG) chprintf(chp, "MOT: Enable driver.\n\r");
+  //if(monitor_port) monitor_port->println(F("MOT: Enable driver."));
   enable();
   _delay(500);
 }
@@ -97,7 +103,8 @@ int  BLDCMotor::initFOC( float zero_electric_offset, Direction _sensor_direction
   // by setting motor.sensor_direction and motor.zero_electric_angle
   _delay(500);
   if(sensor) exit_flag *= alignSensor();
-  else if(monitor_port) monitor_port->println(F("MOT: No sensor."));
+  else if(DEBUG) chprintf(chp, "MOT: No sensor\n\r");
+  //else if(monitor_port) monitor_port->println(F("MOT: No sensor."));
 
   // aligning the current sensor - can be skipped
   // checks if driver phases are the same as current sense phases
@@ -105,13 +112,18 @@ int  BLDCMotor::initFOC( float zero_electric_offset, Direction _sensor_direction
   _delay(500);
   if(exit_flag){ 
     if(current_sense) exit_flag *= alignCurrentSense();
-    else if(monitor_port) monitor_port->println(F("MOT: No current sense."));
+    //else if(monitor_port) monitor_port->println(F("MOT: No current sense."));
+    else if(DEBUG) chprintf(chp, "MOT: No current sense.\n\r");
+
   }
   
   if(exit_flag){
-    if(monitor_port) monitor_port->println(F("MOT: Ready."));
+    //if(monitor_port) monitor_port->println(F("MOT: Ready."));
+    if(DEBUG) chprintf(chp, "MOT: Ready.\n\r");
+
   }else{
-    if(monitor_port) monitor_port->println(F("MOT: Init FOC failed."));
+    //if(monitor_port) monitor_port->println(F("MOT: Init FOC failed."));
+    if(DEBUG) chprintf(chp, "MOT: Init FOC failed.\n\r");
     disable();
   }
  
@@ -122,18 +134,22 @@ int  BLDCMotor::initFOC( float zero_electric_offset, Direction _sensor_direction
 int BLDCMotor::alignCurrentSense() {
   int exit_flag = 1; // success 
 
-  if(monitor_port) monitor_port->println(F("MOT: Align current sense."));
+  //if(monitor_port) monitor_port->println(F("MOT: Align current sense."));
+  if(DEBUG) chprintf(chp, "MOT: Align current sense.\n\r");
 
   // align current sense and the driver
   exit_flag = current_sense->driverAlign(driver, voltage_sensor_align);
   if(!exit_flag){ 
     // error in current sense - phase either not measured or bad connection
-    if(monitor_port) monitor_port->println(F("MOT: Align error!"));
+    //if(monitor_port) monitor_port->println(F("MOT: Align error!"));
+    if(DEBUG) chprintf(chp, "MOT: Init Align error!\n\r");
     exit_flag = 0;
   }else{
     // output the alignment status flag
-    if(monitor_port) monitor_port->print(F("MOT: Success: "));
-    if(monitor_port) monitor_port->println(exit_flag);
+    //if(monitor_port) monitor_port->print(F("MOT: Success: "));
+    //if(monitor_port) monitor_port->println(exit_flag);
+    if(DEBUG) chprintf(chp, "MOT: Success.\n\r");
+    if(DEBUG) chprintf(chp, "%d\n\r", exit_flag);
   }
 
   return exit_flag > 0;
@@ -142,7 +158,8 @@ int BLDCMotor::alignCurrentSense() {
 // Encoder alignment to electrical 0 angle
 int BLDCMotor::alignSensor() {
   int exit_flag = 1; //success
-  if(monitor_port) monitor_port->println(F("MOT: Align sensor."));
+  //if(monitor_port) monitor_port->println(F("MOT: Align sensor."));
+  if(DEBUG) chprintf(chp, "MOT: Align Sensor.\n\r");
   
   // if unknown natural direction
   if(!_isset(sensor_direction)){
@@ -171,24 +188,32 @@ int BLDCMotor::alignSensor() {
     _delay(200);
     // determine the direction the sensor moved 
     if (mid_angle == end_angle) {
-      if(monitor_port) monitor_port->println(F("MOT: Failed to notice movement"));
+      //if(monitor_port) monitor_port->println(F("MOT: Failed to notice movement"));
+      if(DEBUG) chprintf(chp, "MOT: Failed to notice movement.\n\r");
       return 0; // failed calibration
     } else if (mid_angle < end_angle) {
-      if(monitor_port) monitor_port->println(F("MOT: sensor_direction==CCW"));
+      //if(monitor_port) monitor_port->println(F("MOT: sensor_direction==CCW"));
+      if(DEBUG) chprintf(chp, "MOT: sensor_direction==CCW.\n\r");
       sensor_direction = Direction::CCW;
     } else{
-      if(monitor_port) monitor_port->println(F("MOT: sensor_direction==CW"));
+      //if(monitor_port) monitor_port->println(F("MOT: sensor_direction==CW"));
+      if(DEBUG) chprintf(chp, "MOT: sensor_direction==CW.\n\r");
       sensor_direction = Direction::CW;
     }
     // check pole pair number 
-    if(monitor_port) monitor_port->print(F("MOT: PP check: "));
+    //if(monitor_port) monitor_port->print(F("MOT: PP check: "));
+    if(DEBUG) chprintf(chp, "MOT: PP check: ");
     float moved =  fabs(mid_angle - end_angle);
     if( fabs(moved*pole_pairs - _2PI) > 0.5 ) { // 0.5 is arbitrary number it can be lower or higher!
-      if(monitor_port) monitor_port->print(F("fail - estimated pp:"));
-      if(monitor_port) monitor_port->println(_2PI/moved,4);
-    }else if(monitor_port) monitor_port->println(F("OK!"));
+      //if(monitor_port) monitor_port->print(F("fail - estimated pp:"));
+      //if(monitor_port) monitor_port->println(_2PI/moved,4);
+      if(DEBUG) chprintf(chp, "fail - estimated pp: %f\n\r", _2PI/moved);
+      /// TODO: Figure out if ",4" is typo above ^^^
+    //}else if(monitor_port) monitor_port->println(F("OK!"));
+    }else if(DEBUG) chprintf(chp, "OK!\n\r");
 
-  }else if(monitor_port) monitor_port->println(F("MOT: Skip dir calib."));
+  //}else if(monitor_port) monitor_port->println(F("MOT: Skip dir calib."));
+  }else if(DEBUG) chprintf(chp, "MOT: Skip dir calib.\n\r");
 
   // zero electric angle not known
   if(!_isset(zero_electric_angle)){
@@ -198,14 +223,18 @@ int BLDCMotor::alignSensor() {
     _delay(700);
     zero_electric_angle = _normalizeAngle(_electricalAngle(sensor_direction*sensor->getAngle(), pole_pairs));
     _delay(20);
+    /*
     if(monitor_port){
       monitor_port->print(F("MOT: Zero elec. angle: "));
       monitor_port->println(zero_electric_angle);
-    }
+    }//*/
+    if(DEBUG) chprintf(chp, "MOT: Zero elec. angle: %f\n\r", zero_electric_angle);
+
     // stop everything
     setPhaseVoltage(0, 0, 0);
     _delay(200);
-  }else if(monitor_port) monitor_port->println(F("MOT: Skip offset calib."));
+  //}else if(monitor_port) monitor_port->println(F("MOT: Skip offset calib."));
+  }else if(DEBUG) chprintf(chp, "MOT: Skip offset calib.\n\r");
   return exit_flag;
 }
 
@@ -213,7 +242,8 @@ int BLDCMotor::alignSensor() {
 // - to the index
 int BLDCMotor::absoluteZeroSearch() {
   
-  if(monitor_port) monitor_port->println(F("MOT: Index search..."));
+  //if(monitor_port) monitor_port->println(F("MOT: Index search..."));
+  if(DEBUG) chprintf(chp, "MOT: Index search...\n\r");
   // search the absolute zero with small velocity
   float limit_vel = velocity_limit;
   float limit_volt = voltage_limit;
@@ -232,9 +262,15 @@ int BLDCMotor::absoluteZeroSearch() {
   velocity_limit = limit_vel;
   voltage_limit = limit_volt;
   // check if the zero found
+
+  /*
   if(monitor_port){
     if(sensor->needsSearch()) monitor_port->println(F("MOT: Error: Not found!"));
     else monitor_port->println(F("MOT: Success!"));
+  }//*/
+  if(DEBUG) {
+    if(sensor->needsSearch()) chprintf(chp, "MOT: Error: Not found!\n\r");
+    else chprintf(chp, "MOT: Success!\n\r");
   }
   return !sensor->needsSearch();
 }
@@ -279,7 +315,8 @@ void BLDCMotor::loopFOC() {
       break;
     default:
       // no torque control selected
-      if(monitor_port) monitor_port->println(F("MOT: no torque control selected!"));
+      //if(monitor_port) monitor_port->println(F("MOT: no torque control selected!"));
+      if(DEBUG) chprintf(chp, "MOT: No torque control selected!\n\r");
       break;
   }
   
