@@ -330,16 +330,6 @@ void cmd_time(BaseSequentialStream *chp, int argc, char *argv[])
         rtcGetTime(&RTCD1, &timespec);
         chprintf(chp, "Year: %u Month: %u DST: %u DoW: %u Day: %u ms: %u\r\n",
                       timespec.year, timespec.month, timespec.dstflag, timespec.dayofweek, timespec.day, timespec.millisecond);
-    } else if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "Date:    %08X\r\n"
-                      "Time:    %08X\r\n"
-                      "Wakeup:  %08X (%s)\r\n"
-                      "Alarm A: %08X (%s)\r\n"
-                      "Alarm B: %08X (%s)\r\n",
-                      RTCD1.rtc->DR, RTCD1.rtc->TR,
-                      RTCD1.rtc->WUTR, (RTCD1.rtc->CR & RTC_CR_WUTE ? "ENABLED" : "DISABLED"),
-                      RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
-                      RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else {
         goto time_usage;
     }
@@ -513,6 +503,16 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "TX Enable: %s\r\n", (OD_TX_Control.enabled ? "TRUE" : "FALSE"));
         chprintf(chp, "Bat Good:  %s\r\n", (bat_good ? "TRUE" : "FALSE"));
         chprintf(chp, "EDL Mode:  %s\r\n", (edl ? "TRUE" : "FALSE"));
+        chprintf(chp, "===RTC===\r\n"
+                      "Date:      %08X\r\n"
+                      "Time:      %08X\r\n"
+                      "Wakeup:    %08X (%s)\r\n"
+                      "Alarm A:   %08X (%s)\r\n"
+                      "Alarm B:   %08X (%s)\r\n",
+                      RTCD1.rtc->DR, RTCD1.rtc->TR,
+                      RTCD1.rtc->WUTR, (RTCD1.rtc->CR & RTC_CR_WUTE ? "ENABLED" : "DISABLED"),
+                      RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
+                      RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else if (!strcmp(argv[0], "tx") && argc > 1) {
         OD_TX_Control.enabled = (argv[1][0] == 't');
         chEvtSignal(c3_tp, C3_EVENT_TX);
@@ -525,6 +525,7 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "reset")) {
         NVIC_SystemReset();
     } else if (!strcmp(argv[0], "factoryreset")) {
+        chprintf(chp, "Initiating factory reset...");
         factory_reset();
     } else {
         goto state_usage;

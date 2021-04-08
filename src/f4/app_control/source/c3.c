@@ -123,7 +123,7 @@ THD_FUNCTION(c3, arg)
             break;
         case DEPLOY:
             /* Set RTC wakeup alarm for state saving */
-            rtc_state.wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | OD_stateControl.saveInterval;
+            rtc_state.wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | (OD_stateControl.saveInterval - 1);
             rtcSTM32SetPeriodicWakeup(&RTCD1, &rtc_state.wakeup);
 
             /* Initiate antenna deployment if needed */
