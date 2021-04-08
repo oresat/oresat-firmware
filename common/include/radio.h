@@ -11,7 +11,7 @@
 
 #include "ax5043.h"
 #include "si41xx.h"
-#include "pdu.h"
+#include "frame_buf.h"
 
 /*===========================================================================*/
 /* Constants.                                                                */
@@ -21,18 +21,9 @@
 /* Pre-compile time settings.                                                */
 /*===========================================================================*/
 
-/**
- * @name    Configuration options
- * @{
- */
-/**
- * @brief   Enable SDLS for USLP
- */
-#if !defined(USLP_USE_SDLS) || defined(__DOXYGEN__)
-#define USLP_USE_SDLS                       TRUE
+#if !defined(RADIO_FB_COUNT) || defined(__DOXYGEN__)
+#define RADIO_FB_COUNT                      8U
 #endif
-
-/** @} */
 
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
@@ -55,9 +46,10 @@ typedef struct {
 } radio_dev_t;
 
 typedef struct {
+    AX5043Driver            *devp;
     const ax5043_profile_t  *profile;
     const char              *name;
-} radio_profile_t;
+} radio_cfg_t;
 
 /*===========================================================================*/
 /* Macros.                                                                   */
@@ -70,6 +62,14 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern synth_dev_t synth_devices[];
+extern radio_dev_t radio_devices[];
+extern radio_cfg_t radio_cfgs[];
+
+void radio_init(void);
+void radio_start(void);
+void radio_stop(void);
 
 #ifdef __cplusplus
 }

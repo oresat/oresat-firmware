@@ -1,8 +1,6 @@
 #ifndef _COMMS_H_
 #define _COMMS_H_
 
-#include "radio.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
