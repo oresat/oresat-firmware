@@ -40,8 +40,8 @@ fb_t *fb_alloc(size_t len)
     }
 
     fb_t *fb = __fb_alloc();
-    *fb = empty_frame;
     if (fb != NULL) {
+        *fb = empty_frame;
         fb->max_len = FB_MAX_LEN;
         fb->head = fb->buf;
         fb->data = fb->head;

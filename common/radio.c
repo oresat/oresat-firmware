@@ -34,7 +34,7 @@ static fb_t fb_fifo_buf[RADIO_FB_COUNT];
 /*===========================================================================*/
 
 fb_t *__fb_alloc(void) {
-    return chFifoTakeObjectTimeout(&fb_fifo, TIME_IMMEDIATE);
+    return chFifoTakeObjectTimeout(&fb_fifo, TIME_INFINITE);
 }
 
 void __fb_free(fb_t *fb) {

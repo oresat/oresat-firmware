@@ -223,10 +223,10 @@ THD_FUNCTION(rx_worker, arg) {
                 /* Start of new packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
                     /* Acquire frame buffer object if needed */
-                    if (fb == NULL) {
+                    while (fb == NULL) {
                         fb = fb_alloc(FB_MAX_LEN);
-                        fb->phy_rx = devp;
                     }
+                    fb->phy_rx = devp;
                 }
 
                 osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");

@@ -155,7 +155,7 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void ax25_sdu(fb_t *fb, const void *arg);
+void *ax25_sdu(fb_t *fb, const void *arg);
 
 #ifdef __cplusplus
 }
