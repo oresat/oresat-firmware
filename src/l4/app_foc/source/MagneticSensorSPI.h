@@ -1,6 +1,7 @@
 #ifndef MAGNETICSENSORSPI_LIB_H
 #define MAGNETICSENSORSPI_LIB_H
 
+/*
 #include <cstdlib>
 #include <stdio.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
+//*/
 
 
 //#include "Arduino.h"
@@ -15,6 +17,10 @@
 #include "common/base_classes/Sensor.h"
 #include "common/foc_utils.h"
 //#include "common/time_utils.h"
+//*/
+
+#include "app_foc.h"
+
 
 #define DEF_ANGLE_REGISTER 0x3FFF
 

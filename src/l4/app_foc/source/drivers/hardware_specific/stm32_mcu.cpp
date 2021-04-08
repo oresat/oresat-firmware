@@ -1,6 +1,8 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "../BLDCDriver6PWM.h"
+
 #include "../hardware_api.h"
 
 //#if defined(_STM32_DEF_)
@@ -31,10 +33,11 @@ void _setPwm(int ulPin, uint32_t value, int resolution)
 }
 
 
+  /*********** ARDUINO
+
 // init pin pwm 
 HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin)
 {
-  /* ARDUINO
   PinName pin = digitalPinToPinName(ulPin);
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
   
@@ -51,7 +54,7 @@ HardwareTimer* _initPinPWM(uint32_t PWM_freq, int ulPin)
   HT->pause();
   HT->refresh();
   return HT;
-  //*/
+  
 }
 
 
@@ -64,7 +67,6 @@ HardwareTimer* _initPinPWMHigh(uint32_t PWM_freq, int ulPin)
 // init low side pin
 HardwareTimer* _initPinPWMLow(uint32_t PWM_freq, int ulPin)
 {
-  /* ARDUINO
   PinName pin = digitalPinToPinName(ulPin);
   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(pin, PinMap_PWM);
   uint32_t index = get_timer_index(Instance);
@@ -91,14 +93,14 @@ HardwareTimer* _initPinPWMLow(uint32_t PWM_freq, int ulPin)
   HT->pause();
   HT->refresh();
   return HT;
-  //*/
+  
 }
+
 
 
 // align the timers to end the init
 void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3)
 {
-  /* ARDUINO
   HT1->pause();
   HT1->refresh();
   HT2->pause();
@@ -108,13 +110,11 @@ void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3)
   HT1->resume();
   HT2->resume();
   HT3->resume();
-  //*/
 }
 
 // align the timers to end the init
 void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3,HardwareTimer *HT4)
 {
-  /* ARDUINO
   HT1->pause();
   HT1->refresh();
   HT2->pause();
@@ -127,13 +127,12 @@ void _alignPWMTimers(HardwareTimer *HT1,HardwareTimer *HT2,HardwareTimer *HT3,Ha
   HT2->resume();
   HT3->resume();
   HT4->resume();
-  //*/
 }
+
 
 // configure hardware 6pwm interface only one timer with inverted channels
 HardwareTimer* _initHardware6PWMInterface(uint32_t PWM_freq, float dead_zone, int pinA_h, int pinA_l, int pinB_h, int pinB_l, int pinC_h, int pinC_l)
 {
-  /* ARDUINO
   PinName uhPinName = digitalPinToPinName(pinA_h);
   PinName ulPinName = digitalPinToPinName(pinA_l);
   PinName vhPinName = digitalPinToPinName(pinB_h);
@@ -170,8 +169,9 @@ HardwareTimer* _initHardware6PWMInterface(uint32_t PWM_freq, float dead_zone, in
   HT->refresh();
   HT->resume();  
   return HT;
-  //*/
 }
+//*/
+
 
 /// NOTE: For app_foc, assume using hardware timer
 // returns 0 if each pair of pwm channels has same channel
@@ -188,9 +188,14 @@ int _interfaceType(const int pinA_h, const int pinA_l,  const int pinB_h, const 
 // - hardware specific
 int _configure6PWM(long pwm_frequency, float dead_zone, const int pinA_h, const int pinA_l,  const int pinB_h, const int pinB_l, const int pinC_h, const int pinC_l){
     
+  
   // ChibiOS
   // start timer 1
-  pwmStart(&PWMD1,&pwmRWcfg);
+  //pwmStart(&PWMD1,&pwmRWcfg);
+  
+  
+  
+  
   //pwmEnablePeriodicNotification(&PWMD1);  //TODO: what does this do?
 
   

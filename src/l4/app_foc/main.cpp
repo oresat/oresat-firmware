@@ -37,7 +37,7 @@ static SerialConfig serial_conf ={
    To use the serial driver in chprintf we need to cast it and we are using
    this variable to perform a cast only once. 
    from https://www.playembedded.org/blog/vcp-stm32-chibios/ */
-extern static BaseSequentialStream* chp = (BaseSequentialStream*) &LPSD1;
+//extern static BaseSequentialStream* chp = (BaseSequentialStream*) &LPSD1;
 
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {

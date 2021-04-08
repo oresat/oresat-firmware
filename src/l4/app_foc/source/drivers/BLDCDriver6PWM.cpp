@@ -17,9 +17,12 @@
  *
  */
 static PWMConfig pwmRWcfg = {
-  PWM_TIMER_FREQ,	
-  PWM_PERIOD,	
-  pwmpcb,
+  //(uint32_t)PWM_TIMER_FREQ,	
+  //(pwmcnt_t)PWM_PERIOD,
+  10000,                      // TODO change these values
+  10000,
+  //pwmpcb,
+  NULL,
   {
    {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
    {PWM_OUTPUT_ACTIVE_HIGH|PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, NULL},
@@ -27,7 +30,7 @@ static PWMConfig pwmRWcfg = {
    {PWM_OUTPUT_DISABLED, NULL}
   },
   0,
-	0,
+	//0,  // fixing "error: too many initializers for "
   0
 };
 

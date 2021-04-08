@@ -53,13 +53,16 @@ void BLDCMotor::init() {
   }
   P_angle.limit = velocity_limit;
 
-  _delay(500);
+  //_delay(500);
+  chThdSleepMilliseconds(500);
+
   // enable motor
 
   if(DEBUG) chprintf(chp, "MOT: Enable driver.\n\r");
   //if(monitor_port) monitor_port->println(F("MOT: Enable driver."));
   enable();
-  _delay(500);
+  //_delay(500);
+  chThdSleepMilliseconds(500);
 }
 
 
@@ -101,7 +104,8 @@ int  BLDCMotor::initFOC( float zero_electric_offset, Direction _sensor_direction
 
   // sensor and motor alignment - can be skipped
   // by setting motor.sensor_direction and motor.zero_electric_angle
-  _delay(500);
+  //_delay(500);
+  chThdSleepMilliseconds(500);
   if(sensor) exit_flag *= alignSensor();
   else if(DEBUG) chprintf(chp, "MOT: No sensor\n\r");
   //else if(monitor_port) monitor_port->println(F("MOT: No sensor."));
@@ -109,7 +113,8 @@ int  BLDCMotor::initFOC( float zero_electric_offset, Direction _sensor_direction
   // aligning the current sensor - can be skipped
   // checks if driver phases are the same as current sense phases
   // and checks the direction of measuremnt. 
-  _delay(500);
+  //_delay(500);
+  chThdSleepMilliseconds(500);
   if(exit_flag){ 
     if(current_sense) exit_flag *= alignCurrentSense();
     //else if(monitor_port) monitor_port->println(F("MOT: No current sense."));
@@ -173,7 +178,8 @@ int BLDCMotor::alignSensor() {
     for (int i = 0; i <=500; i++ ) {
       float angle = _3PI_2 + _2PI * i / 500.0;
       setPhaseVoltage(voltage_sensor_align, 0,  angle);
-      _delay(2);
+      //_delay(2);
+      chThdSleepMilliseconds(2); /// TODO: Determine if this is necessary
     }
     // take and angle in the middle
     float mid_angle = sensor->getAngle();
@@ -181,11 +187,13 @@ int BLDCMotor::alignSensor() {
     for (int i = 500; i >=0; i-- ) {
       float angle = _3PI_2 + _2PI * i / 500.0 ;
       setPhaseVoltage(voltage_sensor_align, 0,  angle);
-      _delay(2);
+      //_delay(2);
+      chThdSleepMilliseconds(2); /// TODO
     }
     float end_angle = sensor->getAngle();
     setPhaseVoltage(0, 0, 0);
-    _delay(200);
+    //_delay(200);
+    chThdSleepMilliseconds(200);
     // determine the direction the sensor moved 
     if (mid_angle == end_angle) {
       //if(monitor_port) monitor_port->println(F("MOT: Failed to notice movement"));
@@ -220,9 +228,11 @@ int BLDCMotor::alignSensor() {
     // align the electrical phases of the motor and sensor
     // set angle -90(270 = 3PI/2) degrees 
     setPhaseVoltage(voltage_sensor_align, 0,  _3PI_2);
-    _delay(700);
+    //_delay(700);
+    chThdSleepMilliseconds(700);
     zero_electric_angle = _normalizeAngle(_electricalAngle(sensor_direction*sensor->getAngle(), pole_pairs));
-    _delay(20);
+    //_delay(20);
+    chThdSleepMilliseconds(20);
     /*
     if(monitor_port){
       monitor_port->print(F("MOT: Zero elec. angle: "));
@@ -232,7 +242,8 @@ int BLDCMotor::alignSensor() {
 
     // stop everything
     setPhaseVoltage(0, 0, 0);
-    _delay(200);
+    //_delay(200);
+    chThdSleepMilliseconds(200);
   //}else if(monitor_port) monitor_port->println(F("MOT: Skip offset calib."));
   }else if(DEBUG) chprintf(chp, "MOT: Skip offset calib.\n\r");
   return exit_flag;
@@ -489,7 +500,7 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
       Uc = -0.5 * Ualpha - _SQRT3_2 * Ubeta + center;
 
       if (!modulation_centered) {
-        float Umin = min(Ua, min(Ub, Uc));
+        float Umin = std::min(Ua, std::min(Ub, Uc));
         Ua -= Umin;
         Ub -= Umin;
         Uc -= Umin;
@@ -595,7 +606,8 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
 // it uses voltage_limit variable
 float BLDCMotor::velocityOpenloop(float target_velocity){
   // get current timestamp
-  unsigned long now_us = _micros();
+  //unsigned long now_us = _micros(); // ARDUINO
+  unsigned long now_us = time_usecs_t();
   // calculate the sample time from last call
   float Ts = (now_us - open_loop_timestamp) * 1e-6;
   // quick fix for strange cases (micros overflow + timestamp not defined)
@@ -624,7 +636,8 @@ float BLDCMotor::velocityOpenloop(float target_velocity){
 // it uses voltage_limit and velocity_limit variables
 float BLDCMotor::angleOpenloop(float target_angle){
   // get current timestamp
-  unsigned long now_us = _micros();
+  //unsigned long now_us = _micros(); // ARDUINO
+  unsigned long now_us = time_usecs_t();
   // calculate the sample time from last call
   float Ts = (now_us - open_loop_timestamp) * 1e-6;
   // quick fix for strange cases (micros overflow + timestamp not defined)
