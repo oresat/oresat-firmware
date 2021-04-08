@@ -35,9 +35,9 @@
 void ax25_sdu(fb_t *fb, const void *arg)
 {
     const ax25_link_t *link = arg;
-    ax25_frame_t *mac_hdr;
+    ax25_hdr_t *mac_hdr;
 
-    mac_hdr = fb->mac_hdr = fb_push(fb, sizeof(ax25_frame_t));
+    mac_hdr = fb->mac_hdr = fb_push(fb, sizeof(ax25_hdr_t));
     if (mac_hdr == NULL) {
         return;
     }

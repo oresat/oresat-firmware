@@ -465,7 +465,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Register interrupt handler for device and start worker */
     if (devp->irq_worker == NULL) {
-        devp->irq_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
+        devp->irq_worker = chThdCreateFromHeap(NULL, 0x40, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
         palSetLineCallback(config->irq, ax5043IRQHandler, devp);
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
@@ -493,7 +493,17 @@ void ax5043Stop(AX5043Driver *devp) {
             "ax5043Stop(), invalid state");
 
     if (devp->state != AX5043_STOP) {
+        /* Power down device */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+
+        /* Disable the interrupt handler and worker thread */
+        palDisableLineEvent(devp->config->irq);
+        palSetLineCallback(devp->config->irq, NULL, NULL);
+        chThdTerminate(devp->irq_worker);
+        chEvtSignal(devp->irq_worker, AX5043_EVENT_TERMINATE);
+        chThdWait(devp->irq_worker);
+        devp->irq_worker = NULL;
+
 #if AX5043_USE_SPI
 #if AX5043_SHARED_SPI
         spiAcquireBus(devp->config->spip);
@@ -507,14 +517,6 @@ void ax5043Stop(AX5043Driver *devp) {
         spiReleaseBus(devp->config->spip);
 #endif /* AX5043_SHARED_SPI */
 #endif /* AX5043_USE_SPI */
-
-        /* Disable the interrupt handler and worker thread */
-        palDisableLineEvent(devp->config->irq);
-        palSetLineCallback(devp->config->irq, NULL, NULL);
-        chThdTerminate(devp->irq_worker);
-        chEvtSignal(devp->irq_worker, AX5043_EVENT_TERMINATE);
-        chThdWait(devp->irq_worker);
-        devp->irq_worker = NULL;
     }
 
     /* Transition to stop state */
@@ -627,7 +629,8 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
  *
  * @api
  */
-void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+    const ax5043_profile_t *prev_profile;
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -646,6 +649,12 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     prev_state = devp->state;
     prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
     ax5043Idle(devp);
+
+    /* Set TX profile */
+    if (profile != NULL) {
+        prev_profile = ax5043GetProfile(devp);
+        ax5043SetProfile(devp, profile);
+    }
 
     /* Set Frequency Selection */
     uint32_t freq;
@@ -747,6 +756,9 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     /* Return to original state */
+    if (profile != NULL) {
+        ax5043SetProfile(devp, prev_profile);
+    }
     switch (prev_state) {
     case AX5043_RX:
         ax5043RX(devp, prev_chan, false);
@@ -774,7 +786,8 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
  *
  * @api
  */
-void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TXRaw(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+    const ax5043_profile_t *prev_profile;
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -793,6 +806,12 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     prev_state = devp->state;
     prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
     ax5043Idle(devp);
+
+    /* Set TX profile */
+    if (profile != NULL) {
+        prev_profile = ax5043GetProfile(devp);
+        ax5043SetProfile(devp, profile);
+    }
 
     /* Set Frequency Selection */
     uint32_t freq;
@@ -858,6 +877,9 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     /* Return to original state */
+    if (profile != NULL) {
+        ax5043SetProfile(devp, prev_profile);
+    }
     switch (prev_state) {
     case AX5043_RX:
         ax5043RX(devp, prev_chan, false);

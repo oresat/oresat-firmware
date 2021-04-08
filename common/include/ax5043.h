@@ -2882,8 +2882,8 @@ void ax5043Stop(AX5043Driver *devp);
 
 void ax5043Idle(AX5043Driver *devp);
 void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor);
-void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
-void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TXRaw(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 const ax5043_profile_t *ax5043GetProfile(AX5043Driver *devp);

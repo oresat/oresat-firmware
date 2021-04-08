@@ -46,9 +46,10 @@ typedef struct {
 } radio_dev_t;
 
 typedef struct {
+    AX5043Driver            *devp;
     const ax5043_profile_t  *profile;
     const char              *name;
-} radio_profile_t;
+} radio_cfg_t;
 
 /*===========================================================================*/
 /* Macros.                                                                   */
@@ -64,7 +65,7 @@ extern "C" {
 
 extern synth_dev_t synth_devices[];
 extern radio_dev_t radio_devices[];
-extern radio_profile_t radio_profiles[];
+extern radio_cfg_t radio_cfgs[];
 
 void radio_init(void);
 void radio_start(void);

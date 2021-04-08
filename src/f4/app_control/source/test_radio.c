@@ -139,25 +139,25 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         if (argc > 1) {
             uint32_t i, index;
             /* Find max index */
-            for (i = 0; radio_profiles[i].profile != NULL; i++);
+            for (i = 0; radio_cfgs[i].profile != NULL; i++);
             index = strtoul(argv[1], NULL, 0);
             if (index >= i) {
                 chprintf(chp, "ERROR: Invalid profile\r\n");
                 goto radio_usage;
             }
-            ax5043SetProfile(devp, radio_profiles[index].profile);
+            ax5043SetProfile(devp, radio_cfgs[index].profile);
             return;
         } else {
             const ax5043_profile_t *profile;
             profile = ax5043GetProfile(devp);
-            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
-                if (radio_profiles[i].profile == profile) {
-                    chprintf(chp, "Current profile is %s\r\n", radio_profiles[i].name);
+            for (uint32_t i = 0; radio_cfgs[i].profile != NULL; i++) {
+                if (radio_cfgs[i].profile == profile) {
+                    chprintf(chp, "Current profile is %s\r\n", radio_cfgs[i].name);
                 }
             }
             chprintf(chp, "Available profiles:\r\n");
-            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
-                chprintf(chp, "%u:\t%s\r\n", i, radio_profiles[i].name);
+            for (uint32_t i = 0; radio_cfgs[i].profile != NULL; i++) {
+                chprintf(chp, "%u:\t%s\r\n", i, radio_cfgs[i].name);
             }
             chprintf(chp, "\r\n");
             return;
@@ -402,6 +402,7 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
 
     palClearLine(LINE_LNA_ENABLE);
     palSetLine(LINE_PA_ENABLE);
+    /* TODO: Don't use use index to find device */
     ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, 0);
     ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 1);
 
@@ -411,7 +412,7 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
         if (cnt == 0)  cnt = 1;
         ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, txpwr);
         adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
-        ax5043TXRaw(radio_devices[1].devp, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
+        ax5043TXRaw(radio_devices[1].devp, NULL, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
         adcStopConversion(&ADCD1);
     } else {
         ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);

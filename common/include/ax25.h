@@ -93,6 +93,15 @@
 #define AX25_PID_NONE                       (0xF0U)
 /** @} */
 
+/**
+ * @name    AX.25 Maximum values size
+ * @{
+ */
+#define AX25_MAX_PAYLOAD_LEN                (256U)
+#define AX25_MAX_HDR_LEN                    (sizeof(ax25_hdr_t))
+#define AX25_MAX_FRAME_LEN                  (AX25_MAX_PAYLOAD_LEN + AX25_MAX_HDR_LEN)
+/** @} */
+
 /** @} */
 
 /*===========================================================================*/
@@ -132,7 +141,7 @@ typedef struct __attribute__((packed)) {
     uint8_t         src_ssid;
     uint8_t         control;
     uint8_t         sid;
-} ax25_frame_t;
+} ax25_hdr_t;
 /** @} */
 
 /*===========================================================================*/

@@ -2,9 +2,10 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rtc.h"
 #include "comms.h"
-#include "ax25.h"
+#include "radio.h"
+#include "beacon.h"
+#include "rtc.h"
 #include "uslp.h"
 #include "CANopen.h"
 
@@ -35,7 +36,60 @@ static const SPIConfig uhf_spicfg = {
     0,
 };
 
-static const ax5043_profile_t lband_eng[] = {
+static const ax5043_profile_t lband_high[] = {
+    /* Modulation and Framing */
+    {AX5043_REG_MODULATION, AX5043_MODULATION_MSK, 1},
+    {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM, 1},
+    {AX5043_REG_FRAMING, _VAL2FLD(AX5043_FRAMING_FRMMODE, AX5043_FRMMODE_HDLC) |
+                         _VAL2FLD(AX5043_FRAMING_CRCMODE, AX5043_CRCMODE_CCITT), 1},
+    /* Pin Configuration */
+    {AX5043_REG_PINFUNCSYSCLK, AX5043_PFSYSCLK_OUT_XTAL_DIV1, 1},
+    /* Synthesizer */
+    {AX5043_REG_FREQA, 0x1C900001, 4},
+    /* PHY Layer Parameters */
+    /* Receiver Parameters */
+    {AX5043_REG_IFFREQ, 0x170A, 2},
+    {AX5043_REG_DECIMATION, 0x01, 1},
+    {AX5043_REG_RXDATARATE, 0x0042AB, 3},
+    {AX5043_REG_MAXRFOFFSET, 0x0019E8 | AX5043_MAXRFOFFSET_FREQOFFSCORR, 3},
+    /* Receiver Parameter Set 0 */
+    /* TODO */
+    /* Receiver Parameter Set 1 */
+    /* TODO */
+    /* Receiver Parameter Set 2 */
+    /* TODO */
+    /* Receiver Parameter Set 3 */
+    /* TODO */
+    /* MAC Layer Parameters */
+    /* Packet Format */
+    {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
+    {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    /* Pattern Match */
+    /* Packet Controller */
+    {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
+    {AX5043_REG_PKTACCEPTFLAGS, AX5043_PKTACCEPTFLAGS_LRGP, 1},
+    /* Performance Tuning Registers */
+    {AX5043_REG_0xF00, AX5043_0xF00_DEFVAL, 1},
+    {AX5043_REG_0xF0C, AX5043_0xF0C_DEFVAL, 1},
+    {AX5043_REG_0xF0D, AX5043_0xF0D_DEFVAL, 1},
+    {AX5043_REG_0xF10, AX5043_0xF10_TCXO, 1},
+    {AX5043_REG_0xF11, AX5043_0xF11_TCXO, 1},
+    {AX5043_REG_0xF1C, AX5043_0xF1C_DEFVAL, 1},
+    {AX5043_REG_0xF21, AX5043_0xF21_DEFVAL, 1},
+    {AX5043_REG_0xF22, AX5043_0xF22_DEFVAL, 1},
+    {AX5043_REG_0xF23, AX5043_0xF23_DEFVAL, 1},
+    {AX5043_REG_0xF26, AX5043_0xF26_DEFVAL, 1},
+    {AX5043_REG_0xF30, AX5043_0xF30_DEFVAL, 1},
+    {AX5043_REG_0xF31, AX5043_0xF31_DEFVAL, 1},
+    {AX5043_REG_0xF32, AX5043_0xF32_DEFVAL, 1},
+    {AX5043_REG_0xF33, AX5043_0xF33_DEFVAL, 1},
+    {AX5043_REG_0xF35, AX5043_0xF35_XTALDIV1, 1},
+    {AX5043_REG_0xF44, AX5043_0xF44_DEFVAL, 1},
+    {AX5043_REG_0xF72, AX5043_0xF72_NORAWSOFTBITS, 1},
+    {0, 0, 0}
+};
+
+static const ax5043_profile_t lband_low[] = {
     /* Modulation and Framing */
     {AX5043_REG_MODULATION, AX5043_MODULATION_MSK, 1},
     {AX5043_REG_ENCODING, AX5043_ENCODING_NRZI_SCRAM, 1},
@@ -225,7 +279,7 @@ static const AX5043Config lbandcfg = {
     .miso           = LINE_SPI1_MISO,
     .irq            = LINE_LBAND_IRQ,
     .xtal_freq      = XTAL_CLK,
-    .profile        = lband_eng,
+    .profile        = lband_high,
 };
 
 static const AX5043Config uhfcfg = {
@@ -254,15 +308,6 @@ static SI41XXConfig synthcfg = {
 static AX5043Driver lband;
 static AX5043Driver uhf;
 static SI41XXDriver synth;
-
-static const ax25_link_t ax25 = {
-    .dest = "SPACE ",
-    .dest_ssid = 0,
-    .src = "KJ7SAT",
-    .src_ssid = 0,
-    .control = AX25_CTRL_UFRAME | _VAL2FLD(AX25_CTRL_U_FLD, AX25_UFRAME_UI),
-    .sid = AX25_PID_NONE,
-};
 
 static const uslp_pkt_t spp = {
     .pvn            = PVN_SPACE,
@@ -305,6 +350,30 @@ static const uslp_pc_t lband_pc = {
     .fecf_len       = 2,
 };
 
+static const radio_cfg_t lband_high_cfg = {
+    .devp = &lband,
+    .profile = lband_high,
+    .name = "L-Band High Data Rate Engineering",
+};
+
+static const radio_cfg_t lband_low_cfg = {
+    .devp = &lband,
+    .profile = lband_low,
+    .name = "L-Band Low Data Rate Engineering",
+};
+
+static const radio_cfg_t uhf_eng_cfg = {
+    .devp = &uhf,
+    .profile = uhf_eng,
+    .name = "UHF Engineering",
+};
+
+static const radio_cfg_t uhf_ax25_cfg = {
+    .devp = &uhf,
+    .profile = uhf_ax25,
+    .name = "UHF AX.25",
+};
+
 synth_dev_t synth_devices[] = {
     {&synth, &synthcfg, "LO"},
     {NULL, NULL, ""},
@@ -316,54 +385,31 @@ radio_dev_t radio_devices[] = {
     {NULL, NULL, ""},
 };
 
-radio_profile_t radio_profiles[] = {
-    {lband_eng, "L-Band Engineering"},
-    {uhf_eng, "UHF Engineering"},
-    {uhf_ax25, "UHF AX.25"},
-    {NULL, ""},
+radio_cfg_t radio_cfgs[] = {
+    lband_high_cfg,
+    lband_low_cfg,
+    uhf_eng_cfg,
+    uhf_ax25_cfg,
+    {NULL, NULL, ""},
 };
 
 static thread_t *edl_tp[EDL_WORKERS] = {NULL};
 static thread_t *beacon_tp = NULL;
 
-THD_WORKING_AREA(radio_beacon_wa, 0x800);
-THD_FUNCTION(radio_beacon, arg) {
-    char *temp_tlm = ":Test beacon from OreSat0";
-    (void)arg;
-
-    while (!chThdShouldTerminateX()) {
-        fb_t *fb = fb_alloc(256);
-
-        fb_reserve(fb, sizeof(ax25_frame_t));
-        fb->data_ptr = fb_put(fb, strlen(temp_tlm));
-        memcpy(fb->data_ptr, temp_tlm, strlen(temp_tlm));
-        ax25_sdu(fb, &ax25);
-
-        /* APRS Beacon */
-        ax5043SetProfile(&uhf, uhf_ax25);
-        ax5043TX(&uhf, fb->data, fb->len, fb->len, NULL, NULL, false);
-        fb_free(fb);
-
-        chThdSleepMilliseconds(OD_TX_Control.beaconInterval);
-    }
-
-    chThdExit(MSG_OK);
-}
-
 THD_FUNCTION(edl_thd, arg)
 {
     (void)arg;
-    fb_t *fb;
+    fb_t *rx_fb;
 
     while (!chThdShouldTerminateX()) {
-        fb = fb_get();
-        if (fb == NULL) {
+        rx_fb = fb_get();
+        if (rx_fb == NULL) {
             continue;
         }
 
         /* TODO: Process received frame */
 
-        fb_free(fb);
+        fb_free(rx_fb);
     }
 
     chThdExit(MSG_OK);
@@ -397,7 +443,7 @@ void comms_stop(void)
 void comms_beacon(bool enable)
 {
     if (enable && beacon_tp == NULL) {
-        beacon_tp = chThdCreateStatic(radio_beacon_wa, sizeof(radio_beacon_wa), NORMALPRIO, radio_beacon, NULL);
+        beacon_tp = chThdCreateFromHeap(NULL, 0x800, "Beacon", NORMALPRIO, beacon, (void*)&uhf_ax25_cfg);
     } else if (!enable && beacon_tp != NULL) {
         chThdTerminate(beacon_tp);
         chThdWait(beacon_tp);
