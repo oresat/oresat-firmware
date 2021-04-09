@@ -91,7 +91,7 @@ void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
             if (od_entry != 0xFFFF) {
                 len = CO_OD_getLength(CO->SDO[0], od_entry, item->subindex);
                 data = CO_OD_getDataPointer(CO->SDO[0], od_entry, item->subindex);
-                if (len == item->len || data != NULL) {
+                if (len == item->len && data != NULL) {
                     memcpy(fb_put(fb, len), data, len);
                 }
             }
