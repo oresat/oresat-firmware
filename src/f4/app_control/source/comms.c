@@ -393,6 +393,9 @@ radio_cfg_t radio_cfgs[] = {
     {NULL, NULL, ""},
 };
 
+const radio_cfg_t *tx_eng = &uhf_eng_cfg;
+const radio_cfg_t *tx_ax25 = &uhf_ax25_cfg;
+
 static thread_t *edl_tp[EDL_WORKERS] = {NULL};
 static thread_t *beacon_tp = NULL;
 

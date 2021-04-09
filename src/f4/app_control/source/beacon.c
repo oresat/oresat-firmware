@@ -1,5 +1,4 @@
 #include "beacon.h"
-#include "radio.h"
 #include "CANopen.h"
 #include "ax25.h"
 #include "rtc.h"
@@ -104,26 +103,31 @@ void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
     return tlm_start;
 }
 
-THD_FUNCTION(beacon, arg) {
-    const radio_cfg_t *cfg = arg;
+void beacon_send(const radio_cfg_t *cfg)
+{
     fb_t *fb = NULL;
+    while (fb == NULL) {
+        fb = fb_alloc(AX25_MAX_FRAME_LEN);
+    }
+
+    uptime = TIME_I2S(chVTGetSystemTime());
+    unix_time = rtcGetTimeUnix(NULL);
+    fb_reserve(fb, AX25_MAX_HDR_LEN);
+    fb->data_ptr = tlm_payload(fb, &aprs0);
+    fb->mac_hdr = ax25_sdu(fb, &ax25);
+
+    /* APRS Beacon */
+    ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
+    fb_free(fb);
+    fb = NULL;
+}
+
+THD_FUNCTION(beacon, arg)
+{
+    const radio_cfg_t *cfg = arg;
 
     while (!chThdShouldTerminateX()) {
-        while (fb == NULL) {
-            fb = fb_alloc(AX25_MAX_FRAME_LEN);
-        }
-
-        uptime = TIME_I2S(chVTGetSystemTime());
-        unix_time = rtcGetTimeUnix(NULL);
-        fb_reserve(fb, AX25_MAX_HDR_LEN);
-        fb->data_ptr = tlm_payload(fb, &aprs0);
-        fb->mac_hdr = ax25_sdu(fb, &ax25);
-
-        /* APRS Beacon */
-        ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
-        fb_free(fb);
-        fb = NULL;
-
+        beacon_send(cfg);
         chThdSleepMilliseconds(OD_TX_Control.beaconInterval);
     }
 

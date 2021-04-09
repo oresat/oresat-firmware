@@ -3,6 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "radio.h"
 
 typedef enum {
     TLM_MSG,
@@ -34,6 +35,7 @@ typedef struct tlm_pkt {
 extern "C" {
 #endif
 
+void beacon_send(const radio_cfg_t *cfg);
 THD_FUNCTION(beacon, arg);
 
 #ifdef __cplusplus

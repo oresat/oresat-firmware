@@ -2,6 +2,7 @@
 #include <string.h>
 #include "test_radio.h"
 #include "radio.h"
+#include "beacon.h"
 #include "chprintf.h"
 
 #define PA_SAMPLES 8
@@ -56,6 +57,9 @@ static const ADCConversionGroup pa_pwr_cfg = {
     ADC_SQR3_SQ3_N(ADC_CHANNEL_IN15) | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN14) |   /* SQR3 */
     ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)
 };
+
+extern const radio_cfg_t *tx_eng;
+extern const radio_cfg_t *tx_ax25;
 
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
@@ -402,26 +406,25 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
 
     palClearLine(LINE_LNA_ENABLE);
     palSetLine(LINE_PA_ENABLE);
-    /* TODO: Don't use use index to find device */
-    ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, 0);
-    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 1);
+    ax5043WriteU16(tx_eng->devp, AX5043_REG_TXPWRCOEFFB, 0);
+    ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 1);
 
     if (!strcmp(argv[0], "cw") && argc > 2) {
         uint16_t txpwr = strtoul(argv[1], NULL, 0);
         uint32_t cnt = strtoul(argv[2], NULL, 0);
         if (cnt == 0)  cnt = 1;
-        ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, txpwr);
+        ax5043WriteU16(tx_eng->devp, AX5043_REG_TXPWRCOEFFB, txpwr);
         adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
-        ax5043TXRaw(radio_devices[1].devp, NULL, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
+        ax5043TXRaw(tx_eng->devp, NULL, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
         adcStopConversion(&ADCD1);
     } else {
-        ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
+        ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
         palClearLine(LINE_PA_ENABLE);
         palSetLine(LINE_LNA_ENABLE);
         goto rftest_usage;
     }
 
-    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
+    ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
     palClearLine(LINE_PA_ENABLE);
     palSetLine(LINE_LNA_ENABLE);
     return;
@@ -430,6 +433,29 @@ rftest_usage:
                   "Usage: rftest <cmd>\r\n"
                   "    cw <txpwr> <cnt>:\r\n"
                   "         Transmit CW with <txpwr> for <cnt> iterations of a CW REPEATDATA buffer\r\n"
+                  "\r\n");
+    return;
+}
+
+void cmd_beacon(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    int count = 1;
+    if (argc > 0) {
+        count = strtoul(argv[0], NULL, 0);
+        if (count < 1 || count > 10)
+            goto beacon_usage;
+    }
+
+    for (int i = 0; i < count; i++) {
+        beacon_send(tx_ax25);
+        if (count > 1)
+            chThdSleepMilliseconds(1000);
+    }
+
+    return;
+beacon_usage:
+    chprintf(chp, "\r\n"
+                  "Usage: beacon [count]\r\n"
                   "\r\n");
     return;
 }

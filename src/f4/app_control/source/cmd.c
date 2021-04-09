@@ -608,6 +608,7 @@ static const ShellCommand commands[] = {
     {"synth", cmd_synth},
     {"rf", cmd_rf},
     {"rftest", cmd_rftest},
+    {"beacon", cmd_beacon},
     {"state", cmd_state},
     {"fram", cmd_fram},
     {"deploy", cmd_deploy},
