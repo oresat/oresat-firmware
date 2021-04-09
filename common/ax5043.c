@@ -465,7 +465,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Register interrupt handler for device and start worker */
     if (devp->irq_worker == NULL) {
-        devp->irq_worker = chThdCreateFromHeap(NULL, 0x40, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
+        devp->irq_worker = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
         palSetLineCallback(config->irq, ax5043IRQHandler, devp);
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
@@ -612,7 +612,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
         }
 
         /* Start the FIFO worker */
-        devp->rx_worker = chThdCreateFromHeap(NULL, 0x800, "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
+        devp->rx_worker = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
     }
 }
 

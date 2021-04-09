@@ -2,6 +2,7 @@
 #include "radio.h"
 #include "CANopen.h"
 #include "ax25.h"
+#include "rtc.h"
 
 static const ax25_link_t ax25 = {
     .dest = "SPACE ",
@@ -12,21 +13,45 @@ static const ax25_link_t ax25 = {
     .sid = AX25_PID_NONE,
 };
 
+static uint32_t uptime;
+static time_t   unix_time;
+
 static const tlm_item_t tlm_aprs0[] = {
     {   /* User-Defined APRS Start */
         .type = TLM_MSG,
         .msg = "{",
     },
     {   /* Telemetry Version */
-        .type = TLM_LIT,
+        .type = TLM_VAL,
         .len = 1,
         .val = 0,
+    },
+    {   /* C3 State */
+        .type = TLM_PTR,
+        .len = 1,
+        .ptr = &OD_C3State,
+    },
+    {   /* Uptime */
+        .type = TLM_PTR,
+        .len = 4,
+        .ptr = &uptime,
+    },
+    {   /* RTC Time */
+        .type = TLM_PTR,
+        .len = 4,
+        .ptr = &unix_time,
     },
     {   /* MCU Temperature */
         .type = TLM_OD,
         .len = 1,
         .index = OD_2021_MCU_Sensors,
         .subindex = OD_2021_1_MCU_Sensors_temperature,
+    },
+    {   /* MCU VREFINT */
+        .type = TLM_OD,
+        .len = 1,
+        .index = OD_2021_MCU_Sensors,
+        .subindex = OD_2021_2_MCU_Sensors_VREFINT,
     },
     {   /* User-Defined APRS End */
         .type = TLM_MSG,
@@ -50,12 +75,16 @@ void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
         const tlm_item_t *item = &pkt->item[i];
         switch (item->type) {
         case TLM_MSG:
-            len = item->len;
+            len = strlen(item->msg);
             memcpy(fb_put(fb, len), item->msg, len);
             break;
-        case TLM_LIT:
+        case TLM_VAL:
             len = item->len;
             memcpy(fb_put(fb, len), &item->val, len);
+            break;
+        case TLM_PTR:
+            len = item->len;
+            memcpy(fb_put(fb, len), item->ptr, len);
             break;
         case TLM_OD:
             od_entry = CO_OD_find(CO->SDO[0], item->index);
@@ -77,13 +106,15 @@ void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
 
 THD_FUNCTION(beacon, arg) {
     const radio_cfg_t *cfg = arg;
-    fb_t *fb;
+    fb_t *fb = NULL;
 
     while (!chThdShouldTerminateX()) {
         while (fb == NULL) {
             fb = fb_alloc(AX25_MAX_FRAME_LEN);
         }
 
+        uptime = TIME_I2S(chVTGetSystemTime());
+        unix_time = rtcGetTimeUnix(NULL);
         fb_reserve(fb, AX25_MAX_HDR_LEN);
         fb->data_ptr = tlm_payload(fb, &aprs0);
         fb->mac_hdr = ax25_sdu(fb, &ax25);
@@ -91,6 +122,7 @@ THD_FUNCTION(beacon, arg) {
         /* APRS Beacon */
         ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
         fb_free(fb);
+        fb = NULL;
 
         chThdSleepMilliseconds(OD_TX_Control.beaconInterval);
     }

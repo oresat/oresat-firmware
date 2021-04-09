@@ -6,7 +6,8 @@
 
 typedef enum {
     TLM_MSG,
-    TLM_LIT,
+    TLM_VAL,
+    TLM_PTR,
     TLM_OD
 } tlm_type_t;
 
@@ -16,6 +17,7 @@ typedef struct tlm_item {
     union {
         char            *msg;
         uint32_t        val;
+        void            *ptr;
         struct {
             uint32_t    index   : 16;
             uint32_t    subindex: 8;

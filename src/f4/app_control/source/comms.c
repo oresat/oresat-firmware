@@ -424,7 +424,7 @@ void comms_start(void)
 {
     radio_start();
     for (int i = 0; i < EDL_WORKERS; i++) {
-        edl_tp[i] = chThdCreateFromHeap(NULL, 0x400, "EDL Worker", NORMALPRIO, edl_thd, NULL);
+        edl_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "EDL Worker", NORMALPRIO, edl_thd, NULL);
     }
     ax5043RX(&lband, false, false);
     ax5043RX(&uhf, false, false);
@@ -443,7 +443,7 @@ void comms_stop(void)
 void comms_beacon(bool enable)
 {
     if (enable && beacon_tp == NULL) {
-        beacon_tp = chThdCreateFromHeap(NULL, 0x800, "Beacon", NORMALPRIO, beacon, (void*)&uhf_ax25_cfg);
+        beacon_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "Beacon", NORMALPRIO, beacon, (void*)&uhf_ax25_cfg);
     } else if (!enable && beacon_tp != NULL) {
         chThdTerminate(beacon_tp);
         chThdWait(beacon_tp);
