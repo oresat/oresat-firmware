@@ -89,7 +89,7 @@ PROJECT   = app_protocard
 MCU       = cortex-m0
 BOARD     = PROTOCARD_V4
 
-#Project sources.
+# Project sources.
 PROJ_ROOT = ../../..
 APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
@@ -102,12 +102,16 @@ CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
-#Board specific directories.
+# Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+# Enable bootloader
+ifeq ($(USE_BOOTLOADER),)
+  USE_BOOTLOADER = no
+endif
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/oresat_f0.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -130,7 +134,11 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC.ld
+ifeq ($(USE_BOOTLOADER),yes)
+  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app.ld
+else
+  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app-noboot.ld
+endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -191,7 +199,6 @@ ULIBS =
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
 include $(RULESPATH)/arm-none-eabi.mk
 include $(RULESPATH)/rules.mk
-include $(TOOLCHAIN)/bootloader_f0.mk
 include $(TOOLCHAIN)/toolchain.mk
 
 #

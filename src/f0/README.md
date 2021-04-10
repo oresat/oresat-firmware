@@ -12,7 +12,7 @@ number of available pins.
 
 [STM32F091 Reference Manual](https://www.st.com/resource/en/reference_manual/dm00031936-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 
-[STM32F091 Datasheet](https://www.st.com/resource/en/datasheet/stm32f091vb.pdf)
+[STM32F091 Datasheet](https://www.st.com/resource/en/datasheet/stm32f091cc.pdf)
 
 
 ## Testing the toolchain
@@ -34,12 +34,12 @@ write to the board and a flashing green LED. If this all works,
 congratulations! Your toolchain is working and you can begin developing.
 
 ## Creating an app
-The template to copy for new applications is [app_template](app_template).
-To create a new app, simply make a copy of the app_template directory
-and name it whatever you like. From this directory:
+The template to copy for new applications is [app_protocard](app_protocard) or
+[app_devboard](app_devboard). To create a new app, simply make a copy of the
+directory and name it whatever you like. From this directory:
 
 ```
-cp -R app_template app_<name>
+cp -R app_protocard app_<name>
 ```
 
 Then, open the Makefile `app_<name>/Makefile` and edit the line `PROJECT =` to whatever name
@@ -70,9 +70,3 @@ Relative Address 0-0x400: Image meta data. crc32, length, version
 - 0x0008: 4 byte firmware version
 - 0x000C to 0x0400: padding
 Relative Address 0x0400-0xC800: Compiled firmware
-
-
-
-
-
-
