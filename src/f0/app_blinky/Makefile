@@ -89,7 +89,7 @@ PROJECT   = app_blinky
 MCU       = cortex-m0
 BOARD     = ST_NUCLEO64_F091RC
 
-#Project sources.
+# Project sources.
 PROJ_ROOT = ../../..
 APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
@@ -102,7 +102,7 @@ CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
-#Board specific directories.
+# Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Licensing files.
