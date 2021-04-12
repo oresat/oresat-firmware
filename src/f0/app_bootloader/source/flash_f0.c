@@ -3,9 +3,9 @@
 
 size_t flashPageSizeF091(flashpage_t sector)
 {
-	if( sector <= FLASH_PAGE_COUNT ) {
-		return(STM32F093_FLASH_PAGE_SIZE);
-	}
+    if( sector <= FLASH_PAGE_COUNT ) {
+        return(STM32F093_FLASH_PAGE_SIZE);
+    }
 
     return 0;
 }
@@ -82,7 +82,7 @@ int flashPageEraseF091(flashpage_t page_number)
     flashWaitWhileBusy();
 
     if( FLASH->SR & FLASH_SR_EOP ) {
-    	FLASH->SR = FLASH_SR_EOP;
+        FLASH->SR = FLASH_SR_EOP;
     }
     FLASH->CR &= ~FLASH_CR_PER;
 
