@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x400
+  USE_PROCESS_STACKSIZE = 0x800
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x400
+  USE_EXCEPTIONS_STACKSIZE = 0x800
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_devboard
+PROJECT   = app_bootloader
 
 # Target settings.
-MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_L452RE_P
+MCU       = cortex-m0
+BOARD     = PROTOCARD_V4
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -106,20 +106,21 @@ DEPDIR   := $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
-include $(PROJ_SRC)/oresat.mk
+#include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/bootloader.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
-include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32l4xx.mk
+include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/hal/ports/STM32/STM32L4xx/platform.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32F0xx/platform.mk
 include $(BOARDDIR)/board.mk
 include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
+include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
@@ -129,7 +130,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(PROJ_ROOT)/ld/STM32L452xE.ld
+LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-bootloader.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -165,7 +166,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2
+UDEFS =
 
 # Define ASM defines here
 UADEFS =
