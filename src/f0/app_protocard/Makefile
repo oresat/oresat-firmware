@@ -107,7 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Enable bootloader
 ifeq ($(USE_BOOTLOADER),)
-  USE_BOOTLOADER = no
+  USE_BOOTLOADER = yes
 endif
 
 # Project specific files.
