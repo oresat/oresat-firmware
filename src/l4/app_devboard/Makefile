@@ -129,7 +129,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32L452xE.ld
+LDSCRIPT= $(PROJ_ROOT)/ld/STM32L452xE.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

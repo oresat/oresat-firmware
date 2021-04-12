@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x200
+  USE_PROCESS_STACKSIZE = 0x800
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x800
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -83,13 +83,13 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = app_bootloader
 
 # Target settings.
 MCU       = cortex-m0
 BOARD     = PROTOCARD_V4
 
-# Project sources.
+#Project sources.
 PROJ_ROOT = ../../..
 APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
@@ -102,16 +102,12 @@ CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
-# Board specific directories.
+#Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# Enable bootloader
-ifeq ($(USE_BOOTLOADER),)
-  USE_BOOTLOADER = no
-endif
-
 # Project specific files.
-include $(PROJ_SRC)/oresat.mk
+#include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/bootloader.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -134,11 +130,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-ifeq ($(USE_BOOTLOADER),yes)
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app.ld
-else
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app-noboot.ld
-endif
+LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-bootloader.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -174,7 +166,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2
+UDEFS =
 
 # Define ASM defines here
 UADEFS =

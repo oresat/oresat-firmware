@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x200
+  USE_PROCESS_STACKSIZE = 0x400
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x400
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -83,13 +83,13 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = app_f407_discovery
 
 # Target settings.
-MCU       = cortex-m0
-BOARD     = PROTOCARD_V4
+MCU       = cortex-m4
+BOARD     = ORESAT_C3_V3
 
-# Project sources.
+#Project sources.
 PROJ_ROOT = ../../..
 APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
@@ -102,43 +102,36 @@ CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
-# Board specific directories.
+#Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# Enable bootloader
-ifeq ($(USE_BOOTLOADER),)
-  USE_BOOTLOADER = no
-endif
-
 # Project specific files.
-include $(PROJ_SRC)/oresat.mk
+#include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/bootloader.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
+include $(CHIBIOS)/os/hal/boards/ST_STM32F4_DISCOVERY/board.mk
 # Startup files.
-include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
+include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/hal/ports/STM32/STM32F0xx/platform.mk
-include $(BOARDDIR)/board.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
+#include $(BOARDDIR)/board.mk
 include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
+include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/lib/test.mk
-#include $(CHIBIOS)/test/rt/rt_test.mk
-#include $(CHIBIOS)/test/oslib/oslib_test.mk
+include $(CHIBIOS)/test/lib/test.mk
+include $(CHIBIOS)/test/rt/rt_test.mk
+include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-ifeq ($(USE_BOOTLOADER),yes)
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app.ld
-else
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app-noboot.ld
-endif
+LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -174,7 +167,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2
+UDEFS =
 
 # Define ASM defines here
 UADEFS =
