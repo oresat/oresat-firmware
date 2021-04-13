@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-12" fileModificationTime="18:41:58.8150640-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-12" fileModificationTime="19:06:07.3351570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -398,6 +398,9 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180003">
               <UINT />
             </q1:varDeclaration>
+            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180004">
+              <USINT />
+            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180005">
               <UINT />
             </q1:varDeclaration>
@@ -417,6 +420,9 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180103">
               <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180104">
+              <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180105">
               <UINT />
@@ -438,6 +444,9 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180203">
               <UINT />
             </q1:varDeclaration>
+            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180204">
+              <USINT />
+            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180205">
               <UINT />
             </q1:varDeclaration>
@@ -458,6 +467,9 @@
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180303">
               <UINT />
             </q1:varDeclaration>
+            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180304">
+              <USINT />
+            </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180305">
               <UINT />
             </q1:varDeclaration>
@@ -477,6 +489,9 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Inhibit time" uniqueID="UID_RECSUB_180403">
               <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180404">
+              <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Event timer" uniqueID="UID_RECSUB_180405">
               <UINT />
@@ -1948,10 +1963,15 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_180004">
+            <label lang="en">compatibility entry</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180005" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="1000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180006" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -1987,7 +2007,7 @@
           <q1:parameter uniqueID="UID_SUB_180101" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000280+$NODEID" />
+            <q1:defaultValue value="0x40000280+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180102" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -1999,10 +2019,15 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_180104">
+            <label lang="en">compatibility entry</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180105" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180106" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -2038,7 +2063,7 @@
           <q1:parameter uniqueID="UID_SUB_180201" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000380+$NODEID" />
+            <q1:defaultValue value="0x40000380+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180202" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -2050,10 +2075,15 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_180204">
+            <label lang="en">compatibility entry</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180205" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180206" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -2099,6 +2129,11 @@
           <q1:parameter uniqueID="UID_SUB_180303" access="readWrite">
             <label lang="en">Inhibit time</label>
             <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_180304">
+            <label lang="en">compatibility entry</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180305" access="readWrite">
@@ -2153,6 +2188,11 @@
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_180404">
+            <label lang="en">compatibility entry</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180405" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
@@ -2178,7 +2218,7 @@
           <q1:parameter uniqueID="UID_SUB_1A0000" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0001" access="readWrite">
             <label lang="en">Application object 1</label>
@@ -2235,27 +2275,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0100" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000610" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0103" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000710" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0104" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000810" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0105" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -2292,27 +2332,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0200" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0201" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0202" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010610" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0203" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010710" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0204" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010810" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0205" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -2923,7 +2963,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-12" fileModificationTime="18:41:58.8150640-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-12" fileModificationTime="19:06:07.3351570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -3131,43 +3171,48 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160407" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160408" />
           </CANopenObject>
-          <CANopenObject index="1800" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1800" subNumber="6">
+          <CANopenObject index="1800" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1800" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180000" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180001" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180002" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180003" />
+            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180004" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180005" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180006" />
           </CANopenObject>
-          <CANopenObject index="1801" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1801" subNumber="6">
+          <CANopenObject index="1801" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1801" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180100" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180101" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180102" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180103" />
+            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180104" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180105" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180106" />
           </CANopenObject>
-          <CANopenObject index="1802" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1802" subNumber="6">
+          <CANopenObject index="1802" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1802" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180200" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180201" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180202" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180203" />
+            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180204" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180205" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180206" />
           </CANopenObject>
-          <CANopenObject index="1803" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1803" subNumber="6">
+          <CANopenObject index="1803" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1803" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180300" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180301" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180302" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180303" />
+            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180304" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180305" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180306" />
           </CANopenObject>
-          <CANopenObject index="1804" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1804" subNumber="6">
+          <CANopenObject index="1804" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1804" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180400" />
             <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180401" />
             <CANopenSubObject subIndex="02" name="Transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180402" />
             <CANopenSubObject subIndex="03" name="Inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180403" />
+            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180404" />
             <CANopenSubObject subIndex="05" name="Event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180405" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180406" />
           </CANopenObject>
