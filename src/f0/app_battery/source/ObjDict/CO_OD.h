@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             46
+   #define CO_OD_NoOfElements             47
 
 
 /*******************************************************************************
@@ -167,28 +167,68 @@
 /*2021      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                INTEGER8       temperature;
-               INTEGER16      VREFINT;
-               INTEGER16      VBAT;
+               UNSIGNED8      VREFINT;
+               UNSIGNED8      VBAT;
+               UNSIGNED8      VBUSP_Current;
                UNSIGNED16     temperatureRaw;
                UNSIGNED16     VREFINT_Raw;
                UNSIGNED16     VBAT_Raw;
+               UNSIGNED16     VBUSP_CurrentRaw;
                }              OD_MCU_Sensors_t;
 /*6000      */ typedef struct {
                UNSIGNED8      maxSubIndex;
-               UNSIGNED16     VBUS;
+               UNSIGNED16     vbatt;
+               UNSIGNED16     VCellMax;
+               UNSIGNED16     VCellMin;
                UNSIGNED16     VCell;
-               UNSIGNED16     cell1;
-               UNSIGNED16     cell2;
+               UNSIGNED16     VCell2;
+               INTEGER16      currentAvg;
+               INTEGER16      currentMax;
+               INTEGER16      currentMin;
                UNSIGNED16     fullCapacity;
                UNSIGNED16     timeToEmpty;
                UNSIGNED16     timeToFull;
                UNSIGNED16     cycles;
-               UNSIGNED16     chargeState;
                UNSIGNED16     availableCapacity;
-               UNSIGNED16     availableStateOfCharge;
-               UNSIGNED16     presentStateOfCharge;
+               UNSIGNED8      availableStateOfCharge;
+               UNSIGNED8      presentStateOfCharge;
                UNSIGNED16     mixCapacity;
-               }              OD_battery_t;
+               UNSIGNED16     reportingCapacity;
+               INTEGER16      tempAvg1;
+               INTEGER16      tempAvg2;
+               INTEGER16      tempAvgInt;
+               BOOLEAN        dischargeDisable;
+               BOOLEAN        chargeDisable;
+               BOOLEAN        dischargeStatus;
+               BOOLEAN        chargeStatus;
+               }              OD_battery1_t;
+/*6001      */ typedef struct {
+               UNSIGNED8      maxSubIndex;
+               UNSIGNED16     vbatt;
+               UNSIGNED16     VCellMax;
+               UNSIGNED16     VCellMin;
+               UNSIGNED16     VCell;
+               UNSIGNED16     VCell2;
+               INTEGER16      currentAvg;
+               INTEGER16      currentMax;
+               INTEGER16      currentMin;
+               UNSIGNED16     fullCapacity;
+               UNSIGNED16     timeToEmpty;
+               UNSIGNED16     timeToFull;
+               UNSIGNED16     cycles;
+               UNSIGNED16     availableCapacity;
+               UNSIGNED8      availableStateOfCharge;
+               UNSIGNED8      presentStateOfCharge;
+               UNSIGNED16     mixCapacity;
+               UNSIGNED16     reportingCapacity;
+               INTEGER16      tempAvg1;
+               INTEGER16      tempAvg2;
+               INTEGER16      tempAvgInt;
+               BOOLEAN        dischargeDisable;
+               BOOLEAN        chargeDisable;
+               BOOLEAN        dischargeStatus;
+               BOOLEAN        chargeStatus;
+               }              OD_battery2_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -516,36 +556,78 @@
         #define OD_2021_1_MCU_Sensors_temperature                   1
         #define OD_2021_2_MCU_Sensors_VREFINT                       2
         #define OD_2021_3_MCU_Sensors_VBAT                          3
-        #define OD_2021_4_MCU_Sensors_temperatureRaw                4
-        #define OD_2021_5_MCU_Sensors_VREFINT_Raw                   5
-        #define OD_2021_6_MCU_Sensors_VBAT_Raw                      6
+        #define OD_2021_4_MCU_Sensors_VBUSP_Current                 4
+        #define OD_2021_5_MCU_Sensors_temperatureRaw                5
+        #define OD_2021_6_MCU_Sensors_VREFINT_Raw                   6
+        #define OD_2021_7_MCU_Sensors_VBAT_Raw                      7
+        #define OD_2021_8_MCU_Sensors_VBUSP_CurrentRaw              8
 
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
 
 /*6000 */
-        #define OD_6000_battery                                     0x6000
+        #define OD_6000_battery1                                    0x6000
 
-        #define OD_6000_0_battery_maxSubIndex                       0
-        #define OD_6000_1_battery_VBUS                              1
-        #define OD_6000_2_battery_VCell                             2
-        #define OD_6000_3_battery_cell1                             3
-        #define OD_6000_4_battery_cell2                             4
-        #define OD_6000_5_battery_fullCapacity                      5
-        #define OD_6000_6_battery_timeToEmpty                       6
-        #define OD_6000_7_battery_timeToFull                        7
-        #define OD_6000_8_battery_cycles                            8
-        #define OD_6000_9_battery_chargeState                       9
-        #define OD_6000_10_battery_availableCapacity                10
-        #define OD_6000_11_battery_availableStateOfCharge           11
-        #define OD_6000_12_battery_presentStateOfCharge             12
-        #define OD_6000_13_battery_mixCapacity                      13
+        #define OD_6000_0_battery1_maxSubIndex                      0
+        #define OD_6000_1_battery1_vbatt                            1
+        #define OD_6000_2_battery1_VCellMax                         2
+        #define OD_6000_3_battery1_VCellMin                         3
+        #define OD_6000_4_battery1_VCell                            4
+        #define OD_6000_5_battery1_VCell2                           5
+        #define OD_6000_6_battery1_currentAvg                       6
+        #define OD_6000_7_battery1_currentMax                       7
+        #define OD_6000_8_battery1_currentMin                       8
+        #define OD_6000_9_battery1_fullCapacity                     9
+        #define OD_6000_10_battery1_timeToEmpty                     10
+        #define OD_6000_11_battery1_timeToFull                      11
+        #define OD_6000_12_battery1_cycles                          12
+        #define OD_6000_13_battery1_availableCapacity               13
+        #define OD_6000_14_battery1_availableStateOfCharge          14
+        #define OD_6000_15_battery1_presentStateOfCharge            15
+        #define OD_6000_16_battery1_mixCapacity                     16
+        #define OD_6000_17_battery1_reportingCapacity               17
+        #define OD_6000_18_battery1_tempAvg1                        18
+        #define OD_6000_19_battery1_tempAvg2                        19
+        #define OD_6000_20_battery1_tempAvgInt                      20
+        #define OD_6000_21_battery1_dischargeDisable                21
+        #define OD_6000_22_battery1_chargeDisable                   22
+        #define OD_6000_23_battery1_dischargeStatus                 23
+        #define OD_6000_24_battery1_chargeStatus                    24
 
 /*6001 */
-        #define OD_6001_batteryStatus                               0x6001
+        #define OD_6001_battery2                                    0x6001
+
+        #define OD_6001_0_battery2_maxSubIndex                      0
+        #define OD_6001_1_battery2_vbatt                            1
+        #define OD_6001_2_battery2_VCellMax                         2
+        #define OD_6001_3_battery2_VCellMin                         3
+        #define OD_6001_4_battery2_VCell                            4
+        #define OD_6001_5_battery2_VCell2                           5
+        #define OD_6001_6_battery2_currentAvg                       6
+        #define OD_6001_7_battery2_currentMax                       7
+        #define OD_6001_8_battery2_currentMin                       8
+        #define OD_6001_9_battery2_fullCapacity                     9
+        #define OD_6001_10_battery2_timeToEmpty                     10
+        #define OD_6001_11_battery2_timeToFull                      11
+        #define OD_6001_12_battery2_cycles                          12
+        #define OD_6001_13_battery2_availableCapacity               13
+        #define OD_6001_14_battery2_availableStateOfCharge          14
+        #define OD_6001_15_battery2_presentStateOfCharge            15
+        #define OD_6001_16_battery2_mixCapacity                     16
+        #define OD_6001_17_battery2_reportingCapacity               17
+        #define OD_6001_18_battery2_tempAvg1                        18
+        #define OD_6001_19_battery2_tempAvg2                        19
+        #define OD_6001_20_battery2_tempAvgInt                      20
+        #define OD_6001_21_battery2_dischargeDisable                21
+        #define OD_6001_22_battery2_chargeDisable                   22
+        #define OD_6001_23_battery2_dischargeStatus                 23
+        #define OD_6001_24_battery2_chargeStatus                    24
 
 /*6002 */
-        #define OD_6002_modelGaugeAlgStatus                         0x6002
+        #define OD_6002_heaterStatus                                0x6002
+
+/*6003 */
+        #define OD_6003_modelGaugeAlgStatus                         0x6003
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -566,9 +648,10 @@ struct sCO_OD_RAM{
 /*2020      */ OD_MCU_Calibration_t MCU_Calibration;
 /*2021      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
-/*6000      */ OD_battery_t    battery;
-/*6001      */ UNSIGNED16     batteryStatus;
-/*6002      */ UNSIGNED16     modelGaugeAlgStatus;
+/*6000      */ OD_battery1_t   battery1;
+/*6001      */ OD_battery2_t   battery2;
+/*6002      */ BOOLEAN        heaterStatus;
+/*6003      */ UNSIGNED16     modelGaugeAlgStatus;
 
                UNSIGNED32     LastWord;
 };
@@ -754,13 +837,16 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
         #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
         #define ODL_errorStatusBits_stringLength                    10
 
-/*6000, Data Type: battery_t */
-        #define OD_battery                                          CO_OD_RAM.battery
+/*6000, Data Type: battery1_t */
+        #define OD_battery1                                         CO_OD_RAM.battery1
 
-/*6001, Data Type: UNSIGNED16 */
-        #define OD_batteryStatus                                    CO_OD_RAM.batteryStatus
+/*6001, Data Type: battery2_t */
+        #define OD_battery2                                         CO_OD_RAM.battery2
 
-/*6002, Data Type: UNSIGNED16 */
+/*6002, Data Type: BOOLEAN */
+        #define OD_heaterStatus                                     CO_OD_RAM.heaterStatus
+
+/*6003, Data Type: UNSIGNED16 */
         #define OD_modelGaugeAlgStatus                              CO_OD_RAM.modelGaugeAlgStatus
 
 #endif
