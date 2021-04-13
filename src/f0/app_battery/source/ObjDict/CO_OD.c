@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -40,11 +40,12 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2010*/ 0x00000000L,
 /*2011*/ 0x00000000L,
 /*2020*/ {0x3L, 0x00, 0x00, 0x00},
-/*2021*/ {0x6L, 0x0, 0x00, 0x00, 0x00, 0x00, 0x00},
+/*2021*/ {0x8L, 0x0, 0x0L, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
-/*6000*/ {0xDL, 0x2008, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-/*6001*/ 0x02,
-/*6002*/ 0x00,
+/*6000*/ {0x18L, 0x2008, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0},
+/*6001*/ {0x18L, 0x2008, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0},
+/*6002*/ 0,
+/*6003*/ 0x00,
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -95,13 +96,13 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 /*1601*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1602*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1603*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
-/*1800*/ {{0x6L, 0xC0000180L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
-/*1801*/ {0x6L, 0xC0000280L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
-/*1802*/ {0x6L, 0xC0000380L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
+/*1800*/ {{0x6L, 0xC0000180L, 0xFEL, 0x00, 0x0L, 0x3E8, 0x0L},
+/*1801*/ {0x6L, 0x40000280L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
+/*1802*/ {0x6L, 0x40000380L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
 /*1803*/ {0x6L, 0xC0000480L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L}},
-/*1A00*/ {{0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1A01*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1A02*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A00*/ {{0x4L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A01*/ {0x4L, 0x60000110L, 0x60000610L, 0x60000710L, 0x60000810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A02*/ {0x4L, 0x60010110L, 0x60010610L, 0x60010710L, 0x60010810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1A03*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1F80*/ 0x0008L,
 
@@ -320,31 +321,72 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
            {(void*)&CO_OD_RAM.MCU_Calibration.VREFINT_CAL, 0x86, 0x2 },
 };
 
-/*0x2021*/ const CO_OD_entryRecord_t OD_record2021[7] = {
+/*0x2021*/ const CO_OD_entryRecord_t OD_record2021[9] = {
            {(void*)&CO_OD_RAM.MCU_Sensors.highestSubIndexSupported, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.MCU_Sensors.temperature, 0x26, 0x1 },
-           {(void*)&CO_OD_RAM.MCU_Sensors.VREFINT, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.MCU_Sensors.VBAT, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.MCU_Sensors.VREFINT, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.MCU_Sensors.VBAT, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.MCU_Sensors.VBUSP_Current, 0x26, 0x1 },
            {(void*)&CO_OD_RAM.MCU_Sensors.temperatureRaw, 0xA6, 0x2 },
            {(void*)&CO_OD_RAM.MCU_Sensors.VREFINT_Raw, 0xA6, 0x2 },
            {(void*)&CO_OD_RAM.MCU_Sensors.VBAT_Raw, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.MCU_Sensors.VBUSP_CurrentRaw, 0xA6, 0x2 },
 };
 
-/*0x6000*/ const CO_OD_entryRecord_t OD_record6000[14] = {
-           {(void*)&CO_OD_RAM.battery.maxSubIndex, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.battery.VBUS, 0xBE, 0x2 },
-           {(void*)&CO_OD_RAM.battery.VCell, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.cell1, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.cell2, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.fullCapacity, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.timeToEmpty, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.timeToFull, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.cycles, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.chargeState, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.availableCapacity, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.availableStateOfCharge, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.presentStateOfCharge, 0xB6, 0x2 },
-           {(void*)&CO_OD_RAM.battery.mixCapacity, 0xB6, 0x2 },
+/*0x6000*/ const CO_OD_entryRecord_t OD_record6000[25] = {
+           {(void*)&CO_OD_RAM.battery1.maxSubIndex, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.vbatt, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.VCellMax, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.VCellMin, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.VCell, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.VCell2, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.currentAvg, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.currentMax, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.currentMin, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.fullCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.timeToEmpty, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.timeToFull, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.cycles, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.availableCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.availableStateOfCharge, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.presentStateOfCharge, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.mixCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.reportingCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.tempAvg1, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.tempAvg2, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.tempAvgInt, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery1.dischargeDisable, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.chargeDisable, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.dischargeStatus, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery1.chargeStatus, 0x26, 0x1 },
+};
+
+/*0x6001*/ const CO_OD_entryRecord_t OD_record6001[25] = {
+           {(void*)&CO_OD_RAM.battery2.maxSubIndex, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.vbatt, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.VCellMax, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.VCellMin, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.VCell, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.VCell2, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.currentAvg, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.currentMax, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.currentMin, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.fullCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.timeToEmpty, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.timeToFull, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.cycles, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.availableCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.availableStateOfCharge, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.presentStateOfCharge, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.mixCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.reportingCapacity, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.tempAvg1, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.tempAvg2, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.tempAvgInt, 0xA6, 0x2 },
+           {(void*)&CO_OD_RAM.battery2.dischargeDisable, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.chargeDisable, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.dischargeStatus, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.battery2.chargeStatus, 0x26, 0x1 },
 };
 
 /*******************************************************************************
@@ -392,10 +434,11 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2010, 0x00, 0xBE,  8, (void*)&CO_OD_RAM.SCET},
 {0x2011, 0x00, 0xBE,  8, (void*)&CO_OD_RAM.UTC},
 {0x2020, 0x03, 0x00,  0, (void*)&OD_record2020},
-{0x2021, 0x06, 0x00,  0, (void*)&OD_record2021},
+{0x2021, 0x08, 0x00,  0, (void*)&OD_record2021},
 {0x2100, 0x00, 0x06, 10, (void*)&CO_OD_RAM.errorStatusBits},
-{0x6000, 0x0D, 0x00,  0, (void*)&OD_record6000},
-{0x6001, 0x00, 0xB6,  2, (void*)&CO_OD_RAM.batteryStatus},
-{0x6002, 0x00, 0x8E,  2, (void*)&CO_OD_RAM.modelGaugeAlgStatus},
+{0x6000, 0x18, 0x00,  0, (void*)&OD_record6000},
+{0x6001, 0x18, 0x00,  0, (void*)&OD_record6001},
+{0x6002, 0x00, 0x26,  1, (void*)&CO_OD_RAM.heaterStatus},
+{0x6003, 0x00, 0x8E,  2, (void*)&CO_OD_RAM.modelGaugeAlgStatus},
 };
 // clang-format on
