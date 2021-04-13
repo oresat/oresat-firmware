@@ -43,7 +43,14 @@
  */
 #define MAX17205_SA_MG                      0x6CU
 #define MAX17205_SA_SBS_NV                  0x16U
-#define MAX17205_SA(reg)                    (reg & 0x100U ? MAX17205_SA_SBS_NV : MAX17205_SA_MG)
+#define MAX17205_SA(reg)                    ((reg & 0x100U ? MAX17205_SA_SBS_NV : MAX17205_SA_MG) >> 1)
+
+
+
+#define MAX17205_T_RECAL_MS      5
+//tBlock(max) is specified as 7360ms in the data sheet, page 16
+#define MAX17205_T_BLOCK_MS      8000
+
 
 /**
  * @brief   MAX17205 Register Address Conversion
@@ -1171,18 +1178,31 @@ struct MAX17205Driver {
 extern "C" {
 #endif
 void max17205ObjectInit(MAX17205Driver *devp);
-void max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
+bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
 
-uint16_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg);
-void max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value);
+msg_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg, uint16_t *output_dest);
+msg_t max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value);
 
-uint16_t max17205ReadCapacity(MAX17205Driver *devp, uint16_t reg);
-uint16_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg);
-uint16_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg);
-int16_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg);
-int16_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg);
-uint32_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg);
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest);
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
+msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
+msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+
+msg_t max17205HardwareReset(I2CDriver *i2cp);
+msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf, size_t n);
+msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg, uint8_t* rxbuf, size_t n);
+
+msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config);
+msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config);
+
+const char* max17205RegToStr(const uint16_t reg);
+
 #ifdef __cplusplus
 }
 #endif

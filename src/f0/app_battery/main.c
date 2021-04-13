@@ -17,10 +17,13 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "batt.h"
+
+#define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 
 static worker_t battery_worker;
 static thread_descriptor_t battery_worker_desc = {
@@ -55,9 +58,28 @@ static void app_init(void)
  */
 int main(void)
 {
+#if 0
+	//FIXME remove this block
+	halInit();
+	chSysInit();
+	sdStart(&SD2, NULL);
+	chprintf(DEBUG_SERIAL, "\r\nStarting battery app...\r\n");
+	while (true)
+	{
+		palClearLine(LINE_LED);
+		chThdSleepMilliseconds(500);
+		palSetLine(LINE_LED);
+		chThdSleepMilliseconds(500);
+		chprintf(DEBUG_SERIAL, "%u\r\n", chVTGetSystemTime());
+	}
+#endif
+
     // Initialize and start
     oresat_init(&oresat_conf);
     app_init();
+    chprintf(DEBUG_SERIAL, "\r\nStarting battery app...\r\n");
+
     oresat_start();
     return 0;
 }
+
