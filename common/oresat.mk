@@ -1,4 +1,5 @@
 include $(PROJ_SRC)/CANopen.mk
+include $(PROJ_SRC)/util.mk
 
 PROJINC       = $(PROJ_SRC)/include
 
