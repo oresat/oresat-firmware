@@ -292,8 +292,6 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void uslp_send(fb_t *fb);
-void uslp_recv(fb_t *fb);
 
 #ifdef __cplusplus
 }

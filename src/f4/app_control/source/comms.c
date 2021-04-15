@@ -5,6 +5,7 @@
 #include "comms.h"
 #include "radio.h"
 #include "beacon.h"
+#include "c3.h"
 #include "rtc.h"
 #include "uslp.h"
 #include "CANopen.h"
@@ -411,6 +412,7 @@ THD_FUNCTION(edl_thd, arg)
         }
 
         /* TODO: Process received frame */
+        edl_enable(true);
 
         fb_free(rx_fb);
     }

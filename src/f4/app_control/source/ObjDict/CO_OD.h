@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             52
+   #define CO_OD_NoOfElements             53
 
 
 /*******************************************************************************
@@ -176,6 +176,7 @@
 /*6001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED16     saveInterval;
+               UNSIGNED16     EDL_Timeout;
                BOOLEAN        factoryReset;
                }              OD_stateControl_t;
 /*6002      */ typedef struct {
@@ -187,10 +188,18 @@
                }              OD_deploymentControl_t;
 /*6003      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               BOOLEAN        enabled;
-               UNSIGNED32     TX_Timeout;
+               UNSIGNED32     timeout;
                UNSIGNED32     beaconInterval;
                }              OD_TX_Control_t;
+/*6004      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED64     timestamp;
+               UNSIGNED32     alarmA;
+               UNSIGNED32     alarmB;
+               UNSIGNED32     wakeup;
+               UNSIGNED32     lastTX_Enable;
+               UNSIGNED32     lastEDL;
+               }              OD_persistentState_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -821,7 +830,8 @@
 
         #define OD_6001_0_stateControl_maxSubIndex                  0
         #define OD_6001_1_stateControl_saveInterval                 1
-        #define OD_6001_2_stateControl_factoryReset                 2
+        #define OD_6001_2_stateControl_EDL_Timeout                  2
+        #define OD_6001_3_stateControl_factoryReset                 3
 
 /*6002 */
         #define OD_6002_deploymentControl                           0x6002
@@ -836,9 +846,19 @@
         #define OD_6003_TX_Control                                  0x6003
 
         #define OD_6003_0_TX_Control_maxSubIndex                    0
-        #define OD_6003_1_TX_Control_enabled                        1
-        #define OD_6003_2_TX_Control_TX_Timeout                     2
-        #define OD_6003_3_TX_Control_beaconInterval                 3
+        #define OD_6003_1_TX_Control_timeout                        1
+        #define OD_6003_2_TX_Control_beaconInterval                 2
+
+/*6004 */
+        #define OD_6004_persistentState                             0x6004
+
+        #define OD_6004_0_persistentState_maxSubIndex               0
+        #define OD_6004_1_persistentState_timestamp                 1
+        #define OD_6004_2_persistentState_alarmA                    2
+        #define OD_6004_3_persistentState_alarmB                    3
+        #define OD_6004_4_persistentState_wakeup                    4
+        #define OD_6004_5_persistentState_lastTX_Enable             5
+        #define OD_6004_6_persistentState_lastEDL                   6
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -933,6 +953,15 @@ struct sCO_OD_PERSIST_APP{
                UNSIGNED32     LastWord;
 };
 
+/***** Structure for PERSIST_STATE variables ********************************************/
+struct sCO_OD_PERSIST_STATE{
+               UNSIGNED32     FirstWord;
+
+/*6004      */ OD_persistentState_t persistentState;
+
+               UNSIGNED32     LastWord;
+};
+
 /***** Declaration of Object Dictionary variables *****************************/
 extern struct sCO_OD_RAM CO_OD_RAM;
 
@@ -945,6 +974,8 @@ extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
 extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 
 extern struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP;
+
+extern struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE;
 
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
@@ -1103,6 +1134,9 @@ extern struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP;
 
 /*6003, Data Type: TX_Control_t */
         #define OD_TX_Control                                       CO_OD_PERSIST_APP.TX_Control
+
+/*6004, Data Type: persistentState_t */
+        #define OD_persistentState                                  CO_OD_PERSIST_STATE.persistentState
 
 #endif
 // clang-format on

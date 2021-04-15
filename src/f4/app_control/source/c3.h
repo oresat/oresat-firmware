@@ -30,23 +30,21 @@ typedef struct {
     eventmask_t         events;
 } c3_fsm_t;
 
-typedef struct {
-    RTCDateTime timestamp;
-    RTCAlarm    alarm_a;
-    RTCAlarm    alarm_b;
-    RTCWakeup   wakeup;
-} rtc_state_t;
-
 /* Placeholder variables for satellite state from object dictionary */
 /* TODO: Switch to actual OD variables */
 extern bool bat_good;
-extern bool edl;
 
 /* Main Command, Communications, and Control Thread Prototype */
 extern THD_WORKING_AREA(c3_wa, 0x400);
 extern THD_FUNCTION(c3, arg);
 
 /* Support function prototypes */
+void tx_enable(bool state);
+void edl_enable(bool state);
 void factory_reset(void);
+
+bool delay_deploy(void);
+bool tx_enabled(void);
+bool edl_enabled(void);
 
 #endif

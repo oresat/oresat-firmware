@@ -8,8 +8,8 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=8:30AM
-ModificationDate=03-31-2021
+ModificationTime=5:24PM
+ModificationDate=04-14-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=43
+SupportedObjects=44
 1=0x1002
 2=0x1003
 3=0x1005
@@ -168,6 +168,7 @@ SupportedObjects=43
 41=0x6001
 42=0x6002
 43=0x6003
+44=0x6004
 
 [1002]
 ParameterName=Manufacturer status register
@@ -4237,7 +4238,7 @@ PDOMapping=0
 ParameterName=State Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
-SubNumber=0x3
+SubNumber=0x4
 
 [6001sub0]
 ParameterName=Highest sub-index supported
@@ -4245,7 +4246,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x02
+DefaultValue=0x03
 PDOMapping=0
 
 [6001sub1]
@@ -4258,6 +4259,15 @@ DefaultValue=10
 PDOMapping=0
 
 [6001sub2]
+ParameterName=EDL Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=60
+PDOMapping=0
+
+[6001sub3]
 ParameterName=Factory Reset
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -4287,7 +4297,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=120
+DefaultValue=300
 PDOMapping=0
 
 [6002sub2]
@@ -4321,7 +4331,7 @@ PDOMapping=0
 ParameterName=TX Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
-SubNumber=0x4
+SubNumber=0x3
 
 [6003sub0]
 ParameterName=Highest sub-index supported
@@ -4329,34 +4339,94 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x03
+DefaultValue=0x02
 PDOMapping=0
 
 [6003sub1]
-ParameterName=Enabled
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0001
-AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[6003sub2]
-ParameterName=TX Timeout
+ParameterName=Timeout
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=20160
+DefaultValue=86400
 PDOMapping=0
 
-[6003sub3]
+[6003sub2]
 ParameterName=Beacon Interval
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
 DefaultValue=10000
+PDOMapping=0
+
+[6004]
+ParameterName=Persistent State
+ObjectType=0x9
+;StorageLocation=PERSIST_STATE
+SubNumber=0x7
+
+[6004sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x06
+PDOMapping=0
+
+[6004sub1]
+ParameterName=Timestamp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub2]
+ParameterName=Alarm A
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub3]
+ParameterName=Alarm B
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub4]
+ParameterName=Wakeup
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub5]
+ParameterName=Last TX Enable
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub6]
+ParameterName=Last EDL
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
 PDOMapping=0
 
 [ManufacturerObjects]

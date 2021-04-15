@@ -11,6 +11,7 @@
 #include "rtc.h"
 #include "fram.h"
 #include "fs.h"
+#include "frame_buf.h"
 #include "test_mmc.h"
 #include "test_radio.h"
 #include "deployer.h"
@@ -500,9 +501,9 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "status")) {
         chprintf(chp, "C3 State:  %c\r\n", OD_C3State[0]);
-        chprintf(chp, "TX Enable: %s\r\n", (OD_TX_Control.enabled ? "TRUE" : "FALSE"));
+        chprintf(chp, "TX Enable: %s\r\n", (tx_enabled() ? "TRUE" : "FALSE"));
         chprintf(chp, "Bat Good:  %s\r\n", (bat_good ? "TRUE" : "FALSE"));
-        chprintf(chp, "EDL Mode:  %s\r\n", (edl ? "TRUE" : "FALSE"));
+        chprintf(chp, "EDL Mode:  %s\r\n", (edl_enabled() ? "TRUE" : "FALSE"));
         chprintf(chp, "===RTC===\r\n"
                       "Date:      %08X\r\n"
                       "Time:      %08X\r\n"
@@ -514,14 +515,12 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
                       RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
                       RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else if (!strcmp(argv[0], "tx") && argc > 1) {
-        OD_TX_Control.enabled = (argv[1][0] == 't');
-        chEvtSignal(c3_tp, C3_EVENT_TX);
+        tx_enable(argv[1][0] == 't');
     } else if (!strcmp(argv[0], "bat") && argc > 1) {
         bat_good = (argv[1][0] == 't');
         chEvtSignal(c3_tp, C3_EVENT_BAT);
     } else if (!strcmp(argv[0], "edl") && argc > 1) {
-        edl = (argv[1][0] == 't');
-        chEvtSignal(c3_tp, C3_EVENT_EDL);
+        edl_enable(argv[1][0] == 't');
     } else if (!strcmp(argv[0], "reset")) {
         NVIC_SystemReset();
     } else if (!strcmp(argv[0], "factoryreset")) {
@@ -594,6 +593,31 @@ fram_usage:
 }
 
 /*===========================================================================*/
+/* OreSat C3 EDL                                                             */
+/*===========================================================================*/
+void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    if (argc < 1) {
+        goto edl_usage;
+    }
+    if (!strcmp(argv[0], "post")) {
+        fb_t *fb = fb_alloc(0);
+        fb_post(fb);
+    } else {
+        goto edl_usage;
+    }
+
+    return;
+
+edl_usage:
+    chprintf(chp,  "Usage: edl <command>\r\n"
+                   "    post:\r\n"
+                   "        Post a packet to EDL queue\r\n"
+                   "\r\n");
+    return;
+}
+
+/*===========================================================================*/
 /* Shell                                                                     */
 /*===========================================================================*/
 static const ShellCommand commands[] = {
@@ -612,6 +636,7 @@ static const ShellCommand commands[] = {
     {"state", cmd_state},
     {"fram", cmd_fram},
     {"deploy", cmd_deploy},
+    {"edl", cmd_edl},
     {NULL, NULL}
 };
 
