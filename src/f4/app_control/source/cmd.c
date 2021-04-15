@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <ctype.h>
 
 #include "cmd.h"
 #include "c3.h"
@@ -422,18 +424,61 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
 
-        err = file_read(&FSD1, file, buf, BUF_SIZE - 1);
+        err = file_read(&FSD1, file, buf, BUF_SIZE);
         if (err < 0) {
             chprintf(chp, "Error in file_read: %d\r\n", err);
             file_close(&FSD1, file);
             return;
         }
-        buf[err] = '\0';
         for (uint32_t i = 0; i < BUF_SIZE; i++) {
             if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
             chprintf(chp, " %02X", buf[i]);
         }
         chprintf(chp, "\r\n");
+
+        err = file_close(&FSD1, file);
+        if (err < 0) {
+            chprintf(chp, "Error in file_close: %d\r\n", err);
+            return;
+        }
+    } else if (!strcmp(argv[0], "load") && argc > 1) {
+        uint8_t buf[BUF_SIZE] = {0};
+        char str[BUF_SIZE * 2] = {0};
+        char c, *pos = str;
+        file = file_open(&FSD1, argv[1], LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC);
+        if (file == NULL) {
+            chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
+            return;
+        }
+
+        while (streamRead(chp, (uint8_t*)&c, 1) != 0 && c != 4) {
+            c = toupper(c);
+
+            if (isalnum(c)) {
+                *(pos++) = c;
+                if (pos == &str[BUF_SIZE * 2]) {
+                    for (size_t off = 0; off < BUF_SIZE; off++) {
+                        sscanf(&str[off*2], "%2hhx", &buf[off]);
+                    }
+                    pos = str;
+                    err = file_write(&FSD1, file, buf, BUF_SIZE);
+                    if (err < 0) {
+                        chprintf(chp, "Error in file_write: %d\r\n", err);
+                        break;
+                    }
+                }
+            }
+        }
+        if (pos != str) {
+            size_t len = (pos - str) / 2;
+            for (size_t off = 0; off < len; off++) {
+                sscanf(&str[off*2], "%2hhx", &buf[off]);
+            }
+            err = file_write(&FSD1, file, buf, len);
+            if (err < 0) {
+                chprintf(chp, "Error in file_write: %d\r\n", err);
+            }
+        }
 
         err = file_close(&FSD1, file);
         if (err < 0) {
