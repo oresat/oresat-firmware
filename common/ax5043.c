@@ -637,7 +637,8 @@ void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *b
     osalDbgCheck(devp != NULL && buf != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR)), "ax5043TX(), invalid state");
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043TX(), invalid state");
     osalDbgAssert(total_len != 0, "ax5043TX(), invalid total length");
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TX(), no callback when len != total_len");
@@ -794,7 +795,8 @@ void ax5043TXRaw(AX5043Driver *devp, const ax5043_profile_t *profile, const void
     osalDbgCheck(devp != NULL && buf != NULL);
     osalDbgAssert(((devp->state == AX5043_READY) ||
                    (devp->state == AX5043_RX) ||
-                   (devp->state == AX5043_WOR)), "ax5043TXRaw(), invalid state");
+                   (devp->state == AX5043_WOR) ||
+                   (devp->state == AX5043_TX)), "ax5043TXRaw(), invalid state");
     osalDbgAssert(total_len != 0, "ax5043TXRaw(), invalid total length");
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TXRaw(), no callback when len != total_len");
