@@ -11,6 +11,8 @@
 #include "CANopen.h"
 
 #define XTAL_CLK                            16000000U
+#define SCID                                0x4F53U
+#define MCID                                ((USLP_TFVN << 16) | SCID)
 #define EDL_WORKERS                         2
 
 static const SPIConfig lband_spicfg = {
@@ -63,8 +65,11 @@ static const ax5043_profile_t lband_high[] = {
     /* TODO */
     /* MAC Layer Parameters */
     /* Packet Format */
+    {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -116,8 +121,11 @@ static const ax5043_profile_t lband_low[] = {
     /* TODO */
     /* MAC Layer Parameters */
     /* Packet Format */
+    {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -173,8 +181,11 @@ static const ax5043_profile_t uhf_eng[] = {
     {AX5043_REG_TXRATE, 0x018937, 3},
     /* MAC Layer Parameters */
     /* Packet Format */
+    {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -229,8 +240,11 @@ static const ax5043_profile_t uhf_ax25[] = {
     {AX5043_REG_TXRATE, 0x002752, 3},
     /* MAC Layer Parameters */
     /* Packet Format */
+    {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -333,7 +347,7 @@ static const uslp_vc_t vc0 = {
 };
 
 static const uslp_mc_t mc = {
-    .scid           = 0x4F53,
+    .scid           = SCID,
     .vcid[0]        = &vc0,
 };
 
