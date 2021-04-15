@@ -7,7 +7,7 @@
 
 #define CO_USE_GLOBALS
 #define CO_DRIVER_CUSTOM
-#define ORESAT_DEFAULT_ID 0
+#define ORESAT_DEFAULT_ID 0x00
 #define ORESAT_DEFAULT_BITRATE 1000
 
 #ifdef __cplusplus

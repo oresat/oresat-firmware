@@ -89,7 +89,7 @@ PROJECT   = app_protocard
 MCU       = cortex-m0
 BOARD     = PROTOCARD_V4
 
-#Project sources.
+# Project sources.
 PROJ_ROOT = ../../..
 APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
@@ -102,8 +102,13 @@ CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
-#Board specific directories.
+# Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+# Enable bootloader
+ifeq ($(USE_BOOTLOADER),)
+  USE_BOOTLOADER = yes
+endif
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
@@ -123,13 +128,17 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-include $(CHIBIOS)/test/lib/test.mk
-include $(CHIBIOS)/test/rt/rt_test.mk
-include $(CHIBIOS)/test/oslib/oslib_test.mk
+#include $(CHIBIOS)/test/lib/test.mk
+#include $(CHIBIOS)/test/rt/rt_test.mk
+#include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F091xC.ld
+ifeq ($(USE_BOOTLOADER),yes)
+  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app.ld
+else
+  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app-noboot.ld
+endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

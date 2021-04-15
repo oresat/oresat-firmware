@@ -2,7 +2,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "time_sync.h"
+#include "rtc.h"
 #include "comms.h"
 #include "uslp.h"
 #include "CANopen.h"

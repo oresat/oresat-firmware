@@ -3,7 +3,7 @@
 #include <inttypes.h>
 
 #include "cmd.h"
-#include "time_sync.h"
+#include "rtc.h"
 #include "chprintf.h"
 #include "shell.h"
 
