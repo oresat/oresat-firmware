@@ -32,15 +32,14 @@ thread_t *c3_tp;
  */
 static void alarmcb(RTCDriver *rtcp, rtcevent_t event)
 {
-    RTCAlarm alarm = {0};
     chSysLockFromISR();
     switch (event) {
     case RTC_EVENT_ALARM_A:
-        rtcSetAlarm(rtcp, ALARM_A, &alarm);
+        rtcSetAlarm(rtcp, ALARM_A, NULL);
         chEvtSignalI(c3_tp, C3_EVENT_WAKEUP);
         break;
     case RTC_EVENT_ALARM_B:
-        rtcSetAlarm(rtcp, ALARM_B, &alarm);
+        rtcSetAlarm(rtcp, ALARM_B, NULL);
         chEvtSignalI(c3_tp, C3_EVENT_WAKEUP);
         break;
     case RTC_EVENT_WAKEUP:
