@@ -254,11 +254,13 @@ THD_FUNCTION(nmt, arg)
     chThdExit(reset);
 }
 
-void CO_init(CANDriver *CANptr, uint8_t node_id, uint16_t bitrate)
+void CO_init(CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, const CANFilter *fifo1_filters, size_t filter_count)
 {
     CO_ReturnError_t err;
     err = CO_new(NULL);
     chDbgAssert(err == CO_ERROR_NO, "CO_new failed");
+    CO->CANmodule[0]->canFIFO1Filters = fifo1_filters;
+    CO->CANmodule[0]->canFIFO1FilterCount = filter_count;
     err = CO_CANinit(CANptr, bitrate);
     chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
     err = CO_CANopenInit(node_id);

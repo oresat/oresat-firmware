@@ -18,6 +18,8 @@ typedef struct {
     CANDriver *cand;
     uint8_t node_id;
     uint16_t bitrate;
+    const CANFilter *fifo1_filters;
+    size_t filter_count;
 } oresat_config_t;
 
 /* OreSat initialization and main process */
