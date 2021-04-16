@@ -315,13 +315,11 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  * @api
  */
 uint32_t ina226ReadPower(INA226Driver *devp) {
-    uint32_t power;
-
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
+    uint32_t power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
 
     return power;
 }
