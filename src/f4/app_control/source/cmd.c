@@ -350,7 +350,7 @@ time_usage:
 /*===========================================================================*/
 void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    int err;
+    int ret;
     lfs_file_t *file;
     lfs_dir_t *dir;
     struct lfs_info info;
@@ -363,10 +363,10 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         do {
-            err = dir_read(&FSD1, dir, &info);
-            if (err <= 0) {
-                if (err < 0) {
-                    chprintf(chp, "Error in dir_read: %d\r\n", err);
+            ret = dir_read(&FSD1, dir, &info);
+            if (ret <= 0) {
+                if (ret < 0) {
+                    chprintf(chp, "Error in dir_read: %d\r\n", ret);
                 }
                 continue;
             }
@@ -378,22 +378,22 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
                 chprintf(chp, "?    ");
             }
             chprintf(chp, "%8u %s\r\n", info.size, info.name);
-        } while (err > 0);
-        err = dir_close(&FSD1, dir);
-        if (err < 0) {
-            chprintf(chp, "Error in dir_close: %d\r\n", err);
+        } while (ret > 0);
+        ret = dir_close(&FSD1, dir);
+        if (ret < 0) {
+            chprintf(chp, "Error in dir_close: %d\r\n", ret);
             return;
         }
         chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "mkdir") && argc > 1) {
-        err = fs_mkdir(&FSD1, argv[1]);
-        if (err < 0) {
+        ret = fs_mkdir(&FSD1, argv[1]);
+        if (ret < 0) {
             chprintf(chp, "Error in fs_mkdir: %d\r\n");
             return;
         }
     } else if (!strcmp(argv[0], "rm") && argc > 1) {
-        err = fs_remove(&FSD1, argv[1]);
-        if (err < 0) {
+        ret = fs_remove(&FSD1, argv[1]);
+        if (ret < 0) {
             chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
@@ -404,18 +404,18 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
 
-        err = file_read(&FSD1, file, buf, BUF_SIZE - 1);
-        if (err < 0) {
-            chprintf(chp, "Error in file_read: %d\r\n", err);
+        ret = file_read(&FSD1, file, buf, BUF_SIZE - 1);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_read: %d\r\n", ret);
             file_close(&FSD1, file);
             return;
         }
-        buf[err] = '\0';
+        buf[ret] = '\0';
         chprintf(chp, "%s\r\n", buf);
 
-        err = file_close(&FSD1, file);
-        if (err < 0) {
-            chprintf(chp, "Error in file_close: %d\r\n", err);
+        ret = file_close(&FSD1, file);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
     } else if (!strcmp(argv[0], "hexdump") && argc > 1) {
@@ -425,27 +425,27 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
 
-        err = file_read(&FSD1, file, buf, BUF_SIZE);
-        if (err < 0) {
-            chprintf(chp, "Error in file_read: %d\r\n", err);
+        ret = file_read(&FSD1, file, buf, BUF_SIZE);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_read: %d\r\n", ret);
             file_close(&FSD1, file);
             return;
         }
-        for (int i = 0; i < err; i++) {
+        for (int i = 0; i < ret; i++) {
             if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
             chprintf(chp, " %02X", buf[i]);
         }
         chprintf(chp, "\r\n");
 
-        err = file_close(&FSD1, file);
-        if (err < 0) {
-            chprintf(chp, "Error in file_close: %d\r\n", err);
+        ret = file_close(&FSD1, file);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
     } else if (!strcmp(argv[0], "load") && argc > 1) {
         uint8_t buf[BUF_SIZE] = {0};
-        char str[BUF_SIZE * 2] = {0};
-        char c, *pos = str;
+        char line[BUF_SIZE * 2] = {0};
+        char c, *p = line;
         size_t count = 0;
         file = file_open(&FSD1, argv[1], LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC);
         if (file == NULL) {
@@ -456,67 +456,70 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
         while (streamRead(chp, (uint8_t*)&c, 1) != 0 && c != 4) {
             c = toupper(c);
 
-            if (isalnum(c)) {
-                *(pos++) = c;
-                if (pos == &str[BUF_SIZE * 2]) {
+            if (isdigit(c) || (c >= 'A' && c <= 'F')) {
+                streamPut(chp, c);
+                *(p++) = c;
+                if (p == &line[BUF_SIZE * 2]) {
                     for (size_t off = 0; off < BUF_SIZE; off++) {
-                        sscanf(&str[off*2], "%2hhx", &buf[off]);
+                        sscanf(&line[off*2], "%2hhx", &buf[off]);
                     }
-                    pos = str;
-                    err = file_write(&FSD1, file, buf, BUF_SIZE);
-                    if (err < 0) {
-                        chprintf(chp, "Error in file_write: %d\r\n", err);
+                    p = line;
+                    ret = file_write(&FSD1, file, buf, BUF_SIZE);
+                    if (ret < 0) {
+                        chprintf(chp, "Error in file_write: %d\r\n", ret);
                         break;
                     }
-                    count += err;
+                    count += ret;
+                }
+            } else if ((c == 8) || (c == 127)) {
+                if (p != line) {
+                    streamPut(chp, 0x08);
+                    streamPut(chp, 0x20);
+                    streamPut(chp, 0x08);
+                    p--;
                 }
             }
         }
-        if (pos != str) {
-            size_t len = (pos - str) / 2;
+        if (p != line) {
+            size_t len = (p - line) / 2;
             for (size_t off = 0; off < len; off++) {
-                sscanf(&str[off*2], "%2hhx", &buf[off]);
+                sscanf(&line[off*2], "%2hhx", &buf[off]);
             }
-            err = file_write(&FSD1, file, buf, len);
-            if (err < 0) {
-                chprintf(chp, "Error in file_write: %d\r\n", err);
+            ret = file_write(&FSD1, file, buf, len);
+            if (ret < 0) {
+                chprintf(chp, "Error in file_write: %d\r\n", ret);
+            } else {
+                count += ret;
             }
-            count += err;
         }
-        chprintf(chp, "Wrote %u bytes to %s\r\n", count, argv[1]);
+        chprintf(chp, "\r\nWrote %u bytes to %s\r\n", count, argv[1]);
 
-        err = file_close(&FSD1, file);
-        if (err < 0) {
-            chprintf(chp, "Error in file_close: %d\r\n", err);
+        ret = file_close(&FSD1, file);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
     } else if (!strcmp(argv[0], "mount")) {
-        int err;
-
         chprintf(chp, "Attempting to mount LFS...\r\n");
-        err = fs_mount(&FSD1, false);
-        if (err < 0) {
-            chprintf(chp, "Mount failed: %d\r\n", err);
+        ret = fs_mount(&FSD1, false);
+        if (ret < 0) {
+            chprintf(chp, "Mount failed: %d\r\n", ret);
             return;
         }
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "unmount")) {
-        int err;
-
         chprintf(chp, "Attempting to unmount LFS...\r\n");
-        err = fs_unmount(&FSD1);
-        if (err < 0) {
-            chprintf(chp, "Unmount failed: %d\r\n", err);
+        ret = fs_unmount(&FSD1);
+        if (ret < 0) {
+            chprintf(chp, "Unmount failed: %d\r\n", ret);
             return;
         }
         chprintf(chp, "OK\r\n");
     } else if (!strcmp(argv[0], "format")) {
-        int err;
-
         chprintf(chp, "Attempting to format LFS...\r\n");
-        err = fs_format(&FSD1);
-        if (err < 0) {
-            chprintf(chp, "Format failed: %d\r\n", err);
+        ret = fs_format(&FSD1);
+        if (ret < 0) {
+            chprintf(chp, "Format failed: %d\r\n", ret);
             return;
         }
         chprintf(chp, "OK\r\n");
