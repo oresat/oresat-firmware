@@ -21,6 +21,7 @@
 /* Local variables and types.                                                */
 /*===========================================================================*/
 
+/* Frame buffer allocation pool */
 static objects_fifo_t fb_fifo;
 static msg_t fb_fifo_msgs[RADIO_FB_COUNT];
 static fb_t fb_fifo_buf[RADIO_FB_COUNT];

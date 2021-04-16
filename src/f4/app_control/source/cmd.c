@@ -7,14 +7,12 @@
 #include "cmd.h"
 #include "c3.h"
 #include "fw.h"
-#include "radio.h"
 #include "comms.h"
 #include "opd.h"
 #include "CO_master.h"
 #include "rtc.h"
 #include "fram.h"
 #include "fs.h"
-#include "frame_buf.h"
 #include "test_mmc.h"
 #include "test_radio.h"
 #include "deployer.h"
@@ -650,7 +648,6 @@ fram_usage:
 /*===========================================================================*/
 void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    extern const radio_cfg_t *tx_eng;
     uint8_t buf[] = {
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -673,8 +670,7 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         fb_t *fb = fb_alloc(sizeof(buf));
         fb->data_ptr = fb_put(fb, sizeof(buf));
         memcpy(fb->data_ptr, buf, sizeof(buf));
-        ax5043TX(tx_eng->devp, tx_eng->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
-        fb_free(fb);
+        comms_send(fb);
     } else {
         goto edl_usage;
     }
