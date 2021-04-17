@@ -210,7 +210,7 @@ void tmp101Stop(TMP101Driver *devp);
 //  confirm with team:
 bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
 
-msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array);
+msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC);
 
 #ifdef __cplusplus
 }

@@ -21,16 +21,6 @@
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
-typedef union {
-    struct __attribute__((packed)) {
-        uint8_t reg;
-        union {
-            uint8_t data[2];
-            uint16_t value;
-        };
-    };
-    uint8_t buf[3];
-} i2cbuf_t;
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -74,6 +64,30 @@ msg_t tmp101I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
 }
 #endif /* TMP101_USE_I2C */
 
+
+msg_t tmp101I2CReadRegister2(TMP101Driver *devp, const uint8_t reg, uint8_t *dest_2_byte_array)
+{
+    msg_t i2c_result = MSG_OK;
+    uint8_t sensor_addr = devp->config->saddr;
+
+// Prepare for I2C transaction:
+#if TMP101_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+#endif /* TMP101_SHARED_I2C */
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+
+    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, reg, dest_2_byte_array, 2);
+
+    i2cStop(devp->config->i2cp);
+
+#if TMP101_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* TMP101_SHARED_I2C */
+
+    return i2c_result;
+}
+
+
 /*==========================================================================*/
 /* Interface implementation.                                                */
 /*==========================================================================*/
@@ -95,14 +109,9 @@ static const struct TMP101VMT vmt_device = {
  */
 void tmp101ObjectInit(TMP101Driver *devp) {
     devp->vmt = &vmt_device;
-
     devp->config = NULL;
-
     devp->state = TMP101_STOP;
 }
-
-
-
 
 /**
  * @brief   Configures and activates TMP101 Complex Driver peripheral.
@@ -113,8 +122,6 @@ void tmp101ObjectInit(TMP101Driver *devp) {
  * @api
  */
 void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
-//    i2cbuf_t buf;
-
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == TMP101_STOP) ||
             (devp->state == TMP101_READY),
@@ -122,12 +129,11 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
 
     devp->config = config;
 
+#if 0
     /* Configuring common registers, or at minimum start I2C bus. */
-
 #if TMP101_USE_I2C
 #if TMP101_SHARED_I2C
     i2cAcquireBus(config->i2cp);
-
 #endif /* TMP101_SHARED_I2C */
     i2cStart(config->i2cp, config->i2ccfg);
 
@@ -135,9 +141,9 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
     i2cReleaseBus(config->i2cp);
 #endif /* TMP101_SHARED_I2C */
 #endif /* TMP101_USE_I2C */
+#endif
 
     devp->state = TMP101_READY;
-
 }
 
 /**
@@ -148,8 +154,6 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
  * @api
  */
 void tmp101Stop(TMP101Driver *devp) {
-//    i2cbuf_t buf;
-
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == TMP101_STOP) || (devp->state == TMP101_READY),
             "tmp101Stop(), invalid state");
@@ -158,7 +162,6 @@ void tmp101Stop(TMP101Driver *devp) {
 #if TMP101_USE_I2C
 #if TMP101_SHARED_I2C
         i2cAcquireBus(devp->config->i2cp);
-        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* TMP101_SHARED_I2C */
         i2cStop(devp->config->i2cp);
 #if TMP101_SHARED_I2C
@@ -171,80 +174,38 @@ void tmp101Stop(TMP101Driver *devp) {
 }
 
 
-
-// 2021-02-07 - first draft read temperature routine
-#if (0)
-bool read_tmp101an_temperature_v1(TMP101Driver *devp, unsigned int option)
-{
-// 2021-02-07 - these two byte arrays will be passed to a development
-//  routine, to confirm we can talk with the TMP101 sensors of the
-//  solar board.  When that's working we'll move these and the dev'
-//  code over to the TMP101 driver source file.  That will be the
-//  first step to honor and conform to the object oritented device
-//  driver encapsulation that's already expressed in the Oresat firmware
-//  project - TMH
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    uint8_t buffer_tx[2] = {0};
-    uint8_t buffer_rx[5] = {0};
-
-    msg_t i2c_result = MSG_OK;
-    i2cflags_t i2c_flags = 0;
-
-    uint8_t sensor_addr = devp->config->saddr;
-
-    if (option == 2)
-    {
-        // option parameter not yet used - TMH
-    }
-
-// Values chosen per TMP101 datasheet:
-    buffer_tx[0] = TMP101_REG_TEMPERATURE_READING;
-    buffer_tx[1] = 0;
-
-// Clear first two bytes of receive buffer, as temperature reading has 12 bits spanning two bytes:
-    buffer_rx[0] = 0;
-    buffer_rx[1] = 0;
-
-#if TMP101_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-
-    i2c_result = i2cMasterTransmitTimeout(devp->config->i2cp, sensor_addr, buffer_tx, 1, buffer_rx, 2, TIME_INFINITE);
-    i2c_flags = i2cGetErrors(devp->config->i2cp);
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* TMP101_SHARED_I2C */
-
-    if ( i2c_result == MSG_OK )
-        return true;
-    else
-        return true;
-
-}
-#endif // (0)
-
-
 //----------------------------------------------------------------------
 // @brief   routine to read TMP101 temperature sensor, and return a
 //          two-byte reading
 //----------------------------------------------------------------------
-msg_t read_tmp101an_temperature_v2(TMP101Driver *devp, uint8_t* byte_array)
+msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC)
 {
-    msg_t i2c_result = MSG_OK;
-    uint8_t sensor_addr = devp->config->saddr;
+	uint8_t byte_array[2];
+	msg_t i2c_result = tmp101I2CReadRegister2(devp, TMP101_REG_TEMPERATURE, byte_array);
 
-// Prepare for I2C transaction:
-#if TMP101_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+	if( i2c_result == MSG_OK ) {
+		chprintf((BaseSequentialStream *) &SD2, "byte_array[0] = 0x%X byte_array[1] = 0x%X\r\n", byte_array[0], byte_array[1]);
 
-    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, TMP101_REG_TEMPERATURE, byte_array, 2);
+		uint16_t tmp = (byte_array[0] << 4) | ((byte_array[1] >> 4) & 0x0F);
+		if( tmp & (1<<11) ) {
+			//TODO Test measurement of negative temperatures, this math may be wrong...
 
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* TMP101_SHARED_I2C */
+			//Convert 12 bit negative 2's compliment to 16 bit 2's compliment
+			tmp |= 0xF000;
+		}
+		//0.0625 deg C per LSB
+		int16_t tmp_signed = tmp;
+
+		if( dest_temp_c != NULL ) {
+			*dest_temp_c = (((uint32_t) tmp_signed) * 62500) / 1000000;
+		}
+
+		if( dest_temp_mC != NULL ) {
+			*dest_temp_mC = (((uint32_t) tmp_signed) * 62500) / 1000;
+		}
+	}
 
     return i2c_result;
 }
-
-
 
 /** @} */
