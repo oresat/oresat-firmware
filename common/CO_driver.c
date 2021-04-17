@@ -27,7 +27,6 @@
 
 
 #include "301/CO_driver.h"
-#include "can_hw.h"
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
@@ -79,6 +78,8 @@ CO_ReturnError_t CO_CANmodule_init(
 
     osalDbgAssert(CANmodule->canFIFO1FilterCount == 0 || CANmodule->canFIFO1Filters != NULL,
             "Error in CO_CANmodule_init(): FIFO 1 Filters is NULL when count is not 0");
+    osalDbgAssert((CANmodule->canFIFO1FilterCount % 2) == 0,
+            "Error in CO_CANmodule_init(): FIFO 1 Filter count must be multiple of 2");
 
     /* Verify arguments */
     if (CANmodule==NULL || rxArray==NULL || txArray==NULL) {
@@ -144,8 +145,14 @@ CO_ReturnError_t CO_CANmodule_init(
         CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
         CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
     }
-    for (i = 0U; i < CANmodule->canFIFO1FilterCount; i++) {
-        CANmodule->canFilters[i + CANmodule->canFIFO0FilterCount] = CANmodule->canFIFO1Filters[i];
+    for (i = CANmodule->canFIFO0FilterCount; i < CANmodule->useCANrxFilters; i++) {
+        int filter_index = (i - CANmodule->canFIFO0FilterCount) * 2;
+        CANmodule->canFilters[i].filter = i;
+        CANmodule->canFilters[i].mode = 1;                  /* List Mode */
+        CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
+        CANmodule->canFilters[i].assignment = 1;            /* Assign FIFO1 */
+        CANmodule->canFilters[i].register1 = CANmodule->canFIFO1Filters[filter_index].raw;
+        CANmodule->canFilters[i].register2 = CANmodule->canFIFO1Filters[filter_index + 1].raw;
     }
 
     return CO_ERROR_NO;
