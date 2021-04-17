@@ -58,9 +58,9 @@ static thread_descriptor_t cmd_desc = {
 #endif
 
 static oresat_config_t oresat_conf = {
-    &CAND1,
-    0x01,
-    ORESAT_DEFAULT_BITRATE
+    .cand = &CAND1,
+    .node_id = 0x01,
+    .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
 /**

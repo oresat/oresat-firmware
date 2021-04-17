@@ -51,9 +51,9 @@ const I2CConfig i2cconfig = {
 };
 
 static oresat_config_t oresat_conf = {
-    &CAND1,
-    0x04,
-    ORESAT_DEFAULT_BITRATE
+    .cand = &CAND1,
+    .node_id = ORESAT_DEFAULT_ID,
+    .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
 /**

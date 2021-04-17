@@ -3,7 +3,6 @@
 #include "ch.h"
 #include "hal.h"
 #include "comms.h"
-#include "radio.h"
 #include "beacon.h"
 #include "c3.h"
 #include "rtc.h"
@@ -340,10 +339,12 @@ static const uslp_vc_t vc0 = {
     .cop            = COP_NONE,
     .mapid[0]       = &map0,
     .trunc_tf_len   = 128,
+#if (USLP_USE_SDLS == TRUE)
     .sdls_hdr       = NULL,
     .sdls_tlr       = NULL,
     .sdls_hdr_len   = 0,
     .sdls_tlr_len   = 0,
+#endif
 };
 
 static const uslp_mc_t mc = {
@@ -412,7 +413,11 @@ const radio_cfg_t *tx_eng = &uhf_eng_cfg;
 const radio_cfg_t *tx_ax25 = &uhf_ax25_cfg;
 
 static thread_t *edl_tp[EDL_WORKERS] = {NULL};
+static thread_t *tx_tp = NULL;
 static thread_t *beacon_tp = NULL;
+
+static mailbox_t tx_mb;
+static msg_t tx_mb_msgs[RADIO_FB_COUNT];
 
 THD_FUNCTION(edl_thd, arg)
 {
@@ -434,9 +439,30 @@ THD_FUNCTION(edl_thd, arg)
     chThdExit(MSG_OK);
 }
 
+THD_FUNCTION(tx_worker, arg)
+{
+    const radio_cfg_t *cfg = arg;
+    fb_t *fb;
+
+    while (!chThdShouldTerminateX()) {
+        if (chMBFetchTimeout(&tx_mb, (msg_t*)(&fb), TIME_MS2I(1000)) != MSG_OK)
+            continue;
+        ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
+        fb_free(fb);
+    }
+
+    /* Free remaining frame buffers */
+    while (chMBFetchTimeout(&tx_mb, (msg_t*)(&fb), TIME_IMMEDIATE) == MSG_OK) {
+        fb_free(fb);
+    }
+
+    chThdExit(MSG_OK);
+}
+
 void comms_init(void)
 {
     radio_init();
+    chMBObjectInit(&tx_mb, tx_mb_msgs, RADIO_FB_COUNT);
 }
 
 void comms_start(void)
@@ -447,11 +473,21 @@ void comms_start(void)
     }
     ax5043RX(&lband, false, false);
     ax5043RX(&uhf, false, false);
+    tx_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "TX Worker", NORMALPRIO, tx_worker, (void*)tx_eng);
 }
 
 void comms_stop(void)
 {
+    /* Stop transmissions */
+    comms_beacon(false);
+    chThdTerminate(tx_tp);
+    chThdWait(tx_tp);
+    tx_tp = NULL;
+
+    /* Stop receiving */
     radio_stop();
+
+    /* Terminate receive threads */
     for (int i = 0; i < EDL_WORKERS; i++) {
         chThdTerminate(edl_tp[i]);
         chThdWait(edl_tp[i]);
@@ -462,10 +498,22 @@ void comms_stop(void)
 void comms_beacon(bool enable)
 {
     if (enable && beacon_tp == NULL) {
-        beacon_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "Beacon", NORMALPRIO, beacon, (void*)&uhf_ax25_cfg);
+        beacon_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "Beacon", NORMALPRIO, beacon, (void*)tx_ax25);
     } else if (!enable && beacon_tp != NULL) {
         chThdTerminate(beacon_tp);
         chThdWait(beacon_tp);
         beacon_tp = NULL;
     }
+}
+
+void comms_send(fb_t *fb)
+{
+    osalDbgCheck(fb != NULL);
+    chMBPostTimeout(&tx_mb, (msg_t)(fb), TIME_INFINITE);
+}
+
+void comms_send_ahead(fb_t *fb)
+{
+    osalDbgCheck(fb != NULL);
+    chMBPostAheadTimeout(&tx_mb, (msg_t)(fb), TIME_INFINITE);
 }
