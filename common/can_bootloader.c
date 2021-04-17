@@ -5,6 +5,8 @@
 #include "string.h"
 #include "oresat_f0.h"
 
+#define CAN_MAILBOX_TO_USE      2
+
 #define DEFAULT_RETRY_LIMIT     3
 
 #define M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE     64
@@ -92,11 +94,12 @@ void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const ch
 }
 
 
+
 msg_t can_api_receive2(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms, const char *pre_msg, const char *post_msg) {
     CANDriver *canp = can_bl_config->canp;
     BaseSequentialStream *chp = can_bl_config->chp;
 
-    msg_t r = canReceive(canp, CAN_ANY_MAILBOX, msg, TIME_MS2I(timeout_ms));
+    msg_t r = canReceive(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
         can_api_print_rx_frame(chp, msg, pre_msg, post_msg);
     }
@@ -125,7 +128,7 @@ msg_t can_api_transmit(can_bootloader_config_t *can_bl_config, CANTxFrame *msg, 
     CANDriver *canp = can_bl_config->canp;
     BaseSequentialStream *chp = can_bl_config->chp;
 
-    const msg_t r = canTransmit(canp, CAN_ANY_MAILBOX, msg, TIME_MS2I(timeout_ms));
+    const msg_t r = canTransmit(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
         can_api_print_tx_frame(chp, msg, "", " - SUCCESS");
     } else {

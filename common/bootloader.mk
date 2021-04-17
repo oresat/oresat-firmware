@@ -1,4 +1,4 @@
-include $(PROJ_SRC)/util.mk
+#include $(PROJ_SRC)/util.mk
 
 BOOTLOADERINC = $(PROJ_SRC)/include
 
