@@ -564,6 +564,7 @@ int main(void)
 
     chprintf(DEBUG_SD, "Bootloader __flash0_base__ = 0x%08X\r\n", (uint8_t *) &__flash0_base__);
     chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%08X\r\n", (uint8_t *) &__flash0_end__);
+    chprintf(DEBUG_SD, "CPU ID Low: 0x%X\r\n", *cpu_unique_id_low);
 
     extern stkalign_t __main_thread_stack_base__;
     extern stkalign_t __main_thread_stack_end__;

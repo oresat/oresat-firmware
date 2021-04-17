@@ -209,6 +209,8 @@ include $(TOOLCHAIN)/toolchain.mk
 ##############################################################################
 # Custom rules
 #
+xxd:
+	xxd -i build/app_solar.crc32.bin > ./build/app_solar_crc32_blob.h
 
 #
 # Custom rules
