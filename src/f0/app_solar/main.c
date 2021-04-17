@@ -41,6 +41,15 @@ static thread_descriptor_t solar_desc = {
     .funcp = solar,
     .arg = NULL
 };
+static worker_t sensor_mon_worker;
+static thread_descriptor_t sensor_mon_desc = {
+    .name = "Sensor Monitor",
+    .wbase = THD_WORKING_AREA_BASE(sensor_mon_wa),
+    .wend = THD_WORKING_AREA_END(sensor_mon_wa),
+    .prio = NORMALPRIO,
+    .funcp = sensor_mon,
+    .arg = NULL
+};
 
 const I2CConfig i2cconfig = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -64,6 +73,7 @@ static void app_init(void)
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
     reg_worker(&solar_worker, &solar_desc, true, true);
+    reg_worker(&sensor_mon_worker, &sensor_mon_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
