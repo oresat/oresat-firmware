@@ -4,6 +4,8 @@
 
 #include "cmd.h"
 #include "test_time.h"
+#include "test_lfs.h"
+#include "test_bootloader.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -18,6 +20,8 @@ static thread_t *shell_tp;
 /*===========================================================================*/
 static const ShellCommand commands[] = {
     {"time", cmd_time},
+    {"lfs", cmd_lfs},
+    {"bootloader", cmd_bootloader},
     {NULL, NULL}
 };
 

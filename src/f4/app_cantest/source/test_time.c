@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "test_time.h"
 #include "rtc.h"
 #include "chprintf.h"
