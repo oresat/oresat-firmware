@@ -1,5 +1,5 @@
 # Toolchain Test Application
-`app_blinky` is a simple app that blinks a dev board's LED at 1Hz with a 50% duty cycle.
+`app_blinky` is a simple app that blinks a dev board's LED at 1Hz with a 50% duty cycle. it's located in the folder `oresat-firmware/src/f0/app_blinky`.
 
 To ensure you have your toolchain correctly installed and configured,
 you simply need to run the following sequence of commands:
