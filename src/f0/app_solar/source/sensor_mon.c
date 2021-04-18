@@ -43,6 +43,8 @@ THD_WORKING_AREA(sensor_mon_wa, 0x200);
 THD_FUNCTION(sensor_mon, arg)
 {
     (void)arg;
+    chThdSleepMilliseconds(10);
+
     chprintf((BaseSequentialStream *) &SD2, "initializing TMP101 driver instances...\r\n");
     tmp101ObjectInit(&device_driver_for_temp_sensor_01);
     tmp101Start(&device_driver_for_temp_sensor_01, &config_for_temp_sensor_01);
@@ -50,7 +52,7 @@ THD_FUNCTION(sensor_mon, arg)
     tmp101ObjectInit(&device_driver_for_temp_sensor_02);
     tmp101Start(&device_driver_for_temp_sensor_02, &config_for_temp_sensor_02);
 
-    chprintf((BaseSequentialStream *) &SD2, "Starting loop,\r\n");
+    chprintf((BaseSequentialStream *) &SD2, "Starting TMP101 loop,\r\n");
 
     while (!chThdShouldTerminateX())
     {
@@ -69,7 +71,7 @@ THD_FUNCTION(sensor_mon, arg)
         	chprintf((BaseSequentialStream *) &SD2, "Failed to read I2C temperature\r\n");
         }
 
-        chprintf((BaseSequentialStream *) &SD2, "temp_c 1 = %d C  (%d mC)\r\n", temp_c, temp_mC);
+        chprintf((BaseSequentialStream *) &SD2, "temp_c 2 = %d C  (%d mC)\r\n", temp_c, temp_mC);
         chThdSleepMilliseconds(SOLAR_BOARD_TEMPERATURE_READINGS_FREQ_IN_MS - DELAY_BETWEEN_TEMP_READINGS_IN_MS);
     }
 

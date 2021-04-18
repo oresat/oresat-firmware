@@ -242,7 +242,7 @@
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
 #if !defined(INA226_SHARED_I2C) || defined(__DOXYGEN__)
-#define INA226_SHARED_I2C                   FALSE
+#define INA226_SHARED_I2C                   TRUE
 #endif
 /** @} */
 

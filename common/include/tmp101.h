@@ -89,7 +89,7 @@
  * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
  */
 #if !defined(TMP101_SHARED_I2C) || defined(__DOXYGEN__)
-#define TMP101_SHARED_I2C                   FALSE
+#define TMP101_SHARED_I2C                   TRUE
 #endif
 /** @} */
 
