@@ -41,7 +41,7 @@
    FILE INFO:
       FileName:     app.xdd
       FileVersion:  0
-      CreationTime: 11:18AM
+      CreationTime: 12:18PM
       CreationDate: 08-30-2019
       CreatedBy:    Miles Simpson
 *******************************************************************************/
@@ -51,7 +51,7 @@
    DEVICE INFO:
       VendorName:     Portland State Aerospace Society
       VendorNumber:   0
-      ProductName:    OreSat Master Template
+      ProductName:    OreSat C3
       ProductNumber:  0
 *******************************************************************************/
 
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             48
+   #define CO_OD_NoOfElements             53
 
 
 /*******************************************************************************
@@ -173,6 +173,33 @@
                UNSIGNED16     VREFINT_Raw;
                UNSIGNED16     VBAT_Raw;
                }              OD_MCU_Sensors_t;
+/*6001      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     saveInterval;
+               UNSIGNED16     EDL_Timeout;
+               BOOLEAN        factoryReset;
+               }              OD_stateControl_t;
+/*6002      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     timeout;
+               BOOLEAN        deployed;
+               UNSIGNED32     actuationTime;
+               UNSIGNED8      attempts;
+               }              OD_deploymentControl_t;
+/*6003      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     timeout;
+               UNSIGNED32     beaconInterval;
+               }              OD_TX_Control_t;
+/*6004      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED64     timestamp;
+               UNSIGNED32     alarmA;
+               UNSIGNED32     alarmB;
+               UNSIGNED32     wakeup;
+               UNSIGNED32     lastTX_Enable;
+               UNSIGNED32     lastEDL;
+               }              OD_persistentState_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -795,6 +822,44 @@
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
 
+/*6000 */
+        #define OD_6000_C3State                                     0x6000
+
+/*6001 */
+        #define OD_6001_stateControl                                0x6001
+
+        #define OD_6001_0_stateControl_maxSubIndex                  0
+        #define OD_6001_1_stateControl_saveInterval                 1
+        #define OD_6001_2_stateControl_EDL_Timeout                  2
+        #define OD_6001_3_stateControl_factoryReset                 3
+
+/*6002 */
+        #define OD_6002_deploymentControl                           0x6002
+
+        #define OD_6002_0_deploymentControl_maxSubIndex             0
+        #define OD_6002_1_deploymentControl_timeout                 1
+        #define OD_6002_2_deploymentControl_deployed                2
+        #define OD_6002_3_deploymentControl_actuationTime           3
+        #define OD_6002_4_deploymentControl_attempts                4
+
+/*6003 */
+        #define OD_6003_TX_Control                                  0x6003
+
+        #define OD_6003_0_TX_Control_maxSubIndex                    0
+        #define OD_6003_1_TX_Control_timeout                        1
+        #define OD_6003_2_TX_Control_beaconInterval                 2
+
+/*6004 */
+        #define OD_6004_persistentState                             0x6004
+
+        #define OD_6004_0_persistentState_maxSubIndex               0
+        #define OD_6004_1_persistentState_timestamp                 1
+        #define OD_6004_2_persistentState_alarmA                    2
+        #define OD_6004_3_persistentState_alarmB                    3
+        #define OD_6004_4_persistentState_wakeup                    4
+        #define OD_6004_5_persistentState_lastTX_Enable             5
+        #define OD_6004_6_persistentState_lastEDL                   6
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -815,6 +880,7 @@ struct sCO_OD_RAM{
 /*2020      */ OD_MCU_Calibration_t MCU_Calibration;
 /*2021      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
+/*6000      */ VISIBLE_STRING C3State[1];
 
                UNSIGNED32     LastWord;
 };
@@ -876,6 +942,26 @@ struct sCO_OD_PERSIST_MFR{
                UNSIGNED32     LastWord;
 };
 
+/***** Structure for PERSIST_APP variables ********************************************/
+struct sCO_OD_PERSIST_APP{
+               UNSIGNED32     FirstWord;
+
+/*6001      */ OD_stateControl_t stateControl;
+/*6002      */ OD_deploymentControl_t deploymentControl;
+/*6003      */ OD_TX_Control_t TX_Control;
+
+               UNSIGNED32     LastWord;
+};
+
+/***** Structure for PERSIST_STATE variables ********************************************/
+struct sCO_OD_PERSIST_STATE{
+               UNSIGNED32     FirstWord;
+
+/*6004      */ OD_persistentState_t persistentState;
+
+               UNSIGNED32     LastWord;
+};
+
 /***** Declaration of Object Dictionary variables *****************************/
 extern struct sCO_OD_RAM CO_OD_RAM;
 
@@ -886,6 +972,10 @@ extern struct sCO_OD_EEPROM CO_OD_EEPROM;
 extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
 
 extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
+
+extern struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP;
+
+extern struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE;
 
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
@@ -1031,6 +1121,22 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 /*2100, Data Type: OCTET_STRING */
         #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
         #define ODL_errorStatusBits_stringLength                    10
+
+/*6000, Data Type: VISIBLE_STRING */
+        #define OD_C3State                                          CO_OD_RAM.C3State
+        #define ODL_C3State_stringLength                            1
+
+/*6001, Data Type: stateControl_t */
+        #define OD_stateControl                                     CO_OD_PERSIST_APP.stateControl
+
+/*6002, Data Type: deploymentControl_t */
+        #define OD_deploymentControl                                CO_OD_PERSIST_APP.deploymentControl
+
+/*6003, Data Type: TX_Control_t */
+        #define OD_TX_Control                                       CO_OD_PERSIST_APP.TX_Control
+
+/*6004, Data Type: persistentState_t */
+        #define OD_persistentState                                  CO_OD_PERSIST_STATE.persistentState
 
 #endif
 // clang-format on
