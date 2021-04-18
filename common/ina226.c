@@ -290,33 +290,30 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
  * @api
  */
 int32_t ina226ReadShunt(INA226Driver *devp) {
-    //FIXME refactor to handle errors
-    int32_t voltage;
-
+    //FIXME reactor to handle errors
     osalDbgCheck(devp != NULL);
 
-    voltage = ((int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT) * 25)/10;
+    //TODO validate the math on this
+    const int32_t voltage_uV = ((int32_t) ((int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT)) * 25)/10;
 
-    return voltage;
+    return voltage_uV;
 }
 
 /**
  * @brief   Reads INA226 VBUS voltage.
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               VBUS voltage in 1uV increments
+ * @return               VBUS voltage in 1 mV increments
  *
  * @api
  */
 uint32_t ina226ReadVBUS(INA226Driver *devp) {
-    //FIXME refactor to handle errors
-    uint32_t voltage;
-
+    //FIXME reactor to handle errors
     osalDbgCheck(devp != NULL);
 
-    voltage = ina226ReadRaw(devp, INA226_AD_VBUS) * 1250;
+    const uint32_t voltage_mV = (((uint32_t) ina226ReadRaw(devp, INA226_AD_VBUS)) * 1250) / 1000;
 
-    return voltage;
+    return voltage_mV;
 }
 
 /**
@@ -324,21 +321,20 @@ uint32_t ina226ReadVBUS(INA226Driver *devp) {
  * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Current in increments of @p curr_lsb
+ * @return               Current in units of micro amps
  *
  * @api
  */
 int32_t ina226ReadCurrent(INA226Driver *devp) {
-    //FIXME refactor to handle errors
-    int32_t current;
-
+    //FIXME reactor to handle errors
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    current = (int16_t)ina226ReadRaw(devp, INA226_AD_CURRENT) * devp->config->curr_lsb;
+    const int32_t current_raw_register = ina226ReadRaw(devp, INA226_AD_CURRENT);
+    const int32_t current_uA = (current_raw_register * devp->config->curr_lsb * 1000) / 2048;
 
-    return current;
+    return current_uA;
 }
 
 /**
@@ -346,19 +342,19 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Power in increments of @p curr_lsb * 25V
+ * @return               Power in increments of mW
  *
  * @api
  */
 uint32_t ina226ReadPower(INA226Driver *devp) {
-    //FIXME refactor to handle errors
+    //FIXME reactor to handle errors
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    uint32_t power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
+    const uint32_t power_mW = ina226ReadRaw(devp, INA226_AD_POWER) / 2;
 
-    return power;
+    return power_mW;
 }
 
 /** @} */

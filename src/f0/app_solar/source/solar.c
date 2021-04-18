@@ -5,7 +5,7 @@
 
 #define DEBUG_SD                  (BaseSequentialStream *) &SD2
 
-//FIXME I beleive MAX() is defined in some common C library???
+//FIXME I believe MAX() is defined in some common C library???
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
@@ -14,35 +14,24 @@
 #define RSENSE                  100      /* 0.1 ohm  */
 #define DAC_VDDA_UV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
 
-
-/* Defines for MPPT algorithm that changes with each solar cell variant
- * Things to note
- * Negative step size needs to be greater as the curve falls quickly.
- * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
- */
-#ifdef PAO_VERSION_1
-#define MIN_DP_DI               0        /* The most important piece. This keeps the point to the left of MPP. */
-#define NVE_STEP_SIZE           3500     /* Fixed -ve step size */
-#define CURR_THRES_SENS         0        /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
-#define MAX_STEP_SIZE           10000    /* Maximum step size for variable step IC. */
-#define STEP_SIZE_FACTOR        2000     /* Posive step factor. */
-#define NVE_STEP_SIZE_FACTOR    4        /* Negative step factor. This is multipled with Positive step factor */
-#define MIN_PV_CURRENT          0        /* Minimum current drawn from PV cells */
-#define MAX_PV_CURRENT          500000   /* Maximum current drawn from PV cells */
-#define MIN_PV_POWER            50000    /* Minimum power drawn from PV cells */
-#endif
-
+//Assumes 3.3V Vcc
+#define DAC_MININUM_ADJUST_UV   805
 
 #define I_ADJ_INITIAL           1500000
-//#define I_ADJ_MAX               1600000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
+#define HISTERESIS_MW           3
 
 
-//500 is based on the width of the flat at the top of the curve
-#define VREF_STEP_IN_MICROVOLTS_NEGATIVE             500
+//1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
+#define VREF_STEP_IN_MICROVOLTS_NEGATIVE             1000
 #define VREF_STEP_IN_MICROVOLTS_POSITIVE             (VREF_STEP_IN_MICROVOLTS_NEGATIVE * 4)
 #define DIAG_REPORT_EVERY_N_LOOP_ITERATIONS          1
+
+
+#if VREF_STEP_IN_MICROVOLTS_NEGATIVE < DAC_MININUM_ADJUST_UV
+#error "VREF_STEP_IN_MICROVOLTS_NEGATIVE must be greater then DAC_MININUM_ADJUSG_UV"
+#endif
 
 
 /* Based on INA226 datasheet, page 15, Equation (2)
@@ -54,16 +43,16 @@
  * Since CURR_LSB is in uA and Rsense is in mOhm
  * CAL = 0.00512 / (CURR_LSB * Rsense * 10^-9)
  */
-#define NUM_INA226_AVG                                 64
-#define INA226_ADC_CONVERSION_TIME_MICROSECONDS        204
+#define NUM_INA226_AVG                                 16
+#define INA226_ADC_CONVERSION_TIME_MICROSECONDS        1100
 
 static const INA226Config ina226config = {
     &I2CD2,
     &i2cconfig,
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
-    INA226_CONFIG_VSHCT_204US | INA226_CONFIG_VBUSCT_204US |
-    INA226_CONFIG_AVG_64,
+    INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
+    INA226_CONFIG_AVG_16,
     (5120000/(RSENSE * CURR_LSB)),
     CURR_LSB
 };
@@ -80,21 +69,22 @@ static INA226Driver ina226dev;
 typedef struct {
 	uint32_t iadj_uv;
 	bool direction_up_flag;
+	uint32_t step_size;
 
-	bool is_initial_data_valid;
-	uint32_t avg_power_initial_uW;
-	uint32_t avg_voltage_initial_uV;
-	uint32_t avg_current_initial;
+	uint32_t avg_power_initial_mW;
+	uint32_t avg_voltage_initial_mV;
+	uint32_t avg_current_initial_uA;
 
-	uint32_t max_power_initial_uW;
-	uint32_t max_voltage_initial_uV;
-	uint32_t max_current_initial;
+	uint32_t max_power_initial_mW;
+	uint32_t max_voltage_initial_mV;
+	uint32_t max_current_initial_uA;
 
-	uint32_t avg_power_perterbed_uW;
-	uint32_t avg_voltage_perterbed_uV;
-	uint32_t avg_current_perterbed;
-
+	uint32_t avg_power_perturbed_mW;
+	uint32_t avg_voltage_perturbed_mV;
+	uint32_t avg_current_perturbed_uA;
 } mppt_pao_state;
+
+mppt_pao_state pao_state;
 
 
 /**
@@ -104,7 +94,7 @@ typedef struct {
  * @param[in] chan      DAC channel.
  * @param[in] uv        output volts in uv (microVolts).
  */
-void dacPutMicrovolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
+void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
     /* Per section 14.5.3 of the STM32F0x1 ref manual,
      * Vout(mV) = VDDA(mV) * (reg_val / 4096)
      * so, reg_val = (Vout * 4096) / VDDA
@@ -116,33 +106,19 @@ void dacPutMicrovolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
 /**
  * @brief Reads power flow characteristics from the INA226
  *
- * @param[in|out] *dest_avg_power_uW     Output variable into which to store average power reading
+ * @param[in|out] *dest_avg_power_mW     Output variable into which to store average power reading
  * @param[in|out] *dest_avg_voltage_uV   Output variable into which to store average voltage reading
  * @param[in|out] *dest_avg_current      Output variable into which to store average current reading
  *
  * @return true upon success, false otherwise
  */
-bool read_avg_power_and_voltage(uint32_t *dest_avg_power_uW, uint32_t *dest_avg_voltage_uV, uint32_t *dest_avg_current) {
-	const uint32_t num_to_average = 1;
-	uint64_t power_sum = 0;
-	uint64_t voltage_sum = 0;
-	int64_t current_sum;
-
+bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_voltage_mV, uint32_t *dest_avg_current_uA) {
 	chThdSleepMilliseconds((NUM_INA226_AVG * INA226_ADC_CONVERSION_TIME_MICROSECONDS) / 1000);//Compensate for the internal averaging done by the ina chip
 
-	for(uint32_t i = 0; i < num_to_average; i++ ) {
-		//FIXME refactor ina226ReadPower and ina226ReadVBUS to return errors if/when i2c comm issues happen
-		power_sum += ina226ReadPower(&ina226dev);  /* Power in increments of uW */
-		voltage_sum += ina226ReadVBUS(&ina226dev); /* VBUS voltage in uV */
-		current_sum += ina226ReadCurrent(&ina226dev);
-	}
-
-	*dest_avg_power_uW = power_sum / num_to_average;
-	*dest_avg_current = current_sum / num_to_average;
-	*dest_avg_voltage_uV = voltage_sum / num_to_average;
-
-	//Remove some of the noise
-	//*dest_avg_power_uW -= ((*dest_avg_power_uW) % (SMALLEST_UW_MEASUREMENT_UNIT * 2));
+	//FIXME reactor ina226ReadPower and ina226ReadVBUS to return errors if/when i2c comm issues happen
+	*dest_avg_power_mW = ina226ReadPower(&ina226dev);  /* Power in increments of mW */
+	*dest_avg_voltage_mV = ina226ReadVBUS(&ina226dev); /* VBUS voltage in uV */
+	*dest_avg_current_uA = ina226ReadCurrent(&ina226dev);
 
 	return(true);
 }
@@ -156,6 +132,19 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
 	return (v);
 }
 
+/**
+ * Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP.
+ */
+uint32_t get_iadj_step_size(const uint32_t voltage_mV, const bool direction_up_flag) {
+	if( voltage_mV > 4800 ) {
+		return(5000);//up or down is fine
+	}
+
+	if( direction_up_flag ) {
+		return(VREF_STEP_IN_MICROVOLTS_POSITIVE);
+	}
+	return(VREF_STEP_IN_MICROVOLTS_NEGATIVE);
+}
 
 /**
  * @param *pao_state The current state of the perturb and observe algorithm
@@ -163,54 +152,42 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
  * @return true on success, false otherwise
  */
 bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
-	if( ! pao_state->is_initial_data_valid ) {
-		if( ! read_avg_power_and_voltage(&pao_state->avg_power_initial_uW, &pao_state->avg_voltage_initial_uV, &pao_state->avg_current_initial) ) {
-			//FIXME handle error
-		}
-		pao_state->is_initial_data_valid = true;
-	}
+	pao_state->step_size = get_iadj_step_size(pao_state->avg_voltage_initial_mV, pao_state->direction_up_flag);
 
-	pao_state->max_power_initial_uW = MAX(pao_state->max_power_initial_uW, pao_state->avg_power_initial_uW);
-	pao_state->max_voltage_initial_uV = MAX(pao_state->max_voltage_initial_uV, pao_state->avg_voltage_initial_uV);
-	pao_state->max_current_initial = MAX(pao_state->max_current_initial, pao_state->avg_current_initial);
-
-	//FIXME consider step size being too small to actually perturb the read back. This implementation would get stuck and fail to converge on the proper value
-	uint32_t iadj_uv_perterbed = pao_state->iadj_uv;
+	uint32_t iadj_uv_perturbed = pao_state->iadj_uv;
 	if( pao_state->direction_up_flag ) {
-		iadj_uv_perterbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) + VREF_STEP_IN_MICROVOLTS_POSITIVE, I_ADJ_MIN, I_ADJ_MAX);
+		iadj_uv_perturbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) + pao_state->step_size, I_ADJ_MIN, I_ADJ_MAX);
 	} else {
-		iadj_uv_perterbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) - VREF_STEP_IN_MICROVOLTS_NEGATIVE, I_ADJ_MIN, I_ADJ_MAX);
+		iadj_uv_perturbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) - pao_state->step_size, I_ADJ_MIN, I_ADJ_MAX);
 	}
 
-	if( pao_state->iadj_uv == iadj_uv_perterbed ) {
-		//It has saturated, flip the search direction
+	if( pao_state->iadj_uv == iadj_uv_perturbed ) {
+		//It has saturated to an identical value, flip the search direction and process in the next iteration
 		pao_state->direction_up_flag = (! pao_state->direction_up_flag);
 	} else {
-		dacPutMicrovolts(&DACD1, 0, iadj_uv_perterbed);
+		dac_put_microvolts(&DACD1, 0, iadj_uv_perturbed);
 
-		if( ! read_avg_power_and_voltage(&pao_state->avg_power_perterbed_uW, &pao_state->avg_voltage_perterbed_uV, &pao_state->avg_current_perterbed) ) {
+		if( ! read_avg_power_and_voltage(&pao_state->avg_power_perturbed_mW, &pao_state->avg_voltage_perturbed_mV, &pao_state->avg_current_perturbed_uA) ) {
 			//FIXME handle error
 		}
 
-		const int32_t histeresis_uW = 4000;
-
-		if( pao_state->avg_power_perterbed_uW >= (pao_state->avg_power_initial_uW - histeresis_uW) ) {
+		if( pao_state->avg_power_perturbed_mW >= (pao_state->avg_power_initial_mW - HISTERESIS_MW) ) {
 			//Always move the iadj_value, even if the output power is equal. This will cause it to hunt back and forth between two points that have a detectable difference in their power output.
-			pao_state->iadj_uv = iadj_uv_perterbed;
-
-
-			pao_state->avg_current_initial = pao_state->avg_current_perterbed;
-			pao_state->avg_power_initial_uW = pao_state->avg_power_perterbed_uW;
-			pao_state->avg_voltage_initial_uV = pao_state->avg_voltage_perterbed_uV;
-
-			pao_state->is_initial_data_valid = true;
 		} else {
 			pao_state->direction_up_flag = (! pao_state->direction_up_flag);
-			dacPutMicrovolts(&DACD1, 0, pao_state->iadj_uv);
-
-			pao_state->is_initial_data_valid = false;
 		}
+
+		pao_state->iadj_uv = iadj_uv_perturbed;
+
+		pao_state->avg_current_initial_uA = pao_state->avg_current_perturbed_uA;
+		pao_state->avg_power_initial_mW = pao_state->avg_power_perturbed_mW;
+		pao_state->avg_voltage_initial_mV = pao_state->avg_voltage_perturbed_mV;
 	}
+
+	//These values are published to the CANOpen dictionary objects
+	pao_state->max_power_initial_mW = MAX(pao_state->max_power_initial_mW, pao_state->avg_power_initial_mW);
+	pao_state->max_voltage_initial_mV = MAX(pao_state->max_voltage_initial_mV, pao_state->avg_voltage_initial_mV);
+	pao_state->max_current_initial_uA = MAX(pao_state->max_current_initial_uA, pao_state->avg_current_initial_uA);
 
 	return(true);
 }
@@ -234,41 +211,28 @@ THD_FUNCTION(solar, arg)
     	chThdSleepMilliseconds(100);
     }
 
-
-	mppt_pao_state pao_state;
     memset(&pao_state, 0, sizeof(pao_state));
     pao_state.iadj_uv = I_ADJ_INITIAL;
 
     palSetLine(LINE_LT1618_EN);
 
 #if 0
-	chprintf(DEBUG_SD, "Inducing brown out...\r\n");
-	chThdSleepMilliseconds(1000);
-
-	dacPutMicrovolts(&DACD1, 0, 1000000);
-	while(1) {
-		chprintf(DEBUG_SD, "Waiting for brown out...\r\n");
-		chThdSleepMilliseconds(200);
-	}
-#endif
-
-#if 0
 	//Generate CSV output to terminal for ploting in libreoffice
-	for(int iadj = 1500000; iadj >= 0; iadj -= 100 ) {
-		dacPutMicrovolts(&DACD1, 0, iadj);
+	for(int iadj = 1500000; iadj >= 0; iadj -= 1000 ) {
+		dac_put_microvolts(&DACD1, 0, iadj);
 
-		if( ! read_avg_power_and_voltage(&pao_state.avg_power_initial_uW, &pao_state.avg_voltage_initial_uV, &pao_state.avg_current_initial) ) {
+		if( ! read_avg_power_and_voltage(&pao_state.avg_power_initial_mW, &pao_state.avg_voltage_initial_mV, &pao_state.avg_current_initial_uA) ) {
 			//FIXME handle error
 		}
-		chprintf(DEBUG_SD, "iadj_uV,%u,avg_power_initial_uW,%u,avg_voltage_initial_uV,%u,avg_current_initial,%d\r\n",
-				iadj, pao_state.avg_power_initial_uW, pao_state.avg_voltage_initial_uV, pao_state.avg_current_initial);
+		chprintf(DEBUG_SD, "iadj_uV,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d\r\n",
+				iadj, pao_state.avg_power_initial_mW, pao_state.avg_voltage_initial_mV, pao_state.avg_current_initial_uA);
 	}
 	for(;;) {
 
 	}
 #endif
 
-	dacPutMicrovolts(&DACD1, 0, pao_state.iadj_uv);
+	dac_put_microvolts(&DACD1, 0, pao_state.iadj_uv);
 
 
     chprintf(DEBUG_SD, "Done with init INA226....\r\n");
@@ -278,27 +242,28 @@ THD_FUNCTION(solar, arg)
         if ((loop_iteration % DIAG_REPORT_EVERY_N_LOOP_ITERATIONS) == 0) {
         	const uint32_t avg_freq = (loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000));
 
-			chprintf(DEBUG_SD, "loop %u: iadj_uv = %u, direction_up_flag = %u, avg_power_initial_uW = %u, avg_voltage_initial_uV = %u, avg_current_initial = %d, avg_freq = %u\r\n",
+			chprintf(DEBUG_SD, "loop %u: iadj_uv = %u, direction_up_flag = %u, avg_power_initial_mW = %u, avg_voltage_initial_mV = %u, avg_current_initial_uA = %d, step_size = %u, avg_freq = %u\r\n",
 					loop_iteration, pao_state.iadj_uv,
 					pao_state.direction_up_flag,
-					pao_state.avg_power_initial_uW,
-					pao_state.avg_voltage_initial_uV,
-					pao_state.avg_current_initial,
+					pao_state.avg_power_initial_mW,
+					pao_state.avg_voltage_initial_mV,
+					pao_state.avg_current_initial_uA,
+					pao_state.step_size,
 					avg_freq);
         }
 
     	itterate_mppt_perturb_and_observe(&pao_state);
 
-    	OD_PV_Power.voltage = pao_state.avg_voltage_initial_uV;
-    	OD_PV_Power.voltageAvg = pao_state.avg_voltage_initial_uV;
-    	OD_PV_Power.current = pao_state.avg_current_initial;
-    	OD_PV_Power.currentAvg = pao_state.avg_current_initial;
-    	OD_PV_Power.power = pao_state.avg_power_initial_uW;
-    	OD_PV_Power.powerAvg = pao_state.avg_power_initial_uW;
+    	OD_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
+    	OD_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
+    	OD_PV_Power.current = pao_state.avg_current_initial_uA;
+    	OD_PV_Power.currentAvg = pao_state.avg_current_initial_uA;
+    	OD_PV_Power.power = pao_state.avg_power_initial_mW;
+    	OD_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
 
-    	OD_PV_Power.voltageMax = pao_state.max_voltage_initial_uV;
-    	OD_PV_Power.currentMax = pao_state.max_current_initial;
-    	OD_PV_Power.powerAvg = pao_state.max_power_initial_uW;
+    	OD_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
+    	OD_PV_Power.currentMax = pao_state.max_current_initial_uA;
+    	OD_PV_Power.powerAvg = pao_state.max_power_initial_mW;
     	OD_PV_Power.energy = 0;
 
     } // end while thread should run loop
