@@ -5,8 +5,6 @@
 
 #define DEBUG_SD                  (BaseSequentialStream *) &SD2
 
-#define PAO_VERSION_3
-
 //FIXME I beleive MAX() is defined in some common C library???
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
@@ -35,22 +33,16 @@
 #endif
 
 
-#define INA226_MEASUREMENT_CONVERSION_TIME_MS        2
 #define I_ADJ_INITIAL           1500000
-#define I_ADJ_MAX               1600000
+//#define I_ADJ_MAX               1600000
+#define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
 
 
-// Used in Perturb And Observe (PAO) algorithm:
-//#define VREF_STEP_IN_MICROVOLTS_POSITIVE             20
-//#define VREF_STEP_IN_MICROVOLTS_POSITIVE             10000
-#define VREF_STEP_IN_MICROVOLTS_POSITIVE             5000
-//#define VREF_STEP_IN_MICROVOLTS_POSITIVE             1000
-
-#define VREF_STEP_IN_MICROVOLTS_NEGATIVE             VREF_STEP_IN_MICROVOLTS_POSITIVE
+//500 is based on the width of the flat at the top of the curve
+#define VREF_STEP_IN_MICROVOLTS_NEGATIVE             500
+#define VREF_STEP_IN_MICROVOLTS_POSITIVE             (VREF_STEP_IN_MICROVOLTS_NEGATIVE * 4)
 #define DIAG_REPORT_EVERY_N_LOOP_ITERATIONS          1
-#define SMALLEST_UW_MEASUREMENT_UNIT                 50
-//#define TOTAL_NUMBER_OF_STEPS                        ((I_ADJ_MAX - I_ADJ_MIN) / VREF_STEP_IN_MICROVOLTS_POSITIVE)
 
 
 /* Based on INA226 datasheet, page 15, Equation (2)
@@ -62,15 +54,16 @@
  * Since CURR_LSB is in uA and Rsense is in mOhm
  * CAL = 0.00512 / (CURR_LSB * Rsense * 10^-9)
  */
-#define NUM_INA226_AVG      512
+#define NUM_INA226_AVG                                 64
+#define INA226_ADC_CONVERSION_TIME_MICROSECONDS        204
 
 static const INA226Config ina226config = {
     &I2CD2,
     &i2cconfig,
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
-    INA226_CONFIG_VSHCT_140US | INA226_CONFIG_VBUSCT_140US |
-    INA226_CONFIG_AVG_512,
+    INA226_CONFIG_VSHCT_204US | INA226_CONFIG_VBUSCT_204US |
+    INA226_CONFIG_AVG_64,
     (5120000/(RSENSE * CURR_LSB)),
     CURR_LSB
 };
@@ -88,6 +81,7 @@ typedef struct {
 	uint32_t iadj_uv;
 	bool direction_up_flag;
 
+	bool is_initial_data_valid;
 	uint32_t avg_power_initial_uW;
 	uint32_t avg_voltage_initial_uV;
 	uint32_t avg_current_initial;
@@ -134,11 +128,9 @@ bool read_avg_power_and_voltage(uint32_t *dest_avg_power_uW, uint32_t *dest_avg_
 	uint64_t voltage_sum = 0;
 	int64_t current_sum;
 
-	const uint32_t ina266_measurement_conversion_time_us = 1100;
-	chThdSleepMilliseconds((NUM_INA226_AVG * ina266_measurement_conversion_time_us) / 1000);//Compensate for the internal averaging done by the ina chip
+	chThdSleepMilliseconds((NUM_INA226_AVG * INA226_ADC_CONVERSION_TIME_MICROSECONDS) / 1000);//Compensate for the internal averaging done by the ina chip
 
 	for(uint32_t i = 0; i < num_to_average; i++ ) {
-		chThdSleepMilliseconds(INA226_MEASUREMENT_CONVERSION_TIME_MS);
 		//FIXME refactor ina226ReadPower and ina226ReadVBUS to return errors if/when i2c comm issues happen
 		power_sum += ina226ReadPower(&ina226dev);  /* Power in increments of uW */
 		voltage_sum += ina226ReadVBUS(&ina226dev); /* VBUS voltage in uV */
@@ -150,7 +142,7 @@ bool read_avg_power_and_voltage(uint32_t *dest_avg_power_uW, uint32_t *dest_avg_
 	*dest_avg_voltage_uV = voltage_sum / num_to_average;
 
 	//Remove some of the noise
-	*dest_avg_power_uW -= ((*dest_avg_power_uW) % (SMALLEST_UW_MEASUREMENT_UNIT * 2));
+	//*dest_avg_power_uW -= ((*dest_avg_power_uW) % (SMALLEST_UW_MEASUREMENT_UNIT * 2));
 
 	return(true);
 }
@@ -165,21 +157,22 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
 }
 
 
-
 /**
  * @param *pao_state The current state of the perturb and observe algorithm
  *
  * @return true on success, false otherwise
  */
 bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
-	if( ! read_avg_power_and_voltage(&pao_state->avg_power_initial_uW, &pao_state->avg_voltage_initial_uV, &pao_state->avg_current_initial) ) {
-		//FIXME handle error
+	if( ! pao_state->is_initial_data_valid ) {
+		if( ! read_avg_power_and_voltage(&pao_state->avg_power_initial_uW, &pao_state->avg_voltage_initial_uV, &pao_state->avg_current_initial) ) {
+			//FIXME handle error
+		}
+		pao_state->is_initial_data_valid = true;
 	}
 
 	pao_state->max_power_initial_uW = MAX(pao_state->max_power_initial_uW, pao_state->avg_power_initial_uW);
 	pao_state->max_voltage_initial_uV = MAX(pao_state->max_voltage_initial_uV, pao_state->avg_voltage_initial_uV);
 	pao_state->max_current_initial = MAX(pao_state->max_current_initial, pao_state->avg_current_initial);
-
 
 	//FIXME consider step size being too small to actually perturb the read back. This implementation would get stuck and fail to converge on the proper value
 	uint32_t iadj_uv_perterbed = pao_state->iadj_uv;
@@ -204,9 +197,18 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 		if( pao_state->avg_power_perterbed_uW >= (pao_state->avg_power_initial_uW - histeresis_uW) ) {
 			//Always move the iadj_value, even if the output power is equal. This will cause it to hunt back and forth between two points that have a detectable difference in their power output.
 			pao_state->iadj_uv = iadj_uv_perterbed;
+
+
+			pao_state->avg_current_initial = pao_state->avg_current_perterbed;
+			pao_state->avg_power_initial_uW = pao_state->avg_power_perterbed_uW;
+			pao_state->avg_voltage_initial_uV = pao_state->avg_voltage_perterbed_uV;
+
+			pao_state->is_initial_data_valid = true;
 		} else {
 			pao_state->direction_up_flag = (! pao_state->direction_up_flag);
 			dacPutMicrovolts(&DACD1, 0, pao_state->iadj_uv);
+
+			pao_state->is_initial_data_valid = false;
 		}
 	}
 
@@ -251,6 +253,7 @@ THD_FUNCTION(solar, arg)
 #endif
 
 #if 0
+	//Generate CSV output to terminal for ploting in libreoffice
 	for(int iadj = 1500000; iadj >= 0; iadj -= 100 ) {
 		dacPutMicrovolts(&DACD1, 0, iadj);
 
@@ -267,11 +270,8 @@ THD_FUNCTION(solar, arg)
 
 	dacPutMicrovolts(&DACD1, 0, pao_state.iadj_uv);
 
-    if( ! read_avg_power_and_voltage(&pao_state.avg_power_initial_uW, &pao_state.avg_voltage_initial_uV, &pao_state.avg_current_initial) ) {
-		//FIXME handle error
-	}
 
-    //chprintf(DEBUG_SD, "Done with init INA226....\r\n");
+    chprintf(DEBUG_SD, "Done with init INA226....\r\n");
     systime_t loop_start_time_ms = TIME_I2MS(chVTGetSystemTime());
 
 	for (uint32_t loop_iteration = 0; !chThdShouldTerminateX(); loop_iteration++) {
