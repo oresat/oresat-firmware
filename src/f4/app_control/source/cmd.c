@@ -5,7 +5,7 @@
 #include "cmd.h"
 #include "CANopen.h"
 #include "c3.h"
-#include "fw.h"
+#include "test_fw.h"
 #include "test_canopen.h"
 #include "test_opd.h"
 #include "test_time.h"
