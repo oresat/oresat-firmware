@@ -4,18 +4,18 @@ FileVersion=0
 FileRevision=1
 LastEDS=
 EDSVersion=4.0
-Description=OreSat Master Node Object Dictionary
-CreationTime=11:18AM
+Description=OreSat C3 Node Object Dictionary
+CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:08AM
-ModificationDate=03-05-2021
+ModificationTime=5:24PM
+ModificationDate=04-14-2021
 ModifiedBy=
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat Master Template
+ProductName=OreSat C3
 ProductNumber=0
 RevisionNumber=0
 BaudRate_10=1
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=39
+SupportedObjects=44
 1=0x1002
 2=0x1003
 3=0x1005
@@ -164,6 +164,11 @@ SupportedObjects=39
 37=0x1F81
 38=0x1F82
 39=0x1F89
+40=0x6000
+41=0x6001
+42=0x6002
+43=0x6003
+44=0x6004
 
 [1002]
 ParameterName=Manufacturer status register
@@ -4216,6 +4221,212 @@ ObjectType=0x7
 DataType=0x0007
 AccessType=rw
 DefaultValue=
+PDOMapping=0
+
+[6000]
+ParameterName=C3 State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0009
+AccessType=ro
+HighLimit=F
+LowLimit=B
+DefaultValue=B
+PDOMapping=0
+
+[6001]
+ParameterName=State Control
+ObjectType=0x9
+;StorageLocation=PERSIST_APP
+SubNumber=0x4
+
+[6001sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x03
+PDOMapping=0
+
+[6001sub1]
+ParameterName=Save Interval
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10
+PDOMapping=0
+
+[6001sub2]
+ParameterName=EDL Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=60
+PDOMapping=0
+
+[6001sub3]
+ParameterName=Factory Reset
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6002]
+ParameterName=Deployment Control
+ObjectType=0x9
+;StorageLocation=PERSIST_APP
+SubNumber=0x5
+
+[6002sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x04
+PDOMapping=0
+
+[6002sub1]
+ParameterName=Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=300
+PDOMapping=0
+
+[6002sub2]
+ParameterName=Deployed
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rw
+DefaultValue=1
+PDOMapping=0
+
+[6002sub3]
+ParameterName=Actuation Time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=1000
+PDOMapping=0
+
+[6002sub4]
+ParameterName=Attempts
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=3
+PDOMapping=0
+
+[6003]
+ParameterName=TX Control
+ObjectType=0x9
+;StorageLocation=PERSIST_APP
+SubNumber=0x3
+
+[6003sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x02
+PDOMapping=0
+
+[6003sub1]
+ParameterName=Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=86400
+PDOMapping=0
+
+[6003sub2]
+ParameterName=Beacon Interval
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=10000
+PDOMapping=0
+
+[6004]
+ParameterName=Persistent State
+ObjectType=0x9
+;StorageLocation=PERSIST_STATE
+SubNumber=0x7
+
+[6004sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x06
+PDOMapping=0
+
+[6004sub1]
+ParameterName=Timestamp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub2]
+ParameterName=Alarm A
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub3]
+ParameterName=Alarm B
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub4]
+ParameterName=Wakeup
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub5]
+ParameterName=Last TX Enable
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub6]
+ParameterName=Last EDL
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
 PDOMapping=0
 
 [ManufacturerObjects]
