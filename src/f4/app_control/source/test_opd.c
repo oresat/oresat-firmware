@@ -50,14 +50,14 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
         }
         if (!strcmp(argv[0], "enable")) {
             chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
-            if (!opd_enable(opd_addr)) {
+            if (!opd_state(opd_addr, true)) {
                 chprintf(chp, "ENABLED\r\n");
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
         } else if (!strcmp(argv[0], "disable")) {
             chprintf(chp, "Disabling board 0x%02X: ", opd_addr);
-            if (!opd_disable(opd_addr)) {
+            if (!opd_state(opd_addr, false)) {
                 chprintf(chp, "DISABLED\r\n");
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
@@ -102,6 +102,12 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
         } else if (!strcmp(argv[0], "boot")) {
             int retval = opd_boot(opd_addr);
             chprintf(chp, "Boot returned 0x%02X\r\n", retval);
+        } else if (!strcmp(argv[0], "linux_normal")) {
+            chprintf(chp, "Linux boot normal\r\n");
+            opd_linux_recover(opd_addr, false);
+        } else if (!strcmp(argv[0], "linux_recover")) {
+            chprintf(chp, "Linux boot recovery\r\n");
+            opd_linux_recover(opd_addr, true);
         } else {
             goto opd_usage;
         }
@@ -111,18 +117,22 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 
 opd_usage:
     chprintf(chp, "Usage: opd <cmd> <opd_addr>\r\n"
-                  "    sysenable:  Enable OPD subsystem (Power On)\r\n"
-                  "    sysdisable: Disable OPD subsystem (Power Off)\r\n"
-                  "    sysrestart: Cycle power on OPD subsystem\r\n"
-                  "    rescan:     Rescans devices on OPD\r\n"
-                  "    enable:     Enable an OPD attached card\r\n"
-                  "    disable:    Disable an OPD attached card\r\n"
-                  "    reset:      Reset the circuit breaker of a card\r\n"
-                  "    reinit:     Reinitialize a device\r\n"
-                  "    probe:      Probe an address to see if a card responds\r\n"
-                  "    status:     Report the status of a card\r\n"
-                  "    summary:    Report the status of all cards\r\n"
-                  "    boot:       Attempt to bootstrap a card\r\n");
+                  "    sysenable:       Enable OPD subsystem (Power On)\r\n"
+                  "    sysdisable:      Disable OPD subsystem (Power Off)\r\n"
+                  "    sysrestart:      Cycle power on OPD subsystem\r\n"
+                  "    rescan:          Rescans devices on OPD\r\n"
+                  "    enable:          Enable an OPD attached card\r\n"
+                  "    disable:         Disable an OPD attached card\r\n"
+                  "    reset:           Reset the circuit breaker of a card\r\n"
+                  "    reinit:          Reinitialize a device\r\n"
+                  "    probe:           Probe an address to see if a card responds\r\n"
+                  "    status:          Report the status of a card\r\n"
+                  "    summary:         Report the status of all cards\r\n"
+                  "\r\n"
+                  "    boot:            Attempt to bootstrap a card via OPD\r\n"
+                  "    linux_normal:    Set linux boot pin to normal\r\n"
+                  "    linux_recover:   Set linux boot pin to recovery\r\n"
+                  "\r\n");
     return;
 }
 
