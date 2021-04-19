@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 
 #include "cmd.h"
-#include "CANopen.h"
 #include "c3.h"
+#include "CANopen.h"
 #include "test_fw.h"
 #include "test_canopen.h"
 #include "test_opd.h"
@@ -32,7 +31,7 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
     if (!strcmp(argv[0], "status")) {
         chprintf(chp, "C3 State:  %c\r\n", OD_C3State[0]);
         chprintf(chp, "TX Enable: %s\r\n", (tx_enabled() ? "TRUE" : "FALSE"));
-        chprintf(chp, "Bat Good:  %s\r\n", (bat_good ? "TRUE" : "FALSE"));
+        chprintf(chp, "Bat Good:  %s\r\n", (bat_good() ? "TRUE" : "FALSE"));
         chprintf(chp, "EDL Mode:  %s\r\n", (edl_enabled() ? "TRUE" : "FALSE"));
         chprintf(chp, "===RTC===\r\n"
                       "Date:      %08X\r\n"
@@ -46,9 +45,6 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
                       RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
     } else if (!strcmp(argv[0], "tx") && argc > 1) {
         tx_enable(argv[1][0] == 't');
-    } else if (!strcmp(argv[0], "bat") && argc > 1) {
-        bat_good = (argv[1][0] == 't');
-        chEvtSignal(c3_tp, C3_EVENT_BAT);
     } else if (!strcmp(argv[0], "edl") && argc > 1) {
         edl_enable(argv[1][0] == 't');
     } else if (!strcmp(argv[0], "reset")) {
@@ -66,7 +62,6 @@ state_usage:
     chprintf(chp,  "Usage: state <command>\r\n"
                    "    status:         Get current system state\r\n"
                    "    tx <t/f>:       Override TX enable state\r\n"
-                   "    bat <t/f>:      Override battery good state\r\n"
                    "    edl <t/f>:      Override EDL state\r\n"
                    "    reset:          Soft reset C3\r\n"
                    "    factoryreset:   Reset C3 to factory defaults\r\n"

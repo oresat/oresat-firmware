@@ -44,6 +44,14 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2021*/ {0x6L, 0x0, 0x00, 0x00, 0x00, 0x00, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*6000*/ {'B'},
+/*7001*/ {0x1L, 0x00},
+/*7003*/ {0x1L, 0x00},
+/*700B*/ {0x1L, 0x00},
+/*700D*/ {0x1L, 0x00},
+/*700E*/ {0x1L, 0x00},
+/*700F*/ {0x1L, 0x00},
+/*7013*/ {0x1L, 0x00},
+/*7014*/ {0x1L, 0x00},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -393,6 +401,46 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_STATE.persistentState.lastEDL, 0x8F, 0x4 },
 };
 
+/*0x7001*/ const CO_OD_entryRecord_t OD_record7001[2] = {
+           {(void*)&CO_OD_RAM.battery.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.battery.subObject1, 0xB6, 0x2 },
+};
+
+/*0x7003*/ const CO_OD_entryRecord_t OD_record7003[2] = {
+           {(void*)&CO_OD_RAM.solarPanel.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel.subObject1, 0xB6, 0x2 },
+};
+
+/*0x700B*/ const CO_OD_entryRecord_t OD_record700B[2] = {
+           {(void*)&CO_OD_RAM.starTracker.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.subObject1, 0xB6, 0x2 },
+};
+
+/*0x700D*/ const CO_OD_entryRecord_t OD_record700D[2] = {
+           {(void*)&CO_OD_RAM.GPS.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.subObject1, 0xB6, 0x2 },
+};
+
+/*0x700E*/ const CO_OD_entryRecord_t OD_record700E[2] = {
+           {(void*)&CO_OD_RAM.ACS.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.ACS.subObject1, 0xB6, 0x2 },
+};
+
+/*0x700F*/ const CO_OD_entryRecord_t OD_record700F[2] = {
+           {(void*)&CO_OD_RAM.RWB.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.RWB.subObject1, 0xB6, 0x2 },
+};
+
+/*0x7013*/ const CO_OD_entryRecord_t OD_record7013[2] = {
+           {(void*)&CO_OD_RAM.dxWiFi.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.subObject1, 0xB6, 0x2 },
+};
+
+/*0x7014*/ const CO_OD_entryRecord_t OD_record7014[2] = {
+           {(void*)&CO_OD_RAM.CFC.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.subObject1, 0xB6, 0x2 },
+};
+
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
@@ -450,5 +498,13 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x6002, 0x04, 0x00,  0, (void*)&OD_record6002},
 {0x6003, 0x02, 0x00,  0, (void*)&OD_record6003},
 {0x6004, 0x06, 0x00,  0, (void*)&OD_record6004},
+{0x7001, 0x01, 0x00,  0, (void*)&OD_record7001},
+{0x7003, 0x01, 0x00,  0, (void*)&OD_record7003},
+{0x700B, 0x01, 0x00,  0, (void*)&OD_record700B},
+{0x700D, 0x01, 0x00,  0, (void*)&OD_record700D},
+{0x700E, 0x01, 0x00,  0, (void*)&OD_record700E},
+{0x700F, 0x01, 0x00,  0, (void*)&OD_record700F},
+{0x7013, 0x01, 0x00,  0, (void*)&OD_record7013},
+{0x7014, 0x01, 0x00,  0, (void*)&OD_record7014},
 };
 // clang-format on

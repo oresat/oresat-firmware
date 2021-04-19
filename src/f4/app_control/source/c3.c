@@ -15,9 +15,9 @@
 #define TX_ENABLE_ALARM                     ALARM_B     /* TX enable timeout alarm number */
 #define EDL_ALARM                           ALARM_A     /* EDL timeout alarm number */
 
-/* Placeholder variables for satellite state from object dictionary */
-/* TODO: Switch to actual OD variables */
-bool bat_good = true;
+#define BAT_LEVEL_LOW                       600U
+#define BAT_LEVEL_HIGH                      850U
+#define BAT_LOW                             (1000U < BAT_LEVEL_LOW && 1000U < BAT_LEVEL_LOW)
 
 /* Global State Variables */
 thread_t *c3_tp;
@@ -110,6 +110,19 @@ bool delay_deploy(void)
     return (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_deploymentControl.timeout);
 }
 
+bool bat_good(void)
+{
+    static bool good = true;
+
+    if (good && BAT_LOW) {
+        good = false;
+    } else if (!good && !BAT_LOW) {
+        good = true;
+    }
+
+    return good;
+}
+
 bool tx_enabled(void)
 {
     return (difftime(rtcGetTimeUnix(NULL), OD_persistentState.lastTX_Enable) < OD_TX_Control.timeout);
@@ -170,7 +183,7 @@ THD_FUNCTION(c3, arg)
             /* Initiate antenna deployment if needed */
             static uint8_t attempts = 0;
             if (!OD_deploymentControl.deployed && attempts < OD_deploymentControl.attempts) {
-                if (bat_good) {
+                if (bat_good()) {
                     deploy_heli(OD_deploymentControl.actuationTime);
                     deploy_turn(OD_deploymentControl.actuationTime);
                     attempts++;
@@ -188,7 +201,7 @@ THD_FUNCTION(c3, arg)
 
             if (edl_enabled()) {
                 OD_C3State[0] = EDL;
-            } else if (tx_enabled() && bat_good) {
+            } else if (tx_enabled() && bat_good()) {
                 OD_C3State[0] = BEACON;
             } else {
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
@@ -199,7 +212,7 @@ THD_FUNCTION(c3, arg)
 
             if (edl_enabled()) {
                 OD_C3State[0] = EDL;
-            } else if (!tx_enabled() || !bat_good) {
+            } else if (!tx_enabled() || !bat_good()) {
                 OD_C3State[0] = STANDBY;
             } else {
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
@@ -209,7 +222,7 @@ THD_FUNCTION(c3, arg)
             comms_beacon(false);
 
             if (!edl_enabled()) {
-                if (tx_enabled() && bat_good) {
+                if (tx_enabled() && bat_good()) {
                     OD_C3State[0] = BEACON;
                 } else {
                     OD_C3State[0] = STANDBY;
