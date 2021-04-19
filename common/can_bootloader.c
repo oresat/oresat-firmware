@@ -207,7 +207,7 @@ bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint3
         memset(&msg, 0, sizeof(msg));
         msg_t r = can_api_receive(can_bl_config, &msg, timeout_ms);
         if( r == MSG_OK ) {
-            if( msg.SID == ORESAT_BOOTLOADER_CAN_COMMAND_GET && msg.DLC == 8 ) {
+            if( msg.SID == STM32_BOOTLOADER_CAN_ANNOUNCE && msg.DLC == 8 ) {
 
                 if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
                     const uint32_t remote_low_cpu_id = (msg.data8[4] << 24) | (msg.data8[5] << 16) | (msg.data8[6] << 8) | (msg.data8[7] << 0);
@@ -712,6 +712,8 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
     if( ! can_bootloader_initiate(can_bl_config, 5000) ) {
         chprintf(chp, "Failed to put node into bootloader mode...\r\n");
         return(false);
+    } else {
+    	chprintf(chp, "Successfully put node into bootloader mode...\r\n");
     }
 
 

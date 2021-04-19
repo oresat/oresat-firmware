@@ -74,7 +74,11 @@ static flt_reg_t fifo1_filters[] = {
     {
         .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ACK,
         .scale16.id_mask[1].STID = STM32_BOOTLOADER_CAN_NACK,
-    }
+    },
+	{
+		.scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
+		.scale16.id_mask[1].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
+	}
 };
 
 static oresat_config_t oresat_conf = {

@@ -24,7 +24,7 @@ extern int __flash1_base__;
 extern size_t __flash1_size__;
 extern int __flash1_end__;
 
-void setup_f0_vectors(void);
+//void setup_f0_vectors(void);
 
 #ifdef __cplusplus
 }

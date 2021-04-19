@@ -216,7 +216,7 @@ bool is_flash_page_eraseable(const uint8_t page_number) {
  * @return true if the given flash address can be written to, false otherwise.
  */
 bool is_flash_write_address_valid(const uint8_t *address) {
-    uint8_t *application_start_flash = (uint8_t *) &__flash1_base__;
+    uint8_t *application_start_flash = ((uint8_t *) &__flash1_base__) - 0x400; //Note: the 1024 bytes prior to __flash1_base__ represents the meta-data block that can be written to by the C3
     uint8_t *application_end_flash = (uint8_t *) &__flash1_end__;
 
     if( address >= application_start_flash && address < application_end_flash ) {
@@ -330,7 +330,7 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
                         //Failed to receive an expected frame of data to be written
                         break;
                     }
-                    if( write_rx_frame.SID != 0x04 ) {//Recommended ID based on AN3154
+                    if( write_rx_frame.SID != CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID ) {//Recommended ID based on AN3154
                         //Wrong SID, protocol misalignment?
                         break;
                     }
@@ -420,7 +420,7 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 void can_bootloader_announce_presence_on_bus(void) {
     CANTxFrame txmsg;
     memset(&txmsg, 0, sizeof(txmsg));
-    txmsg.SID = 0;
+    txmsg.SID = STM32_BOOTLOADER_CAN_ANNOUNCE;
     txmsg.DLC = 8;
     txmsg.data32[0] = 0x04030201;
     txmsg.data32[1] = *cpu_unique_id_low;
@@ -466,7 +466,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
       * see hal_can_lld.h for definition of CANFilter struct.
       */
 
-#define NUM_CAN_FILTERS     8
+#define NUM_CAN_FILTERS     9
 
     CANFilter can_filter_12[NUM_CAN_FILTERS] = {\
       /*{<filter bank number>, <mode>, <scale>, <assignment, FIFO0 or FIFO1>, <register 1>, <register 2>}  */ \
@@ -478,6 +478,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
       {5, 0, 1, 0, set_can_sid_data(CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID), set_can_sid_mask(0x7FF)},\
       {6, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_ACK), set_can_sid_mask(0x7FF)},\
       {7, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_NACK), set_can_sid_mask(0x7FF)},\
+	  {8, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_ANNOUNCE), set_can_sid_mask(0x7FF)},\
     };
 
 #if 1

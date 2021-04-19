@@ -3,13 +3,14 @@
 #include "test_bootloader.h"
 #include "can_bootloader.h"
 #include "chprintf.h"
+#include "oresat_f0.h"
 
 #include "app_solar.crc32.bin.h"
 
 //FIXME duplicate define from oresat_f0.h
-#define ORESAT_F0_FIRMWARE_CRC_ADDRESS                0x0800A000
+//#define ORESAT_F0_FIRMWARE_CRC_ADDRESS                0x0800A000
 //const uint32_t low_cpuid_of_protoboard = 0x1D000800;
-const uint32_t low_cpuid_of_solarcard = 0x58001;
+const uint32_t low_cpuid_of_solarcard = 0x1800500;
 
 CANDriver *canp = &CAND1;
 
@@ -37,19 +38,13 @@ uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer
 }
 
 void test_can_fw_update(BaseSequentialStream *chp) {
-
-
-
-
   can_bootloader_config_t can_bl_config;
   can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, low_cpuid_of_solarcard, false);
 
-  //test_garbage_can_transmit();
-  //oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, 72, test_read_function);
-
-  oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, build_app_solar_crc32_bin_len, firmware_blob_read_function);
+  bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, build_app_solar_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
+  chprintf(chp, "Firmware update success flag: %u\r\n", r);
 }
 
 
@@ -81,6 +76,9 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 				chprintf(chp, "No CAN frame RXed\r\n");
 			}
 		}
+
+    } else if (!strcmp(argv[0], "w") ) {
+    	test_can_fw_update(chp);
 
     } else {
         goto bootloader_usage;
