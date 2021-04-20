@@ -208,7 +208,7 @@ THD_FUNCTION(solar, arg)
     /* Start up LT1618 */
     palSetLine(LINE_LT1618_EN);
 
-    while(!chThdShouldTerminateX()){
+    while (!chThdShouldTerminateX()) {
         chThdSleepMilliseconds(SLEEP_MS);
 
         /* Get present values */
