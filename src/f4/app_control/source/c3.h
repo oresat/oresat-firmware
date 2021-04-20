@@ -30,10 +30,6 @@ typedef struct {
     eventmask_t         events;
 } c3_fsm_t;
 
-/* Placeholder variables for satellite state from object dictionary */
-/* TODO: Switch to actual OD variables */
-extern bool bat_good;
-
 /* Main Command, Communications, and Control Thread Prototype */
 extern THD_WORKING_AREA(c3_wa, 0x400);
 extern THD_FUNCTION(c3, arg);
@@ -44,6 +40,7 @@ void edl_enable(bool state);
 void factory_reset(void);
 
 bool delay_deploy(void);
+bool bat_good(void);
 bool tx_enabled(void);
 bool edl_enabled(void);
 

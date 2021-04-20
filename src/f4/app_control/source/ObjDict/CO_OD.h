@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             53
+   #define CO_OD_NoOfElements             61
 
 
 /*******************************************************************************
@@ -200,6 +200,38 @@
                UNSIGNED32     lastTX_Enable;
                UNSIGNED32     lastEDL;
                }              OD_persistentState_t;
+/*7001      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_battery_t;
+/*7003      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_solarPanel_t;
+/*700B      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_starTracker_t;
+/*700D      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_GPS_t;
+/*700E      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_ACS_t;
+/*700F      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_RWB_t;
+/*7013      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_dxWiFi_t;
+/*7014      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED16     subObject1;
+               }              OD_CFC_t;
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR OBJECT DICTIONARY INDEXES
@@ -860,6 +892,54 @@
         #define OD_6004_5_persistentState_lastTX_Enable             5
         #define OD_6004_6_persistentState_lastEDL                   6
 
+/*7001 */
+        #define OD_7001_battery                                     0x7001
+
+        #define OD_7001_0_battery_maxSubIndex                       0
+        #define OD_7001_1_battery_subObject1                        1
+
+/*7003 */
+        #define OD_7003_solarPanel                                  0x7003
+
+        #define OD_7003_0_solarPanel_maxSubIndex                    0
+        #define OD_7003_1_solarPanel_subObject1                     1
+
+/*700B */
+        #define OD_700B_starTracker                                 0x700B
+
+        #define OD_700B_0_starTracker_maxSubIndex                   0
+        #define OD_700B_1_starTracker_subObject1                    1
+
+/*700D */
+        #define OD_700D_GPS                                         0x700D
+
+        #define OD_700D_0_GPS_maxSubIndex                           0
+        #define OD_700D_1_GPS_subObject1                            1
+
+/*700E */
+        #define OD_700E_ACS                                         0x700E
+
+        #define OD_700E_0_ACS_maxSubIndex                           0
+        #define OD_700E_1_ACS_subObject1                            1
+
+/*700F */
+        #define OD_700F_RWB                                         0x700F
+
+        #define OD_700F_0_RWB_maxSubIndex                           0
+        #define OD_700F_1_RWB_subObject1                            1
+
+/*7013 */
+        #define OD_7013_dxWiFi                                      0x7013
+
+        #define OD_7013_0_dxWiFi_maxSubIndex                        0
+        #define OD_7013_1_dxWiFi_subObject1                         1
+
+/*7014 */
+        #define OD_7014_CFC                                         0x7014
+
+        #define OD_7014_0_CFC_maxSubIndex                           0
+        #define OD_7014_1_CFC_subObject1                            1
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -881,6 +961,14 @@ struct sCO_OD_RAM{
 /*2021      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*6000      */ VISIBLE_STRING C3State[1];
+/*7001      */ OD_battery_t    battery;
+/*7003      */ OD_solarPanel_t solarPanel;
+/*700B      */ OD_starTracker_t starTracker;
+/*700D      */ OD_GPS_t        GPS;
+/*700E      */ OD_ACS_t        ACS;
+/*700F      */ OD_RWB_t        RWB;
+/*7013      */ OD_dxWiFi_t     dxWiFi;
+/*7014      */ OD_CFC_t        CFC;
 
                UNSIGNED32     LastWord;
 };
@@ -1137,6 +1225,30 @@ extern struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE;
 
 /*6004, Data Type: persistentState_t */
         #define OD_persistentState                                  CO_OD_PERSIST_STATE.persistentState
+
+/*7001, Data Type: battery_t */
+        #define OD_battery                                          CO_OD_RAM.battery
+
+/*7003, Data Type: solarPanel_t */
+        #define OD_solarPanel                                       CO_OD_RAM.solarPanel
+
+/*700B, Data Type: starTracker_t */
+        #define OD_starTracker                                      CO_OD_RAM.starTracker
+
+/*700D, Data Type: GPS_t */
+        #define OD_GPS                                              CO_OD_RAM.GPS
+
+/*700E, Data Type: ACS_t */
+        #define OD_ACS                                              CO_OD_RAM.ACS
+
+/*700F, Data Type: RWB_t */
+        #define OD_RWB                                              CO_OD_RAM.RWB
+
+/*7013, Data Type: dxWiFi_t */
+        #define OD_dxWiFi                                           CO_OD_RAM.dxWiFi
+
+/*7014, Data Type: CFC_t */
+        #define OD_CFC                                              CO_OD_RAM.CFC
 
 #endif
 // clang-format on

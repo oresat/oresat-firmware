@@ -103,25 +103,19 @@ bool opd_probe(i2caddr_t addr, bool restart)
     return opd_dev[addr].valid;
 }
 
-int opd_enable(i2caddr_t addr)
+int opd_state(i2caddr_t addr, bool enable)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true) {
         return -1;
     }
 
-    max7310SetPin(&opd_dev[addr].dev, OPD_EN);
-    return 0;
-}
-
-int opd_disable(i2caddr_t addr)
-{
-    /* Ensure device is valid */
-    if (opd_dev[addr].valid != true) {
-        return -1;
+    if (enable) {
+        max7310SetPin(&opd_dev[addr].dev, OPD_EN);
+    } else {
+        max7310ClearPin(&opd_dev[addr].dev, OPD_EN);
     }
 
-    max7310ClearPin(&opd_dev[addr].dev, OPD_EN);
     return 0;
 }
 
@@ -299,4 +293,19 @@ int opd_boot(i2caddr_t addr)
     max7310ClearPin(devp, OPD_BOOT0);
 
     return retval;
+}
+
+int opd_linux_recover(i2caddr_t addr, bool enable)
+{
+    if (opd_dev[addr].valid != true) {
+        return -1;
+    }
+
+    if (enable) {
+        max7310ClearPin(&opd_dev[addr].dev, OPD_LINUX_BOOT);
+    } else {
+        max7310SetPin(&opd_dev[addr].dev, OPD_LINUX_BOOT);
+    }
+    return 0;
+
 }

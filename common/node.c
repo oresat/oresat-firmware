@@ -39,7 +39,7 @@ void node_start(uint8_t node_id)
 
     if (node->opd_addr) {
         opd_probe(node->opd_addr);
-        opd_enable(node->opd_addr);
+        opd_state(node->opd_addr, true);
     }
 }
 
@@ -55,7 +55,7 @@ void node_stop(uint8_t node_id)
     CO_HBconsumer_initCallbackHeartbeatStarted(hb_cons, index, NULL, NULL);
     CO_HBconsumer_initCallbackTimeout(hb_cons, index, NULL, NULL);
     if (node->opd_addr) {
-        opd_disable(node->opd_addr);
+        opd_state(node->opd_addr, false);
     }
     node->state = NODE_OFFLINE;
 }

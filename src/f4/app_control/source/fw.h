@@ -8,7 +8,15 @@
 extern "C" {
 #endif
 
-void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[]);
+typedef enum {
+    BANK_0 = 0,
+    BANK_1 = 1
+} fw_bank_t;
+
+int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t len);
+int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset);
+int fw_flash(EFlashDriver *eflp, char *filename);
+int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank);
 
 #ifdef __cplusplus
 }
