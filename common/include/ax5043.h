@@ -2284,6 +2284,7 @@
  * @{
  */
 #define AX5043_0xF00_DEFVAL                 (0x0FU)
+#define AX5043_0xF08_DEFVAL                 (0x04U)
 #define AX5043_0xF0C_DEFVAL                 (0x00U)
 #define AX5043_0xF0D_DEFVAL                 (0x03U)
 #define AX5043_0xF10_CRYSTAL                (0x03U)
