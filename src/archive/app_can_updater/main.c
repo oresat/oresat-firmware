@@ -188,7 +188,7 @@ int main(void) {
   oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_protocard2_crc32_bin_len, firmware_blob_read_function);
 #endif
 
-  print_can_bootloader_config_t(&can_bl_config);
+  print_can_bootloader_config_t(DEBUG_SD, &can_bl_config);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except

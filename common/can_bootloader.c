@@ -9,10 +9,20 @@
 
 #define DEFAULT_RETRY_LIMIT     3
 
+
 #define M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE     64
 uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
 
 #define STM32_BOOTLOADER_TEST_CODE    0
+
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
+#define can_bl_api_print_rx_frame(a, b, c, d) can_api_print_rx_frame(a, b, c, d)
+#define can_bl_api_print_tx_frame(a, b, c, d) can_api_print_tx_frame(a, b, c, d)
+#else
+#define can_bl_api_print_rx_frame(a, b, c, d)
+#define can_bl_api_print_tx_frame(a, b, c, d)
+#endif
+
 
 /**
  * Used to fully initialize a can_bootloader_config_t structure.
@@ -39,9 +49,10 @@ bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config
     return (true);
 }
 
-void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config) {
-    BaseSequentialStream *chp = can_bl_config->chp;
-
+/**
+ * Helper functino to
+ */
+void print_can_bootloader_config_t(BaseSequentialStream *chp, can_bootloader_config_t *can_bl_config) {
     chprintf(chp, "can_bootloader_config_t:\r\n");
     chprintf(chp, "  low_cpu_id:                   0x%X\r\n", can_bl_config->low_cpu_id);
     chprintf(chp, "  stm32_bootloader_mode:        %u\r\n", can_bl_config->stm32_bootloader_mode);
@@ -55,6 +66,7 @@ void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config) {
     chprintf(chp, "  can_tx_fail_count:            %u\r\n", can_bl_config->can_tx_fail_count);
     chprintf(chp, "  initiate_connection_count:    %u\r\n", can_bl_config->initiate_connection_count);
     chprintf(chp, "  connection_verify_fail:       %u\r\n", can_bl_config->connection_verify_fail);
+    chprintf(chp, "  update_duration_ms:           %u\r\n", can_bl_config->update_duration_ms);
 }
 
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg) {
@@ -74,6 +86,8 @@ void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const ch
     chprintf(chp, "%s", post_msg);
     chprintf(chp, "\r\n");
 }
+
+
 
 
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg) {
@@ -96,13 +110,17 @@ void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const ch
 
 
 
+
+
+
+
 msg_t can_api_receive2(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms, const char *pre_msg, const char *post_msg) {
     CANDriver *canp = can_bl_config->canp;
     BaseSequentialStream *chp = can_bl_config->chp;
 
     msg_t r = canReceive(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
-        can_api_print_rx_frame(chp, msg, pre_msg, post_msg);
+        can_bl_api_print_rx_frame(chp, msg, pre_msg, post_msg);
     }
     return(r);
 }
@@ -131,9 +149,9 @@ msg_t can_api_transmit(can_bootloader_config_t *can_bl_config, CANTxFrame *msg, 
 
     const msg_t r = canTransmit(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
-        can_api_print_tx_frame(chp, msg, "", " - SUCCESS");
+        can_bl_api_print_tx_frame(chp, msg, "", " - SUCCESS");
     } else {
-        can_api_print_tx_frame(chp, msg, "", " - FAIL");
+        can_bl_api_print_tx_frame(chp, msg, "", " - FAIL");
         can_bl_config->can_tx_fail_count++;
     }
     return(r);
@@ -186,7 +204,7 @@ bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint3
 
                 if( r == MSG_OK ) {
                     chprintf(chp, "Got response from STM32 CAN bootloader...\r\n");
-                    can_api_print_rx_frame(chp, &msg, "", "");
+                    can_bl_api_print_rx_frame(chp, &msg, "", "");
                     if( msg.SID == STM32_BOOTLOADER_CAN_ACK ) {
                         chprintf(chp, "Successfully put remote STM32 devices into CAN bootloader mode!\r\n");
                         //chThdSleepMilliseconds(5000);
@@ -264,15 +282,15 @@ bool can_bootloader_wait_for_ack(can_bootloader_config_t *can_bl_config, const u
         msg_t r = can_api_receive2(can_bl_config, &rx_msg, 1000, "", "expecting ACK/NACK");
         if( r == MSG_OK ) {
             if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_ACK ) {
-                can_api_print_rx_frame(chp, &rx_msg, "", " - got ACK");
+                can_bl_api_print_rx_frame(chp, &rx_msg, "", " - got ACK");
                 can_bl_config->ack_count++;
                 return(true);
             } else if( rx_msg.SID == sid_match && rx_msg.data8[0] == STM32_BOOTLOADER_CAN_NACK ) {
-                can_api_print_rx_frame(chp, &rx_msg, "", " - got NACK");
+                can_bl_api_print_rx_frame(chp, &rx_msg, "", " - got NACK");
                 can_bl_config->nack_count++;
                 return(false);
             } else {
-                can_api_print_rx_frame(chp, &rx_msg, "", " - UNKNOWN");
+                can_bl_api_print_rx_frame(chp, &rx_msg, "", " - UNKNOWN");
                 can_bl_config->unknown_count++;
             }
 
@@ -314,7 +332,7 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
     BaseSequentialStream *chp = can_bl_config->chp;
 
     //can_api_purge_rx_buffer(canp, chp);
-    chprintf(chp, "\r\ncan_bootloader_read_data(0x%X, %u)\r\n", memory_address, num_bytes_to_read);
+    chprintf(chp, "can_bootloader_read_data(0x%X, %u)\r\n", memory_address, num_bytes_to_read);
 
     msg_t r = 0;
 
@@ -340,7 +358,7 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
         expected_frame_count++;
     }
 
-    chprintf(chp, "expected_frame_count = %u\r\n", expected_frame_count);
+    //chprintf(chp, "expected_frame_count = %u\r\n", expected_frame_count);
 
     uint32_t dest_buffer_index = 0;
     for(uint32_t i = 0; i < expected_frame_count; i++) {
@@ -355,18 +373,19 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
         }
     }
 
-    chprintf(chp, "final dest_buffer_index = %u\r\n", dest_buffer_index);
+    //chprintf(chp, "final dest_buffer_index = %u\r\n", dest_buffer_index);
 
     if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY) ) {
         return(false);
     }
 
-
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
     chprintf(chp, "Successfully read memory from remote device...\r\n");
     for(uint32_t i = 0; i < dest_buffer_index; i++ ) {
         chprintf(chp, " 0x%X",  dest_buffer[i]);
     }
     chprintf(chp, "\r\n\r\n");
+#endif
 
     return(true);
 }
@@ -381,7 +400,9 @@ bool can_bootloader_read_data(can_bootloader_config_t *can_bl_config, const uint
 bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uint32_t page_number) {
     BaseSequentialStream *chp = can_bl_config->chp;
 
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
     chprintf(chp, "\r\ncan_bootloader_erase_page(%u)\r\n", page_number);
+#endif
     msg_t r = 0;
 
     CANTxFrame tx_msg;
@@ -404,8 +425,6 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
         return(false);
     }
 
-    //can_api_purge_rx_buffer(can_bl_config);
-
     chprintf(chp, "Successfully erased page %u on remote device\r\n", page_number);
     return(true);
 }
@@ -422,7 +441,7 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
 bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const uint32_t memory_address, const uint8_t *src_buffer, const uint32_t num_bytes) {
     BaseSequentialStream *chp = can_bl_config->chp;
 
-    chprintf(chp, "\r\ncan_bootloader_write_memory(., 0x%X, ., %u)\r\n", memory_address, num_bytes);
+    chprintf(chp, "can_bootloader_write_memory(., 0x%X, ., %u)\r\n", memory_address, num_bytes);
 
     msg_t r = 0;
 
@@ -475,7 +494,7 @@ bool can_bootloader_write_memory(can_bootloader_config_t *can_bl_config, const u
         return(false);
     }
 
-    chprintf(chp, "Successfully wrote memory on remote device...\r\n");
+    //chprintf(chp, "Successfully wrote memory on remote device...\r\n");
 
     return(true);
 }
@@ -511,6 +530,7 @@ bool can_bootloader_go(can_bootloader_config_t *can_bl_config, const uint32_t me
 /**
  * Function for development and testing of this API.
  */
+#if 0
 bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
     BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -571,6 +591,7 @@ bool can_bootloader_test(can_bootloader_config_t *can_bl_config) {
 
     return(true);
 }
+#endif
 
 /**
  * Used to validate communication to a remote bootloader device.
@@ -699,16 +720,104 @@ bool can_bootloader_verify_memory_reliable(can_bootloader_config_t *can_bl_confi
 }
 
 /**
- * Upates firmware on an M0 node
+ * Writes a subsection of a firmware image to a remote node.
  *
+ * @param *can_bl_config Configuration structure pointer for the bootloader update process.
  * @param base_address Address from which to start the firmware update
+ * @param start_byte_offset  Offset from which to start writing.
  * @param total_firmware_length_bytes Number of bytes to write
- * @param read_function_pointer Function pointer that will return chuncks of data from a given offset and length to be written to the remote device.
+ * @param read_function_pointer Function pointer that will return chucks of data from a given offset and length to be written to the remote device.
+ *
+ * @return true upon success, false otherwise.
+ */
+bool oresat_firmware_update_m0_write_subsection(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t start_byte_offset, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer) {
+
+    uint32_t current_file_offset = start_byte_offset;//0;
+
+    while (current_file_offset < total_firmware_length_bytes) {
+        uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+        if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
+            bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
+            if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
+                bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+            }
+        }
+
+        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
+        	chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
+            return(false);
+        }
+
+        if( ! can_bootloader_write_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+        	chprintf(can_bl_config->chp, "failed can_bootloader_write_memory_reliable()\r\n");
+            return(false);
+        }
+
+        current_file_offset += bytes_to_write_to_flash;
+    }
+
+    return(true);
+}
+
+
+/**
+ * Verifies a sub-section of the firmware image on the remote node.
+ *
+ * @param *can_bl_config Configuration structure pointer for the bootloader update process.
+ * @param base_address Address from which to start the firmware update
+ * @param start_byte_offset  Offset from which to start writing.
+ * @param total_firmware_length_bytes Number of bytes to write
+ * @param read_function_pointer Function pointer that will return chucks of data from a given offset and length to be written to the remote device.
+ *
+ * @return true upon success, false otherwise.
+ */
+bool oresat_firmware_update_m0_verify_subsection(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t start_byte_offset, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer) {
+    uint32_t current_file_offset = start_byte_offset;//0;
+
+    while (current_file_offset < total_firmware_length_bytes) {
+        uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+        if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
+            bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
+            if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
+                bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
+            }
+        }
+
+        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
+        	chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
+            return(false);
+        }
+
+        if( ! can_bootloader_verify_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+        	chprintf(can_bl_config->chp, "failed can_bootloader_verify_memory_reliable()\r\n");
+            return(false);
+        }
+
+        current_file_offset += bytes_to_write_to_flash;
+    }
+
+    return(true);
+}
+
+
+/**
+ * Updates firmware on an M0 node
+ *
+ * @param *can_bl_config Configuration structure pointer for the bootloader update process.
+ * @param base_address Address from which to start the firmware update
+ * @param start_byte_offset  Offset from which to start writing.
+ * @param total_firmware_length_bytes Number of bytes to write
+ * @param read_function_pointer Function pointer that will return chucks of data from a given offset and length to be written to the remote device.
  *
  * @return true upon success, false otherwise.
  */
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer) {
+	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
+
     BaseSequentialStream *chp = can_bl_config->chp;
+
+    chprintf(chp, "Trying to put node into bootloader mode...\r\n");
+    chThdSleepMilliseconds(10);
 
     if( ! can_bootloader_initiate(can_bl_config, 5000) ) {
         chprintf(chp, "Failed to put node into bootloader mode...\r\n");
@@ -735,52 +844,28 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
     }
 
 
-    uint32_t current_file_offset = 0;
-
-    while (current_file_offset < total_firmware_length_bytes) {
-        uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-        if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
-            bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
-            if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
-                bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-            }
-        }
-
-        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
-            return(false);
-        }
-
-        if( ! can_bootloader_write_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
-            return(false);
-        }
-
-        current_file_offset += bytes_to_write_to_flash;
+    //Initially skip the meta-data portion so that if the node power cycle mid update, the bootloader will not try to CRC check the whole image
+    if( ! oresat_firmware_update_m0_write_subsection(can_bl_config, base_address, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, total_firmware_length_bytes, read_function_pointer) ) {
+    	return(false);
     }
 
-
-    current_file_offset = 0;
-
-    while (current_file_offset < total_firmware_length_bytes) {
-        uint32_t bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-        if( (current_file_offset + bytes_to_write_to_flash) > total_firmware_length_bytes ) {
-            bytes_to_write_to_flash = total_firmware_length_bytes - current_file_offset;
-            if( bytes_to_write_to_flash > M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE ) {
-                bytes_to_write_to_flash = M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE;
-            }
-        }
-
-        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
-            return(false);
-        }
-
-        if( ! can_bootloader_verify_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
-            return(false);
-        }
-
-        current_file_offset += bytes_to_write_to_flash;
+    if( ! oresat_firmware_update_m0_verify_subsection(can_bl_config, base_address, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, total_firmware_length_bytes, read_function_pointer) ) {
+    	return(false);
     }
+
+    //Write the CRC portion last
+    if( ! oresat_firmware_update_m0_write_subsection(can_bl_config, base_address, 0, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, read_function_pointer) ) {
+    	return(false);
+    }
+
+    if( ! oresat_firmware_update_m0_verify_subsection(can_bl_config, base_address, 0, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, read_function_pointer) ) {
+    	return(false);
+    }
+
 
     can_bootloader_go(can_bl_config, ORESAT_F0_FIRMWARE_CODE_ADDRESS);
+
+    can_bl_config->update_duration_ms = TIME_I2MS(chVTGetSystemTime()) - start_time;
 
     chprintf(chp, "\r\nSuccessfully wrote and verified firmware image to remote MCU device...\r\n\r\n");
 

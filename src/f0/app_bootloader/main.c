@@ -26,6 +26,13 @@
 #include "can_bootloader.h"
 #include "util.h"
 
+
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
+#define dbgchprintf(dchp, str, ...)       chprintf(dchp, str, ##__VA_ARGS__)
+#else
+#define dbgchprintf(dchp, str, ...)
+#endif
+
 #define BOOTLOADER_VERSION                           0xAB
 #define CAN_DRIVER                                   &CAND1
 
@@ -123,39 +130,36 @@ bool check_firmware_crc_and_branch(const bool print_serial_output) {
 
 msg_t can_bootloader_transmit(CANTxFrame *msg) {
     const msg_t r = canTransmit(CAN_DRIVER, CAN_ANY_MAILBOX, msg, CAN_TRANSMIT_TIMEOUT);
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
     if( r == MSG_OK ) {
         can_api_print_tx_frame(DEBUG_SD, msg, "", " - SUCCESS");
     } else {
         can_api_print_tx_frame(DEBUG_SD, msg, "", " - FAIL");
     }
+#endif
     chThdSleepMilliseconds(20);
     return(r);
 }
 
 msg_t can_bootloader_receive(CANRxFrame *msg) {
     msg_t r = canReceive(CAN_DRIVER, CAN_ANY_MAILBOX, msg, CAN_RECEIVE_TIMEOUT);
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
     if( r == MSG_OK ) {
         can_api_print_rx_frame(DEBUG_SD, msg, "", "");
     }
+#endif
     return(r);
 }
 
 msg_t can_bootloader_receive2(CANRxFrame *msg, sysinterval_t timeout) {
     const msg_t r = canReceive(CAN_DRIVER, CAN_ANY_MAILBOX, msg, timeout);
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
     if( r == MSG_OK ) {
-#if 1
         can_api_print_rx_frame(DEBUG_SD, msg, "", "");
-#else
-        chprintf(DEBUG_SD, "CAN RX: SID = 0x%X DLC = %u [", msg->SID, msg->DLC);
-        for(int i = 0; i < msg->DLC && i < 8; i++ ) {
-            chprintf(DEBUG_SD, " 0x%X", msg->data8[i]);
-        }
-        chprintf(DEBUG_SD, " ]\r\n");
-#endif
     }
+#endif
     return(r);
 }
-
 
 void can_bootloader_init_frame(CANTxFrame *msg, const uint32_t sid, const uint32_t dlc) {
     memset(msg, 0, sizeof(*msg));
@@ -187,12 +191,12 @@ bool can_bootloader_send_ack_nack(const uint32_t sid, const bool ack_flag) {
 }
 
 bool can_bootloader_send_ack(const uint32_t sid) {
-    chprintf(DEBUG_SD, "Transmitting CAN bootloader ACK\r\n");
+    dbgchprintf(DEBUG_SD, "Transmitting CAN bootloader ACK\r\n");
     return(can_bootloader_send_ack_nack(sid, true));
 }
 
 bool can_bootloader_send_nack(const uint32_t sid) {
-    chprintf(DEBUG_SD, "Transmitting CAN bootloader NACK\r\n");
+    dbgchprintf(DEBUG_SD, "Transmitting CAN bootloader NACK\r\n");
     return(can_bootloader_send_ack_nack(sid, false));
 }
 
@@ -203,7 +207,7 @@ bool is_flash_page_eraseable(const uint8_t page_number) {
     uint32_t *bootloader_end_flash = (uint32_t *) &__flash0_end__;
     uint32_t last_bootloader_page_number = ((((uint32_t)bootloader_end_flash) - 0x08000000) / STM32F093_FLASH_PAGE_SIZE) - 1;
 
-    //chprintf(DEBUG_SD, "last_bootloader_page_number = %u\r\n", last_bootloader_page_number);
+    //dbgchprintf(DEBUG_SD, "last_bootloader_page_number = %u\r\n", last_bootloader_page_number);
 
     if( page_number > last_bootloader_page_number && page_number <= FLASH_PAGE_COUNT) {
         return true;
@@ -282,8 +286,8 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
             const uint8_t *address_to_read_from = (uint8_t *) ((rx_msg->data8[0] << 24) | (rx_msg->data8[1] << 16) | (rx_msg->data8[2] << 8) | rx_msg->data8[3]);
             const uint8_t number_of_bytes_to_read = rx_msg->data8[4] + 1;
 
-            chprintf(DEBUG_SD, "Address to read from: 0x%X\r\n", address_to_read_from);
-            chprintf(DEBUG_SD, "Number of bytes to read: %u\r\n", number_of_bytes_to_read);
+            dbgchprintf(DEBUG_SD, "Address to read from: 0x%X\r\n", address_to_read_from);
+            dbgchprintf(DEBUG_SD, "Number of bytes to read: %u\r\n", number_of_bytes_to_read);
 
             can_bootloader_send_ack(command_sid);
 
@@ -295,9 +299,9 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
                 }
 
                 if( (tx_r = can_bootloader_transmit(&reply_msg)) != MSG_OK ) {
-                    chprintf(DEBUG_SD, "Failed to transmit response data.\r\n");
+                    dbgchprintf(DEBUG_SD, "Failed to transmit response data.\r\n");
                 } else {
-                    chprintf(DEBUG_SD, "Transmitted %u bytes in response to read request.\r\n", reply_msg.DLC);
+                    dbgchprintf(DEBUG_SD, "Transmitted %u bytes in response to read request.\r\n", reply_msg.DLC);
                 }
             }
 
@@ -348,28 +352,26 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
                     can_bootloader_send_ack(command_sid);
                 }
 
-                chprintf(DEBUG_SD, "number_of_bytes_to_write = %u\r\n", number_of_bytes_to_write);
-                chprintf(DEBUG_SD, "temp_buffer_index = %u\r\n", temp_buffer_index);
+                dbgchprintf(DEBUG_SD, "number_of_bytes_to_write = %u\r\n", number_of_bytes_to_write);
+                dbgchprintf(DEBUG_SD, "temp_buffer_index = %u\r\n", temp_buffer_index);
 
 
                 if( number_of_bytes_to_write > 0 && temp_buffer_index == number_of_bytes_to_write ) {
-                    chprintf(DEBUG_SD, "Writing data to flash...\r\n");
-
                     int fw_r = flashWriteF091((uintptr_t) write_address, bootloader_temp_write_buffer, number_of_bytes_to_write);
 
                     if( fw_r == FLASH_RETURN_SUCCESS ) {
-                        chprintf(DEBUG_SD, "Successfully wrote data to flash...\r\n");
+                        //dbgchprintf(DEBUG_SD, "Successfully wrote data to flash...\r\n");
                         can_bootloader_send_ack(command_sid);
                     } else {
-                        chprintf(DEBUG_SD, "Failed to write data to flash...\r\n");
+                        dbgchprintf(DEBUG_SD, "Failed to write data to flash...\r\n");
                         can_bootloader_send_nack(command_sid);
                     }
                 } else {
-                    chprintf(DEBUG_SD, "Incorrect number of bytes to write...\r\n");
+                    dbgchprintf(DEBUG_SD, "Incorrect number of bytes to write...\r\n");
                     can_bootloader_send_nack(command_sid);
                 }
             } else {
-                chprintf(DEBUG_SD, "Address 0x%X outside of valid write range...\r\n", write_address);
+                dbgchprintf(DEBUG_SD, "Address 0x%X outside of valid write range...\r\n", write_address);
                 can_bootloader_send_nack(command_sid);
             }
         }
@@ -378,7 +380,7 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
         {
             //const uint32_t number_of_pages_to_erase = rx_msg->DLC;
             const uint32_t number_of_pages_to_erase = rx_msg->data8[0] + 1;
-            chprintf(DEBUG_SD, "number_of_pages_to_erase = %u\r\n", number_of_pages_to_erase);
+            dbgchprintf(DEBUG_SD, "number_of_pages_to_erase = %u\r\n", number_of_pages_to_erase);
 
             can_bootloader_send_ack(command_sid);
 
@@ -387,24 +389,24 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
 
                 const uint32_t page_number_to_erase = rx_msg->data8[i];
                 if( is_flash_page_eraseable(page_number_to_erase) ) {
-                    chprintf(DEBUG_SD, "Erasing page number = %u\r\n", page_number_to_erase);
+                    //dbgchprintf(DEBUG_SD, "Erasing page number = %u\r\n", page_number_to_erase);
                     chThdSleepMilliseconds(10);
 
                     int re = flashPageEraseF091(page_number_to_erase);
 
                     if( re == FLASH_RETURN_SUCCESS ) {
-                        chprintf(DEBUG_SD, "Successfully erased page\r\n");
+                        //dbgchprintf(DEBUG_SD, "Successfully erased page\r\n");
                     } else {
-                        chprintf(DEBUG_SD, "Failed to erase page\r\n");
+                        dbgchprintf(DEBUG_SD, "Failed to erase page\r\n");
                         error_count++;
                     }
                 } else {
-                    chprintf(DEBUG_SD, "Page %u cannot be erased.\r\n", page_number_to_erase);
+                    dbgchprintf(DEBUG_SD, "Page %u cannot be erased.\r\n", page_number_to_erase);
                     chThdSleepMilliseconds(10);
                     error_count++;
                 }
 
-                chprintf(DEBUG_SD, "Done with erase command\r\n");
+                dbgchprintf(DEBUG_SD, "Done with erase command\r\n");
 
                 if( error_count > 0 ) {
                     can_bootloader_send_nack(command_sid);

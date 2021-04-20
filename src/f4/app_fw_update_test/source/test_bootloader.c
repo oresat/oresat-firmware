@@ -66,11 +66,11 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
 
 	char *lsf_filepath = (char*) arg0;
 
-	chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Opening %s\r\n", lsf_filepath);
+	//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Opening %s\r\n", lsf_filepath);
 
 	lfs_file_t *lsf_file_handle = file_open(&FSD1, lsf_filepath, LFS_O_RDONLY);
 	if( lsf_file_handle == NULL ) {
-		chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error in file_open: %d\r\n", FSD1.err);
+		//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error in file_open: %d\r\n", FSD1.err);
 		return(0);
 	}
 
@@ -80,15 +80,15 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
 
 		int ret = file_read(&FSD1, lsf_file_handle, dest_buffer, number_of_bytes);
 		if( ret < 0 ) {
-			chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
+			//chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
 			//FIXME error
 		} else {
 			return_value = ret;
 		}
 
-		chprintf(bootloader_chp_global, "Read %u bytes from offset %u from file %s\r\n", return_value, of, lsf_filepath);
+		//chprintf(bootloader_chp_global, "Read %u bytes from offset %u from file %s\r\n", return_value, of, lsf_filepath);
 	} else {
-		chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error lfs_file_length = %d\r\n", lfs_file_length);
+		//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error lfs_file_length = %d\r\n", lfs_file_length);
 	}
 
 	file_close(&FSD1, lsf_file_handle);
@@ -117,7 +117,7 @@ bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_
 
   bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, lfs_file_length, firmware_blob_read_function_from_lfs);
 
-  print_can_bootloader_config_t(&can_bl_config);
+  print_can_bootloader_config_t(chp, &can_bl_config);
   chprintf(chp, "Firmware update success flag: %u\r\n", r);
 
   return(r);

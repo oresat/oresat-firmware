@@ -3,7 +3,9 @@
 #include "ch.h"
 #include "hal.h"
 
-#define ORESAT_F0_FLASH_PAGE_SIZE                     2048
+#define CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG           0
+
+#define ORESAT_F0_FLASH_PAGE_SIZE                    2048
 
 #define BOOTLOADER_EXPECTED_FIRST_FRAME_ID           0x79
 #define STM32_BOOTLOADER_SYNCHRONIZATION_SID         0x79
@@ -52,6 +54,8 @@ typedef struct {
     uint32_t can_tx_fail_count;
     uint32_t initiate_connection_count;
     uint32_t connection_verify_fail;
+
+    uint32_t update_duration_ms;
 } can_bootloader_config_t;
 
 #ifdef __cplusplus
@@ -61,7 +65,7 @@ extern "C" {
 bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, const void *read_function_arg0);
 
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms);
-void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config);
+void print_can_bootloader_config_t(BaseSequentialStream *chp, can_bootloader_config_t *can_bl_config);
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer);
 
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v);
@@ -70,7 +74,7 @@ void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const ch
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
 msg_t can_api_receive(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms);
 
-bool can_bootloader_test(can_bootloader_config_t *can_bl_config);
+//bool can_bootloader_test(can_bootloader_config_t *can_bl_config);
 
 #ifdef __cplusplus
 }
