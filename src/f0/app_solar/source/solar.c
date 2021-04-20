@@ -82,6 +82,7 @@ typedef struct {
 	uint32_t avg_voltage_initial_mV;
 	uint32_t avg_current_initial_uA;
 
+
 	uint32_t max_power_initial_mW;
 	uint32_t max_voltage_initial_mV;
 	uint32_t max_current_initial_uA;
@@ -89,6 +90,8 @@ typedef struct {
 	uint32_t avg_power_perturbed_mW;
 	uint32_t avg_voltage_perturbed_mV;
 	uint32_t avg_current_perturbed_uA;
+
+	bool hit_step_size_threshold_flag;
 } mppt_pao_state;
 
 mppt_pao_state pao_state;
@@ -149,12 +152,24 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
 /**
  * Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP.
  */
-uint32_t get_iadj_step_size(const uint32_t voltage_mV, const bool direction_up_flag) {
-	if( voltage_mV > 4800 ) {
-		return(5000);//up or down is fine
+uint32_t get_iadj_step_size(mppt_pao_state *pao_state) {
+	if( (! pao_state->hit_step_size_threshold_flag) && pao_state->max_voltage_initial_mV != 0 ) {
+		const uint32_t threshold_low_mV = pao_state->max_voltage_initial_mV / 20; //0.95 threshold
+		const uint32_t threshold_mV = pao_state->max_voltage_initial_mV - threshold_low_mV;
+
+		const int32_t mv_delta = pao_state->avg_voltage_initial_mV - threshold_mV;
+
+		if(  pao_state->avg_voltage_initial_mV > threshold_mV ) {
+		    const int32_t v = (((pao_state->avg_voltage_initial_mV - threshold_mV) * 100) / threshold_low_mV);
+			const uint32_t step_size = (((5000 - VREF_STEP_IN_MICROVOLTS_NEGATIVE) * v) / 100) + VREF_STEP_IN_MICROVOLTS_NEGATIVE;
+
+			return(step_size);//up or down is fine
+		} else {
+			pao_state->hit_step_size_threshold_flag = true;
+		}
 	}
 
-	if( direction_up_flag ) {
+	if( pao_state->direction_up_flag ) {
 		return(VREF_STEP_IN_MICROVOLTS_POSITIVE);
 	}
 	return(VREF_STEP_IN_MICROVOLTS_NEGATIVE);
@@ -166,7 +181,8 @@ uint32_t get_iadj_step_size(const uint32_t voltage_mV, const bool direction_up_f
  * @return true on success, false otherwise
  */
 bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
-	pao_state->step_size = get_iadj_step_size(pao_state->avg_voltage_initial_mV, pao_state->direction_up_flag);
+
+	pao_state->step_size = get_iadj_step_size(pao_state);
 
 	uint32_t iadj_uv_perturbed = pao_state->iadj_uv;
 	if( pao_state->direction_up_flag ) {
@@ -266,7 +282,7 @@ THD_FUNCTION(solar, arg)
         if ((loop_iteration % DIAG_REPORT_EVERY_N_LOOP_ITERATIONS) == 0) {
         	const uint32_t avg_freq = (loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000));
 
-			chprintf(DEBUG_SD, "loop %u: iadj_uv = %u, direction_up_flag = %u, avg_power_initial_mW = %u, avg_voltage_initial_mV = %u, avg_current_initial_uA = %d, step_size = %u, avg_freq = %u\r\n",
+			chprintf(DEBUG_SD, "loop,%u,iadj_uv,%u,direction_up_flag,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d,step_size,%u,avg_freq,%u\r\n",
 					loop_iteration, pao_state.iadj_uv,
 					pao_state.direction_up_flag,
 					pao_state.avg_power_initial_mW,
@@ -291,7 +307,6 @@ THD_FUNCTION(solar, arg)
     	OD_PV_Power.energy = 0;
 
 
-    	//FIXME LT1618IADJ is a uin8_t. This should be a uint16
     	OD_MPPT.LT1618IADJ = pao_state.iadj_uv;
 
     } // end while thread should run loop
