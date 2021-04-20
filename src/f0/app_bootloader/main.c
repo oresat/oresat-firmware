@@ -417,13 +417,26 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
     }
 }
 
+uint32_t get_announce_unique_id(void) {
+    const uint8_t node_id = ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos);
+
+    if( node_id < 0x7F ) {
+    	chprintf(DEBUG_SD, "Found OreSAT Node ID: 0x%X\r\n", node_id);
+    	return(node_id);
+    }
+    chprintf(DEBUG_SD, "Node id 0x%X is outside of valid range (not programmed yet?)\r\n", node_id);
+
+	chprintf(DEBUG_SD, "Found CPU ID Low: 0x%X\r\n", (*cpu_unique_id_low));
+	return(*cpu_unique_id_low);
+}
+
 void can_bootloader_announce_presence_on_bus(void) {
     CANTxFrame txmsg;
     memset(&txmsg, 0, sizeof(txmsg));
     txmsg.SID = STM32_BOOTLOADER_CAN_ANNOUNCE;
     txmsg.DLC = 8;
     txmsg.data32[0] = 0x04030201;
-    txmsg.data32[1] = *cpu_unique_id_low;
+    txmsg.data32[1] = get_announce_unique_id();
 
     chprintf(DEBUG_SD, "\r\nBootloader announcing presence on bus...\r\n");
     can_bootloader_transmit(&txmsg);
@@ -522,7 +535,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
         if( r == MSG_OK ) {
             if( ! got_stay_bootloader_frame ) {
                 if( rxmsg.SID == BOOTLOADER_EXPECTED_FIRST_FRAME_ID && rxmsg.DLC == 8 ) {
-                    if( rxmsg.data32[0] == *cpu_unique_id_low && rxmsg.data32[1] == CAN_ANNOUNCE_MAGIC_NUMBER ) {
+                    if( rxmsg.data32[0] == get_announce_unique_id() && rxmsg.data32[1] == CAN_ANNOUNCE_MAGIC_NUMBER ) {
                         //Host will TX a reply frame with the magic number and CPU unique ID values swapped to indicaet this node should stay in bootloader mode
                         chprintf(DEBUG_SD, "RXed frame to stay in bootloader mode...\r\n");
                         got_stay_bootloader_frame = true;
