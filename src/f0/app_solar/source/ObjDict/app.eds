@@ -5,11 +5,11 @@ FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat Solar Board Object Dictionary
-CreationTime=2:51PM
+CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:30PM
-ModificationDate=03-05-2021
+ModificationTime=5:21PM
+ModificationDate=04-19-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -1964,7 +1964,7 @@ PDOMapping=1
 ParameterName=LT1618 IADJ
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0005
+DataType=0x0006
 AccessType=ro
 DefaultValue=0
 PDOMapping=1

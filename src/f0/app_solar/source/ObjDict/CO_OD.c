@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -44,7 +44,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*6000*/ {0xAL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 /*6001*/ {0x6L, 0x0, 0x0, 0x7F, 0x7F, 0x80, 0x80},
-/*6002*/ {0x2L, 0x0L, 0x0L},
+/*6002*/ {0x2L, 0x0L, 0x00},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -357,7 +357,7 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
 /*0x6002*/ const CO_OD_entryRecord_t OD_record6002[3] = {
            {(void*)&CO_OD_RAM.MPPT.highestSubIndexSupported, 0x06, 0x1 },
            {(void*)&CO_OD_RAM.MPPT.algorithm, 0x3E, 0x1 },
-           {(void*)&CO_OD_RAM.MPPT.LT1618IADJ, 0x26, 0x1 },
+           {(void*)&CO_OD_RAM.MPPT.LT1618IADJ, 0xA6, 0x2 },
 };
 
 /*******************************************************************************

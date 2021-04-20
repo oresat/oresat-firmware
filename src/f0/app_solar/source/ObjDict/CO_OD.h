@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -41,7 +41,7 @@
    FILE INFO:
       FileName:     app.xdd
       FileVersion:  0
-      CreationTime: 2:51PM
+      CreationTime: 3:51PM
       CreationDate: 08-12-2019
       CreatedBy:    Miles Simpson
 *******************************************************************************/
@@ -198,7 +198,7 @@
 /*6002      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED8      algorithm;
-               UNSIGNED8      LT1618IADJ;
+               UNSIGNED16     LT1618IADJ;
                }              OD_MPPT_t;
 
 /*******************************************************************************
