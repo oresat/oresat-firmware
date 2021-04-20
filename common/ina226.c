@@ -257,7 +257,7 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
  *
  * @api
  */
-uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
+msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest) {
     i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
@@ -270,15 +270,19 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* INA226_SHARED_I2C */
 
-    //FIXME handle errors from ina226I2CReadRegister
     buf.reg = reg;
-    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
+    const msg_t ret = ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
 
 #if INA226_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* INA226_SHARED_I2C */
 #endif /* INA226_USE_I2C */
-    return __REVSH(buf.value);
+
+    if( ret == MSG_OK ) {
+    	*dest = __REVSH(buf.value);
+    }
+
+    return(ret);
 }
 
 /**
@@ -289,14 +293,18 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
  *
  * @api
  */
-int32_t ina226ReadShunt(INA226Driver *devp) {
-    //FIXME reactor to handle errors
+msg_t ina226ReadShunt(INA226Driver *devp, int32_t *dest_voltage_uV) {
     osalDbgCheck(devp != NULL);
 
-    //TODO validate the math on this
-    const int32_t voltage_uV = ((int32_t) ((int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT)) * 25)/10;
+    //TODO validate the math on this. This function has not actually been tested
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_SHUNT, &reg_value);
 
-    return voltage_uV;
+    if( ret == MSG_OK ) {
+    	*dest_voltage_uV = ((int32_t) ((int16_t) reg_value) * 25)/10;
+    }
+
+    return(ret);
 }
 
 /**
@@ -307,13 +315,16 @@ int32_t ina226ReadShunt(INA226Driver *devp) {
  *
  * @api
  */
-uint32_t ina226ReadVBUS(INA226Driver *devp) {
-    //FIXME reactor to handle errors
+msg_t ina226ReadVBUS(INA226Driver *devp, uint32_t *dest_voltage_mV) {
     osalDbgCheck(devp != NULL);
 
-    const uint32_t voltage_mV = (((uint32_t) ina226ReadRaw(devp, INA226_AD_VBUS)) * 1250) / 1000;
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_VBUS, &reg_value);
+    if( ret == MSG_OK ) {
+    	*dest_voltage_mV = (((uint32_t) reg_value) * 1250) / 1000;
+    }
 
-    return voltage_mV;
+    return ret;
 }
 
 /**
@@ -325,16 +336,19 @@ uint32_t ina226ReadVBUS(INA226Driver *devp) {
  *
  * @api
  */
-int32_t ina226ReadCurrent(INA226Driver *devp) {
-    //FIXME reactor to handle errors
+msg_t ina226ReadCurrent(INA226Driver *devp, uint32_t *dest_current_uA) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    const int32_t current_raw_register = ina226ReadRaw(devp, INA226_AD_CURRENT);
-    const int32_t current_uA = (current_raw_register * devp->config->curr_lsb * 1000) / 2048;
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_CURRENT, &reg_value);
 
-    return current_uA;
+    if( ret == MSG_OK ) {
+    	*dest_current_uA = (reg_value * devp->config->curr_lsb * 1000) / 2048;
+    }
+
+    return(ret);
 }
 
 /**
@@ -346,15 +360,19 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  *
  * @api
  */
-uint32_t ina226ReadPower(INA226Driver *devp) {
-    //FIXME reactor to handle errors
+msg_t ina226ReadPower(INA226Driver *devp, uint32_t *dest_power_mW) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    const uint32_t power_mW = ina226ReadRaw(devp, INA226_AD_POWER) / 2;
+    uint16_t reg_value = 0;
+	const msg_t ret = ina226ReadRaw(devp, INA226_AD_POWER, &reg_value);
 
-    return power_mW;
+	if( ret == MSG_OK ) {
+		*dest_power_mW = reg_value / 2;
+	}
+
+	return ret;
 }
 
 /** @} */

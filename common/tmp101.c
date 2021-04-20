@@ -39,10 +39,8 @@
  * @return               the operation status.
  * @notapi
  */
-msg_t tmp101I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
-        uint8_t* rxbuf, size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-    		TIME_MS2I(50));
+msg_t tmp101I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg, uint8_t* rxbuf, size_t n) {
+    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n, TIME_MS2I(50));
 }
 
 /**
@@ -57,18 +55,16 @@ msg_t tmp101I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
  * @return               the operation status.
  * @notapi
  */
-msg_t tmp101I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
-        size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-    		TIME_MS2I(50));
+msg_t tmp101I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf, size_t n) {
+    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0, TIME_MS2I(50));
 }
-#endif /* TMP101_USE_I2C */
 
-
+/**
+ *
+ */
 msg_t tmp101I2CReadRegister2(TMP101Driver *devp, const uint8_t reg, uint8_t *dest_2_byte_array)
 {
-    msg_t i2c_result = MSG_OK;
-    uint8_t sensor_addr = devp->config->saddr;
+    const uint8_t sensor_addr = devp->config->saddr;
 
 // Prepare for I2C transaction:
 #if TMP101_SHARED_I2C
@@ -76,7 +72,7 @@ msg_t tmp101I2CReadRegister2(TMP101Driver *devp, const uint8_t reg, uint8_t *des
 #endif /* TMP101_SHARED_I2C */
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 
-    i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, reg, dest_2_byte_array, 2);
+    const msg_t i2c_result = tmp101I2CReadRegister(devp->config->i2cp, sensor_addr, reg, dest_2_byte_array, 2);
 
     i2cStop(devp->config->i2cp);
 
@@ -181,7 +177,8 @@ void tmp101Stop(TMP101Driver *devp) {
 msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC)
 {
 	uint8_t byte_array[2];
-	msg_t i2c_result = tmp101I2CReadRegister2(devp, TMP101_REG_TEMPERATURE, byte_array);
+
+	const msg_t i2c_result = tmp101I2CReadRegister2(devp, TMP101_REG_TEMPERATURE, byte_array);
 
 	if( i2c_result == MSG_OK ) {
 		//chprintf((BaseSequentialStream *) &SD2, "byte_array[0] = 0x%X byte_array[1] = 0x%X\r\n", byte_array[0], byte_array[1]);
@@ -201,9 +198,15 @@ msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_
 		if( dest_temp_mC != NULL ) {
 			*dest_temp_mC = (((int32_t) tmp_signed) * 62500) / 1000;
 		}
+	} else {
+		*dest_temp_c = 0;
+		*dest_temp_mC = 0;
 	}
 
     return i2c_result;
 }
+
+
+#endif /* TMP101_USE_I2C */
 
 /** @} */

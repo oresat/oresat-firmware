@@ -17,6 +17,7 @@
 //Assumes 3.3V Vcc
 #define DAC_MININUM_ADJUST_UV   805
 
+#define I_ADJ_FAILSAFE          1450000
 #define I_ADJ_INITIAL           1500000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
@@ -33,6 +34,7 @@
 #error "VREF_STEP_IN_MICROVOLTS_NEGATIVE must be greater then DAC_MININUM_ADJUSG_UV"
 #endif
 
+extern const I2CConfig i2cconfig;
 
 /* Based on INA226 datasheet, page 15, Equation (2)
  * CURR_LSB = Max Current / 2^15
@@ -66,6 +68,11 @@ static const DACConfig dac1cfg = {
 
 static INA226Driver ina226dev;
 
+typedef enum {
+	MPPT_ALGORITHM_PAO = 0
+} mppt_algorithm_t;
+
+
 typedef struct {
 	uint32_t iadj_uv;
 	bool direction_up_flag;
@@ -85,6 +92,7 @@ typedef struct {
 } mppt_pao_state;
 
 mppt_pao_state pao_state;
+
 
 
 /**
@@ -115,12 +123,18 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
 bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_voltage_mV, uint32_t *dest_avg_current_uA) {
 	chThdSleepMilliseconds((NUM_INA226_AVG * INA226_ADC_CONVERSION_TIME_MICROSECONDS) / 1000);//Compensate for the internal averaging done by the ina chip
 
-	//FIXME reactor ina226ReadPower and ina226ReadVBUS to return errors if/when i2c comm issues happen
-	*dest_avg_power_mW = ina226ReadPower(&ina226dev);  /* Power in increments of mW */
-	*dest_avg_voltage_mV = ina226ReadVBUS(&ina226dev); /* VBUS voltage in uV */
-	*dest_avg_current_uA = ina226ReadCurrent(&ina226dev);
+	bool ret = true;
+	if( ina226ReadPower(&ina226dev, dest_avg_power_mW) != MSG_OK ) {
+		ret = false;
+	}
+	if( ina226ReadVBUS(&ina226dev, dest_avg_voltage_mV) != MSG_OK ) {
+		ret = false;
+	}
+	if( ina226ReadCurrent(&ina226dev, dest_avg_current_uA) != MSG_OK ) {
+		ret = false;
+	}
 
-	return(true);
+	return(ret);
 }
 
 uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t max) {
@@ -168,20 +182,28 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 		dac_put_microvolts(&DACD1, 0, iadj_uv_perturbed);
 
 		if( ! read_avg_power_and_voltage(&pao_state->avg_power_perturbed_mW, &pao_state->avg_voltage_perturbed_mV, &pao_state->avg_current_perturbed_uA) ) {
-			//FIXME handle error
-		}
+			//I2C communications error, no data to make a decision on. Fail safe to moving left
+			pao_state->direction_up_flag = true;
 
-		if( pao_state->avg_power_perturbed_mW >= (pao_state->avg_power_initial_mW - HISTERESIS_MW) ) {
-			//Always move the iadj_value, even if the output power is equal. This will cause it to hunt back and forth between two points that have a detectable difference in their power output.
+			pao_state->iadj_uv = iadj_uv_perturbed;
+			if( pao_state->iadj_uv > I_ADJ_FAILSAFE ) {
+				pao_state->iadj_uv = I_ADJ_FAILSAFE;
+			}
+			return(false);
+
 		} else {
-			pao_state->direction_up_flag = (! pao_state->direction_up_flag);
+			if( pao_state->avg_power_perturbed_mW >= (pao_state->avg_power_initial_mW - HISTERESIS_MW) ) {
+				//Always move the iadj_value, even if the output power is equal. This will cause it to hunt back and forth between two points that have a detectable difference in their power output.
+			} else {
+				pao_state->direction_up_flag = (! pao_state->direction_up_flag);
+			}
+
+			pao_state->iadj_uv = iadj_uv_perturbed;
+
+			pao_state->avg_current_initial_uA = pao_state->avg_current_perturbed_uA;
+			pao_state->avg_power_initial_mW = pao_state->avg_power_perturbed_mW;
+			pao_state->avg_voltage_initial_mV = pao_state->avg_voltage_perturbed_mV;
 		}
-
-		pao_state->iadj_uv = iadj_uv_perturbed;
-
-		pao_state->avg_current_initial_uA = pao_state->avg_current_perturbed_uA;
-		pao_state->avg_power_initial_mW = pao_state->avg_power_perturbed_mW;
-		pao_state->avg_voltage_initial_mV = pao_state->avg_voltage_perturbed_mV;
 	}
 
 	//These values are published to the CANOpen dictionary objects
@@ -234,6 +256,8 @@ THD_FUNCTION(solar, arg)
 
 	dac_put_microvolts(&DACD1, 0, pao_state.iadj_uv);
 
+	//Only PAO implemented for the time being
+	OD_MPPT.algorithm = MPPT_ALGORITHM_PAO;
 
     chprintf(DEBUG_SD, "Done with init INA226....\r\n");
     systime_t loop_start_time_ms = TIME_I2MS(chVTGetSystemTime());
@@ -256,15 +280,19 @@ THD_FUNCTION(solar, arg)
 
     	OD_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
     	OD_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
-    	OD_PV_Power.current = pao_state.avg_current_initial_uA;
-    	OD_PV_Power.currentAvg = pao_state.avg_current_initial_uA;
+    	OD_PV_Power.current = pao_state.avg_current_initial_uA / 1000;
+    	OD_PV_Power.currentAvg = pao_state.avg_current_initial_uA / 1000;
     	OD_PV_Power.power = pao_state.avg_power_initial_mW;
     	OD_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
 
     	OD_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
-    	OD_PV_Power.currentMax = pao_state.max_current_initial_uA;
-    	OD_PV_Power.powerAvg = pao_state.max_power_initial_mW;
+    	OD_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
+    	OD_PV_Power.powerMax = pao_state.max_power_initial_mW;
     	OD_PV_Power.energy = 0;
+
+
+    	//FIXME LT1618IADJ is a uin8_t. This should be a uint16
+    	OD_MPPT.LT1618IADJ = pao_state.iadj_uv;
 
     } // end while thread should run loop
 

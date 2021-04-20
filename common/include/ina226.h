@@ -368,11 +368,11 @@ void ina226ObjectInit(INA226Driver *devp);
 void ina226Start(INA226Driver *devp, const INA226Config *config);
 void ina226Stop(INA226Driver *devp);
 void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg);
-int32_t ina226ReadShunt(INA226Driver *devp);
-uint32_t ina226ReadVBUS(INA226Driver *devp);
-int32_t ina226ReadCurrent(INA226Driver *devp);
-uint32_t ina226ReadPower(INA226Driver *devp);
+msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest);
+msg_t ina226ReadShunt(INA226Driver *devp, int32_t *dest_voltage_uV);
+msg_t ina226ReadVBUS(INA226Driver *devp, uint32_t *dest_voltage_mV);
+msg_t ina226ReadCurrent(INA226Driver *devp, uint32_t *dest_current_uA);
+msg_t ina226ReadPower(INA226Driver *devp, uint32_t *dest_power_mW);
 #ifdef __cplusplus
 }
 #endif
