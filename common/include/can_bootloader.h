@@ -32,13 +32,15 @@ typedef enum {
 } oresat_bootloader_can_command_t;
 
 
-typedef uint32_t (*firmware_read_function_ptr_t)(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes);
+typedef uint32_t (*firmware_read_function_ptr_t)(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes, void *arg0);
 
 typedef struct {
     CANDriver *canp;
     BaseSequentialStream *chp;//debug stream
     uint32_t low_cpu_id;
     bool stm32_bootloader_mode;
+
+    void *read_function_arg0;
 
     uint32_t read_fail_count;
     uint32_t write_fail_count;
@@ -56,7 +58,7 @@ typedef struct {
 extern "C" {
 #endif
 
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode);
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, const void *read_function_arg0);
 
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms);
 void print_can_bootloader_config_t(can_bootloader_config_t *can_bl_config);

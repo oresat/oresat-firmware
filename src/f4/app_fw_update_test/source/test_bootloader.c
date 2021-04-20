@@ -4,27 +4,24 @@
 #include "can_bootloader.h"
 #include "chprintf.h"
 #include "oresat_f0.h"
+#include "fs.h"
 
 #include "app_solar.crc32.bin.h"
 
-//FIXME duplicate define from oresat_f0.h
-//#define ORESAT_F0_FIRMWARE_CRC_ADDRESS                0x0800A000
 //const uint32_t low_cpuid_of_protoboard = 0x1D000800;
-
 const uint32_t unique_id_of_solarcard = 0x1800500;
+BaseSequentialStream *bootloader_chp_global = NULL;
 
 CANDriver *canp = &CAND1;
 
-volatile uint32_t g_can_rx_count = 0;
+// xxd -i app_solar.crc32.bin > app_solar.crc32.bin.h
 
-//#define DEBUG_SD    (BaseSequentialStream *) &SD2
-
-// xxd -i app_protocard2.crc32.bin > ../../../f4/app_f407_discovery/firmware_blob.h
+#if 0
 /*
  * This is an example of reading source firmware image data from an in-memory buffer, but this function could be implemented
  * to open a file from a file system, seek to an offset in the file, read some data into dest_buffer and close the file.
  */
-uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes) {
+uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes, void *arg0) {
 	uint32_t dest_index = 0;
 
 	for(; dest_index < number_of_bytes; dest_index++ ) {
@@ -43,14 +40,88 @@ uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer
  */
 void test_can_fw_update(BaseSequentialStream *chp, const uint32_t card_unique_id) {
   can_bootloader_config_t can_bl_config;
-  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false);
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, NULL);
 
   bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_solar_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
   chprintf(chp, "Firmware update success flag: %u\r\n", r);
 }
+#endif
 
+lfs_soff_t get_lfs_filesize(char *lfs_filepath) {
+	lfs_file_t *lsf_file_handle = file_open(&FSD1, lfs_filepath, LFS_O_RDONLY);
+	if (lsf_file_handle == NULL) {
+		return (-1);
+	}
+	const lfs_soff_t lfs_file_length = file_size(&FSD1, lsf_file_handle);
+
+	file_close(&FSD1, lsf_file_handle);
+	return (lfs_file_length);
+}
+
+
+uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *dest_buffer, const uint32_t number_of_bytes, void *arg0) {
+	uint32_t return_value = 0;
+
+	char *lsf_filepath = (char*) arg0;
+
+	chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Opening %s\r\n", lsf_filepath);
+
+	lfs_file_t *lsf_file_handle = file_open(&FSD1, lsf_filepath, LFS_O_RDONLY);
+	if( lsf_file_handle == NULL ) {
+		chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error in file_open: %d\r\n", FSD1.err);
+		return(0);
+	}
+
+	const lfs_soff_t lfs_file_length = file_size(&FSD1, lsf_file_handle);
+	if( lfs_file_length >= 0 && lfs_file_length > offset ) {
+		const lfs_soff_t of = file_seek(&FSD1, lsf_file_handle, offset, 0);
+
+		int ret = file_read(&FSD1, lsf_file_handle, dest_buffer, number_of_bytes);
+		if( ret < 0 ) {
+			chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
+			//FIXME error
+		} else {
+			return_value = ret;
+		}
+
+		chprintf(bootloader_chp_global, "Read %u bytes from offset %u from file %s\r\n", return_value, of, lsf_filepath);
+	} else {
+		chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error lfs_file_length = %d\r\n", lfs_file_length);
+	}
+
+	file_close(&FSD1, lsf_file_handle);
+
+
+	return(return_value);
+}
+
+
+/**
+ * This function will update a remote OreSAT node that has gone into bootloader mode with the contents of a file specified
+ * by lfs_filepath
+ *
+ * @param  card_unique_id The OreSAT Node ID or the unique CPU ID low 32 bits, depending on if the target node has it's OPT bytes programmed
+ * @param *lfs_filepath The path on the LFS file system containing the firmware image contnts.
+ *
+ * @return true on success, false otherwise
+ */
+bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_unique_id, char *lfs_filepath) {
+  can_bootloader_config_t can_bl_config;
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, lfs_filepath);
+
+  const lfs_soff_t lfs_file_length = get_lfs_filesize(lfs_filepath);
+
+  chprintf(chp, "File Length: %u\r\n", lfs_file_length);
+
+  bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, lfs_file_length, firmware_blob_read_function_from_lfs);
+
+  print_can_bootloader_config_t(&can_bl_config);
+  chprintf(chp, "Firmware update success flag: %u\r\n", r);
+
+  return(r);
+}
 
 
 /*===========================================================================*/
@@ -58,9 +129,13 @@ void test_can_fw_update(BaseSequentialStream *chp, const uint32_t card_unique_id
 /*===========================================================================*/
 void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 {
+	bootloader_chp_global = chp;
+
     if (argc < 1) {
         goto bootloader_usage;
     }
+
+    char filename[] = "app_solar.crc32.bin";
 
     for(int i = 0; i < argc; i++ ) {
     	chprintf(chp, "argv[%u] = %s\r\n", i, argv[i]);
@@ -83,8 +158,31 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 		}
 #endif
 
+
+    } else if (!strcmp(argv[0], "wfw") ) {
+    	lfs_file_t *file;
+    	file = file_open(&FSD1, filename, LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC);
+		if (file == NULL) {
+			chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
+			return;
+		}
+
+		int ret = file_write(&FSD1, file, app_solar_crc32_bin, app_solar_crc32_bin_len);
+		if( ret < 0 ) {
+			chprintf(chp, "Error in file_write: %d\r\n", ret);
+		}
+
+		ret = file_close(&FSD1, file);
+		if (ret < 0) {
+			chprintf(chp, "Error in file_close: %d\r\n", ret);
+			return;
+		}
+
+		chprintf(chp, "Successfully wrote file to LFS file system\r\n");
+
     } else if (!strcmp(argv[0], "w") ) {
-    	test_can_fw_update(chp, unique_id_of_solarcard);
+    	//test_can_fw_update(chp, unique_id_of_solarcard);
+    	can_fw_update_from_lfs_file(chp, unique_id_of_solarcard, filename);
 
     } else {
         goto bootloader_usage;

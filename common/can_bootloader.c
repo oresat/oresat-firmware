@@ -24,7 +24,7 @@ uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
  *
  * @return true on success, false otherwise.
  */
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode) {
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, const void *read_function_arg0) {
     if (can_bl_config == NULL) {
         return (false);
     }
@@ -34,6 +34,7 @@ bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config
     can_bl_config->chp = chp;
     can_bl_config->low_cpu_id = low_cpu_id;
     can_bl_config->stm32_bootloader_mode = stm32_bootloader_mode;
+    can_bl_config->read_function_arg0 = read_function_arg0;
 
     return (true);
 }
@@ -745,7 +746,7 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
             }
         }
 
-        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
             return(false);
         }
 
@@ -768,7 +769,7 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
             }
         }
 
-        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
+        if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
             return(false);
         }
 

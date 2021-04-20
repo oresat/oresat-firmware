@@ -22,6 +22,7 @@
 /* Project header files */
 #include "oresat.h"
 #include "rtc.h"
+#include "fs.h"
 #include "can_bootloader.h"
 #ifdef SHELL_ENABLE
 #include "cmd.h"
@@ -89,6 +90,16 @@ static oresat_config_t oresat_conf = {
     .filter_count = sizeof(fifo1_filters),
 };
 
+static SDCConfig sdccfg = {
+    .bus_width = SDC_MODE_4BIT,
+};
+
+static FSConfig fscfg = {
+    .sdcp = &SDCD1,
+    .sdccfg = &sdccfg,
+    .mmc_pwr = LINE_MMC_PWR,
+};
+
 /**
  * @brief App Initialization
  */
@@ -99,6 +110,10 @@ static void app_init(void)
 #ifdef SHELL_ENABLE
     reg_worker(&cmd_worker, &cmd_desc, true, true);
 #endif
+
+    /* Prepare filesystem */
+	fs_init(&FSD1);
+	fs_start(&FSD1, &fscfg);
 
     /* Initialize shell and start serial interface */
 #ifdef SHELL_ENABLE
