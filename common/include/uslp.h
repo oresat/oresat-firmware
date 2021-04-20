@@ -26,7 +26,7 @@
  * @{
  */
 /**
- * @brief   Identification Fields
+ * @brief   TFPH Identification Fields
  * @{
  */
 /** Transfer Frame Version Number */
@@ -59,26 +59,36 @@
 #define USLP_TFPH_ID_EOFPH_Msk              (0x1U << USLP_TFPH_ID_EOFPH_Pos)
 #define USLP_TFPH_ID_EOFPH                  USLP_TFPH_ID_EOFPH_Msk
 /** @} */
+
 /**
  * @brief   Additional TFPH flags and fields
  * @{
  */
 /** Bypass/Sequence Control Flag        */
-#define USLP_TFPH_MISC_BYPASS_SEQ_CTRL_Pos  (7U)
-#define USLP_TFPH_MISC_BYPASS_SEQ_CTRL_Msk  (0x1U << USLP_TFPH_MISC_BYPASS_SEQ_CTRL_Pos)
-#define USLP_TFPH_MISC_BYPASS_SEQ_CTRL      USLP_TFPH_MISC_BYPASS_SEQ_CTRL_Msk
+#define USLP_TFPH_FLAGS_BYPASS_SEQ_CTRL_Pos (7U)
+#define USLP_TFPH_FLAGS_BYPASS_SEQ_CTRL_Msk (0x1U << USLP_TFPH_FLAGS_BYPASS_SEQ_CTRL_Pos)
+#define USLP_TFPH_FLAGS_BYPASS_SEQ_CTRL     USLP_TFPH_FLAGS_BYPASS_SEQ_CTRL_Msk
 /** Protocol Control Command Flag       */
-#define USLP_TFPH_MISC_PROTO_CTRL_CMD_Pos   (6U)
-#define USLP_TFPH_MISC_PROTO_CTRL_CMD_Msk   (0x1U << USLP_TFPH_MISC_PROTO_CTRL_CMD_Pos)
-#define USLP_TFPH_MISC_PROTO_CTRL_CMD       USLP_TFPH_MISC_PROTO_CTRL_CMD_Msk
+#define USLP_TFPH_FLAGS_PROTO_CTRL_CMD_Pos  (6U)
+#define USLP_TFPH_FLAGS_PROTO_CTRL_CMD_Msk  (0x1U << USLP_TFPH_FLAGS_PROTO_CTRL_CMD_Pos)
+#define USLP_TFPH_FLAGS_PROTO_CTRL_CMD      USLP_TFPH_FLAGS_PROTO_CTRL_CMD_Msk
 /** Operational Control Field Flag      */
-#define USLP_TFPH_MISC_OCF_Pos              (3U)
-#define USLP_TFPH_MISC_OCF_Msk              (0x1U << USLP_TFPH_MISC_OCF_Pos)
-#define USLP_TFPH_MISC_OCF                  USLP_TFPH_MISC_OCF_Msk
+#define USLP_TFPH_FLAGS_OCF_Pos             (3U)
+#define USLP_TFPH_FLAGS_OCF_Msk             (0x1U << USLP_TFPH_FLAGS_OCF_Pos)
+#define USLP_TFPH_FLAGS_OCF                 USLP_TFPH_FLAGS_OCF_Msk
 /** VC Frame Count Length               */
-#define USLP_TFPH_MISC_VC_FRM_CNT_LEN_Pos   (0U)
-#define USLP_TFPH_MISC_VC_FRM_CNT_LEN_Msk   (0x7U << USLP_TFPH_MISC_VC_FRM_CNT_LEN_Pos)
-#define USLP_TFPH_MISC_VC_FRM_CNT_LEN       USLP_TFPH_MISC_VC_FRM_CNT_LEN_Msk
+#define USLP_TFPH_FLAGS_VCF_CNT_LEN_Pos     (0U)
+#define USLP_TFPH_FLAGS_VCF_CNT_LEN_Msk     (0x7U << USLP_TFPH_FLAGS_VCF_CNT_LEN_Pos)
+#define USLP_TFPH_FLAGS_VCF_CNT_LEN         USLP_TFPH_FLAGS_VCF_CNT_LEN_Msk
+/** @} */
+
+/**
+ * @brief   TFPH Virtual Channel Frame Count
+ * @{
+ */
+/** VC Frame Count */
+#define USLP_TFPH_VCF_CNT_Msk(n)            (((1ULL << (n * 8)) - 1) & 0x00FFFFFFFFFFFFFFULL)
+#define USLP_TFPH_VCF_CNT(n)                USLP_TFPH_VCF_CNT_Msk(n)
 /** @} */
 /** @} */
 
@@ -134,14 +144,16 @@
  * @{
  */
 typedef enum {
-    UPID_SPP_ENCAPS = 0x00U,    /** Space Packets or Encapsulation Packets   */
-    UPID_COP_1      = 0x01U,    /** COP-1 Control Commands                   */
-    UPID_COP_P      = 0x02U,    /** COP-P Control Commands                   */
-    UPID_SDLS       = 0x03U,    /** SDLS Control Commands                    */
-    UPID_USER_DEF   = 0x04U,    /** User-defined Octet Stream                */
-    UPID_MAPA_SDU   = 0x05U,    /** Mission-specific information-1 MAPA_SDU  */
-    UPID_PROX_1     = 0x07U,    /** Proximity-1 SPDU                         */
-    UPID_IDLE       = 0x1FU     /** Idle Data                                */
+    UPID_SPP_ENCAPS     = 0x00U,    /** Space Packets or Encapsulation Packets   */
+    UPID_COP_1          = 0x01U,    /** COP-1 Control Commands                   */
+    UPID_COP_P          = 0x02U,    /** COP-P Control Commands                   */
+    UPID_SDLS           = 0x03U,    /** SDLS Control Commands                    */
+    UPID_USER_DEF       = 0x04U,    /** User-defined Octet Stream                */
+    UPID_MAPA_SDU       = 0x05U,    /** Mission-specific information-1 MAPA_SDU  */
+    UPID_PROX_1_PSEUDO1 = 0x06U,    /** Proximity-1 Pseudo Packet ID 1 for Segmt */
+    UPID_PROX_1         = 0x07U,    /** Proximity-1 SPDU                         */
+    UPID_PROX_1_PSEUDO2 = 0x08U,    /** Proximity-1 Pseudo Packet ID 2 for Segmt */
+    UPID_IDLE           = 0x1FU     /** Idle Data                                */
 } uslp_pid_t;
 /** @} */
 
@@ -150,8 +162,8 @@ typedef enum {
  * @{
  */
 typedef enum {
-    PVN_SPACE       = 0x0U,     /** Space Packet                             */
-    PVN_ENCAPS      = 0x7U      /** Encapsuation Packet                      */
+    PVN_SPACE           = 0x0U,     /** Space Packet                             */
+    PVN_ENCAPS          = 0x7U      /** Encapsuation Packet                      */
 } ccsds_pvn_t;
 /** @} */
 
@@ -160,9 +172,9 @@ typedef enum {
  * @{
  */
 typedef enum {
-    SDU_MAP_PKT,                /** MAPP_SDU                                 */
-    SDU_MAP_ACCESS,             /** MAPA_SDU                                 */
-    SDU_MAP_OCTET_STREAM        /** MAP Octet Stream SDU                     */
+    SDU_MAP_PKT,                    /** MAPP_SDU                                 */
+    SDU_MAP_ACCESS,                 /** MAPA_SDU                                 */
+    SDU_MAP_OCTET_STREAM            /** MAP Octet Stream SDU                     */
 } uslp_sdu_t;
 /** @} */
 
@@ -171,21 +183,10 @@ typedef enum {
  * @{
  */
 typedef enum {
-    COP_NONE,                   /** No COP in effect                         */
-    COP_COP_1,                  /** COP-1 in effect                          */
-    COP_COP_P                   /** COP-P in effect                          */
+    COP_NONE,                       /** No COP in effect                         */
+    COP_COP_1,                      /** COP-1 in effect                          */
+    COP_COP_P                       /** COP-P in effect                          */
 } uslp_cop_t;
-/** @} */
-
-/**
- * @name    USLP Packet Definition
- * @{
- */
-typedef struct {
-    ccsds_pvn_t pvn;            /** Packet Version Number                    */
-    size_t      max_pkt_len;    /** Maximum Packet Length                    */
-    bool        incomplete;     /** Delivery of incomplete packets required  */
-} uslp_pkt_t;
 /** @} */
 
 /**
@@ -193,9 +194,13 @@ typedef struct {
  * @{
  */
 typedef struct {
-    uslp_sdu_t  sdu;            /** Service Data Unit Type                   */
-    uslp_pid_t  upid;           /** USLP Protocol Identifier                 */
-    const uslp_pkt_t *pkt;      /** Packet definition for SDU_MAP_PKT        */
+    uslp_sdu_t      sdu;            /** Service Data Unit Type                   */
+    uslp_pid_t      upid;           /** USLP Protocol Identifier                 */
+    /* For UPID_SPP_ENCAPS */
+    size_t          max_pkt_len;    /** Maximum Packet Length                    */
+    bool            incomplete;     /** Delivery of incomplete packets required  */
+    size_t          pvn_cnt;        /** Count of valid packet version numbers    */
+    ccsds_pvn_t     pvn[];          /** Valid Packet Version Numbers             */
 } uslp_map_t;
 /** @} */
 
@@ -204,18 +209,20 @@ typedef struct {
  * @{
  */
 typedef struct {
-    bool        fixed;          /** (1) Fixed or (0) Variable Length Channel */
-    uint64_t    seq_ctrl_len;   /** VC Count Length for Sequence Control QoS */
-    uint64_t    expedited_len;  /** VC Count Length for Expedited QoS        */
-    uslp_cop_t  cop;            /** COP in Effect                            */
-    const uslp_map_t *mapid[16];/** Multiplexer Access Points                */
-    size_t      trunc_tf_len;   /** Truncated Transfer Frame Length          */
-    bool        ocf;            /** OCF Allowed (Variable) / Required (Fixed)*/
+    bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
+    uint8_t         seq_ctrl_len;   /** VC Count Length for Sequence Control QoS */
+    uint8_t         expedited_len;  /** VC Count Length for Expedited QoS        */
+    uint64_t        *seq_ctrl_cnt;  /** Pointer to sequence control frame counter*/
+    uint64_t        *expedited_cnt; /** Pointer to expedited frame counter       */
+    uslp_cop_t      cop;            /** COP in Effect                            */
+    const uslp_map_t *mapid[16];    /** Multiplexer Access Points                */
+    size_t          trunc_tf_len;   /** Truncated Transfer Frame Length          */
+    bool            ocf;            /** OCF Allowed (Variable) / Required (Fixed)*/
 #if USLP_USE_SDLS == 1
-    sdls_hdr_t  *sdls_hdr;      /** Pointer to SDLS Header if applicable     */
-    sdls_tlr_t  *sdls_tlr;      /** Pointer to SDLS Trailer if applicable    */
-    size_t      sdls_hdr_len;   /** SDLS Header Length (octets)              */
-    size_t      sdls_tlr_len;   /** SDLS Trailer Length (octets)             */
+    bool            has_sdls_hdr;   /** SDLS Header applicable                   */
+    bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
+    size_t          sdls_hdr_len;   /** SDLS Header Length (octets)              */
+    size_t          sdls_tlr_len;   /** SDLS Trailer Length (octets)             */
 #endif
 } uslp_vc_t;
 /** @} */
@@ -225,9 +232,9 @@ typedef struct {
  * @{
  */
 typedef struct {
-    bool        fixed;          /** (1) Fixed or (0) Variable Length Channel */
-    uint16_t    scid;           /** Spacecraft Identifier                    */
-    const uslp_vc_t *vcid[63];  /** Virtual Channels                         */
+    bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
+    uint16_t        scid;           /** Spacecraft Identifier                    */
+    const uslp_vc_t *vcid[63];      /** Virtual Channels                         */
 } uslp_mc_t;
 /** @} */
 
@@ -236,14 +243,14 @@ typedef struct {
  * @{
  */
 typedef struct {
-    const char  *name;          /** Physical Channel Name                    */
-    bool        fixed;          /** (1) Fixed or (0) Variable Length Channel */
-    size_t      tf_len;         /** Transfer Frame Length (octets)           */
-    bool        insert_zone;    /** Presence of Insert Zone                  */
-    size_t      insert_zone_len;/** Insert Zone Length (octets)              */
-    bool        fecf;           /** Presence of Frame Error Control Field    */
-    size_t      fecf_len;       /** Frame Error Control Field Length (octets)*/
-    bool        gen_oid;        /** Generate OID Frame                       */
+    const char      *name;          /** Physical Channel Name                    */
+    bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
+    size_t          tf_len;         /** Transfer Frame Length (octets)           */
+    bool            insert_zone;    /** Presence of Insert Zone                  */
+    size_t          insert_zone_len;/** Insert Zone Length (octets)              */
+    bool            fecf;           /** Presence of Frame Error Control Field    */
+    size_t          fecf_len;       /** Frame Error Control Field Length (octets)*/
+    bool            gen_oid;        /** Generate OID Frame                       */
 } uslp_pc_t;
 /** @} */
 
@@ -252,10 +259,9 @@ typedef struct {
  * @{
  */
 typedef struct {
-    const uslp_pc_t *phy_chan;
-    const uslp_mc_t *master_chan;
-    uint8_t     vcid;
-    uint8_t     mapid;
+    const uslp_mc_t *mc;            /** Master channel of link                   */
+    const uslp_pc_t *pc_rx;         /** Physical receive channel of link         */
+    const uslp_pc_t *pc_tx;         /** Physical transmit channel of link        */
 } uslp_link_t;
 /** @} */
 
@@ -264,10 +270,10 @@ typedef struct {
  * @{
  */
 typedef struct __attribute__((packed)) {
-    uint32_t    id;              /** Identifier fields                       */
-    uint16_t    len;             /** Frame Length                            */
-    uint8_t     misc;            /** Additional flags and fields             */
-    uint8_t     vc_frm_cnt[];    /** Virtual Channel Frame Count             */
+    uint32_t        id;             /** Identifier fields                       */
+    uint16_t        len;            /** Frame Length                            */
+    uint8_t         flags;          /** Additional flags and fields             */
+    uint8_t         vcf_cnt[];      /** Virtual Channel Frame Count             */
 } uslp_tfph_t;
 /** @} */
 
@@ -276,9 +282,19 @@ typedef struct __attribute__((packed)) {
  * @{
  */
 typedef struct __attribute__((packed)) {
-    uint8_t     flags;          /** TFDZ Construction Rules and UPID fields  */
-    uint16_t    offset;         /** First Header/Last Valid Octet Offset     */
+    uint8_t         flags;          /** TFDZ Construction Rules and UPID fields  */
+    uint16_t        offset;         /** First Header/Last Valid Octet Offset     */
 } uslp_tfdf_hdr_t;
+/** @} */
+
+/**
+ * @name    USLP Operational Control Field (OCF)
+ * @{
+ */
+typedef union __attribute__((packed)) {
+    uint32_t        ocf;
+    uint8_t         byte[4];
+} uslp_ocf_t;
 /** @} */
 
 /*===========================================================================*/

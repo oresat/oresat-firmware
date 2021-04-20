@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "ch.h"
 #include "hal.h"
 #include "comms.h"
@@ -9,10 +7,15 @@
 #include "uslp.h"
 #include "CANopen.h"
 
+#define EDL_WORKERS                         2
+
 #define XTAL_CLK                            16000000U
+
 #define SCID                                0x4F53U
 #define MCID                                ((USLP_TFVN << 16) | SCID)
-#define EDL_WORKERS                         2
+/* 16-bit FECF provided by AX5043 driver */
+#define FECF_LEN                            2
+#define USLP_MAX_LEN                        (FB_MAX_LEN + FECF_LEN)
 
 static const SPIConfig lband_spicfg = {
     false,
@@ -67,8 +70,8 @@ static const ax5043_profile_t lband_high[] = {
     {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
-    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
-    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID) | USLP_TFPH_ID_SRC_DST, 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID | USLP_TFPH_ID_SRC_DST, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -123,8 +126,8 @@ static const ax5043_profile_t lband_low[] = {
     {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
-    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
-    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID) | USLP_TFPH_ID_SRC_DST, 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID | USLP_TFPH_ID_SRC_DST, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -183,8 +186,8 @@ static const ax5043_profile_t uhf_eng[] = {
     {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_MSBFIRST | AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
-    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
-    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID) | USLP_TFPH_ID_SRC_DST, 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID | USLP_TFPH_ID_SRC_DST, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -242,8 +245,8 @@ static const ax5043_profile_t uhf_ax25[] = {
     {AX5043_REG_PKTADDRCFG, AX5043_PKTADDRCFG_FECSYNCDIS, 1},
     {AX5043_REG_PKTLENCFG, _VAL2FLD(AX5043_PKTLENCFG_LENBITS, 0xF), 1},
     {AX5043_REG_PKTMAXLEN, 0xFF, 1},
-    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID), 4},
-    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID, 4},
+    {AX5043_REG_PKTADDR, _VAL2FLD(USLP_TFPH_ID_MCID, MCID) | USLP_TFPH_ID_SRC_DST, 4},
+    {AX5043_REG_PKTADDRMASK, USLP_TFPH_ID_MCID | USLP_TFPH_ID_SRC_DST, 4},
     /* Pattern Match */
     /* Packet Controller */
     {AX5043_REG_PKTCHUNKSIZE, AX5043_PKTCHUNKSIZE_240, 1},
@@ -323,25 +326,25 @@ static AX5043Driver lband;
 static AX5043Driver uhf;
 static SI41XXDriver synth;
 
-static const uslp_pkt_t spp = {
-    .pvn            = PVN_SPACE,
-    .max_pkt_len    = 512,
-    .incomplete     = false,
-};
-
 static const uslp_map_t map0 = {
     .sdu            = SDU_MAP_PKT,
     .upid           = UPID_SPP_ENCAPS,
-    .pkt            = &spp,
+    .max_pkt_len    = 1024,
+    .incomplete     = false,
+    .pvn_cnt        = 1,
+    .pvn            = {PVN_SPACE},
 };
 
 static const uslp_vc_t vc0 = {
+    .seq_ctrl_len   = VC0_SEQ_CTRL_LEN,
+    .expedited_len  = VC0_EXPEDITED_LEN,
+    .seq_ctrl_cnt   = NULL,
+    .expedited_cnt  = NULL,
     .cop            = COP_NONE,
     .mapid[0]       = &map0,
-    .trunc_tf_len   = 128,
+    .trunc_tf_len   = USLP_MAX_LEN,
+    .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
-    .sdls_hdr       = NULL,
-    .sdls_tlr       = NULL,
     .sdls_hdr_len   = 0,
     .sdls_tlr_len   = 0,
 #endif
@@ -354,16 +357,28 @@ static const uslp_mc_t mc = {
 
 static const uslp_pc_t uhf_pc = {
     .name           = "UHF",
-    .tf_len         = FB_MAX_LEN,
+    .tf_len         = USLP_MAX_LEN,
     .fecf           = true,
-    .fecf_len       = 2,
+    .fecf_len       = FECF_LEN,
 };
 
 static const uslp_pc_t lband_pc = {
     .name           = "L-Band",
-    .tf_len         = FB_MAX_LEN,
+    .tf_len         = USLP_MAX_LEN,
     .fecf           = true,
-    .fecf_len       = 2,
+    .fecf_len       = FECF_LEN,
+};
+
+static const uslp_link_t edl_uhf_link = {
+    .mc = &mc,
+    .pc_rx = &uhf_pc,
+    .pc_tx = &uhf_pc,
+};
+
+static const uslp_link_t edl_lband_link = {
+    .mc = &mc,
+    .pc_rx = &lband_pc,
+    .pc_tx = &uhf_pc,
 };
 
 static const radio_cfg_t lband_high_cfg = {
