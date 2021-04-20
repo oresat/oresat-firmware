@@ -10,7 +10,8 @@
 //FIXME duplicate define from oresat_f0.h
 //#define ORESAT_F0_FIRMWARE_CRC_ADDRESS                0x0800A000
 //const uint32_t low_cpuid_of_protoboard = 0x1D000800;
-const uint32_t low_cpuid_of_solarcard = 0x1800500;
+
+const uint32_t unique_id_of_solarcard = 0x1800500;
 
 CANDriver *canp = &CAND1;
 
@@ -27,8 +28,8 @@ uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer
 	uint32_t dest_index = 0;
 
 	for(; dest_index < number_of_bytes; dest_index++ ) {
-		if( (offset + dest_index) < build_app_solar_crc32_bin_len ) {
-			dest_buffer[dest_index] = build_app_solar_crc32_bin[offset + dest_index];
+		if( (offset + dest_index) < app_solar_crc32_bin_len ) {
+			dest_buffer[dest_index] = app_solar_crc32_bin[offset + dest_index];
 		} else {
 			break;
 		}
@@ -37,11 +38,14 @@ uint32_t firmware_blob_read_function(const uint32_t offset, uint8_t *dest_buffer
 	return(dest_index);
 }
 
-void test_can_fw_update(BaseSequentialStream *chp) {
+/**
+ * @param  card_unique_id The OreSAT Node ID or the unique CPU ID low 32 bits, depending on if the target node has it's OPT bytes programmed
+ */
+void test_can_fw_update(BaseSequentialStream *chp, const uint32_t card_unique_id) {
   can_bootloader_config_t can_bl_config;
-  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, low_cpuid_of_solarcard, false);
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false);
 
-  bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, build_app_solar_crc32_bin_len, firmware_blob_read_function);
+  bool r = oresat_firmware_update_m0(&can_bl_config, ORESAT_F0_FIRMWARE_CRC_ADDRESS, app_solar_crc32_bin_len, firmware_blob_read_function);
 
   print_can_bootloader_config_t(&can_bl_config);
   chprintf(chp, "Firmware update success flag: %u\r\n", r);
@@ -63,9 +67,10 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     if (!strcmp(argv[0], "r") ) {
+#if 0
     	//test_can_fw_update(chp);
 		can_bootloader_config_t can_bl_config;
-		can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, low_cpuid_of_solarcard, false);
+		can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, unique_id_of_solarcard, false);
 		CANRxFrame msg;
 		for(;;) {
 			chprintf(chp, "Attempting to RX can frame (g_can_rx_count = %u)...\r\n", g_can_rx_count);
@@ -76,9 +81,10 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 				chprintf(chp, "No CAN frame RXed\r\n");
 			}
 		}
+#endif
 
     } else if (!strcmp(argv[0], "w") ) {
-    	test_can_fw_update(chp);
+    	test_can_fw_update(chp, unique_id_of_solarcard);
 
     } else {
         goto bootloader_usage;
