@@ -414,8 +414,11 @@
 
 /* Performance Tuning Registers */
 #define AX5043_REG_0xF00                    0xF00U
+#define AX5043_REG_0xF08                    0xF08U
+#define AX5043_REG_POWCTRL1                 0xF08U
 #define AX5043_REG_0xF0C                    0xF0CU
 #define AX5043_REG_0xF0D                    0xF0DU
+#define AX5043_REG_REF                      0xF0DU
 #define AX5043_REG_0xF10                    0xF10U
 #define AX5043_REG_XTALOSC                  0xF10U
 #define AX5043_REG_0xF11                    0xF11U
@@ -2281,6 +2284,7 @@
  * @{
  */
 #define AX5043_0xF00_DEFVAL                 (0x0FU)
+#define AX5043_0xF08_DEFVAL                 (0x04U)
 #define AX5043_0xF0C_DEFVAL                 (0x00U)
 #define AX5043_0xF0D_DEFVAL                 (0x03U)
 #define AX5043_0xF10_CRYSTAL                (0x03U)
