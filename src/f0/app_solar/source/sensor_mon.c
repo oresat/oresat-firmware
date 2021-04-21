@@ -85,6 +85,8 @@ THD_FUNCTION(sensor_mon, arg)
         } else {
         	//FIXME propagate error to CANOpen emergency
         	chprintf(DEBUG_SD, "Failed to read I2C temperature\r\n");
+        	//void CO_errorReport(CO_EM_t *em, const uint8_t errorBit, const uint16_t errorCode, const uint32_t infoCode);
+        	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 1);
         }
 
         if( read_tmp101an_temperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
