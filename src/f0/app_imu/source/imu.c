@@ -47,6 +47,9 @@ THD_FUNCTION(imu, arg)
 
     uint8_t gyroscope_readings_byte_array[6];
 
+    int16_t acc_temperature = 0;
+    uint8_t acc_mode_conf = 0;
+
     /* Initialize and start the BMI088 IMU sensor */
     bmi088ObjectInit(&imudev);
     bmi088Start(&imudev, &imucfg);
@@ -60,6 +63,12 @@ THD_FUNCTION(imu, arg)
     chprintf(CHP, "powering on acc . . .\r\n");
     BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
     chThdSleepMilliseconds(50);
+
+// 2021-04-01 - THU
+    power_status = readPowerCtrlReg(&imudev);
+    chprintf(CHP, "power status is %u\r\n", power_status);
+
+
 
     chprintf(CHP, "setting acc mode to active . . .\r\n");
     BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
@@ -80,46 +89,77 @@ THD_FUNCTION(imu, arg)
 
         if ((iterations % 10) == 0) {
 #if ( 1 )
+//            chprintf(CHP, "powering on accelerometer again . . .\r\n");
+//            BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
+//            chThdSleepMilliseconds(5);
+
+            power_status = readPowerCtrlReg(&imudev);
+            chprintf(CHP, "power control register holds %u\r\n", power_status);
+            chThdSleepMilliseconds(5);
+
+            acc_mode_conf = readPowerConfReg(&imudev);
+            chprintf(CHP, "mode config register holds %u\r\n", acc_mode_conf);
+            chThdSleepMilliseconds(5);
+#endif
+
+#if ( 1 )
             bmi088_chip_id = bmi088ReadChipId(&imudev);
             chprintf(CHP, "BMI088 accelerometer ID is %u\r\n", bmi088_chip_id);
             chThdSleepMilliseconds(10);
+#endif
 
+#if ( 1 )
             bmi088_gyro_chip_id = bmi088ReadGyrosChipId(&imudev);
             chprintf(CHP, "BMI088 gyroscope ID is %u\r\n", bmi088_gyro_chip_id);
             chThdSleepMilliseconds(10);
-
-//            power_status = readPowerCtrlReg(&imudev);
-//            chprintf(CHP, "power status is %u\r\n", power_status);
-//            chThdSleepMilliseconds(5);
 
 //            interrupt_status = bmi088ReadIntStat(&imudev);
 //            chprintf(CHP, "interrupt status is %u\r\n", interrupt_status);
 //            chThdSleepMilliseconds(5);
 
-            error_acc = bmi088ReadErrCode(&imudev);
-            chprintf(CHP, "error code from BMI088 = %u\r\n", error_acc);
-            chThdSleepMilliseconds(10);
+//            error_acc = bmi088ReadErrCode(&imudev);
+//            chprintf(CHP, "error code from BMI088 = %u\r\n", error_acc);
+//            chThdSleepMilliseconds(10);
 
             acc_inx = bmi088ReadAccInX(&imudev);
             acc_iny = bmi088ReadAccInY(&imudev);
             acc_inz = bmi088ReadAccInZ(&imudev);
             chprintf(CHP, "Acc readings X = %d, Y = %d, Z = %d\r\n", acc_inx, acc_iny, acc_inz);
-            chThdSleepMilliseconds(10);
+            chThdSleepMilliseconds(5);
 #endif
             bmi088ObtainGyroscopesReadings(&imudev, gyroscope_readings_byte_array);
             chprintf(CHP, "gyro X rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
             chprintf(CHP, "gyro Y rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
             chprintf(CHP, "gyro Z rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
 
-
-            if ((iterations % 50) == 5) {
-                chprintf(CHP, "powering on accelerometer again . . .\r\n");
-                BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
-            }
-
-            chprintf(CHP, "\r\n");
+            acc_temperature = bmi088ReadTemp(&imudev);
+            chprintf(CHP, "Accelerator temperature holds %d C\r\n", acc_temperature);
+            chThdSleepMilliseconds(5);
         }
 
+
+        if ((iterations % 50) == 5) {
+//            chprintf(CHP, "powering on accelerometer again . . .\r\n");
+//            BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
+//
+//            power_status = readPowerCtrlReg(&imudev);
+//            chprintf(CHP, "power status is %u\r\n", power_status);
+//            chThdSleepMilliseconds(5);
+
+            acc_mode_conf = readPowerConfReg(&imudev);
+            if ( acc_mode_conf == BMI088_MODE_SUSPEND )
+            {
+                chprintf(CHP, "---- setting accelerator mode active . . .\r\n");
+                BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
+            }
+            else
+            {
+                chprintf(CHP, "---- setting accelerator mode to suspend . . .\r\n");
+                BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_SUSPEND);
+            }
+        }
+
+        chprintf(CHP, "\r\n");
         chThdSleepMilliseconds(250);
     }
 

@@ -934,6 +934,7 @@ uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
 void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst);
 void accEnable(BMI088Driver *devp, uint8_t enable);
 uint8_t readPowerCtrlReg(BMI088Driver *devp);
+uint8_t readPowerConfReg(BMI088Driver *devp);
 uint8_t bmi088ReadIntStat(BMI088Driver *devp);
 uint16_t bmi088ReadTemp(BMI088Driver *devp);
 
