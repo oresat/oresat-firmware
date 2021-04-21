@@ -34,7 +34,7 @@ uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
  *
  * @return true on success, false otherwise.
  */
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, const void *read_function_arg0) {
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, void *read_function_arg0) {
     if (can_bl_config == NULL) {
         return (false);
     }
@@ -109,18 +109,12 @@ void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const ch
 }
 
 
-
-
-
-
-
 msg_t can_api_receive2(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms, const char *pre_msg, const char *post_msg) {
     CANDriver *canp = can_bl_config->canp;
-    BaseSequentialStream *chp = can_bl_config->chp;
 
     msg_t r = canReceive(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
-        can_bl_api_print_rx_frame(chp, msg, pre_msg, post_msg);
+        can_bl_api_print_rx_frame(can_bl_config->chp, msg, pre_msg, post_msg);
     }
     return(r);
 }
@@ -145,13 +139,12 @@ void can_api_purge_rx_buffer(can_bootloader_config_t *can_bl_config) {
 
 msg_t can_api_transmit(can_bootloader_config_t *can_bl_config, CANTxFrame *msg, const uint32_t timeout_ms) {
     CANDriver *canp = can_bl_config->canp;
-    BaseSequentialStream *chp = can_bl_config->chp;
 
     const msg_t r = canTransmit(canp, CAN_MAILBOX_TO_USE, msg, TIME_MS2I(timeout_ms));
     if( r == MSG_OK ) {
-        can_bl_api_print_tx_frame(chp, msg, "", " - SUCCESS");
+        can_bl_api_print_tx_frame(can_bl_config->chp, msg, "", " - SUCCESS");
     } else {
-        can_bl_api_print_tx_frame(chp, msg, "", " - FAIL");
+        can_bl_api_print_tx_frame(can_bl_config->chp, msg, "", " - FAIL");
         can_bl_config->can_tx_fail_count++;
     }
     return(r);
@@ -818,6 +811,9 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 
     chprintf(chp, "Trying to put node into bootloader mode...\r\n");
     chThdSleepMilliseconds(10);
+
+    // CAN FIFO 1 on the C3 Node will almost certainly have some cruft bootloader related can messages in it that need to be discarded
+    can_api_purge_rx_buffer(can_bl_config);
 
     if( ! can_bootloader_initiate(can_bl_config, 5000) ) {
         chprintf(chp, "Failed to put node into bootloader mode...\r\n");

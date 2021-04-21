@@ -75,15 +75,18 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
 	}
 
 	const lfs_soff_t lfs_file_length = file_size(&FSD1, lsf_file_handle);
-	if( lfs_file_length >= 0 && lfs_file_length > offset ) {
+	if( lfs_file_length >= 0 && lfs_file_length > ((int32_t) offset) ) {
 		const lfs_soff_t of = file_seek(&FSD1, lsf_file_handle, offset, 0);
-
-		int ret = file_read(&FSD1, lsf_file_handle, dest_buffer, number_of_bytes);
-		if( ret < 0 ) {
-			//chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
-			//FIXME error
+		if( of < 0 || of != ((int32_t) offset) ) {
+			//FIXME handle error
 		} else {
-			return_value = ret;
+			int ret = file_read(&FSD1, lsf_file_handle, dest_buffer, number_of_bytes);
+			if( ret < 0 ) {
+				//chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
+				//FIXME error
+			} else {
+				return_value = ret;
+			}
 		}
 
 		//chprintf(bootloader_chp_global, "Read %u bytes from offset %u from file %s\r\n", return_value, of, lsf_filepath);
@@ -167,7 +170,7 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 			return;
 		}
 
-		int ret = file_write(&FSD1, file, app_solar_crc32_bin, app_solar_crc32_bin_len);
+		int ret = file_write(&FSD1, file, build_app_solar_crc32_bin, build_app_solar_crc32_bin_len);
 		if( ret < 0 ) {
 			chprintf(chp, "Error in file_write: %d\r\n", ret);
 		}

@@ -62,7 +62,7 @@ typedef struct {
 extern "C" {
 #endif
 
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, const void *read_function_arg0);
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, void *read_function_arg0);
 
 bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint32_t timeout_ms);
 void print_can_bootloader_config_t(BaseSequentialStream *chp, can_bootloader_config_t *can_bl_config);
