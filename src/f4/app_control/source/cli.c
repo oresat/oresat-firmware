@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cmd.h"
+#include "cli.h"
 #include "c3.h"
 #include "CANopen.h"
 #include "test_fw.h"
@@ -102,8 +102,8 @@ static const ShellConfig shell_cfg = {
 };
 
 THD_WORKING_AREA(shell_wa, 0x1000);
-THD_WORKING_AREA(cmd_wa, 0x100);
-THD_FUNCTION(cmd, arg)
+THD_WORKING_AREA(cli_wa, 0x100);
+THD_FUNCTION(cli, arg)
 {
     (void)arg;
 

@@ -433,8 +433,8 @@ static const uslp_map_t map0 = {
 };
 
 static const uslp_vc_t vc0 = {
-    .seq_ctrl_len   = VC0_SEQ_CTRL_LEN,
-    .expedited_len  = VC0_EXPEDITED_LEN,
+    .seq_ctrl_len   = 0,
+    .expedited_len  = 0,
     .seq_ctrl_cnt   = NULL,
     .expedited_cnt  = NULL,
     .cop            = COP_NONE,
