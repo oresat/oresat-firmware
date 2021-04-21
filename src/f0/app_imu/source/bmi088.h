@@ -37,10 +37,22 @@
 #define BMI088_PATCH                        0
 /** @} */
 
-#define BMI088_SADDR                        0
+//#define BMI088_SADDR                        0
 /** @} */
-#define BMI088_ACC_SADDR                    0x18u 
-#define BMI088_GYRO_SADDR                   0x68u
+
+#define BMI088_ACC_SADDR                    0x18
+#define BMI088_GYRO_SADDR                   0x68
+
+//#define BMI088_ACC_SADDR                    (0x18 << 1)
+//#define BMI088_GYRO_SADDR                   (0x68 << 1)
+
+//#define BMI088_ACC_SADDR                    (0x18 >> 1)
+//#define BMI088_GYRO_SADDR                   (0x68 >> 1)
+
+
+#define BMI088_ACCL_EXPECTED_CHIP_ID          0x1E
+#define BMI088_GYRO_EXPECTED_CHIP_ID          0x0F
+
 /**
  * @name    BMI088 Accelerometer Register Addresses
  * @{
@@ -919,19 +931,23 @@ struct BMI088Driver {
 extern "C" {
 #endif
 void bmi088ObjectInit(BMI088Driver *devp);
-void bmi088Start(BMI088Driver *devp, const BMI088Config *config);
+bool bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
-uint8_t bmi088ReadChipId(BMI088Driver *devp);
+msg_t bmi088ReadChipId(BMI088Driver *devp, uint8_t *dest);
 uint8_t bmi088ReadErrCode(BMI088Driver *devp);
 uint8_t bmi088ReadErrFatal(BMI088Driver *devp);
 uint8_t bmi088ReadAccStatus(BMI088Driver *devp);
 
+#if 0
 int16_t bmi088ReadAccInX(BMI088Driver *devp);
 int16_t bmi088ReadAccInY(BMI088Driver *devp);
 int16_t bmi088ReadAccInZ(BMI088Driver *devp);
+#endif
+
+msg_t bmi088ReadAccXYZ(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z );
 
 uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
-void bmi088SoftReset(BMI088Driver *devp, uint8_t softrst);
+msg_t bmi088SoftReset(BMI088Driver *devp);
 void accEnable(BMI088Driver *devp, uint8_t enable);
 uint8_t readPowerCtrlReg(BMI088Driver *devp);
 uint8_t readPowerConfReg(BMI088Driver *devp);
@@ -939,19 +955,22 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp);
 uint16_t bmi088ReadTemp(BMI088Driver *devp);
 
 
-// 2021-03-28 - 'imu-dev-003--accelerometer-chip-id-debug' branch work, observing gyro device ID via I2C:
-uint8_t bmi088ReadGyrosChipId(BMI088Driver *devp);
-// 2021-03-29
+msg_t bmi088ReadGyrosChipId(BMI088Driver *devp, uint8_t *dest);
 uint8_t bmi088ReadRawU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 uint16_t bmi088ReadRawU16(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg);
 
-// 2021-03-30
-void BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, bmi088_power_state_t power_state);
-void BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
-void BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr);
-void BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_mode);
+msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8_t *dest);
 
+msg_t BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, const bmi088_power_state_t power_state);
+msg_t BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
+msg_t BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr);
+msg_t BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_mode);
+
+#if 0
 uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings);
+#endif
+
+msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, int32_t *dest_gyro_x, int32_t *dest_gyro_y, int32_t *dest_gyro_z );
 
 #ifdef __cplusplus
 }
