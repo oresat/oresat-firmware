@@ -17,6 +17,10 @@
 #define FLASH_PAGE_COUNT                         127
 
 
+#define OB_DATA_ADDRESS_DATA0     (0x1FFFF804)
+#define OB_DATA_ADDRESS_DATA1     (0x1FFFF806)
+
+
 /* Error codes */
 
 /** @brief Flash operation successful */
@@ -56,6 +60,9 @@ typedef uintptr_t flashaddr_t;
 
 /** @brief Index of a page */
 typedef uint8_t flashpage_t;
+
+
+bool flashWriteOptionBytes(const uint8_t data0_value, const uint8_t data1_value);
 
 /**
  * @brief Get the size of @p sector.

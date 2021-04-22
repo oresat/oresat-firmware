@@ -582,11 +582,42 @@ int main(void)
     chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%08X\r\n", (uint8_t *) &__flash0_end__);
     chprintf(DEBUG_SD, "CPU ID Low: 0x%X\r\n", *cpu_unique_id_low);
 
+    chprintf(DEBUG_SD, "Option Byte Data 0:       0x%X\r\n", OB->DATA0);
+    chprintf(DEBUG_SD, "Option Byte Data 1:       0x%X\r\n", OB->DATA1);
+
+    chprintf(DEBUG_SD, "Option Byte Data 0 (OBR): 0x%X\r\n", ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos));
+    chprintf(DEBUG_SD, "Option Byte Data 1 (OBR): 0x%X\r\n", ((FLASH->OBR & FLASH_OBR_DATA1_Msk) >> FLASH_OBR_DATA1_Pos));
+
+
     extern stkalign_t __main_thread_stack_base__;
     extern stkalign_t __main_thread_stack_end__;
     chprintf(DEBUG_SD, "Stack size: %u\r\n", ((uint8_t *) &__main_thread_stack_end__) - ((uint8_t *) &__main_thread_stack_base__));
 
     chThdSleepMilliseconds(50);
+
+#if 0
+    chprintf(DEBUG_SD, "Write option bytes? y/n? ");
+    uint8_t ch = 0;
+    sdRead(&SD2, &ch, 1);
+    chprintf(DEBUG_SD, "\r\n");
+
+    if( ch == 'y' ) {
+		chprintf(DEBUG_SD, "Attempting to write option byte...\r\n");
+		chThdSleepMilliseconds(50);
+
+    	if( flashWriteOptionBytes(0x11, 0xAB) ) {
+    		chprintf(DEBUG_SD, "Successfully wrote option bytes...\r\n");
+    	} else {
+    		chprintf(DEBUG_SD, "Failed to write option bytes...\r\n");
+    	}
+    } else {
+		chprintf(DEBUG_SD, "Skipping...\r\n");
+    }
+
+    for(;;) {
+    	chThdSleepMilliseconds(50);
+    }
+#endif
 
 #if 0
     for(int i = 0; i < 140; i++ ) {

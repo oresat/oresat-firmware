@@ -1,38 +1,8 @@
 #include "flash_f0.h"
 #include <string.h>
+#include "chprintf.h"
 
-size_t flashPageSizeF091(flashpage_t sector)
-{
-    if( sector <= FLASH_PAGE_COUNT ) {
-        return(STM32F093_FLASH_PAGE_SIZE);
-    }
-
-    return 0;
-}
-
-flashaddr_t flashPageBeginF091(flashpage_t page)
-{
-    flashaddr_t address = FLASH_BASE;
-    while (page > 0)
-    {
-        --page;
-        address += flashPageSizeF091(page);
-    }
-    return address;
-}
-
-flashaddr_t flashPageEndF091(flashpage_t page)
-{
-    return flashPageBeginF091(page + 1);
-}
-
-flashpage_t flashPageAtF091(flashaddr_t address)
-{
-    flashpage_t page_number = 0;
-    while (address >= flashPageEndF091(page_number))
-        ++page_number;
-    return page_number;
-}
+#define DEBUG_SD    (BaseSequentialStream *)          &SD2
 
 /**
  * @brief Wait for the flash operation to finish.
@@ -59,6 +29,146 @@ static bool_t flashUnlock(void)
         return CH_FAILED;
     return CH_SUCCESS;
 }
+
+/**
+ * @brief Unlock the option byte memory for write access.
+ * @return CH_SUCCESS  Unlock was successful.
+ * @return CH_FAILED    Unlock failed.
+ */
+static bool_t flashUnlockOptionBytes(void) {
+	//See example code in A2.5 of reference manual
+	flashWaitWhileBusy();
+
+	if( flashUnlock() != CH_SUCCESS ) {
+		return(CH_FAILED);
+	}
+
+	if ((FLASH->CR & FLASH_CR_OPTWRE) == 0) {
+		/* Authorizes the Option Byte register programming */
+		FLASH->OPTKEYR = FLASH_OPTKEY1;
+		FLASH->OPTKEYR = FLASH_OPTKEY2;
+	}
+
+	return CH_SUCCESS;
+}
+
+/**
+ * FIXME document this
+ */
+void flashLockOptionBytes(void) {
+	FLASH->CR |= FLASH_CR_OPTWRE;
+}
+
+/**
+ * FIXME document this
+ */
+bool flashEraseOptionBytes(void) {
+	FLASH->CR |= FLASH_CR_OPTER;
+	FLASH->CR |= FLASH_CR_STRT;
+
+	flashWaitWhileBusy();
+
+    if( FLASH->SR & FLASH_SR_EOP ) {
+        FLASH->SR = FLASH_SR_EOP;
+    }
+    FLASH->CR &= ~FLASH_CR_OPTER;
+
+	return CH_SUCCESS;
+}
+
+/**
+ * FIXME document this
+ *
+ * If you accidently lot the device, connect with Open OCD, run 'halt' then run 'stm32f0x unlock 0' then power cycle the device.
+ *
+ */
+bool flashWriteOptionBytes(const uint8_t data0_value, const uint8_t data1_value) {
+	bool ret = false;
+	chprintf(DEBUG_SD, "Unlocking...\r\n"); chThdSleepMilliseconds(50);
+
+	if(flashUnlockOptionBytes() == CH_SUCCESS) {
+	  // erase option bytes before programming
+	  chprintf(DEBUG_SD, "Erasing...\r\n"); chThdSleepMilliseconds(50);
+
+	  if(flashEraseOptionBytes() == CH_SUCCESS) {
+		  chprintf(DEBUG_SD, "Programming...\r\n"); chThdSleepMilliseconds(50);
+
+		 // program selected option byte
+		 FLASH->CR |= FLASH_CR_OPTPG;
+
+		 uint16_t write_value = data0_value | ((~data0_value) << 8);
+		 OB->DATA0 = write_value;
+
+		 write_value = data1_value | ((~data1_value) << 8);
+		 OB->DATA1 = write_value;
+
+
+		 chprintf(DEBUG_SD, "Waiting...\r\n"); chThdSleepMilliseconds(50);
+		 flashWaitWhileBusy();
+
+		 if( FLASH->SR & FLASH_SR_EOP ) {
+			 FLASH->SR = FLASH_SR_EOP;
+		 }
+		 FLASH->CR &= ~FLASH_CR_OPTPG;
+
+		 chprintf(DEBUG_SD, "Relocking...\r\n"); chThdSleepMilliseconds(50);
+		 flashLockOptionBytes();
+
+
+		 //Note: A CPU reset is necessary for this to take effect
+		 ret = true;
+	  }
+	}
+
+	return(ret);
+}
+
+
+/**
+ * FIXME document this
+ */
+size_t flashPageSizeF091(flashpage_t sector)
+{
+    if( sector <= FLASH_PAGE_COUNT ) {
+        return(STM32F093_FLASH_PAGE_SIZE);
+    }
+
+    return 0;
+}
+
+/**
+ * FIXME document this
+ */
+flashaddr_t flashPageBeginF091(flashpage_t page)
+{
+    flashaddr_t address = FLASH_BASE;
+    while (page > 0)
+    {
+        --page;
+        address += flashPageSizeF091(page);
+    }
+    return address;
+}
+
+/**
+ * FIXME document this
+ */
+flashaddr_t flashPageEndF091(flashpage_t page)
+{
+    return flashPageBeginF091(page + 1);
+}
+
+/**
+ * FIXME document this
+ */
+flashpage_t flashPageAtF091(flashaddr_t address)
+{
+    flashpage_t page_number = 0;
+    while (address >= flashPageEndF091(page_number))
+        ++page_number;
+    return page_number;
+}
+
 
 /**
  * @brief Lock the flash memory for write access.
@@ -98,6 +208,9 @@ int flashPageEraseF091(flashpage_t page_number)
     return FLASH_RETURN_SUCCESS;
 }
 
+/**
+ * FIXME document this
+ */
 int flashEraseF091(flashaddr_t address, size_t size)
 {
     while (size > 0)
@@ -113,6 +226,9 @@ int flashEraseF091(flashaddr_t address, size_t size)
     return FLASH_RETURN_SUCCESS;
 }
 
+/**
+ * FIXME document this
+ */
 bool_t flashIsErasedF091(flashaddr_t address, size_t size)
 {
     /* Check for default set bits in the flash memory
@@ -136,6 +252,9 @@ bool_t flashIsErasedF091(flashaddr_t address, size_t size)
     return TRUE;
 }
 
+/**
+ * FIXME document this
+ */
 bool_t flashCompare(flashaddr_t address, const char* buffer, size_t size)
 {
     /* For efficiency, compare flashdata_t values as much as possible,
@@ -160,12 +279,18 @@ bool_t flashCompare(flashaddr_t address, const char* buffer, size_t size)
     return TRUE;
 }
 
+/**
+ * FIXME document this
+ */
 int flashRead2(flashaddr_t address, char* buffer, size_t size)
 {
     memcpy(buffer, (char*)address, size);
     return FLASH_RETURN_SUCCESS;
 }
 
+/**
+ * FIXME document this
+ */
 static void flashWriteDataF091(flashaddr_t address, const flashdata_t data)
 {
     /* Enter flash programming mode */
@@ -181,6 +306,9 @@ static void flashWriteDataF091(flashaddr_t address, const flashdata_t data)
     FLASH->CR &= ~FLASH_CR_PG;
 }
 
+/**
+ * FIXME document this
+ */
 int flashWriteF091(flashaddr_t address, const uint8_t* buffer, size_t size)
 {
     /* Unlock flash for write access */
