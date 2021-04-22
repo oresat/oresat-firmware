@@ -157,7 +157,7 @@ int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
     uint16_t addr = (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? FRAM_FWINFO_ADDR : FRAM_FWINFO_ADDR + sizeof(fw_info_t));
     framWrite(&FRAMD1, addr, &fw_info, sizeof(fw_info_t));
 
-    return ret;
+    return fw_verify(eflp, !(SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE));
 }
 
 int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank)

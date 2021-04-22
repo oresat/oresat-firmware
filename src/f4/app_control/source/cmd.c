@@ -15,7 +15,7 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         break;
     case CMD_C3_FLASH:
         ret = fb_put(resp_fb, sizeof(int));
-        *((int*)ret) = fw_flash(&EFLD1, (char*)&cmd->arg[4], (uint32_t)cmd->arg[0]);
+        *((int*)ret) = fw_flash(&EFLD1, (char*)&cmd->arg[4], *((uint32_t*)cmd->arg));
         break;
     case CMD_C3_BANK:
         ret = fb_put(resp_fb, sizeof(int));
@@ -30,15 +30,6 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         ret = fb_put(resp_fb, 1);
         opd_stop();
         *((uint8_t*)ret) = 0;
-        break;
-    case CMD_OPD_SCAN:
-        ret = fb_put(resp_fb, 1);
-        opd_scan(cmd->arg[0]);
-        *((uint8_t*)ret) = 0;
-        break;
-    case CMD_OPD_REINIT:
-        ret = fb_put(resp_fb, 1);
-        *((int8_t *)ret) = opd_probe(cmd->arg[0], true);
         break;
     case CMD_OPD_ENABLE:
         ret = fb_put(resp_fb, 1);
