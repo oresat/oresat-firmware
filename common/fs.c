@@ -804,6 +804,10 @@ lfs_file_t *file_open(FSDriver *fsp, const char *path, int flags)
 
     if (file != NULL) {
         fsp->err = lfs_file_open(&fsp->lfs, file, path, flags);
+        if (fsp->err != LFS_ERR_OK) {
+            fs_free_file(fsp, file);
+            file = NULL;
+        }
     }
 
     return file;
@@ -1100,6 +1104,10 @@ lfs_dir_t *dir_open(FSDriver *fsp, const char *path)
 
     if (dir != NULL) {
         fsp->err = lfs_dir_open(&fsp->lfs, dir, path);
+        if (fsp->err != LFS_ERR_OK) {
+            fs_free_dir(fsp, dir);
+            dir = NULL;
+        }
     }
 
     return dir;
