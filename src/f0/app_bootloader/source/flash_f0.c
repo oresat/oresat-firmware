@@ -98,7 +98,7 @@ bool flashWriteOptionBytes(const uint8_t data0_value, const uint8_t data1_value)
 
 		 //Note: Erasing the data bytes automatically erases the READ Protection value. Restore it so that we can write to flash in the future.
 		 const uint8_t data_rdp = 0xAA;
-		 uint16_t write_value = data_rdp | ((~data_rdp) << 8);
+		 uint16_t write_value = ((uint16_t) data_rdp) | ((uint16_t) ((~data_rdp) << 8));
 		 OB->RDP = write_value;
 
 		 write_value = data0_value | ((~data0_value) << 8);

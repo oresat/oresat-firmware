@@ -423,6 +423,43 @@ bool can_bootloader_erase_page(can_bootloader_config_t *can_bl_config, const uin
 }
 
 /**
+ * TODO document this
+ *
+ * @return true on success, false otherwise.
+ */
+bool can_bootloader_set_opt_data(can_bootloader_config_t *can_bl_config, const uint8_t data_0_value, const uint8_t data_1_value) {
+#if CAN_BOOTLOADER_ENABLE_SERIAL_DEBUG
+    chprintf(can_bl_config->chp, "can_bootloader_set_opt_data(0x%X, 0x%X)\r\n", data_0_value, data_1_value);
+#endif
+    msg_t r = 0;
+
+    CANTxFrame tx_msg;
+    memset(&tx_msg, 0, sizeof(tx_msg));
+    tx_msg.SID = ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA;
+    tx_msg.DLC = 2;
+    tx_msg.data8[0] = data_0_value;
+    tx_msg.data8[1] = data_1_value;
+
+
+    if( (r = can_api_transmit(can_bl_config, &tx_msg, 100)) != MSG_OK ) {
+        return(false);
+    }
+    if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA) ) {
+        return(false);
+    }
+
+
+    if( ! can_bootloader_wait_for_ack(can_bl_config, ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA) ) {
+        return(false);
+    }
+
+    chprintf(can_bl_config->chp, "Successfully set data 0 and data 1 on remote node to 0x%X and 0x%X\r\n", data_0_value, data_1_value);
+    return(true);
+}
+
+
+
+/**
  * Writes to flash memory on the remote device.
  *
  * @param memory_address Base memory address to start writing to.
@@ -793,6 +830,7 @@ bool oresat_firmware_update_m0_verify_subsection(can_bootloader_config_t *can_bl
 }
 
 
+
 /**
  * Updates firmware on an M0 node
  *
@@ -883,6 +921,8 @@ const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_c
             return ("ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY");
         case ORESAT_BOOTLOADER_CAN_COMMAND_ERASE:
             return ("ORESAT_BOOTLOADER_CAN_COMMAND_ERASE");
+        case ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA:
+        	return("ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA");
     }
 
     if( v == STM32_BOOTLOADER_CAN_ACK ) {

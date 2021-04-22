@@ -416,11 +416,34 @@ void can_bootloader_handle_frame(CANRxFrame *rx_msg) {
             }
         }
             break;
+        case ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA:
+        {
+        	if( rx_msg->DLC == 2 ) {
+        		can_bootloader_send_ack(command_sid);
+
+        		const uint8_t data_0_byte = rx_msg->data8[0];
+        		const uint8_t data_1_byte = rx_msg->data8[1];
+
+        		if( flashWriteOptionBytes(data_0_byte, data_1_byte) ) {
+					chprintf(DEBUG_SD, "Successfully wrote option bytes...\r\n");
+					//Note: a CPU reset must be done
+					can_bootloader_send_ack(command_sid);
+				} else {
+					chprintf(DEBUG_SD, "Failed to write option bytes...\r\n");
+					can_bootloader_send_nack(command_sid);
+				}
+        	} else {
+        		can_bootloader_send_nack(command_sid);
+        	}
+        }
+        	break;
     }
 }
 
 uint32_t get_announce_unique_id(void) {
-    const uint8_t node_id = ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos);
+	//Note: The value in OBR requires a hard reset of the CPU to read back properly.
+    //const uint8_t node_id = ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos);
+    const uint8_t node_id = OB->DATA0;
 
     if( node_id < 0x7F ) {
     	chprintf(DEBUG_SD, "Found OreSAT Node ID: 0x%X\r\n", node_id);
@@ -481,7 +504,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
       * see hal_can_lld.h for definition of CANFilter struct.
       */
 
-#define NUM_CAN_FILTERS     9
+#define NUM_CAN_FILTERS     10
 
     CANFilter can_filter_12[NUM_CAN_FILTERS] = {\
       /*{<filter bank number>, <mode>, <scale>, <assignment, FIFO0 or FIFO1>, <register 1>, <register 2>}  */ \
@@ -494,6 +517,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
       {6, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_ACK), set_can_sid_mask(0x7FF)},\
       {7, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_NACK), set_can_sid_mask(0x7FF)},\
 	  {8, 0, 1, 0, set_can_sid_data(STM32_BOOTLOADER_CAN_ANNOUNCE), set_can_sid_mask(0x7FF)},\
+	  {9, 0, 1, 0, set_can_sid_data(ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA), set_can_sid_mask(0x7FF)},\
     };
 
 #if 1

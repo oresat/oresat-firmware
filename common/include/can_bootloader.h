@@ -30,7 +30,8 @@ typedef enum {
     //ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_PROTECT = 0x63,
     //ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_UNPROTECT = 0x73,
     //ORESAT_BOOTLOADER_CAN_COMMAND_READOUT_PROTECT = 0x82,
-    //ORESAT_BOOTLOADER_CAN_COMMAND_READOUT_UNPROTECT = 0x92
+    //ORESAT_BOOTLOADER_CAN_COMMAND_READOUT_UNPROTECT = 0x92,
+	ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA = 0x65
 } oresat_bootloader_can_command_t;
 
 
@@ -70,6 +71,9 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 
 const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_command_t v);
 
+bool can_bootloader_set_opt_data(can_bootloader_config_t *can_bl_config, const uint8_t data_0_value, const uint8_t data_1_value);
+
+void can_api_purge_rx_buffer(can_bootloader_config_t *can_bl_config);
 void can_api_print_rx_frame(BaseSequentialStream *chp, CANRxFrame *msg, const char *pre_msg, const char *post_msg);
 void can_api_print_tx_frame(BaseSequentialStream *chp, CANTxFrame *msg, const char *pre_msg, const char *post_msg);
 msg_t can_api_receive(can_bootloader_config_t *can_bl_config, CANRxFrame *msg, const uint32_t timeout_ms);

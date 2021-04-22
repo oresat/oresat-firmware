@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "test_bootloader.h"
 #include "can_bootloader.h"
@@ -8,8 +9,11 @@
 
 #include "app_solar.crc32.bin.h"
 
-//const uint32_t low_cpuid_of_protoboard = 0x1D000800;
+const uint32_t low_cpuid_of_protoboard = 0x1D000800;
+const uint32_t node_of_protoboard = 0x11;
+
 const uint32_t unique_id_of_solarcard = 0x1800500;
+
 BaseSequentialStream *bootloader_chp_global = NULL;
 
 CANDriver *canp = &CAND1;
@@ -126,6 +130,28 @@ bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_
   return(r);
 }
 
+bool can_write_node_id(BaseSequentialStream *chp, const uint32_t card_unique_id, const uint8_t data_0_value, const uint8_t data_1_value) {
+  can_bootloader_config_t can_bl_config;
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, NULL);
+
+  chprintf(chp, "Trying to put node 0x%X into bootloader mode...\r\n", card_unique_id);
+  chThdSleepMilliseconds(10);
+
+  // CAN FIFO 1 on the C3 Node will almost certainly have some cruft bootloader related can messages in it that need to be discarded
+  can_api_purge_rx_buffer(&can_bl_config);
+
+  if( ! can_bootloader_initiate(&can_bl_config, 5000) ) {
+	  chprintf(chp, "Failed to put node into bootloader mode...\r\n");
+	  return(false);
+  } else {
+	chprintf(chp, "Successfully put node into bootloader mode...\r\n");
+  }
+
+  bool ret = can_bootloader_set_opt_data(&can_bl_config, data_0_value, data_1_value);
+
+  return(ret);
+}
+
 
 /*===========================================================================*/
 /*                                                                       */
@@ -161,6 +187,28 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 		}
 #endif
 
+    } else if (!strcmp(argv[0], "opt") && argc >= 4 ) {
+    	//Example of programmign node ID 22 (onto node id 22)   bootloader opt 22 FF 00000022
+
+    	uint8_t data_0 = 0;
+    	sscanf(argv[1], "%2hhx", &data_0);
+
+    	uint8_t data_1 = 0;
+    	sscanf(argv[2], "%2hhx", &data_1);
+
+    	uint8_t cpu_id_0 = 0;
+    	uint8_t cpu_id_1 = 0;
+    	uint8_t cpu_id_2 = 0;
+    	uint8_t cpu_id_3 = 0;
+    	sscanf(argv[3], "%2hhx%2hhx%2hhx%2hhx", &cpu_id_0, &cpu_id_1, &cpu_id_2, &cpu_id_3);
+
+    	uint32_t cpu_id = (cpu_id_3 << 24) |(cpu_id_2 << 16) | (cpu_id_1 << 8) |  cpu_id_0;
+
+    	if( can_write_node_id(chp, cpu_id, data_0, data_1) ) {
+    		chprintf(chp, "Successfully wrote data 0 and data 1 OPT bytes...\r\n");
+    	} else {
+    		chprintf(chp, "Failed to write data 0 and data 1 OPT bytes...\r\n");
+    	}
 
     } else if (!strcmp(argv[0], "wfw") ) {
     	lfs_file_t *file;
