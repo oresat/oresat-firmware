@@ -105,14 +105,15 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
 
         /* Stop the driver, locking the flash */
         eflStop(&EFLD1);
-    } else if (!strcmp(argv[0], "flash") && argc > 1) {
+    } else if (!strcmp(argv[0], "flash") && argc > 2) {
+        uint32_t crc = strtoul(argv[2], NULL, 0);
         int err;
 
         /* Start the driver, unlocking the flash */
         eflStart(&EFLD1, NULL);
 
         chprintf(chp, "Erasing offline bank and writing %s... ", argv[1]);
-        err = fw_flash(&EFLD1, argv[1]);
+        err = fw_flash(&EFLD1, argv[1], crc);
         if (err != 0) {
             chprintf(chp, "Error: Return code %d\r\n", err);
             return;
@@ -158,7 +159,7 @@ fw_usage:
                    "        Read <size> bytes of flash starting at <offset> into <file>\r\n"
                    "    write <offset> <file>:\r\n"
                    "        Write <file> to flash starting at <offset>\r\n"
-                   "    flash <file>:\r\n"
+                   "    flash <file> <expected_crc>:\r\n"
                    "        Write <file> to offline bank\r\n"
                    "    bank <num>:\r\n"
                    "        Set flash bank to <num> for next boot\r\n"

@@ -5,6 +5,8 @@
 
 typedef enum {
     CMD_TX_CTRL,
+    CMD_C3_FLASH,
+    CMD_C3_BANK,
     CMD_OPD_SYSENABLE,
     CMD_OPD_SYSDISABLE,
     CMD_OPD_SCAN,

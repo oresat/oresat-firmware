@@ -13,9 +13,14 @@ typedef enum {
     BANK_1 = 1
 } fw_bank_t;
 
+typedef struct {
+    uint32_t crc;
+    size_t len;
+} fw_info_t;
+
 int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t len);
 int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset);
-int fw_flash(EFlashDriver *eflp, char *filename);
+int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc);
 int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank);
 
 #ifdef __cplusplus

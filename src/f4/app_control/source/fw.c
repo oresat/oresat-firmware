@@ -3,10 +3,12 @@
 
 #include "fw.h"
 #include "fs.h"
+#include "crc.h"
+#include "persist.h"
+#include "fram.h"
 
 #define FLASH_OPTKEY1                       0x08192A3BU
 #define FLASH_OPTKEY2                       0x4C5D6E7FU
-
 #define FLASH_BANK_OFFSET                   0x100000U
 #define BUF_SIZE                            256
 
@@ -15,7 +17,7 @@ uint8_t buf[BUF_SIZE];
 int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t len)
 {
     lfs_file_t *file;
-    int err;
+    int ret;
 
     file = file_open(&FSD1, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
     if (file == NULL) {
@@ -28,13 +30,13 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
             n = BUF_SIZE;
         }
 
-        err = flashRead(eflp, offset, n, buf);
-        if (err != FLASH_NO_ERROR) {
+        ret = flashRead(eflp, offset, n, buf);
+        if (ret != FLASH_NO_ERROR) {
             break;
         }
         n = file_write(&FSD1, file, buf, n);
         if (n < 0) {
-            err = n;
+            ret = n;
             break;
         }
 
@@ -42,15 +44,15 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
         len -= n;
     } while (len);
 
-    err = file_close(&FSD1, file);
-    return err;
+    ret = file_close(&FSD1, file);
+    return ret;
 }
 
 int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
 {
     lfs_file_t *file;
     ssize_t n;
-    int err;
+    int ret;
 
     file = file_open(&FSD1, filename, LFS_O_RDONLY);
     if (file == NULL) {
@@ -58,46 +60,74 @@ int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
     }
 
     while ((n = file_read(&FSD1, file, buf, BUF_SIZE)) > 0) {
-        err = flashProgram(eflp, offset, n, buf);
-        if (err != FLASH_NO_ERROR) {
+        ret = flashProgram(eflp, offset, n, buf);
+        if (ret != FLASH_NO_ERROR) {
             break;
         }
         offset += n;
     }
     if (n != 0) {
-        err = n;
+        ret = n;
     }
 
-    err = file_close(&FSD1, file);
-    return err;
+    ret = file_close(&FSD1, file);
+    return ret;
 }
 
-int fw_flash(EFlashDriver *eflp, char *filename)
+int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
 {
-    int err;
+    lfs_file_t *file;
+    fw_info_t fw_info = {0};
+    ssize_t n;
+    int ret;
+
+    /* Verify the file matches the expected CRC */
+    file = file_open(&FSD1, filename, LFS_O_RDONLY);
+    if (file == NULL) {
+        return FSD1.err;
+    }
+    while ((n = file_read(&FSD1, file, buf, BUF_SIZE)) > 0) {
+        fw_info.crc = crc32(buf, n, fw_info.crc);
+        fw_info.len += n;
+    }
+    if (n != 0) {
+        ret = n;
+    }
+    ret = file_close(&FSD1, file);
+    if (ret)
+        return ret;
+    if (fw_info.crc != expected_crc) {
+        ret = FLASH_ERROR_VERIFY;
+        return ret;
+    }
 
     /* Erase the offline flash bank */
-    err = flashStartEraseAll(eflp);
-    if (err != FLASH_NO_ERROR)
-        goto fw_flash_fail;
+    ret = flashStartEraseAll(eflp);
+    if (ret != FLASH_NO_ERROR)
+        return ret;
     /* Wait for erase operation to complete */
-    err = flashWaitErase((BaseFlash*)eflp);
-    if (err != FLASH_NO_ERROR)
-        goto fw_flash_fail;
+    ret = flashWaitErase((BaseFlash*)eflp);
+    if (ret != FLASH_NO_ERROR)
+        return ret;
     /* Write new firmware image to offline bank */
-    err = fw_write(eflp, filename, FLASH_BANK_OFFSET);
+    ret = fw_write(eflp, filename, FLASH_BANK_OFFSET);
+    if (ret != FLASH_NO_ERROR)
+        return ret;
 
-fw_flash_fail:
-    return err;
+    /* Commit new FW info to FRAM */
+    uint16_t addr = (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? FRAM_FWINFO_ADDR : FRAM_FWINFO_ADDR + sizeof(fw_info_t));
+    framWrite(&FRAMD1, addr, &fw_info, sizeof(fw_info_t));
+
+    return ret;
 }
 
 int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank)
 {
-    int err;
+    int ret;
 
-    err = flashQueryErase(eflp, NULL);
-    if (err != FLASH_NO_ERROR)
-        return err;
+    ret = flashQueryErase(eflp, NULL);
+    if (ret != FLASH_NO_ERROR)
+        return ret;
     /* Unlock option byte control register */
     eflp->flash->OPTKEYR |= FLASH_OPTKEY1;
     eflp->flash->OPTKEYR |= FLASH_OPTKEY2;
@@ -113,5 +143,5 @@ int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank)
     /* Lock option byte control register */
     eflp->flash->OPTCR |= FLASH_OPTCR_OPTLOCK;
 
-    return err;
+    return ret;
 }

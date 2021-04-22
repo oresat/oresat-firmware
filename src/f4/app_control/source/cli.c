@@ -14,6 +14,7 @@
 #include "test_radio.h"
 #include "test_comms.h"
 #include "test_deploy.h"
+#include "test_crc.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -87,6 +88,7 @@ static const ShellCommand commands[] = {
     {"beacon", cmd_beacon},
     {"state", cmd_state},
     {"fram", cmd_fram},
+    {"crc", cmd_crc},
     {"deploy", cmd_deploy},
     {"edl", cmd_edl},
     {NULL, NULL}
