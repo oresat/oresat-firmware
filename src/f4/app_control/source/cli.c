@@ -34,6 +34,10 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "TX Enable: %s\r\n", (tx_enabled() ? "TRUE" : "FALSE"));
         chprintf(chp, "Bat Good:  %s\r\n", (bat_good() ? "TRUE" : "FALSE"));
         chprintf(chp, "EDL Mode:  %s\r\n", (edl_enabled() ? "TRUE" : "FALSE"));
+        chprintf(chp, "Current Bank: %d\r\n"
+                      "Next Boot Bank: %d\r\n\r\n",
+                      (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? 1 : 0),
+                      (FLASH->OPTCR & FLASH_OPTCR_BFB2 ? 1 : 0));
         chprintf(chp, "===RTC===\r\n"
                       "Date:      %08X\r\n"
                       "Time:      %08X\r\n"
@@ -48,6 +52,10 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         tx_enable(argv[1][0] == 't');
     } else if (!strcmp(argv[0], "edl") && argc > 1) {
         edl_enable(argv[1][0] == 't');
+    } else if (!strcmp(argv[0], "i2c_cycle")) {
+        palSetLine(LINE_I2C_PWROFF);
+        chThdSleepMilliseconds(10);
+        palClearLine(LINE_I2C_PWROFF);
     } else if (!strcmp(argv[0], "reset")) {
         NVIC_SystemReset();
     } else if (!strcmp(argv[0], "factoryreset")) {
@@ -64,6 +72,7 @@ state_usage:
                    "    status:         Get current system state\r\n"
                    "    tx <t/f>:       Override TX enable state\r\n"
                    "    edl <t/f>:      Override EDL state\r\n"
+                   "    i2c_cycle:      Power cycle I2C peripheral bus\r\n"
                    "    reset:          Soft reset C3\r\n"
                    "    factoryreset:   Reset C3 to factory defaults\r\n"
                    "\r\n");

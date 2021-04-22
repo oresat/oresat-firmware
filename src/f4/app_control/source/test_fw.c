@@ -53,7 +53,7 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
 
         /* Stop the driver, locking the flash */
         eflStop(&EFLD1);
-    } else if (!strcmp(argv[0], "verify") && argc > 1) {
+    } else if (!strcmp(argv[0], "verifyerase") && argc > 1) {
         /* Start the driver, unlocking the flash */
         eflStart(&EFLD1, NULL);
 
@@ -64,7 +64,7 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             goto fw_usage;
         }
 
-        /* Query for completion status and verify */
+        /* Query for completion status and verify erase */
         chprintf(chp, "Erase query returned %d\r\n", flashQueryErase(&EFLD1, NULL));
         chprintf(chp, "Erase verify returned %d\r\n", flashVerifyErase(&EFLD1, sector));
 
@@ -75,9 +75,6 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
         size_t len = strtoul(argv[2], NULL, 0);
         int err;
 
-        /* Start the driver, unlocking the flash */
-        eflStart(&EFLD1, NULL);
-
         chprintf(chp, "Reading %d bytes of flash to %s starting at offset 0x%06X... ", len, argv[3], offset);
         err = fw_read(&EFLD1, argv[3], offset, len);
         if (err != 0) {
@@ -85,15 +82,9 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "Done!\r\n");
-
-        /* Stop the driver, locking the flash */
-        eflStop(&EFLD1);
     } else if (!strcmp(argv[0], "write") && argc > 2) {
         uint32_t offset = strtoul(argv[1], NULL, 0);
         int err;
-
-        /* Start the driver, unlocking the flash */
-        eflStart(&EFLD1, NULL);
 
         chprintf(chp, "Writing %s to flash at offset %05X... ", argv[2], offset);
         err = fw_write(&EFLD1, argv[2], offset);
@@ -102,15 +93,9 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "Done!\r\n");
-
-        /* Stop the driver, locking the flash */
-        eflStop(&EFLD1);
     } else if (!strcmp(argv[0], "flash") && argc > 2) {
         uint32_t crc = strtoul(argv[2], NULL, 0);
         int err;
-
-        /* Start the driver, unlocking the flash */
-        eflStart(&EFLD1, NULL);
 
         chprintf(chp, "Erasing offline bank and writing %s... ", argv[1]);
         err = fw_flash(&EFLD1, argv[1], crc);
@@ -119,9 +104,18 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "Done!\r\n");
+    } else if (!strcmp(argv[0], "verify") && argc > 1) {
+        fw_bank_t bank;
+        if (argv[1][0] == '0') {
+            bank = BANK_0;
+        } else if (argv[1][0] == '1') {
+            bank = BANK_1;
+        } else {
+            goto fw_usage;
+        }
 
-        /* Stop the driver, locking the flash */
-        eflStop(&EFLD1);
+        chprintf(chp, "Verifying FW in bank %d... ", bank);
+        chprintf(chp, "%s!\r\n\r\n", (fw_verify(&EFLD1, bank) ? "VALID" : "INVALID"));
     } else if (!strcmp(argv[0], "bank") && argc > 1) {
         uint32_t bank;
         if (argv[1][0] == '0') {
@@ -139,10 +133,6 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "Done!\r\n\r\n");
-    } else if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "Current Bank: %d\r\nNext Boot Bank: %d\r\n\r\n",
-                (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? BANK_1 : BANK_0),
-                (FLASH->OPTCR & FLASH_OPTCR_BFB2 ? BANK_1 : BANK_0));
     } else {
         goto fw_usage;
     }
@@ -153,7 +143,7 @@ fw_usage:
     chprintf(chp,  "Usage: fw <command>\r\n"
                    "    erase [sector]:\r\n"
                    "        Erase [sector] or the offline bank if no sector provided\r\n"
-                   "    verify <sector>:\r\n"
+                   "    verifyerase <sector>:\r\n"
                    "        Verify sector erased\r\n"
                    "    read <offset> <size> <file>:\r\n"
                    "        Read <size> bytes of flash starting at <offset> into <file>\r\n"
@@ -161,10 +151,10 @@ fw_usage:
                    "        Write <file> to flash starting at <offset>\r\n"
                    "    flash <file> <expected_crc>:\r\n"
                    "        Write <file> to offline bank\r\n"
+                   "    verify <bank>:\r\n"
+                   "        Verify firmware in <bank> against CRC\r\n"
                    "    bank <num>:\r\n"
                    "        Set flash bank to <num> for next boot\r\n"
-                   "    status:\r\n"
-                   "        Display the status of embedded flash subsystem\r\n"
                    "\r\n");
     return;
 }
