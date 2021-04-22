@@ -3,42 +3,83 @@
 #include "comms.h"
 #include "beacon.h"
 #include "c3.h"
+#include "cmd.h"
 #include "rtc.h"
 #include "uslp.h"
 #include "CANopen.h"
 
-#define EDL_WORKERS                         2
-
-#define XTAL_CLK                            16000000U
-
-#define SCID                                0x4F53U
-#define MCID                                ((USLP_TFVN << 16) | SCID)
-/* 16-bit FECF provided by AX5043 driver */
-#define FECF_LEN                            2
-#define USLP_MAX_LEN                        (FB_MAX_LEN + FECF_LEN)
-
-static const SPIConfig lband_spicfg = {
-    false,
-    NULL,                                   /* Operation complete callback */
-    LINE_LBAND_CS,
-    // SPI_CR1
-    SPI_CR1_SPE     |                       /* SPI enable */
-    SPI_CR1_MSTR    |                       /* Master */
-    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
-    SPI_CR1_SSM,
-    0,
+static const uslp_map_t map_cmd = {
+    .sdu            = SDU_MAP_ACCESS,
+    .upid           = UPID_MAPA_SDU,
+    .max_pkt_len    = 1024,
+    .incomplete     = false,
+    .map_recv       = comms_cmd,
 };
 
-static const SPIConfig uhf_spicfg = {
-    false,
-    NULL,                                   /* Operation complete callback */
-    LINE_UHF_CS,
-    // SPI_CR1
-    SPI_CR1_SPE     |                       /* SPI enable */
-    SPI_CR1_MSTR    |                       /* Master */
-    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
-    SPI_CR1_SSM,
-    0,
+static const uslp_vc_t vc0 = {
+    .seq_ctrl_len   = 0,
+    .expedited_len  = 0,
+    .seq_ctrl_cnt   = NULL,
+    .expedited_cnt  = NULL,
+    .fop            = NULL,
+    .farm           = NULL,
+    .mapid[0]       = &map_cmd,
+    .trunc_tf_len   = USLP_MAX_LEN,
+    .ocf            = false,
+#if (USLP_USE_SDLS == TRUE)
+    .sdls_hdr_len   = 0,
+    .sdls_tlr_len   = 0,
+#endif
+};
+
+static const uslp_vc_t vc1 = {
+    .seq_ctrl_len   = 0,
+    .expedited_len  = 0,
+    .seq_ctrl_cnt   = NULL,
+    .expedited_cnt  = NULL,
+    .fop            = NULL,
+    .farm           = NULL,
+    .mapid[0]       = &map_cmd,
+    .trunc_tf_len   = USLP_MAX_LEN,
+    .ocf            = false,
+#if (USLP_USE_SDLS == TRUE)
+    .sdls_hdr_len   = 0,
+    .sdls_tlr_len   = 0,
+#endif
+};
+
+const uslp_mc_t mc = {
+    .scid           = SCID,
+    .vcid[0]        = &vc0,
+    .vcid[1]        = &vc1,
+};
+
+static const uslp_pc_t uhf_pc = {
+    .name           = "UHF",
+    .tf_len         = USLP_MAX_LEN,
+    .fecf           = true,
+    .fecf_len       = FECF_LEN,
+    .phy_send       = comms_send,
+    .phy_send_prio  = comms_send_ahead,
+};
+
+static const uslp_pc_t lband_pc = {
+    .name           = "L-Band",
+    .tf_len         = USLP_MAX_LEN,
+    .fecf           = true,
+    .fecf_len       = FECF_LEN,
+};
+
+static const uslp_link_t edl_uhf_link = {
+    .mc = &mc,
+    .pc_rx = &uhf_pc,
+    .pc_tx = &uhf_pc,
+};
+
+static const uslp_link_t edl_lband_link = {
+    .mc = &mc,
+    .pc_rx = &lband_pc,
+    .pc_tx = &uhf_pc,
 };
 
 static const ax5043_profile_t lband_high[] = {
@@ -387,12 +428,37 @@ static const uint8_t postamble[] = {
     AX5043_CHUNK_TXCTRL_SETPA
 };
 
+static const SPIConfig lband_spicfg = {
+    false,
+    NULL,                                   /* Operation complete callback */
+    LINE_LBAND_CS,
+    // SPI_CR1
+    SPI_CR1_SPE     |                       /* SPI enable */
+    SPI_CR1_MSTR    |                       /* Master */
+    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
+    SPI_CR1_SSM,
+    0,
+};
+
+static const SPIConfig uhf_spicfg = {
+    false,
+    NULL,                                   /* Operation complete callback */
+    LINE_UHF_CS,
+    // SPI_CR1
+    SPI_CR1_SPE     |                       /* SPI enable */
+    SPI_CR1_MSTR    |                       /* Master */
+    SPI_CR1_BR_1    |                       /* f_pclk/8 (f_pclk = 84MHz, so 10.5MHz) */
+    SPI_CR1_SSM,
+    0,
+};
+
 static const AX5043Config lbandcfg = {
     .spip           = &SPID1,
     .spicfg         = &lband_spicfg,
     .miso           = LINE_SPI1_MISO,
     .irq            = LINE_LBAND_IRQ,
     .xtal_freq      = XTAL_CLK,
+    .phy_arg        = &edl_lband_link,
     .profile        = lband_high,
 };
 
@@ -402,6 +468,7 @@ static const AX5043Config uhfcfg = {
     .miso           = LINE_SPI1_MISO,
     .irq            = LINE_UHF_IRQ,
     .xtal_freq      = XTAL_CLK,
+    .phy_arg        = &edl_uhf_link,
     .profile        = uhf_eng,
     .preamble       = preamble,
     .preamble_len   = sizeof(preamble),
@@ -422,61 +489,6 @@ static SI41XXConfig synthcfg = {
 static AX5043Driver lband;
 static AX5043Driver uhf;
 static SI41XXDriver synth;
-
-static const uslp_map_t map0 = {
-    .sdu            = SDU_MAP_PKT,
-    .upid           = UPID_SPP_ENCAPS,
-    .max_pkt_len    = 1024,
-    .incomplete     = false,
-    .pvn_cnt        = 1,
-    .pvn            = {PVN_SPACE},
-};
-
-static const uslp_vc_t vc0 = {
-    .seq_ctrl_len   = 0,
-    .expedited_len  = 0,
-    .seq_ctrl_cnt   = NULL,
-    .expedited_cnt  = NULL,
-    .cop            = COP_NONE,
-    .mapid[0]       = &map0,
-    .trunc_tf_len   = USLP_MAX_LEN,
-    .ocf            = false,
-#if (USLP_USE_SDLS == TRUE)
-    .sdls_hdr_len   = 0,
-    .sdls_tlr_len   = 0,
-#endif
-};
-
-static const uslp_mc_t mc = {
-    .scid           = SCID,
-    .vcid[0]        = &vc0,
-};
-
-static const uslp_pc_t uhf_pc = {
-    .name           = "UHF",
-    .tf_len         = USLP_MAX_LEN,
-    .fecf           = true,
-    .fecf_len       = FECF_LEN,
-};
-
-static const uslp_pc_t lband_pc = {
-    .name           = "L-Band",
-    .tf_len         = USLP_MAX_LEN,
-    .fecf           = true,
-    .fecf_len       = FECF_LEN,
-};
-
-static const uslp_link_t edl_uhf_link = {
-    .mc = &mc,
-    .pc_rx = &uhf_pc,
-    .pc_tx = &uhf_pc,
-};
-
-static const uslp_link_t edl_lband_link = {
-    .mc = &mc,
-    .pc_rx = &lband_pc,
-    .pc_tx = &uhf_pc,
-};
 
 static const radio_cfg_t lband_high_cfg = {
     .devp = &lband,
@@ -542,9 +554,8 @@ THD_FUNCTION(edl_thd, arg)
             continue;
         }
 
-        /* TODO: Process received frame */
         edl_enable(true);
-
+        uslp_recv(rx_fb->phy_arg, rx_fb);
         fb_free(rx_fb);
     }
 
@@ -605,6 +616,15 @@ void comms_stop(void)
         chThdWait(edl_tp[i]);
         edl_tp[i] = NULL;
     }
+}
+
+void comms_cmd(fb_t *fb)
+{
+    cmd_t *cmd = (cmd_t*)fb->data;
+    fb_t *resp_fb = fb_alloc(CMD_RESP_SIZE);
+    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
+    cmd_process(cmd, resp_fb);
+    uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 
 void comms_beacon(bool enable)

@@ -227,6 +227,7 @@ THD_FUNCTION(rx_worker, arg) {
                         fb = fb_alloc(FB_MAX_LEN);
                     }
                     fb->phy_rx = devp;
+                    fb->phy_arg = (void*)devp->config->phy_arg;
                 }
 
                 osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");
