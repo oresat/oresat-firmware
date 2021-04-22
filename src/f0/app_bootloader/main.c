@@ -582,6 +582,7 @@ int main(void)
     chprintf(DEBUG_SD, "Bootloader __flash0_end__ = 0x%08X\r\n", (uint8_t *) &__flash0_end__);
     chprintf(DEBUG_SD, "CPU ID Low: 0x%X\r\n", *cpu_unique_id_low);
 
+    chprintf(DEBUG_SD, "Option Byte RDP:          0x%X\r\n", OB->RDP);
     chprintf(DEBUG_SD, "Option Byte Data 0:       0x%X\r\n", OB->DATA0);
     chprintf(DEBUG_SD, "Option Byte Data 1:       0x%X\r\n", OB->DATA1);
 
