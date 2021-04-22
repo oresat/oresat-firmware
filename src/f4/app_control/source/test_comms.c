@@ -8,13 +8,16 @@
 #include "chprintf.h"
 
 #define COMMS_EVENT_LOOPBACK_RX EVENT_MASK(0)
+#define CMD_RESP_BUF_SIZE 64
 
 extern const uslp_mc_t mc;
 
 static fb_t *tx_fb;
 
-static uint8_t resp_buf[64];
 static thread_t *cli_tp;
+
+static uint8_t resp_buf[CMD_RESP_BUF_SIZE];
+static size_t buf_len;
 
 void loopback_tx(fb_t *fb);
 void loopback_rx(fb_t *fb);
@@ -85,6 +88,7 @@ void loopback_rx(fb_t *fb)
 {
     osalDbgCheck(fb != NULL);
     memcpy(resp_buf, fb->data, fb->len);
+    buf_len = fb->len;
     chEvtSignal(cli_tp, COMMS_EVENT_LOOPBACK_RX);
 }
 
@@ -111,30 +115,34 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
     }
     if (!strcmp(argv[0], "tx_enable")) {
         cmd_t *cmd;
-        tx_fb = fb_alloc(64);
+        tx_fb = fb_alloc(USLP_MAX_HEADER_LEN + CMD_RESP_BUF_SIZE);
+        fb_reserve(tx_fb, USLP_MAX_HEADER_LEN);
         cmd = fb_put(tx_fb, sizeof(cmd_t) + 1);
         cmd->cmd = CMD_TX_CTRL;
         cmd->arg[0] = 1;
         uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
         chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_INFINITE);
         chprintf(chp, "Response buffer:");
-        for (size_t i = 0; i < 64; i++) {
-            if (i % 0x10) chprintf(chp, "\r\n%04X:", i);
+        for (size_t i = 0; i < buf_len; i++) {
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
             chprintf(chp, " %02X", resp_buf[i]);
         }
+        chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "tx_disable")) {
         cmd_t *cmd;
-        tx_fb = fb_alloc(64);
+        tx_fb = fb_alloc(USLP_MAX_HEADER_LEN + CMD_RESP_BUF_SIZE);
+        fb_reserve(tx_fb, USLP_MAX_HEADER_LEN);
         cmd = fb_put(tx_fb, sizeof(cmd_t) + 1);
         cmd->cmd = CMD_TX_CTRL;
         cmd->arg[0] = 0;
         uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
         chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_INFINITE);
         chprintf(chp, "Response buffer:");
-        for (size_t i = 0; i < 64; i++) {
-            if (i % 0x10) chprintf(chp, "\r\n%04X:", i);
+        for (size_t i = 0; i < buf_len; i++) {
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
             chprintf(chp, " %02X", resp_buf[i]);
         }
+        chprintf(chp, "\r\n");
     } else if (!strcmp(argv[0], "send")) {
         edl_enable(true);
         tx_fb = fb_alloc(sizeof(buf));

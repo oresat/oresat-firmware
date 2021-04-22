@@ -9,7 +9,7 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     switch (cmd->cmd) {
     case CMD_TX_CTRL:
         ret = fb_put(resp_fb, sizeof(int));
-        tx_enable(cmd->arg);
+        tx_enable(cmd->arg[0]);
         *((int*)ret) = tx_enabled();
         break;
     case CMD_OPD_SYSENABLE:

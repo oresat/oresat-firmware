@@ -120,7 +120,7 @@ static void uslp_vc_recv(const uslp_vc_t *vc, fb_t *fb)
     uslp_tfph_t *tfph = (uslp_tfph_t*)fb->data;
     size_t vcf_cnt_len;
 
-    if (tfph->id & USLP_TFPH_ID_EOFPH) {
+    if (__builtin_bswap32(tfph->id) & USLP_TFPH_ID_EOFPH) {
         fb_pull(fb, sizeof(uint32_t));
         return;
     }
@@ -138,8 +138,9 @@ static void uslp_vc_recv(const uslp_vc_t *vc, fb_t *fb)
 static void uslp_map_recv(const uslp_map_t *map, fb_t *fb)
 {
     uslp_tfdf_hdr_t *tfdf_hdr = (uslp_tfdf_hdr_t*)fb->data;
-    uint8_t rules, upid;
+    uslp_pid_t upid;
     uint16_t offset;
+    uint8_t rules;
 
     /* Extract TFDF Header */
     uslp_parse_tfdf_hdr(tfdf_hdr, &rules, &upid, &offset);
@@ -177,7 +178,7 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
 
     uslp_map_gen(map, fb);
     fb->mac_hdr = uslp_vc_gen(vc, fb, mc->scid, vcid, mapid, expedite);
-    ((uslp_tfph_t*)fb->mac_hdr)->len = __builtin_bswap16(fb->len) + pc->fecf_len;
+    ((uslp_tfph_t*)fb->mac_hdr)->len = __builtin_bswap16(fb->len + pc->fecf_len);
     pc->phy_send(fb);
 
     return 0;
