@@ -44,14 +44,14 @@ static const max17205_regval_t batt_cfg[] = {
 };
 
 static const MAX17205Config max17205configPack1 = {
-	&I2CD2,
-	&i2cconfig_2,
+	&I2CD1,
+	&i2cconfig_1,
     batt_cfg
 };
 
 static const MAX17205Config max17205configPack2 = {
-	&I2CD1,
-	&i2cconfig_1,
+	&I2CD2,
+	&i2cconfig_2,
     batt_cfg
 };
 
@@ -95,7 +95,9 @@ static batt_pack_data_t pack_2_data;
 
 battery_heating_state_machine_state_t current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
 
-
+/**
+ * TODO document this
+ */
 void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_data_t *pk2_data) {
 	if( pk1_data->is_data_valid && pk2_data->is_data_valid ) {
 		int16_t avg_temp_1_C = pk1_data->avg_temp_1_C;
@@ -113,6 +115,7 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 				palSetLine(LINE_MOARPWR);
 				palSetLine(LINE_HEATER_ON_1);
 				palSetLine(LINE_HEATER_ON_2);
+				CO_OD_RAM.heaterStatus = 1;
 				//Once they’re greater than 5 °C or the combined pack capacity is < 25%
 
 				if( (avg_temp_1_C > 5 && avg_temp_2_C > 5) || (total_state_of_charge < 25) ) {
@@ -124,6 +127,7 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 				palClearLine(LINE_HEATER_ON_1);
 				palClearLine(LINE_HEATER_ON_2);
 				palClearLine(LINE_MOARPWR);
+				CO_OD_RAM.heaterStatus = 0;
 
 				if( (avg_temp_1_C < -5 || avg_temp_2_C < -5) && (present_state_of_charge_1 > 25 || present_state_of_charge_2 > 25) ) {
 					current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_HEATING;
@@ -141,35 +145,15 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 	}
 }
 
-
+/**
+ * TODO document this
+ */
 void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t line_dchg_dis, const ioline_t line_chg_dis, const char* pk_str) {
 
 	chprintf(DEBUG_SERIAL, "LINE_DCHG_STAT_PK1 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK1));
 	chprintf(DEBUG_SERIAL, "LINE_CHG_STAT_PK1 = %u\r\n", palReadLine(LINE_CHG_STAT_PK1));
-
 	chprintf(DEBUG_SERIAL, "LINE_DCHG_STAT_PK2 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK2));
 	chprintf(DEBUG_SERIAL, "LINE_CHG_STAT_PK2 = %u\r\n", palReadLine(LINE_CHG_STAT_PK2));
-
-	/*
-
-Turning heaters OFF
-LINE_DCHG_STAT_PK1 = 1
-LINE_CHG_STAT_PK1 = 1
-LINE_DCHG_STAT_PK2 = 1
-LINE_CHG_STAT_PK2 = 1
-Disabling discharge on PK1
-Enabling charging on PK1
-LINE_DCHG_STAT_PK1 = 1
-LINE_CHG_STAT_PK1 = 1
-LINE_DCHG_STAT_PK2 = 1
-LINE_CHG_STAT_PK2 = 1
-Enabling discharge on PK2
-Enabling charging on PK2
-
-	 */
-
-
-
 
 	if( pk_data->is_data_valid ) {
 		if( pk_data->VCell_mV < 3000 || pk_data->present_state_of_charge < 20 ) {
@@ -204,53 +188,9 @@ Enabling charging on PK2
 	}
 }
 
-/*
-
-=================================
-Populating Pack 1 Data
-  max17205ReadTemperatureChecked(0x137 MAX17205_AD_AVGTEMP1) = 23 C (raw: 2964 0xB94)
-  max17205ReadTemperatureChecked(0x139 MAX17205_AD_AVGTEMP2) = 23 C (raw: 2964 0xB94)
-  max17205ReadTemperatureChecked(0x138 MAX17205_AD_AVGINTTEMP) = 23 C (raw: 2964 0xB94)
-avg_temp_1_C = 23 C, avg_temp_2_C = 23 C, avg_int_temp_C = 23 C
-  max17205ReadVoltageChecked(0xD4 MAX17205_AD_AVGCELL1) = 4064 mV
-  max17205ReadVoltageChecked(0x19 MAX17205_AD_AVGVCELL) = 4063 mV
-  max17205ReadBattVoltage(0xDA MAX17205_AD_BATT) = 8130 mV
-cell1_mV = 4064, cell2_mV = 4066, VCell_mV = 4063, batt_mV = 8130
-max_volt_mV = 4060, min_volt_mV = 4040
-  max17205ReadCurrent(0xB MAX17205_AD_AVGCURRENT) = 88 mA (raw: 564 0x234)
-max_mA = 80, min_mA = 80
-avg_current_mA = 88 mA
-  max17205ReadCapacityChecked(0x10 MAX17205_AD_FULLCAP) = 1477 mAh (raw: 2955 0xB8B)
-  max17205ReadCapacityChecked(0x1F MAX17205_AD_AVCAP) = 1113 mAh (raw: 2227 0x8B3)
-  max17205ReadCapacityChecked(0xF MAX17205_AD_MIXCAP) = 1135 mAh (raw: 2271 0x8DF)
-  max17205ReadCapacityChecked(0x5 MAX17205_AD_REPCAP) = 1134 mAh (raw: 2268 0x8DC)
-full_capacity_mAh = 1477, available_capacity_mAh = 1113, mix_capacity = 1135
-  max17205ReadTimeChecked(0x11 MAX17205_AD_TTE) = 40954 seconds (682 minutes) (raw: 65535 0xFFFF)
-  max17205ReadTimeChecked(0x20 MAX17205_AD_TTF) = 0 seconds (0 minutes) (raw: 0 0x0)
-  max17205ReadPercentageChecked(0xE MAX17205_AD_AVSOC) = 75% (raw: 19290 0x4B5A)
-  max17205ReadPercentageChecked(0xFF MAX17205_AD_VFSOC) = 75% (raw: 19325 0x4B7D)
-time_to_empty = 40954 (seconds), time_to_full = 0 (seconds), available_state_of_charge = 75%, present_state_of_charge = 75%
-cycles = 0
-
-Populating Pack 2 Data
-
-max_mA = 0, min_mA = -40
-avg_current_mA = 0 mA
-  max17205ReadCapacityChecked(0x10 MAX17205_AD_FULLCAP) = 1477 mAh (raw: 2955 0xB8B)
-  max17205ReadCapacityChecked(0x1F MAX17205_AD_AVCAP) = 109 mAh (raw: 219 0xDB)
-  max17205ReadCapacityChecked(0xF MAX17205_AD_MIXCAP) = 131 mAh (raw: 263 0x107)
-  max17205ReadCapacityChecked(0x5 MAX17205_AD_REPCAP) = 132 mAh (raw: 264 0x108)
-full_capacity_mAh = 1477, available_capacity_mAh = 109, mix_capacity = 131
-  max17205ReadTimeChecked(0x11 MAX17205_AD_TTE) = 40954 seconds (682 minutes) (raw: 65535 0xFFFF)
-  max17205ReadTimeChecked(0x20 MAX17205_AD_TTF) = 40954 seconds (682 minutes) (raw: 65535 0xFFFF)
-  max17205ReadPercentageChecked(0xE MAX17205_AD_AVSOC) = 7% (raw: 1896 0x768)
-  max17205ReadPercentageChecked(0xFF MAX17205_AD_VFSOC) = 8% (raw: 2251 0x8CB)
-time_to_empty = 40954 (seconds), time_to_full = 40954 (seconds), available_state_of_charge = 7%, present_state_of_charge = 8%
-
+/**
+ * TODO document this
  */
-
-
-
 bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 	msg_t r = 0;
 	memset(dest, 0, sizeof(*dest));
@@ -380,39 +320,16 @@ THD_FUNCTION(batt, arg)
     const bool pack_1_init_flag = max17205Start(&max17205devPack1, &max17205configPack1);
     chprintf(DEBUG_SERIAL, "max17205Start(pack1) = %u\r\n", pack_1_init_flag);
 
+    /*
     max17205PrintintNonvolatileMemory(&max17205configPack1);
     while(1) {
     	chThdSleepMilliseconds(1000);
     }
+    */
 
     const bool pack_2_init_flag = max17205Start(&max17205devPack2, &max17205configPack2);
     chprintf(DEBUG_SERIAL, "max17205Start(pack2) = %u\r\n", pack_2_init_flag);
 
-#if 0
-    //TODO delete this block
-    while (!chThdShouldTerminateX()) {
-    	chprintf(DEBUG_SERIAL, "=================================\r\n");
-    	chThdSleepMilliseconds(1000);
-
-		i2cStart(max17205configPack2.i2cp, max17205configPack2.i2ccfg);
-		max17205devPack2.state = MAX17205_READY;
-		chprintf(DEBUG_SERIAL, "Done starting i2c, %u\r\n", max17205configPack2.i2cp->state);
-		chThdSleepMilliseconds(100);
-
-		uint16_t cell1_mV = 0;
-		uint16_t cell2_mV = 0;
-		uint16_t VCell_mV = 0;
-
-		msg_t r;
-    	r = max17205ReadVoltage(&max17205devPack2, MAX17205_AD_AVGCELL1, &cell1_mV);
-		//r = max17205ReadVoltageChecked(&max17205dev, MAX17205_AD_AVGCELL2, &cell2);
-		//r = max17205ReadVoltageChecked(&max17205dev, MAX17205_AD_AVGVCELL, &VCell);
-
-		chprintf(DEBUG_SERIAL, "cell1 = %u, cell2 = %u, VCell = %u\r\n", cell1_mV, cell2_mV, VCell_mV);
-
-		i2cStop(max17205configPack2.i2cp);
-    }
-#endif
 
     uint16_t pack_1_comm_rx_error_count = 0;
     uint16_t pack_2_comm_rx_error_count = 0;
