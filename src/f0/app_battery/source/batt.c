@@ -334,8 +334,12 @@ THD_FUNCTION(batt, arg)
     uint16_t pack_1_comm_rx_error_count = 0;
     uint16_t pack_2_comm_rx_error_count = 0;
     while (!chThdShouldTerminateX()) {
-    	chprintf(DEBUG_SERIAL, "=================================\r\n");
-    	chThdSleepMilliseconds(4000);
+    	chprintf(DEBUG_SERIAL, "================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
+    	for(uint32_t sl = 0; sl < 3500; sl += 50) {
+    		chprintf(DEBUG_SERIAL, "    %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
+    		chThdSleepMilliseconds(50);
+    	}
+    	//chThdSleepMilliseconds(1000);
 
     	chprintf(DEBUG_SERIAL, "Populating Pack 1 Data\r\n");
     	if( ! populate_pack_data(&max17205devPack1, &pack_1_data) ) {
@@ -409,6 +413,8 @@ THD_FUNCTION(batt, arg)
 
         palToggleLine(LINE_LED);
     }
+
+    chprintf(DEBUG_SERIAL, "Terminating battery thread...\r\n");
 
     max17205Stop(&max17205devPack1);
     max17205Stop(&max17205devPack2);

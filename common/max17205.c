@@ -266,7 +266,7 @@ msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config) {
 msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
         uint8_t* rxbuf, size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+            TIME_MS2I(50));
 }
 
 /**
@@ -284,7 +284,7 @@ msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
 msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-            TIME_INFINITE);
+    		TIME_MS2I(50));
 }
 #endif /* MAX17205_USE_I2C */
 
