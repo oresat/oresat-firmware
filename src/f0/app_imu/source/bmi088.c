@@ -128,7 +128,6 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
     devp->config = config;
 
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
 
     /* Configuring common registers.*/
 #if BMI088_USE_I2C
@@ -138,7 +137,6 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
     i2cStart(config->i2cp, config->i2ccfg);
 
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
 
 #if (0)
     i2cbuf_t buf;
@@ -157,54 +155,37 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
     bmi088I2CWriteRegister(config->i2cp, config->acc_saddr, buf.buf, sizeof(buf));
 #endif
 
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
 
     if( BMI088AccelerometerPowerOnOrOff(devp, BMI088_ON) != MSG_OK ) {
-    	//FIXME better error handling
     	ret = false;
     }
 
     if( BMI088AccelerometerEnableOrSuspend(devp, BMI088_MODE_ACTIVE) != MSG_OK ) {
-    	//FIXME better error handling
     	ret = false;
     }
 
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);chThdSleepMilliseconds(50);
 
 #if BMI088_SHARED_I2C
     i2cReleaseBus(config->i2cp);
 #endif /* BMI088_SHARED_I2C */
 #endif /* BMI088_USE_I2C */
 
-
-
-
-#if 0
     if( ! ret ) {
     	devp->state = BMI088_UNINIT;
     } else {
     	devp->state = BMI088_READY;
     }
-#else
-    //FIXME switch this #if block
-    devp->state = BMI088_READY;
-#endif
 
-    devp->state = BMI088_READY;
-
+#if 0
     if( devp->state == BMI088_READY ) {
-		chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);chThdSleepMilliseconds(50);
 		uint8_t chip_id_accelerometer = 0;
 		msg_t r = bmi088ReadChipId(devp, &chip_id_accelerometer);
-		if ( chip_id_accelerometer != BMI088_ACCL_EXPECTED_CHIP_ID ) {
-			chThdSleepMilliseconds(2);
-			r =  bmi088ReadChipId(devp, &chip_id_accelerometer);
-		}
 
 		if ( chip_id_accelerometer != BMI088_ACCL_EXPECTED_CHIP_ID ) {
 			ret = false;
 		}
     }
+#endif
 
 
     return(ret);
@@ -344,7 +325,6 @@ msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8
     i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* BMI088_SHARED_I2C */
 
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);chThdSleepMilliseconds(50);
     buf.reg = reg;
     msg_t r = bmi088I2CReadRegister(devp->config->i2cp, saddr, buf.reg, buf.data, 1);
     if( r != MSG_OK ) {
@@ -354,6 +334,7 @@ msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8
     }
 
 #if BMI088_SHARED_I2C
+    i2cStop(devp->config->i2cp);
     i2cReleaseBus(devp->config->i2cp);
 #endif /* BMI088_SHARED_I2C */
 #endif /* BMI088_USE_I2C */
@@ -361,7 +342,6 @@ msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8
     if( r == MSG_OK ) {
     	*dest = buf.data[0];
     }
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);chThdSleepMilliseconds(50);
     return(r);
 }
 
@@ -533,7 +513,6 @@ uint8_t readPowerConfReg(BMI088Driver *devp){
  */
 msg_t bmi088ReadChipId(BMI088Driver *devp, uint8_t *dest) {
     osalDbgCheck(devp != NULL);
-    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);chThdSleepMilliseconds(50);
     msg_t r = bmi088ReadRawU8Err(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_CHIP_ID, dest);
 
     return r;
@@ -703,7 +682,7 @@ int32_t bmi088RawAcclTmG(const uint8_t lsb, const uint8_t msb) {
 /**
  * FIXME documentation
  */
-msg_t bmi088ReadAccXYZmG(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z ) {
+msg_t bmi088ReadAccXYZmG(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z, uint16_t *dest_acc_x_raw, uint16_t *dest_acc_y_raw, uint16_t *dest_acc_z_raw ) {
     osalDbgCheck(devp != NULL);
 
     uint8_t raw_data_buffer[6];
@@ -712,45 +691,14 @@ msg_t bmi088ReadAccXYZmG(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest
     	*dest_accl_x = bmi088RawAcclTmG(raw_data_buffer[0], raw_data_buffer[1]);
     	*dest_accl_y = bmi088RawAcclTmG(raw_data_buffer[2], raw_data_buffer[3]);
     	*dest_accl_z = bmi088RawAcclTmG(raw_data_buffer[4], raw_data_buffer[5]);
-    }
-
-    return(r);
-}
-
-
-
-int32_t bmi088RawAcclTmS2(const uint8_t lsb, const uint8_t msb) {
-	//FIXME impliment this
-	int16_t accInt16   = (msb << 8) |  lsb;
-
-	int32_t accx_range_register = 0x01;//FIXME query register
-
-	int32_t accMG  = (((accInt16 * 1000 * 2 * (accx_range_register + 1))/ 32768) * 3) / 2;
-
-	return(accMG);
-}
-
-/**
- * FIXME documentation
- */
-msg_t bmi088ReadAccXYZmS2(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z, uint16_t *dest_acc_x_raw, uint16_t *dest_acc_y_raw, uint16_t *dest_acc_z_raw) {
-    osalDbgCheck(devp != NULL);
-
-    uint8_t raw_data_buffer[6];
-    msg_t r = bmi088ReadRawBuff(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_LSB, raw_data_buffer, sizeof(raw_data_buffer));
-    if( r == MSG_OK ) {
-    	*dest_accl_x = bmi088RawAcclTmS2(raw_data_buffer[0], raw_data_buffer[1]);
-    	*dest_accl_y = bmi088RawAcclTmS2(raw_data_buffer[2], raw_data_buffer[3]);
-    	*dest_accl_z = bmi088RawAcclTmS2(raw_data_buffer[4], raw_data_buffer[5]);
 
     	*dest_acc_x_raw = raw_data_buffer[0] | (raw_data_buffer[1] << 8);
-    	*dest_acc_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
-    	*dest_acc_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
+		*dest_acc_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
+		*dest_acc_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
     }
 
     return(r);
 }
-
 
 
 /**
@@ -806,13 +754,6 @@ uint8_t bmi088ReadIntStat(BMI088Driver *devp){
  */
 
 msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c){
-    //int16_t  temperature;
-    //uint16_t temp_uint11;
-    //uint8_t LSB;
-
-    //reading_union_t reading;
-    //reading.as_int16_type = 0;
-
     osalDbgCheck(devp != NULL);
 
     uint8_t raw_data_buffer[2];
@@ -914,11 +855,5 @@ msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, int32_t *dest_gyro_x, int32_t *dest_
     return(r);
 }
 #endif
-
-
-
-
-
-
 
 
