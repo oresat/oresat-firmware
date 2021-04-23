@@ -32,16 +32,18 @@ static const uslp_vc_t vc0 = {
 #endif
 };
 
+static uint64_t vc1_seq_cnt;
+static uint64_t vc1_exp_cnt;
 static const uslp_vc_t vc1 = {
-    .seq_ctrl_len   = 0,
-    .expedited_len  = 0,
-    .seq_ctrl_cnt   = NULL,
-    .expedited_cnt  = NULL,
+    .seq_ctrl_len   = 4,
+    .expedited_len  = 4,
+    .seq_ctrl_cnt   = &vc1_seq_cnt,
+    .expedited_cnt  = &vc1_exp_cnt,
     .fop            = NULL,
     .farm           = NULL,
     .mapid[0]       = &map_cmd,
     .trunc_tf_len   = USLP_MAX_LEN,
-    .ocf            = false,
+    .ocf            = true,
 #if (USLP_USE_SDLS == TRUE)
     .sdls_hdr_len   = 0,
     .sdls_tlr_len   = 0,

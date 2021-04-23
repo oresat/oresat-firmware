@@ -23,6 +23,9 @@
 /* Local functions.                                                          */
 /*===========================================================================*/
 
+/**
+ * Generate USLP TFPH ID field
+ */
 static inline uint32_t uslp_gen_id(uint16_t scid, uint8_t vcid, uint8_t mapid)
 {
     return __builtin_bswap32(
@@ -32,6 +35,9 @@ static inline uint32_t uslp_gen_id(uint16_t scid, uint8_t vcid, uint8_t mapid)
                 mapid       << USLP_TFPH_ID_MAPID_Pos);
 }
 
+/**
+ * Parse USLP TFPH ID field into component pieces
+ */
 static inline bool uslp_parse_id(uint32_t id, uint16_t *scid, uint8_t *vcid, uint8_t *mapid)
 {
     id = __builtin_bswap32(id);
@@ -43,6 +49,9 @@ static inline bool uslp_parse_id(uint32_t id, uint16_t *scid, uint8_t *vcid, uin
     return true;
 }
 
+/**
+ * Parse USLP TFDF Header into component pieces
+ */
 static inline void uslp_parse_tfdf_hdr(uslp_tfdf_hdr_t *hdr, uint8_t *rules, uslp_pid_t *upid, uint16_t *offset)
 {
     *rules = (hdr->flags & USLP_TFDF_HDR_TFDZ_RULES) >> USLP_TFDF_HDR_TFDZ_RULES_Pos;
@@ -50,6 +59,9 @@ static inline void uslp_parse_tfdf_hdr(uslp_tfdf_hdr_t *hdr, uint8_t *rules, usl
     *offset = __builtin_bswap16(hdr->offset);
 }
 
+/**
+ * Generate MAP components of frame
+ */
 static void *uslp_map_gen(const uslp_map_t *map, fb_t *fb)
 {
     uslp_tfdf_hdr_t *tfdf_hdr;
@@ -69,7 +81,10 @@ static void *uslp_map_gen(const uslp_map_t *map, fb_t *fb)
     return tfdf_hdr;
 }
 
-static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, uint16_t scid, uint8_t vcid, uint8_t mapid, bool expedite)
+/**
+ * Generate VC components of frame
+ */
+static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, bool expedite)
 {
     uslp_tfph_t *tfph;
     size_t vcf_cnt_len;
@@ -96,8 +111,6 @@ static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, uint16_t scid, uint8_t v
 #endif
 
     tfph = fb_push(fb, sizeof(uslp_tfph_t) + vcf_cnt_len);
-
-    tfph->id = uslp_gen_id(scid, vcid, mapid);
 
 #if (0)
     /* TODO: Implement FOP */
@@ -171,14 +184,16 @@ static void uslp_map_recv(const uslp_map_t *map, fb_t *fb)
 
 int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid, bool expedite)
 {
+    uslp_tfph_t *tfph;
     const uslp_pc_t *pc = link->pc_tx;
     const uslp_mc_t *mc = link->mc;
     const uslp_vc_t *vc = mc->vcid[vcid];
     const uslp_map_t *map = vc->mapid[mapid];
 
     uslp_map_gen(map, fb);
-    fb->mac_hdr = uslp_vc_gen(vc, fb, mc->scid, vcid, mapid, expedite);
-    ((uslp_tfph_t*)fb->mac_hdr)->len = __builtin_bswap16(fb->len + pc->fecf_len);
+    tfph = uslp_vc_gen(vc, fb, expedite);
+    tfph->id = uslp_gen_id(mc->scid, vcid, mapid);
+    tfph->len = __builtin_bswap16(fb->len + pc->fecf_len);
     pc->phy_send(fb);
 
     return 0;

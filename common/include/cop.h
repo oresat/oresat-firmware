@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "frame_buf.h"
+#include "uslp.h"
 
 /*===========================================================================*/
 /* Constants.                                                                */
@@ -34,7 +36,7 @@
  */
 typedef enum {
     COP_DIR_INIT_NO_CLCW,
-    COP_DIR_INIT,
+    COP_DIR_INIT_CLCW,
     COP_DIR_INIT_UNLOCK,
     COP_DIR_INIT_SET_VR,
     COP_DIR_TERMINATE,
@@ -83,7 +85,7 @@ typedef enum {
  * @name    Communications Operation Procedures and Notifications
  * @{
  */
-typedef int (*cop_fop_t)(cop_dir_t directive, void *arg);
+typedef cop_notify_t (*cop_fop_t)(cop_dir_t directive, void *arg);
 typedef void (*cop_farm_t)(void);
 typedef void (*cop_notify_cb_t)(cop_notify_t notification, cop_alert_t reason);
 /** @} */

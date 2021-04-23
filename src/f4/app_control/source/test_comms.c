@@ -8,7 +8,6 @@
 #include "chprintf.h"
 
 #define COMMS_EVENT_LOOPBACK_RX EVENT_MASK(0)
-#define CMD_RESP_BUF_SIZE 64
 
 extern const uslp_mc_t mc;
 
@@ -16,7 +15,7 @@ static fb_t *tx_fb;
 
 static thread_t *cli_tp;
 
-static uint8_t resp_buf[CMD_RESP_BUF_SIZE];
+static uint8_t resp_buf[CMD_RESP_SIZE];
 static size_t buf_len;
 
 static void loopback_tx(fb_t *fb);
@@ -95,7 +94,7 @@ static void loopback_rx(fb_t *fb)
 static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
 {
     cmd_t *cmd;
-    tx_fb = fb_alloc(USLP_MAX_HEADER_LEN + CMD_RESP_BUF_SIZE);
+    tx_fb = fb_alloc(CMD_RESP_SIZE);
     fb_reserve(tx_fb, USLP_MAX_HEADER_LEN);
     cmd = fb_put(tx_fb, sizeof(cmd_t) + arg_len);
     cmd->cmd = cmd_code;
