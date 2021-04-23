@@ -139,22 +139,6 @@ THD_FUNCTION(imu, arg)
 			chprintf(CHP, "Failed to read gyro chip ID from BMI088, r = %d\r\n", r);
 
 		}
-
-#if 0
-		uint8_t power_status = readPowerCtrlReg(&imudev);
-		chprintf(CHP, "power status is %u\r\n", power_status);
-
-
-		chprintf(CHP, "setting acc mode to active . . .\r\n");
-		BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
-#endif
-
-
-		//chprintf(CHP, "setting filter and output data rate . . .\r\n");
-		//BMI088AccelerometerSetFilterAndODR(&imudev, 0x88); // Per datasheet, 0x88 = 4-fold oversampling and 100Hz output data rate
-
-		//chprintf(CHP, "enabling positive acc' self test . . .\r\n");
-		//BMI088AccelerometerSetSelfTestMode(&imudev, 0x0D);
     }
 
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {

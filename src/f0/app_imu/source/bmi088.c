@@ -767,11 +767,8 @@ msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c){
 		} else {
 		  temp_int11 = temp_uint11;
 		}
-
-
 		*dest_temp_c = ((temp_int11 * 125) / 1000) + 23;
     }
-
 
     return(r);
 }
