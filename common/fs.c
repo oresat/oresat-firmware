@@ -1108,7 +1108,7 @@ uint32_t file_crc(FSDriver *fsp, lfs_file_t *file)
     uint32_t crc = 0;
     uint8_t buf[512];
 
-    while ((ret_size = lfs_file_read(&fsp->lfs, file, buf, 512)) > 0) {
+    while ((ret_size = file_read(fsp, file, buf, 512)) > 0) {
         crc = lfs_crc(crc, buf, ret_size);
     }
     if (ret_size < 0) {

@@ -1,12 +1,16 @@
 #ifndef _CMD_H_
 #define _CMD_H_
 
-#include "comms.h"
+#include "frame_buf.h"
 
 typedef enum {
     CMD_TX_CTRL,
     CMD_C3_FLASH,
     CMD_C3_BANK,
+    CMD_FS_FORMAT,
+    CMD_FS_UNMOUNT,
+    CMD_FS_REMOVE,
+    CMD_FS_CRC,
     CMD_OPD_SYSENABLE,
     CMD_OPD_SYSDISABLE,
     CMD_OPD_ENABLE,
@@ -40,4 +44,3 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb);
 }
 #endif /*__cplusplus*/
 #endif
-
