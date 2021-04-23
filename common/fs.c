@@ -777,6 +777,46 @@ int fs_removeattr(FSDriver *fsp, const char *path, uint8_t type)
 }
 
 /**
+ * @brief   Return filesystem size in blocks.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ *
+ * @return              Filesystem size in blocks or negative error code on failure
+ * @api
+ */
+lfs_size_t fs_size(FSDriver *fsp)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "fs_size(), invalid state");
+
+    lfs_ssize_t ret_size;
+    fsp->err = LFS_ERR_OK;
+
+    ret_size = lfs_fs_size(&fsp->lfs);
+    if (ret_size < 0) {
+        fsp->err = ret_size;
+        return ret_size;
+    }
+
+    return ret_size;
+}
+
+/**
+ * @brief   Return filesystem utilization as percentage.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ *
+ * @return              Filesystem utilization percent or negative error code on failure
+ * @api
+ */
+uint8_t fs_usage(FSDriver *fsp)
+{
+    return fs_size(fsp) / fsp->lfscfg.block_count;
+}
+
+/**
  * @brief   Opens a file.
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
@@ -1045,6 +1085,37 @@ lfs_soff_t file_size(FSDriver *fsp, lfs_file_t *file)
     }
 
     return off;
+}
+
+/**
+ * @brief   Return CRC32 of a file.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  file     Open file pointer
+ *
+ * @return              CRC32 of file
+ * @api
+ */
+uint32_t file_crc(FSDriver *fsp, lfs_file_t *file)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && file != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "file_crc(), invalid state");
+
+    lfs_ssize_t ret_size;
+    fsp->err = LFS_ERR_OK;
+    uint32_t crc = 0;
+    uint8_t buf[512];
+
+    while ((ret_size = lfs_file_read(&fsp->lfs, file, buf, 512)) > 0) {
+        crc = lfs_crc(crc, buf, ret_size);
+    }
+    if (ret_size < 0) {
+        fsp->err = ret_size;
+    }
+
+    return crc;
 }
 
 /**

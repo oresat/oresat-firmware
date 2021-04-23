@@ -71,29 +71,19 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
                 ~hw_32, ~sw_32, hw_16, sw_16, ccitt);
     } else if (!strcmp(argv[0], "file") && argc > 1) {
         int ret;
-        uint32_t crc = 0;
         lfs_file_t *file;
-        uint8_t buf[256];
 
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
             chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
             return;
         }
-        while ((ret = file_read(&FSD1, file, buf, 256)) > 0) {
-            crc = crc32(buf, ret, crc);
-        }
-        if (ret < 0) {
-            chprintf(chp, "Error in file_read: %d\r\n", ret);
-            file_close(&FSD1, file);
-            return;
-        }
+        chprintf(chp, "CRC32: 0x%08X\r\n", file_crc(&FSD1, file));
         ret = file_close(&FSD1, file);
         if (ret < 0) {
             chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
-        chprintf(chp, "CRC32: 0x%08X\r\n", crc);
     } else {
         goto crc_usage;
     }

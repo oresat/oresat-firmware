@@ -26,10 +26,7 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
 
     eflStart(&EFLD1, NULL);
     while (len) {
-        ssize_t n = len;
-        if (n > BUF_SIZE) {
-            n = BUF_SIZE;
-        }
+        ssize_t n = (len > BUF_SIZE ? BUF_SIZE : len);
 
         ret = flashRead(eflp, offset, n, buf);
         if (ret != FLASH_NO_ERROR) {
@@ -40,13 +37,12 @@ int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t le
             ret = n;
             break;
         }
-
         offset += n;
         len -= n;
     };
     eflStop(&EFLD1);
 
-    ret = file_close(&FSD1, file);
+    file_close(&FSD1, file);
     return ret;
 }
 
@@ -74,7 +70,7 @@ int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
         ret = n;
     }
 
-    ret = file_close(&FSD1, file);
+    file_close(&FSD1, file);
     return ret;
 }
 
@@ -114,7 +110,6 @@ int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
 {
     lfs_file_t *file;
     fw_info_t fw_info = {0};
-    ssize_t n;
     int ret;
 
     /* Verify the file matches the expected CRC */
@@ -122,19 +117,14 @@ int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
     if (file == NULL) {
         return FSD1.err;
     }
-    while ((n = file_read(&FSD1, file, buf, BUF_SIZE)) > 0) {
-        fw_info.crc = crc32(buf, n, fw_info.crc);
-        fw_info.len += n;
+    fw_info.crc = file_crc(&FSD1, file);
+    fw_info.len = file_size(&FSD1, file);
+    file_close(&FSD1, file);
+    if (FSD1.err != LFS_ERR_OK) {
+        return FSD1.err;
     }
-    if (n != 0) {
-        ret = n;
-    }
-    ret = file_close(&FSD1, file);
-    if (ret)
-        return ret;
     if (fw_info.crc != expected_crc) {
-        ret = FLASH_ERROR_VERIFY;
-        return ret;
+        return FLASH_ERROR_VERIFY;
     }
 
     /* Erase the offline flash bank */
