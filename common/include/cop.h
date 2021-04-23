@@ -81,15 +81,6 @@ typedef enum {
 } cop_alert_t;
 /** @} */
 
-/**
- * @name    Communications Operation Procedures and Notifications
- * @{
- */
-typedef cop_notify_t (*cop_fop_t)(cop_dir_t directive, void *arg);
-typedef void (*cop_farm_t)(void);
-typedef void (*cop_notify_cb_t)(cop_notify_t notification, cop_alert_t reason);
-/** @} */
-
 /*===========================================================================*/
 /* Macros.                                                                   */
 /*===========================================================================*/
@@ -101,6 +92,8 @@ typedef void (*cop_notify_cb_t)(cop_notify_t notification, cop_alert_t reason);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+uint8_t cop_fop1(const uslp_vc_t *vc, fb_t *fb, bool expedite);
 
 #ifdef __cplusplus
 }

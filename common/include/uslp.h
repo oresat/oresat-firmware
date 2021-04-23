@@ -12,7 +12,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "frame_buf.h"
-#include "cop.h"
 
 #if defined(USLP_USE_SDLS) && USLP_USE_SDLS == 1
 #include "sdls.h"
@@ -187,6 +186,28 @@ typedef enum {
 /** @} */
 
 /**
+ * @name    USLP Communications Operation Procedure Types
+ * @{
+ */
+typedef enum {
+    COP_NONE,                       /** No COP in effect                         */
+    COP_1,                          /** COP-1 in effect                          */
+    COP_P                           /** COP-P in effect                          */
+} uslp_cop_t;
+/** @} */
+
+/**
+ * @name    USLP Frame Error Control Field Type
+ * @{
+ */
+typedef enum {
+    FECF_NONE,                      /** No FECF implemented                      */
+    FECF_SW,                        /** Software FECF implemented                */
+    FECF_HW                         /** Hardware FECF implemented                */
+} uslp_fecf_t;
+/** @} */
+
+/**
  * @name    USLP Multiplexer Access Point Definition
  * @{
  */
@@ -212,21 +233,21 @@ typedef struct {
     uint8_t         expedited_len;  /** VC Count Length for Expedited QoS        */
     uint64_t        *seq_ctrl_cnt;  /** Pointer to sequence control frame counter*/
     uint64_t        *expedited_cnt; /** Pointer to expedited frame counter       */
-    cop_fop_t       fop;            /** COP FOP in Effect                        */
-    cop_farm_t      farm;           /** COP FARM in Effect                       */
+    uslp_cop_t      cop;            /** COP in effect                            */
     const uslp_map_t *mapid[16];    /** Multiplexer Access Points                */
     size_t          trunc_tf_len;   /** Truncated Transfer Frame Length          */
     bool            ocf;            /** OCF Allowed (Variable) / Required (Fixed)*/
+    void            *lock_arg;      /** Arugment to (un)lock functions           */
+    void (*lock)(void *arg);        /** Function to lock VC                      */
+    void (*unlock)(void *arg);      /** Function to unlock VC                    */
+    void (*mc_ocf_recv)(fb_t *fb);  /** Master Channel OCF Service Receive       */
+    void (*vcf_recv)(fb_t *fb);     /** Virtual Channel Frame Service Receive    */
 #if USLP_USE_SDLS == 1
     bool            has_sdls_hdr;   /** SDLS Header applicable                   */
     bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
     size_t          sdls_hdr_len;   /** SDLS Header Length (octets)              */
     size_t          sdls_tlr_len;   /** SDLS Trailer Length (octets)             */
 #endif
-    void (*vc_lock)(void);          /** Function to lock VC                      */
-    void (*vc_unlock)(void);        /** Function to unlock VC                    */
-    void (*mc_ocf_recv)(fb_t *fb);  /** Master Channel OCF Service Receive       */
-    void (*vcf_recv)(fb_t *fb);     /** Virtual Channel Frame Service Receive    */
 } uslp_vc_t;
 /** @} */
 
@@ -253,11 +274,13 @@ typedef struct {
     size_t          tf_len;         /** Transfer Frame Length (octets)           */
     bool            insert_zone;    /** Presence of Insert Zone                  */
     size_t          insert_zone_len;/** Insert Zone Length (octets)              */
-    bool            fecf;           /** Presence of Frame Error Control Field    */
+    uslp_fecf_t     fecf;           /** Frame Error Control Field Implementation */
     size_t          fecf_len;       /** Frame Error Control Field Length (octets)*/
     bool            gen_oid;        /** Generate OID Frame                       */
     void (*phy_send)(fb_t *fb);     /** Function to send a frame                 */
     void (*phy_send_prio)(fb_t *fb);/** Function to send a priority frame first  */
+    uint32_t (*crc32)(const uint8_t block[], size_t len, uint16_t crc);
+    uint16_t (*crc16)(const uint8_t block[], size_t len, uint16_t crc);
 } uslp_pc_t;
 /** @} */
 

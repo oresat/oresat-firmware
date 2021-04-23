@@ -4,16 +4,35 @@
 #include "beacon.h"
 #include "c3.h"
 #include "cmd.h"
+#include "file_xfr.h"
 #include "rtc.h"
 #include "uslp.h"
 #include "CANopen.h"
 
+static inline void vc_lock(void *arg) {
+    mutex_t *mutex = arg;
+    chMtxLock(mutex);
+}
+
+static inline void vc_unlock(void *arg) {
+    mutex_t *mutex = arg;
+    chMtxUnlock(mutex);
+}
+
 static const uslp_map_t map_cmd = {
     .sdu            = SDU_MAP_ACCESS,
     .upid           = UPID_MAPA_SDU,
-    .max_pkt_len    = 1024,
+    .max_pkt_len    = CMD_RESP_LEN,
     .incomplete     = false,
     .map_recv       = comms_cmd,
+};
+
+static const uslp_map_t map_file = {
+    .sdu            = SDU_MAP_ACCESS,
+    .upid           = UPID_MAPA_SDU,
+    .max_pkt_len    = FILE_BUF_LEN,
+    .incomplete     = false,
+    .map_recv       = comms_file,
 };
 
 static const uslp_vc_t vc0 = {
@@ -21,9 +40,9 @@ static const uslp_vc_t vc0 = {
     .expedited_len  = 0,
     .seq_ctrl_cnt   = NULL,
     .expedited_cnt  = NULL,
-    .fop            = NULL,
-    .farm           = NULL,
+    .cop            = COP_NONE,
     .mapid[0]       = &map_cmd,
+    .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
@@ -34,16 +53,20 @@ static const uslp_vc_t vc0 = {
 
 static uint64_t vc1_seq_cnt;
 static uint64_t vc1_exp_cnt;
+static MUTEX_DECL(vc1_lock);
 static const uslp_vc_t vc1 = {
     .seq_ctrl_len   = 4,
     .expedited_len  = 4,
     .seq_ctrl_cnt   = &vc1_seq_cnt,
     .expedited_cnt  = &vc1_exp_cnt,
-    .fop            = NULL,
-    .farm           = NULL,
+    .cop            = COP_1,
     .mapid[0]       = &map_cmd,
+    .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = true,
+    .lock_arg       = &vc1_lock,
+    .lock           = vc_lock,
+    .unlock         = vc_unlock,
 #if (USLP_USE_SDLS == TRUE)
     .sdls_hdr_len   = 0,
     .sdls_tlr_len   = 0,
@@ -59,7 +82,7 @@ const uslp_mc_t mc = {
 static const uslp_pc_t uhf_pc = {
     .name           = "UHF",
     .tf_len         = USLP_MAX_LEN,
-    .fecf           = true,
+    .fecf           = FECF_HW,
     .fecf_len       = FECF_LEN,
     .phy_send       = comms_send,
     .phy_send_prio  = comms_send_ahead,
@@ -68,7 +91,7 @@ static const uslp_pc_t uhf_pc = {
 static const uslp_pc_t lband_pc = {
     .name           = "L-Band",
     .tf_len         = USLP_MAX_LEN,
-    .fecf           = true,
+    .fecf           = FECF_HW,
     .fecf_len       = FECF_LEN,
 };
 
@@ -622,10 +645,18 @@ void comms_stop(void)
 
 void comms_cmd(fb_t *fb)
 {
-    cmd_t *cmd = (cmd_t*)fb->data;
-    fb_t *resp_fb = fb_alloc(CMD_RESP_SIZE);
+    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
-    cmd_process(cmd, resp_fb);
+    cmd_process((cmd_t*)fb->data, resp_fb);
+    uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
+}
+
+void comms_file(fb_t *fb)
+{
+    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC);
+    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
+    int *ret = fb_put(resp_fb, sizeof(int));
+    *ret = file_recv((file_xfr_t*)fb->data);
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 

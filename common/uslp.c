@@ -6,6 +6,7 @@
  * @{
  */
 #include "uslp.h"
+#include "cop.h"
 
 /*===========================================================================*/
 /* Local definitions.                                                        */
@@ -87,16 +88,7 @@ static void *uslp_map_gen(const uslp_map_t *map, fb_t *fb)
 static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, bool expedite)
 {
     uslp_tfph_t *tfph;
-    size_t vcf_cnt_len;
-    uint64_t *vcf_cnt_var;
-
-    if (expedite) {
-        vcf_cnt_len = vc->expedited_len;
-        vcf_cnt_var = vc->expedited_cnt;
-    } else {
-        vcf_cnt_len = vc->seq_ctrl_len;
-        vcf_cnt_var = vc->seq_ctrl_cnt;
-    }
+    uint8_t flags = 0;
 
 #if USLP_USE_SDLS == 1
     sdls_hdr_t *sdls_hdr = NULL;
@@ -110,21 +102,44 @@ static void *uslp_vc_gen(const uslp_vc_t *vc, fb_t *fb, bool expedite)
     }
 #endif
 
-    tfph = fb_push(fb, sizeof(uslp_tfph_t) + vcf_cnt_len);
-
-#if (0)
-    /* TODO: Implement FOP */
-    uslp_ocf_t *ocf;
-    ocf = fb_put(fb, sizeof(uslp_ocf_t));
-
-    if (vcf_cnt_len) {
-        (++(*vcf_cnt_var)) %= USLP_TFPH_VCF_CNT(vcf_cnt_len) + 1;
-        for (uint8_t i = 0; i < vcf_cnt_len; i++) {
-            tfph->vcf_cnt[i] = ((uint8_t*)vcf_cnt_var)[vcf_cnt_len - i];
-        }
+    switch (vc->cop) {
+    case COP_1:
+        flags = cop_fop1(vc, fb, expedite);
+        break;
+    case COP_P:
+        break;
+    case COP_NONE:
+    default:
+        break;
     }
-#endif
+    tfph = fb_push(fb, sizeof(uslp_tfph_t));
+    tfph->flags = flags;
+
     return tfph;
+}
+
+static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
+{
+    uint16_t len = fb->len;
+    void *crc;
+    switch (pc->fecf) {
+    case FECF_SW:
+        crc = fb_put(fb, pc->fecf_len);
+        /* TODO: Verify this implements correctly */
+        if (pc->fecf_len == 2 && pc->crc16) {
+            *((uint16_t*)crc) = __builtin_bswap16(pc->crc16(fb->data, len, 0));
+        } else if (pc->fecf_len == 4 && pc->crc32) {
+            *((uint32_t*)crc) = __builtin_bswap32(pc->crc32(fb->data, len, 0));
+        } else {
+            break;
+        }
+    case FECF_HW:
+        len += pc->fecf_len;
+    case FECF_NONE:
+    default:
+        break;
+    }
+    return __builtin_bswap16(len);
 }
 
 static void uslp_vc_recv(const uslp_vc_t *vc, fb_t *fb)
@@ -193,7 +208,7 @@ int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid
     uslp_map_gen(map, fb);
     tfph = uslp_vc_gen(vc, fb, expedite);
     tfph->id = uslp_gen_id(mc->scid, vcid, mapid);
-    tfph->len = __builtin_bswap16(fb->len + pc->fecf_len);
+    tfph->len = uslp_fecf_gen(pc, fb);
     pc->phy_send(fb);
 
     return 0;

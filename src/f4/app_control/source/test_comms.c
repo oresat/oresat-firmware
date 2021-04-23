@@ -3,6 +3,7 @@
 #include "test_comms.h"
 #include "c3.h"
 #include "cmd.h"
+#include "file_xfr.h"
 #include "comms.h"
 #include "uslp.h"
 #include "chprintf.h"
@@ -15,7 +16,7 @@ static fb_t *tx_fb;
 
 static thread_t *cli_tp;
 
-static uint8_t resp_buf[CMD_RESP_SIZE];
+static uint8_t resp_buf[CMD_RESP_LEN];
 static size_t buf_len;
 
 static void loopback_tx(fb_t *fb);
@@ -24,7 +25,15 @@ static void loopback_rx(fb_t *fb);
 static const uslp_map_t map_cmd = {
     .sdu            = SDU_MAP_ACCESS,
     .upid           = UPID_MAPA_SDU,
-    .max_pkt_len    = 1024,
+    .max_pkt_len    = CMD_RESP_LEN,
+    .incomplete     = false,
+    .map_recv       = loopback_rx,
+};
+
+static const uslp_map_t map_file = {
+    .sdu            = SDU_MAP_ACCESS,
+    .upid           = UPID_MAPA_SDU,
+    .max_pkt_len    = FILE_BUF_LEN,
     .incomplete     = false,
     .map_recv       = loopback_rx,
 };
@@ -34,9 +43,9 @@ static const uslp_vc_t vc0 = {
     .expedited_len  = 0,
     .seq_ctrl_cnt   = NULL,
     .expedited_cnt  = NULL,
-    .fop            = NULL,
-    .farm           = NULL,
+    .cop            = COP_NONE,
     .mapid[0]       = &map_cmd,
+    .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
@@ -53,7 +62,7 @@ static const uslp_mc_t loopback_mc = {
 static const uslp_pc_t loopback_pc = {
     .name           = "Loopback",
     .tf_len         = USLP_MAX_LEN,
-    .fecf           = true,
+    .fecf           = FECF_HW,
     .fecf_len       = FECF_LEN,
     .phy_send       = loopback_tx,
     .phy_send_prio  = loopback_tx,
@@ -94,7 +103,7 @@ static void loopback_rx(fb_t *fb)
 static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
 {
     cmd_t *cmd;
-    tx_fb = fb_alloc(CMD_RESP_SIZE);
+    tx_fb = fb_alloc(CMD_RESP_ALLOC);
     fb_reserve(tx_fb, USLP_MAX_HEADER_LEN);
     cmd = fb_put(tx_fb, sizeof(cmd_t) + arg_len);
     cmd->cmd = cmd_code;
