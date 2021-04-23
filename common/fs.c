@@ -13,6 +13,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "fs.h"
+#include "crc.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -1109,7 +1110,7 @@ uint32_t file_crc(FSDriver *fsp, lfs_file_t *file)
     uint8_t buf[512];
 
     while ((ret_size = file_read(fsp, file, buf, 512)) > 0) {
-        crc = lfs_crc(crc, buf, ret_size);
+        crc = crc32(buf, ret_size, crc);
     }
     if (ret_size < 0) {
         fsp->err = ret_size;

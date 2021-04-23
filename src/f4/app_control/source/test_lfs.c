@@ -57,6 +57,20 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
+    } else if (!strcmp(argv[0], "crc") && argc > 1) {
+        file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
+        if (file == NULL) {
+            chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
+            return;
+        }
+
+        chprintf(chp, "CRC32: %08X\r\n", file_crc(&FSD1, file));
+
+        ret = file_close(&FSD1, file);
+        if (ret < 0) {
+            chprintf(chp, "Error in file_close: %d\r\n", ret);
+            return;
+        }
     } else if (!strcmp(argv[0], "cat") && argc > 1) {
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
@@ -194,6 +208,7 @@ lfs_usage:
                    "    ls:         List directories\r\n"
                    "    mkdir:      Make a directory\r\n"
                    "    rm:         Delete file or directory\r\n"
+                   "    crc:        Print CRC32 of file\r\n"
                    "    cat:        Dump 255 bytes of file as string\r\n"
                    "    hexdump:    Dump 255 bytes of file as hex\r\n"
                    "\r\n"

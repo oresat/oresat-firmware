@@ -23,6 +23,7 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
             0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
         };
         uint32_t hw_32 = 0xFFFFFFFFU, sw_32 = 0xFFFFFFFFU;
+        uint32_t lfscrc= 0xFFFFFFFFU;
         uint16_t hw_16 = 0xFFFFU;
         uint16_t sw_16 = 0xFFFFU;
         uint16_t ccitt = 0xFFFFU;
@@ -34,23 +35,28 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
 #endif
         sw_16 = crc16_ccitt_sw(test, sizeof(test), sw_16);
         ccitt = crc16_ccitt(test, sizeof(test), ccitt);
+        lfscrc = lfs_crc(lfscrc, test, sizeof(test));
 #if (STM32_CRC_PROGRAMMABLE == FALSE)
         chprintf(chp, "CRC16_HW NOT SUPPORTED\r\n");
 #endif
         chprintf(chp, "CRC32_HW:    %08X\r\n"
-                "CRC32_SW:    %08X\r\n"
-                "CRC16_HW:    %04X\r\n"
-                "CRC16_SW:    %04X\r\n"
-                "CCITT:       %04X\r\n\r\n",
-                ~hw_32, ~sw_32, hw_16, sw_16, ccitt);
+                      "CRC32_SW:    %08X\r\n"
+                      "LFS_CRC:     %08X\r\n"
+                      "CRC16_HW:    %04X\r\n"
+                      "CRC16_SW:    %04X\r\n"
+                      "CCITT:       %04X\r\n\r\n",
+                      ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
 
-        hw_32 = sw_32 = 0xFFFFFFFFU;
+        hw_32 = sw_32 = lfscrc = 0xFFFFFFFFU;
         hw_16 = sw_16 = ccitt = 0xFFFFU;
         for (size_t i = 0; i < sizeof(test); i+=4) {
             hw_32 = crc32_hw((uint32_t*)(&test[i]), 1, hw_32);
         }
         for (size_t i = 0; i < sizeof(test); i+=4) {
             sw_32 = crc32_sw(&test[i], sizeof(uint32_t), sw_32);
+        }
+        for (size_t i = 0; i < sizeof(test); i+=4) {
+            lfscrc = lfs_crc(lfscrc, &test[i], sizeof(uint32_t));
         }
 #if (STM32_CRC_PROGRAMMABLE == TRUE)
         for (size_t i = 0; i < sizeof(test); i+=4) {
@@ -64,26 +70,12 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
             ccitt = crc16_ccitt(&test[i], sizeof(uint32_t), ccitt);
         }
         chprintf(chp, "CRC32_HW:    %08X\r\n"
-                "CRC32_SW:    %08X\r\n"
-                "CRC16_HW:    %04X\r\n"
-                "CRC16_SW:    %04X\r\n"
-                "CCITT:       %04X\r\n\r\n",
-                ~hw_32, ~sw_32, hw_16, sw_16, ccitt);
-    } else if (!strcmp(argv[0], "file") && argc > 1) {
-        int ret;
-        lfs_file_t *file;
-
-        file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
-        if (file == NULL) {
-            chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
-            return;
-        }
-        chprintf(chp, "CRC32: 0x%08X\r\n", file_crc(&FSD1, file));
-        ret = file_close(&FSD1, file);
-        if (ret < 0) {
-            chprintf(chp, "Error in file_close: %d\r\n", ret);
-            return;
-        }
+                      "CRC32_SW:    %08X\r\n"
+                      "LFS_CRC:     %08X\r\n"
+                      "CRC16_HW:    %04X\r\n"
+                      "CRC16_SW:    %04X\r\n"
+                      "CCITT:       %04X\r\n\r\n",
+                      ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
     } else {
         goto crc_usage;
     }
@@ -94,8 +86,6 @@ crc_usage:
     chprintf(chp,  "Usage: crc <command>\r\n"
                    "    check:\r\n"
                    "        Check consistency of CRC implementations\r\n"
-                   "    file <filename>:\r\n"
-                   "        Run CRC32 on <filename>\r\n"
                    "\r\n");
     return;
 }
