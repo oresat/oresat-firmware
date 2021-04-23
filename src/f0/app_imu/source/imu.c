@@ -28,9 +28,16 @@ THD_FUNCTION(imu, arg)
     (void) arg;
     msg_t r;
 
+    chprintf(CHP, "Starting IMU thread...\r\n");
+    chThdSleepMilliseconds(50);
+
     /* Initialize and start the BMI088 IMU sensor */
     bmi088ObjectInit(&imudev);
+    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
+
     bmi088Start(&imudev, &imucfg);
+    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
+    chprintf(CHP, "state = %u\r\n", imudev.state);
 
 	uint8_t bmi088_chip_id = 0;
 #if 0
@@ -40,6 +47,8 @@ THD_FUNCTION(imu, arg)
 		chprintf(CHP, "Failed to read chip ID from BMI088, r = %d\r\n", r);
 	}
 #endif
+
+    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
 
     //chprintf(CHP, "powering on acc . . .\r\n");
     //BMI088AccelerometerPowerOnOrOff(&imudev, BMI088_ON);
@@ -52,6 +61,9 @@ THD_FUNCTION(imu, arg)
     chprintf(CHP, "setting acc mode to active . . .\r\n");
     BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
 #endif
+
+    chprintf(CHP, "%s(%u)\r\n", __FILE__, __LINE__);
+
     //chprintf(CHP, "setting filter and output data rate . . .\r\n");
     //BMI088AccelerometerSetFilterAndODR(&imudev, 0x88); // Per datasheet, 0x88 = 4-fold oversampling and 100Hz output data rate
 
@@ -105,53 +117,57 @@ THD_FUNCTION(imu, arg)
 //            chprintf(CHP, "error code from BMI088 = %u\r\n", error_acc);
 //            chThdSleepMilliseconds(10);
 
+		int32_t acc_x_mS2 = 0;
+		int32_t acc_y_mS2 = 0;
+		int32_t acc_z_mS2 = 0;
+		uint16_t acc_x_raw = 0;
+		uint16_t acc_y_raw = 0;
+		uint16_t acc_z_raw = 0;
+
 #if 0
-#if 1
-		int32_t acc_x_mG = 0;
-		int32_t acc_y_mG = 0;
-		int32_t acc_z_mG = 0;
-		if( bmi088ReadAccXYZ(&imudev, &acc_x_mG, &acc_y_mG, &acc_z_mG) == MSG_OK ) {
-			chprintf(CHP, "Acc readings X = %d, Y = %d, Z = %d\r\n", acc_x_mG, acc_y_mG, acc_z_mG);
+		if( bmi088ReadAccXYZmS2(&imudev, &acc_x_mS2, &acc_y_mS2, &acc_z_mS2, &acc_x_raw, &acc_y_raw, &acc_z_raw) == MSG_OK ) {
+			chprintf(CHP, "Acc readings m/s^2 X = %d, Y = %d, Z = %d\r\n", acc_x_mS2, acc_y_mS2, acc_z_mS2);
 		} else {
 			//FIXME handle error
 			chprintf(CHP, "Failed to read accelerometer readings\r\n");
 		}
-#else
 
-		int16_t acc_inx = bmi088ReadAccInX(&imudev);
-		int16_t acc_iny = bmi088ReadAccInY(&imudev);
-		int16_t acc_inz = bmi088ReadAccInZ(&imudev);
-		chprintf(CHP, "Acc readings X = %d, Y = %d, Z = %d\r\n", acc_inx, acc_iny, acc_inz);
-#endif
+		int32_t acc_x_mG = 0;
+		int32_t acc_y_mG = 0;
+		int32_t acc_z_mG = 0;
+		if( bmi088ReadAccXYZmG(&imudev, &acc_x_mG, &acc_y_mG, &acc_z_mG) == MSG_OK ) {
+			chprintf(CHP, "Acc readings mG X = %d, Y = %d, Z = %d\r\n", acc_x_mG, acc_y_mG, acc_z_mG);
+		} else {
+			//FIXME handle error
+			chprintf(CHP, "Failed to read accelerometer readings\r\n");
+		}
 		chThdSleepMilliseconds(5);
 #endif
 
 
-#if 0
-#if 1
 		int32_t gyro_x = 0;
 		int32_t gyro_y = 0;
 		int32_t gyro_z = 0;
-		if( bmi088ReadGyroXYZ(&imudev, &gyro_x, &gyro_y, &gyro_z) == MSG_OK ) {
+		uint16_t gyro_x_raw = 0;
+		uint16_t gyro_y_raw = 0;
+		uint16_t gyro_z_raw = 0;
+#if 0
+		if( bmi088ReadGyroXYZ(&imudev, &gyro_x, &gyro_y, &gyro_z, &gyro_x_raw, &gyro_y_raw, &gyro_z_raw) == MSG_OK ) {
 			chprintf(CHP, "Gyro readings X = %d, Y = %d, Z = %d\r\n", gyro_x, gyro_y, gyro_z);
 
 		} else {
 			//FIXME handle error
 			chprintf(CHP, "Failed to read gyro readings\r\n");
 		}
-
-#else
-		uint8_t gyroscope_readings_byte_array[6];
-		bmi088ObtainGyroscopesReadings(&imudev, gyroscope_readings_byte_array);
-		chprintf(CHP, "gyro X rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[0] + (gyroscope_readings_byte_array[1] << 8)));
-		chprintf(CHP, "gyro Y rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[2] + (gyroscope_readings_byte_array[3] << 8)));
-		chprintf(CHP, "gyro Z rate %d\r\n", (int16_t)(gyroscope_readings_byte_array[4] + (gyroscope_readings_byte_array[5] << 8)));
-#endif
 #endif
 
+		int16_t temp_c = 0;
 #if 0
-		int16_t acc_temperature = bmi088ReadTemp(&imudev);
-		chprintf(CHP, "Accelerator temperature holds %d C\r\n", acc_temperature);
+		if( bmi088ReadTemp(&imudev, &temp_c) == MSG_OK ) {
+			chprintf(CHP, "Accelerator temp_c = %d C\r\n", temp_c);
+		} else {
+			chprintf(CHP, "Failed to read temperature data...\r\n");
+		}
 		chThdSleepMilliseconds(5);
 #endif
 
@@ -179,23 +195,23 @@ THD_FUNCTION(imu, arg)
 
         chprintf(CHP, "\r\n");
 
-        //FIXME set all these CANOpen values to real numbers
-        OD_gyroscope.pitchRate = 0;
-        OD_gyroscope.yawRate = 0;
-        OD_gyroscope.rollRate = 0;
-        OD_gyroscope.pitchRateRaw = 0;
-        OD_gyroscope.yawRateRaw = 0;
-        OD_gyroscope.rollRateRaw = 0;
+        OD_gyroscope.pitchRate = gyro_x;
+        OD_gyroscope.yawRate = gyro_y;
+        OD_gyroscope.rollRate = gyro_z;
+        OD_gyroscope.pitchRateRaw = gyro_x_raw;
+        OD_gyroscope.yawRateRaw = gyro_y_raw;
+        OD_gyroscope.rollRateRaw = gyro_z_raw;
 
-        OD_acceleration.x = 0;
-        OD_acceleration.y = 0;
-        OD_acceleration.z = 0;
-        OD_acceleration.XRaw = 0;
-        OD_acceleration.YRaw = 0;
-        OD_acceleration.ZRaw = 0;
+        OD_acceleration.x = acc_x_mS2;
+        OD_acceleration.y = acc_y_mS2;
+        OD_acceleration.z = acc_z_mS2;
+        OD_acceleration.XRaw = acc_x_raw;
+        OD_acceleration.YRaw = acc_y_raw;
+        OD_acceleration.ZRaw = acc_z_raw;
 
-        OD_IMU_Temperature = 0;
+        OD_IMU_Temperature = temp_c;
 
+        //TODO Impliment magnetometer driver and populate this info
         OD_magnetometerPZ1.x = 0;
         OD_magnetometerPZ1.y = 0;
         OD_magnetometerPZ1.z = 0;

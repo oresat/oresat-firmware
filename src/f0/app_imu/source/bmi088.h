@@ -944,7 +944,8 @@ int16_t bmi088ReadAccInY(BMI088Driver *devp);
 int16_t bmi088ReadAccInZ(BMI088Driver *devp);
 #endif
 
-msg_t bmi088ReadAccXYZ(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z );
+msg_t bmi088ReadAccXYZmG(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z );
+msg_t bmi088ReadAccXYZmS2(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z, uint16_t *dest_acc_x_raw, uint16_t *dest_acc_y_raw, uint16_t *dest_acc_z_raw);
 
 uint32_t bmi088ReadSensorTimeData(BMI088Driver *devp);
 msg_t bmi088SoftReset(BMI088Driver *devp);
@@ -952,7 +953,7 @@ void accEnable(BMI088Driver *devp, uint8_t enable);
 uint8_t readPowerCtrlReg(BMI088Driver *devp);
 uint8_t readPowerConfReg(BMI088Driver *devp);
 uint8_t bmi088ReadIntStat(BMI088Driver *devp);
-uint16_t bmi088ReadTemp(BMI088Driver *devp);
+msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c);
 
 
 msg_t bmi088ReadGyrosChipId(BMI088Driver *devp, uint8_t *dest);
@@ -970,7 +971,7 @@ msg_t BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_m
 uint8_t bmi088ObtainGyroscopesReadings(BMI088Driver *devp, uint8_t* packed_readings);
 #endif
 
-msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, int32_t *dest_gyro_x, int32_t *dest_gyro_y, int32_t *dest_gyro_z );
+msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, int32_t *dest_gyro_x, int32_t *dest_gyro_y, int32_t *dest_gyro_z, uint16_t *dest_gyro_x_raw, uint16_t *dest_gyro_y_raw, uint16_t *dest_gyro_z_raw);
 
 #ifdef __cplusplus
 }

@@ -55,7 +55,7 @@ static void app_init(void)
 {
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
-    reg_worker(&imu_worker, &imu_desc, false, true);
+    reg_worker(&imu_worker, &imu_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
