@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_template
+PROJECT   = app_devboard
 
 # Target settings.
 MCU       = cortex-m4
@@ -130,7 +130,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(STARTUPLD)/STM32F446xE.ld
+LDSCRIPT= $(PROJ_ROOT)/ld/STM32F446xE.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
