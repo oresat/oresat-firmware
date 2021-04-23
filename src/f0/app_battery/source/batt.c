@@ -335,11 +335,11 @@ THD_FUNCTION(batt, arg)
     uint16_t pack_2_comm_rx_error_count = 0;
     while (!chThdShouldTerminateX()) {
     	chprintf(DEBUG_SERIAL, "================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
-    	for(uint32_t sl = 0; sl < 3500; sl += 50) {
-    		chprintf(DEBUG_SERIAL, "    %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
-    		chThdSleepMilliseconds(50);
-    	}
-    	//chThdSleepMilliseconds(1000);
+//    	for(uint32_t sl = 0; sl < 3500; sl += 50) {
+//    		chprintf(DEBUG_SERIAL, "    %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
+//    		chThdSleepMilliseconds(50);
+//    	}
+    	chThdSleepMilliseconds(1000);
 
     	chprintf(DEBUG_SERIAL, "Populating Pack 1 Data\r\n");
     	if( ! populate_pack_data(&max17205devPack1, &pack_1_data) ) {
@@ -353,58 +353,56 @@ THD_FUNCTION(batt, arg)
     	}
 
 
-    	CO_OD_RAM.battery1.maxSubIndex = 1;
-		CO_OD_RAM.battery1.vbatt = pack_1_data.batt_mV;
-		CO_OD_RAM.battery1.VCellMax = pack_1_data.VCell_max_volt_mV;
-		CO_OD_RAM.battery1.VCellMin = pack_1_data.VCell_min_volt_mV;
-		CO_OD_RAM.battery1.VCell = pack_1_data.cell1_mV;
-		CO_OD_RAM.battery1.VCell2 = pack_1_data.cell2_mV;
-		CO_OD_RAM.battery1.currentAvg = pack_1_data.avg_current_mA;
-		CO_OD_RAM.battery1.currentMax = pack_1_data.max_current_mA;
-		CO_OD_RAM.battery1.currentMin = pack_1_data.min_current_mA;
-		CO_OD_RAM.battery1.fullCapacity = pack_1_data.full_capacity_mAh;
-		CO_OD_RAM.battery1.timeToEmpty = pack_1_data.time_to_empty;
-		CO_OD_RAM.battery1.timeToFull = pack_1_data.time_to_full;
-		CO_OD_RAM.battery1.cycles = pack_1_data.cycles;
-		CO_OD_RAM.battery1.availableCapacity = pack_1_data.available_capacity_mAh;
-		CO_OD_RAM.battery1.availableStateOfCharge = pack_1_data.available_state_of_charge;
-		CO_OD_RAM.battery1.presentStateOfCharge = pack_1_data.present_state_of_charge;
-		CO_OD_RAM.battery1.mixCapacity = pack_1_data.mix_capacity;
-		CO_OD_RAM.battery1.reportingCapacity = pack_1_data.reporting_capacity_mAh;
-		CO_OD_RAM.battery1.tempAvg1 = pack_1_data.avg_temp_1_C;
-		CO_OD_RAM.battery1.tempAvg2 = pack_1_data.avg_temp_2_C;
-		CO_OD_RAM.battery1.tempAvgInt = pack_1_data.avg_int_temp_C;
-		CO_OD_RAM.battery1.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK1);
-		CO_OD_RAM.battery1.chargeDisable = palReadLine(LINE_CHG_DIS_PK1);
-		CO_OD_RAM.battery1.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK1);
-		CO_OD_RAM.battery1.chargeStatus = palReadLine(LINE_CHG_STAT_PK1);
+		OD_battery1.vbatt = pack_1_data.batt_mV;
+		OD_battery1.VCellMax = pack_1_data.VCell_max_volt_mV;
+		OD_battery1.VCellMin = pack_1_data.VCell_min_volt_mV;
+		OD_battery1.VCell = pack_1_data.cell1_mV;
+		OD_battery1.VCell2 = pack_1_data.cell2_mV;
+		OD_battery1.currentAvg = pack_1_data.avg_current_mA;
+		OD_battery1.currentMax = pack_1_data.max_current_mA;
+		OD_battery1.currentMin = pack_1_data.min_current_mA;
+		OD_battery1.fullCapacity = pack_1_data.full_capacity_mAh;
+		OD_battery1.timeToEmpty = pack_1_data.time_to_empty;
+		OD_battery1.timeToFull = pack_1_data.time_to_full;
+		OD_battery1.cycles = pack_1_data.cycles;
+		OD_battery1.availableCapacity = pack_1_data.available_capacity_mAh;
+		OD_battery1.availableStateOfCharge = pack_1_data.available_state_of_charge;
+		OD_battery1.presentStateOfCharge = pack_1_data.present_state_of_charge;
+		OD_battery1.mixCapacity = pack_1_data.mix_capacity;
+		OD_battery1.reportingCapacity = pack_1_data.reporting_capacity_mAh;
+		OD_battery1.tempAvg1 = pack_1_data.avg_temp_1_C;
+		OD_battery1.tempAvg2 = pack_1_data.avg_temp_2_C;
+		OD_battery1.tempAvgInt = pack_1_data.avg_int_temp_C;
+		OD_battery1.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK1);
+		OD_battery1.chargeDisable = palReadLine(LINE_CHG_DIS_PK1);
+		OD_battery1.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK1);
+		OD_battery1.chargeStatus = palReadLine(LINE_CHG_STAT_PK1);
 
 
-		CO_OD_RAM.battery2.maxSubIndex = 2;
-		CO_OD_RAM.battery2.vbatt = pack_2_data.batt_mV;
-		CO_OD_RAM.battery2.VCellMax = pack_2_data.VCell_max_volt_mV;
-		CO_OD_RAM.battery2.VCellMin = pack_2_data.VCell_min_volt_mV;
-		CO_OD_RAM.battery2.VCell = pack_2_data.cell1_mV;
-		CO_OD_RAM.battery2.VCell2 = pack_2_data.cell2_mV;
-		CO_OD_RAM.battery2.currentAvg = pack_2_data.avg_current_mA;
-		CO_OD_RAM.battery2.currentMax = pack_2_data.max_current_mA;
-		CO_OD_RAM.battery2.currentMin = pack_2_data.min_current_mA;
-		CO_OD_RAM.battery2.fullCapacity = pack_2_data.full_capacity_mAh;
-		CO_OD_RAM.battery2.timeToEmpty = pack_2_data.time_to_empty;
-		CO_OD_RAM.battery2.timeToFull = pack_2_data.time_to_full;
-		CO_OD_RAM.battery2.cycles = pack_2_data.cycles;
-		CO_OD_RAM.battery2.availableCapacity = pack_2_data.available_capacity_mAh;
-		CO_OD_RAM.battery2.availableStateOfCharge = pack_2_data.available_state_of_charge;
-		CO_OD_RAM.battery2.presentStateOfCharge = pack_2_data.present_state_of_charge;
-		CO_OD_RAM.battery2.mixCapacity = pack_2_data.mix_capacity;
-		CO_OD_RAM.battery2.reportingCapacity = pack_2_data.reporting_capacity_mAh;
-		CO_OD_RAM.battery2.tempAvg1 = pack_2_data.avg_temp_1_C;
-		CO_OD_RAM.battery2.tempAvg2 = pack_2_data.avg_temp_2_C;
-		CO_OD_RAM.battery2.tempAvgInt = pack_2_data.avg_int_temp_C;
-		CO_OD_RAM.battery2.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK2);
-		CO_OD_RAM.battery2.chargeDisable = palReadLine(LINE_CHG_DIS_PK2);
-		CO_OD_RAM.battery2.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK2);
-		CO_OD_RAM.battery2.chargeStatus = palReadLine(LINE_CHG_STAT_PK2);
+		OD_battery2.vbatt = pack_2_data.batt_mV;
+		OD_battery2.VCellMax = pack_2_data.VCell_max_volt_mV;
+		OD_battery2.VCellMin = pack_2_data.VCell_min_volt_mV;
+		OD_battery2.VCell = pack_2_data.cell1_mV;
+		OD_battery2.VCell2 = pack_2_data.cell2_mV;
+		OD_battery2.currentAvg = pack_2_data.avg_current_mA;
+		OD_battery2.currentMax = pack_2_data.max_current_mA;
+		OD_battery2.currentMin = pack_2_data.min_current_mA;
+		OD_battery2.fullCapacity = pack_2_data.full_capacity_mAh;
+		OD_battery2.timeToEmpty = pack_2_data.time_to_empty;
+		OD_battery2.timeToFull = pack_2_data.time_to_full;
+		OD_battery2.cycles = pack_2_data.cycles;
+		OD_battery2.availableCapacity = pack_2_data.available_capacity_mAh;
+		OD_battery2.availableStateOfCharge = pack_2_data.available_state_of_charge;
+		OD_battery2.presentStateOfCharge = pack_2_data.present_state_of_charge;
+		OD_battery2.mixCapacity = pack_2_data.mix_capacity;
+		OD_battery2.reportingCapacity = pack_2_data.reporting_capacity_mAh;
+		OD_battery2.tempAvg1 = pack_2_data.avg_temp_1_C;
+		OD_battery2.tempAvg2 = pack_2_data.avg_temp_2_C;
+		OD_battery2.tempAvgInt = pack_2_data.avg_int_temp_C;
+		OD_battery2.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK2);
+		OD_battery2.chargeDisable = palReadLine(LINE_CHG_DIS_PK2);
+		OD_battery2.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK2);
+		OD_battery2.chargeStatus = palReadLine(LINE_CHG_STAT_PK2);
 
 
         run_battery_heating_state_machine(&pack_1_data, &pack_2_data);
