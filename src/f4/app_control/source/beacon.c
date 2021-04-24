@@ -41,16 +41,14 @@ static const tlm_item_t tlm_aprs0[] = {
         .ptr = &unix_time,
     },
     {   /* MCU Temperature */
-        .type = TLM_OD,
+        .type = TLM_PTR,
         .len = 1,
-        .index = OD_2021_MCU_Sensors,
-        .subindex = OD_2021_1_MCU_Sensors_temperature,
+        .ptr = &OD_MCU_Sensors.temperature,
     },
     {   /* MCU VREFINT */
-        .type = TLM_OD,
+        .type = TLM_PTR,
         .len = 1,
-        .index = OD_2021_MCU_Sensors,
-        .subindex = OD_2021_2_MCU_Sensors_VREFINT,
+        .ptr = &OD_MCU_Sensors.VREFINT,
     },
     {   /* User-Defined APRS End */
         .type = TLM_MSG,
