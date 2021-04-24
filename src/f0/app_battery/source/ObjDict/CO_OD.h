@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             47
+   #define CO_OD_NoOfElements             48
 
 
 /*******************************************************************************
@@ -189,11 +189,8 @@
                UNSIGNED16     timeToEmpty;
                UNSIGNED16     timeToFull;
                UNSIGNED16     cycles;
-               UNSIGNED16     availableCapacity;
-               UNSIGNED8      availableStateOfCharge;
-               UNSIGNED8      presentStateOfCharge;
-               UNSIGNED16     mixCapacity;
-               UNSIGNED16     reportingCapacity;
+               UNSIGNED8      reportedStateOfCharge;
+               UNSIGNED16     reportedCapacity;
                INTEGER16      tempAvg1;
                INTEGER16      tempAvg2;
                INTEGER16      tempAvgInt;
@@ -216,11 +213,8 @@
                UNSIGNED16     timeToEmpty;
                UNSIGNED16     timeToFull;
                UNSIGNED16     cycles;
-               UNSIGNED16     availableCapacity;
-               UNSIGNED8      availableStateOfCharge;
-               UNSIGNED8      presentStateOfCharge;
-               UNSIGNED16     mixCapacity;
-               UNSIGNED16     reportingCapacity;
+               UNSIGNED8      reportedStateOfCharge;
+               UNSIGNED16     reportedCapacity;
                INTEGER16      tempAvg1;
                INTEGER16      tempAvg2;
                INTEGER16      tempAvgInt;
@@ -581,18 +575,15 @@
         #define OD_6000_10_battery1_timeToEmpty                     10
         #define OD_6000_11_battery1_timeToFull                      11
         #define OD_6000_12_battery1_cycles                          12
-        #define OD_6000_13_battery1_availableCapacity               13
-        #define OD_6000_14_battery1_availableStateOfCharge          14
-        #define OD_6000_15_battery1_presentStateOfCharge            15
-        #define OD_6000_16_battery1_mixCapacity                     16
-        #define OD_6000_17_battery1_reportingCapacity               17
-        #define OD_6000_18_battery1_tempAvg1                        18
-        #define OD_6000_19_battery1_tempAvg2                        19
-        #define OD_6000_20_battery1_tempAvgInt                      20
-        #define OD_6000_21_battery1_dischargeDisable                21
-        #define OD_6000_22_battery1_chargeDisable                   22
-        #define OD_6000_23_battery1_dischargeStatus                 23
-        #define OD_6000_24_battery1_chargeStatus                    24
+        #define OD_6000_13_battery1_reportedStateOfCharge           13
+        #define OD_6000_14_battery1_reportedCapacity                14
+        #define OD_6000_15_battery1_tempAvg1                        15
+        #define OD_6000_16_battery1_tempAvg2                        16
+        #define OD_6000_17_battery1_tempAvgInt                      17
+        #define OD_6000_18_battery1_dischargeDisable                18
+        #define OD_6000_19_battery1_chargeDisable                   19
+        #define OD_6000_20_battery1_dischargeStatus                 20
+        #define OD_6000_21_battery1_chargeStatus                    21
 
 /*6001 */
         #define OD_6001_battery2                                    0x6001
@@ -610,24 +601,24 @@
         #define OD_6001_10_battery2_timeToEmpty                     10
         #define OD_6001_11_battery2_timeToFull                      11
         #define OD_6001_12_battery2_cycles                          12
-        #define OD_6001_13_battery2_availableCapacity               13
-        #define OD_6001_14_battery2_availableStateOfCharge          14
-        #define OD_6001_15_battery2_presentStateOfCharge            15
-        #define OD_6001_16_battery2_mixCapacity                     16
-        #define OD_6001_17_battery2_reportingCapacity               17
-        #define OD_6001_18_battery2_tempAvg1                        18
-        #define OD_6001_19_battery2_tempAvg2                        19
-        #define OD_6001_20_battery2_tempAvgInt                      20
-        #define OD_6001_21_battery2_dischargeDisable                21
-        #define OD_6001_22_battery2_chargeDisable                   22
-        #define OD_6001_23_battery2_dischargeStatus                 23
-        #define OD_6001_24_battery2_chargeStatus                    24
+        #define OD_6001_13_battery2_reportedStateOfCharge           13
+        #define OD_6001_14_battery2_reportedCapacity                14
+        #define OD_6001_15_battery2_tempAvg1                        15
+        #define OD_6001_16_battery2_tempAvg2                        16
+        #define OD_6001_17_battery2_tempAvgInt                      17
+        #define OD_6001_18_battery2_dischargeDisable                18
+        #define OD_6001_19_battery2_chargeDisable                   19
+        #define OD_6001_20_battery2_dischargeStatus                 20
+        #define OD_6001_21_battery2_chargeStatus                    21
 
 /*6002 */
         #define OD_6002_heaterStatus                                0x6002
 
 /*6003 */
         #define OD_6003_modelGaugeAlgStatus                         0x6003
+
+/*6004 */
+        #define OD_6004_heaterOn                                    0x6004
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -652,6 +643,7 @@ struct sCO_OD_RAM{
 /*6001      */ OD_battery2_t   battery2;
 /*6002      */ BOOLEAN        heaterStatus;
 /*6003      */ UNSIGNED16     modelGaugeAlgStatus;
+/*6004      */ BOOLEAN        heaterOn;
 
                UNSIGNED32     LastWord;
 };
@@ -848,6 +840,9 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 
 /*6003, Data Type: UNSIGNED16 */
         #define OD_modelGaugeAlgStatus                              CO_OD_RAM.modelGaugeAlgStatus
+
+/*6004, Data Type: BOOLEAN */
+        #define OD_heaterOn                                         CO_OD_RAM.heaterOn
 
 #endif
 // clang-format on
