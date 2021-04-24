@@ -8,8 +8,8 @@ Description=OreSat Solar Board Object Dictionary
 CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=5:21PM
-ModificationDate=04-19-2021
+ModificationTime=12:17PM
+ModificationDate=04-24-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -1150,7 +1150,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1800sub2]
@@ -1186,7 +1186,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1800sub6]
@@ -1219,7 +1219,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1801sub2]
@@ -1255,7 +1255,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1801sub6]
@@ -1288,7 +1288,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000380+$NODEID
+DefaultValue=0x40000380+$NODEID
 PDOMapping=0
 
 [1802sub2]
@@ -1324,7 +1324,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1802sub6]
@@ -1357,7 +1357,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000480+$NODEID
+DefaultValue=0x40000480+$NODEID
 PDOMapping=0
 
 [1803sub2]
@@ -1393,7 +1393,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1803sub6]
@@ -1417,7 +1417,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A00sub1]
@@ -1426,7 +1426,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000110
 PDOMapping=0
 
 [1A00sub2]
@@ -1435,7 +1435,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000210
 PDOMapping=0
 
 [1A00sub3]
@@ -1444,7 +1444,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000310
 PDOMapping=0
 
 [1A00sub4]
@@ -1453,7 +1453,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000410
 PDOMapping=0
 
 [1A00sub5]
@@ -1504,7 +1504,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A01sub1]
@@ -1513,7 +1513,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000510
 PDOMapping=0
 
 [1A01sub2]
@@ -1522,7 +1522,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000610
 PDOMapping=0
 
 [1A01sub3]
@@ -1531,7 +1531,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000710
 PDOMapping=0
 
 [1A01sub4]
@@ -1540,7 +1540,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000810
 PDOMapping=0
 
 [1A01sub5]
@@ -1591,7 +1591,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x02
 PDOMapping=0
 
 [1A02sub1]
@@ -1600,7 +1600,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000910
 PDOMapping=0
 
 [1A02sub2]
@@ -1609,7 +1609,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000A10
 PDOMapping=0
 
 [1A02sub3]
@@ -1678,7 +1678,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x06
 PDOMapping=0
 
 [1A03sub1]
@@ -1687,7 +1687,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010108
 PDOMapping=0
 
 [1A03sub2]
@@ -1696,7 +1696,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010208
 PDOMapping=0
 
 [1A03sub3]
@@ -1705,7 +1705,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010308
 PDOMapping=0
 
 [1A03sub4]
@@ -1714,7 +1714,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010408
 PDOMapping=0
 
 [1A03sub5]
@@ -1723,7 +1723,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010508
 PDOMapping=0
 
 [1A03sub6]
@@ -1732,7 +1732,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010608
 PDOMapping=0
 
 [1A03sub7]
