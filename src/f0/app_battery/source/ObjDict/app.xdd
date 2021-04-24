@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-12" fileModificationTime="19:06:07.3351570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-23" fileModificationTime="22:43:20.3192550-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -745,40 +745,31 @@
             <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_60000C">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available Capacity" uniqueID="UID_RECSUB_60000D">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Available State of Charge" uniqueID="UID_RECSUB_60000E">
+            <q1:varDeclaration name="Reported State of Charge" uniqueID="UID_RECSUB_60000D">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Present State of Charge" uniqueID="UID_RECSUB_60000F">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mix Capacity" uniqueID="UID_RECSUB_600010">
+            <q1:varDeclaration name="Reported Capacity" uniqueID="UID_RECSUB_60000E">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Reporting Capacity" uniqueID="UID_RECSUB_600011">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_600012">
+            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_60000F">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600013">
+            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600010">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600014">
+            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600011">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600015">
+            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600012">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600016">
+            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600013">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600017">
+            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600014">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600018">
+            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600015">
               <BOOL />
             </q1:varDeclaration>
           </q1:struct>
@@ -822,40 +813,31 @@
             <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_60010C">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available Capacity" uniqueID="UID_RECSUB_60010D">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Available State of Charge" uniqueID="UID_RECSUB_60010E">
+            <q1:varDeclaration name="Reported State of Charge" uniqueID="UID_RECSUB_60010D">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Present State of Charge" uniqueID="UID_RECSUB_60010F">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mix Capacity" uniqueID="UID_RECSUB_600110">
+            <q1:varDeclaration name="Reported Capacity" uniqueID="UID_RECSUB_60010E">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Reporting Capacity" uniqueID="UID_RECSUB_600111">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_600112">
+            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_60010F">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600113">
+            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600110">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600114">
+            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600111">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600115">
+            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600112">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600116">
+            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600113">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600117">
+            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600114">
               <BOOL />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600118">
+            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600115">
               <BOOL />
             </q1:varDeclaration>
           </q1:struct>
@@ -2685,7 +2667,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           <q1:parameter uniqueID="UID_SUB_600000">
             <label lang="en">max sub-index</label>
             <USINT />
-            <q1:defaultValue value="0x18" />
+            <q1:defaultValue value="0x15" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600001">
             <label lang="en">Vbatt</label>
@@ -2748,61 +2730,46 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000D">
-            <label lang="en">Available Capacity</label>
-            <UINT />
+            <label lang="en">Reported State of Charge</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000E">
-            <label lang="en">Available State of Charge</label>
-            <USINT />
+            <label lang="en">Reported Capacity</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000F">
-            <label lang="en">Present State of Charge</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600010">
-            <label lang="en">Mix Capacity</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600011">
-            <label lang="en">Reporting Capacity</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600012">
             <label lang="en">Temp avg1</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600013">
+          <q1:parameter uniqueID="UID_SUB_600010">
             <label lang="en">Temp avg2</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600014">
+          <q1:parameter uniqueID="UID_SUB_600011">
             <label lang="en">Temp avg int</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600015">
+          <q1:parameter uniqueID="UID_SUB_600012">
             <label lang="en">Discharge disable</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600016">
+          <q1:parameter uniqueID="UID_SUB_600013">
             <label lang="en">Charge disable</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600017">
+          <q1:parameter uniqueID="UID_SUB_600014">
             <label lang="en">Discharge status</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600018">
+          <q1:parameter uniqueID="UID_SUB_600015">
             <label lang="en">Charge status</label>
             <BOOL />
             <q1:defaultValue value="0" />
@@ -2814,7 +2781,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           <q1:parameter uniqueID="UID_SUB_600100">
             <label lang="en">max sub-index</label>
             <USINT />
-            <q1:defaultValue value="0x18" />
+            <q1:defaultValue value="0x15" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600101">
             <label lang="en">Vbatt</label>
@@ -2877,61 +2844,46 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010D">
-            <label lang="en">Available Capacity</label>
-            <UINT />
+            <label lang="en">Reported State of Charge</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010E">
-            <label lang="en">Available State of Charge</label>
-            <USINT />
+            <label lang="en">Reported Capacity</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010F">
-            <label lang="en">Present State of Charge</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600110">
-            <label lang="en">Mix Capacity</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600111">
-            <label lang="en">Reporting Capacity</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600112">
             <label lang="en">Temp avg1</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600113">
+          <q1:parameter uniqueID="UID_SUB_600110">
             <label lang="en">Temp avg2</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600114">
+          <q1:parameter uniqueID="UID_SUB_600111">
             <label lang="en">Temp avg int</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600115">
+          <q1:parameter uniqueID="UID_SUB_600112">
             <label lang="en">Discharge disable</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600116">
+          <q1:parameter uniqueID="UID_SUB_600113">
             <label lang="en">Charge disable</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600117">
+          <q1:parameter uniqueID="UID_SUB_600114">
             <label lang="en">Discharge status</label>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600118">
+          <q1:parameter uniqueID="UID_SUB_600115">
             <label lang="en">Charge status</label>
             <BOOL />
             <q1:defaultValue value="0" />
@@ -2944,6 +2896,11 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           <q1:parameter uniqueID="UID_OBJ_6003" access="readWrite">
             <label lang="en">ModelGauge Alg Status</label>
             <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6004">
+            <label lang="en">Heater On</label>
+            <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
         </q1:parameterList>
@@ -2963,7 +2920,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-12" fileModificationTime="19:06:07.3351570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-23" fileModificationTime="22:43:20.3192550-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -3299,7 +3256,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="08" name="VBUSP Current (Raw)" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_202108" />
           </CANopenObject>
           <CANopenObject index="2100" name="Error Status Bits" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2100" />
-          <CANopenObject index="6000" name="Battery1" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="25">
+          <CANopenObject index="6000" name="Battery1" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="22">
             <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600000" />
             <CANopenSubObject subIndex="01" name="Vbatt" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600001" />
             <CANopenSubObject subIndex="02" name="VCell max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600002" />
@@ -3313,20 +3270,17 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="0A" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000A" />
             <CANopenSubObject subIndex="0B" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000B" />
             <CANopenSubObject subIndex="0C" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000C" />
-            <CANopenSubObject subIndex="0D" name="Available Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000D" />
-            <CANopenSubObject subIndex="0E" name="Available State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000E" />
-            <CANopenSubObject subIndex="0F" name="Present State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000F" />
-            <CANopenSubObject subIndex="10" name="Mix Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600010" />
-            <CANopenSubObject subIndex="11" name="Reporting Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600011" />
-            <CANopenSubObject subIndex="12" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600012" />
-            <CANopenSubObject subIndex="13" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600013" />
-            <CANopenSubObject subIndex="14" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600014" />
-            <CANopenSubObject subIndex="15" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600015" />
-            <CANopenSubObject subIndex="16" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600016" />
-            <CANopenSubObject subIndex="17" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600017" />
-            <CANopenSubObject subIndex="18" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600018" />
+            <CANopenSubObject subIndex="0D" name="Reported State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000D" />
+            <CANopenSubObject subIndex="0E" name="Reported Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000E" />
+            <CANopenSubObject subIndex="0F" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000F" />
+            <CANopenSubObject subIndex="10" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600010" />
+            <CANopenSubObject subIndex="11" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600011" />
+            <CANopenSubObject subIndex="12" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600012" />
+            <CANopenSubObject subIndex="13" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600013" />
+            <CANopenSubObject subIndex="14" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600014" />
+            <CANopenSubObject subIndex="15" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600015" />
           </CANopenObject>
-          <CANopenObject index="6001" name="Battery2" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="25">
+          <CANopenObject index="6001" name="Battery2" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="22">
             <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600100" />
             <CANopenSubObject subIndex="01" name="Vbatt" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600101" />
             <CANopenSubObject subIndex="02" name="VCell max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600102" />
@@ -3340,21 +3294,19 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="0A" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010A" />
             <CANopenSubObject subIndex="0B" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010B" />
             <CANopenSubObject subIndex="0C" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010C" />
-            <CANopenSubObject subIndex="0D" name="Available Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010D" />
-            <CANopenSubObject subIndex="0E" name="Available State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010E" />
-            <CANopenSubObject subIndex="0F" name="Present State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010F" />
-            <CANopenSubObject subIndex="10" name="Mix Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600110" />
-            <CANopenSubObject subIndex="11" name="Reporting Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600111" />
-            <CANopenSubObject subIndex="12" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600112" />
-            <CANopenSubObject subIndex="13" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600113" />
-            <CANopenSubObject subIndex="14" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600114" />
-            <CANopenSubObject subIndex="15" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600115" />
-            <CANopenSubObject subIndex="16" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600116" />
-            <CANopenSubObject subIndex="17" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600117" />
-            <CANopenSubObject subIndex="18" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600118" />
+            <CANopenSubObject subIndex="0D" name="Reported State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010D" />
+            <CANopenSubObject subIndex="0E" name="Reported Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010E" />
+            <CANopenSubObject subIndex="0F" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010F" />
+            <CANopenSubObject subIndex="10" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600110" />
+            <CANopenSubObject subIndex="11" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600111" />
+            <CANopenSubObject subIndex="12" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600112" />
+            <CANopenSubObject subIndex="13" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600113" />
+            <CANopenSubObject subIndex="14" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600114" />
+            <CANopenSubObject subIndex="15" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600115" />
           </CANopenObject>
           <CANopenObject index="6002" name="Heater Status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6002" />
           <CANopenObject index="6003" name="ModelGauge Alg Status" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6003" />
+          <CANopenObject index="6004" name="Heater On" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6004" />
         </q2:CANopenObjectList>
         <dummyUsage>
           <dummy entry="Dummy0001=0" />
