@@ -76,10 +76,10 @@ static flt_reg_t fifo1_filters[] = {
         .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ACK,
         .scale16.id_mask[1].STID = STM32_BOOTLOADER_CAN_NACK,
     },
-	{
-		.scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
-		.scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA,
-	}
+    {
+        .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
+        .scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA,
+    }
 };
 
 static oresat_config_t oresat_conf = {
@@ -87,7 +87,7 @@ static oresat_config_t oresat_conf = {
     .node_id = 0x01,
     .bitrate = ORESAT_DEFAULT_BITRATE,
     .fifo1_filters = fifo1_filters,
-    .filter_count = sizeof(fifo1_filters),
+    .filter_count = sizeof(fifo1_filters) / sizeof(flt_reg_t),
 };
 
 static SDCConfig sdccfg = {
@@ -112,8 +112,8 @@ static void app_init(void)
 #endif
 
     /* Prepare filesystem */
-	fs_init(&FSD1);
-	fs_start(&FSD1, &fscfg);
+    fs_init(&FSD1);
+    fs_start(&FSD1, &fscfg);
 
     /* Initialize shell and start serial interface */
 #ifdef SHELL_ENABLE
