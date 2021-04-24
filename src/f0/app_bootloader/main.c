@@ -538,7 +538,7 @@ void can_bootloader_run(const bool is_firmware_a_valid) {
     bool got_stay_bootloader_frame = false;
 
 
-    const uint32_t bootloader_timeout_threshold_ms = 3000;
+    const uint32_t bootloader_timeout_threshold_ms = 500;
     while ( true ) {
         if( is_firmware_a_valid ) {
             if( (! got_stay_bootloader_frame) && ((TIME_I2MS(chVTGetSystemTime())) - start_time) >= bootloader_timeout_threshold_ms ) {
