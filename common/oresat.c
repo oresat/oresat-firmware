@@ -1,6 +1,7 @@
 #include "oresat.h"
 #include "sensors.h"
 #include "CO_threads.h"
+#include "CANopen.h"
 
 CANDriver *cand;
 
@@ -15,6 +16,11 @@ void oresat_init(oresat_config_t *config)
      */
     halInit();
     chSysInit();
+
+    /* Enumerate UID */
+    for (int i = 0; i < 3; i++) {
+        OD_MCU_UniqueDeviceID[i] = ((uint32_t*)UID_BASE)[i];
+    }
 
     /* Init sensors */
     sensors_init();
