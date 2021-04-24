@@ -611,7 +611,6 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
  */
 msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 	i2cbuf_t buf;
-	msg_t r;
 
 
 	//Determine the number of times NV memory has been written on this chip.

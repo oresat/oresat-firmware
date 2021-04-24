@@ -17,6 +17,14 @@
 #define NCELLS          2U          /* Number of cells */
 
 typedef enum {
+	BATTERY_OD_ERROR_INFO_CODE_NONE = 0,
+	BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR,
+	BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR,
+	BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING,
+	BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING,
+} battery_od_error_info_code_t;
+
+typedef enum {
 	BATTERY_STATE_MACHINE_STATE_NOT_HEATING = 0,
 	BATTERY_STATE_MACHINE_STATE_HEATING,
 } battery_heating_state_machine_state_t;
@@ -39,8 +47,30 @@ static const I2CConfig i2cconfig_2 = {
     0
 };
 
+//The values for batt_nv_programing_cfg are detailed in the google document "MAX17205 Register Values"
+static const max17205_regval_t batt_nv_programing_cfg[] = {
+    {MAX17205_AD_NPACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
+                                          _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
+                                          MAX17205_PACKCFG_BALCFG_40 |
+										  MAX17205_PACKCFG_CHEN |
+										  MAX17205_PACKCFG_TDEN |
+										  MAX17205_PACKCFG_A1EN |
+										  MAX17205_PACKCFG_A2EN )}, /* 0x3CA2 */
+	{MAX17205_AD_NDESIGNCAP, 5200}, /*0x1450*/
+	{MAX17205_AD_NNVCFG0, MAX17205_NNVCFG0_ENOCV |
+							MAX17205_NNVCFG0_ENX |
+							MAX17205_NNVCFG0_ENCFG |
+							MAX17205_NNVCFG0_ENLCFG |
+							MAX17205_NNVCFG0_ENDC },
+	{MAX17205_AD_NNVCFG1, MAX17205_NNVCFG1_ENTTF | MAX17205_NNVCFG1_ENCTE},
+	{MAX17205_AD_NNVCFG2, MAX17205_NNVCFG2_ENFC |
+							(9 & MAX17205_NNVCFG2_CYCLESPSAVE_Msk)},
+	{MAX17205_AD_NCONFIG, MAX17205_NCONFIG_TEN |
+							(1<<4)},
+    {0,0}
+};
 
-#if 1
+
 static const max17205_regval_t batt_cfg[] = {
     {MAX17205_AD_PACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
                                           _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
@@ -50,22 +80,9 @@ static const max17205_regval_t batt_cfg[] = {
 										  MAX17205_PACKCFG_A1EN |
 										  MAX17205_PACKCFG_A2EN )},
     {MAX17205_AD_NRSENSE, MAX17205_RSENSE2REG(10000U)},
-	{MAX17205_AD_DESIGNCAP, 5200},
+	{MAX17205_AD_CONFIG, MAX17205_CONFIG_TEN | MAX17205_CONFIG_ETHRM},
     {0,0}
 };
-#else
-static const max17205_regval_t batt_cfg[] = {
-    {MAX17205_AD_PACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
-                                          _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
-                                          MAX17205_PACKCFG_BALCFG_40 |
-										  MAX17205_PACKCFG_CHEN |
-										  MAX17205_PACKCFG_TDEN |
-										  MAX17205_PACKCFG_A1EN |
-										  MAX17205_PACKCFG_A2EN )},
-    {MAX17205_AD_NRSENSE, MAX17205_RSENSE2REG(10000U)},
-    {0,0}
-};
-#endif
 
 
 static const MAX17205Config max17205configPack1 = {
@@ -129,14 +146,12 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 	if( pk1_data->is_data_valid && pk2_data->is_data_valid ) {
 		const uint16_t total_state_of_charge = (pk1_data->present_state_of_charge + pk2_data->present_state_of_charge) / 2;
 
-
 		switch (current_batery_state_machine_state) {
 			case BATTERY_STATE_MACHINE_STATE_HEATING:
 				dbgprintf("Turning heaters ON\r\n");
 				palSetLine(LINE_MOARPWR);
 				palSetLine(LINE_HEATER_ON_1);
 				palSetLine(LINE_HEATER_ON_2);
-				CO_OD_RAM.heaterStatus = 1;
 				//Once they’re greater than 5 °C or the combined pack capacity is < 25%
 
 				if( (pk1_data->avg_temp_1_C > 5 && pk2_data->avg_temp_1_C > 5) || (total_state_of_charge < 25) ) {
@@ -148,7 +163,6 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 				palClearLine(LINE_HEATER_ON_1);
 				palClearLine(LINE_HEATER_ON_2);
 				palClearLine(LINE_MOARPWR);
-				CO_OD_RAM.heaterStatus = 0;
 
 				if( (pk1_data->avg_temp_1_C < -5 || pk2_data->avg_temp_1_C < -5) && (pk1_data->present_state_of_charge > 25 || pk2_data->present_state_of_charge > 25) ) {
 					current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_HEATING;
@@ -163,6 +177,8 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 		palClearLine(LINE_HEATER_ON_1);
 		palClearLine(LINE_HEATER_ON_2);
 		palClearLine(LINE_MOARPWR);
+
+		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING);
 	}
 }
 
@@ -205,6 +221,8 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 		//fail safe mode
 		palSetLine(line_dchg_dis);
 		palSetLine(line_chg_dis);
+
+		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING);
 	}
 }
 
@@ -212,12 +230,13 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
  * TODO document this
  */
 bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
+	msg_t r = 0;
+	memset(dest, 0, sizeof(*dest));
+
 	if( driver->state != MAX17205_READY ) {
 		return(false);
 	}
 
-	msg_t r = 0;
-	memset(dest, 0, sizeof(*dest));
 	dest->is_data_valid = true;
 
 
@@ -339,7 +358,43 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 /**
  * Helper function to trigger write of volatile memory on MAX71205 chip
  */
-void prompt_nv_memory_write(const MAX17205Config *config, const char *pack_str) {
+bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, const char *pack_str) {
+	bool ret = false;
+	dbgprintf("\r\n%s\r\n", pack_str);
+
+	dbgprintf("Current and expected NV settings:\r\n");
+	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
+		uint16_t reg_value = 0;
+		if( max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) == MSG_OK ) {
+			dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n", max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg, reg_value, batt_nv_programing_cfg[idx].value);
+		} else {
+			dbgprintf("Failed to read reg value\r\n");
+		}
+	}
+#if 0
+	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
+		if( max17205WriteRaw(devp, batt_nv_programing_cfg[idx].reg, batt_nv_programing_cfg[idx].value) == MSG_OK ) {
+			dbgprintf("Successfully wrote reg value\r\n");
+		} else {
+			dbgprintf("Failed to write reg value\r\n");
+		}
+
+	}
+	dbgprintf("Current and expected NV settings:\r\n");
+	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
+		uint16_t reg_value = 0;
+		if( max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) == MSG_OK ) {
+			dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n", max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg, reg_value, batt_nv_programing_cfg[idx].value);
+		} else {
+			dbgprintf("Failed to read reg value\r\n");
+		}
+	}
+#endif
+
+
+	return(true);
+
+#if 0
 	dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
 	uint8_t ch = 0;
 	sdRead(&SD2, &ch, 1);
@@ -351,12 +406,16 @@ void prompt_nv_memory_write(const MAX17205Config *config, const char *pack_str) 
 
 		if (max17205NonvolatileBlockProgram(config)) {
 			dbgprintf("Successfully wrote non volatile memory...\r\n");
+			ret = true;
 		} else {
 			dbgprintf("Failed to write non volatile memory...\r\n");
 		}
 	} else {
 		dbgprintf("Skipping...\r\n");
 	}
+#endif
+
+	return(ret);
 }
 
 /* Battery monitoring thread */
@@ -382,9 +441,9 @@ THD_FUNCTION(batt, arg)
     dbgprintf("max17205Start(pack2) = %u\r\n", pack_2_init_flag);
 
 
-#if 0
-    bool b1 = prompt_nv_memory_write(&max17205configPack1, "Pack 1");
-    bool b2 = prompt_nv_memory_write(&max17205configPack2, "Pack 2");
+#if 1
+    bool b1 = prompt_nv_memory_write(&max17205devPack1, &max17205configPack1, "Pack 1");
+    bool b2 = prompt_nv_memory_write(&max17205devPack2, &max17205configPack2, "Pack 2");
     if( b1 || b2 ) {
 		for (;;) {
 			dbgprintf(".");
@@ -402,7 +461,7 @@ THD_FUNCTION(batt, arg)
     	dbgprintf("Populating Pack 1 Data\r\n");
     	if( ! populate_pack_data(&max17205devPack1, &pack_1_data) ) {
     		pack_1_comm_rx_error_count++;
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 1);
+            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
     	}
     	pack_1_data.pack_number = 1;
 
@@ -410,22 +469,11 @@ THD_FUNCTION(batt, arg)
     	chThdSleepMilliseconds(100);
     	if( ! populate_pack_data(&max17205devPack2, &pack_2_data) ) {
     		pack_2_comm_rx_error_count++;
-    		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 2);
+    		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR);
     	}
     	pack_2_data.pack_number = 2;
 
 
-    	//Add: heaterOn
-
-		//Rename: presentStateOfCharge to reportedStateOfCharge
-		//Rename: reportingCapacity to reportedCapacity
-
-		//Remove: availableCapacity
-		//Remove: availableStateOfCharge
-		//Remove: mixCapacity
-
-#if 1
-#if 0
 		OD_battery1.vbatt = pack_1_data.batt_mV;
 		OD_battery1.VCellMax = pack_1_data.VCell_max_volt_mV;
 		OD_battery1.VCellMin = pack_1_data.VCell_min_volt_mV;
@@ -447,61 +495,31 @@ THD_FUNCTION(batt, arg)
 		OD_battery1.chargeDisable = palReadLine(LINE_CHG_DIS_PK1);
 		OD_battery1.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK1);
 		OD_battery1.chargeStatus = palReadLine(LINE_CHG_STAT_PK1);
-#endif
-#else
 
 
-		OD_battery1.vbatt = pack_1_data.batt_mV;
-		OD_battery1.VCellMax = pack_1_data.VCell_max_volt_mV;
-		OD_battery1.VCellMin = pack_1_data.VCell_min_volt_mV;
-		OD_battery1.VCell = pack_1_data.cell1_mV;
-		OD_battery1.VCell2 = pack_1_data.cell2_mV;
-		OD_battery1.currentAvg = pack_1_data.avg_current_mA;
-		OD_battery1.currentMax = pack_1_data.max_current_mA;
-		OD_battery1.currentMin = pack_1_data.min_current_mA;
-		OD_battery1.fullCapacity = pack_1_data.full_capacity_mAh;
-		OD_battery1.timeToEmpty = pack_1_data.time_to_empty;
-		OD_battery1.timeToFull = pack_1_data.time_to_full;
-		OD_battery1.cycles = pack_1_data.cycles;
-		OD_battery1.availableCapacity = pack_1_data.available_capacity_mAh;
-		OD_battery1.availableStateOfCharge = pack_1_data.available_state_of_charge;
-		OD_battery1.presentStateOfCharge = pack_1_data.reported_state_of_charge;
-		OD_battery1.mixCapacity = pack_1_data.mix_capacity;
-		OD_battery1.reportingCapacity = pack_1_data.reporting_capacity_mAh;
-		OD_battery1.tempAvg1 = pack_1_data.avg_temp_1_C;
-		OD_battery1.tempAvg2 = pack_1_data.avg_temp_2_C;
-		OD_battery1.tempAvgInt = pack_1_data.avg_int_temp_C;
-		OD_battery1.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK1);
-		OD_battery1.chargeDisable = palReadLine(LINE_CHG_DIS_PK1);
-		OD_battery1.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK1);
-		OD_battery1.chargeStatus = palReadLine(LINE_CHG_STAT_PK1);
-
-
-		OD_battery2.vbatt = pack_2_data.batt_mV;
-		OD_battery2.VCellMax = pack_2_data.VCell_max_volt_mV;
-		OD_battery2.VCellMin = pack_2_data.VCell_min_volt_mV;
-		OD_battery2.VCell = pack_2_data.cell1_mV;
-		OD_battery2.VCell2 = pack_2_data.cell2_mV;
-		OD_battery2.currentAvg = pack_2_data.avg_current_mA;
-		OD_battery2.currentMax = pack_2_data.max_current_mA;
-		OD_battery2.currentMin = pack_2_data.min_current_mA;
-		OD_battery2.fullCapacity = pack_2_data.full_capacity_mAh;
-		OD_battery2.timeToEmpty = pack_2_data.time_to_empty;
-		OD_battery2.timeToFull = pack_2_data.time_to_full;
-		OD_battery2.cycles = pack_2_data.cycles;
-		OD_battery2.availableCapacity = pack_2_data.available_capacity_mAh;
-		OD_battery2.availableStateOfCharge = pack_2_data.available_state_of_charge;
-		OD_battery2.presentStateOfCharge = pack_2_data.reported_state_of_charge;
-		OD_battery2.mixCapacity = pack_2_data.mix_capacity;
-		OD_battery2.reportingCapacity = pack_2_data.reporting_capacity_mAh;
-		OD_battery2.tempAvg1 = pack_2_data.avg_temp_1_C;
-		OD_battery2.tempAvg2 = pack_2_data.avg_temp_2_C;
-		OD_battery2.tempAvgInt = pack_2_data.avg_int_temp_C;
+		OD_battery2.vbatt = pack_1_data.batt_mV;
+		OD_battery2.VCellMax = pack_1_data.VCell_max_volt_mV;
+		OD_battery2.VCellMin = pack_1_data.VCell_min_volt_mV;
+		OD_battery2.VCell = pack_1_data.cell1_mV;
+		OD_battery2.VCell2 = pack_1_data.cell2_mV;
+		OD_battery2.currentAvg = pack_1_data.avg_current_mA;
+		OD_battery2.currentMax = pack_1_data.max_current_mA;
+		OD_battery2.currentMin = pack_1_data.min_current_mA;
+		OD_battery2.fullCapacity = pack_1_data.full_capacity_mAh;
+		OD_battery2.timeToEmpty = pack_1_data.time_to_empty;
+		OD_battery2.timeToFull = pack_1_data.time_to_full;
+		OD_battery2.cycles = pack_1_data.cycles;
+		OD_battery2.reportedStateOfCharge = pack_1_data.reported_state_of_charge;
+		OD_battery2.reportedCapacity = pack_1_data.reported_capacity_mAh;
+		OD_battery2.tempAvg1 = pack_1_data.avg_temp_1_C;
+		OD_battery2.tempAvg2 = pack_1_data.avg_temp_2_C;
+		OD_battery2.tempAvgInt = pack_1_data.avg_int_temp_C;
 		OD_battery2.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK2);
 		OD_battery2.chargeDisable = palReadLine(LINE_CHG_DIS_PK2);
 		OD_battery2.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK2);
 		OD_battery2.chargeStatus = palReadLine(LINE_CHG_STAT_PK2);
-#endif
+
+		CO_OD_RAM.heaterStatus = palReadLine(LINE_MOARPWR);
 
         run_battery_heating_state_machine(&pack_1_data, &pack_2_data);
         update_battery_charging_state(&pack_1_data, LINE_DCHG_DIS_PK1, LINE_CHG_DIS_PK1);
