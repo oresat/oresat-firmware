@@ -30,7 +30,7 @@ static const uslp_map_t map_cmd = {
 static const uslp_map_t map_file = {
     .sdu            = SDU_MAP_ACCESS,
     .upid           = UPID_MAPA_SDU,
-    .max_pkt_len    = FILE_BUF_LEN,
+    .max_pkt_len    = FILE_BUF_LEN + sizeof(file_xfr_t),
     .incomplete     = false,
     .map_recv       = comms_file,
 };

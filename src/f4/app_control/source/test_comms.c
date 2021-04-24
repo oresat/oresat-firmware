@@ -33,7 +33,7 @@ static const uslp_map_t map_cmd = {
 static const uslp_map_t map_file = {
     .sdu            = SDU_MAP_ACCESS,
     .upid           = UPID_MAPA_SDU,
-    .max_pkt_len    = FILE_BUF_LEN,
+    .max_pkt_len    = FILE_BUF_LEN + sizeof(file_xfr_t),
     .incomplete     = false,
     .map_recv       = loopback_rx,
 };
@@ -110,7 +110,7 @@ static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
     if (arg != NULL)
         memcpy(cmd->arg, arg, arg_len);
     uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
-    chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_INFINITE);
+    chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10));
 }
 
 static void print_response(BaseSequentialStream *chp)
@@ -121,6 +121,76 @@ static void print_response(BaseSequentialStream *chp)
             chprintf(chp, " %02X", resp_buf[i]);
         }
         chprintf(chp, "\r\n");
+}
+
+static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_soff_t off, lfs_size_t len)
+{
+    file_xfr_t *xfr;
+    lfs_file_t *file;
+    uint8_t *data;
+    int ret;
+
+    file = file_open(&FSD1, src, LFS_O_RDONLY);
+    if (file == NULL) {
+        return FSD1.err;
+    }
+    ret = file_seek(&FSD1, file, off, LFS_SEEK_SET);
+    if (ret < 0) {
+        file_close(&FSD1, file);
+        return ret;
+    }
+
+    tx_fb = fb_alloc(FB_MAX_LEN);
+    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t));
+    data = fb_put(tx_fb, len);
+    ret = file_read(&FSD1, file, data, len);
+    file_close(&FSD1, file);
+    if (ret < 0) {
+        fb_free(tx_fb);
+        return ret;
+    }
+    xfr = fb_push(tx_fb, sizeof(file_xfr_t));
+    memcpy(xfr->filename, dest, strlen(dest) + 1);
+    xfr->off = off;
+    xfr->len = len;
+    chprintf(chp, "Sending %d byte block to offset %d...\r\n", len, off);
+    uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 1, true);
+    chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10));
+    print_response(chp);
+
+    return ret;
+}
+
+static int send_file(BaseSequentialStream *chp, char *src, char *dest)
+{
+    lfs_ssize_t len;
+    lfs_soff_t off = 0;
+    lfs_file_t *file;
+
+    if (!strcmp(src, dest)) {
+        return LFS_ERR_INVAL;
+    }
+
+    file = file_open(&FSD1, src, LFS_O_RDONLY);
+    if (file == NULL) {
+        return FSD1.err;
+    }
+    len = file_size(&FSD1, file);
+    file_close(&FSD1, file);
+    if (len < 0) {
+        return FSD1.err;
+    }
+
+    while (len) {
+        lfs_ssize_t n = (len > FILE_BUF_LEN ? FILE_BUF_LEN : len);
+        n =  send_file_seg(chp, src, dest, off, n);
+        if (n < 0) {
+            return n;
+        }
+        off += n;
+        len -= n;
+    }
+    return off;
 }
 
 /*===========================================================================*/
@@ -140,21 +210,37 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "c3_flash") && argc > 2) {
         struct {
             uint32_t crc;
-            char filename[strlen(argv[1])];
+            char filename[strlen(argv[1]) + 1];
         } arg;
         arg.crc = strtoul(argv[2], NULL, 0);
-        memcpy(arg.filename, argv[1], strlen(argv[1]));
+        memcpy(arg.filename, argv[1], strlen(argv[1]) + 1);
         send_cmd(CMD_C3_FLASH, (uint8_t*)&arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "c3_bank") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_C3_BANK, &arg, sizeof(arg));
         print_response(chp);
+    } else if (!strcmp(argv[0], "fs_format")) {
+        send_cmd(CMD_FS_FORMAT, NULL, 0);
+        print_response(chp);
+    } else if (!strcmp(argv[0], "fs_unmount")) {
+        send_cmd(CMD_FS_UNMOUNT, NULL, 0);
+        print_response(chp);
+    } else if (!strcmp(argv[0], "fs_remove") && argc > 1) {
+        send_cmd(CMD_FS_REMOVE, (uint8_t*)argv[1], strlen(argv[1]) + 1);
+        print_response(chp);
+    } else if (!strcmp(argv[0], "fs_crc") && argc > 1) {
+        send_cmd(CMD_FS_CRC, (uint8_t*)argv[1], strlen(argv[1]) + 1);
+        print_response(chp);
     } else if (!strcmp(argv[0], "opd_sysenable")) {
         send_cmd(CMD_OPD_SYSENABLE, NULL, 0);
         print_response(chp);
     } else if (!strcmp(argv[0], "opd_sysdisable")) {
         send_cmd(CMD_OPD_SYSDISABLE, NULL, 0);
+        print_response(chp);
+    } else if (!strcmp(argv[0], "opd_scan") && argc > 1) {
+        uint8_t arg = strtoul(argv[1], NULL, 0);
+        send_cmd(CMD_OPD_SCAN, &arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "opd_enable") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);
@@ -168,6 +254,16 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_OPD_RESET, &arg, sizeof(arg));
         print_response(chp);
+    } else if (!strcmp(argv[0], "opd_status") && argc > 1) {
+        uint8_t arg = strtoul(argv[1], NULL, 0);
+        send_cmd(CMD_OPD_STATUS, &arg, sizeof(arg));
+        print_response(chp);
+    } else if (!strcmp(argv[0], "fs_upload") && argc > 2) {
+        chprintf(chp, "File send result: %d\r\n", send_file(chp, argv[1], argv[2]));
+    } else if (!strcmp(argv[0], "fs_upload_seg") && argc > 4) {
+        lfs_soff_t off = strtoul(argv[3], NULL, 0);
+        lfs_ssize_t len = strtoul(argv[4], NULL, 0);
+        chprintf(chp, "File send result: %d\r\n", send_file_seg(chp, argv[1], argv[2], off, len));
     } else if (!strcmp(argv[0], "send")) {
         uint8_t buf[] = {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -198,16 +294,28 @@ edl_usage:
                    "        Post a C3 Flash command to EDL RX queue\r\n"
                    "    c3_bank <bank>:\r\n"
                    "        Post a C3 Bank command to EDL RX queue\r\n"
+                   "    fs_format:\r\n"
+                   "        Post FS Format command to EDL RX queue\r\n"
+                   "    fs_unmount:\r\n"
+                   "        Post FS Unmount command to EDL RX queue\r\n"
+                   "    fs_remove <filename>:\r\n"
+                   "        Post FS Remove command to EDL RX queue\r\n"
+                   "    fs_crc <filename>:\r\n"
+                   "        Post FS CRC command to EDL RX queue\r\n"
                    "    opd_sysenable:\r\n"
                    "        Post a OPD SysEnable command to EDL RX queue\r\n"
                    "    opd_sysdisable:\r\n"
                    "        Post a OPD SysDisable command to EDL RX queue\r\n"
+                   "    opd_scan <restart>:\r\n"
+                   "        Post a OPD Scan command for <addr> to EDL RX queue\r\n"
                    "    opd_enable <addr>:\r\n"
                    "        Post a OPD Enable command for <addr> to EDL RX queue\r\n"
                    "    opd_disable <addr>:\r\n"
                    "        Post a OPD Disable command for <addr> to EDL RX queue\r\n"
                    "    opd_reset <addr>:\r\n"
                    "        Post a OPD Reset command for <addr> to EDL RX queue\r\n"
+                   "    opd_status <addr>:\r\n"
+                   "        Post a OPD Status command for <addr> to EDL RX queue\r\n"
                    "    send:\r\n"
                    "        Send a packet on EDL link\r\n"
                    "\r\n");

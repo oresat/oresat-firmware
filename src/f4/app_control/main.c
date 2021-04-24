@@ -123,6 +123,11 @@ static void app_init(void)
     reg_worker(&cli_worker, &cli_desc, true, true);
 #endif
 
+    /* Register WDT and C3 worker thread */
+    reg_worker(&wdt_worker, &wdt_desc, true, true);
+    reg_worker(&c3_worker, &c3_desc, true, true);
+    start_worker(&wdt_worker);
+
     /* Initialize FRAM */
     framObjectInit(&FRAMD1);
     framStart(&FRAMD1, &framcfg);
@@ -141,10 +146,6 @@ static void app_init(void)
     /* Initialize and start radio systems */
     comms_init();
     comms_start();
-
-    /* Register WDT and C3 worker thread */
-    reg_worker(&wdt_worker, &wdt_desc, true, true);
-    reg_worker(&c3_worker, &c3_desc, true, true);
 
 }
 

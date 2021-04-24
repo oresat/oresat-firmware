@@ -11,7 +11,7 @@ int file_recv(file_xfr_t *xfr)
     }
 
     ret = file_seek(&FSD1, file, xfr->off, LFS_SEEK_SET);
-    if (ret)
+    if (ret < 0)
         goto file_recv_fail;
 
     ret = file_write(&FSD1, file, xfr->data, xfr->len);

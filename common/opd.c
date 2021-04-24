@@ -46,7 +46,7 @@ void opd_start(void)
 #ifdef LINE_OPD_ENABLE
     /* Enable the subsystem if the device has a control line */
     palClearLine(LINE_OPD_ENABLE);
-    chThdSleepMilliseconds(10);
+    chThdSleepMilliseconds(600);
 #endif /* LINE_OPD_ENABLE */
 
     /* Start the I2C driver */
@@ -90,6 +90,7 @@ bool opd_probe(i2caddr_t addr, bool restart)
     if (result == MSG_OK) {
         /* If a device responded, set as valid and (re)start if needed */
         if (opd_dev[addr].valid != true || restart) {
+            max7310Stop(&opd_dev[addr].dev);
             max7310Start(&opd_dev[addr].dev, &opd_dev[addr].config);
         }
         opd_dev[addr].valid = true;
