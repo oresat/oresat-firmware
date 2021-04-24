@@ -774,12 +774,12 @@ bool oresat_firmware_update_m0_write_subsection(can_bootloader_config_t *can_bl_
         }
 
         if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
-        	chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
+            chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
             return(false);
         }
 
         if( ! can_bootloader_write_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
-        	chprintf(can_bl_config->chp, "failed can_bootloader_write_memory_reliable()\r\n");
+            chprintf(can_bl_config->chp, "failed can_bootloader_write_memory_reliable()\r\n");
             return(false);
         }
 
@@ -814,12 +814,12 @@ bool oresat_firmware_update_m0_verify_subsection(can_bootloader_config_t *can_bl
         }
 
         if( ! read_function_pointer(current_file_offset, m0_firmware_temp_buffer, bytes_to_write_to_flash, can_bl_config->read_function_arg0) ) {
-        	chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
+            chprintf(can_bl_config->chp, "failed oresat_firmware_update_m0_write_subsection()\r\n");
             return(false);
         }
 
         if( ! can_bootloader_verify_memory_reliable(can_bl_config, (base_address + current_file_offset), m0_firmware_temp_buffer, bytes_to_write_to_flash) ) {
-        	chprintf(can_bl_config->chp, "failed can_bootloader_verify_memory_reliable()\r\n");
+            chprintf(can_bl_config->chp, "failed can_bootloader_verify_memory_reliable()\r\n");
             return(false);
         }
 
@@ -843,7 +843,7 @@ bool oresat_firmware_update_m0_verify_subsection(can_bootloader_config_t *can_bl
  * @return true upon success, false otherwise.
  */
 bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uint32_t base_address, const uint32_t total_firmware_length_bytes, firmware_read_function_ptr_t read_function_pointer) {
-	const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
+    const systime_t start_time = TIME_I2MS(chVTGetSystemTime());
 
     BaseSequentialStream *chp = can_bl_config->chp;
 
@@ -857,7 +857,7 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
         chprintf(chp, "Failed to put node into bootloader mode...\r\n");
         return(false);
     } else {
-    	chprintf(chp, "Successfully put node into bootloader mode...\r\n");
+        chprintf(chp, "Successfully put node into bootloader mode...\r\n");
     }
 
 
@@ -880,20 +880,20 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 
     //Initially skip the meta-data portion so that if the node power cycle mid update, the bootloader will not try to CRC check the whole image
     if( ! oresat_firmware_update_m0_write_subsection(can_bl_config, base_address, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, total_firmware_length_bytes, read_function_pointer) ) {
-    	return(false);
+        return(false);
     }
 
     if( ! oresat_firmware_update_m0_verify_subsection(can_bl_config, base_address, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, total_firmware_length_bytes, read_function_pointer) ) {
-    	return(false);
+        return(false);
     }
 
     //Write the CRC portion last
     if( ! oresat_firmware_update_m0_write_subsection(can_bl_config, base_address, 0, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, read_function_pointer) ) {
-    	return(false);
+        return(false);
     }
 
     if( ! oresat_firmware_update_m0_verify_subsection(can_bl_config, base_address, 0, M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE, read_function_pointer) ) {
-    	return(false);
+        return(false);
     }
 
 
@@ -922,7 +922,7 @@ const char* oresat_bootloader_can_command_t_to_str(const oresat_bootloader_can_c
         case ORESAT_BOOTLOADER_CAN_COMMAND_ERASE:
             return ("ORESAT_BOOTLOADER_CAN_COMMAND_ERASE");
         case ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA:
-        	return("ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA");
+            return("ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA");
     }
 
     if( v == STM32_BOOTLOADER_CAN_ACK ) {
