@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -41,7 +41,7 @@
    FILE INFO:
       FileName:     app.xdd
       FileVersion:  0
-      CreationTime: 2:51PM
+      CreationTime: 3:51PM
       CreationDate: 08-12-2019
       CreatedBy:    Miles Simpson
 *******************************************************************************/
@@ -68,8 +68,8 @@
   #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
-  #define CO_NO_RPDO                     4   //Associated objects: 14xx, 16xx
-  #define CO_NO_TPDO                     4   //Associated objects: 18xx, 1Axx
+  #define CO_NO_RPDO                     16   //Associated objects: 14xx, 16xx
+  #define CO_NO_TPDO                     16   //Associated objects: 18xx, 1Axx
   #define CO_NO_NMT_MASTER               0
   #define CO_NO_TRACE                    0
 
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             46
+   #define CO_OD_NoOfElements             95
 
 
 /*******************************************************************************
@@ -158,20 +158,22 @@
                UNSIGNED8      ntoggle;
                UNSIGNED8      ctoggle;
                }              OD_BUS_Management_t;
-/*2020      */ typedef struct {
+/*2021      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED16     TS_CAL1;
                UNSIGNED16     TS_CAL2;
                UNSIGNED16     VREFINT_CAL;
                }              OD_MCU_Calibration_t;
-/*2021      */ typedef struct {
+/*2022      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                INTEGER8       temperature;
-               INTEGER16      VREFINT;
-               INTEGER16      VBAT;
+               UNSIGNED8      VREFINT;
+               UNSIGNED8      VBAT;
+               UNSIGNED8      VBUSP_Current;
                UNSIGNED16     temperatureRaw;
                UNSIGNED16     VREFINT_Raw;
                UNSIGNED16     VBAT_Raw;
+               UNSIGNED16     VBUSP_CurrentRaw;
                }              OD_MCU_Sensors_t;
 /*6000      */ typedef struct {
                UNSIGNED8      maxSubIndex;
@@ -346,6 +348,102 @@
         #define OD_1403_2_RPDOCommunicationParameter_transmissionType 2
         #define OD_1403_5_RPDOCommunicationParameter_eventTimer     5
 
+/*1404 */
+        #define OD_1404_RPDOCommunicationParameter                  0x1404
+
+        #define OD_1404_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1404_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1404_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1404_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1405 */
+        #define OD_1405_RPDOCommunicationParameter                  0x1405
+
+        #define OD_1405_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1405_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1405_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1405_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1406 */
+        #define OD_1406_RPDOCommunicationParameter                  0x1406
+
+        #define OD_1406_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1406_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1406_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1406_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1407 */
+        #define OD_1407_RPDOCommunicationParameter                  0x1407
+
+        #define OD_1407_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1407_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1407_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1407_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1408 */
+        #define OD_1408_RPDOCommunicationParameter                  0x1408
+
+        #define OD_1408_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1408_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1408_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1408_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1409 */
+        #define OD_1409_RPDOCommunicationParameter                  0x1409
+
+        #define OD_1409_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1409_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1409_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1409_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140A */
+        #define OD_140A_RPDOCommunicationParameter                  0x140A
+
+        #define OD_140A_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140A_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140A_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140A_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140B */
+        #define OD_140B_RPDOCommunicationParameter                  0x140B
+
+        #define OD_140B_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140B_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140B_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140B_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140C */
+        #define OD_140C_RPDOCommunicationParameter                  0x140C
+
+        #define OD_140C_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140C_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140C_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140C_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140D */
+        #define OD_140D_RPDOCommunicationParameter                  0x140D
+
+        #define OD_140D_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140D_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140D_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140D_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140E */
+        #define OD_140E_RPDOCommunicationParameter                  0x140E
+
+        #define OD_140E_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140E_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140E_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140E_5_RPDOCommunicationParameter_eventTimer     5
+
+/*140F */
+        #define OD_140F_RPDOCommunicationParameter                  0x140F
+
+        #define OD_140F_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_140F_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_140F_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_140F_5_RPDOCommunicationParameter_eventTimer     5
+
 /*1600 */
         #define OD_1600_RPDOMappingParameter                        0x1600
 
@@ -398,6 +496,162 @@
         #define OD_1603_7_RPDOMappingParameter_applicationObject7   7
         #define OD_1603_8_RPDOMappingParameter_applicationObject8   8
 
+/*1604 */
+        #define OD_1604_RPDOMappingParameter                        0x1604
+
+        #define OD_1604_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1604_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1604_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1604_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1604_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1604_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1604_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1604_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1604_8_RPDOMappingParameter_applicationObject8   8
+
+/*1605 */
+        #define OD_1605_RPDOMappingParameter                        0x1605
+
+        #define OD_1605_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1605_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1605_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1605_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1605_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1605_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1605_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1605_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1605_8_RPDOMappingParameter_applicationObject8   8
+
+/*1606 */
+        #define OD_1606_RPDOMappingParameter                        0x1606
+
+        #define OD_1606_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1606_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1606_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1606_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1606_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1606_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1606_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1606_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1606_8_RPDOMappingParameter_applicationObject8   8
+
+/*1607 */
+        #define OD_1607_RPDOMappingParameter                        0x1607
+
+        #define OD_1607_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1607_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1607_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1607_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1607_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1607_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1607_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1607_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1607_8_RPDOMappingParameter_applicationObject8   8
+
+/*1608 */
+        #define OD_1608_RPDOMappingParameter                        0x1608
+
+        #define OD_1608_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1608_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1608_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1608_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1608_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1608_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1608_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1608_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1608_8_RPDOMappingParameter_applicationObject8   8
+
+/*1609 */
+        #define OD_1609_RPDOMappingParameter                        0x1609
+
+        #define OD_1609_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1609_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1609_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1609_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1609_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1609_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1609_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1609_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1609_8_RPDOMappingParameter_applicationObject8   8
+
+/*160A */
+        #define OD_160A_RPDOMappingParameter                        0x160A
+
+        #define OD_160A_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160A_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160A_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160A_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160A_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160A_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160A_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160A_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160A_8_RPDOMappingParameter_applicationObject8   8
+
+/*160B */
+        #define OD_160B_RPDOMappingParameter                        0x160B
+
+        #define OD_160B_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160B_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160B_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160B_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160B_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160B_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160B_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160B_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160B_8_RPDOMappingParameter_applicationObject8   8
+
+/*160C */
+        #define OD_160C_RPDOMappingParameter                        0x160C
+
+        #define OD_160C_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160C_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160C_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160C_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160C_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160C_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160C_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160C_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160C_8_RPDOMappingParameter_applicationObject8   8
+
+/*160D */
+        #define OD_160D_RPDOMappingParameter                        0x160D
+
+        #define OD_160D_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160D_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160D_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160D_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160D_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160D_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160D_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160D_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160D_8_RPDOMappingParameter_applicationObject8   8
+
+/*160E */
+        #define OD_160E_RPDOMappingParameter                        0x160E
+
+        #define OD_160E_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160E_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160E_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160E_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160E_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160E_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160E_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160E_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160E_8_RPDOMappingParameter_applicationObject8   8
+
+/*160F */
+        #define OD_160F_RPDOMappingParameter                        0x160F
+
+        #define OD_160F_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_160F_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_160F_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_160F_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_160F_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_160F_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_160F_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_160F_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_160F_8_RPDOMappingParameter_applicationObject8   8
+
 /*1800 */
         #define OD_1800_TPDOCommunicationParameter                  0x1800
 
@@ -441,6 +695,138 @@
         #define OD_1803_4_TPDOCommunicationParameter_compatibilityEntry 4
         #define OD_1803_5_TPDOCommunicationParameter_eventTimer     5
         #define OD_1803_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1804 */
+        #define OD_1804_TPDOCommunicationParameter                  0x1804
+
+        #define OD_1804_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1804_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1804_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1804_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1804_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1804_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1804_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1805 */
+        #define OD_1805_TPDOCommunicationParameter                  0x1805
+
+        #define OD_1805_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1805_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1805_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1805_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1805_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1805_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1805_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1806 */
+        #define OD_1806_TPDOCommunicationParameter                  0x1806
+
+        #define OD_1806_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1806_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1806_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1806_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1806_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1806_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1806_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1807 */
+        #define OD_1807_TPDOCommunicationParameter                  0x1807
+
+        #define OD_1807_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1807_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1807_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1807_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1807_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1807_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1807_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1808 */
+        #define OD_1808_TPDOCommunicationParameter                  0x1808
+
+        #define OD_1808_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1808_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1808_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1808_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1808_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1808_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1808_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1809 */
+        #define OD_1809_TPDOCommunicationParameter                  0x1809
+
+        #define OD_1809_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1809_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1809_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1809_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1809_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1809_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1809_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180A */
+        #define OD_180A_TPDOCommunicationParameter                  0x180A
+
+        #define OD_180A_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180A_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180A_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180A_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180A_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180A_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180A_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180B */
+        #define OD_180B_TPDOCommunicationParameter                  0x180B
+
+        #define OD_180B_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180B_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180B_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180B_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180B_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180B_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180B_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180C */
+        #define OD_180C_TPDOCommunicationParameter                  0x180C
+
+        #define OD_180C_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180C_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180C_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180C_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180C_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180C_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180C_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180D */
+        #define OD_180D_TPDOCommunicationParameter                  0x180D
+
+        #define OD_180D_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180D_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180D_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180D_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180D_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180D_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180D_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180E */
+        #define OD_180E_TPDOCommunicationParameter                  0x180E
+
+        #define OD_180E_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180E_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180E_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180E_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180E_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180E_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180E_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*180F */
+        #define OD_180F_TPDOCommunicationParameter                  0x180F
+
+        #define OD_180F_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_180F_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_180F_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_180F_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_180F_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_180F_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_180F_6_TPDOCommunicationParameter_SYNCStartValue 6
 
 /*1A00 */
         #define OD_1A00_TPDOMappingParameter                        0x1A00
@@ -494,6 +880,162 @@
         #define OD_1A03_7_TPDOMappingParameter_applicationObject7   7
         #define OD_1A03_8_TPDOMappingParameter_applicationObject8   8
 
+/*1A04 */
+        #define OD_1A04_TPDOMappingParameter                        0x1A04
+
+        #define OD_1A04_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A04_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A04_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A04_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A04_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A04_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A04_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A04_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A04_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A05 */
+        #define OD_1A05_TPDOMappingParameter                        0x1A05
+
+        #define OD_1A05_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A05_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A05_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A05_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A05_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A05_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A05_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A05_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A05_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A06 */
+        #define OD_1A06_TPDOMappingParameter                        0x1A06
+
+        #define OD_1A06_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A06_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A06_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A06_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A06_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A06_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A06_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A06_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A06_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A07 */
+        #define OD_1A07_TPDOMappingParameter                        0x1A07
+
+        #define OD_1A07_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A07_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A07_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A07_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A07_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A07_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A07_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A07_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A07_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A08 */
+        #define OD_1A08_TPDOMappingParameter                        0x1A08
+
+        #define OD_1A08_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A08_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A08_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A08_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A08_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A08_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A08_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A08_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A08_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A09 */
+        #define OD_1A09_TPDOMappingParameter                        0x1A09
+
+        #define OD_1A09_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A09_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A09_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A09_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A09_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A09_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A09_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A09_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A09_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0A */
+        #define OD_1A0A_TPDOMappingParameter                        0x1A0A
+
+        #define OD_1A0A_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0A_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0A_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0A_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0A_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0A_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0A_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0A_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0A_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0B */
+        #define OD_1A0B_TPDOMappingParameter                        0x1A0B
+
+        #define OD_1A0B_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0B_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0B_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0B_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0B_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0B_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0B_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0B_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0B_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0C */
+        #define OD_1A0C_TPDOMappingParameter                        0x1A0C
+
+        #define OD_1A0C_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0C_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0C_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0C_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0C_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0C_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0C_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0C_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0C_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0D */
+        #define OD_1A0D_TPDOMappingParameter                        0x1A0D
+
+        #define OD_1A0D_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0D_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0D_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0D_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0D_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0D_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0D_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0D_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0D_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0E */
+        #define OD_1A0E_TPDOMappingParameter                        0x1A0E
+
+        #define OD_1A0E_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0E_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0E_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0E_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0E_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0E_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0E_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0E_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0E_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A0F */
+        #define OD_1A0F_TPDOMappingParameter                        0x1A0F
+
+        #define OD_1A0F_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A0F_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A0F_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A0F_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A0F_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A0F_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A0F_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A0F_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A0F_8_TPDOMappingParameter_applicationObject8   8
+
 /*1F80 */
         #define OD_1F80_NMTStartup                                  0x1F80
 
@@ -513,23 +1055,33 @@
         #define OD_2011_UTC                                         0x2011
 
 /*2020 */
-        #define OD_2020_MCU_Calibration                             0x2020
+        #define OD_2020_MCU_UniqueDeviceID                          0x2020
 
-        #define OD_2020_0_MCU_Calibration_maxSubIndex               0
-        #define OD_2020_1_MCU_Calibration_TS_CAL1                   1
-        #define OD_2020_2_MCU_Calibration_TS_CAL2                   2
-        #define OD_2020_3_MCU_Calibration_VREFINT_CAL               3
+        #define OD_2020_0_MCU_UniqueDeviceID_maxSubIndex            0
+        #define OD_2020_1_MCU_UniqueDeviceID_UID                    1
+        #define OD_2020_2_MCU_UniqueDeviceID_UID                    2
+        #define OD_2020_3_MCU_UniqueDeviceID_UID                    3
 
 /*2021 */
-        #define OD_2021_MCU_Sensors                                 0x2021
+        #define OD_2021_MCU_Calibration                             0x2021
 
-        #define OD_2021_0_MCU_Sensors_maxSubIndex                   0
-        #define OD_2021_1_MCU_Sensors_temperature                   1
-        #define OD_2021_2_MCU_Sensors_VREFINT                       2
-        #define OD_2021_3_MCU_Sensors_VBAT                          3
-        #define OD_2021_4_MCU_Sensors_temperatureRaw                4
-        #define OD_2021_5_MCU_Sensors_VREFINT_Raw                   5
-        #define OD_2021_6_MCU_Sensors_VBAT_Raw                      6
+        #define OD_2021_0_MCU_Calibration_maxSubIndex               0
+        #define OD_2021_1_MCU_Calibration_TS_CAL1                   1
+        #define OD_2021_2_MCU_Calibration_TS_CAL2                   2
+        #define OD_2021_3_MCU_Calibration_VREFINT_CAL               3
+
+/*2022 */
+        #define OD_2022_MCU_Sensors                                 0x2022
+
+        #define OD_2022_0_MCU_Sensors_maxSubIndex                   0
+        #define OD_2022_1_MCU_Sensors_temperature                   1
+        #define OD_2022_2_MCU_Sensors_VREFINT                       2
+        #define OD_2022_3_MCU_Sensors_VBAT                          3
+        #define OD_2022_4_MCU_Sensors_VBUSP_Current                 4
+        #define OD_2022_5_MCU_Sensors_temperatureRaw                5
+        #define OD_2022_6_MCU_Sensors_VREFINT_Raw                   6
+        #define OD_2022_7_MCU_Sensors_VBAT_Raw                      7
+        #define OD_2022_8_MCU_Sensors_VBUSP_CurrentRaw              8
 
 /*2100 */
         #define OD_2100_errorStatusBits                             0x2100
@@ -583,8 +1135,9 @@ struct sCO_OD_RAM{
 /*1011      */ UNSIGNED32      restoreDefaultParameters[4];
 /*2010      */ UNSIGNED64     SCET;
 /*2011      */ UNSIGNED64     UTC;
-/*2020      */ OD_MCU_Calibration_t MCU_Calibration;
-/*2021      */ OD_MCU_Sensors_t MCU_Sensors;
+/*2020      */ UNSIGNED32      MCU_UniqueDeviceID[3];
+/*2021      */ OD_MCU_Calibration_t MCU_Calibration;
+/*2022      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*6000      */ OD_PV_Power_t   PV_Power;
 /*6001      */ OD_PV_Temp_t    PV_Temp;
@@ -628,10 +1181,10 @@ struct sCO_OD_PERSIST_COMM{
 /*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
 /*1029      */ UNSIGNED8       errorBehavior[2];
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
-/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[4];
-/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[4];
-/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[4];
-/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[4];
+/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[16];
+/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[16];
+/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[16];
+/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[16];
 /*1F80      */ UNSIGNED32     NMTStartup;
 
                UNSIGNED32     LastWord;
@@ -764,10 +1317,15 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 /*2011, Data Type: UNSIGNED64 */
         #define OD_UTC                                              CO_OD_RAM.UTC
 
-/*2020, Data Type: MCU_Calibration_t */
+/*2020, Data Type: UNSIGNED32, Array[3] */
+        #define OD_MCU_UniqueDeviceID                               CO_OD_RAM.MCU_UniqueDeviceID
+        #define ODL_MCU_UniqueDeviceID_arrayLength                  3
+        #define ODA_MCU_UniqueDeviceID_UID                          0
+
+/*2021, Data Type: MCU_Calibration_t */
         #define OD_MCU_Calibration                                  CO_OD_RAM.MCU_Calibration
 
-/*2021, Data Type: MCU_Sensors_t */
+/*2022, Data Type: MCU_Sensors_t */
         #define OD_MCU_Sensors                                      CO_OD_RAM.MCU_Sensors
 
 /*2100, Data Type: OCTET_STRING */
