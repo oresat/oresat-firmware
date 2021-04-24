@@ -8,7 +8,7 @@ Description=OreSat IMU Application Object Dictionary
 CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=3:10PM
+ModificationTime=3:51PM
 ModificationDate=04-24-2021
 ModifiedBy=Ryan Meidick
 
@@ -2733,7 +2733,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1800sub0]
 ParameterName=Highest sub-index supported
@@ -2750,7 +2750,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1800sub2]
@@ -2771,13 +2771,22 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1800sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1800sub5]
 ParameterName=Event timer
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1800sub6]
@@ -2793,7 +2802,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1801sub0]
 ParameterName=Highest sub-index supported
@@ -2810,7 +2819,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1801sub2]
@@ -2831,13 +2840,22 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1801sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1801sub5]
 ParameterName=Event timer
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1801sub6]
@@ -2853,7 +2871,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1802sub0]
 ParameterName=Highest sub-index supported
@@ -2870,7 +2888,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000380+$NODEID
+DefaultValue=0x40000380+$NODEID
 PDOMapping=0
 
 [1802sub2]
@@ -2891,13 +2909,22 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1802sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1802sub5]
 ParameterName=Event timer
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1802sub6]
@@ -2913,7 +2940,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1803sub0]
 ParameterName=Highest sub-index supported
@@ -2930,7 +2957,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000480+$NODEID
+DefaultValue=0x40000480+$NODEID
 PDOMapping=0
 
 [1803sub2]
@@ -2948,6 +2975,15 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[1803sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
@@ -2973,7 +3009,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1804sub0]
 ParameterName=Highest sub-index supported
@@ -2990,7 +3026,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1804sub2]
@@ -3008,6 +3044,15 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[1804sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
@@ -3033,7 +3078,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1805sub0]
 ParameterName=Highest sub-index supported
@@ -3050,7 +3095,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1805sub2]
@@ -3068,6 +3113,15 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[1805sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
@@ -3093,7 +3147,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1806sub0]
 ParameterName=Highest sub-index supported
@@ -3131,6 +3185,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1806sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1806sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3153,7 +3216,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1807sub0]
 ParameterName=Highest sub-index supported
@@ -3191,6 +3254,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1807sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1807sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3213,7 +3285,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1808sub0]
 ParameterName=Highest sub-index supported
@@ -3251,6 +3323,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1808sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1808sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3273,7 +3354,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1809sub0]
 ParameterName=Highest sub-index supported
@@ -3311,6 +3392,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1809sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1809sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3333,7 +3423,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Asub0]
 ParameterName=Highest sub-index supported
@@ -3371,6 +3461,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Asub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Asub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3393,7 +3492,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Bsub0]
 ParameterName=Highest sub-index supported
@@ -3431,6 +3530,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Bsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Bsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3453,7 +3561,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Csub0]
 ParameterName=Highest sub-index supported
@@ -3491,6 +3599,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Csub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Csub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3513,7 +3630,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Dsub0]
 ParameterName=Highest sub-index supported
@@ -3551,6 +3668,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Dsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Dsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3573,7 +3699,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Esub0]
 ParameterName=Highest sub-index supported
@@ -3611,6 +3737,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Esub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Esub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3633,7 +3768,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Fsub0]
 ParameterName=Highest sub-index supported
@@ -3671,6 +3806,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Fsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Fsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3701,7 +3845,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x03
 PDOMapping=0
 
 [1A00sub1]
@@ -3710,7 +3854,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000110
 PDOMapping=0
 
 [1A00sub2]
@@ -3719,7 +3863,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000210
 PDOMapping=0
 
 [1A00sub3]
@@ -3728,7 +3872,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000310
 PDOMapping=0
 
 [1A00sub4]
@@ -3788,7 +3932,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x03
 PDOMapping=0
 
 [1A01sub1]
@@ -3797,7 +3941,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010110
 PDOMapping=0
 
 [1A01sub2]
@@ -3806,7 +3950,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010210
 PDOMapping=0
 
 [1A01sub3]
@@ -3815,7 +3959,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010310
 PDOMapping=0
 
 [1A01sub4]
@@ -3875,7 +4019,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x01
 PDOMapping=0
 
 [1A02sub1]
@@ -3884,7 +4028,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60020010
 PDOMapping=0
 
 [1A02sub2]
@@ -3962,7 +4106,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A03sub1]
@@ -3971,7 +4115,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60030110
 PDOMapping=0
 
 [1A03sub2]
@@ -3980,7 +4124,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60030210
 PDOMapping=0
 
 [1A03sub3]
@@ -3989,7 +4133,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60030310
 PDOMapping=0
 
 [1A03sub4]
@@ -3998,7 +4142,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60040110
 PDOMapping=0
 
 [1A03sub5]
@@ -4049,7 +4193,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A04sub1]
@@ -4058,7 +4202,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60040210
 PDOMapping=0
 
 [1A04sub2]
@@ -4067,7 +4211,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60040310
 PDOMapping=0
 
 [1A04sub3]
@@ -4076,7 +4220,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60050110
 PDOMapping=0
 
 [1A04sub4]
@@ -4085,7 +4229,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60050210
 PDOMapping=0
 
 [1A04sub5]
@@ -4136,7 +4280,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A05sub1]
@@ -4145,7 +4289,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60050310
 PDOMapping=0
 
 [1A05sub2]
@@ -4154,7 +4298,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60060110
 PDOMapping=0
 
 [1A05sub3]
@@ -4163,7 +4307,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60060210
 PDOMapping=0
 
 [1A05sub4]
@@ -4172,7 +4316,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60060310
 PDOMapping=0
 
 [1A05sub5]
