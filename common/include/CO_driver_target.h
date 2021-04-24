@@ -33,6 +33,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "CO_driver_custom.h"
+#include "can_hw.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -246,6 +247,9 @@ typedef struct {
      * they won't be used. In this case will be *all* received CAN messages
      * processed by software. */
     CANFilter           canFilters[STM32_CAN_MAX_FILTERS];
+    const flt_reg_t    *canFIFO1Filters;
+    volatile uint32_t   canFIFO0FilterCount;
+    volatile uint32_t   canFIFO1FilterCount;
     volatile uint32_t   useCANrxFilters;
     /* If flag is true, then message in transmitt buffer is synchronous PDO
      * message, which will be aborted, if CO_clearPendingSyncPDOs() function

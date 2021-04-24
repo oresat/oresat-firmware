@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "worker.h"
+#include "can_hw.h"
 
 #define CO_USE_GLOBALS
 #define CO_DRIVER_CUSTOM
@@ -18,6 +19,8 @@ typedef struct {
     CANDriver *cand;
     uint8_t node_id;
     uint16_t bitrate;
+    const flt_reg_t *fifo1_filters;
+    size_t filter_count;
 } oresat_config_t;
 
 /* OreSat initialization and main process */
