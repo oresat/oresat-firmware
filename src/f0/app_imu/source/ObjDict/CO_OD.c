@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -99,14 +99,18 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 /*1601*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1602*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1603*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
-/*1800*/ {{0x6L, 0xC0000180L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
-/*1801*/ {0x6L, 0xC0000280L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
-/*1802*/ {0x6L, 0xC0000380L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
-/*1803*/ {0x6L, 0xC0000480L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L}},
-/*1A00*/ {{0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1A01*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1A02*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1A03*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
+/*1800*/ {{0x6L, 0x40000180L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
+/*1801*/ {0x6L, 0x40000280L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
+/*1802*/ {0x6L, 0x40000380L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
+/*1803*/ {0x6L, 0x40000480L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
+/*1804*/ {0x6L, 0x40000181L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
+/*1805*/ {0x6L, 0x40000281L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L}},
+/*1A00*/ {{0x3L, 0x60000110L, 0x60000210L, 0x60000310L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A01*/ {0x3L, 0x60010110L, 0x60010210L, 0x60010310L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A02*/ {0x1L, 0x60020008L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A03*/ {0x4L, 0x60030110L, 0x60030210L, 0x60030310L, 0x60040110L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A04*/ {0x4L, 0x60040210L, 0x60040310L, 0x60050110L, 0x60050210L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A05*/ {0x4L, 0x60050310L, 0x60060110L, 0x60060210L, 0x60060310L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1F80*/ 0x0008L,
 
            CO_OD_FIRST_LAST_WORD,
@@ -261,6 +265,26 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
            {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[3].SYNCStartValue, 0x0F, 0x1 },
 };
 
+/*0x1804*/ const CO_OD_entryRecord_t OD_record1804[7] = {
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].COB_IDUsedByTPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].inhibitTime, 0x8F, 0x2 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].compatibilityEntry, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].eventTimer, 0x8F, 0x2 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[4].SYNCStartValue, 0x0F, 0x1 },
+};
+
+/*0x1805*/ const CO_OD_entryRecord_t OD_record1805[7] = {
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].COB_IDUsedByTPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].inhibitTime, 0x8F, 0x2 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].compatibilityEntry, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].eventTimer, 0x8F, 0x2 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[5].SYNCStartValue, 0x0F, 0x1 },
+};
+
 /*0x1A00*/ const CO_OD_entryRecord_t OD_record1A00[9] = {
            {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[0].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
            {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[0].applicationObject1, 0x8F, 0x4 },
@@ -307,6 +331,30 @@ struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR = {
            {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[3].applicationObject6, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[3].applicationObject7, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[3].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1A04*/ const CO_OD_entryRecord_t OD_record1A04[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[4].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1A05*/ const CO_OD_entryRecord_t OD_record1A05[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.TPDOMappingParameter[5].applicationObject8, 0x8F, 0x4 },
 };
 
 /*0x2000*/ const CO_OD_entryRecord_t OD_record2000[5] = {
@@ -418,10 +466,14 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1801, 0x06, 0x00,  0, (void*)&OD_record1801},
 {0x1802, 0x06, 0x00,  0, (void*)&OD_record1802},
 {0x1803, 0x06, 0x00,  0, (void*)&OD_record1803},
+{0x1804, 0x06, 0x00,  0, (void*)&OD_record1804},
+{0x1805, 0x06, 0x00,  0, (void*)&OD_record1805},
 {0x1A00, 0x08, 0x00,  0, (void*)&OD_record1A00},
 {0x1A01, 0x08, 0x00,  0, (void*)&OD_record1A01},
 {0x1A02, 0x08, 0x00,  0, (void*)&OD_record1A02},
 {0x1A03, 0x08, 0x00,  0, (void*)&OD_record1A03},
+{0x1A04, 0x08, 0x00,  0, (void*)&OD_record1A04},
+{0x1A05, 0x08, 0x00,  0, (void*)&OD_record1A05},
 {0x1F80, 0x00, 0x8F,  4, (void*)&CO_OD_PERSIST_COMM.NMTStartup},
 {0x2000, 0x04, 0x00,  0, (void*)&OD_record2000},
 {0x2010, 0x00, 0xBE,  8, (void*)&CO_OD_RAM.SCET},

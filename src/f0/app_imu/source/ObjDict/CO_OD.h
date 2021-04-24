@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -41,7 +41,7 @@
    FILE INFO:
       FileName:     app.xdd
       FileVersion:  0
-      CreationTime: 2:51PM
+      CreationTime: 3:51PM
       CreationDate: 08-12-2019
       CreatedBy:    Miles Simpson
 *******************************************************************************/
@@ -69,7 +69,7 @@
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NO_RPDO                     4   //Associated objects: 14xx, 16xx
-  #define CO_NO_TPDO                     4   //Associated objects: 18xx, 1Axx
+  #define CO_NO_TPDO                     6   //Associated objects: 18xx, 1Axx
   #define CO_NO_NMT_MASTER               0
   #define CO_NO_TRACE                    0
 
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             50
+   #define CO_OD_NoOfElements             54
 
 
 /*******************************************************************************
@@ -457,6 +457,28 @@
         #define OD_1803_5_TPDOCommunicationParameter_eventTimer     5
         #define OD_1803_6_TPDOCommunicationParameter_SYNCStartValue 6
 
+/*1804 */
+        #define OD_1804_TPDOCommunicationParameter                  0x1804
+
+        #define OD_1804_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1804_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1804_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1804_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1804_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1804_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1804_6_TPDOCommunicationParameter_SYNCStartValue 6
+
+/*1805 */
+        #define OD_1805_TPDOCommunicationParameter                  0x1805
+
+        #define OD_1805_0_TPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1805_1_TPDOCommunicationParameter_COB_IDUsedByTPDO 1
+        #define OD_1805_2_TPDOCommunicationParameter_transmissionType 2
+        #define OD_1805_3_TPDOCommunicationParameter_inhibitTime    3
+        #define OD_1805_4_TPDOCommunicationParameter_compatibilityEntry 4
+        #define OD_1805_5_TPDOCommunicationParameter_eventTimer     5
+        #define OD_1805_6_TPDOCommunicationParameter_SYNCStartValue 6
+
 /*1A00 */
         #define OD_1A00_TPDOMappingParameter                        0x1A00
 
@@ -508,6 +530,32 @@
         #define OD_1A03_6_TPDOMappingParameter_applicationObject6   6
         #define OD_1A03_7_TPDOMappingParameter_applicationObject7   7
         #define OD_1A03_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A04 */
+        #define OD_1A04_TPDOMappingParameter                        0x1A04
+
+        #define OD_1A04_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A04_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A04_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A04_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A04_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A04_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A04_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A04_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A04_8_TPDOMappingParameter_applicationObject8   8
+
+/*1A05 */
+        #define OD_1A05_TPDOMappingParameter                        0x1A05
+
+        #define OD_1A05_0_TPDOMappingParameter_maxSubIndex          0
+        #define OD_1A05_1_TPDOMappingParameter_applicationObject1   1
+        #define OD_1A05_2_TPDOMappingParameter_applicationObject2   2
+        #define OD_1A05_3_TPDOMappingParameter_applicationObject3   3
+        #define OD_1A05_4_TPDOMappingParameter_applicationObject4   4
+        #define OD_1A05_5_TPDOMappingParameter_applicationObject5   5
+        #define OD_1A05_6_TPDOMappingParameter_applicationObject6   6
+        #define OD_1A05_7_TPDOMappingParameter_applicationObject7   7
+        #define OD_1A05_8_TPDOMappingParameter_applicationObject8   8
 
 /*1F80 */
         #define OD_1F80_NMTStartup                                  0x1F80
@@ -673,8 +721,8 @@ struct sCO_OD_PERSIST_COMM{
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
 /*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[4];
 /*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[4];
-/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[4];
-/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[4];
+/*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[6];
+/*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[6];
 /*1F80      */ UNSIGNED32     NMTStartup;
 
                UNSIGNED32     LastWord;
