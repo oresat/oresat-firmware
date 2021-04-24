@@ -1,16 +1,12 @@
 # Toolchain Test Application
-`app_blinky` is a simple app that blinks a dev board's LED at 1Hz with a 50% duty cycle.
+`app_blinky` is a simple app that blinks a dev board's LED at 1Hz with a 50% duty cycle. it's located in the folder `oresat-firmware/src/f0/app_blinky`.
 
-To ensure you have your toolchain correctly installed and configured,
-you simply need to run the following sequence of commands:
+To ensure you have your toolchain correctly installed and configured:
+* Plug in a NUCLEO-F091RC development board using a USB MiniB cable.
+* `cd` into the `app_blinky` directory
+* Run `make` and `make write`
 
-```
-make
-make write
-```
-
-If you see something like the following output for each, your
-toolchain works:
+If you see something like the following output for each, your toolchain works. Note that you might get more warning messages than you see below, but if the LED starts to blink, you're good to go!
 
 ```
 ➜ make
