@@ -10,7 +10,7 @@
 #include "hal.h"
 #include "max17205.h"
 
-#if 0
+#if 1
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
 #else
@@ -621,7 +621,7 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 	if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf)) == MSG_OK ) {
 		chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
 
-		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(0x1ED), 0x1ED, buf.data, sizeof(buf.data)) == MSG_OK ) {
+		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(0x1ED), 0xED, buf.data, sizeof(buf.data)) == MSG_OK ) {
 			uint8_t mm = (buf.value & 0xFF) & ((buf.value >> 8) & 0xFF);
 			dbgprintf("Memory Update Masking of register 0x%X is 0x%X\r\n", 0x1ED, mm);
 		}
@@ -630,6 +630,7 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 	dbgprintf("\r\nMAX17205 *Volatile* Registers\r\n");
 	uint16_t volatile_reg_list[] = {
 			MAX17205_AD_PACKCFG,
+			MAX17205_AD_DESIGNCAP,
 			MAX17205_AD_NRSENSE,
 			0
 	};
@@ -786,6 +787,8 @@ const char* max17205RegToStr(const uint16_t reg) {
 			return("MAX17205_AD_REPCAP");
 		case MAX17205_AD_PACKCFG:
 			return("MAX17205_AD_PACKCFG");
+		case MAX17205_AD_DESIGNCAP:
+			return("MAX17205_AD_DESIGNCAP");
 
 
 		case MAX17205_AD_NXTABLE0:
