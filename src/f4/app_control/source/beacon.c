@@ -59,7 +59,7 @@ static const tlm_item_t tlm_aprs0[] = {
 };
 
 static const tlm_pkt_t aprs0 = {
-    .item_cnt = sizeof(tlm_aprs0),
+    .item_cnt = sizeof(tlm_aprs0) / sizeof(tlm_item_t),
     .item = tlm_aprs0,
 };
 
