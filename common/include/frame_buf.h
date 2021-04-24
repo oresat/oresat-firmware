@@ -2,7 +2,7 @@
  * @file    frame_buf.h
  * @brief   Frame buffer support library.
  *
- * @addtogroup RADIO
+ * @addtogroup CCSDS
  * @{
  */
 #ifndef _FRAME_BUF_H_
