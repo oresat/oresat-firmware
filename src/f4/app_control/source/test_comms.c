@@ -83,6 +83,13 @@ static const uslp_link_t edl_loopback_rx_link = {
 static void loopback_tx(fb_t *fb)
 {
     osalDbgCheck(fb != NULL);
+
+    /* Implement 10% chance of dropped frame */
+    if (0) {
+        fb_free(fb);
+        return;
+    }
+
     if (fb == tx_fb) {
         fb->phy_arg = (void*)&edl_loopback_tx_link;
         fb_post(fb);
@@ -100,6 +107,20 @@ static void loopback_rx(fb_t *fb)
     chEvtSignal(cli_tp, COMMS_EVENT_LOOPBACK_RX);
 }
 
+static void print_response(BaseSequentialStream *chp)
+{
+    if (chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10)) != 0) {
+        chprintf(chp, "Response buffer:");
+        for (size_t i = 0; i < buf_len; i++) {
+            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
+            chprintf(chp, " %02X", resp_buf[i]);
+        }
+        chprintf(chp, "\r\n");
+    } else {
+        chprintf(chp, "No response!\r\n");
+    }
+}
+
 static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
 {
     cmd_t *cmd;
@@ -110,17 +131,6 @@ static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
     if (arg != NULL)
         memcpy(cmd->arg, arg, arg_len);
     uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
-    chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10));
-}
-
-static void print_response(BaseSequentialStream *chp)
-{
-        chprintf(chp, "Response buffer:");
-        for (size_t i = 0; i < buf_len; i++) {
-            if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
-            chprintf(chp, " %02X", resp_buf[i]);
-        }
-        chprintf(chp, "\r\n");
 }
 
 static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_soff_t off, lfs_size_t len)
@@ -155,7 +165,6 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
     xfr->len = len;
     chprintf(chp, "Sending %d byte block to offset %d...\r\n", len, off);
     uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 1, true);
-    chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10));
     print_response(chp);
 
     return ret;
