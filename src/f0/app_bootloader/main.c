@@ -20,7 +20,7 @@
 #include "chprintf.h"
 #include "oresat_f0.h"
 #include "can_hw.h"
-#include "crc32.h"
+#include "crc.h"
 #include <string.h>
 #include "flash_f0.h"
 #include "can_bootloader.h"
@@ -79,7 +79,7 @@ bool validate_firmware_image(void *base_address, const uint32_t length, const ui
         return false;
     }
 
-    const uint32_t crc_of_flash_data = crc32(0, base_address, length);
+    const uint32_t crc_of_flash_data = crc32(base_address, length, 0);
 
     if( crc_of_flash_data != expected_crc32 ) {
         return false;
@@ -110,7 +110,7 @@ bool check_firmware_crc_and_branch(const bool print_serial_output) {
         chprintf(DEBUG_SD, "firmware_expected_crc = 0x%X\r\n", firmware_expected_crc);
         chprintf(DEBUG_SD, "firmware_expected_length = %u\r\n", firmware_expected_length);
         if( firmware_metadata_valid ) {
-            chprintf(DEBUG_SD, "firmware_actual CRC = 0x%X\r\n", crc32(0, (void*) ORESAT_F0_FIRMWARE_LENGTH_ADDRESS, firmware_expected_length));
+            chprintf(DEBUG_SD, "firmware_actual CRC = 0x%X\r\n", crc32((void*) ORESAT_F0_FIRMWARE_LENGTH_ADDRESS, firmware_expected_length, 0));
         }
         chprintf(DEBUG_SD, "firmware_version = %u\r\n", firmware_version);
         chprintf(DEBUG_SD, "firmware_metadata_valid = %u\r\n", firmware_metadata_valid);
