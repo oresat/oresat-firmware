@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=3:02PM
+ModificationTime=4:07PM
 ModificationDate=04-24-2021
 ModifiedBy=
 
@@ -7612,7 +7612,7 @@ PDOMapping=0
 ParameterName=Deployment Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
-SubNumber=0x5
+SubNumber=0x4
 
 [6002sub0]
 ParameterName=Highest sub-index supported
@@ -7620,7 +7620,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x04
+DefaultValue=0x03
 PDOMapping=0
 
 [6002sub1]
@@ -7633,24 +7633,15 @@ DefaultValue=300
 PDOMapping=0
 
 [6002sub2]
-ParameterName=Deployed
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0001
-AccessType=rw
-DefaultValue=1
-PDOMapping=0
-
-[6002sub3]
 ParameterName=Actuation Time
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=1000
+DefaultValue=15000
 PDOMapping=0
 
-[6002sub4]
+[6002sub3]
 ParameterName=Attempts
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -7680,7 +7671,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=86400
+DefaultValue=1209600
 PDOMapping=0
 
 [6003sub2]
@@ -7696,7 +7687,7 @@ PDOMapping=0
 ParameterName=Persistent State
 ObjectType=0x9
 ;StorageLocation=PERSIST_STATE
-SubNumber=0x7
+SubNumber=0x8
 
 [6004sub0]
 ParameterName=Highest sub-index supported
@@ -7704,7 +7695,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x06
+DefaultValue=0x07
 PDOMapping=0
 
 [6004sub1]
@@ -7757,6 +7748,15 @@ ParameterName=Last EDL
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub7]
+ParameterName=Deployed
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
 AccessType=rw
 DefaultValue=0
 PDOMapping=0

@@ -484,7 +484,7 @@ static const AX5043Config lbandcfg = {
     .irq            = LINE_LBAND_IRQ,
     .xtal_freq      = XTAL_CLK,
     .phy_arg        = &edl_lband_link,
-    .profile        = lband_high,
+    .profile        = lband_low,
 };
 
 static const AX5043Config uhfcfg = {

@@ -184,7 +184,6 @@
 /*6002      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED32     timeout;
-               BOOLEAN        deployed;
                UNSIGNED32     actuationTime;
                UNSIGNED8      attempts;
                }              OD_deploymentControl_t;
@@ -201,6 +200,7 @@
                UNSIGNED32     wakeup;
                UNSIGNED32     lastTX_Enable;
                UNSIGNED32     lastEDL;
+               BOOLEAN        deployed;
                }              OD_persistentState_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
@@ -1422,9 +1422,8 @@
 
         #define OD_6002_0_deploymentControl_maxSubIndex             0
         #define OD_6002_1_deploymentControl_timeout                 1
-        #define OD_6002_2_deploymentControl_deployed                2
-        #define OD_6002_3_deploymentControl_actuationTime           3
-        #define OD_6002_4_deploymentControl_attempts                4
+        #define OD_6002_2_deploymentControl_actuationTime           2
+        #define OD_6002_3_deploymentControl_attempts                3
 
 /*6003 */
         #define OD_6003_TX_Control                                  0x6003
@@ -1443,6 +1442,7 @@
         #define OD_6004_4_persistentState_wakeup                    4
         #define OD_6004_5_persistentState_lastTX_Enable             5
         #define OD_6004_6_persistentState_lastEDL                   6
+        #define OD_6004_7_persistentState_deployed                  7
 
 /*7001 */
         #define OD_7001_battery                                     0x7001

@@ -184,8 +184,8 @@ struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP = {
            CO_OD_FIRST_LAST_WORD,
 
 /*6001*/ {0x3L, 0x0A, 0x3C, 0},
-/*6002*/ {0x4L, 0x012CL, 1, 0x03E8L, 0x3L},
-/*6003*/ {0x2L, 0x15180L, 0x2710L},
+/*6002*/ {0x3L, 0x012CL, 0x3A98L, 0x3L},
+/*6003*/ {0x2L, 0x127500L, 0x2710L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -195,7 +195,7 @@ struct sCO_OD_PERSIST_APP CO_OD_PERSIST_APP = {
 struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            CO_OD_FIRST_LAST_WORD,
 
-/*6004*/ {0x6L, 0x00000000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*6004*/ {0x7L, 0x00000000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -920,10 +920,9 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_APP.stateControl.factoryReset, 0x0F, 0x1 },
 };
 
-/*0x6002*/ const CO_OD_entryRecord_t OD_record6002[5] = {
+/*0x6002*/ const CO_OD_entryRecord_t OD_record6002[4] = {
            {(void*)&CO_OD_PERSIST_APP.deploymentControl.highestSubIndexSupported, 0x07, 0x1 },
            {(void*)&CO_OD_PERSIST_APP.deploymentControl.timeout, 0x8F, 0x4 },
-           {(void*)&CO_OD_PERSIST_APP.deploymentControl.deployed, 0x0F, 0x1 },
            {(void*)&CO_OD_PERSIST_APP.deploymentControl.actuationTime, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_APP.deploymentControl.attempts, 0x0F, 0x1 },
 };
@@ -934,7 +933,7 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_APP.TX_Control.beaconInterval, 0x8F, 0x4 },
 };
 
-/*0x6004*/ const CO_OD_entryRecord_t OD_record6004[7] = {
+/*0x6004*/ const CO_OD_entryRecord_t OD_record6004[8] = {
            {(void*)&CO_OD_PERSIST_STATE.persistentState.highestSubIndexSupported, 0x07, 0x1 },
            {(void*)&CO_OD_PERSIST_STATE.persistentState.timestamp, 0x8F, 0x8 },
            {(void*)&CO_OD_PERSIST_STATE.persistentState.alarmA, 0x8F, 0x4 },
@@ -942,6 +941,7 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_STATE.persistentState.wakeup, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_STATE.persistentState.lastTX_Enable, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_STATE.persistentState.lastEDL, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_STATE.persistentState.deployed, 0x0F, 0x1 },
 };
 
 /*0x7001*/ const CO_OD_entryRecord_t OD_record7001[2] = {
@@ -1087,9 +1087,9 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x2100, 0x00, 0x06, 10, (void*)&CO_OD_RAM.errorStatusBits},
 {0x6000, 0x00, 0x06,  1, (void*)&CO_OD_RAM.C3State},
 {0x6001, 0x03, 0x00,  0, (void*)&OD_record6001},
-{0x6002, 0x04, 0x00,  0, (void*)&OD_record6002},
+{0x6002, 0x03, 0x00,  0, (void*)&OD_record6002},
 {0x6003, 0x02, 0x00,  0, (void*)&OD_record6003},
-{0x6004, 0x06, 0x00,  0, (void*)&OD_record6004},
+{0x6004, 0x07, 0x00,  0, (void*)&OD_record6004},
 {0x7001, 0x01, 0x00,  0, (void*)&OD_record7001},
 {0x7003, 0x01, 0x00,  0, (void*)&OD_record7003},
 {0x700B, 0x01, 0x00,  0, (void*)&OD_record700B},

@@ -183,7 +183,7 @@ THD_FUNCTION(c3, arg)
 
             /* Initiate antenna deployment if needed */
             static uint8_t attempts = 0;
-            if (!OD_deploymentControl.deployed && attempts < OD_deploymentControl.attempts) {
+            if (!OD_persistentState.deployed && attempts < OD_deploymentControl.attempts) {
                 if (bat_good()) {
                     deploy_heli(OD_deploymentControl.actuationTime);
                     deploy_turn(OD_deploymentControl.actuationTime);
@@ -194,6 +194,7 @@ THD_FUNCTION(c3, arg)
             } else {
                 /* Enter standy state */
                 OD_C3State[0] = STANDBY;
+                OD_persistentState.deployed = 1;
                 attempts = 0;
             }
             break;
