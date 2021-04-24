@@ -829,21 +829,21 @@ typedef enum {
 } bmi088_acc_operating_mode_t;
 
 typedef struct {
-	int32_t accl_x;
-	int32_t accl_y;
-	int32_t accl_z;
-	uint16_t accl_x_raw;
-	uint16_t accl_y_raw;
-	uint16_t accl_z_raw;
+    int32_t accl_x;
+    int32_t accl_y;
+    int32_t accl_z;
+    uint16_t accl_x_raw;
+    uint16_t accl_y_raw;
+    uint16_t accl_z_raw;
 } bmi088_accelerometer_sample_t;
 
 typedef struct {
-	int32_t gyro_x;
-	int32_t gyro_y;
-	int32_t gyro_z;
-	uint16_t gyro_x_raw;
-	uint16_t gyro_y_raw;
-	uint16_t gyro_z_raw;
+    int32_t gyro_x;
+    int32_t gyro_y;
+    int32_t gyro_z;
+    uint16_t gyro_x_raw;
+    uint16_t gyro_y_raw;
+    uint16_t gyro_z_raw;
 } bmi088_gyro_sample_t;
 
 /**

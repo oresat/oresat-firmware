@@ -103,7 +103,7 @@ void bmi088ObjectInit(BMI088Driver *devp) {
  * @api
  */
 bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
-	bool ret = true;
+    bool ret = true;
 
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == BMI088_STOP) ||
@@ -140,11 +140,11 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
 
     if( bmi088AccelerometerPowerOnOrOff(devp, BMI088_ON) != MSG_OK ) {
-    	ret = false;
+        ret = false;
     }
 
     if( bmi088AccelerometerEnableOrSuspend(devp, BMI088_MODE_ACTIVE) != MSG_OK ) {
-    	ret = false;
+        ret = false;
     }
 
 
@@ -154,7 +154,7 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif /* BMI088_USE_I2C */
 
     if( ret ) {
-    	devp->state = BMI088_READY;
+        devp->state = BMI088_READY;
     }
 
     return(ret);
@@ -220,7 +220,7 @@ msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8
 #endif /* BMI088_USE_I2C */
 
     if( r == MSG_OK ) {
-    	*dest = buf.data[0];
+        *dest = buf.data[0];
     }
     return(r);
 }
@@ -254,18 +254,18 @@ msg_t bmi088ReadRawBuff(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8_
  * TODO document this
  */
 msg_t bmi088I2CWriteRegisterU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8_t value, const uint32_t post_delay_ms) {
-	osalDbgCheck(devp != NULL);
+    osalDbgCheck(devp != NULL);
 
-	uint8_t write_buffer[2];
+    uint8_t write_buffer[2];
 
-	write_buffer[0] = reg;
-	write_buffer[1] = value;
+    write_buffer[0] = reg;
+    write_buffer[1] = value;
 
-	msg_t r = bmi088I2CWriteRegister(devp->config->i2cp, saddr, write_buffer, sizeof(write_buffer));
-	if( post_delay_ms > 0 ) {
-		chThdSleepMilliseconds(post_delay_ms);
-	}
-	return(r);
+    msg_t r = bmi088I2CWriteRegister(devp->config->i2cp, saddr, write_buffer, sizeof(write_buffer));
+    if( post_delay_ms > 0 ) {
+        chThdSleepMilliseconds(post_delay_ms);
+    }
+    return(r);
 }
 
 
@@ -400,7 +400,7 @@ msg_t bmi088ReadErrFatal(BMI088Driver *devp, uint8_t *dest){
     osalDbgCheck(devp != NULL);
     msg_t r = bmi088ReadRawU8Err(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_ERR_REG, dest);
     if( r == MSG_OK ) {
-    	*dest &= 0x01;
+        *dest &= 0x01;
     }
     return(r);
 }
@@ -417,7 +417,7 @@ msg_t bmi088ReadAccelerometerStatus(BMI088Driver *devp, uint8_t *dest){
     osalDbgCheck(devp != NULL);
     msg_t r = bmi088ReadRawU8Err(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_STATUS, dest);
     if( r == MSG_OK ) {
-    	*dest &= 0x80;
+        *dest &= 0x80;
     }
     return(r);
 }
@@ -428,13 +428,13 @@ msg_t bmi088ReadAccelerometerStatus(BMI088Driver *devp, uint8_t *dest){
  * TODO document this
  */
 int32_t bmi088RawAcclTmG(const uint8_t lsb, const uint8_t msb) {
-	const int16_t accInt16   = (msb << 8) |  lsb;
+    const int16_t accInt16   = (msb << 8) |  lsb;
 
-	const int32_t accx_range_register = 0x01;//FIXME query register for dynamic value. Using the power up default for now
+    const int32_t accx_range_register = 0x01;//FIXME query register for dynamic value. Using the power up default for now
 
-	const int32_t accMG  = (((accInt16 * 1000 * 2 * (accx_range_register + 1))/ 32768) * 3) / 2;
+    const int32_t accMG  = (((accInt16 * 1000 * 2 * (accx_range_register + 1))/ 32768) * 3) / 2;
 
-	return(accMG);
+    return(accMG);
 }
 
 /**
@@ -447,13 +447,13 @@ msg_t bmi088ReadAccelerometerXYZmG(BMI088Driver *devp, bmi088_accelerometer_samp
     uint8_t raw_data_buffer[6];
     msg_t r = bmi088ReadRawBuff(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_X_LSB, raw_data_buffer, sizeof(raw_data_buffer));
     if( r == MSG_OK ) {
-    	dest->accl_x = bmi088RawAcclTmG(raw_data_buffer[0], raw_data_buffer[1]);
-    	dest->accl_y = bmi088RawAcclTmG(raw_data_buffer[2], raw_data_buffer[3]);
-    	dest->accl_z = bmi088RawAcclTmG(raw_data_buffer[4], raw_data_buffer[5]);
+        dest->accl_x = bmi088RawAcclTmG(raw_data_buffer[0], raw_data_buffer[1]);
+        dest->accl_y = bmi088RawAcclTmG(raw_data_buffer[2], raw_data_buffer[3]);
+        dest->accl_z = bmi088RawAcclTmG(raw_data_buffer[4], raw_data_buffer[5]);
 
-    	dest->accl_x_raw = raw_data_buffer[0] | (raw_data_buffer[1] << 8);
-    	dest->accl_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
-    	dest->accl_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
+        dest->accl_x_raw = raw_data_buffer[0] | (raw_data_buffer[1] << 8);
+        dest->accl_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
+        dest->accl_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
     }
 
     return(r);
@@ -473,7 +473,7 @@ msg_t bmi088ReadIntStat(BMI088Driver *devp, uint8_t *dest){
 
     msg_t r = bmi088ReadRawU8Err(devp, devp->config->acc_saddr, BMI088_ADDR_ACC_INT_STAT_1, dest);
     if( r == MSG_OK ) {
-    	*dest &= 0x80;
+        *dest &= 0x80;
     }
     return(r);
 }
@@ -493,17 +493,17 @@ msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c){
     uint8_t raw_data_buffer[2];
     msg_t r = bmi088ReadRawBuff(devp, devp->config->acc_saddr, BMI088_ADDR_TEMP_MSB, raw_data_buffer, sizeof(raw_data_buffer));
     if( r == MSG_OK ) {
-    	//TODO validate that this handles negative temperatures correctly
-    	//This code block is directly from the datasheet
-    	int16_t  temp_int11 = 0;
-		uint32_t temp_uint11 = ( raw_data_buffer[0] * 8 ) + ( raw_data_buffer[1] / 32 );
+        //TODO validate that this handles negative temperatures correctly
+        //This code block is directly from the datasheet
+        int16_t  temp_int11 = 0;
+        uint32_t temp_uint11 = ( raw_data_buffer[0] * 8 ) + ( raw_data_buffer[1] / 32 );
 
-		if (temp_uint11 > 1023) {
-		  temp_int11 = (temp_uint11 - 2048);
-		} else {
-		  temp_int11 = temp_uint11;
-		}
-		*dest_temp_c = ((temp_int11 * 125) / 1000) + 23;
+        if (temp_uint11 > 1023) {
+          temp_int11 = (temp_uint11 - 2048);
+        } else {
+          temp_int11 = temp_uint11;
+        }
+        *dest_temp_c = ((temp_int11 * 125) / 1000) + 23;
     }
 
     return(r);
@@ -514,14 +514,14 @@ msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c){
  * FIXME documentation
  */
 int32_t bmi088RawGyroToDegPerSec(const uint8_t lsb, const uint8_t msb) {
-	//TODO verify this calculation with real world known rotation rate data
-	const int16_t gyroInt16   = (msb << 8) |  lsb;
+    //TODO verify this calculation with real world known rotation rate data
+    const int16_t gyroInt16   = (msb << 8) |  lsb;
 
-	const int32_t lsb_deg_per_sec = 16384; // for 2000 deg/sec range
+    const int32_t lsb_deg_per_sec = 16384; // for 2000 deg/sec range
 
-	const int32_t dps = (gyroInt16 * lsb_deg_per_sec) / 1000;
+    const int32_t dps = (gyroInt16 * lsb_deg_per_sec) / 1000;
 
-	return(dps);
+    return(dps);
 }
 
 
@@ -534,13 +534,13 @@ msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, bmi088_gyro_sample_t *dest) {
     uint8_t raw_data_buffer[6];
     msg_t r = bmi088ReadRawBuff(devp, devp->config->gyro_saddr, BMI088_AD_GYR_RATE_X_LSB, raw_data_buffer, sizeof(raw_data_buffer));
     if( r == MSG_OK ) {
-    	dest->gyro_x = bmi088RawGyroToDegPerSec(raw_data_buffer[0], raw_data_buffer[1]);
-    	dest->gyro_y = bmi088RawGyroToDegPerSec(raw_data_buffer[2], raw_data_buffer[3]);
-    	dest->gyro_z = bmi088RawGyroToDegPerSec(raw_data_buffer[4], raw_data_buffer[5]);
+        dest->gyro_x = bmi088RawGyroToDegPerSec(raw_data_buffer[0], raw_data_buffer[1]);
+        dest->gyro_y = bmi088RawGyroToDegPerSec(raw_data_buffer[2], raw_data_buffer[3]);
+        dest->gyro_z = bmi088RawGyroToDegPerSec(raw_data_buffer[4], raw_data_buffer[5]);
 
-    	dest->gyro_x_raw = raw_data_buffer[0] | (raw_data_buffer[1] << 8);
-    	dest->gyro_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
-    	dest->gyro_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
+        dest->gyro_x_raw = raw_data_buffer[0] | (raw_data_buffer[1] << 8);
+        dest->gyro_y_raw = raw_data_buffer[2] | (raw_data_buffer[3] << 8);
+        dest->gyro_z_raw = raw_data_buffer[4] | (raw_data_buffer[5] << 8);
     }
 
     return(r);
