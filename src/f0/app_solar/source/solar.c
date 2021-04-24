@@ -1,11 +1,16 @@
 #include "solar.h"
 #include "ina226.h"
 #include "CANopen.h"
-#include "chprintf.h"
 
+#if 1
 #define DEBUG_SD                (BaseSequentialStream *) &SD2
+#include "chprintf.h"
+#define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
+#else
+#define dbgprintf(str, ...)
+#endif
 
-//FIXME I believe MAX() is defined in some common C library???
+
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
@@ -96,7 +101,6 @@ typedef struct {
 mppt_pao_state pao_state;
 
 
-
 /**
  * @brief control DAC output in microvolts.
  *
@@ -134,6 +138,9 @@ bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_
 	}
 	if( ina226ReadCurrent(&ina226dev, dest_avg_current_uA) != MSG_OK ) {
 		ret = false;
+	}
+	if( ! ret ) {
+		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
 	}
 
 	return(ret);
@@ -204,7 +211,7 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 				pao_state->iadj_uv = I_ADJ_FAILSAFE;
 			}
 
-			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 3);
+			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
 
 			return(false);
 
@@ -240,14 +247,14 @@ THD_FUNCTION(solar, arg)
 
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
-    chprintf(DEBUG_SD, "Initializing DAC....\r\n");
+    dbgprintf("Initializing DAC....\r\n");
     dacStart(&DACD1, &dac1cfg);
 
-    chprintf(DEBUG_SD, "Initializing INA226....\r\n");
+    dbgprintf("Initializing INA226....\r\n");
     ina226Start(&ina226dev, &ina226config);
 
     if( ina226dev.state != INA226_READY ) {
-    	chprintf(DEBUG_SD, "Failed to initialize INA226!!!\r\n");
+    	dbgprintf("Failed to initialize INA226!!!\r\n");
     	chThdSleepMilliseconds(100);
     }
 
@@ -264,7 +271,7 @@ THD_FUNCTION(solar, arg)
 		if( ! read_avg_power_and_voltage(&pao_state.avg_power_initial_mW, &pao_state.avg_voltage_initial_mV, &pao_state.avg_current_initial_uA) ) {
 			//FIXME handle error
 		}
-		chprintf(DEBUG_SD, "iadj_uV,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d\r\n",
+		dbgprintf("iadj_uV,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d\r\n",
 				iadj, pao_state.avg_power_initial_mW, pao_state.avg_voltage_initial_mV, pao_state.avg_current_initial_uA);
 	}
 	for(;;) {
@@ -274,24 +281,19 @@ THD_FUNCTION(solar, arg)
 
 	dac_put_microvolts(&DACD1, 0, pao_state.iadj_uv);
 
-	//Only PAO implemented for the time being
-	OD_MPPT.algorithm = MPPT_ALGORITHM_PAO;
-
-    chprintf(DEBUG_SD, "Done with init INA226....\r\n");
+    dbgprintf("Done with init INA226....\r\n");
     systime_t loop_start_time_ms = TIME_I2MS(chVTGetSystemTime());
 
 	for (uint32_t loop_iteration = 0; !chThdShouldTerminateX(); loop_iteration++) {
         if ((loop_iteration % DIAG_REPORT_EVERY_N_LOOP_ITERATIONS) == 0) {
-        	const uint32_t avg_freq = (loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000));
-
-			chprintf(DEBUG_SD, "loop,%u,iadj_uv,%u,direction_up_flag,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d,step_size,%u,avg_freq,%u\r\n",
+			dbgprintf("loop,%u,iadj_uv,%u,direction_up_flag,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d,step_size,%u,avg_freq,%u\r\n",
 					loop_iteration, pao_state.iadj_uv,
 					pao_state.direction_up_flag,
 					pao_state.avg_power_initial_mW,
 					pao_state.avg_voltage_initial_mV,
 					pao_state.avg_current_initial_uA,
 					pao_state.step_size,
-					avg_freq);
+					((loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000))));
         }
 
     	itterate_mppt_perturb_and_observe(&pao_state);
@@ -310,6 +312,9 @@ THD_FUNCTION(solar, arg)
 
 
     	OD_MPPT.LT1618IADJ = pao_state.iadj_uv / 1000;
+
+		//Only PAO implemented for the time being
+		OD_MPPT.algorithm = MPPT_ALGORITHM_PAO;
 
     }
 
