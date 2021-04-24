@@ -33,9 +33,9 @@ static thread_descriptor_t battery_worker_desc = {
 };
 
 static oresat_config_t oresat_conf = {
-    &CAND1,
-    0x02,
-    ORESAT_DEFAULT_BITRATE
+    .cand = &CAND1,
+    .node_id = ORESAT_DEFAULT_ID,
+    .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
 /**
