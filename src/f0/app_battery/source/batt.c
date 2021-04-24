@@ -100,13 +100,7 @@ battery_heating_state_machine_state_t current_batery_state_machine_state = BATTE
  */
 void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_data_t *pk2_data) {
 	if( pk1_data->is_data_valid && pk2_data->is_data_valid ) {
-		int16_t avg_temp_1_C = pk1_data->avg_temp_1_C;
-		int16_t avg_temp_2_C = pk2_data->avg_temp_1_C;
-
-		uint16_t present_state_of_charge_1 = pk1_data->present_state_of_charge;
-		uint16_t present_state_of_charge_2 = pk2_data->present_state_of_charge;
-
-		const uint16_t total_state_of_charge = (present_state_of_charge_1 + present_state_of_charge_2) / 2;
+		const uint16_t total_state_of_charge = (pk1_data->present_state_of_charge + pk2_data->present_state_of_charge) / 2;
 
 
 		switch (current_batery_state_machine_state) {
@@ -118,7 +112,7 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 				CO_OD_RAM.heaterStatus = 1;
 				//Once they’re greater than 5 °C or the combined pack capacity is < 25%
 
-				if( (avg_temp_1_C > 5 && avg_temp_2_C > 5) || (total_state_of_charge < 25) ) {
+				if( (pk1_data->avg_temp_1_C > 5 && pk2_data->avg_temp_1_C > 5) || (total_state_of_charge < 25) ) {
 					current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
 				}
 				break;
@@ -129,7 +123,7 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 				palClearLine(LINE_MOARPWR);
 				CO_OD_RAM.heaterStatus = 0;
 
-				if( (avg_temp_1_C < -5 || avg_temp_2_C < -5) && (present_state_of_charge_1 > 25 || present_state_of_charge_2 > 25) ) {
+				if( (pk1_data->avg_temp_1_C < -5 || pk2_data->avg_temp_1_C < -5) && (pk1_data->present_state_of_charge > 25 || pk2_data->present_state_of_charge > 25) ) {
 					current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_HEATING;
 				}
 				break;
@@ -149,7 +143,6 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
  * TODO document this
  */
 void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t line_dchg_dis, const ioline_t line_chg_dis, const char* pk_str) {
-
 	chprintf(DEBUG_SERIAL, "LINE_DCHG_STAT_PK1 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK1));
 	chprintf(DEBUG_SERIAL, "LINE_CHG_STAT_PK1 = %u\r\n", palReadLine(LINE_CHG_STAT_PK1));
 	chprintf(DEBUG_SERIAL, "LINE_DCHG_STAT_PK2 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK2));
@@ -309,6 +302,29 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     return(dest->is_data_valid);
 }
 
+/**
+ * Helper function to trigger write of volatile memory on MAX71205 chip
+ */
+void prompt_nv_memory_write(const MAX17205Config *config, const char *pack_str) {
+	chprintf(DEBUG_SD, "Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
+	uint8_t ch = 0;
+	sdRead(&SD2, &ch, 1);
+	chprintf(DEBUG_SD, "\r\n");
+
+	if (ch == 'y') {
+		chprintf(DEBUG_SD, "Attempting to write non volatile memory...\r\n");
+		chThdSleepMilliseconds(50);
+
+		if (max17205NonvolatileBlockProgram(config)) {
+			chprintf(DEBUG_SD, "Successfully wrote non volatile memory...\r\n");
+		} else {
+			chprintf(DEBUG_SD, "Failed to write non volatile memory...\r\n");
+		}
+	} else {
+		chprintf(DEBUG_SD, "Skipping...\r\n");
+	}
+}
+
 /* Battery monitoring thread */
 THD_WORKING_AREA(batt_wa, 0x400);
 THD_FUNCTION(batt, arg)
@@ -331,15 +347,22 @@ THD_FUNCTION(batt, arg)
     chprintf(DEBUG_SERIAL, "max17205Start(pack2) = %u\r\n", pack_2_init_flag);
 
 
+#if 1
+    bool b1 = prompt_nv_memory_write(&max17205configPack1, "Pack 1");
+    bool b2 = prompt_nv_memory_write(&max17205configPack2, "Pack 2");
+    if( b1 || b2 ) {
+		for (;;) {
+			chprintf(DEBUG_SERIAL, ".");
+			chThdSleepMilliseconds(1000);
+		}
+    }
+#endif
+
+
     uint16_t pack_1_comm_rx_error_count = 0;
     uint16_t pack_2_comm_rx_error_count = 0;
     while (!chThdShouldTerminateX()) {
     	chprintf(DEBUG_SERIAL, "================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
-//    	for(uint32_t sl = 0; sl < 3500; sl += 50) {
-//    		chprintf(DEBUG_SERIAL, "    %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
-//    		chThdSleepMilliseconds(50);
-//    	}
-    	chThdSleepMilliseconds(1000);
 
     	chprintf(DEBUG_SERIAL, "Populating Pack 1 Data\r\n");
     	if( ! populate_pack_data(&max17205devPack1, &pack_1_data) ) {
@@ -410,6 +433,8 @@ THD_FUNCTION(batt, arg)
         update_battery_charging_state(&pack_2_data, LINE_DCHG_DIS_PK2, LINE_CHG_DIS_PK2, "PK2");
 
         palToggleLine(LINE_LED);
+
+        chThdSleepMilliseconds(1000);
     }
 
     chprintf(DEBUG_SERIAL, "Terminating battery thread...\r\n");

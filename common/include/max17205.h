@@ -46,7 +46,6 @@
 #define MAX17205_SA(reg)                    ((reg & 0x100U ? MAX17205_SA_SBS_NV : MAX17205_SA_MG) >> 1)
 
 
-
 #define MAX17205_T_RECAL_MS      5
 //tBlock(max) is specified as 7360ms in the data sheet, page 16
 #define MAX17205_T_BLOCK_MS      8000

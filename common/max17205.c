@@ -9,7 +9,13 @@
 
 #include "hal.h"
 #include "max17205.h"
+
+#if 0
 #include "chprintf.h"
+#define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
+#else
+#define dbgprintf(str, ...)
+#endif
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -39,6 +45,570 @@ typedef union {
 
 #if (MAX17205_USE_I2C) || defined(__DOXYGEN__)
 
+/**
+ * See page 85 of the data sheet
+ */
+msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config) {
+	i2cbuf_t buf;
+	msg_t r;
+
+	//	1. Write desired memory locations to new values.
+	//should be done prior to calling this function
+
+	bool success_flag = false;
+	for(int retry_count = 0; (! success_flag) && retry_count < 1; retry_count++ ) {
+		dbgprintf("Clearing CommStat.NVError bit\r\n");
+		//	2. Clear CommStat.NVError bit.
+		buf.reg = MAX17205_AD(MAX17205_AD_COMMSTAT);
+		buf.value = MAX17205_COMMSTAT_NVERROR;
+		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMSTAT), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
+			return(r);
+		}
+
+		//	3. Write 0xE904 to the Command register 0x060 to initiate a block copy.
+		buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
+		buf.value = 0xE904;
+		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
+			dbgprintf("Initiated failed to send command to initiate block copy....\r\n");
+			return(r);
+		} else {
+			dbgprintf("Initiated MAX17205 block copy....\r\n");
+		}
+
+
+		//	4. Wait t BLOCK for the copy to complete.
+
+		dbgprintf("Waiting %u ms for block copy to complete....\r\n", MAX17205_T_BLOCK_MS);
+		chThdSleepMilliseconds(MAX17205_T_BLOCK_MS); //tBlock(max) is specified as 7360ms in the data sheet, page 16
+
+
+		//	5. Check the CommStat.NVError bit. If set, repeat the process. If clear, continue.
+		if( (r = max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_COMMSTAT), buf.data, sizeof(buf.data))) != MSG_OK ) {
+			dbgprintf("Failed to query COMMSTAT register...\r\n");
+			return(r);
+		} else {
+			dbgprintf("Read MAX17205_AD_COMMSTAT register 0x%X as 0x%X\r\n", MAX17205_AD_COMMSTAT, buf.value);
+			if( buf.value & MAX17205_COMMSTAT_NVERROR ) {
+				//Error bit is set
+				dbgprintf("Block copy failed, retrying...\r\n");
+			} else {
+				dbgprintf("Block copy was successful, breaking...\r\n");
+				success_flag = true;
+				break;
+			}
+		}
+	}
+
+	if( ! success_flag ) {
+		return(MSG_RESET);
+	}
+
+
+	//	6. Write 0x000F to the Command register 0x060 to POR the IC.
+	//	7. Wait t POR for the IC to reset.
+	//	8. Write 0x0001 to Counter Register 0x0BB to reset firmware.
+	//	9. Wait t POR for the firmware to restart.
+	if( (r = max17205HardwareReset(config->i2cp)) != MSG_OK ) {
+		return(r);
+	}
+
+	return(MSG_OK);
+}
+
+
+
+/**
+ * @brief   Reads registers value using I2C.
+ * @pre     The I2C interface must be initialized and the driver started.
+ *
+ * @param[in]  i2cp      pointer to the I2C interface
+ * @param[in]  sad       slave address without R bit
+ * @param[in]  reg       first sub-register address
+ * @param[out] rxbuf     pointer to an output buffer
+ * @param[in]  n         number of consecutive register to read
+ * @return               the operation status.
+ * @notapi
+ */
+msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
+        uint8_t* rxbuf, size_t n) {
+    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
+            TIME_MS2I(50));
+}
+
+/**
+ * @brief   Writes a value into a register using I2C.
+ * @pre     The I2C interface must be initialized and the driver started.
+ *
+ * @param[in] i2cp       pointer to the I2C interface
+ * @param[in] sad        slave address without R bit
+ * @param[in] txbuf      buffer containing command in first byte and high
+ *                       and low data bytes
+ * @param[in] n          size of txbuf
+ * @return               the operation status.
+ * @notapi
+ */
+msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
+        size_t n) {
+    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
+    		TIME_MS2I(50));
+}
+#endif /* MAX17205_USE_I2C */
+
+/*==========================================================================*/
+/* Interface implementation.                                                */
+/*==========================================================================*/
+
+static const struct MAX17205VMT vmt_device = {
+    (size_t)0,
+};
+
+/*===========================================================================*/
+/* Driver exported functions.                                                */
+/*===========================================================================*/
+
+/**
+ * @brief   Initializes an instance.
+ *
+ * @param[out] devp     pointer to the @p MAX17205Driver object
+ *
+ * @init
+ */
+void max17205ObjectInit(MAX17205Driver *devp) {
+    devp->vmt = &vmt_device;
+
+    devp->config = NULL;
+
+    devp->state = MAX17205_STOP;
+}
+
+msg_t max17205HardwareReset(I2CDriver *i2cp) {
+	i2cbuf_t buf;
+	msg_t r;
+
+	dbgprintf("Reseting MAX17205...\r\n");
+
+	buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
+	buf.value = MAX17205_COMMAND_HARDWARE_RESET;
+	if( (r = max17205I2CWriteRegister(i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf))) != MSG_OK ) {
+		return(r);
+	}
+	chThdSleepMilliseconds(10);
+
+	uint32_t check_count = 0;
+	do {
+		if( max17205I2CReadRegister(i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_STATUS), buf.data, sizeof(buf.data)) != MSG_OK ) {
+			//do nothing
+			dbgprintf("Waiting for MAX17205 to complete reset...\r\n");
+			chThdSleepMilliseconds(10);
+		}
+		check_count++;
+	} while (!(buf.value & MAX17205_STATUS_POR) && check_count < 10); /* While still resetting */
+
+	//FIXME doesn't handle failure to POR properly
+	return(MSG_OK);
+}
+
+/**
+ * @brief   Configures and activates MAX17205 Complex Driver peripheral.
+ *
+ * @param[in] devp      pointer to the @p MAX17205Driver object
+ * @param[in] config    pointer to the @p MAX17205Config object
+ *
+ * @api
+ */
+bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
+    i2cbuf_t buf;
+    uint32_t comm_error_count = 0;
+
+    osalDbgCheck((devp != NULL) && (config != NULL));
+    osalDbgAssert((devp->state == MAX17205_STOP) ||
+            (devp->state == MAX17205_READY),
+            "max17205Start(), invalid state");
+
+    devp->config = config;
+
+    /* Configuring common registers.*/
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+    i2cAcquireBus(config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+
+    i2cStart(config->i2cp, config->i2ccfg);
+
+    /* Reset device */
+#if 0
+    max17205HardwareReset(config->i2cp);
+#endif
+
+
+#if 0
+    //Read npkgcfg         0xA02
+    if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_PACKCFG), buf.data, sizeof(buf.data)) == MSG_OK ) {
+		dbgprintf("Read MAX17205_AD_PACKCFG register 0x%X as 0x%X\r\n", MAX17205_AD_PACKCFG, buf.value);
+	}
+#endif
+
+
+
+    buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
+    buf.value = MAX17205_SETVAL(MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
+    if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf)) != MSG_OK ) {
+    	comm_error_count++;
+    }
+
+    for (const max17205_regval_t *pair = config->regcfg; pair->reg; pair++) {
+        buf.reg = MAX17205_AD(pair->reg);
+        buf.value = pair->value;
+
+        dbgprintf("Setting MAX17205 register 0x%X to 0x%X\r\n", buf.reg, buf.value);
+
+        if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(pair->reg), buf.buf, sizeof(buf)) != MSG_OK ) {
+        	comm_error_count++;
+        }
+    }
+
+#if MAX17205_SHARED_I2C
+    i2cReleaseBus(config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+
+    if( comm_error_count == 0 ) {
+    	devp->state = MAX17205_READY;
+    	return(true);
+    } else {
+    	devp->state = MAX17205_UNINIT;
+    }
+    return(false);
+}
+
+/**
+ * @brief   Deactivates the MAX17205 Complex Driver peripheral.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ *
+ * @api
+ */
+void max17205Stop(MAX17205Driver *devp) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert((devp->state == MAX17205_STOP) || (devp->state == MAX17205_READY),
+            "max17205Stop(), invalid state");
+
+    if (devp->state == MAX17205_READY) {
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+        i2cAcquireBus(devp->config->i2cp);
+        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX17205_SHARED_I2C */
+
+        /* Reset device */
+        buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
+        buf.value = MAX17205_COMMAND_HARDWARE_RESET;
+        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
+        buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
+        buf.value = MAX17205_SETVAL(MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
+        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
+
+        i2cStop(devp->config->i2cp);
+#if MAX17205_SHARED_I2C
+        i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+    }
+    devp->state = MAX17205_STOP;
+}
+
+/**
+ * @brief   Reads MAX17205 register as raw value.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read
+ *
+ * @api
+ */
+msg_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg, uint16_t *output_dest) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == MAX17205_READY,
+            "max17205ReadRaw(), invalid state");
+
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX17205_SHARED_I2C */
+
+    buf.reg = MAX17205_AD(reg);
+
+    const msg_t r = max17205I2CReadRegister(devp->config->i2cp, MAX17205_SA(reg), buf.reg, buf.data, sizeof(buf.data));
+
+    //dbgprintf("max17205I2CReadRegister(0x%X), r = %d", reg, r);
+
+#if MAX17205_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+
+    if( r == MSG_OK ) {
+    	*output_dest = buf.value;
+    	//dbgprintf(" value = %u 0x%X", buf.value, buf.value);
+    }
+    //dbgprintf("\r\n");
+
+    return(r);
+}
+
+/**
+ * @brief   Writes MAX17205 register as raw value.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to write to
+ * @param[in] value      the value to write
+ *
+ * @api
+ */
+msg_t max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
+    i2cbuf_t buf;
+
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == MAX17205_READY,
+            "max17205WriteRaw(), invalid state");
+
+#if MAX17205_USE_I2C
+#if MAX17205_SHARED_I2C
+    i2cAcquireBus(devp->config->i2cp);
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+#endif /* MAX17205_SHARED_I2C */
+
+    buf.reg = MAX17205_AD(reg);
+    buf.value = value;
+    const msg_t r = max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(reg), buf.buf, sizeof(buf));
+
+#if MAX17205_SHARED_I2C
+    i2cReleaseBus(devp->config->i2cp);
+#endif /* MAX17205_SHARED_I2C */
+#endif /* MAX17205_USE_I2C */
+
+    return(r);
+}
+
+
+/**
+ * @brief   Reads an MAX17205 capacity value from a register in mAh.
+ * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest)
+{
+	uint16_t reg_value = 0;
+	const msg_t r = max17205ReadRaw(devp, reg, &reg_value);
+
+	if( r == MSG_OK ) {
+		uint16_t nr_sense_value = 0;
+
+		const msg_t r2 = max17205ReadRaw(devp, MAX17205_AD_NRSENSE, &nr_sense_value);
+		if( r2 == MSG_OK ) {
+			*dest = reg_value * 5000U / MAX17205_REG2RSENSE(nr_sense_value);
+
+			dbgprintf("  max17205ReadCapacityChecked(0x%X %s) = %u mAh (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, reg_value, reg_value);
+		} else {
+			return(r2);
+		}
+	} else {
+		return(r);
+	}
+
+	return(MSG_OK);
+}
+
+
+/**
+ * @brief   Reads an MAX17205 percentage value from a register in 1% increments.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
+{
+	uint16_t temp = 0;
+    msg_t r = max17205ReadRaw(devp, reg, &temp);
+
+    if( r == MSG_OK ) {
+    	*dest = temp / 256U;
+    	dbgprintf("  max17205ReadPercentageChecked(0x%X %s) = %u%% (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp, temp);
+    }
+    return(r);
+}
+
+
+/**
+ * @brief   Reads an MAX17205 voltage value from a register in mV.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
+{
+	uint16_t temp = 0;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+
+	if( r == MSG_OK ) {
+		//Output is in millivolts. LSB unit is 0.078125mV
+		*dest = (((uint32_t) temp) * 78125U) / 1000000U;
+		dbgprintf("  max17205ReadVoltageChecked(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
+	}
+	return(r);
+}
+
+/**
+ * @brief   Reads an MAX17205 voltage value from a register in mV.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
+{
+	uint16_t temp = 0;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+
+	if( r == MSG_OK ) {
+		//Output is in millivolts. LSB unit is 1.25mV
+		*dest = (((uint32_t) temp) * 125U) / 100U;
+		dbgprintf("  max17205ReadBattVoltage(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
+	}
+	return(r);
+}
+
+
+/**
+ * @brief   Reads an MAX17205 current value from a register in mA.
+ * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
+{
+	uint16_t temp = 0;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+
+	if( r == MSG_OK ) {
+		int16_t temp_signed = temp;
+		//Assumes Rsense = 0.01 ohms
+		*dest = ((int32_t)temp_signed * 15625) / 100000;// 156.25 uA / 100 / 1000 uA/mA
+
+		dbgprintf("  max17205ReadCurrent(0x%X %s) = %d mA (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp_signed, temp);
+	}
+	return(r);
+}
+
+
+/**
+ * @brief   Reads an MAX17205 temperature value from a register in 0.001C increments.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
+{
+	uint16_t temp = 0;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+	if( r == MSG_OK ) {
+		int16_t temp_signed = temp;
+
+		*dest = temp_signed * 1000U / 256U;
+		dbgprintf("  max17205ReadTemperatureChecked(0x%X %s) = %d mC (%u C) (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, (*dest / 1000), temp_signed, temp);
+	}
+    return(r);
+}
+
+/**
+ * @brief   Reads an MAX17205 temperature value from a register in 1C increments.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
+{
+	uint16_t temp = 0;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+	if( r == MSG_OK ) {
+		int16_t temp_signed = temp;
+
+		*dest = (temp_signed / 10) - 273;
+		dbgprintf("  max17205ReadTemperatureChecked(0x%X %s) = %d C (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp_signed, temp);
+	}
+    return(r);
+}
+
+/**
+ * @brief   Reads an MAX17205 resistance value from a register in mOhms.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+/*
+inline uint16_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg)
+{
+    return max17205ReadRaw(devp, reg) * 1000U / 4096U;
+}
+*/
+
+msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
+{
+	uint16_t temp;
+	msg_t r = max17205ReadRaw(devp, reg, &temp);
+	if( r == MSG_OK ) {
+		*dest = temp * 1000U / 4096U;
+	}
+
+	return(r);
+}
+
+/**
+ * @brief   Reads an MAX17205 time value from a register in seconds.
+ *
+ * @param[in] devp       pointer to the @p MAX17205Driver object
+ * @param[in] reg        the register to read from
+ *
+ * @api
+ */
+msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
+{
+	uint16_t temp = 0;
+    msg_t r = max17205ReadRaw(devp, reg, &temp);
+    if( r == MSG_OK ) {
+    	*dest = temp * 5625U / 1000;
+
+    	uint16_t minutes = *dest / 60;
+    	dbgprintf("  max17205ReadTimeChecked(0x%X %s) = %u seconds (%u minutes) (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, minutes, temp, temp);
+    }
+    return(r);
+}
+
+/**
+ * TODO document this
+ */
 msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 	i2cbuf_t buf;
 	msg_t r;
@@ -53,12 +623,11 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 
 		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(0x1ED), 0x1ED, buf.data, sizeof(buf.data)) == MSG_OK ) {
 			uint8_t mm = (buf.value & 0xFF) & ((buf.value >> 8) & 0xFF);
-			chprintf((BaseSequentialStream*) &SD2, "Memory Update Masking of register 0x%X is 0x%X\r\n", 0x1ED, mm);
+			dbgprintf("Memory Update Masking of register 0x%X is 0x%X\r\n", 0x1ED, mm);
 		}
 	}
 
-#if 1
-	chprintf((BaseSequentialStream*) &SD2, "\r\nMAX17205 *Volatile* Registers\r\n");
+	dbgprintf("\r\nMAX17205 *Volatile* Registers\r\n");
 	uint16_t volatile_reg_list[] = {
 			MAX17205_AD_PACKCFG,
 			MAX17205_AD_NRSENSE,
@@ -67,13 +636,13 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 
 	for(int i = 0; volatile_reg_list[i] != 0;i++) {
 		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(volatile_reg_list[i]), buf.data, sizeof(buf.data)) == MSG_OK ) {
-			chprintf((BaseSequentialStream*) &SD2, "   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(volatile_reg_list[i]), volatile_reg_list[i], buf.value);
+			dbgprintf("   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(volatile_reg_list[i]), volatile_reg_list[i], buf.value);
 		}
 	}
 
 
 	//See table 19 on page 83 of the data sheet to see the list of non-volatile registers
-	chprintf((BaseSequentialStream*) &SD2, "\r\nMAX17205 Non-Volatile Registers\r\n");
+	dbgprintf("\r\nMAX17205 Non-Volatile Registers\r\n");
 	uint16_t reg_list[] = {
 			MAX17205_AD_NXTABLE0,
 			MAX17205_AD_NXTABLE1,
@@ -169,574 +738,13 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 
 	for(int i = 0; reg_list[i] != 0;i++) {
 		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(reg_list[i]), buf.data, sizeof(buf.data)) == MSG_OK ) {
-			chprintf((BaseSequentialStream*) &SD2, "   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(reg_list[i]), reg_list[i], buf.value);
+			dbgprintf("   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(reg_list[i]), reg_list[i], buf.value);
 		}
-	}
-#endif
-
-
-	return(MSG_OK);
-}
-
-/**
- * See page 85 of the data sheet
- */
-msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config) {
-	i2cbuf_t buf;
-	msg_t r;
-
-	//	1. Write desired memory locations to new values.
-	//should be done prior to calling this function
-
-	bool success_flag = false;
-	for(int retry_count = 0; (! success_flag) && retry_count < 1; retry_count++ ) {
-		chprintf((BaseSequentialStream*) &SD2, "Clearing CommStat.NVError bit\r\n");
-		//	2. Clear CommStat.NVError bit.
-		buf.reg = MAX17205_AD(MAX17205_AD_COMMSTAT);
-		buf.value = MAX17205_COMMSTAT_NVERROR;
-		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMSTAT), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
-			return(r);
-		}
-
-		//	3. Write 0xE904 to the Command register 0x060 to initiate a block copy.
-		buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-		buf.value = 0xE904;
-		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
-			chprintf((BaseSequentialStream*) &SD2, "Initiated failed to send command to initiate block copy....\r\n");
-			return(r);
-		} else {
-			chprintf((BaseSequentialStream*) &SD2, "Initiated MAX17205 block copy....\r\n");
-		}
-
-
-		//	4. Wait t BLOCK for the copy to complete.
-
-		chprintf((BaseSequentialStream*) &SD2, "Waiting %u ms for block copy to complete....\r\n", MAX17205_T_BLOCK_MS);
-		chThdSleepMilliseconds(MAX17205_T_BLOCK_MS); //tBlock(max) is specified as 7360ms in the data sheet, page 16
-
-
-		//	5. Check the CommStat.NVError bit. If set, repeat the process. If clear, continue.
-		if( (r = max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_COMMSTAT), buf.data, sizeof(buf.data))) != MSG_OK ) {
-			chprintf((BaseSequentialStream*) &SD2, "Failed to query COMMSTAT register...\r\n");
-			return(r);
-		} else {
-			chprintf((BaseSequentialStream*) &SD2, "Read MAX17205_AD_COMMSTAT register 0x%X as 0x%X\r\n", MAX17205_AD_COMMSTAT, buf.value);
-			if( buf.value & MAX17205_COMMSTAT_NVERROR ) {
-				//Error bit is set
-				chprintf((BaseSequentialStream*) &SD2, "Block copy failed, retrying...\r\n");
-			} else {
-				chprintf((BaseSequentialStream*) &SD2, "Block copy was successful, breaking...\r\n");
-				success_flag = true;
-				break;
-			}
-		}
-	}
-
-	if( ! success_flag ) {
-		return(MSG_RESET);
-	}
-
-
-	//	6. Write 0x000F to the Command register 0x060 to POR the IC.
-	//	7. Wait t POR for the IC to reset.
-	//	8. Write 0x0001 to Counter Register 0x0BB to reset firmware.
-	//	9. Wait t POR for the firmware to restart.
-	if( (r = max17205HardwareReset(config->i2cp)) != MSG_OK ) {
-		return(r);
-	}
-
-
-	return(MSG_OK);
-}
-
-
-
-/**
- * @brief   Reads registers value using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in]  i2cp      pointer to the I2C interface
- * @param[in]  sad       slave address without R bit
- * @param[in]  reg       first sub-register address
- * @param[out] rxbuf     pointer to an output buffer
- * @param[in]  n         number of consecutive register to read
- * @return               the operation status.
- * @notapi
- */
-msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
-        uint8_t* rxbuf, size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_MS2I(50));
-}
-
-/**
- * @brief   Writes a value into a register using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in] i2cp       pointer to the I2C interface
- * @param[in] sad        slave address without R bit
- * @param[in] txbuf      buffer containing command in first byte and high
- *                       and low data bytes
- * @param[in] n          size of txbuf
- * @return               the operation status.
- * @notapi
- */
-msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
-        size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-    		TIME_MS2I(50));
-}
-#endif /* MAX17205_USE_I2C */
-
-/*==========================================================================*/
-/* Interface implementation.                                                */
-/*==========================================================================*/
-
-static const struct MAX17205VMT vmt_device = {
-    (size_t)0,
-};
-
-/*===========================================================================*/
-/* Driver exported functions.                                                */
-/*===========================================================================*/
-
-/**
- * @brief   Initializes an instance.
- *
- * @param[out] devp     pointer to the @p MAX17205Driver object
- *
- * @init
- */
-void max17205ObjectInit(MAX17205Driver *devp) {
-    devp->vmt = &vmt_device;
-
-    devp->config = NULL;
-
-    devp->state = MAX17205_STOP;
-}
-
-msg_t max17205HardwareReset(I2CDriver *i2cp) {
-	i2cbuf_t buf;
-	msg_t r;
-
-	chprintf((BaseSequentialStream*) &SD2, "Reseting MAX17205...\r\n");
-
-	buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-	buf.value = MAX17205_COMMAND_HARDWARE_RESET;
-	if( (r = max17205I2CWriteRegister(i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf))) != MSG_OK ) {
-		return(r);
-	}
-	chThdSleepMilliseconds(10);
-
-	uint32_t check_count = 0;
-	do {
-		if( max17205I2CReadRegister(i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_STATUS), buf.data, sizeof(buf.data)) != MSG_OK ) {
-			//do nothing
-			chprintf((BaseSequentialStream*) &SD2, "Waiting for MAX17205 to complete reset...\r\n");
-			chThdSleepMilliseconds(10);
-		}
-		check_count++;
-	} while (!(buf.value & MAX17205_STATUS_POR) && check_count < 10); /* While still resetting */
-
-	return(MSG_OK);
-}
-
-/**
- * @brief   Configures and activates MAX17205 Complex Driver peripheral.
- *
- * @param[in] devp      pointer to the @p MAX17205Driver object
- * @param[in] config    pointer to the @p MAX17205Config object
- *
- * @api
- */
-bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
-    i2cbuf_t buf;
-    uint32_t comm_error_count = 0;
-
-    osalDbgCheck((devp != NULL) && (config != NULL));
-    osalDbgAssert((devp->state == MAX17205_STOP) ||
-            (devp->state == MAX17205_READY),
-            "max17205Start(), invalid state");
-
-    devp->config = config;
-
-    /* Configuring common registers.*/
-#if MAX17205_USE_I2C
-#if MAX17205_SHARED_I2C
-    i2cAcquireBus(config->i2cp);
-#endif /* MAX17205_SHARED_I2C */
-
-    i2cStart(config->i2cp, config->i2ccfg);
-
-    /* Reset device */
-#if 0
-    max17205HardwareReset(config->i2cp);
-#endif
-
-
-#if 0
-    //Read npkgcfg         0xA02
-    if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_PACKCFG), buf.data, sizeof(buf.data)) == MSG_OK ) {
-		chprintf((BaseSequentialStream*) &SD2, "Read MAX17205_AD_PACKCFG register 0x%X as 0x%X\r\n", MAX17205_AD_PACKCFG, buf.value);
-	}
-#endif
-
-
-
-    buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
-    buf.value = MAX17205_SETVAL(MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
-    if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf)) != MSG_OK ) {
-    	comm_error_count++;
-    }
-
-    for (const max17205_regval_t *pair = config->regcfg; pair->reg; pair++) {
-        buf.reg = MAX17205_AD(pair->reg);
-        buf.value = pair->value;
-
-        chprintf((BaseSequentialStream*) &SD2, "Setting MAX17205 register 0x%X to 0x%X\r\n", buf.reg, buf.value);
-
-        if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(pair->reg), buf.buf, sizeof(buf)) != MSG_OK ) {
-        	comm_error_count++;
-        }
-    }
-
-#if MAX17205_SHARED_I2C
-    i2cReleaseBus(config->i2cp);
-#endif /* MAX17205_SHARED_I2C */
-#endif /* MAX17205_USE_I2C */
-    if( comm_error_count == 0 ) {
-    	devp->state = MAX17205_READY;
-    	return(true);
-    } else {
-    	devp->state = MAX17205_UNINIT;
-    }
-    return(false);
-}
-
-/**
- * @brief   Deactivates the MAX17205 Complex Driver peripheral.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- *
- * @api
- */
-void max17205Stop(MAX17205Driver *devp) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert((devp->state == MAX17205_STOP) || (devp->state == MAX17205_READY),
-            "max17205Stop(), invalid state");
-
-    if (devp->state == MAX17205_READY) {
-#if MAX17205_USE_I2C
-#if MAX17205_SHARED_I2C
-        i2cAcquireBus(devp->config->i2cp);
-        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* MAX17205_SHARED_I2C */
-
-        /* Reset device */
-        buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-        buf.value = MAX17205_COMMAND_HARDWARE_RESET;
-        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf));
-        buf.reg = MAX17205_AD(MAX17205_AD_CONFIG2);
-        buf.value = MAX17205_SETVAL(MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
-        max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(MAX17205_AD_CONFIG2), buf.buf, sizeof(buf));
-
-        i2cStop(devp->config->i2cp);
-#if MAX17205_SHARED_I2C
-        i2cReleaseBus(devp->config->i2cp);
-#endif /* MAX17205_SHARED_I2C */
-#endif /* MAX17205_USE_I2C */
-    }
-    devp->state = MAX17205_STOP;
-}
-
-/**
- * @brief   Reads MAX17205 register as raw value.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read
- *
- * @api
- */
-msg_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg, uint16_t *output_dest) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MAX17205_READY,
-            "max17205ReadRaw(), invalid state");
-
-#if MAX17205_USE_I2C
-#if MAX17205_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* MAX17205_SHARED_I2C */
-
-    buf.reg = MAX17205_AD(reg);
-
-    const msg_t r = max17205I2CReadRegister(devp->config->i2cp, MAX17205_SA(reg), buf.reg, buf.data, sizeof(buf.data));
-
-    //chprintf((BaseSequentialStream*) &SD2, "max17205I2CReadRegister(0x%X), r = %d", reg, r);
-
-#if MAX17205_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* MAX17205_SHARED_I2C */
-#endif /* MAX17205_USE_I2C */
-
-    if( r == MSG_OK ) {
-    	*output_dest = buf.value;
-    	//chprintf((BaseSequentialStream*) &SD2, " value = %u 0x%X", buf.value, buf.value);
-    }
-    //chprintf((BaseSequentialStream*) &SD2, "\r\n");
-
-    return(r);
-}
-
-/**
- * @brief   Writes MAX17205 register as raw value.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to write to
- * @param[in] value      the value to write
- *
- * @api
- */
-msg_t max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MAX17205_READY,
-            "max17205WriteRaw(), invalid state");
-
-#if MAX17205_USE_I2C
-#if MAX17205_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* MAX17205_SHARED_I2C */
-
-    buf.reg = MAX17205_AD(reg);
-    buf.value = value;
-    const msg_t r = max17205I2CWriteRegister(devp->config->i2cp, MAX17205_SA(reg), buf.buf, sizeof(buf));
-
-#if MAX17205_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* MAX17205_SHARED_I2C */
-#endif /* MAX17205_USE_I2C */
-
-    return(r);
-}
-
-
-/**
- * @brief   Reads an MAX17205 capacity value from a register in mAh.
- * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest)
-{
-	uint16_t reg_value = 0;
-	const msg_t r = max17205ReadRaw(devp, reg, &reg_value);
-
-	if( r == MSG_OK ) {
-		uint16_t nr_sense_value = 0;
-
-		const msg_t r2 = max17205ReadRaw(devp, MAX17205_AD_NRSENSE, &nr_sense_value);
-		if( r2 == MSG_OK ) {
-			*dest = reg_value * 5000U / MAX17205_REG2RSENSE(nr_sense_value);
-
-			chprintf((BaseSequentialStream*) &SD2, "  max17205ReadCapacityChecked(0x%X %s) = %u mAh (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, reg_value, reg_value);
-		} else {
-			return(r2);
-		}
-	} else {
-		return(r);
 	}
 
 	return(MSG_OK);
 }
 
-
-/**
- * @brief   Reads an MAX17205 percentage value from a register in 1% increments.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
-{
-	uint16_t temp = 0;
-    msg_t r = max17205ReadRaw(devp, reg, &temp);
-
-    if( r == MSG_OK ) {
-    	*dest = temp / 256U;
-    	chprintf((BaseSequentialStream*) &SD2, "  max17205ReadPercentageChecked(0x%X %s) = %u%% (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp, temp);
-    }
-    return(r);
-}
-
-
-/**
- * @brief   Reads an MAX17205 voltage value from a register in mV.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
-{
-	uint16_t temp = 0;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-
-	if( r == MSG_OK ) {
-		//Output is in millivolts. LSB unit is 0.078125mV
-		*dest = (((uint32_t) temp) * 78125U) / 1000000U;
-		chprintf((BaseSequentialStream*) &SD2, "  max17205ReadVoltageChecked(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
-	}
-	return(r);
-}
-
-/**
- * @brief   Reads an MAX17205 voltage value from a register in mV.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
-{
-	uint16_t temp = 0;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-
-	if( r == MSG_OK ) {
-		//Output is in millivolts. LSB unit is 1.25mV
-		*dest = (((uint32_t) temp) * 125U) / 100U;
-		chprintf((BaseSequentialStream*) &SD2, "  max17205ReadBattVoltage(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
-	}
-	return(r);
-}
-
-
-/**
- * @brief   Reads an MAX17205 current value from a register in mA.
- * @pre     nRSENSE register must be set to a value with a LSB of 10uOhm
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
-{
-	uint16_t temp = 0;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-
-	if( r == MSG_OK ) {
-		int16_t temp_signed = temp;
-		//Assumes Rsense = 0.01 ohms
-		*dest = ((int32_t)temp_signed * 15625) / 100000;// 156.25 uA / 100 / 1000 uA/mA
-
-		chprintf((BaseSequentialStream*) &SD2, "  max17205ReadCurrent(0x%X %s) = %d mA (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp_signed, temp);
-	}
-	return(r);
-}
-
-
-/**
- * @brief   Reads an MAX17205 temperature value from a register in 0.001C increments.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
-{
-	uint16_t temp = 0;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-	if( r == MSG_OK ) {
-		int16_t temp_signed = temp;
-
-		*dest = temp_signed * 1000U / 256U;
-		chprintf((BaseSequentialStream*) &SD2, "  max17205ReadTemperatureChecked(0x%X %s) = %d mC (%u C) (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, (*dest / 1000), temp_signed, temp);
-	}
-    return(r);
-}
-
-/**
- * @brief   Reads an MAX17205 temperature value from a register in 1C increments.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
-{
-	uint16_t temp = 0;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-	if( r == MSG_OK ) {
-		int16_t temp_signed = temp;
-
-		*dest = (temp_signed / 10) - 273;
-		chprintf((BaseSequentialStream*) &SD2, "  max17205ReadTemperatureChecked(0x%X %s) = %d C (raw: %d 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, temp_signed, temp);
-	}
-    return(r);
-}
-
-/**
- * @brief   Reads an MAX17205 resistance value from a register in mOhms.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-/*
-inline uint16_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg)
-{
-    return max17205ReadRaw(devp, reg) * 1000U / 4096U;
-}
-*/
-
-msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
-{
-	uint16_t temp;
-	msg_t r = max17205ReadRaw(devp, reg, &temp);
-	if( r == MSG_OK ) {
-		*dest = temp * 1000U / 4096U;
-	}
-
-	return(r);
-}
-
-/**
- * @brief   Reads an MAX17205 time value from a register in seconds.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
-{
-	uint16_t temp = 0;
-    msg_t r = max17205ReadRaw(devp, reg, &temp);
-    if( r == MSG_OK ) {
-    	*dest = temp * 5625U / 1000;
-
-    	uint16_t minutes = *dest / 60;
-    	chprintf((BaseSequentialStream*) &SD2, "  max17205ReadTimeChecked(0x%X %s) = %u seconds (%u minutes) (raw: %u 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, minutes, temp, temp);
-    }
-    return(r);
-}
 
 const char* max17205RegToStr(const uint16_t reg) {
 	switch (reg) {
@@ -964,6 +972,5 @@ const char* max17205RegToStr(const uint16_t reg) {
 
 	return("[reg?]");
 }
-
 
 /** @} */

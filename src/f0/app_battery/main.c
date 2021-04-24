@@ -58,22 +58,6 @@ static void app_init(void)
  */
 int main(void)
 {
-#if 0
-	//FIXME remove this block
-	halInit();
-	chSysInit();
-	sdStart(&SD2, NULL);
-	chprintf(DEBUG_SERIAL, "\r\nStarting battery app...\r\n");
-	while (true)
-	{
-		palClearLine(LINE_LED);
-		chThdSleepMilliseconds(500);
-		palSetLine(LINE_LED);
-		chThdSleepMilliseconds(500);
-		chprintf(DEBUG_SERIAL, "%u\r\n", chVTGetSystemTime());
-	}
-#endif
-
     // Initialize and start
     oresat_init(&oresat_conf);
     app_init();
