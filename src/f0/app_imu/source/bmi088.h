@@ -43,15 +43,8 @@
 #define BMI088_ACC_SADDR                    0x18
 #define BMI088_GYRO_SADDR                   0x68
 
-//#define BMI088_ACC_SADDR                    (0x18 << 1)
-//#define BMI088_GYRO_SADDR                   (0x68 << 1)
-
-//#define BMI088_ACC_SADDR                    (0x18 >> 1)
-//#define BMI088_GYRO_SADDR                   (0x68 >> 1)
-
-
-#define BMI088_ACCL_EXPECTED_CHIP_ID          0x1E
-#define BMI088_GYRO_EXPECTED_CHIP_ID          0x0F
+#define BMI088_ACCL_EXPECTED_CHIP_ID        0x1E
+#define BMI088_GYRO_EXPECTED_CHIP_ID        0x0F
 
 /**
  * @name    BMI088 Accelerometer Register Addresses
@@ -841,7 +834,6 @@ typedef enum {
 } bmi088_acc_operating_mode_t;
 
 
-
 /**
  * @brief   BMI088 configuration structure.
  */
@@ -930,32 +922,51 @@ struct BMI088Driver {
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+	int32_t accl_x;
+	int32_t accl_y;
+	int32_t accl_z;
+	uint16_t accl_x_raw;
+	uint16_t accl_y_raw;
+	uint16_t accl_z_raw;
+} bmi088_accelerometer_sample_t;
+
+typedef struct {
+	int32_t gyro_x;
+	int32_t gyro_y;
+	int32_t gyro_z;
+	uint16_t gyro_x_raw;
+	uint16_t gyro_y_raw;
+	uint16_t gyro_z_raw;
+} bmi088_gyro_sample_t;
+
 void bmi088ObjectInit(BMI088Driver *devp);
 bool bmi088Start(BMI088Driver *devp, const BMI088Config *config);
 void bmi088Stop(BMI088Driver *devp);
-msg_t bmi088ReadChipId(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadErrCode(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadErrFatal(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadAccStatus(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadAccXYZmG(BMI088Driver *devp, int32_t *dest_accl_x, int32_t *dest_accl_y, int32_t *dest_accl_z, uint16_t *dest_acc_x_raw, uint16_t *dest_acc_y_raw, uint16_t *dest_acc_z_raw);
-msg_t bmi088SoftReset(BMI088Driver *devp);
-msg_t readPowerCtrlReg(BMI088Driver *devp, uint8_t *dest);
-msg_t readPowerConfReg(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadIntStat(BMI088Driver *devp, uint8_t *dest);
-msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c);
-
-void accEnable(BMI088Driver *devp, uint8_t enable);
-
-msg_t bmi088ReadGyrosChipId(BMI088Driver *devp, uint8_t *dest);
-
-msg_t BMI088AccelerometerPowerOnOrOff(BMI088Driver *devp, const bmi088_power_state_t power_state);
-msg_t BMI088AccelerometerEnableOrSuspend(BMI088Driver *devp, bmi088_acc_operating_mode_t operating_mode);
-msg_t BMI088AccelerometerSetFilterAndODR(BMI088Driver *devp, uint8_t acc_filter_and_odr);
-msg_t BMI088AccelerometerSetSelfTestMode(BMI088Driver *devp, uint8_t self_test_mode);
-
-msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, int32_t *dest_gyro_x, int32_t *dest_gyro_y, int32_t *dest_gyro_z, uint16_t *dest_gyro_x_raw, uint16_t *dest_gyro_y_raw, uint16_t *dest_gyro_z_raw);
 
 msg_t bmi088ReadRawU8Err(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg, uint8_t *dest);
+
+msg_t bmi088SoftReset(BMI088Driver *devp);
+msg_t bmi088ReadPowerCtrlReg(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadPowerConfReg(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadIntStat(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadErrCode(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadErrFatal(BMI088Driver *devp, uint8_t *dest);
+
+msg_t bmi088ReadAccelerometerXYZmG(BMI088Driver *devp, bmi088_accelerometer_sample_t *dest);
+msg_t bmi088ReadAccelerometerStatus(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadAccelerometerChipId(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088AccelerometerEnableOrSuspend(BMI088Driver *devp, const bmi088_acc_operating_mode_t operating_mode);
+msg_t bmi088AccelerometerPowerOnOrOff(BMI088Driver *devp, const bmi088_power_state_t power_state);
+msg_t bmi088AccelerometerSetFilterAndODR(BMI088Driver *devp, const uint8_t acc_filter_and_odr);
+msg_t bmi088AccelerometerSetSelfTestMode(BMI088Driver *devp, const uint8_t self_test_mode);
+
+msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c);
+
+msg_t bmi088ReadGyroChipId(BMI088Driver *devp, uint8_t *dest);
+msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, bmi088_gyro_sample_t *dest);
+
 
 #ifdef __cplusplus
 }

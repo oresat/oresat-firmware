@@ -28,31 +28,23 @@ void update_imu_data(void) {
 		return;
 	}
 
+	//TODO Power up out of suspend
 	//BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_ACTIVE);
 	//chThdSleepMilliseconds(10);
 
 
-	int32_t acc_x_mG = 0;
-	int32_t acc_y_mG = 0;
-	int32_t acc_z_mG = 0;
-	uint16_t acc_x_raw = 0;
-	uint16_t acc_z_raw = 0;
-	uint16_t acc_y_raw = 0;
-	if( bmi088ReadAccXYZmG(&imudev, &acc_x_mG, &acc_y_mG, &acc_z_mG, &acc_x_raw, &acc_y_raw, &acc_z_raw ) == MSG_OK ) {
-		chprintf(CHP, "Acc readings mG X = %d, Y = %d, Z = %d\r\n", acc_x_mG, acc_y_mG, acc_z_mG);
+	bmi088_accelerometer_sample_t accl_data;
+	if( bmi088ReadAccelerometerXYZmG(&imudev, &accl_data ) == MSG_OK ) {
+		chprintf(CHP, "Acc readings mG X = %d, Y = %d, Z = %d\r\n", accl_data.accl_x, accl_data.accl_y, accl_data.accl_z);
 	} else {
 		//FIXME handle error
 		chprintf(CHP, "Failed to read accelerometer readings\r\n");
 	}
 
-	int32_t gyro_x = 0;
-	int32_t gyro_y = 0;
-	int32_t gyro_z = 0;
-	uint16_t gyro_x_raw = 0;
-	uint16_t gyro_y_raw = 0;
-	uint16_t gyro_z_raw = 0;
-	if( bmi088ReadGyroXYZ(&imudev, &gyro_x, &gyro_y, &gyro_z, &gyro_x_raw, &gyro_y_raw, &gyro_z_raw) == MSG_OK ) {
-		chprintf(CHP, "Gyro readings X = %d, Y = %d, Z = %d\r\n", gyro_x, gyro_y, gyro_z);
+	bmi088_gyro_sample_t gyro_sample;
+
+	if( bmi088ReadGyroXYZ(&imudev, &gyro_sample) == MSG_OK ) {
+		chprintf(CHP, "Gyro readings X = %d, Y = %d, Z = %d\r\n", gyro_sample.gyro_x, gyro_sample.gyro_y, gyro_sample.gyro_z);
 
 	} else {
 		//FIXME handle error
@@ -68,22 +60,23 @@ void update_imu_data(void) {
 
 	chprintf(CHP, "\r\n");
 
+	//TODO re-suspend to save power
 	//BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_SUSPEND);
 
 
-	OD_gyroscope.pitchRate = gyro_x;
-	OD_gyroscope.yawRate = gyro_y;
-	OD_gyroscope.rollRate = gyro_z;
-	OD_gyroscope.pitchRateRaw = gyro_x_raw;
-	OD_gyroscope.yawRateRaw = gyro_y_raw;
-	OD_gyroscope.rollRateRaw = gyro_z_raw;
+	OD_gyroscope.pitchRate = gyro_sample.gyro_x;
+	OD_gyroscope.yawRate = gyro_sample.gyro_y;
+	OD_gyroscope.rollRate = gyro_sample.gyro_z;
+	OD_gyroscope.pitchRateRaw = gyro_sample.gyro_x_raw;
+	OD_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
+	OD_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
 
-	OD_acceleration.x = acc_x_mG;
-	OD_acceleration.y = acc_y_mG;
-	OD_acceleration.z = acc_z_mG;
-	OD_acceleration.XRaw = acc_x_raw;
-	OD_acceleration.YRaw = acc_y_raw;
-	OD_acceleration.ZRaw = acc_z_raw;
+	OD_acceleration.x = accl_data.accl_x;
+	OD_acceleration.y = accl_data.accl_y;
+	OD_acceleration.z = accl_data.accl_z;
+	OD_acceleration.XRaw = accl_data.accl_x_raw;
+	OD_acceleration.YRaw = accl_data.accl_y_raw;
+	OD_acceleration.ZRaw = accl_data.accl_z_raw;
 
 	OD_IMU_Temperature = temp_c;
 
@@ -125,14 +118,14 @@ THD_FUNCTION(imu, arg)
     	chprintf(CHP, "Failed to start IMU driver...\r\n");
     } else {
 		uint8_t bmi088_chip_id = 0;
-		if( (r = bmi088ReadChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
+		if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
 			chprintf(CHP, "BMI088 accelerometer chip ID is 0x%X, expected to be 0x%X\r\n", bmi088_chip_id, BMI088_ACCL_EXPECTED_CHIP_ID);
 		} else {
 			chprintf(CHP, "Failed to read accl chip ID from BMI088, r = %d\r\n", r);
 		}
 
 		uint8_t bmi088_gyro_chip_id = 0;
-		msg_t r = bmi088ReadGyrosChipId(&imudev, &bmi088_gyro_chip_id);
+		msg_t r = bmi088ReadGyroChipId(&imudev, &bmi088_gyro_chip_id);
 		if( r == MSG_OK ) {
 			chprintf(CHP, "BMI088 gyroscope ID is 0x%X, expected to be 0x%X\r\n", bmi088_gyro_chip_id, BMI088_GYRO_EXPECTED_CHIP_ID);
 		} else {
