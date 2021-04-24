@@ -61,13 +61,13 @@ THD_FUNCTION(sensor_mon, arg)
 
     int16_t temp_c = 0;
     int32_t temp_mC = 0;
-    if( read_tmp101an_temperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
+    if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
     	OD_PV_Temp.cell1Temp = temp_c;
     	OD_PV_Temp.cell1TempMax = temp_c;
     	OD_PV_Temp.cell1TempMin = temp_c;
     }
 
-    if( read_tmp101an_temperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
+    if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
     	OD_PV_Temp.cell2Temp = temp_c;
     	OD_PV_Temp.cell2TempMax = temp_c;
     	OD_PV_Temp.cell2TempMin = temp_c;
@@ -76,28 +76,26 @@ THD_FUNCTION(sensor_mon, arg)
 
     while (!chThdShouldTerminateX())
     {
-        if( read_tmp101an_temperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
+        if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
         	OD_PV_Temp.cell1Temp = temp_c;
         	OD_PV_Temp.cell1TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell1TempMax);
         	OD_PV_Temp.cell1TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell1TempMin);
 
         	chprintf(DEBUG_SD, "temp_c 1 = %d C  (%d mC)\r\n", temp_c, temp_mC);
         } else {
-        	//FIXME propagate error to CANOpen emergency
         	chprintf(DEBUG_SD, "Failed to read I2C temperature\r\n");
-        	//void CO_errorReport(CO_EM_t *em, const uint8_t errorBit, const uint16_t errorCode, const uint32_t infoCode);
-        	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 1);
+        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 1);
         }
 
-        if( read_tmp101an_temperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
+        if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
         	OD_PV_Temp.cell2Temp = temp_c;
 			OD_PV_Temp.cell2TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell2TempMax);
 			OD_PV_Temp.cell2TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell2TempMin);
 
 			chprintf(DEBUG_SD, "temp_c 2 = %d C  (%d mC)\r\n", temp_c, temp_mC);
         } else {
-        	//FIXME propagate error to CANOpen emergency
 			chprintf(DEBUG_SD, "Failed to read I2C temperature\r\n");
+			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 2);
         }
 
         chThdSleepMilliseconds(4000);

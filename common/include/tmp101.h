@@ -206,11 +206,7 @@ void tmp101ObjectInit(TMP101Driver *devp);
 void tmp101Start(TMP101Driver *devp, const TMP101Config *config);
 void tmp101Stop(TMP101Driver *devp);
 
-// 2021-02-24 - Probably can remove the following first version 'read temperature' routine,
-//  confirm with team:
-bool read_tmp101an_temperature_v1(TMP101Driver* device_ptr, unsigned int option);
-
-msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC);
+msg_t tmp101ReadTemperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC);
 
 #ifdef __cplusplus
 }

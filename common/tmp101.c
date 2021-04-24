@@ -60,7 +60,7 @@ msg_t tmp101I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf, siz
 }
 
 /**
- *
+ * TODO document this
  */
 msg_t tmp101I2CReadRegister2(TMP101Driver *devp, const uint8_t reg, uint8_t *dest_2_byte_array)
 {
@@ -125,7 +125,6 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
 
     devp->config = config;
 
-#if 0
     /* Configuring common registers, or at minimum start I2C bus. */
 #if TMP101_USE_I2C
 #if TMP101_SHARED_I2C
@@ -137,7 +136,6 @@ void tmp101Start(TMP101Driver *devp, const TMP101Config *config) {
     i2cReleaseBus(config->i2cp);
 #endif /* TMP101_SHARED_I2C */
 #endif /* TMP101_USE_I2C */
-#endif
 
     devp->state = TMP101_READY;
 }
@@ -174,7 +172,7 @@ void tmp101Stop(TMP101Driver *devp) {
 // @brief   routine to read TMP101 temperature sensor, and return a
 //          two-byte reading
 //----------------------------------------------------------------------
-msg_t read_tmp101an_temperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC)
+msg_t tmp101ReadTemperature(TMP101Driver *devp, int16_t *dest_temp_c, int32_t *dest_temp_mC)
 {
 	uint8_t byte_array[2];
 

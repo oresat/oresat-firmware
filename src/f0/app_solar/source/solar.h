@@ -6,8 +6,6 @@
 
 #define INA226_SADDR            (0x40)
 
-
-
 /* Solar application thread prototypes */
 extern THD_WORKING_AREA(solar_wa, 0x400);
 extern THD_FUNCTION(solar, arg);

@@ -3,7 +3,7 @@
 #include "CANopen.h"
 #include "chprintf.h"
 
-#define DEBUG_SD                  (BaseSequentialStream *) &SD2
+#define DEBUG_SD                (BaseSequentialStream *) &SD2
 
 //FIXME I believe MAX() is defined in some common C library???
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -82,7 +82,6 @@ typedef struct {
 	uint32_t avg_voltage_initial_mV;
 	uint32_t avg_current_initial_uA;
 
-
 	uint32_t max_power_initial_mW;
 	uint32_t max_voltage_initial_mV;
 	uint32_t max_current_initial_uA;
@@ -157,9 +156,8 @@ uint32_t get_iadj_step_size(mppt_pao_state *pao_state) {
 		const uint32_t threshold_low_mV = pao_state->max_voltage_initial_mV / 20; //0.95 threshold
 		const uint32_t threshold_mV = pao_state->max_voltage_initial_mV - threshold_low_mV;
 
-		const int32_t mv_delta = pao_state->avg_voltage_initial_mV - threshold_mV;
-
 		if(  pao_state->avg_voltage_initial_mV > threshold_mV ) {
+			//Linear scale of step size based on delta from maximum voltage
 		    const int32_t v = (((pao_state->avg_voltage_initial_mV - threshold_mV) * 100) / threshold_low_mV);
 			const uint32_t step_size = (((5000 - VREF_STEP_IN_MICROVOLTS_NEGATIVE) * v) / 100) + VREF_STEP_IN_MICROVOLTS_NEGATIVE;
 
@@ -205,6 +203,9 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 			if( pao_state->iadj_uv > I_ADJ_FAILSAFE ) {
 				pao_state->iadj_uv = I_ADJ_FAILSAFE;
 			}
+
+			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, 3);
+
 			return(false);
 
 		} else {
@@ -236,6 +237,7 @@ THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
+
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
     chprintf(DEBUG_SD, "Initializing DAC....\r\n");
@@ -255,7 +257,7 @@ THD_FUNCTION(solar, arg)
     palSetLine(LINE_LT1618_EN);
 
 #if 0
-	//Generate CSV output to terminal for ploting in libreoffice
+	//Generate CSV output to terminal for plotting in libreoffice
 	for(int iadj = 1500000; iadj >= 0; iadj -= 1000 ) {
 		dac_put_microvolts(&DACD1, 0, iadj);
 
@@ -304,12 +306,12 @@ THD_FUNCTION(solar, arg)
     	OD_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
     	OD_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
     	OD_PV_Power.powerMax = pao_state.max_power_initial_mW;
-    	OD_PV_Power.energy = 0;
+    	OD_PV_Power.energy = 0;//TODO Accumulate power output from INA226 and track mAh
 
 
-    	OD_MPPT.LT1618IADJ = pao_state.iadj_uv;
+    	OD_MPPT.LT1618IADJ = pao_state.iadj_uv / 1000;
 
-    } // end while thread should run loop
+    }
 
     /* Stop drivers */
     dacStop(&DACD1);
