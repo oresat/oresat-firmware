@@ -3,6 +3,9 @@
 #include "chprintf.h"
 #include "CANopen.h"
 
+#define BMI088_GYRO_SADDR 0x68U
+#define BMI088_ACC_SADDR 0x18U
+
 #define CHP ((BaseSequentialStream*) &SD2)
 
 static const I2CConfig i2ccfg = {
@@ -119,7 +122,7 @@ THD_FUNCTION(imu, arg)
     } else {
 		uint8_t bmi088_chip_id = 0;
 		if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
-			chprintf(CHP, "BMI088 accelerometer chip ID is 0x%X, expected to be 0x%X\r\n", bmi088_chip_id, BMI088_ACCL_EXPECTED_CHIP_ID);
+			chprintf(CHP, "BMI088 accelerometer chip ID is 0x%X, expected to be 0x%X\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED);
 		} else {
 			chprintf(CHP, "Failed to read accl chip ID from BMI088, r = %d\r\n", r);
 		}
@@ -127,7 +130,7 @@ THD_FUNCTION(imu, arg)
 		uint8_t bmi088_gyro_chip_id = 0;
 		msg_t r = bmi088ReadGyroChipId(&imudev, &bmi088_gyro_chip_id);
 		if( r == MSG_OK ) {
-			chprintf(CHP, "BMI088 gyroscope ID is 0x%X, expected to be 0x%X\r\n", bmi088_gyro_chip_id, BMI088_GYRO_EXPECTED_CHIP_ID);
+			chprintf(CHP, "BMI088 gyroscope ID is 0x%X, expected to be 0x%X\r\n", bmi088_gyro_chip_id, BMI088_GYR_CHIP_ID_EXPECTED);
 		} else {
 			chprintf(CHP, "Failed to read gyro chip ID from BMI088, r = %d\r\n", r);
 

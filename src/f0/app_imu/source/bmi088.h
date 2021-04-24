@@ -36,52 +36,45 @@
  */
 #define BMI088_PATCH                        0
 /** @} */
-
-//#define BMI088_SADDR                        0
 /** @} */
 
-#define BMI088_ACC_SADDR                    0x18
-#define BMI088_GYRO_SADDR                   0x68
-
-#define BMI088_ACCL_EXPECTED_CHIP_ID        0x1E
-#define BMI088_GYRO_EXPECTED_CHIP_ID        0x0F
 
 /**
  * @name    BMI088 Accelerometer Register Addresses
  * @{
  */
-#define BMI088_ADDR_ACC_SOFTRESET             0x7EU
-#define BMI088_ADDR_ACC_PWR_CTRL              0x7DU
-#define BMI088_ADDR_ACC_PWR_CONF              0x7CU
-#define BMI088_ADDR_ACC_SELF_TEST             0x6DU
-#define BMI088_ADDR_INT_MAP_DATA              0x58U
-#define BMI088_ADDR_INT2_IO_CTRL              0x54U
-#define BMI088_ADDR_INT1_IO_CTRL              0x53U
-#define BMI088_ADDR_FIFO_CONFIG_1             0x49U
-#define BMI088_ADDR_FIFO_CONFIG_0             0x48U
-#define BMI088_ADDR_FIFO_WTM_1                0x47U
-#define BMI088_ADDR_FIFO_WTM_0                0x46U
-#define BMI088_ADDR_FIFO_DOWNS                0x45U 
-#define BMI088_ADDR_ACC_RANGE                 0x41U
-#define BMI088_ADDR_ACC_CONF                  0x40U
-#define BMI088_ADDR_FIFO_DATA                 0x26U
-#define BMI088_ADDR_FIFO_LENGTH_1             0x25U
-#define BMI088_ADDR_FIFO_LENGTH_0             0x24U
-#define BMI088_ADDR_TEMP_LSB                  0x23U
-#define BMI088_ADDR_TEMP_MSB                  0x22U
-#define BMI088_ADDR_ACC_INT_STAT_1            0x1DU  // needs bit mask, only bit 7 used
-#define BMI088_ADDR_SENSORTIME_2              0x1AU
-#define BMI088_ADDR_SENSORTIME_1              0x19U
-#define BMI088_ADDR_SENSORTIME_0              0x18U
-#define BMI088_ADDR_ACC_Z_MSB                 0x17U
-#define BMI088_ADDR_ACC_Z_LSB                 0x16U
-#define BMI088_ADDR_ACC_Y_MSB                 0x15U
-#define BMI088_ADDR_ACC_Y_LSB                 0x14U
-#define BMI088_ADDR_ACC_X_MSB                 0x13U
-#define BMI088_ADDR_ACC_X_LSB                 0x12U
-#define BMI088_ADDR_ACC_STATUS                0x03U  // needs bit mask, only bit 7 used
-#define BMI088_ADDR_ACC_ERR_REG               0x02U  // needs bit mask, only bits 4:2,0 used
-#define BMI088_ADDR_ACC_CHIP_ID               0x00U
+#define BMI088_ADDR_ACC_SOFTRESET           0x7EU
+#define BMI088_ADDR_ACC_PWR_CTRL            0x7DU
+#define BMI088_ADDR_ACC_PWR_CONF            0x7CU
+#define BMI088_ADDR_ACC_SELF_TEST           0x6DU
+#define BMI088_ADDR_INT_MAP_DATA            0x58U
+#define BMI088_ADDR_INT2_IO_CTRL            0x54U
+#define BMI088_ADDR_INT1_IO_CTRL            0x53U
+#define BMI088_ADDR_FIFO_CONFIG_1           0x49U
+#define BMI088_ADDR_FIFO_CONFIG_0           0x48U
+#define BMI088_ADDR_FIFO_WTM_1              0x47U
+#define BMI088_ADDR_FIFO_WTM_0              0x46U
+#define BMI088_ADDR_FIFO_DOWNS              0x45U
+#define BMI088_ADDR_ACC_RANGE               0x41U
+#define BMI088_ADDR_ACC_CONF                0x40U
+#define BMI088_ADDR_FIFO_DATA               0x26U
+#define BMI088_ADDR_FIFO_LENGTH_1           0x25U
+#define BMI088_ADDR_FIFO_LENGTH_0           0x24U
+#define BMI088_ADDR_TEMP_LSB                0x23U
+#define BMI088_ADDR_TEMP_MSB                0x22U
+#define BMI088_ADDR_ACC_INT_STAT_1          0x1DU
+#define BMI088_ADDR_SENSORTIME_2            0x1AU
+#define BMI088_ADDR_SENSORTIME_1            0x19U
+#define BMI088_ADDR_SENSORTIME_0            0x18U
+#define BMI088_ADDR_ACC_Z_MSB               0x17U
+#define BMI088_ADDR_ACC_Z_LSB               0x16U
+#define BMI088_ADDR_ACC_Y_MSB               0x15U
+#define BMI088_ADDR_ACC_Y_LSB               0x14U
+#define BMI088_ADDR_ACC_X_MSB               0x13U
+#define BMI088_ADDR_ACC_X_LSB               0x12U
+#define BMI088_ADDR_ACC_STATUS              0x03U
+#define BMI088_ADDR_ACC_ERR_REG             0x02U
+#define BMI088_ADDR_ACC_CHIP_ID             0x00U
 /** @} */
 
 /**
@@ -122,7 +115,7 @@
  */
 #define BMI088_ACC_SELF_TEST_Pos            (0U)
 #define BMI088_ACC_SELF_TEST_Msk            (0xFFU << BMI088_ACC_SELF_TEST_Pos)
-#define BMI088_ACC_SELF_TEST                BMI088_ACC_SELF_TEST_Msk 
+#define BMI088_ACC_SELF_TEST                BMI088_ACC_SELF_TEST_Msk
 #define BMI088_ACC_SELF_TEST_OFF            (0x00U << BMI088_ACC_SELF_TEST_Pos)
 #define BMI088_ACC_SELF_TEST_POS_SIG        (0x0DU << BMI088_ACC_SELF_TEST_Pos)
 #define BMI088_ACC_SELF_TEST_NEG_SIG        (0x09U << BMI088_ACC_SELF_TEST_Pos)
@@ -144,13 +137,13 @@
 #define BMI088_ACC_MAP_DATA_INT1_DRDY       BMI088_ACC_MAP_DATA_INT1_DRDY_Msk
 #define BMI088_ACC_MAP_DATA_INT2_FFUL_Po    (4U)
 #define BMI088_ACC_MAP_DATA_INT2_FFULL_M    (0x1U << BMI088_ACC_MAP_INT2_DATA_FFULL_Pos)
-#define BMI088_ACC_MAP_DATA_INT2_FFULL      BMI088_ACC_MAP_DATA_INT2_FFULL_Msk 
+#define BMI088_ACC_MAP_DATA_INT2_FFULL      BMI088_ACC_MAP_DATA_INT2_FFULL_Msk
 #define BMI088_ACC_MAP_DATA_INT2_FWM_Pos    (5U)
 #define BMI088_ACC_MAP_DATA_INT2_FWM_Msk    (0x1U << BMI088_ACC_MAP_DATA_INT2_FWM_Pos)
-#define BMI088_ACC_MAP_DATA_INT2_FWM        BMI088_ACC_MAP_DATA_INT2_FWM_Msk  
+#define BMI088_ACC_MAP_DATA_INT2_FWM        BMI088_ACC_MAP_DATA_INT2_FWM_Msk
 #define BMI088_ACC_MAP_DATA_INT2_DRDY_Pos   (6U)
 #define BMI088_ACC_MAP_DATA_INT2_DRDY_Msk   (0x1U << BMI088_ACC_MAOP_DATA_INT2_DRDY_Pos)
-#define BMI088_ACC_MAP_DATA_INT2_DRDY       BMI088_ACC_MAP_DATA_INT2_DRDY_Msk  
+#define BMI088_ACC_MAP_DATA_INT2_DRDY       BMI088_ACC_MAP_DATA_INT2_DRDY_Msk
 /**@}*/
 
 /**
@@ -162,16 +155,16 @@
 #define BMI088_ACC_IO_CTRL_INT2_LVL         BMI088_ACC_IO_CTRL_INT2_LVL_Msk
 #define BMI088_ACC_IO_CTRL_INT2_LVL_L       (0x0U << BMI088_ACC_IO_CTRL_INT2_LVL_Pos)
 #define BMI088_ACC_IO_CTRL_INT2_LVL_H       (0x1U << BMI088_ACC_IO_CTRL_INT2_LVL_Pos)
-#define BMI088_ACC_IO_CTRL_INT2_OD_Pos      (2U)     
+#define BMI088_ACC_IO_CTRL_INT2_OD_Pos      (2U)
 #define BMI088_ACC_IO_CTRL_INT2_OD_Msk      (0x1U << BMI088_ACC_IO_CTRL_INT2_OD_Pos)
-#define BMI088_ACC_IO_CTRL_INT2_OD          BMI088_ACC_IO_CTRL_INT2_OD_Msk       
-#define BMI088_ACC_IO_CTRL_INT2_OD_PSH_PLL  (0x0U << BMI088_ACC_IO_CTRL_INT2_OD_Pos)      
-#define BMI088_ACC_IO_CTRL_INT2_OD_OPN_DRN  (0x1U << BMI088_ACC_IO_CTRL_INT2_OD_Pos)   
+#define BMI088_ACC_IO_CTRL_INT2_OD          BMI088_ACC_IO_CTRL_INT2_OD_Msk
+#define BMI088_ACC_IO_CTRL_INT2_OD_PSH_PLL  (0x0U << BMI088_ACC_IO_CTRL_INT2_OD_Pos)
+#define BMI088_ACC_IO_CTRL_INT2_OD_OPN_DRN  (0x1U << BMI088_ACC_IO_CTRL_INT2_OD_Pos)
 #define BMI088_ACC_IO_CTRL_INT2_EN_OUT_Pos  (3U)
 #define BMI088_ACC_IO_CTRL_INT2_EN_OUT_Msk  (0x1U << BMI088_ACC_IO_CTRL_INT2_OUT_Pos
 #define BMI088_ACC_IO_CTRL_INT2_EN_OUT      BMI088_ACC_IO_CTRL_INT2_EN_OUT_Msk
-#define BMI088_ACC_IO_CTRL_INT2_EN_IN_Pos   (4U)   
-#define BMI088_ACC_IO_CTRL_INT2_EN_IN_Msk   (0x1U << BMI088_ACC_IO_CTRL_INT2_EN_IN_Pos)   
+#define BMI088_ACC_IO_CTRL_INT2_EN_IN_Pos   (4U)
+#define BMI088_ACC_IO_CTRL_INT2_EN_IN_Msk   (0x1U << BMI088_ACC_IO_CTRL_INT2_EN_IN_Pos)
 #define BMI088_ACC_IO_CTRL_INT2_EN_IN       BMI088_ACC_IO_CTRL_INT2_EN_IN_Msk
 /**@}*/
 
@@ -184,16 +177,16 @@
 #define BMI088_ACC_IO_CTRL_INT1_LVL         BMI088_ACC_IO_CTRL_INT1_LVL_Msk
 #define BMI088_ACC_IO_CTRL_INT1_LVL_L       (0x0U << BMI088_ACC_IO_CTRL_INT1_LVL_Pos)
 #define BMI088_ACC_IO_CTRL_INT1_LVL_H       (0x1U << BMI088_ACC_IO_CTRL_INT1_LVL_Pos)
-#define BMI088_ACC_IO_CTRL_INT1_OD_Pos      (2U)     
+#define BMI088_ACC_IO_CTRL_INT1_OD_Pos      (2U)
 #define BMI088_ACC_IO_CTRL_INT1_OD_Msk      (0x1U << BMI088_ACC_IO_CTRL_INT1_OD_Pos)
-#define BMI088_ACC_IO_CTRL_INT1_OD          BMI088_ACC_IO_CTRL_INT1_OD_Msk       
-#define BMI088_ACC_IO_CTRL_INT1_OD_PSH_PLL  (0x0U << BMI088_ACC_IO_CTRL_INT1_OD_Pos)      
-#define BMI088_ACC_IO_CTRL_INT1_OD_OPN_DRN  (0x1U << BMI088_ACC_IO_CTRL_INT1_OD_Pos)   
+#define BMI088_ACC_IO_CTRL_INT1_OD          BMI088_ACC_IO_CTRL_INT1_OD_Msk
+#define BMI088_ACC_IO_CTRL_INT1_OD_PSH_PLL  (0x0U << BMI088_ACC_IO_CTRL_INT1_OD_Pos)
+#define BMI088_ACC_IO_CTRL_INT1_OD_OPN_DRN  (0x1U << BMI088_ACC_IO_CTRL_INT1_OD_Pos)
 #define BMI088_ACC_IO_CTRL_INT1_EN_OUT_Pos  (3U)
 #define BMI088_ACC_IO_CTRL_INT1_EN_OUT_Msk  (0x1U << BMI088_ACC_IO_CTRL_INT1_OUT_Pos
 #define BMI088_ACC_IO_CTRL_INT1_EN_OUT      BMI088_ACC_IO_CTRL_INT1_EN_OUT_Msk
-#define BMI088_ACC_IO_CTRL_INT1_EN_IN_Pos   (4U)   
-#define BMI088_ACC_IO_CTRL_INT1_EN_IN_Msk   (0x1U << BMI088_ACC_IO_CTRL_INT1_EN_IN_Pos)   
+#define BMI088_ACC_IO_CTRL_INT1_EN_IN_Pos   (4U)
+#define BMI088_ACC_IO_CTRL_INT1_EN_IN_Msk   (0x1U << BMI088_ACC_IO_CTRL_INT1_EN_IN_Pos)
 #define BMI088_ACC_IO_CTRL_INT1_EN_IN       BMI088_ACC_IO_CTRL_INT1_EN_IN_Msk
 /**@}*/
 
@@ -204,12 +197,12 @@
  */
 #define BMI088_ACC_FIFO_CONFIG1_INT2_EN_Pos (2U)
 #define BMI088_ACC_FIFO_CONFIG1_INT2_EN_Msk (0x1U << BMI088_ACC_FIFO_CONFIG1_INT2_EN_Pos)
-#define BMI088_ACC_FIFO_CONFIG1_INT2_EN     BMI088_ACC_FIFO_CONFIG1_INT2_EN_Msk 
-#define BMI088_ACC_FIFO_CONFIG1_INT1_EN_Pos (3U)    
-#define BMI088_ACC_FIFO_CONFIG1_INT1_EN_Msk (0x1U << BMI088_ACC_FIFO_CONFIG1_INT1_EN_Pos)  
-#define BMI088_ACC_FIFO_CONFIG1_INT1_EN     BMI088_ACC_FIFO_CONFIG1_INT1_EN_Msk		
-#define BMI088_ACC_FIFO_CONFIG1_ACC_EN_Pos  (6U)    
-#define BMI088_ACC_FIFO_CONFIG1_ACC_EN_Msk  (0x1U << BMI088_ACC_FIFO_CONFIG1_ACC_EN_Pos) 
+#define BMI088_ACC_FIFO_CONFIG1_INT2_EN     BMI088_ACC_FIFO_CONFIG1_INT2_EN_Msk
+#define BMI088_ACC_FIFO_CONFIG1_INT1_EN_Pos (3U)
+#define BMI088_ACC_FIFO_CONFIG1_INT1_EN_Msk (0x1U << BMI088_ACC_FIFO_CONFIG1_INT1_EN_Pos)
+#define BMI088_ACC_FIFO_CONFIG1_INT1_EN     BMI088_ACC_FIFO_CONFIG1_INT1_EN_Msk
+#define BMI088_ACC_FIFO_CONFIG1_ACC_EN_Pos  (6U)
+#define BMI088_ACC_FIFO_CONFIG1_ACC_EN_Msk  (0x1U << BMI088_ACC_FIFO_CONFIG1_ACC_EN_Pos)
 #define BMI088_ACC_FIFO_CONFIG1_ACC_EN      BMI088_ACC_FIFO_CONFIG1_ACC_EN_Msk
 /** @} */
 
@@ -228,8 +221,8 @@
  * @name    BMI088 ACC FIFO Watermark 1 register fields
  * @{
  */
-#define BMI088_ACC_FIFO_WTM_1_Pos           (0U) 
-#define BMI088_ACC_FIFO_WTM_1_Msk           (0x1FU << BMI088_ACC_FIFO_WTM_1_Pos) 
+#define BMI088_ACC_FIFO_WTM_1_Pos           (0U)
+#define BMI088_ACC_FIFO_WTM_1_Msk           (0x1FU << BMI088_ACC_FIFO_WTM_1_Pos)
 #define BMI088_ACC_FIFO_WTM_1               BMI088_ACC_FIFO_WTM_1_Msk
 /** @} */
 
@@ -237,18 +230,18 @@
  * @name    BMI088 ACC FIFO Watermark 0 register fields
  * @{
  */
-#define BMI088_ACC_FIFO_WTM_0_Pos          (0U) 
-#define BMI088_ACC_FIFO_WTM_0_Msk          (0xFFU << BMI088_ACC_FIFO_WTM_1_Pos) 
-#define BMI088_ACC_FIFO_WTM_0              BMI088_ACC_FIFO_WTM_0_Msk
+#define BMI088_ACC_FIFO_WTM_0_Pos           (0U)
+#define BMI088_ACC_FIFO_WTM_0_Msk           (0xFFU << BMI088_ACC_FIFO_WTM_1_Pos)
+#define BMI088_ACC_FIFO_WTM_0               BMI088_ACC_FIFO_WTM_0_Msk
 /** @} */
 
 /**
  * @name    BMI088 ACC FIFO DOWNS register fields
  * @{
  */
-#define BMI088_ACC_FIFO_DOWNS_Pos           (5U) 
-#define BMI088_ACC_FIFO_DOWNS_Msk           (0x3U << BMI088_ACC_FIFO_DOWNS_Pos) 
-#define BMI088_ACC_FIFO_DOWNS               BMI088_ACC_FIFO_DOWNS_Msk      
+#define BMI088_ACC_FIFO_DOWNS_Pos           (5U)
+#define BMI088_ACC_FIFO_DOWNS_Msk           (0x3U << BMI088_ACC_FIFO_DOWNS_Pos)
+#define BMI088_ACC_FIFO_DOWNS               BMI088_ACC_FIFO_DOWNS_Msk
 /** @} */
 
 /**
@@ -292,8 +285,8 @@
  * @{
  */
 #define BMI088_ACC_FIFO_DATA_Pos            (0U)
-#define BMI088_ACC_FIFO_DATA_Msk            (0xFFU << BMI088_ACC_FIFO_DATA_Pos)         
-#define BMI088_ACC_FIFO_DATA                BMI088_ACC_FIFO_DATA_Msk        
+#define BMI088_ACC_FIFO_DATA_Msk            (0xFFU << BMI088_ACC_FIFO_DATA_Pos)
+#define BMI088_ACC_FIFO_DATA                BMI088_ACC_FIFO_DATA_Msk
 /** @} */
 
 /**
@@ -451,6 +444,7 @@
 #define BMI088_ACC_CHIP_ID_Pos              (0U)
 #define BMI088_ACC_CHIP_ID_Msk              (0xFFU << BMI088_ACC_CHIP_ID_Pos)
 #define BMI088_ACC_CHIP_ID                  BMI088_ACC_CHIP_ID_Msk
+#define BMI088_ACC_CHIP_ID_EXPECTED         (0x1EU)
 /** @} */
 
 /**
@@ -458,59 +452,60 @@
  * @{
  */
 #define BMI088_AD_GYR_CHIP_ID               0x00U
-#define BMI088_AD_GYR_RATE_X_LSB            0x02U            
-#define BMI088_AD_GYR_RATE_X_MSB            0x03U            
-#define BMI088_AD_GYR_RATE_Y_LSB            0x04U            
-#define BMI088_AD_GYR_RATE_Y_MSB            0x05U            
-#define BMI088_AD_GYR_RATE_Z_LSB            0x06U  
-#define BMI088_AD_GYR_RATE_Z_MSB            0x07U         
-#define BMI088_AD_GYR_INT_STAT_1            0x0AU  
-#define BMI088_AD_GYR_FIFO_STATUS           0x0EU             
-#define BMI088_AD_GYR_RANGE                 0x0FU      
-#define BMI088_AD_GYR_BANDWIDTH             0x10U           
-#define BMI088_AD_GYR_LPM1                  0x11U      
-#define BMI088_AD_GYR_SOFTRESET             0x14U           
-#define BMI088_AD_GYR_INT_CTRL              0x15U          
-#define BMI088_AD_GYR_INT3_INT4_IO_CONFIG   0x16U                     
-#define BMI088_AD_GYR_INT3_INT4_IO_MAP      0x18U                  
-#define BMI088_AD_GYR_FIFO_WM_EN            0x1EU            
-#define BMI088_AD_GYR_FIFO_EXT_INT_S        0x34U                
-#define BMI088_AD_GYR_SELF_TEST             0x3CU           
-#define BMI088_AD_GYR_CONFIG_0              0x3DU          
-#define BMI088_AD_GYR_CONFIG_1              0x3EU        
-#define BMI088_AD_GYR_FIFO_DATA             0x3FU           
+#define BMI088_AD_GYR_RATE_X_LSB            0x02U
+#define BMI088_AD_GYR_RATE_X_MSB            0x03U
+#define BMI088_AD_GYR_RATE_Y_LSB            0x04U
+#define BMI088_AD_GYR_RATE_Y_MSB            0x05U
+#define BMI088_AD_GYR_RATE_Z_LSB            0x06U
+#define BMI088_AD_GYR_RATE_Z_MSB            0x07U
+#define BMI088_AD_GYR_INT_STAT_1            0x0AU
+#define BMI088_AD_GYR_FIFO_STATUS           0x0EU
+#define BMI088_AD_GYR_RANGE                 0x0FU
+#define BMI088_AD_GYR_BANDWIDTH             0x10U
+#define BMI088_AD_GYR_LPM1                  0x11U
+#define BMI088_AD_GYR_SOFTRESET             0x14U
+#define BMI088_AD_GYR_INT_CTRL              0x15U
+#define BMI088_AD_GYR_INT3_INT4_IO_CONFIG   0x16U
+#define BMI088_AD_GYR_INT3_INT4_IO_MAP      0x18U
+#define BMI088_AD_GYR_FIFO_WM_EN            0x1EU
+#define BMI088_AD_GYR_FIFO_EXT_INT_S        0x34U
+#define BMI088_AD_GYR_SELF_TEST             0x3CU
+#define BMI088_AD_GYR_CONFIG_0              0x3DU
+#define BMI088_AD_GYR_CONFIG_1              0x3EU
+#define BMI088_AD_GYR_FIFO_DATA             0x3FU
 /** @} */
 
 /**
- * @name    BMI088 Gyroscope Chip ID Register 
+ * @name    BMI088 Gyroscope Chip ID Register
  * @{
  */
 #define BMI088_GYR_CHIP_ID_Pos              (0U)
-#define BMI088_GYR_CHIP_ID_Msk              (0xFF << BMI088_GYR_CHIP_ID_Pos)                
+#define BMI088_GYR_CHIP_ID_Msk              (0xFF << BMI088_GYR_CHIP_ID_Pos)
 #define BMI088_GYR_CHIP_ID                  BMI088_GYR_CHIP_ID_Msk
+#define BMI088_GYR_CHIP_ID_EXPECTED         (0x0FU)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate X LSB Register 
+ * @name    BMI088 Gyroscope Rate X LSB Register
  * @{
  */
 #define BMI088_GYR_RATE_X_LSB_Pos           (0U)
 #define BMI088_GYR_RATE_X_LSB_Msk           (0xFF << BMI088_GYR_RATE_X_LSB_Pos)
-#define BMI088_GYR_RATE_X_LSB               BMI088_GYR_RATE_X_LSB_Msk 
+#define BMI088_GYR_RATE_X_LSB               BMI088_GYR_RATE_X_LSB_Msk
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate X MSB Register 
+ * @name    BMI088 Gyroscope Rate X MSB Register
  * @{
  */
 
 #define BMI088_GYR_RATE_X_MSB_Pos           (0U)
-#define BMI088_GYR_RATE_X_MSB_Msk           (0xFF << BMI088_GYR_RATE_X_MSB_Pos) 
+#define BMI088_GYR_RATE_X_MSB_Msk           (0xFF << BMI088_GYR_RATE_X_MSB_Pos)
 #define BMI088_GYR_RATE_X_MSB               BMI088_GYR_X_MSB_Msk
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate y LSB Register 
+ * @name    BMI088 Gyroscope Rate y LSB Register
  * @{
  */
 
@@ -520,7 +515,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate Y MSB Register 
+ * @name    BMI088 Gyroscope Rate Y MSB Register
  * @{
  */
 
@@ -530,7 +525,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate Z LSB Register 
+ * @name    BMI088 Gyroscope Rate Z LSB Register
  * @{
  */
 
@@ -540,7 +535,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Rate Z MSB Register 
+ * @name    BMI088 Gyroscope Rate Z MSB Register
  * @{
  */
 
@@ -550,19 +545,19 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Int Stat 1 Register 
+ * @name    BMI088 Gyroscope Int Stat 1 Register
  * @{
  */
-#define BMI088_GYR_INT_STAT1_FIFO_INT_Pos   (4U)   
+#define BMI088_GYR_INT_STAT1_FIFO_INT_Pos   (4U)
 #define BMI088_GYR_INT_STAT1_FIFO_INT_Msk   (0x1U << BMI088_GYR_INT_STAT1_FIFIO_INT_Pos)
 #define BMI088_GYR_INT_STAT1_FIFO_INT       BMI088_GYR_INT_STAT1_FIFO_INT_Msk
-#define BMI088_GYR_INT_STAT1_DRDY_Pos       (7U)   
+#define BMI088_GYR_INT_STAT1_DRDY_Pos       (7U)
 #define BMI088_GYR_INT_STAT1_DRDY_Msk       (0x1U << BMI088_GYR_INT_STAT1_DRDY_Pos)
 #define BMI088_GYR_INT_STAT1_DRDY           BMI088_GYR_INT_STAT1_DRDY_Msk
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope FIFO Status Register 
+ * @name    BMI088 Gyroscope FIFO Status Register
  * @{
  */
 #define BMI088_GYR_FIFO_STATUS_OVERRUN_Pos  (7U)
@@ -574,10 +569,10 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Range Register 
+ * @name    BMI088 Gyroscope Range Register
  * @{
  */
-#define BMI088_GYR_RANGE_Pos                (0U) 
+#define BMI088_GYR_RANGE_Pos                (0U)
 #define BMI088_GYR_RANGE_Msk                (0xFFU << BMI088_GYR_RANGE_Pos)
 #define BMI088_GYR_RANGE                    BMI088_GYR_RANGE_Msk
 #define BMI088_GYR_RANGE_2K                 (0x00U BMI088_GYR_RANGE_Pos)
@@ -588,27 +583,27 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Bandwidth Register 
+ * @name    BMI088 Gyroscope Bandwidth Register
  * @{
  */
-#define BMI088_GYR_BANDWIDTH_Pos            (0U)  
-#define BMI088_GYR_BANDWIDTH_Msk            (0xFFU << BMI088_GYR_BANDWIDTH_Pos) 
-#define BMI088_GYR_BANDWIDTH                BMI088_GYR_BANDWIDTH_Msk  
+#define BMI088_GYR_BANDWIDTH_Pos            (0U)
+#define BMI088_GYR_BANDWIDTH_Msk            (0xFFU << BMI088_GYR_BANDWIDTH_Pos)
+#define BMI088_GYR_BANDWIDTH                BMI088_GYR_BANDWIDTH_Msk
 #define BMI088_GYR_BANDWIDTH_2KHZ_532HZ     (0x00U << BMI088_GYR_BANDWIDTH_Pos)
-#define BMI088_GYR_BANDWIDTH_2KHZ_230HZ     (0x01U << BMI088_GYR_BANDWIDTH_Pos) 
+#define BMI088_GYR_BANDWIDTH_2KHZ_230HZ     (0x01U << BMI088_GYR_BANDWIDTH_Pos)
 #define BMI088_GYR_BANDWIDTH_1KHZ_116HZ     (0x02U << BMI088_GYR_BANDWIDTH_Pos)
 #define BMI088_GYR_BANDWIDTH_400HZ_47HZ     (0x03U << BMI088_GYR_BANDWIDTH_Pos)
 #define BMI088_GYR_BANDWIDTH_200HZ_23HZ     (0x04U << BMI088_GYR_BANDWIDTH_Pos)
-#define BMI088_GYR_BANDWIDTH_100HZ_12HZ     (0x05U << BMI088_GYR_BANDWIDTH_Pos) 
-#define BMI088_GYR_BANDWIDTH_200HZ_64HZ     (0x06U << BMI088_GYR_BANDWIDTH_Pos) 
+#define BMI088_GYR_BANDWIDTH_100HZ_12HZ     (0x05U << BMI088_GYR_BANDWIDTH_Pos)
+#define BMI088_GYR_BANDWIDTH_200HZ_64HZ     (0x06U << BMI088_GYR_BANDWIDTH_Pos)
 #define BMI088_GYR_BANDWIDTH_100HZ_32HZ     (0x07U << BMI088_GYR_BANDWIDTH_Pos)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope LPM1 Register 
+ * @name    BMI088 Gyroscope LPM1 Register
  * @{
  */
-#define BMI088_GYR_LPM1_Pos                 (0U)   
+#define BMI088_GYR_LPM1_Pos                 (0U)
 #define BMI088_GYR_LPM1_Msk                 (0xFFU << BMI088_GYR_LPM1_Pos)
 #define BMI088_GYR_LPM1                     BMI088_GYR_LPM1_Msk
 #define BMI088_GYR_LPM1_PM_NORMAL           (0x00U << BMI088_GYR_LPM1_Pos)
@@ -617,17 +612,17 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Soft Reset Register 
+ * @name    BMI088 Gyroscope Soft Reset Register
  * @{
  */
 #define BMI088_GYR_SOFT_RESET_Pos           (0U)
 #define BMI088_GYR_SOFT_RESET_Msk           (0xFFU << BMI088_GYR_SOFT_RESET_Pos)
 #define BMI088_GYR_SOFT_RESET               BMI088_GYR_SOFT_RESET_Msk
-#define BMI088_GYR_SOFT_RESET_CMD           (0xB6 << BMI088_GYR_SOFT_RESET_Pos)  
+#define BMI088_GYR_SOFT_RESET_CMD           (0xB6 << BMI088_GYR_SOFT_RESET_Pos)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Int Control Register 
+ * @name    BMI088 Gyroscope Int Control Register
  * @{
  */
 #define BMI088_GYR_FIFO_INT_EN_Pos          (6U)
@@ -639,7 +634,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Int3 Int4 IO Configure Register 
+ * @name    BMI088 Gyroscope Int3 Int4 IO Configure Register
  * @{
  */
 #define BMI088_GYR_INT3_LVL_Pos             (0U)
@@ -650,8 +645,8 @@
 #define BMI088_GYR_INT3_OD_Pos              (1U)
 #define BMI088_GYR_INT3_OD_Msk              (0x1U << BMI088_GYR_INT3_OD_Pos)
 #define BMI088_GYR_INT3_OD                  BMI088_GYR_INT3_OD_Msk
-#define BMI088_GYR_INT3_OD_OPEN_DRAIN       (0x1U << BMI088_GYR_INT3_OD_Pos)  
-#define BMI088_GYR_INT3_OD_PUSH_PULL        (0x0U << BMI088_GYR_INT3_OD_Pos) 
+#define BMI088_GYR_INT3_OD_OPEN_DRAIN       (0x1U << BMI088_GYR_INT3_OD_Pos)
+#define BMI088_GYR_INT3_OD_PUSH_PULL        (0x0U << BMI088_GYR_INT3_OD_Pos)
 #define BMI088_GYR_INT4_LVL_Pos             (2U)
 #define BMI088_GYR_INT4_LVL_Msk             (0x1U << BMI088_GYR_INT4_LVL_Pos)
 #define BMI088_GYR_INT4_LVL                 BMI088_GYR_INT4_LVL_Msk
@@ -665,7 +660,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Int3 Int4 IO Map  Register 
+ * @name    BMI088 Gyroscope Int3 Int4 IO Map  Register
  * @{
  */
 #define BMI088_GYR_INT3_DRDY_Pos            (0U)
@@ -681,25 +676,25 @@
 #define BMI088_GYR_INT4_FIFO                BMI088_GYR_INT4_FIFO_Msk
 #define BMI088_GYR_INT4_FIFO_RST            (0x0U << BMI088_GYR_INT4_FIFO_Pos)
 #define BMI088_GYR_INT4_DRDY_Pos            (7U)
-#define BMI088_GYR_INT4_DRDY_Msk            (0x1U << BMI088_GYR_INT4_DRDY_Pos)  
+#define BMI088_GYR_INT4_DRDY_Msk            (0x1U << BMI088_GYR_INT4_DRDY_Pos)
 #define BMI088_GYR_INT4_DRDY                BMI088_GYR_INT4_DRDY_Msk
 #define BMI088_GYR_INT4_DRDY_RST            (0x0U << BMI088_GYR_INT$_DRDY_Pos)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope FIFO Watermark Enable  Register 
+ * @name    BMI088 Gyroscope FIFO Watermark Enable  Register
  * @{
  */
 #define BMI088_GYR_WM_EN_Pos                (0U)
 #define BMI088_GYR_WM_WN_Msk                (0xFFU << BMI088_GYR_WM_EN_Pos)
-#define BMI088_GYR_WM_EN                    BMI088_GYR_WM_EN_Msk 
+#define BMI088_GYR_WM_EN                    BMI088_GYR_WM_EN_Msk
 #define BMI088_GYR_WM_INT_DISABLE           (0x08U << BMI088_GYR_WM_EN_Pos)
 #define BMI088_GYR_WM_INT_ENABLE            (0x88U << BMI088_GYR_WM_EN_Pos)
 #define BMI088_GYR_WM_RST                   (0x08U << BMI088_GYR_WM_EN_Pos)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope External Synchronization  Register 
+ * @name    BMI088 Gyroscope External Synchronization  Register
  * @{
  */
 #define BMI088_GYR_EXT_FIFO_S_SELECT_Pos    (4U)
@@ -713,10 +708,10 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope Self Test Register 
+ * @name    BMI088 Gyroscope Self Test Register
  * @{
  */
-#define BMI088_GYR_SELF_TEST_Pos            (0U)  
+#define BMI088_GYR_SELF_TEST_Pos            (0U)
 #define BMI088_GYR_SELF_TEST_Msk            (0x17U << BMI088_GYR_SELF_TEST_Pos)
 #define BMI088_GYR_SELF_TEST                BMI088_GYR_SELF_TEST_Msk
 #define BMI088_GYR_SELF_TEST_TRIG_BIST      (0x1U << BMI088_GYR_SELF_TEST_Pos)
@@ -726,17 +721,17 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope FIFO Config 0 Register 
+ * @name    BMI088 Gyroscope FIFO Config 0 Register
  * @{
  */
-#define BMI088_GYR_FIFO_CONFIG_0_Pos        (0U) 
+#define BMI088_GYR_FIFO_CONFIG_0_Pos        (0U)
 #define BMI088_GYR_FIFO_CONFIG_0_Msk        (0x7FU << BMI088_GYR_FIFO_CONFIG_0_Pos)
 #define BMI088_GYR_FIFO_CONFIG_0            BMI088_GYR_FIFO_CONFIG_0_Msk
 #define BMI088_GYR_FIFO_CONFIG_0_RST        (0x00  <<  BMI088_GYR_FIFO_CONFIG_0_Pos)
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope FIFO Config 1 Register 
+ * @name    BMI088 Gyroscope FIFO Config 1 Register
  * @{
  */
 #define BMI088_GYR_FIFO_CONFIG_1_Pos        (0U)
@@ -747,7 +742,7 @@
 /**@} */
 
 /**
- * @name    BMI088 Gyroscope FIFO Data Register 
+ * @name    BMI088 Gyroscope FIFO Data Register
  * @{
  */
 #define BMI088_GYR_FIFO_DATA_Pos            (0U)
@@ -833,96 +828,6 @@ typedef enum {
     BMI088_MODE_SUSPEND = 3
 } bmi088_acc_operating_mode_t;
 
-
-/**
- * @brief   BMI088 configuration structure.
- */
-typedef struct {
-#if (BMI088_USE_I2C) || defined(__DOXYGEN__)
-    /**
-     * @brief I2C driver associated with this BMI088.
-     */
-    I2CDriver                   *i2cp;
-    /**
-     * @brief I2C configuration associated with this BMI088.
-     */
-    const I2CConfig             *i2ccfg;
-    /**
-     * @brief BMI088 Accelerometer Slave Address
-     */
-    i2caddr_t                   acc_saddr;
-    /**
-     * @brief BMI088 Gyro Slave Address
-     */
-    i2caddr_t                   gyro_saddr;
-#endif /* BMI088_USE_I2C */
-/**
-* @brief BMI088 configuration register value
-*/
-uint16_t                        cfg;
-/**
-* @brief BMI088 configuration register value
-*/
-uint16_t                        cal;
-/**
-* @brief BMI088 Current LSB value for use in calculations
-*/
-uint16_t                        curr_lsb;
-} BMI088Config;
-
-/**
- * @brief   @p BMI088 specific methods.
- */
-#define _bmi088_methods_alone
-
-/**
- * @brief   @p BMI088 specific methods with inherited ones.
- */
-#define _bmi088_methods                                                     \
-    _base_object_methods
-
-/**
- * @extends BaseObjectVMT
- *
- * @brief   @p BMI088 virtual methods table.
- */
-struct BMI088VMT {
-    _bmi088_methods
-};
-
-/**
- * @brief   @p BMI088Driver specific data.
- */
-#define _bmi088_data                                                        \
-    _base_object_data                                                       \
-    /* Driver state.*/                                                      \
-    bmi088_state_t              state;                                      \
-    /* Current configuration data.*/                                        \
-    const BMI088Config          *config;
-
-/**
- * @brief BMI088 Power Monitor class.
- */
-struct BMI088Driver {
-    /** @brief Virtual Methods Table.*/
-    const struct BMI088VMT     *vmt;
-    _bmi088_data
-};
-
-/** @} */
-
-/*===========================================================================*/
-/* Driver macros.                                                            */
-/*===========================================================================*/
-
-/*===========================================================================*/
-/* External declarations.                                                    */
-/*===========================================================================*/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
 	int32_t accl_x;
 	int32_t accl_y;
@@ -940,6 +845,54 @@ typedef struct {
 	uint16_t gyro_y_raw;
 	uint16_t gyro_z_raw;
 } bmi088_gyro_sample_t;
+
+/**
+ * @brief   BMI088 configuration structure.
+ */
+typedef struct {
+#if (BMI088_USE_I2C) || defined(__DOXYGEN__)
+    /**
+     * @brief I2C driver associated with this BMI088.
+     */
+    I2CDriver                       *i2cp;
+    /**
+     * @brief I2C configuration associated with this BMI088.
+     */
+    const I2CConfig                 *i2ccfg;
+    /**
+     * @brief BMI088 Accelerometer Slave Address
+     */
+    i2caddr_t                       acc_saddr;
+    /**
+     * @brief BMI088 Gyro Slave Address
+     */
+    i2caddr_t                       gyro_saddr;
+#endif /* BMI088_USE_I2C */
+} BMI088Config;
+
+/**
+ * @brief BMI088 Power Monitor class.
+ */
+struct BMI088Driver {
+    /* Driver state.*/
+    bmi088_state_t              state;
+    /* Current configuration data.*/
+    const BMI088Config          *config;
+};
+
+/** @} */
+
+/*===========================================================================*/
+/* Driver macros.                                                            */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* External declarations.                                                    */
+/*===========================================================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void bmi088ObjectInit(BMI088Driver *devp);
 bool bmi088Start(BMI088Driver *devp, const BMI088Config *config);

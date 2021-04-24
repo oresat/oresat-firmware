@@ -44,7 +44,7 @@ static thread_descriptor_t imu_desc = {
 
 static oresat_config_t oresat_conf = {
     &CAND1,
-    0x7f, // ORESAT_DEFAULT_ID,
+    ORESAT_DEFAULT_ID,
     ORESAT_DEFAULT_BITRATE
 };
 
@@ -55,7 +55,7 @@ static void app_init(void)
 {
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
-    reg_worker(&imu_worker, &imu_desc, true, true);
+    reg_worker(&imu_worker, &imu_desc, false, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);

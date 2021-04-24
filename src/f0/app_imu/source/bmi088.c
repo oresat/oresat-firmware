@@ -9,14 +9,10 @@
 
 #include "hal.h"
 #include "bmi088.h"
-#include "chprintf.h"
-#include "string.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
-
-#define CHP ((BaseSequentialStream*) &SD2)
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -25,6 +21,7 @@
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
+
 typedef union {
     struct __attribute__((packed)) {
         uint8_t reg;
@@ -35,13 +32,6 @@ typedef union {
     };
     uint8_t buf[3];
 } i2cbuf_t;
-
-
-typedef union {
-    int16_t as_int16_type;
-    uint8_t as_bytes[1];
-} reading_union_t;
-
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -87,10 +77,6 @@ msg_t bmi088I2CWriteRegister(I2CDriver *i2cp, i2caddr_t saddr, uint8_t *txbuf,
 /* Interface implementation.                                                */
 /*==========================================================================*/
 
-static const struct BMI088VMT vmt_device = {
-    (size_t)0,
-};
-
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
@@ -103,8 +89,6 @@ static const struct BMI088VMT vmt_device = {
  * @init
  */
 void bmi088ObjectInit(BMI088Driver *devp) {
-    devp->vmt = &vmt_device;
-
     devp->config = NULL;
 
     devp->state = BMI088_STOP;
@@ -169,9 +153,7 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif /* BMI088_SHARED_I2C */
 #endif /* BMI088_USE_I2C */
 
-    if( ! ret ) {
-    	devp->state = BMI088_UNINIT;
-    } else {
+    if( ret ) {
     	devp->state = BMI088_READY;
     }
 
@@ -292,7 +274,7 @@ msg_t bmi088I2CWriteRegisterU8(BMI088Driver *devp, i2caddr_t saddr, uint8_t reg,
  *
  * @param[in] devp       Pointer to the @p BMI088Driver object
  * @param[in] soft_rst   write 0xB6 to soft reset register (Do not write any other value to this register)
- *               
+ *
  * @api
  */
 msg_t bmi088SoftReset(BMI088Driver *devp) {
@@ -305,7 +287,7 @@ msg_t bmi088SoftReset(BMI088Driver *devp) {
 /**
  * @brief   Enable BMI088 Accelerometer.
  *
- * @param[in] devp       Pointer to the @p BMI088Driver object              
+ * @param[in] devp       Pointer to the @p BMI088Driver object
  * @param[in] enable     Value to write to enable: 4, to disable: 0;
  * @api
  * @note   2021-03-30 Ted observes I2C lines only showing two bytes sent, saddr and
@@ -373,7 +355,7 @@ msg_t bmi088ReadPowerConfReg(BMI088Driver *devp, uint8_t *dest){
  * @brief   Reads BMI088 Chip ID.
  *
  * @param[in] devp       Pointer to the @p BMI088Driver object
- * @return               
+ * @return
  *
  * @api
  */
@@ -408,9 +390,9 @@ msg_t bmi088ReadErrCode(BMI088Driver *devp, uint8_t *dest){
 
 /**
  * @brief   Reads BMI088 Error Fatal Register.
- * 
+ *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               Flag: fatal Error; cleared by power-on-reset or soft-reset 
+ * @return               Flag: fatal Error; cleared by power-on-reset or soft-reset
  *
  * @api
  */
@@ -482,7 +464,7 @@ msg_t bmi088ReadAccelerometerXYZmG(BMI088Driver *devp, bmi088_accelerometer_samp
  * @brief   Reads BMI088 Interrupt Status Register.
  *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               interrupt status 
+ * @return               interrupt status
  *
  * @api
  */
@@ -500,7 +482,7 @@ msg_t bmi088ReadIntStat(BMI088Driver *devp, uint8_t *dest){
  * @brief   Reads BMI088 ACC Temperature sensor data
  *
  * @param[in] devp       pointer to the @p BMI088Driver object
- * @return               11 bit temp value in 2's complement format 
+ * @return               11 bit temp value in 2's complement format
  *
  * @api
  */
