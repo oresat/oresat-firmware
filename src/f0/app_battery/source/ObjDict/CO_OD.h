@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             48
+   #define CO_OD_NoOfElements             47
 
 
 /*******************************************************************************
@@ -617,9 +617,6 @@
 /*6003 */
         #define OD_6003_modelGaugeAlgStatus                         0x6003
 
-/*6004 */
-        #define OD_6004_heaterOn                                    0x6004
-
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -643,7 +640,6 @@ struct sCO_OD_RAM{
 /*6001      */ OD_battery2_t   battery2;
 /*6002      */ BOOLEAN        heaterStatus;
 /*6003      */ UNSIGNED16     modelGaugeAlgStatus;
-/*6004      */ BOOLEAN        heaterOn;
 
                UNSIGNED32     LastWord;
 };
@@ -840,9 +836,6 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 
 /*6003, Data Type: UNSIGNED16 */
         #define OD_modelGaugeAlgStatus                              CO_OD_RAM.modelGaugeAlgStatus
-
-/*6004, Data Type: BOOLEAN */
-        #define OD_heaterOn                                         CO_OD_RAM.heaterOn
 
 #endif
 // clang-format on
