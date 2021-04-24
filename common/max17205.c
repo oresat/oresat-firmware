@@ -10,7 +10,7 @@
 #include "hal.h"
 #include "max17205.h"
 
-#if 1
+#if 0
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
 #else
