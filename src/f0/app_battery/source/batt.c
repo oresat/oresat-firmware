@@ -5,7 +5,9 @@
 #include "chprintf.h"
 
 
-#if 1
+#define ENABLE_NV_MEMORY_UPDATE_CODE      0
+
+#if 0 || ENABLE_NV_MEMORY_UPDATE_CODE
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
@@ -362,56 +364,71 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, 
 	bool ret = false;
 	dbgprintf("\r\n%s\r\n", pack_str);
 
+	uint16_t masking_register = 0;
+	uint8_t num_writes_left = 0;
+	if( max17205ReadNVWriteCountMaskingRegister(config, &masking_register, &num_writes_left) == MSG_OK ) {
+		dbgprintf("Memory Update Masking of register is 0x%X, num_writes_left = %u\r\n", masking_register, num_writes_left);
+	}
+
+	bool all_elements_match = true;
 	dbgprintf("Current and expected NV settings:\r\n");
 	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
 		uint16_t reg_value = 0;
 		if( max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) == MSG_OK ) {
 			dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n", max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg, reg_value, batt_nv_programing_cfg[idx].value);
+			if( reg_value != batt_nv_programing_cfg[idx].value ) {
+				all_elements_match = false;
+			}
 		} else {
 			dbgprintf("Failed to read reg value\r\n");
 		}
 	}
-#if 0
-	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
-		if( max17205WriteRaw(devp, batt_nv_programing_cfg[idx].reg, batt_nv_programing_cfg[idx].value) == MSG_OK ) {
-			dbgprintf("Successfully wrote reg value\r\n");
-		} else {
-			dbgprintf("Failed to write reg value\r\n");
-		}
 
-	}
-	dbgprintf("Current and expected NV settings:\r\n");
-	for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
-		uint16_t reg_value = 0;
-		if( max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) == MSG_OK ) {
-			dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n", max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg, reg_value, batt_nv_programing_cfg[idx].value);
-		} else {
-			dbgprintf("Failed to read reg value\r\n");
-		}
-	}
-#endif
-
-
-	return(true);
-
-#if 0
-	dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
-	uint8_t ch = 0;
-	sdRead(&SD2, &ch, 1);
-	dbgprintf("\r\n");
-
-	if (ch == 'y') {
-		dbgprintf("Attempting to write non volatile memory...\r\n");
-		chThdSleepMilliseconds(50);
-
-		if (max17205NonvolatileBlockProgram(config)) {
-			dbgprintf("Successfully wrote non volatile memory...\r\n");
-			ret = true;
-		} else {
-			dbgprintf("Failed to write non volatile memory...\r\n");
-		}
+#if ENABLE_NV_MEMORY_UPDATE_CODE
+	if( all_elements_match ) {
+		dbgprintf("All NV Ram elements already match expected values...\r\n");
 	} else {
-		dbgprintf("Skipping...\r\n");
+		dbgprintf("One or more NV Ram elements don't match expected values...\r\n");
+		bool write_reg_success_flag = true;
+		for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
+			if( max17205WriteRaw(devp, batt_nv_programing_cfg[idx].reg, batt_nv_programing_cfg[idx].value) == MSG_OK ) {
+				dbgprintf("Successfully wrote reg value\r\n");
+			} else {
+				dbgprintf("Failed to write reg value\r\n");
+				write_reg_success_flag = false;
+			}
+		}
+
+		if( write_reg_success_flag ) {
+			dbgprintf("Current and expected NV settings:\r\n");
+			for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
+				uint16_t reg_value = 0;
+				if( max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) == MSG_OK ) {
+					dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n", max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg, reg_value, batt_nv_programing_cfg[idx].value);
+				} else {
+					dbgprintf("Failed to read reg value\r\n");
+				}
+			}
+
+
+			dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
+			uint8_t ch = 0;
+			sdRead(&SD2, &ch, 1);
+			dbgprintf("\r\n");
+
+			if (ch == 'y') {
+				ret = true;
+
+				dbgprintf("Attempting to write non volatile memory on MAX17205...\r\n");
+				chThdSleepMilliseconds(50);
+
+				if (max17205NonvolatileBlockProgram(config) == MSG_OK ) {
+					dbgprintf("Successfully wrote non volatile memory on MAX17205...\r\n");
+				} else {
+					dbgprintf("Failed to write non volatile memory on MAX17205...\r\n");
+				}
+			}
+		}
 	}
 #endif
 
@@ -442,14 +459,15 @@ THD_FUNCTION(batt, arg)
 
 
 #if 1
-    bool b1 = prompt_nv_memory_write(&max17205devPack1, &max17205configPack1, "Pack 1");
-    bool b2 = prompt_nv_memory_write(&max17205devPack2, &max17205configPack2, "Pack 2");
-    if( b1 || b2 ) {
-		for (;;) {
-			dbgprintf(".");
-			chThdSleepMilliseconds(1000);
-		}
-    }
+    prompt_nv_memory_write(&max17205devPack1, &max17205configPack1, "Pack 1");
+    prompt_nv_memory_write(&max17205devPack2, &max17205configPack2, "Pack 2");
+#if ENABLE_NV_MEMORY_UPDATE_CODE
+    dbgprintf("Done with NV RAM update code, disable ENABLE_NV_MEMORY_UPDATE_CODE and re-write firmware.\r\n");
+	for (;;) {
+		dbgprintf(".");
+		chThdSleepMilliseconds(1000);
+	}
+#endif
 #endif
 
 

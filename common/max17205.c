@@ -55,51 +55,48 @@ msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config) {
 	//	1. Write desired memory locations to new values.
 	//should be done prior to calling this function
 
-	bool success_flag = false;
-	for(int retry_count = 0; (! success_flag) && retry_count < 1; retry_count++ ) {
-		dbgprintf("Clearing CommStat.NVError bit\r\n");
-		//	2. Clear CommStat.NVError bit.
-		buf.reg = MAX17205_AD(MAX17205_AD_COMMSTAT);
-		buf.value = MAX17205_COMMSTAT_NVERROR;
-		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMSTAT), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
-			return(r);
-		}
+	dbgprintf("Clearing CommStat.NVError bit\r\n");
+	//	2. Clear CommStat.NVError bit.
+	buf.reg = MAX17205_AD(MAX17205_AD_COMMSTAT);
+	buf.value = MAX17205_COMMSTAT_NVERROR;
+	if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMSTAT), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
+		return(r);
+	}
 
-		//	3. Write 0xE904 to the Command register 0x060 to initiate a block copy.
-		buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
-		buf.value = 0xE904;
-		if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
-			dbgprintf("Initiated failed to send command to initiate block copy....\r\n");
-			return(r);
+	//	3. Write 0xE904 to the Command register 0x060 to initiate a block copy.
+	buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
+	buf.value = 0xE904;
+	if( (r = max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf))) != MSG_OK ) {
+		dbgprintf("Initiated failed to send command to initiate block copy....\r\n");
+		return(r);
+	} else {
+		dbgprintf("Initiated MAX17205 block copy....\r\n");
+	}
+
+
+	//	4. Wait t BLOCK for the copy to complete.
+
+	dbgprintf("Waiting %u ms for block copy to complete....\r\n", MAX17205_T_BLOCK_MS);
+	chThdSleepMilliseconds(MAX17205_T_BLOCK_MS); //tBlock(max) is specified as 7360ms in the data sheet, page 16
+
+
+	bool successful_block_copy_flag = false;
+	//	5. Check the CommStat.NVError bit. If set, repeat the process. If clear, continue.
+	if( (r = max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_COMMSTAT), buf.data, sizeof(buf.data))) != MSG_OK ) {
+		dbgprintf("Failed to query COMMSTAT register...\r\n");
+		return(r);
+	} else {
+		dbgprintf("Read MAX17205_AD_COMMSTAT register 0x%X as 0x%X\r\n", MAX17205_AD_COMMSTAT, buf.value);
+		if( buf.value & MAX17205_COMMSTAT_NVERROR ) {
+			//Error bit is set
+			dbgprintf("Block copy failed...\r\n");
 		} else {
-			dbgprintf("Initiated MAX17205 block copy....\r\n");
-		}
-
-
-		//	4. Wait t BLOCK for the copy to complete.
-
-		dbgprintf("Waiting %u ms for block copy to complete....\r\n", MAX17205_T_BLOCK_MS);
-		chThdSleepMilliseconds(MAX17205_T_BLOCK_MS); //tBlock(max) is specified as 7360ms in the data sheet, page 16
-
-
-		//	5. Check the CommStat.NVError bit. If set, repeat the process. If clear, continue.
-		if( (r = max17205I2CReadRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), MAX17205_AD(MAX17205_AD_COMMSTAT), buf.data, sizeof(buf.data))) != MSG_OK ) {
-			dbgprintf("Failed to query COMMSTAT register...\r\n");
-			return(r);
-		} else {
-			dbgprintf("Read MAX17205_AD_COMMSTAT register 0x%X as 0x%X\r\n", MAX17205_AD_COMMSTAT, buf.value);
-			if( buf.value & MAX17205_COMMSTAT_NVERROR ) {
-				//Error bit is set
-				dbgprintf("Block copy failed, retrying...\r\n");
-			} else {
-				dbgprintf("Block copy was successful, breaking...\r\n");
-				success_flag = true;
-				break;
-			}
+			dbgprintf("Block copy was successful, breaking...\r\n");
+			successful_block_copy_flag = true;
 		}
 	}
 
-	if( ! success_flag ) {
+	if( ! successful_block_copy_flag ) {
 		return(MSG_RESET);
 	}
 
@@ -109,6 +106,7 @@ msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config) {
 	//	8. Write 0x0001 to Counter Register 0x0BB to reset firmware.
 	//	9. Wait t POR for the firmware to restart.
 	if( (r = max17205HardwareReset(config->i2cp)) != MSG_OK ) {
+		dbgprintf("Failed to reset MAX17205\r\n");
 		return(r);
 	}
 
@@ -190,7 +188,8 @@ msg_t max17205HardwareReset(I2CDriver *i2cp) {
 	buf.reg = MAX17205_AD(MAX17205_AD_COMMAND);
 	buf.value = MAX17205_COMMAND_HARDWARE_RESET;
 	if( (r = max17205I2CWriteRegister(i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf))) != MSG_OK ) {
-		return(r);
+		dbgprintf("Cmd register write failed...\r\n");
+		//return(r);
 	}
 	chThdSleepMilliseconds(10);
 
@@ -607,14 +606,17 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
 }
 
 /**
+ * The MAX17205 allows for the NV ram to be written no more then 7 times on a single chip. Each time, an additional bit is set in a flash register which can be queried.
+ *
  * TODO document this
  */
-msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
-	i2cbuf_t buf;
-
-
+msg_t max17205ReadNVWriteCountMaskingRegister(const MAX17205Config *config, uint16_t *reg_dest, uint8_t *number_of_writes_left) {
 	//Determine the number of times NV memory has been written on this chip.
 	//See page 85 of the data sheet
+
+	dbgprintf("Reading NV Masking register...\r\n");
+	i2cbuf_t buf;
+
 	buf.reg = MAX17205_AD_COMMAND;
 	buf.value = 0xE2FA;
 	if( max17205I2CWriteRegister(config->i2cp, MAX17205_SA(MAX17205_AD_COMMAND), buf.buf, sizeof(buf.buf)) == MSG_OK ) {
@@ -623,8 +625,36 @@ msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
 		if( max17205I2CReadRegister(config->i2cp, MAX17205_SA(0x1ED), 0xED, buf.data, sizeof(buf.data)) == MSG_OK ) {
 			uint8_t mm = (buf.value & 0xFF) & ((buf.value >> 8) & 0xFF);
 			dbgprintf("Memory Update Masking of register 0x%X is 0x%X\r\n", 0x1ED, mm);
+
+			uint8_t num_left = 7;
+			for(uint8_t i = 0; i < 8; i++) {
+				if( buf.value & (1<<i) && num_left > 0) {
+					num_left--;
+				}
+			}
+
+			*reg_dest = buf.value;
+			*number_of_writes_left = num_left;
+			return(MSG_OK);
 		}
 	}
+
+	return(MSG_TIMEOUT);
+}
+
+/**
+ * TODO document this
+ */
+msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config) {
+	i2cbuf_t buf;
+
+
+	uint16_t masking_register = 0;
+	uint8_t num_left = 0;
+	if( max17205ReadNVWriteCountMaskingRegister(config, &masking_register, &num_left) == MSG_OK ) {
+
+	}
+
 
 	dbgprintf("\r\nMAX17205 *Volatile* Registers\r\n");
 	uint16_t volatile_reg_list[] = {

@@ -1197,6 +1197,7 @@ msg_t max17205HardwareReset(I2CDriver *i2cp);
 msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf, size_t n);
 msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg, uint8_t* rxbuf, size_t n);
 
+msg_t max17205ReadNVWriteCountMaskingRegister(const MAX17205Config *config, uint16_t *reg_dest, uint8_t *number_of_writes_left);
 msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config);
 msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config);
 
