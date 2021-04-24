@@ -264,11 +264,11 @@ void CO_init(CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, const flt_reg
     err = CO_CANinit(CANptr, bitrate);
     chDbgAssert(err == CO_ERROR_NO, "CO_CANinit failed");
     for (int i = 0; i < CO_NO_TPDO; i++) {
-        if (OD_TPDOCommunicationParameter[i].COB_IDUsedByTPDO == 0x180U + (0x100U * (i % 4)))
+        if ((OD_TPDOCommunicationParameter[i].COB_IDUsedByTPDO) && 0x7FF == 0x180U + (0x100U * (i % 4)))
             OD_TPDOCommunicationParameter[i].COB_IDUsedByTPDO += node_id + i / 4;
     }
     for (int i = 0; i < CO_NO_RPDO; i++) {
-        if (OD_RPDOCommunicationParameter[i].COB_IDUsedByRPDO == 0x200U + (0x100U * (i % 4)))
+        if ((OD_RPDOCommunicationParameter[i].COB_IDUsedByRPDO) && 0x7FF == 0x200U + (0x100U * (i % 4)))
             OD_RPDOCommunicationParameter[i].COB_IDUsedByRPDO += node_id + i / 4;
     }
     err = CO_CANopenInit(node_id);
