@@ -27,7 +27,6 @@
 
 
 #include "301/CO_driver.h"
-#include "can_hw.h"
 
 #define container_of(ptr, type, member) ({const typeof(((type *)0)->member) *__mptr = (ptr); (type *)((char *)__mptr - offsetof(type,member));})
 
@@ -77,6 +76,11 @@ CO_ReturnError_t CO_CANmodule_init(
 {
     uint16_t i;
 
+    osalDbgAssert(CANmodule->canFIFO1FilterCount == 0 || CANmodule->canFIFO1Filters != NULL,
+            "Error in CO_CANmodule_init(): FIFO 1 Filters is NULL when count is not 0");
+    osalDbgAssert((CANmodule->canFIFO1FilterCount % 2) == 0,
+            "Error in CO_CANmodule_init(): FIFO 1 Filter count must be multiple of 2");
+
     /* Verify arguments */
     if (CANmodule==NULL || rxArray==NULL || txArray==NULL) {
         return CO_ERROR_ILLEGAL_ARGUMENT;
@@ -94,7 +98,12 @@ CO_ReturnError_t CO_CANmodule_init(
     CANmodule->txSize = txSize;
     CANmodule->CANerrorStatus = 0;
     CANmodule->CANnormal = false;
-    CANmodule->useCANrxFilters = (rxSize <= (STM32_CAN_MAX_FILTERS * 4) ? (rxSize / 4) + 1 : 0);
+    if ((rxSize / 4) + 1 + CANmodule->canFIFO1FilterCount <= STM32_CAN_MAX_FILTERS) {
+        CANmodule->canFIFO0FilterCount = (rxSize / 4) + 1;
+        CANmodule->useCANrxFilters = CANmodule->canFIFO0FilterCount + CANmodule->canFIFO1FilterCount;
+    } else {
+        CANmodule->useCANrxFilters = 0;
+    }
     CANmodule->bufferInhibitFlag = false;
     CANmodule->firstCANtxMessage = true;
     CANmodule->CANtxCount = 0U;
@@ -128,13 +137,22 @@ CO_ReturnError_t CO_CANmodule_init(
     /* CO_CANrxBufferInit() functions, called by separate CANopen */
     /* init functions. */
     /* Initialize all filter entries */
-    for (i = 0U; i < CANmodule->useCANrxFilters; i++) {
+    for (i = 0U; i < CANmodule->canFIFO0FilterCount; i++) {
         CANmodule->canFilters[i].filter = i;
         CANmodule->canFilters[i].mode = 1;                  /* List Mode */
         CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
         CANmodule->canFilters[i].assignment = 0;            /* Assign FIFO0 */
         CANmodule->canFilters[i].register1 = 0;             /* Clear out the IDs */
         CANmodule->canFilters[i].register2 = 0;             /* Clear out the IDs */
+    }
+    for (i = CANmodule->canFIFO0FilterCount; i < CANmodule->useCANrxFilters; i++) {
+        int filter_index = (i - CANmodule->canFIFO0FilterCount) * 2;
+        CANmodule->canFilters[i].filter = i;
+        CANmodule->canFilters[i].mode = 1;                  /* List Mode */
+        CANmodule->canFilters[i].scale = 0;                 /* 16bit scale */
+        CANmodule->canFilters[i].assignment = 1;            /* Assign FIFO1 */
+        CANmodule->canFilters[i].register1 = CANmodule->canFIFO1Filters[filter_index].raw;
+        CANmodule->canFilters[i].register2 = CANmodule->canFIFO1Filters[filter_index + 1].raw;
     }
 
     return CO_ERROR_NO;
@@ -390,7 +408,7 @@ void CO_CANrx_cb(CANDriver *canp, uint32_t flags)
     CANmodule = container_of(canp->config, CO_CANmodule_t, cancfg);
 
     chSysLockFromISR();
-    canTryReceiveI(canp, CAN_ANY_MAILBOX, &rcvMsg.rxFrame);
+    canTryReceiveI(canp, 1, &rcvMsg.rxFrame);
     rcvMsgIdent = rcvMsg.SID | (rcvMsg.RTR << 11);
     if (CANmodule->useCANrxFilters) {
         /* CAN module filters are used. Message with known 11-bit identifier has */
