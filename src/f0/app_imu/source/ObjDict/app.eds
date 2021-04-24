@@ -8,7 +8,7 @@ Description=OreSat IMU Application Object Dictionary
 CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=3:51PM
+ModificationTime=4:06PM
 ModificationDate=04-24-2021
 ModifiedBy=Ryan Meidick
 
@@ -4028,7 +4028,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60020010
+DefaultValue=0x60020008
 PDOMapping=0
 
 [1A02sub2]
