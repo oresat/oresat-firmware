@@ -222,7 +222,7 @@ bool can_bootloader_initiate(can_bootloader_config_t *can_bl_config, const uint3
             if( msg.SID == STM32_BOOTLOADER_CAN_ANNOUNCE && msg.DLC == 8 ) {
 
                 if( msg.data8[0] == 0x01 && msg.data8[1] == 0x02 && msg.data8[2] == 0x03 && msg.data8[3] == 0x04 ) {
-                    const uint32_t remote_low_cpu_id = (msg.data8[4] << 24) | (msg.data8[5] << 16) | (msg.data8[6] << 8) | (msg.data8[7] << 0);
+                    const uint32_t remote_low_cpu_id = (msg.data8[7] << 24) | (msg.data8[6] << 16) | (msg.data8[5] << 8) | (msg.data8[4] << 0);
                     chprintf(chp, "Remote CPU ID Low = 0x%X\r\n", remote_low_cpu_id);
 
                     if( can_bl_config->low_cpu_id == 0 || remote_low_cpu_id == can_bl_config->low_cpu_id ) {

@@ -188,7 +188,7 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 #endif
 
     } else if (!strcmp(argv[0], "opt") && argc >= 4 ) {
-    	//Example of programmign node ID 22 (onto node id 22)   bootloader opt 22 FF 00000022
+    	//Example of programming node ID 22 (onto node id 22)   bootloader opt 22 FF 00000022
 
     	uint8_t data_0 = 0;
     	sscanf(argv[1], "%2hhx", &data_0);
@@ -202,7 +202,8 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
     	uint8_t cpu_id_3 = 0;
     	sscanf(argv[3], "%2hhx%2hhx%2hhx%2hhx", &cpu_id_0, &cpu_id_1, &cpu_id_2, &cpu_id_3);
 
-    	uint32_t cpu_id = (cpu_id_3 << 24) |(cpu_id_2 << 16) | (cpu_id_1 << 8) |  cpu_id_0;
+    	uint32_t cpu_id = (cpu_id_0 << 24) |(cpu_id_1 << 16) | (cpu_id_2 << 8) |  cpu_id_3;
+    	chprintf(chp, "Looking for CPU ID 0x%X\r\n", cpu_id);
 
     	if( can_write_node_id(chp, cpu_id, data_0, data_1) ) {
     		chprintf(chp, "Successfully wrote data 0 and data 1 OPT bytes...\r\n");
