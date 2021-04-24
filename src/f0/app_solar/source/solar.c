@@ -2,7 +2,7 @@
 #include "ina226.h"
 #include "CANopen.h"
 
-#if 1
+#if 0
 #define DEBUG_SD                (BaseSequentialStream *) &SD2
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
