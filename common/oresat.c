@@ -35,7 +35,7 @@ void oresat_init(oresat_config_t *config)
     }
 
     /* Initialize CANopen Subsystem */
-    CO_init(cand, config->node_id, config->bitrate);
+    CO_init(cand, config->node_id, config->bitrate, config->fifo1_filters, config->filter_count);
 
     return;
 }
