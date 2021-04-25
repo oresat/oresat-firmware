@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="13:54:53.9525290-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="16:02:23.1333830-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -11778,12 +11778,12 @@ If true, skips antenna deployment attempt</description>
           <q1:parameter uniqueID="UID_SUB_700101" access="readWriteInput">
             <label lang="en">Vbatt BP1</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="7200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700102" access="readWriteInput">
             <label lang="en">Vbatt BP2</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="7200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700103" access="readWriteInput">
             <label lang="en">VCell max BP1</label>
@@ -13406,7 +13406,7 @@ If true, skips antenna deployment attempt</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="13:54:53.9525290-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="16:02:23.1333830-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

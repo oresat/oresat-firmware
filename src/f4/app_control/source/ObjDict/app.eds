@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:54PM
+ModificationTime=4:01PM
 ModificationDate=04-25-2021
 ModifiedBy=
 
@@ -12372,7 +12372,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rwr
-DefaultValue=0
+DefaultValue=7200
 PDOMapping=1
 
 [7001sub2]
@@ -12381,7 +12381,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rwr
-DefaultValue=0
+DefaultValue=7200
 PDOMapping=1
 
 [7001sub3]

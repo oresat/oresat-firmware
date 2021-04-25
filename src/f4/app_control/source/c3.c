@@ -111,6 +111,15 @@ bool delay_deploy(void)
     return (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_deploymentControl.timeout);
 }
 
+CO_SDO_abortCode_t OD_BATT_CALLBACK(CO_ODF_arg_t *ODF_arg)
+{
+    if (!ODF_arg->reading) {
+        chEvtSignal(c3_tp, C3_EVENT_BAT);
+    }
+
+    return CO_SDO_AB_NONE;
+}
+
 bool bat_good(void)
 {
     static bool good = true;
@@ -155,6 +164,7 @@ THD_FUNCTION(c3, arg)
 
     c3_tp = chThdGetSelfX();
     rtcSetCallback(&RTCD1, alarmcb);
+    CO_OD_configure(CO->SDO[0], OD_7001_battery, OD_BATT_CALLBACK, NULL, NULL, 0);
 
     /* Restore saved state */
     c3StateRestore();
