@@ -77,6 +77,13 @@ const uslp_mc_t mc = {
     .vcid[1]        = &vc1,
 };
 
+static const uslp_pc_t lband_pc = {
+    .name           = "L-Band",
+    .tf_len         = USLP_MAX_LEN,
+    .fecf           = FECF_HW,
+    .fecf_len       = FECF_LEN,
+};
+
 static const uslp_pc_t uhf_pc = {
     .name           = "UHF",
     .tf_len         = USLP_MAX_LEN,
@@ -86,22 +93,15 @@ static const uslp_pc_t uhf_pc = {
     .phy_send_prio  = comms_send_ahead,
 };
 
-static const uslp_pc_t lband_pc = {
-    .name           = "L-Band",
-    .tf_len         = USLP_MAX_LEN,
-    .fecf           = FECF_HW,
-    .fecf_len       = FECF_LEN,
+static const uslp_link_t edl_lband_link = {
+    .mc = &mc,
+    .pc_rx = &lband_pc,
+    .pc_tx = &uhf_pc,
 };
 
 static const uslp_link_t edl_uhf_link = {
     .mc = &mc,
     .pc_rx = &uhf_pc,
-    .pc_tx = &uhf_pc,
-};
-
-static const uslp_link_t edl_lband_link = {
-    .mc = &mc,
-    .pc_rx = &lband_pc,
     .pc_tx = &uhf_pc,
 };
 
@@ -578,15 +578,24 @@ THD_FUNCTION(edl_thd, arg)
 {
     (void)arg;
     fb_t *rx_fb;
+    size_t len;
 
     while (!chThdShouldTerminateX()) {
         rx_fb = fb_get();
         if (rx_fb == NULL) {
             continue;
         }
-
         edl_enable(true);
-        uslp_recv(rx_fb->phy_arg, rx_fb);
+        len = rx_fb->len;
+        if (uslp_recv(rx_fb->phy_arg, rx_fb)) {
+            if (rx_fb->phy_arg == &edl_lband_link) {
+                OD_persistentState.LBandRX_Bytes += len;
+                OD_persistentState.LBandRX_Packets += 1;
+            } else if (rx_fb->phy_arg == &edl_uhf_link) {
+                OD_persistentState.UHF_RX_Bytes += len;
+                OD_persistentState.UHF_RX_Packets += 1;
+            }
+        }
         fb_free(rx_fb);
     }
 

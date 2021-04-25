@@ -344,7 +344,7 @@ int uslp_mc_ocf_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
 int uslp_cop_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
 int uslp_vcf_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
 int uslp_mcf_send(const uslp_link_t *link, fb_t *fb);
-void uslp_recv(const uslp_link_t *link, fb_t *fb);
+bool uslp_recv(const uslp_link_t *link, fb_t *fb);
 
 #ifdef __cplusplus
 }

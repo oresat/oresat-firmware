@@ -16,9 +16,9 @@
 #define TX_ENABLE_ALARM                     ALARM_B     /* TX enable timeout alarm number */
 #define EDL_ALARM                           ALARM_A     /* EDL timeout alarm number */
 
-#define BAT_LEVEL_LOW                       600U
-#define BAT_LEVEL_HIGH                      850U
-#define BAT_LOW                             (1000U < BAT_LEVEL_LOW && 1000U < BAT_LEVEL_LOW)
+#define BAT_LEVEL_LOW                       6500U
+#define BAT_LEVEL_HIGH                      7000U
+#define BAT_LOW                             (OD_battery[0].vbattBP1 < BAT_LEVEL_LOW && OD_battery[0].vbattBP2 < BAT_LEVEL_LOW)
 
 /* Global State Variables */
 thread_t *c3_tp;
@@ -158,6 +158,9 @@ THD_FUNCTION(c3, arg)
 
     /* Restore saved state */
     c3StateRestore();
+
+    /* Increment power cycles */
+    OD_persistentState.powerCycles++;
 
     /* State loop */
     while (!chThdShouldTerminateX()) {

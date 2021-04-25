@@ -90,6 +90,9 @@ static void loopback_tx(fb_t *fb)
         return;
     }
 
+    /* Add empty FECF */
+    fb_put(fb, 2);
+
     if (fb == tx_fb) {
         fb->phy_arg = (void*)&edl_loopback_tx_link;
         fb_post(fb);
@@ -125,7 +128,7 @@ static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
 {
     cmd_t *cmd;
     tx_fb = fb_alloc(CMD_RESP_ALLOC);
-    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN);
+    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + 2);
     cmd = fb_put(tx_fb, sizeof(cmd_t) + arg_len);
     cmd->cmd = cmd_code;
     if (arg != NULL)
@@ -151,7 +154,7 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
     }
 
     tx_fb = fb_alloc(FB_MAX_LEN);
-    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t));
+    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t) + 2);
     data = fb_put(tx_fb, len);
     ret = file_read(&FSD1, file, data, len);
     file_close(&FSD1, file);
@@ -229,6 +232,12 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_C3_BANK, &arg, sizeof(arg));
         print_response(chp);
+    } else if (!strcmp(argv[0], "fs_upload") && argc > 2) {
+        chprintf(chp, "File send result: %d\r\n", send_file(chp, argv[1], argv[2]));
+    } else if (!strcmp(argv[0], "fs_upload_seg") && argc > 4) {
+        lfs_soff_t off = strtoul(argv[3], NULL, 0);
+        lfs_ssize_t len = strtoul(argv[4], NULL, 0);
+        chprintf(chp, "File send result: %d\r\n", send_file_seg(chp, argv[1], argv[2], off, len));
     } else if (!strcmp(argv[0], "fs_format")) {
         send_cmd(CMD_FS_FORMAT, NULL, 0);
         print_response(chp);
@@ -267,12 +276,6 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_OPD_STATUS, &arg, sizeof(arg));
         print_response(chp);
-    } else if (!strcmp(argv[0], "fs_upload") && argc > 2) {
-        chprintf(chp, "File send result: %d\r\n", send_file(chp, argv[1], argv[2]));
-    } else if (!strcmp(argv[0], "fs_upload_seg") && argc > 4) {
-        lfs_soff_t off = strtoul(argv[3], NULL, 0);
-        lfs_ssize_t len = strtoul(argv[4], NULL, 0);
-        chprintf(chp, "File send result: %d\r\n", send_file_seg(chp, argv[1], argv[2], off, len));
     } else if (!strcmp(argv[0], "send")) {
         uint8_t buf[] = {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -303,6 +306,10 @@ edl_usage:
                    "        Post a C3 Flash command to EDL RX queue\r\n"
                    "    c3_bank <bank>:\r\n"
                    "        Post a C3 Bank command to EDL RX queue\r\n"
+                   "    fs_upload <src> <dest>:\r\n"
+                   "        Upload <src> to <dest> via EDL\r\n"
+                   "    fs_upload_seg <src> <dest> <offset> <len>:\r\n"
+                   "        Upload <len> bytes starting at <offset> from <src> to <dest> via EDL\r\n"
                    "    fs_format:\r\n"
                    "        Post FS Format command to EDL RX queue\r\n"
                    "    fs_unmount:\r\n"

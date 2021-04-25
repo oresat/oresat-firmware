@@ -5,6 +5,7 @@
  * @addtogroup CCSDS
  * @{
  */
+#include "ch.h"
 #include "frame_buf.h"
 
 /*===========================================================================*/
@@ -36,6 +37,7 @@ static const fb_t empty_frame;
 fb_t *fb_alloc(size_t len)
 {
     if (len > FB_MAX_LEN) {
+        chDbgCheck(false);
         return NULL;
     }
 
@@ -94,6 +96,7 @@ void fb_reserve(fb_t *fb, size_t len)
 void *fb_put(fb_t *fb, size_t len)
 {
     if (fb == NULL || fb->tail + len > fb->end) {
+        chDbgCheck(false);
         return NULL;
     }
     void *ptr = fb->tail;
@@ -105,6 +108,7 @@ void *fb_put(fb_t *fb, size_t len)
 void *fb_push(fb_t *fb, size_t len)
 {
     if (fb == NULL || fb->data - len < fb->head) {
+        chDbgCheck(false);
         return NULL;
     }
     fb->data -= len;
@@ -115,6 +119,7 @@ void *fb_push(fb_t *fb, size_t len)
 void *fb_pull(fb_t *fb, size_t len)
 {
     if (fb == NULL || fb->data + len > fb->tail) {
+        chDbgCheck(false);
         return NULL;
     }
     fb->data += len;
@@ -126,6 +131,7 @@ void *fb_pull(fb_t *fb, size_t len)
 void fb_trim(fb_t *fb, size_t len)
 {
     if (fb == NULL || fb->tail - len < fb->data) {
+        chDbgCheck(false);
         return;
     }
     fb->tail -= len;

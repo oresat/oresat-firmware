@@ -45,9 +45,6 @@ static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *sci
     /* Must be USLP frame */
     if ((id & USLP_TFPH_ID_TFVN) >> USLP_TFPH_ID_TFVN_Pos != USLP_TFVN)
         return false;
-    /* Must be destination */
-    if (!(id & USLP_TFPH_ID_SRC_DST))
-        return false;
     /* Must match SCID */
     *scid = (id & USLP_TFPH_ID_SCID) >> USLP_TFPH_ID_SCID_Pos;
     if (*scid != scid_match)
@@ -308,7 +305,7 @@ int uslp_mcf_send(const uslp_link_t *link, fb_t *fb)
     return 0;
 }
 
-void uslp_recv(const uslp_link_t *link, fb_t *fb)
+bool uslp_recv(const uslp_link_t *link, fb_t *fb)
 {
     uslp_tfph_t *tfph = (uslp_tfph_t*)fb->data;
     const uslp_pc_t *pc = link->pc_rx;
@@ -320,11 +317,11 @@ void uslp_recv(const uslp_link_t *link, fb_t *fb)
 
     /* Verify CRC */
     if (!uslp_fecf_recv(pc, fb))
-        return;
+        return false;
 
     /* Parse out IDs */
     if (!uslp_parse_id(tfph->id, mc->scid, &scid, &vcid, &mapid))
-        return;
+        return false;
 
     /* Insert Service */
     if (pc->insert_zone) {
@@ -346,7 +343,7 @@ void uslp_recv(const uslp_link_t *link, fb_t *fb)
     /* Demux VC */
     vc = mc->vcid[vcid];
     if (vc == NULL)
-        return;
+        return false;
 
     /* VCF Service */
     if (vc->vcf_recv)
@@ -358,9 +355,10 @@ void uslp_recv(const uslp_link_t *link, fb_t *fb)
     /* Demux MAP */
     map = vc->mapid[mapid];
     if (map == NULL)
-        return;
+        return false;
 
     /* MAP Reception/Extraction */
     uslp_map_recv(map, fb);
+    return true;
 }
 /** @} */

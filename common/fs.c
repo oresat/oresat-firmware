@@ -789,11 +789,14 @@ lfs_size_t fs_size(FSDriver *fsp)
 {
     /* Sanity checks */
     osalDbgCheck(fsp != NULL);
-    osalDbgAssert(fsp->state == FS_MOUNTED,
+    osalDbgAssert((fsp->state != FS_UNINIT) && (fsp->state != FS_STOP),
             "fs_size(), invalid state");
 
     lfs_ssize_t ret_size;
-    fsp->err = LFS_ERR_OK;
+    fsp->err = fs_access_start(fsp);
+    if (fsp->err != LFS_ERR_OK) {
+        return fsp->err;
+    }
 
     ret_size = lfs_fs_size(&fsp->lfs);
     if (ret_size < 0) {
@@ -801,6 +804,7 @@ lfs_size_t fs_size(FSDriver *fsp)
         return ret_size;
     }
 
+    fsp->err = fs_access_end(fsp);
     return ret_size;
 }
 
