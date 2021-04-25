@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-24" fileModificationTime="14:40:24.3790660-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="11:45:28.9580860-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -80,7 +80,7 @@
             <UDINT />
           </q1:array>
           <q1:array name="Error behavior" uniqueID="UID_ARR_1029">
-            <q1:subrange lowerLimit="0" upperLimit="2" />
+            <q1:subrange lowerLimit="0" upperLimit="6" />
             <USINT />
           </q1:array>
           <q1:array name="MCU Unique Device ID" uniqueID="UID_ARR_2020">
@@ -2190,27 +2190,56 @@
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1029">
-            <description lang="en">Sub-indexes 1 and above:
-* Value 0x00: on error change to NMT state Pre-operational (only if currently in NMT state Operational)
-* Value 0x01: on error do nothing
-* Value 0x02: on error change to NMT state Stopped</description>
+            <description lang="en">If error is detected and operating NMT state is NMT operational, this object defines behavior of the device.
+
+Value definition for all subindexes:
+   0x00 - if operational, switch to NMT pre-operational
+   0x01 - do nothing
+   0x02 - switch to NMT stopped
+
+01 - Communication error - bus off or Heartbeat consumer error.
+02 - Communication other error (critical errors - see 'Error status bits') except CAN bus passive but including bus off or Heartbeat consumer.
+03 - Communication passive - any communication error including CAN bus passive.
+04 - Generic error (critical errors - see 'Error status bits').
+05 - Device profile error - bit 5 in error register is set.
+06 - Manufacturer specific error - bit 7 in error register is set.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1029" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
+            <q1:property name="CO_storageGroup" value="ROM" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_102900">
-            <label lang="en">Highest sub-index supported</label>
+            <label lang="en">max sub-index</label>
             <USINT />
-            <q1:defaultValue value="0x02" />
+            <q1:defaultValue value="6" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_102901" access="readWrite">
-            <label lang="en">Communication error</label>
+            <label lang="en">Communication</label>
             <USINT />
-            <q1:defaultValue value="0x00" />
+            <q1:defaultValue value="0x01" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_102902" access="readWrite">
-            <label lang="en">Profile- or manufacturer-specific error</label>
+            <label lang="en">Communication other</label>
             <USINT />
-            <q1:defaultValue value="0x00" />
+            <q1:defaultValue value="0x01" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_102903" access="readWrite">
+            <label lang="en">Communication passive</label>
+            <USINT />
+            <q1:defaultValue value="0x01" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_102904" access="readWrite">
+            <label lang="en">Generic</label>
+            <USINT />
+            <q1:defaultValue value="0x01" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_102905" access="readWrite">
+            <label lang="en">Device profile</label>
+            <USINT />
+            <q1:defaultValue value="0x01" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_102906" access="readWrite">
+            <label lang="en">Manufacturer specific</label>
+            <USINT />
+            <q1:defaultValue value="0x01" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1200">
             <description lang="en">* Sub-indexes 1 and 2:
@@ -5737,7 +5766,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2021-04-24" fileModificationTime="14:40:24.3790660-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="11:45:28.9580860-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -5837,10 +5866,14 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="07" name="Emergency consumer 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102807" />
             <CANopenSubObject subIndex="08" name="Emergency consumer 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102808" />
           </CANopenObject>
-          <CANopenObject index="1029" name="Error behavior" objectType="8" uniqueIDRef="UID_OBJ_1029" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102900" />
-            <CANopenSubObject subIndex="01" name="Communication error" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102901" />
-            <CANopenSubObject subIndex="02" name="Profile- or manufacturer-specific error" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102902" />
+          <CANopenObject index="1029" name="Error behavior" objectType="8" uniqueIDRef="UID_OBJ_1029" subNumber="7">
+            <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102900" />
+            <CANopenSubObject subIndex="01" name="Communication" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102901" />
+            <CANopenSubObject subIndex="02" name="Communication other" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102902" />
+            <CANopenSubObject subIndex="03" name="Communication passive" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102903" />
+            <CANopenSubObject subIndex="04" name="Generic" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102904" />
+            <CANopenSubObject subIndex="05" name="Device profile" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102905" />
+            <CANopenSubObject subIndex="06" name="Manufacturer specific" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_102906" />
           </CANopenObject>
           <CANopenObject index="1200" name="SDO server parameter" objectType="9" uniqueIDRef="UID_OBJ_1200" subNumber="4">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_120000" />

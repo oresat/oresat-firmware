@@ -305,8 +305,12 @@
         #define OD_1029_errorBehavior                               0x1029
 
         #define OD_1029_0_errorBehavior_maxSubIndex                 0
-        #define OD_1029_1_errorBehavior_communicationError          1
-        #define OD_1029_2_errorBehavior_profileOrManufacturerSpecificError 2
+        #define OD_1029_1_errorBehavior_communication               1
+        #define OD_1029_2_errorBehavior_communicationOther          2
+        #define OD_1029_3_errorBehavior_communicationPassive        3
+        #define OD_1029_4_errorBehavior_generic                     4
+        #define OD_1029_5_errorBehavior_deviceProfile               5
+        #define OD_1029_6_errorBehavior_manufacturerSpecific        6
 
 /*1200 */
         #define OD_1200_SDOServerParameter                          0x1200
@@ -1155,6 +1159,7 @@ struct sCO_OD_ROM{
 /*1009      */ VISIBLE_STRING manufacturerHardwareVersion[3];
 /*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[5];
 /*1018      */ OD_identity_t   identity;
+/*1029      */ UNSIGNED8       errorBehavior[6];
 
                UNSIGNED32     LastWord;
 };
@@ -1179,7 +1184,6 @@ struct sCO_OD_PERSIST_COMM{
 /*1016      */ UNSIGNED32      consumerHeartbeatTime[8];
 /*1017      */ UNSIGNED16     producerHeartbeatTime;
 /*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
-/*1029      */ UNSIGNED8       errorBehavior[2];
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
 /*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[16];
 /*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[16];
@@ -1284,11 +1288,15 @@ extern struct sCO_OD_PERSIST_MFR CO_OD_PERSIST_MFR;
 /*1019, Data Type: UNSIGNED8 */
         #define OD_synchronousCounterOverflowValue                  CO_OD_PERSIST_COMM.synchronousCounterOverflowValue
 
-/*1029, Data Type: UNSIGNED8, Array[2] */
-        #define OD_errorBehavior                                    CO_OD_PERSIST_COMM.errorBehavior
-        #define ODL_errorBehavior_arrayLength                       2
-        #define ODA_errorBehavior_communicationError                0
-        #define ODA_errorBehavior_profileOrManufacturerSpecificError 1
+/*1029, Data Type: UNSIGNED8, Array[6] */
+        #define OD_errorBehavior                                    CO_OD_ROM.errorBehavior
+        #define ODL_errorBehavior_arrayLength                       6
+        #define ODA_errorBehavior_communication                     0
+        #define ODA_errorBehavior_communicationOther                1
+        #define ODA_errorBehavior_communicationPassive              2
+        #define ODA_errorBehavior_generic                           3
+        #define ODA_errorBehavior_deviceProfile                     4
+        #define ODA_errorBehavior_manufacturerSpecific              5
 
 /*1200, Data Type: SDOServerParameter_t */
         #define OD_SDOServerParameter                               CO_OD_PERSIST_COMM.SDOServerParameter
