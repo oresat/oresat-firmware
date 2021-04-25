@@ -8,8 +8,8 @@ Description=OreSat Master Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=2:53PM
-ModificationDate=04-24-2021
+ModificationTime=11:47AM
+ModificationDate=04-25-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -678,34 +678,70 @@ PDOMapping=0
 [1029]
 ParameterName=Error behavior
 ObjectType=0x8
-;StorageLocation=PERSIST_COMM
-SubNumber=0x3
+;StorageLocation=ROM
+SubNumber=0x7
 
 [1029sub0]
-ParameterName=Highest sub-index supported
+ParameterName=max sub-index
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x02
+DefaultValue=6
 PDOMapping=0
 
 [1029sub1]
-ParameterName=Communication error
+ParameterName=Communication
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub2]
-ParameterName=Profile- or manufacturer-specific error
+ParameterName=Communication other
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub3]
+ParameterName=Communication passive
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub4]
+ParameterName=Generic
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub5]
+ParameterName=Device profile
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub6]
+ParameterName=Manufacturer specific
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
 PDOMapping=0
 
 [1200]
@@ -2860,7 +2896,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1800sub0]
 ParameterName=Highest sub-index supported
@@ -2898,15 +2934,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1800sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1800sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -2929,7 +2956,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1801sub0]
 ParameterName=Highest sub-index supported
@@ -2967,15 +2994,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1801sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1801sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -2998,7 +3016,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1802sub0]
 ParameterName=Highest sub-index supported
@@ -3036,15 +3054,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1802sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1802sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3067,7 +3076,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1803sub0]
 ParameterName=Highest sub-index supported
@@ -3105,15 +3114,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1803sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1803sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3136,7 +3136,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1804sub0]
 ParameterName=Highest sub-index supported
@@ -3174,15 +3174,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1804sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1804sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3205,7 +3196,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1805sub0]
 ParameterName=Highest sub-index supported
@@ -3243,15 +3234,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1805sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1805sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3274,7 +3256,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1806sub0]
 ParameterName=Highest sub-index supported
@@ -3312,15 +3294,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1806sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1806sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3343,7 +3316,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1807sub0]
 ParameterName=Highest sub-index supported
@@ -3381,15 +3354,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1807sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1807sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3412,7 +3376,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1808sub0]
 ParameterName=Highest sub-index supported
@@ -3450,15 +3414,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1808sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1808sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3481,7 +3436,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [1809sub0]
 ParameterName=Highest sub-index supported
@@ -3519,15 +3474,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[1809sub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [1809sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3550,7 +3496,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Asub0]
 ParameterName=Highest sub-index supported
@@ -3588,15 +3534,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[180Asub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [180Asub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3619,7 +3556,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Bsub0]
 ParameterName=Highest sub-index supported
@@ -3657,15 +3594,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[180Bsub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [180Bsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3688,7 +3616,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Csub0]
 ParameterName=Highest sub-index supported
@@ -3726,15 +3654,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[180Csub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [180Csub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3757,7 +3676,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Dsub0]
 ParameterName=Highest sub-index supported
@@ -3795,15 +3714,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[180Dsub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [180Dsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3826,7 +3736,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Esub0]
 ParameterName=Highest sub-index supported
@@ -3864,15 +3774,6 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
-[180Esub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-PDOMapping=0
-
 [180Esub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3895,7 +3796,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x7
+SubNumber=0x6
 
 [180Fsub0]
 ParameterName=Highest sub-index supported
@@ -3930,15 +3831,6 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
-PDOMapping=0
-
-[180Fsub4]
-ParameterName=compatibility entry
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
