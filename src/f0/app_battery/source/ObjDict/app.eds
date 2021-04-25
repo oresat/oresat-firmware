@@ -8,7 +8,7 @@ Description=OreSat Battery Application Object Dictionary
 CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:58AM
+ModificationTime=4:16PM
 ModificationDate=04-25-2021
 ModifiedBy=
 
@@ -2782,7 +2782,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1800sub2]
@@ -2818,7 +2818,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1800sub6]
@@ -2989,7 +2989,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000480+$NODEID
+DefaultValue=0x40000480+$NODEID
 PDOMapping=0
 
 [1803sub2]
@@ -3025,7 +3025,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1803sub6]
@@ -3058,7 +3058,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1804sub2]
@@ -3094,7 +3094,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1804sub6]
@@ -3127,7 +3127,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1805sub2]
@@ -3163,7 +3163,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1805sub6]
@@ -3196,7 +3196,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000380+$NODEID
+DefaultValue=0x40000380+$NODEID
 PDOMapping=0
 
 [1806sub2]
@@ -3232,7 +3232,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1806sub6]
@@ -3265,7 +3265,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000480+$NODEID
+DefaultValue=0x40000480+$NODEID
 PDOMapping=0
 
 [1807sub2]
@@ -3301,7 +3301,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1807sub6]
@@ -3334,7 +3334,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1808sub2]
@@ -3370,7 +3370,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1808sub6]
@@ -3403,7 +3403,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1809sub2]
@@ -3439,7 +3439,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1809sub6]
