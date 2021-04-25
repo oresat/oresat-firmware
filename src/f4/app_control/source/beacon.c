@@ -1,7 +1,9 @@
 #include "beacon.h"
+#include "comms.h"
 #include "CANopen.h"
 #include "ax25.h"
 #include "rtc.h"
+#include "fs.h"
 
 static const ax25_link_t ax25 = {
     .dest = "SPACE ",
@@ -15,44 +17,52 @@ static const ax25_link_t ax25 = {
 static time_t unix_time;
 
 static const tlm_item_t tlm_aprs0[] = {
-    {   /* User-Defined APRS Start */
-        .type = TLM_MSG,
-        .msg = "{",
-    },
-    {   /* Telemetry Version */
-        .type = TLM_VAL,
-        .len = 1,
-        .val = 0,
-    },
-    {   /* C3 State */
-        .type = TLM_PTR,
-        .len = 1,
-        .ptr = &OD_C3State,
-    },
-    {   /* Uptime */
-        .type = TLM_PTR,
-        .len = 4,
-        .ptr = &OD_C3Telemetry.uptime,
-    },
-    {   /* RTC Time */
-        .type = TLM_PTR,
-        .len = 4,
-        .ptr = &unix_time,
-    },
-    {   /* MCU Temperature */
-        .type = TLM_PTR,
-        .len = 1,
-        .ptr = &OD_MCU_Sensors.temperature,
-    },
-    {   /* MCU VREFINT */
-        .type = TLM_PTR,
-        .len = 1,
-        .ptr = &OD_MCU_Sensors.VREFINT,
-    },
-    {   /* User-Defined APRS End */
-        .type = TLM_MSG,
-        .msg = "}"
-    }
+    /* User-Defined APRS Start */
+    { .type = TLM_MSG, .msg = "{" },
+    /* Telemetry Version */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* C3 State */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3State },
+    /* Uptime */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_C3Telemetry.uptime },
+    /* RTC Time */
+    { .type = TLM_PTR, .len = 4, .ptr = &unix_time },
+    /* MCU Temperature */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.temperature },
+    /* MCU VREFINT */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VREFINT },
+    /* VBUSP Voltage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VBAT },
+    /* VBUSP Current */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VBUSP_Current },
+    /* WDT Timeouts */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_persistentState.powerCycles },
+    /* eMMC Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.EMMC_Usage },
+    /* L-Band RX Bytes */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.LBandRX_Bytes },
+    /* L-Band Valid Packets */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.LBandRX_Packets },
+    /* L-Band Last RSSI */
+    { .type = TLM_PTR, .len = 1, .ptr = &lband.rssi },
+    /* L-Band PLL Lock TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* UHF Temperature */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.UHF_Temperature },
+    /* UHF Forward Power */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_C3Telemetry.UHF_FWD_Pwr },
+    /* UHF Reverse Power */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_C3Telemetry.UHF_REV_Pwr },
+    /* UHF RX Bytes */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.UHF_RX_Bytes },
+    /* UHF Valid Packets */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.UHF_RX_Packets },
+    /* UHF Last RSSI */
+    { .type = TLM_PTR, .len = 1, .ptr = &uhf.rssi },
+    /* UHF PLL Lock TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* User-Defined APRS End */
+    { .type = TLM_MSG, .msg = "}" }
 };
 
 static const tlm_pkt_t aprs0 = {
@@ -109,6 +119,8 @@ void beacon_send(const radio_cfg_t *cfg)
 
     OD_C3Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
     unix_time = rtcGetTimeUnix(NULL);
+    OD_C3Telemetry.EMMC_Usage = fs_usage(&FSD1);
+
     fb_reserve(fb, AX25_MAX_HDR_LEN);
     fb->data_ptr = tlm_payload(fb, &aprs0);
     fb->mac_hdr = ax25_sdu(fb, &ax25);

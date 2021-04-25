@@ -201,11 +201,21 @@
                UNSIGNED32     lastTX_Enable;
                UNSIGNED32     lastEDL;
                BOOLEAN        deployed;
+               UNSIGNED16     powerCycles;
+               UNSIGNED32     LBandRX_Bytes;
+               UNSIGNED32     LBandRX_Packets;
+               UNSIGNED32     UHF_RX_Bytes;
+               UNSIGNED32     UHF_RX_Packets;
+               UNSIGNED64     VC1SequenceCount;
+               UNSIGNED64     VC1ExpediteCount;
                }              OD_persistentState_t;
 /*7000      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED32     uptime;
                UNSIGNED8      EMMC_Usage;
+               INTEGER8       UHF_Temperature;
+               UNSIGNED16     UHF_FWD_Pwr;
+               UNSIGNED16     UHF_REV_Pwr;
                }              OD_C3Telemetry_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
@@ -2245,6 +2255,13 @@
         #define OD_6004_5_persistentState_lastTX_Enable             5
         #define OD_6004_6_persistentState_lastEDL                   6
         #define OD_6004_7_persistentState_deployed                  7
+        #define OD_6004_8_persistentState_powerCycles               8
+        #define OD_6004_9_persistentState_LBandRX_Bytes             9
+        #define OD_6004_10_persistentState_LBandRX_Packets          10
+        #define OD_6004_11_persistentState_UHF_RX_Bytes             11
+        #define OD_6004_12_persistentState_UHF_RX_Packets           12
+        #define OD_6004_13_persistentState_VC1SequenceCount         13
+        #define OD_6004_14_persistentState_VC1ExpediteCount         14
 
 /*7000 */
         #define OD_7000_C3Telemetry                                 0x7000
@@ -2252,6 +2269,9 @@
         #define OD_7000_0_C3Telemetry_maxSubIndex                   0
         #define OD_7000_1_C3Telemetry_uptime                        1
         #define OD_7000_2_C3Telemetry_EMMC_Usage                    2
+        #define OD_7000_3_C3Telemetry_UHF_Temperature               3
+        #define OD_7000_4_C3Telemetry_UHF_FWD_Pwr                   4
+        #define OD_7000_5_C3Telemetry_UHF_REV_Pwr                   5
 
 /*7001 */
         #define OD_7001_battery                                     0x7001

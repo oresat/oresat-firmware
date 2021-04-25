@@ -51,14 +51,12 @@ static const uslp_vc_t vc0 = {
 #endif
 };
 
-static uint64_t vc1_seq_cnt;
-static uint64_t vc1_exp_cnt;
 static MUTEX_DECL(vc1_lock);
 static const uslp_vc_t vc1 = {
-    .seq_ctrl_len   = 4,
-    .expedited_len  = 4,
-    .seq_ctrl_cnt   = &vc1_seq_cnt,
-    .expedited_cnt  = &vc1_exp_cnt,
+    .seq_ctrl_len   = sizeof(OD_persistentState.VC1SequenceCount),
+    .expedited_len  = sizeof(OD_persistentState.VC1ExpediteCount),
+    .seq_ctrl_cnt   = &OD_persistentState.VC1SequenceCount,
+    .expedited_cnt  = &OD_persistentState.VC1ExpediteCount,
     .cop            = COP_1,
     .mapid[0]       = &map_cmd,
     .mapid[1]       = &map_file,
@@ -519,9 +517,9 @@ static SI41XXConfig synthcfg = {
     .if_r           = 32,
 };
 
-static AX5043Driver lband;
-static AX5043Driver uhf;
-static SI41XXDriver synth;
+AX5043Driver lband;
+AX5043Driver uhf;
+SI41XXDriver synth;
 
 static const radio_cfg_t lband_high_cfg = {
     .devp = &lband,

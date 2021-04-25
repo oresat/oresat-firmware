@@ -19,6 +19,9 @@
 extern "C" {
 #endif
 
+extern AX5043Driver lband;
+extern AX5043Driver uhf;
+
 void comms_init(void);
 void comms_start(void);
 void comms_stop(void);

@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:51AM
+ModificationTime=1:54PM
 ModificationDate=04-25-2021
 ModifiedBy=
 
@@ -12154,7 +12154,7 @@ PDOMapping=0
 ParameterName=Persistent State
 ObjectType=0x9
 ;StorageLocation=PERSIST_STATE
-SubNumber=0x8
+SubNumber=0xF
 
 [6004sub0]
 ParameterName=Highest sub-index supported
@@ -12162,7 +12162,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x07
+DefaultValue=0x0E
 PDOMapping=0
 
 [6004sub1]
@@ -12228,11 +12228,74 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[6004sub8]
+ParameterName=Power Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub9]
+ParameterName=LBand RX Bytes
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004subA]
+ParameterName=LBand RX Packets
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004subB]
+ParameterName=UHF RX Bytes
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004subC]
+ParameterName=UHF RX Packets
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004subD]
+ParameterName=VC1 Sequence Count
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004subE]
+ParameterName=VC1 Expedite Count
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
 [7000]
 ParameterName=C3 Telemetry
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x3
+SubNumber=0x6
 
 [7000sub0]
 ParameterName=Highest sub-index supported
@@ -12240,7 +12303,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x02
+DefaultValue=0x05
 PDOMapping=0
 
 [7000sub1]
@@ -12250,7 +12313,7 @@ ObjectType=0x7
 DataType=0x0007
 AccessType=ro
 DefaultValue=0
-PDOMapping=1
+PDOMapping=0
 
 [7000sub2]
 ParameterName=eMMC Usage
@@ -12259,7 +12322,34 @@ ObjectType=0x7
 DataType=0x0005
 AccessType=ro
 DefaultValue=0
-PDOMapping=1
+PDOMapping=0
+
+[7000sub3]
+ParameterName=UHF Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[7000sub4]
+ParameterName=UHF FWD Pwr
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[7000sub5]
+ParameterName=UHF REV Pwr
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
 
 [7001]
 ParameterName=Battery
