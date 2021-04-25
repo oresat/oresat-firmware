@@ -212,7 +212,7 @@ include $(TOOLCHAIN)/toolchain.mk
 #
 
 xxd:
-	xxd -i build/app_solar.crc32.bin >app_solar.crc32.bin.h
+	xxd -i build/$(PROJECT).crc32.bin > build/$(PROJECT).crc32.bin.h
 
 #
 # Custom rules
