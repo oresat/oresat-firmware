@@ -40,9 +40,9 @@ static const tlm_item_t tlm_aprs0[] = {
     /* eMMC Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.EMMC_Usage },
     /* L-Band RX Bytes */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.LBandRX_Bytes },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.LBandRX_Bytes },
     /* L-Band Valid Packets */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.LBandRX_Packets },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.LBandRX_Packets },
     /* L-Band Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &lband.rssi },
     /* L-Band PLL Lock TODO */
@@ -54,9 +54,9 @@ static const tlm_item_t tlm_aprs0[] = {
     /* UHF Reverse Power */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_C3Telemetry.UHF_REV_Pwr },
     /* UHF RX Bytes */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.UHF_RX_Bytes },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.UHF_RX_Bytes },
     /* UHF Valid Packets */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_persistentState.UHF_RX_Packets },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.UHF_RX_Packets },
     /* UHF Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &uhf.rssi },
     /* UHF PLL Lock TODO */

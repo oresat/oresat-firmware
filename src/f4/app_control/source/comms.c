@@ -74,7 +74,7 @@ static const uslp_vc_t vc1 = {
 const uslp_mc_t mc = {
     .scid           = SCID,
     .vcid[0]        = &vc0,
-    .vcid[1]        = &vc1,
+    /*.vcid[1]        = &vc1,*/
 };
 
 static const uslp_pc_t lband_pc = {
