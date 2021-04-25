@@ -2,14 +2,61 @@
 #include <string.h>
 #include "test_opd.h"
 #include "opd.h"
+#include "node_mgr.h"
 #include "chprintf.h"
+
+/*===========================================================================*/
+/* OreSat Node Control                                                       */
+/*===========================================================================*/
+void cmd_node(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    static uint8_t node_id = 0;
+
+    if (argc < 1) {
+        goto node_usage;
+    } else if (argc > 1) {
+        node_id = strtoul(argv[1], NULL, 0);
+        chprintf(chp, "Setting persistent Node ID to 0x%02X\r\n", node_id);
+    }
+
+    if (node_id == 0) {
+        chprintf(chp, "Please specify an node address at least once (it will persist)\r\n");
+        goto node_usage;
+    }
+    if (!strcmp(argv[0], "enable")) {
+        chprintf(chp, "Enabling Node 0x%02X: ", node_id);
+        if (!node_enable(node_id, true)) {
+            chprintf(chp, "ENABLED\r\n");
+        } else {
+            chprintf(chp, "NOT CONNECTED\r\n");
+        }
+    } else if (!strcmp(argv[0], "disable")) {
+        chprintf(chp, "Disabling Node 0x%02X: ", node_id);
+        if (!node_enable(node_id, false)) {
+            chprintf(chp, "DISABLED\r\n");
+        } else {
+            chprintf(chp, "NOT CONNECTED\r\n");
+        }
+    } else {
+        goto node_usage;
+    }
+
+    return;
+
+node_usage:
+    chprintf(chp, "Usage: node <cmd> <node_id>\r\n"
+                  "    enable:          Enable an node attached card\r\n"
+                  "    disable:         Disable an node attached card\r\n"
+                  "\r\n");
+    return;
+}
 
 /*===========================================================================*/
 /* OreSat Power Domain Control                                               */
 /*===========================================================================*/
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    static uint8_t opd_addr = 0;
+    static i2caddr_t opd_addr = 0;
     opd_status_t status = {0};
 
     if (argc < 1) {
@@ -135,5 +182,3 @@ opd_usage:
                   "\r\n");
     return;
 }
-
-

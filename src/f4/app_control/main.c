@@ -25,7 +25,7 @@
 #include "c3.h"
 #include "fram.h"
 #include "fs.h"
-#include "opd.h"
+#include "node_mgr.h"
 #include "comms.h"
 #include "rtc.h"
 #include "CO_master.h"
@@ -33,24 +33,29 @@
 #include "cli.h"
 #endif
 
-/*
 static const oresat_node_t nodes[] = {
-    {0x02, 0x00, 2000, "Battery 1"},
-    {0x03, 0x00, 2000, "Battery 2"},
-    {0x04, 0x00, 2000, "Solar Panel 1"},
-    {0x05, 0x00, 2000, "Solar Panel 2"},
-    {0x06, 0x00, 2000, "Solar Panel 3"},
-    {0x07, 0x00, 2000, "Solar Panel 4"},
-    {0x08, 0x00, 2000, "Solar Panel 5"},
-    {0x09, 0x00, 2000, "Solar Panel 6"},
-    {0x0A, 0x00, 2000, "Solar Panel 7"},
-    {0x0B, 0x00, 2000, "Solar Panel 8"},
-    {0x31, 0x18, 2000, "Protocard 1"},
-    {0x32, 0x19, 2000, "Protocard 2"},
-    {0x33, 0x1A, 2000, "Protocard 3"},
-    {0x11, 0x1D, 2000, "Star Tracker"}
+    {0x04, 0x18, 2000, "Battery 0"},
+    {0x08, 0x1D, 2000, "Battery 1"},
+    {0x0C, 0x00, 2000, "Solar Panel 0"},
+    {0x10, 0x00, 2000, "Solar Panel 1"},
+    {0x14, 0x00, 2000, "Solar Panel 2"},
+    {0x18, 0x00, 2000, "Solar Panel 3"},
+    {0x1C, 0x00, 2000, "Solar Panel 4"},
+    {0x20, 0x00, 2000, "Solar Panel 5"},
+    {0x24, 0x00, 2000, "Solar Panel 6"},
+    {0x28, 0x00, 2000, "Solar Panel 7"},
+    {0x2C, 0x1C, 2000, "Star Tracker 0"},
+    {0x30, 0x00, 2000, "Star Tracker 1"},
+    {0x34, 0x19, 2000, "GPS"},
+    {0x38, 0x1A, 2000, "ACS"},
+    {0x3C, 0x20, 2000, "RWB 0"},
+    {0x40, 0x21, 2000, "RWB 1"},
+    {0x44, 0x22, 2000, "RWB 2"},
+    {0x48, 0x23, 2000, "RWB 3"},
+    {0x4C, 0x1B, 2000, "DxWiFi"},
+    {0x50, 0x1E, 2000, "CRC"},
+    {0, 0, 0, NULL}
 };
-*/
 
 #ifdef SHELL_ENABLE
 static worker_t cli_worker;
@@ -77,9 +82,18 @@ static thread_descriptor_t c3_desc = {
     .name = "C3",
     .wbase = THD_WORKING_AREA_BASE(c3_wa),
     .wend = THD_WORKING_AREA_END(c3_wa),
-    .prio = NORMALPRIO,
+    .prio = NORMALPRIO + 1,
     .funcp = c3,
     .arg = NULL
+};
+static worker_t node_mgr_worker;
+static thread_descriptor_t node_mgr_desc = {
+    .name = "Node Manager",
+    .wbase = THD_WORKING_AREA_BASE(node_mgr_wa),
+    .wend = THD_WORKING_AREA_END(node_mgr_wa),
+    .prio = NORMALPRIO,
+    .funcp = node_mgr,
+    .arg = (void*)&nodes
 };
 
 static I2CConfig i2ccfg = {
@@ -126,6 +140,7 @@ static void app_init(void)
     /* Register WDT and C3 worker thread */
     reg_worker(&wdt_worker, &wdt_desc, true, true);
     reg_worker(&c3_worker, &c3_desc, true, true);
+    reg_worker(&node_mgr_worker, &node_mgr_desc, true, true);
     start_worker(&wdt_worker);
 
     /* Initialize FRAM */
@@ -136,17 +151,12 @@ static void app_init(void)
     fs_init(&FSD1);
     fs_start(&FSD1, &fscfg);
 
-    /* Initialize OPD */
-    opd_init();
-    opd_start();
-
     /* Initialize SDO client */
     sdo_init();
 
     /* Initialize and start radio systems */
     comms_init();
     comms_start();
-
 }
 
 /**

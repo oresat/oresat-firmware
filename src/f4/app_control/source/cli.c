@@ -87,6 +87,7 @@ static const ShellCommand commands[] = {
     {"nmt", cmd_nmt},
     /*{"sdo", cmd_sdo},*/
     {"opd", cmd_opd},
+    {"node", cmd_node},
     {"mmc", cmd_mmc},
     {"time", cmd_time},
     {"lfs", cmd_lfs},

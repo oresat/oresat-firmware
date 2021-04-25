@@ -107,7 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/opd.mk
+include $(PROJ_SRC)/node_mgr.mk
 include $(PROJ_SRC)/rtc.mk
 include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/fs.mk
