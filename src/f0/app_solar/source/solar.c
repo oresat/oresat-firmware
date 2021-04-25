@@ -141,7 +141,8 @@ bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_
 		ret = false;
 	}
 	if( ! ret ) {
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
+		//FIXME CO_errorReport blocks indefinitely???
+		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
 	}
 
 	return(ret);
@@ -212,7 +213,8 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 				pao_state->iadj_uv = I_ADJ_FAILSAFE;
 			}
 
-			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
+			//FIXME CO_errorReport blocks indefinitely???
+			//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
 
 			return(false);
 
