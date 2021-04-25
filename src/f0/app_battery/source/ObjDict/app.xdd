@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-24" fileModificationTime="15:22:49.0273000-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-24" fileModificationTime="17:45:03.3027370-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -1754,7 +1754,7 @@
               <UINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="Battery1" uniqueID="UID_REC_6000">
+          <q1:struct name="Battery" uniqueID="UID_REC_6000">
             <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_600000">
               <USINT />
             </q1:varDeclaration>
@@ -1770,68 +1770,62 @@
             <q1:varDeclaration name="VCell" uniqueID="UID_RECSUB_600004">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="VCell2" uniqueID="UID_RECSUB_600005">
+            <q1:varDeclaration name="VCell1" uniqueID="UID_RECSUB_600005">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current avg" uniqueID="UID_RECSUB_600006">
+            <q1:varDeclaration name="VCell2" uniqueID="UID_RECSUB_600006">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell avg" uniqueID="UID_RECSUB_600007">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_600008">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current max" uniqueID="UID_RECSUB_600007">
+            <q1:varDeclaration name="Current avg" uniqueID="UID_RECSUB_600009">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current min" uniqueID="UID_RECSUB_600008">
+            <q1:varDeclaration name="Current max" uniqueID="UID_RECSUB_60000A">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Full Capacity" uniqueID="UID_RECSUB_600009">
+            <q1:varDeclaration name="Current min" uniqueID="UID_RECSUB_60000B">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Full Capacity" uniqueID="UID_RECSUB_60000C">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Time To Empty" uniqueID="UID_RECSUB_60000A">
+            <q1:varDeclaration name="Reported Capacity" uniqueID="UID_RECSUB_60000D">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Time To Full" uniqueID="UID_RECSUB_60000B">
+            <q1:varDeclaration name="Time To Empty" uniqueID="UID_RECSUB_60000E">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_60000C">
+            <q1:varDeclaration name="Time To Full" uniqueID="UID_RECSUB_60000F">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available Capacity" uniqueID="UID_RECSUB_60000D">
+            <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_600010">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available State of Charge" uniqueID="UID_RECSUB_60000E">
+            <q1:varDeclaration name="Reported State of Charge" uniqueID="UID_RECSUB_600011">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Present State of Charge" uniqueID="UID_RECSUB_60000F">
+            <q1:varDeclaration name="Temperature" uniqueID="UID_RECSUB_600012">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature avg" uniqueID="UID_RECSUB_600013">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature max" uniqueID="UID_RECSUB_600014">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature min" uniqueID="UID_RECSUB_600015">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="State" uniqueID="UID_RECSUB_600016">
               <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mix Capacity" uniqueID="UID_RECSUB_600010">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Reporting Capacity" uniqueID="UID_RECSUB_600011">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_600012">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600013">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600014">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600015">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600016">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600017">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600018">
-              <BOOL />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="Battery2" uniqueID="UID_REC_6001">
+          <q1:struct name="Battery" uniqueID="UID_REC_6001">
             <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_600100">
               <USINT />
             </q1:varDeclaration>
@@ -1847,65 +1841,59 @@
             <q1:varDeclaration name="VCell" uniqueID="UID_RECSUB_600104">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="VCell2" uniqueID="UID_RECSUB_600105">
+            <q1:varDeclaration name="VCell1" uniqueID="UID_RECSUB_600105">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current avg" uniqueID="UID_RECSUB_600106">
+            <q1:varDeclaration name="VCell2" uniqueID="UID_RECSUB_600106">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell avg" uniqueID="UID_RECSUB_600107">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_600108">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current max" uniqueID="UID_RECSUB_600107">
+            <q1:varDeclaration name="Current avg" uniqueID="UID_RECSUB_600109">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Current min" uniqueID="UID_RECSUB_600108">
+            <q1:varDeclaration name="Current max" uniqueID="UID_RECSUB_60010A">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Full Capacity" uniqueID="UID_RECSUB_600109">
+            <q1:varDeclaration name="Current min" uniqueID="UID_RECSUB_60010B">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Full Capacity" uniqueID="UID_RECSUB_60010C">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Time To Empty" uniqueID="UID_RECSUB_60010A">
+            <q1:varDeclaration name="Reported Capacity" uniqueID="UID_RECSUB_60010D">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Time To Full" uniqueID="UID_RECSUB_60010B">
+            <q1:varDeclaration name="Time To Empty" uniqueID="UID_RECSUB_60010E">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_60010C">
+            <q1:varDeclaration name="Time To Full" uniqueID="UID_RECSUB_60010F">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available Capacity" uniqueID="UID_RECSUB_60010D">
+            <q1:varDeclaration name="Cycles" uniqueID="UID_RECSUB_600110">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Available State of Charge" uniqueID="UID_RECSUB_60010E">
+            <q1:varDeclaration name="Reported State of Charge" uniqueID="UID_RECSUB_600111">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Present State of Charge" uniqueID="UID_RECSUB_60010F">
+            <q1:varDeclaration name="Temperature" uniqueID="UID_RECSUB_600112">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature avg" uniqueID="UID_RECSUB_600113">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature max" uniqueID="UID_RECSUB_600114">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature min" uniqueID="UID_RECSUB_600115">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="State" uniqueID="UID_RECSUB_600116">
               <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mix Capacity" uniqueID="UID_RECSUB_600110">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Reporting Capacity" uniqueID="UID_RECSUB_600111">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg1" uniqueID="UID_RECSUB_600112">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg2" uniqueID="UID_RECSUB_600113">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Temp avg int" uniqueID="UID_RECSUB_600114">
-              <INT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge disable" uniqueID="UID_RECSUB_600115">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Charge disable" uniqueID="UID_RECSUB_600116">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Discharge status" uniqueID="UID_RECSUB_600117">
-              <BOOL />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Charge status" uniqueID="UID_RECSUB_600118">
-              <BOOL />
             </q1:varDeclaration>
           </q1:struct>
         </q1:dataTypeList>
@@ -4892,27 +4880,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0000" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0001" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0002" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0003" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0004" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000410" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0005" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -4949,12 +4937,12 @@
           <q1:parameter uniqueID="UID_SUB_1A0100" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x04" />
+            <q1:defaultValue value="0x03" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000110" />
+            <q1:defaultValue value="0x60000510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">Application object 2</label>
@@ -4969,7 +4957,7 @@
           <q1:parameter uniqueID="UID_SUB_1A0104" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000810" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0105" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5011,22 +4999,22 @@
           <q1:parameter uniqueID="UID_SUB_1A0201" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60010110" />
+            <q1:defaultValue value="0x60000810" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0202" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60010610" />
+            <q1:defaultValue value="0x60000910" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0203" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60010710" />
+            <q1:defaultValue value="0x60000A10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0204" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60010810" />
+            <q1:defaultValue value="0x60000B10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0205" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5063,27 +5051,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0300" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0301" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0302" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0303" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001410" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0304" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0305" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5120,27 +5108,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0400" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0401" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000C10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0402" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60000D10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0403" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001108" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0404" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60001608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0405" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5177,27 +5165,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0500" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0501" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0502" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0503" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0504" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010410" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0505" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5234,22 +5222,22 @@
           <q1:parameter uniqueID="UID_SUB_1A0600" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x03" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0601" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0602" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010610" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0603" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010710" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0604" access="readWrite">
             <label lang="en">Application object 4</label>
@@ -5291,27 +5279,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0700" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0701" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010810" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0702" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010910" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0703" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010A10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0704" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010B10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0705" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5348,27 +5336,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0800" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0801" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0802" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0803" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011410" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0804" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0805" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5405,27 +5393,27 @@
           <q1:parameter uniqueID="UID_SUB_1A0900" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0901" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010C10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0902" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60010D10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0903" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011108" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0904" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60011608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0905" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -6003,13 +5991,15 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="00 00 00 00 00 00 00 00 00 00" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6000">
-            <label lang="en">Battery1</label>
+            <description lang="en">all volt, all cur, all temp, cap &amp; stat of &amp; state
+
+all 10s</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_6000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600000">
             <label lang="en">max sub-index</label>
             <USINT />
-            <q1:defaultValue value="0x18" />
+            <q1:defaultValue value="0x16" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600001">
             <label lang="en">Vbatt</label>
@@ -6032,113 +6022,103 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600005">
-            <label lang="en">VCell2</label>
+            <label lang="en">VCell1</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600006">
-            <label lang="en">Current avg</label>
-            <INT />
+            <label lang="en">VCell2</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600007">
-            <label lang="en">Current max</label>
-            <INT />
+            <label lang="en">VCell avg</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600008">
-            <label lang="en">Current min</label>
+            <label lang="en">Current</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600009">
+            <label lang="en">Current avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60000A">
+            <label lang="en">Current max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60000B">
+            <label lang="en">Current min</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60000C">
             <label lang="en">Full Capacity</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60000A">
-            <label lang="en">Time To Empty</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60000B">
-            <label lang="en">Time To Full</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60000C">
-            <label lang="en">Cycles</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000D">
-            <label lang="en">Available Capacity</label>
+            <label lang="en">Reported Capacity</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000E">
-            <label lang="en">Available State of Charge</label>
-            <USINT />
+            <label lang="en">Time To Empty</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60000F">
-            <label lang="en">Present State of Charge</label>
-            <USINT />
+            <label lang="en">Time To Full</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600010">
-            <label lang="en">Mix Capacity</label>
+            <label lang="en">Cycles</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600011">
-            <label lang="en">Reporting Capacity</label>
-            <UINT />
+            <label lang="en">Reported State of Charge</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600012">
-            <label lang="en">Temp avg1</label>
+            <label lang="en">Temperature</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600013">
-            <label lang="en">Temp avg2</label>
+            <label lang="en">Temperature avg</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600014">
-            <label lang="en">Temp avg int</label>
+            <label lang="en">Temperature max</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600015">
-            <label lang="en">Discharge disable</label>
-            <BOOL />
+            <label lang="en">Temperature min</label>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600016">
-            <label lang="en">Charge disable</label>
-            <BOOL />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600017">
-            <label lang="en">Discharge status</label>
-            <BOOL />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600018">
-            <label lang="en">Charge status</label>
-            <BOOL />
+            <label lang="en">State</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6001">
-            <label lang="en">Battery2</label>
+            <description lang="en">all volt, all cur, all temp, cap &amp; stat of &amp; state</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_6001" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600100">
             <label lang="en">max sub-index</label>
             <USINT />
-            <q1:defaultValue value="0x18" />
+            <q1:defaultValue value="0x16" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600101">
             <label lang="en">Vbatt</label>
@@ -6161,111 +6141,96 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600105">
-            <label lang="en">VCell2</label>
+            <label lang="en">VCell1</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600106">
-            <label lang="en">Current avg</label>
-            <INT />
+            <label lang="en">VCell2</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600107">
-            <label lang="en">Current max</label>
-            <INT />
+            <label lang="en">VCell avg</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600108">
-            <label lang="en">Current min</label>
+            <label lang="en">Current</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600109">
+            <label lang="en">Current avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60010A">
+            <label lang="en">Current max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60010B">
+            <label lang="en">Current min</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60010C">
             <label lang="en">Full Capacity</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60010A">
-            <label lang="en">Time To Empty</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60010B">
-            <label lang="en">Time To Full</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60010C">
-            <label lang="en">Cycles</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010D">
-            <label lang="en">Available Capacity</label>
+            <label lang="en">Reported Capacity</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010E">
-            <label lang="en">Available State of Charge</label>
-            <USINT />
+            <label lang="en">Time To Empty</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60010F">
-            <label lang="en">Present State of Charge</label>
-            <USINT />
+            <label lang="en">Time To Full</label>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600110">
-            <label lang="en">Mix Capacity</label>
+            <label lang="en">Cycles</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600111">
-            <label lang="en">Reporting Capacity</label>
-            <UINT />
+            <label lang="en">Reported State of Charge</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600112">
-            <label lang="en">Temp avg1</label>
+            <label lang="en">Temperature</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600113">
-            <label lang="en">Temp avg2</label>
+            <label lang="en">Temperature avg</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600114">
-            <label lang="en">Temp avg int</label>
+            <label lang="en">Temperature max</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600115">
-            <label lang="en">Discharge disable</label>
-            <BOOL />
+            <label lang="en">Temperature min</label>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600116">
-            <label lang="en">Charge disable</label>
-            <BOOL />
+            <label lang="en">State</label>
+            <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600117">
-            <label lang="en">Discharge status</label>
-            <BOOL />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600118">
-            <label lang="en">Charge status</label>
-            <BOOL />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6002">
-            <label lang="en">Heater Status</label>
-            <BOOL />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6003" access="readWrite">
+          <q1:parameter uniqueID="UID_OBJ_6002" access="readWrite">
             <label lang="en">ModelGauge Alg Status</label>
             <UINT />
             <q1:defaultValue value="0" />
@@ -6287,7 +6252,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-24" fileModificationTime="15:22:49.0273000-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-24" fileModificationTime="17:45:03.3027370-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -7036,62 +7001,57 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="08" name="VBUSP Current (Raw)" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_202208" />
           </CANopenObject>
           <CANopenObject index="2100" name="Error Status Bits" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2100" />
-          <CANopenObject index="6000" name="Battery1" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="25">
+          <CANopenObject index="6000" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="23">
             <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600000" />
             <CANopenSubObject subIndex="01" name="Vbatt" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600001" />
             <CANopenSubObject subIndex="02" name="VCell max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600002" />
             <CANopenSubObject subIndex="03" name="VCell min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600003" />
             <CANopenSubObject subIndex="04" name="VCell" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600004" />
-            <CANopenSubObject subIndex="05" name="VCell2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600005" />
-            <CANopenSubObject subIndex="06" name="Current avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600006" />
-            <CANopenSubObject subIndex="07" name="Current max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600007" />
-            <CANopenSubObject subIndex="08" name="Current min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600008" />
-            <CANopenSubObject subIndex="09" name="Full Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600009" />
-            <CANopenSubObject subIndex="0A" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000A" />
-            <CANopenSubObject subIndex="0B" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000B" />
-            <CANopenSubObject subIndex="0C" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000C" />
-            <CANopenSubObject subIndex="0D" name="Available Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000D" />
-            <CANopenSubObject subIndex="0E" name="Available State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000E" />
-            <CANopenSubObject subIndex="0F" name="Present State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000F" />
-            <CANopenSubObject subIndex="10" name="Mix Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600010" />
-            <CANopenSubObject subIndex="11" name="Reporting Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600011" />
-            <CANopenSubObject subIndex="12" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600012" />
-            <CANopenSubObject subIndex="13" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600013" />
-            <CANopenSubObject subIndex="14" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600014" />
-            <CANopenSubObject subIndex="15" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600015" />
-            <CANopenSubObject subIndex="16" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600016" />
-            <CANopenSubObject subIndex="17" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600017" />
-            <CANopenSubObject subIndex="18" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600018" />
+            <CANopenSubObject subIndex="05" name="VCell1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600005" />
+            <CANopenSubObject subIndex="06" name="VCell2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600006" />
+            <CANopenSubObject subIndex="07" name="VCell avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600007" />
+            <CANopenSubObject subIndex="08" name="Current" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600008" />
+            <CANopenSubObject subIndex="09" name="Current avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600009" />
+            <CANopenSubObject subIndex="0A" name="Current max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000A" />
+            <CANopenSubObject subIndex="0B" name="Current min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000B" />
+            <CANopenSubObject subIndex="0C" name="Full Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000C" />
+            <CANopenSubObject subIndex="0D" name="Reported Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000D" />
+            <CANopenSubObject subIndex="0E" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000E" />
+            <CANopenSubObject subIndex="0F" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000F" />
+            <CANopenSubObject subIndex="10" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600010" />
+            <CANopenSubObject subIndex="11" name="Reported State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600011" />
+            <CANopenSubObject subIndex="12" name="Temperature" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600012" />
+            <CANopenSubObject subIndex="13" name="Temperature avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600013" />
+            <CANopenSubObject subIndex="14" name="Temperature max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600014" />
+            <CANopenSubObject subIndex="15" name="Temperature min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600015" />
+            <CANopenSubObject subIndex="16" name="State" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600016" />
           </CANopenObject>
-          <CANopenObject index="6001" name="Battery2" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="25">
+          <CANopenObject index="6001" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="23">
             <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600100" />
             <CANopenSubObject subIndex="01" name="Vbatt" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600101" />
             <CANopenSubObject subIndex="02" name="VCell max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600102" />
             <CANopenSubObject subIndex="03" name="VCell min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600103" />
             <CANopenSubObject subIndex="04" name="VCell" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600104" />
-            <CANopenSubObject subIndex="05" name="VCell2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600105" />
-            <CANopenSubObject subIndex="06" name="Current avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600106" />
-            <CANopenSubObject subIndex="07" name="Current max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600107" />
-            <CANopenSubObject subIndex="08" name="Current min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600108" />
-            <CANopenSubObject subIndex="09" name="Full Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600109" />
-            <CANopenSubObject subIndex="0A" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010A" />
-            <CANopenSubObject subIndex="0B" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010B" />
-            <CANopenSubObject subIndex="0C" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010C" />
-            <CANopenSubObject subIndex="0D" name="Available Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010D" />
-            <CANopenSubObject subIndex="0E" name="Available State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010E" />
-            <CANopenSubObject subIndex="0F" name="Present State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010F" />
-            <CANopenSubObject subIndex="10" name="Mix Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600110" />
-            <CANopenSubObject subIndex="11" name="Reporting Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600111" />
-            <CANopenSubObject subIndex="12" name="Temp avg1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600112" />
-            <CANopenSubObject subIndex="13" name="Temp avg2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600113" />
-            <CANopenSubObject subIndex="14" name="Temp avg int" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600114" />
-            <CANopenSubObject subIndex="15" name="Discharge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600115" />
-            <CANopenSubObject subIndex="16" name="Charge disable" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600116" />
-            <CANopenSubObject subIndex="17" name="Discharge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600117" />
-            <CANopenSubObject subIndex="18" name="Charge status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600118" />
+            <CANopenSubObject subIndex="05" name="VCell1" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600105" />
+            <CANopenSubObject subIndex="06" name="VCell2" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600106" />
+            <CANopenSubObject subIndex="07" name="VCell avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600107" />
+            <CANopenSubObject subIndex="08" name="Current" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600108" />
+            <CANopenSubObject subIndex="09" name="Current avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600109" />
+            <CANopenSubObject subIndex="0A" name="Current max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010A" />
+            <CANopenSubObject subIndex="0B" name="Current min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010B" />
+            <CANopenSubObject subIndex="0C" name="Full Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010C" />
+            <CANopenSubObject subIndex="0D" name="Reported Capacity" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010D" />
+            <CANopenSubObject subIndex="0E" name="Time To Empty" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010E" />
+            <CANopenSubObject subIndex="0F" name="Time To Full" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60010F" />
+            <CANopenSubObject subIndex="10" name="Cycles" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600110" />
+            <CANopenSubObject subIndex="11" name="Reported State of Charge" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600111" />
+            <CANopenSubObject subIndex="12" name="Temperature" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600112" />
+            <CANopenSubObject subIndex="13" name="Temperature avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600113" />
+            <CANopenSubObject subIndex="14" name="Temperature max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600114" />
+            <CANopenSubObject subIndex="15" name="Temperature min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600115" />
+            <CANopenSubObject subIndex="16" name="State" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600116" />
           </CANopenObject>
-          <CANopenObject index="6002" name="Heater Status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6002" />
-          <CANopenObject index="6003" name="ModelGauge Alg Status" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6003" />
+          <CANopenObject index="6002" name="ModelGauge Alg Status" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6002" />
         </q2:CANopenObjectList>
         <dummyUsage>
           <dummy entry="Dummy0001=0" />
