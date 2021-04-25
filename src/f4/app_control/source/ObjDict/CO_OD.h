@@ -68,7 +68,7 @@
   #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
   #define CO_NO_LSS_SERVER               0   //LSS Slave
   #define CO_NO_LSS_CLIENT               0   //LSS Master
-  #define CO_NO_RPDO                     16   //Associated objects: 14xx, 16xx
+  #define CO_NO_RPDO                     47   //Associated objects: 14xx, 16xx
   #define CO_NO_TPDO                     16   //Associated objects: 18xx, 1Axx
   #define CO_NO_NMT_MASTER               0
   #define CO_NO_TRACE                    0
@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             111
+   #define CO_OD_NoOfElements             175
 
 
 /*******************************************************************************
@@ -204,28 +204,50 @@
                }              OD_persistentState_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     vbatt;
-               UNSIGNED16     VCellMax;
-               UNSIGNED16     VCellMin;
-               UNSIGNED16     VCell;
-               UNSIGNED16     VCell1;
-               UNSIGNED16     VCell2;
-               UNSIGNED16     VCellAvg;
-               INTEGER16      current;
-               INTEGER16      currentAvg;
-               INTEGER16      currentMax;
-               INTEGER16      currentMin;
-               UNSIGNED16     fullCapacity;
-               UNSIGNED16     reportedCapacity;
-               UNSIGNED16     timeToEmpty;
-               UNSIGNED16     timeToFull;
-               UNSIGNED16     cycles;
-               UNSIGNED8      reportedStateOfCharge;
-               INTEGER16      temperature;
-               INTEGER16      temperatureAvg;
-               INTEGER16      temperatureMax;
-               INTEGER16      temperatureMin;
-               UNSIGNED8      state;
+               UNSIGNED16     vbattBP1;
+               UNSIGNED16     vbattBP2;
+               UNSIGNED16     VCellMaxBP1;
+               UNSIGNED16     VCellMaxBP2;
+               UNSIGNED16     VCellMinBP1;
+               UNSIGNED16     VCellMinBP2;
+               UNSIGNED16     VCellBP1;
+               UNSIGNED16     VCellBP2;
+               UNSIGNED16     VCell1BP1;
+               UNSIGNED16     VCell1BP2;
+               UNSIGNED16     VCell2BP1;
+               UNSIGNED16     VCell2BP2;
+               UNSIGNED16     VCellAvgBP1;
+               UNSIGNED16     VCellAvgBP2;
+               INTEGER16      currentBP1;
+               INTEGER16      currentBP2;
+               INTEGER16      currentAvgBP1;
+               INTEGER16      currentAvgBP2;
+               INTEGER16      currentMaxBP1;
+               INTEGER16      currentMaxBP2;
+               INTEGER16      currentMinBP1;
+               INTEGER16      currentMinBP2;
+               UNSIGNED16     fullCapacityBP1;
+               UNSIGNED16     fullCapacityBP2;
+               UNSIGNED16     reportedCapacityBP1;
+               UNSIGNED16     reportedCapacityBP2;
+               UNSIGNED16     timeToEmptyBP1;
+               UNSIGNED16     timeToEmptyBP2;
+               UNSIGNED16     timeToFullBP1;
+               UNSIGNED16     timeToFullBP2;
+               UNSIGNED16     cyclesBP1;
+               UNSIGNED16     cyclesBP2;
+               UNSIGNED8      reportedStateOfChargeBP1;
+               UNSIGNED8      reportedStateOfChargeBP2;
+               INTEGER16      temperatureBP1;
+               INTEGER16      temperatureBP2;
+               INTEGER16      temperatureAvgBP1;
+               INTEGER16      temperatureAvgBP2;
+               INTEGER16      temperatureMaxBP1;
+               INTEGER16      temperatureMaxBP2;
+               INTEGER16      temperatureMinBP1;
+               INTEGER16      temperatureMinBP2;
+               UNSIGNED8      stateBP1;
+               UNSIGNED8      stateBP2;
                }              OD_battery_t;
 /*7003      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
@@ -239,18 +261,69 @@
                INTEGER16      currentMax;
                UNSIGNED16     powerMax;
                UNSIGNED16     energy;
+               INTEGER8       cell1Temp;
+               INTEGER8       cell2Temp;
+               INTEGER8       cell1TempMin;
+               INTEGER8       cell2TempMin;
+               INTEGER8       cell1TempMax;
+               INTEGER8       cell2TempMax;
                }              OD_solarPanel_t;
 /*700B      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      RAM_Percent;
+               UNSIGNED8      freadCacheLength;
+               UNSIGNED8      fwriteCacheLength;
+               UNSIGNED8      activeApps;
+               UNSIGNED8      failedApps;
+               UNSIGNED8      updaterStatus;
+               UNSIGNED8      updatesAvailable;
+               INTEGER16      rightAscension;
+               INTEGER16      declination;
+               INTEGER16      roll;
+               UNSIGNED64     timestamp;
                }              OD_starTracker_t;
 /*700D      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      RAM_Percent;
+               UNSIGNED8      freadCacheLength;
+               UNSIGNED8      fwriteCacheLength;
+               UNSIGNED8      activeApps;
+               UNSIGNED8      failedApps;
+               UNSIGNED8      updaterStatus;
+               UNSIGNED8      updatesAvailable;
+               UNSIGNED8      GPS_Status;
+               UNSIGNED8      satellitesLocked;
+               UNSIGNED64     timestamp;
+               INTEGER32      positionX;
+               INTEGER32      positionY;
+               INTEGER32      positionZ;
+               INTEGER32      velocityX;
+               INTEGER32      velocityY;
+               INTEGER32      velocityZ;
                }              OD_GPS_t;
 /*700E      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               INTEGER16      gyroPitch;
+               INTEGER16      gyroYaw;
+               INTEGER16      gyroRoll;
+               INTEGER16      accelerationX;
+               INTEGER16      accelerationY;
+               INTEGER16      accelerationZ;
+               UNSIGNED8      IMUTemp;
+               INTEGER16      magnetometerPZ1X;
+               INTEGER16      magnetometerPZ1Y;
+               INTEGER16      magnetometerPZ1Z;
+               INTEGER16      magnetometerPZ2X;
+               INTEGER16      magnetometerPZ2Y;
+               INTEGER16      magnetometerPZ2Z;
+               INTEGER16      magnetometerMZ1X;
+               INTEGER16      magnetometerMZ1Y;
+               INTEGER16      magnetometerMZ1Z;
+               INTEGER16      magnetometerMZ2X;
+               INTEGER16      magnetometerMZ2Y;
+               INTEGER16      magnetometerMZ2Z;
                }              OD_ACS_t;
 /*700F      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
@@ -258,11 +331,26 @@
                }              OD_RWB_t;
 /*7013      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      RAM_Percent;
+               UNSIGNED8      freadCacheLength;
+               UNSIGNED8      fwriteCacheLength;
+               UNSIGNED8      activeApps;
+               UNSIGNED8      failedApps;
+               UNSIGNED8      updaterStatus;
+               UNSIGNED8      updatesAvailable;
+               BOOLEAN        transmitting;
                }              OD_dxWiFi_t;
 /*7014      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      RAM_Percent;
+               UNSIGNED8      freadCacheLength;
+               UNSIGNED8      fwriteCacheLength;
+               UNSIGNED8      activeApps;
+               UNSIGNED8      failedApps;
+               UNSIGNED8      updaterStatus;
+               UNSIGNED8      updatesAvailable;
                }              OD_CFC_t;
 
 /*******************************************************************************
@@ -551,6 +639,254 @@
         #define OD_140F_2_RPDOCommunicationParameter_transmissionType 2
         #define OD_140F_5_RPDOCommunicationParameter_eventTimer     5
 
+/*1410 */
+        #define OD_1410_RPDOCommunicationParameter                  0x1410
+
+        #define OD_1410_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1410_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1410_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1410_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1411 */
+        #define OD_1411_RPDOCommunicationParameter                  0x1411
+
+        #define OD_1411_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1411_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1411_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1411_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1412 */
+        #define OD_1412_RPDOCommunicationParameter                  0x1412
+
+        #define OD_1412_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1412_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1412_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1412_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1413 */
+        #define OD_1413_RPDOCommunicationParameter                  0x1413
+
+        #define OD_1413_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1413_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1413_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1413_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1414 */
+        #define OD_1414_RPDOCommunicationParameter                  0x1414
+
+        #define OD_1414_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1414_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1414_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1414_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1415 */
+        #define OD_1415_RPDOCommunicationParameter                  0x1415
+
+        #define OD_1415_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1415_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1415_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1415_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1416 */
+        #define OD_1416_RPDOCommunicationParameter                  0x1416
+
+        #define OD_1416_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1416_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1416_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1416_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1417 */
+        #define OD_1417_RPDOCommunicationParameter                  0x1417
+
+        #define OD_1417_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1417_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1417_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1417_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1418 */
+        #define OD_1418_RPDOCommunicationParameter                  0x1418
+
+        #define OD_1418_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1418_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1418_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1418_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1419 */
+        #define OD_1419_RPDOCommunicationParameter                  0x1419
+
+        #define OD_1419_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1419_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1419_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1419_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141A */
+        #define OD_141A_RPDOCommunicationParameter                  0x141A
+
+        #define OD_141A_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141A_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141A_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141A_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141B */
+        #define OD_141B_RPDOCommunicationParameter                  0x141B
+
+        #define OD_141B_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141B_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141B_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141B_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141C */
+        #define OD_141C_RPDOCommunicationParameter                  0x141C
+
+        #define OD_141C_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141C_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141C_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141C_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141D */
+        #define OD_141D_RPDOCommunicationParameter                  0x141D
+
+        #define OD_141D_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141D_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141D_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141D_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141E */
+        #define OD_141E_RPDOCommunicationParameter                  0x141E
+
+        #define OD_141E_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141E_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141E_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141E_5_RPDOCommunicationParameter_eventTimer     5
+
+/*141F */
+        #define OD_141F_RPDOCommunicationParameter                  0x141F
+
+        #define OD_141F_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_141F_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_141F_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_141F_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1420 */
+        #define OD_1420_RPDOCommunicationParameter                  0x1420
+
+        #define OD_1420_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1420_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1420_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1420_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1421 */
+        #define OD_1421_RPDOCommunicationParameter                  0x1421
+
+        #define OD_1421_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1421_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1421_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1421_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1422 */
+        #define OD_1422_RPDOCommunicationParameter                  0x1422
+
+        #define OD_1422_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1422_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1422_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1422_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1423 */
+        #define OD_1423_RPDOCommunicationParameter                  0x1423
+
+        #define OD_1423_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1423_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1423_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1423_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1424 */
+        #define OD_1424_RPDOCommunicationParameter                  0x1424
+
+        #define OD_1424_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1424_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1424_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1424_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1425 */
+        #define OD_1425_RPDOCommunicationParameter                  0x1425
+
+        #define OD_1425_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1425_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1425_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1425_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1426 */
+        #define OD_1426_RPDOCommunicationParameter                  0x1426
+
+        #define OD_1426_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1426_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1426_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1426_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1427 */
+        #define OD_1427_RPDOCommunicationParameter                  0x1427
+
+        #define OD_1427_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1427_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1427_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1427_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1428 */
+        #define OD_1428_RPDOCommunicationParameter                  0x1428
+
+        #define OD_1428_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1428_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1428_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1428_5_RPDOCommunicationParameter_eventTimer     5
+
+/*1429 */
+        #define OD_1429_RPDOCommunicationParameter                  0x1429
+
+        #define OD_1429_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1429_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1429_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_1429_5_RPDOCommunicationParameter_eventTimer     5
+
+/*142A */
+        #define OD_142A_RPDOCommunicationParameter                  0x142A
+
+        #define OD_142A_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_142A_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_142A_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_142A_5_RPDOCommunicationParameter_eventTimer     5
+
+/*142B */
+        #define OD_142B_RPDOCommunicationParameter                  0x142B
+
+        #define OD_142B_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_142B_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_142B_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_142B_5_RPDOCommunicationParameter_eventTimer     5
+
+/*142C */
+        #define OD_142C_RPDOCommunicationParameter                  0x142C
+
+        #define OD_142C_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_142C_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_142C_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_142C_5_RPDOCommunicationParameter_eventTimer     5
+
+/*142D */
+        #define OD_142D_RPDOCommunicationParameter                  0x142D
+
+        #define OD_142D_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_142D_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_142D_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_142D_5_RPDOCommunicationParameter_eventTimer     5
+
+/*142E */
+        #define OD_142E_RPDOCommunicationParameter                  0x142E
+
+        #define OD_142E_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_142E_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_142E_2_RPDOCommunicationParameter_transmissionType 2
+        #define OD_142E_5_RPDOCommunicationParameter_eventTimer     5
+
 /*1600 */
         #define OD_1600_RPDOMappingParameter                        0x1600
 
@@ -758,6 +1094,409 @@
         #define OD_160F_6_RPDOMappingParameter_applicationObject6   6
         #define OD_160F_7_RPDOMappingParameter_applicationObject7   7
         #define OD_160F_8_RPDOMappingParameter_applicationObject8   8
+
+/*1610 */
+        #define OD_1610_RPDOMappingParameter                        0x1610
+
+        #define OD_1610_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1610_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1610_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1610_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1610_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1610_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1610_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1610_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1610_8_RPDOMappingParameter_applicationObject8   8
+
+/*1611 */
+        #define OD_1611_RPDOMappingParameter                        0x1611
+
+        #define OD_1611_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1611_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1611_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1611_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1611_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1611_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1611_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1611_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1611_8_RPDOMappingParameter_applicationObject8   8
+
+/*1612 */
+        #define OD_1612_RPDOMappingParameter                        0x1612
+
+        #define OD_1612_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1612_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1612_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1612_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1612_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1612_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1612_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1612_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1612_8_RPDOMappingParameter_applicationObject8   8
+
+/*1613 */
+        #define OD_1613_RPDOMappingParameter                        0x1613
+
+        #define OD_1613_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1613_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1613_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1613_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1613_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1613_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1613_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1613_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1613_8_RPDOMappingParameter_applicationObject8   8
+
+/*1614 */
+        #define OD_1614_RPDOMappingParameter                        0x1614
+
+        #define OD_1614_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1614_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1614_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1614_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1614_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1614_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1614_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1614_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1614_8_RPDOMappingParameter_applicationObject8   8
+
+/*1615 */
+        #define OD_1615_RPDOMappingParameter                        0x1615
+
+        #define OD_1615_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1615_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1615_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1615_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1615_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1615_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1615_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1615_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1615_8_RPDOMappingParameter_applicationObject8   8
+
+/*1616 */
+        #define OD_1616_RPDOMappingParameter                        0x1616
+
+        #define OD_1616_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1616_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1616_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1616_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1616_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1616_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1616_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1616_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1616_8_RPDOMappingParameter_applicationObject8   8
+
+/*1617 */
+        #define OD_1617_RPDOMappingParameter                        0x1617
+
+        #define OD_1617_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1617_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1617_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1617_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1617_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1617_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1617_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1617_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1617_8_RPDOMappingParameter_applicationObject8   8
+
+/*1618 */
+        #define OD_1618_RPDOMappingParameter                        0x1618
+
+        #define OD_1618_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1618_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1618_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1618_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1618_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1618_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1618_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1618_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1618_8_RPDOMappingParameter_applicationObject8   8
+
+/*1619 */
+        #define OD_1619_RPDOMappingParameter                        0x1619
+
+        #define OD_1619_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1619_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1619_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1619_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1619_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1619_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1619_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1619_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1619_8_RPDOMappingParameter_applicationObject8   8
+
+/*161A */
+        #define OD_161A_RPDOMappingParameter                        0x161A
+
+        #define OD_161A_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161A_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161A_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161A_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161A_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161A_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161A_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161A_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161A_8_RPDOMappingParameter_applicationObject8   8
+
+/*161B */
+        #define OD_161B_RPDOMappingParameter                        0x161B
+
+        #define OD_161B_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161B_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161B_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161B_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161B_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161B_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161B_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161B_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161B_8_RPDOMappingParameter_applicationObject8   8
+
+/*161C */
+        #define OD_161C_RPDOMappingParameter                        0x161C
+
+        #define OD_161C_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161C_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161C_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161C_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161C_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161C_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161C_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161C_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161C_8_RPDOMappingParameter_applicationObject8   8
+
+/*161D */
+        #define OD_161D_RPDOMappingParameter                        0x161D
+
+        #define OD_161D_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161D_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161D_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161D_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161D_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161D_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161D_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161D_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161D_8_RPDOMappingParameter_applicationObject8   8
+
+/*161E */
+        #define OD_161E_RPDOMappingParameter                        0x161E
+
+        #define OD_161E_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161E_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161E_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161E_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161E_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161E_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161E_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161E_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161E_8_RPDOMappingParameter_applicationObject8   8
+
+/*161F */
+        #define OD_161F_RPDOMappingParameter                        0x161F
+
+        #define OD_161F_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_161F_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_161F_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_161F_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_161F_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_161F_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_161F_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_161F_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_161F_8_RPDOMappingParameter_applicationObject8   8
+
+/*1620 */
+        #define OD_1620_RPDOMappingParameter                        0x1620
+
+        #define OD_1620_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1620_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1620_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1620_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1620_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1620_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1620_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1620_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1620_8_RPDOMappingParameter_applicationObject8   8
+
+/*1621 */
+        #define OD_1621_RPDOMappingParameter                        0x1621
+
+        #define OD_1621_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1621_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1621_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1621_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1621_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1621_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1621_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1621_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1621_8_RPDOMappingParameter_applicationObject8   8
+
+/*1622 */
+        #define OD_1622_RPDOMappingParameter                        0x1622
+
+        #define OD_1622_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1622_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1622_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1622_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1622_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1622_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1622_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1622_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1622_8_RPDOMappingParameter_applicationObject8   8
+
+/*1623 */
+        #define OD_1623_RPDOMappingParameter                        0x1623
+
+        #define OD_1623_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1623_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1623_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1623_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1623_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1623_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1623_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1623_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1623_8_RPDOMappingParameter_applicationObject8   8
+
+/*1624 */
+        #define OD_1624_RPDOMappingParameter                        0x1624
+
+        #define OD_1624_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1624_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1624_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1624_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1624_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1624_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1624_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1624_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1624_8_RPDOMappingParameter_applicationObject8   8
+
+/*1625 */
+        #define OD_1625_RPDOMappingParameter                        0x1625
+
+        #define OD_1625_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1625_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1625_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1625_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1625_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1625_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1625_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1625_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1625_8_RPDOMappingParameter_applicationObject8   8
+
+/*1626 */
+        #define OD_1626_RPDOMappingParameter                        0x1626
+
+        #define OD_1626_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1626_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1626_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1626_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1626_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1626_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1626_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1626_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1626_8_RPDOMappingParameter_applicationObject8   8
+
+/*1627 */
+        #define OD_1627_RPDOMappingParameter                        0x1627
+
+        #define OD_1627_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1627_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1627_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1627_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1627_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1627_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1627_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1627_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1627_8_RPDOMappingParameter_applicationObject8   8
+
+/*1628 */
+        #define OD_1628_RPDOMappingParameter                        0x1628
+
+        #define OD_1628_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1628_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1628_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1628_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1628_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1628_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1628_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1628_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1628_8_RPDOMappingParameter_applicationObject8   8
+
+/*1629 */
+        #define OD_1629_RPDOMappingParameter                        0x1629
+
+        #define OD_1629_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1629_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1629_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1629_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1629_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1629_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1629_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1629_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1629_8_RPDOMappingParameter_applicationObject8   8
+
+/*162A */
+        #define OD_162A_RPDOMappingParameter                        0x162A
+
+        #define OD_162A_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_162A_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_162A_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_162A_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_162A_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_162A_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_162A_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_162A_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_162A_8_RPDOMappingParameter_applicationObject8   8
+
+/*162B */
+        #define OD_162B_RPDOMappingParameter                        0x162B
+
+        #define OD_162B_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_162B_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_162B_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_162B_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_162B_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_162B_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_162B_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_162B_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_162B_8_RPDOMappingParameter_applicationObject8   8
+
+/*162C */
+        #define OD_162C_RPDOMappingParameter                        0x162C
+
+        #define OD_162C_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_162C_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_162C_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_162C_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_162C_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_162C_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_162C_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_162C_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_162C_8_RPDOMappingParameter_applicationObject8   8
+
+/*162D */
+        #define OD_162D_RPDOMappingParameter                        0x162D
+
+        #define OD_162D_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_162D_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_162D_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_162D_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_162D_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_162D_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_162D_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_162D_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_162D_8_RPDOMappingParameter_applicationObject8   8
+
+/*162E */
+        #define OD_162E_RPDOMappingParameter                        0x162E
+
+        #define OD_162E_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_162E_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_162E_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_162E_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_162E_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_162E_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_162E_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_162E_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_162E_8_RPDOMappingParameter_applicationObject8   8
 
 /*1800 */
         #define OD_1800_TPDOCommunicationParameter                  0x1800
@@ -1502,55 +2241,50 @@
         #define OD_7001_battery                                     0x7001
 
         #define OD_7001_0_battery_maxSubIndex                       0
-        #define OD_7001_1_battery_vbatt                             1
-        #define OD_7001_2_battery_VCellMax                          2
-        #define OD_7001_3_battery_VCellMin                          3
-        #define OD_7001_4_battery_VCell                             4
-        #define OD_7001_5_battery_VCell1                            5
-        #define OD_7001_6_battery_VCell2                            6
-        #define OD_7001_7_battery_VCellAvg                          7
-        #define OD_7001_8_battery_current                           8
-        #define OD_7001_9_battery_currentAvg                        9
-        #define OD_7001_10_battery_currentMax                       10
-        #define OD_7001_11_battery_currentMin                       11
-        #define OD_7001_12_battery_fullCapacity                     12
-        #define OD_7001_13_battery_reportedCapacity                 13
-        #define OD_7001_14_battery_timeToEmpty                      14
-        #define OD_7001_15_battery_timeToFull                       15
-        #define OD_7001_16_battery_cycles                           16
-        #define OD_7001_17_battery_reportedStateOfCharge            17
-        #define OD_7001_18_battery_temperature                      18
-        #define OD_7001_19_battery_temperatureAvg                   19
-        #define OD_7001_20_battery_temperatureMax                   20
-        #define OD_7001_21_battery_temperatureMin                   21
-        #define OD_7001_22_battery_state                            22
-
-/*7002 */
-        #define OD_7002_battery                                     0x7002
-
-        #define OD_7002_0_battery_maxSubIndex                       0
-        #define OD_7002_1_battery_vbatt                             1
-        #define OD_7002_2_battery_VCellMax                          2
-        #define OD_7002_3_battery_VCellMin                          3
-        #define OD_7002_4_battery_VCell                             4
-        #define OD_7002_5_battery_VCell1                            5
-        #define OD_7002_6_battery_VCell2                            6
-        #define OD_7002_7_battery_VCellAvg                          7
-        #define OD_7002_8_battery_current                           8
-        #define OD_7002_9_battery_currentAvg                        9
-        #define OD_7002_10_battery_currentMax                       10
-        #define OD_7002_11_battery_currentMin                       11
-        #define OD_7002_12_battery_fullCapacity                     12
-        #define OD_7002_13_battery_reportedCapacity                 13
-        #define OD_7002_14_battery_timeToEmpty                      14
-        #define OD_7002_15_battery_timeToFull                       15
-        #define OD_7002_16_battery_cycles                           16
-        #define OD_7002_17_battery_reportedStateOfCharge            17
-        #define OD_7002_18_battery_temperature                      18
-        #define OD_7002_19_battery_temperatureAvg                   19
-        #define OD_7002_20_battery_temperatureMax                   20
-        #define OD_7002_21_battery_temperatureMin                   21
-        #define OD_7002_22_battery_state                            22
+        #define OD_7001_1_battery_vbattBP1                          1
+        #define OD_7001_2_battery_vbattBP2                          2
+        #define OD_7001_3_battery_VCellMaxBP1                       3
+        #define OD_7001_4_battery_VCellMaxBP2                       4
+        #define OD_7001_5_battery_VCellMinBP1                       5
+        #define OD_7001_6_battery_VCellMinBP2                       6
+        #define OD_7001_7_battery_VCellBP1                          7
+        #define OD_7001_8_battery_VCellBP2                          8
+        #define OD_7001_9_battery_VCell1BP1                         9
+        #define OD_7001_10_battery_VCell1BP2                        10
+        #define OD_7001_11_battery_VCell2BP1                        11
+        #define OD_7001_12_battery_VCell2BP2                        12
+        #define OD_7001_13_battery_VCellAvgBP1                      13
+        #define OD_7001_14_battery_VCellAvgBP2                      14
+        #define OD_7001_15_battery_currentBP1                       15
+        #define OD_7001_16_battery_currentBP2                       16
+        #define OD_7001_17_battery_currentAvgBP1                    17
+        #define OD_7001_18_battery_currentAvgBP2                    18
+        #define OD_7001_19_battery_currentMaxBP1                    19
+        #define OD_7001_20_battery_currentMaxBP2                    20
+        #define OD_7001_21_battery_currentMinBP1                    21
+        #define OD_7001_22_battery_currentMinBP2                    22
+        #define OD_7001_23_battery_fullCapacityBP1                  23
+        #define OD_7001_24_battery_fullCapacityBP2                  24
+        #define OD_7001_25_battery_reportedCapacityBP1              25
+        #define OD_7001_26_battery_reportedCapacityBP2              26
+        #define OD_7001_27_battery_timeToEmptyBP1                   27
+        #define OD_7001_28_battery_timeToEmptyBP2                   28
+        #define OD_7001_29_battery_timeToFullBP1                    29
+        #define OD_7001_30_battery_timeToFullBP2                    30
+        #define OD_7001_31_battery_cyclesBP1                        31
+        #define OD_7001_32_battery_cyclesBP2                        32
+        #define OD_7001_33_battery_reportedStateOfChargeBP1         33
+        #define OD_7001_34_battery_reportedStateOfChargeBP2         34
+        #define OD_7001_35_battery_temperatureBP1                   35
+        #define OD_7001_36_battery_temperatureBP2                   36
+        #define OD_7001_37_battery_temperatureAvgBP1                37
+        #define OD_7001_38_battery_temperatureAvgBP2                38
+        #define OD_7001_39_battery_temperatureMaxBP1                39
+        #define OD_7001_40_battery_temperatureMaxBP2                40
+        #define OD_7001_41_battery_temperatureMinBP1                41
+        #define OD_7001_42_battery_temperatureMinBP2                42
+        #define OD_7001_43_battery_stateBP1                         43
+        #define OD_7001_44_battery_stateBP2                         44
 
 /*7003 */
         #define OD_7003_solarPanel                                  0x7003
@@ -1566,24 +2300,138 @@
         #define OD_7003_8_solarPanel_currentMax                     8
         #define OD_7003_9_solarPanel_powerMax                       9
         #define OD_7003_10_solarPanel_energy                        10
+        #define OD_7003_11_solarPanel_cell1Temp                     11
+        #define OD_7003_12_solarPanel_cell2Temp                     12
+        #define OD_7003_13_solarPanel_cell1TempMin                  13
+        #define OD_7003_14_solarPanel_cell2TempMin                  14
+        #define OD_7003_15_solarPanel_cell1TempMax                  15
+        #define OD_7003_16_solarPanel_cell2TempMax                  16
+
+/*7004 */
+        #define OD_7004_solarPanel                                  0x7004
+
+        #define OD_7004_0_solarPanel_maxSubIndex                    0
+        #define OD_7004_1_solarPanel_voltage                        1
+        #define OD_7004_2_solarPanel_current                        2
+        #define OD_7004_3_solarPanel_power                          3
+        #define OD_7004_4_solarPanel_voltageAvg                     4
+        #define OD_7004_5_solarPanel_currentAvg                     5
+        #define OD_7004_6_solarPanel_powerAvg                       6
+        #define OD_7004_7_solarPanel_voltageMax                     7
+        #define OD_7004_8_solarPanel_currentMax                     8
+        #define OD_7004_9_solarPanel_powerMax                       9
+        #define OD_7004_10_solarPanel_energy                        10
+        #define OD_7004_11_solarPanel_cell1Temp                     11
+        #define OD_7004_12_solarPanel_cell2Temp                     12
+        #define OD_7004_13_solarPanel_cell1TempMin                  13
+        #define OD_7004_14_solarPanel_cell2TempMin                  14
+        #define OD_7004_15_solarPanel_cell1TempMax                  15
+        #define OD_7004_16_solarPanel_cell2TempMax                  16
+
+/*7005 */
+        #define OD_7005_solarPanel                                  0x7005
+
+        #define OD_7005_0_solarPanel_maxSubIndex                    0
+        #define OD_7005_1_solarPanel_voltage                        1
+        #define OD_7005_2_solarPanel_current                        2
+        #define OD_7005_3_solarPanel_power                          3
+        #define OD_7005_4_solarPanel_voltageAvg                     4
+        #define OD_7005_5_solarPanel_currentAvg                     5
+        #define OD_7005_6_solarPanel_powerAvg                       6
+        #define OD_7005_7_solarPanel_voltageMax                     7
+        #define OD_7005_8_solarPanel_currentMax                     8
+        #define OD_7005_9_solarPanel_powerMax                       9
+        #define OD_7005_10_solarPanel_energy                        10
+        #define OD_7005_11_solarPanel_cell1Temp                     11
+        #define OD_7005_12_solarPanel_cell2Temp                     12
+        #define OD_7005_13_solarPanel_cell1TempMin                  13
+        #define OD_7005_14_solarPanel_cell2TempMin                  14
+        #define OD_7005_15_solarPanel_cell1TempMax                  15
+        #define OD_7005_16_solarPanel_cell2TempMax                  16
+
+/*7006 */
+        #define OD_7006_solarPanel                                  0x7006
+
+        #define OD_7006_0_solarPanel_maxSubIndex                    0
+        #define OD_7006_1_solarPanel_voltage                        1
+        #define OD_7006_2_solarPanel_current                        2
+        #define OD_7006_3_solarPanel_power                          3
+        #define OD_7006_4_solarPanel_voltageAvg                     4
+        #define OD_7006_5_solarPanel_currentAvg                     5
+        #define OD_7006_6_solarPanel_powerAvg                       6
+        #define OD_7006_7_solarPanel_voltageMax                     7
+        #define OD_7006_8_solarPanel_currentMax                     8
+        #define OD_7006_9_solarPanel_powerMax                       9
+        #define OD_7006_10_solarPanel_energy                        10
+        #define OD_7006_11_solarPanel_cell1Temp                     11
+        #define OD_7006_12_solarPanel_cell2Temp                     12
+        #define OD_7006_13_solarPanel_cell1TempMin                  13
+        #define OD_7006_14_solarPanel_cell2TempMin                  14
+        #define OD_7006_15_solarPanel_cell1TempMax                  15
+        #define OD_7006_16_solarPanel_cell2TempMax                  16
 
 /*700B */
         #define OD_700B_starTracker                                 0x700B
 
         #define OD_700B_0_starTracker_maxSubIndex                   0
-        #define OD_700B_1_starTracker_subObject1                    1
+        #define OD_700B_1_starTracker_rootParitionPercent           1
+        #define OD_700B_2_starTracker_RAM_Percent                   2
+        #define OD_700B_3_starTracker_freadCacheLength              3
+        #define OD_700B_4_starTracker_fwriteCacheLength             4
+        #define OD_700B_5_starTracker_activeApps                    5
+        #define OD_700B_6_starTracker_failedApps                    6
+        #define OD_700B_7_starTracker_updaterStatus                 7
+        #define OD_700B_8_starTracker_updatesAvailable              8
+        #define OD_700B_9_starTracker_rightAscension                9
+        #define OD_700B_10_starTracker_declination                  10
+        #define OD_700B_11_starTracker_roll                         11
+        #define OD_700B_12_starTracker_timestamp                    12
 
 /*700D */
         #define OD_700D_GPS                                         0x700D
 
         #define OD_700D_0_GPS_maxSubIndex                           0
-        #define OD_700D_1_GPS_subObject1                            1
+        #define OD_700D_1_GPS_rootParitionPercent                   1
+        #define OD_700D_2_GPS_RAM_Percent                           2
+        #define OD_700D_3_GPS_freadCacheLength                      3
+        #define OD_700D_4_GPS_fwriteCacheLength                     4
+        #define OD_700D_5_GPS_activeApps                            5
+        #define OD_700D_6_GPS_failedApps                            6
+        #define OD_700D_7_GPS_updaterStatus                         7
+        #define OD_700D_8_GPS_updatesAvailable                      8
+        #define OD_700D_9_GPS_GPS_Status                            9
+        #define OD_700D_10_GPS_satellitesLocked                     10
+        #define OD_700D_11_GPS_timestamp                            11
+        #define OD_700D_12_GPS_positionX                            12
+        #define OD_700D_13_GPS_positionY                            13
+        #define OD_700D_14_GPS_positionZ                            14
+        #define OD_700D_15_GPS_velocityX                            15
+        #define OD_700D_16_GPS_velocityY                            16
+        #define OD_700D_17_GPS_velocityZ                            17
 
 /*700E */
         #define OD_700E_ACS                                         0x700E
 
         #define OD_700E_0_ACS_maxSubIndex                           0
-        #define OD_700E_1_ACS_subObject1                            1
+        #define OD_700E_1_ACS_gyroPitch                             1
+        #define OD_700E_2_ACS_gyroYaw                               2
+        #define OD_700E_3_ACS_gyroRoll                              3
+        #define OD_700E_4_ACS_accelerationX                         4
+        #define OD_700E_5_ACS_accelerationY                         5
+        #define OD_700E_6_ACS_accelerationZ                         6
+        #define OD_700E_7_ACS_IMUTemp                               7
+        #define OD_700E_8_ACS_magnetometerPZ1X                      8
+        #define OD_700E_9_ACS_magnetometerPZ1Y                      9
+        #define OD_700E_10_ACS_magnetometerPZ1Z                     10
+        #define OD_700E_11_ACS_magnetometerPZ2X                     11
+        #define OD_700E_12_ACS_magnetometerPZ2Y                     12
+        #define OD_700E_13_ACS_magnetometerPZ2Z                     13
+        #define OD_700E_14_ACS_magnetometerMZ1X                     14
+        #define OD_700E_15_ACS_magnetometerMZ1Y                     15
+        #define OD_700E_16_ACS_magnetometerMZ1Z                     16
+        #define OD_700E_17_ACS_magnetometerMZ2X                     17
+        #define OD_700E_18_ACS_magnetometerMZ2Y                     18
+        #define OD_700E_19_ACS_magnetometerMZ2Z                     19
 
 /*700F */
         #define OD_700F_RWB                                         0x700F
@@ -1595,13 +2443,28 @@
         #define OD_7013_dxWiFi                                      0x7013
 
         #define OD_7013_0_dxWiFi_maxSubIndex                        0
-        #define OD_7013_1_dxWiFi_subObject1                         1
+        #define OD_7013_1_dxWiFi_rootParitionPercent                1
+        #define OD_7013_2_dxWiFi_RAM_Percent                        2
+        #define OD_7013_3_dxWiFi_freadCacheLength                   3
+        #define OD_7013_4_dxWiFi_fwriteCacheLength                  4
+        #define OD_7013_5_dxWiFi_activeApps                         5
+        #define OD_7013_6_dxWiFi_failedApps                         6
+        #define OD_7013_7_dxWiFi_updaterStatus                      7
+        #define OD_7013_8_dxWiFi_updatesAvailable                   8
+        #define OD_7013_9_dxWiFi_transmitting                       9
 
 /*7014 */
         #define OD_7014_CFC                                         0x7014
 
         #define OD_7014_0_CFC_maxSubIndex                           0
-        #define OD_7014_1_CFC_subObject1                            1
+        #define OD_7014_1_CFC_rootParitionPercent                   1
+        #define OD_7014_2_CFC_RAM_Percent                           2
+        #define OD_7014_3_CFC_freadCacheLength                      3
+        #define OD_7014_4_CFC_fwriteCacheLength                     4
+        #define OD_7014_5_CFC_activeApps                            5
+        #define OD_7014_6_CFC_failedApps                            6
+        #define OD_7014_7_CFC_updaterStatus                         7
+        #define OD_7014_8_CFC_updatesAvailable                      8
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -1625,8 +2488,8 @@ struct sCO_OD_RAM{
 /*2022      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*6000      */ VISIBLE_STRING C3State[1];
-/*7001      */ OD_battery_t    battery[2];
-/*7003      */ OD_solarPanel_t solarPanel;
+/*7001      */ OD_battery_t    battery;
+/*7003      */ OD_solarPanel_t solarPanel[4];
 /*700B      */ OD_starTracker_t starTracker;
 /*700D      */ OD_GPS_t        GPS;
 /*700E      */ OD_ACS_t        ACS;
@@ -1674,8 +2537,8 @@ struct sCO_OD_PERSIST_COMM{
 /*1029      */ UNSIGNED8       errorBehavior[2];
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
 /*1280      */ OD_SDOClientParameter_t SDOClientParameter[1];
-/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[16];
-/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[16];
+/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[47];
+/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[47];
 /*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[16];
 /*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[16];
 /*1F80      */ UNSIGNED32     NMTStartup;

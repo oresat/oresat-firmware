@@ -45,15 +45,17 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*2022*/ {0x8L, 0x0, 0x0L, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00},
 /*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*6000*/ {'B'},
-/*7001*/ {{0x16L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x0L},
-/*7002*/ {0x16L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x0L}},
-/*7003*/ {0xAL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-/*700B*/ {0x1L, 0x00},
-/*700D*/ {0x1L, 0x00},
-/*700E*/ {0x1L, 0x00},
+/*7001*/ {0x2CL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0L},
+/*7003*/ {{0x10L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x7F, 0x7F, 0x80, 0x80},
+/*7004*/ {0x10L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x7F, 0x7F, 0x80, 0x80},
+/*7005*/ {0x10L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x7F, 0x7F, 0x80, 0x80},
+/*7006*/ {0x10L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x7F, 0x7F, 0x80, 0x80}},
+/*700B*/ {0xCL, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x00, 0x00, 0x00, 0x00000000L},
+/*700D*/ {0x11L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x00000000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*700E*/ {0x13L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 /*700F*/ {0x1L, 0x00},
-/*7013*/ {0x1L, 0x00},
-/*7014*/ {0x1L, 0x00},
+/*7013*/ {0x9L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0},
+/*7014*/ {0x8L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -98,38 +100,100 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 /*1029*/ {0x1L, 0x1L},
 /*1200*/ {{0x3L, 0x80000000L, 0x80000000L, 0x1L}},
 /*1280*/ {{0x3L, 0x80000000L, 0x80000000L, 0x1L}},
-/*1400*/ {{0x5L, 0x80000200L, 0xFEL, 0x00},
-/*1401*/ {0x5L, 0x80000300L, 0xFEL, 0x00},
-/*1402*/ {0x5L, 0x80000400L, 0xFEL, 0x00},
-/*1403*/ {0x5L, 0x80000500L, 0xFEL, 0x00},
-/*1404*/ {0x5L, 0x80000200L, 0xFEL, 0x00},
-/*1405*/ {0x5L, 0x80000300L, 0xFEL, 0x00},
-/*1406*/ {0x5L, 0x80000400L, 0xFEL, 0x00},
-/*1407*/ {0x5L, 0x80000500L, 0xFEL, 0x00},
-/*1408*/ {0x5L, 0x80000200L, 0xFEL, 0x00},
-/*1409*/ {0x5L, 0x80000300L, 0xFEL, 0x00},
-/*140A*/ {0x5L, 0x80000400L, 0xFEL, 0x00},
-/*140B*/ {0x5L, 0x80000500L, 0xFEL, 0x00},
-/*140C*/ {0x5L, 0x80000200L, 0xFEL, 0x00},
-/*140D*/ {0x5L, 0x80000300L, 0xFEL, 0x00},
-/*140E*/ {0x5L, 0x80000400L, 0xFEL, 0x00},
-/*140F*/ {0x5L, 0x80000500L, 0xFEL, 0x00}},
-/*1600*/ {{0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1601*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1602*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1603*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1604*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1605*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1606*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1607*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1608*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1609*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160A*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160B*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160C*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160D*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160E*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*160F*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
+/*1400*/ {{0x5L, 0x0181L, 0xFEL, 0x00},
+/*1401*/ {0x5L, 0x0184L, 0xFEL, 0x00},
+/*1402*/ {0x5L, 0x0284L, 0xFEL, 0x00},
+/*1403*/ {0x5L, 0x0384L, 0xFEL, 0x00},
+/*1404*/ {0x5L, 0x0484L, 0xFEL, 0x00},
+/*1405*/ {0x5L, 0x0185L, 0xFEL, 0x00},
+/*1406*/ {0x5L, 0x0285L, 0xFEL, 0x00},
+/*1407*/ {0x5L, 0x0385L, 0xFEL, 0x00},
+/*1408*/ {0x5L, 0x0485L, 0xFEL, 0x00},
+/*1409*/ {0x5L, 0x0186L, 0xFEL, 0x00},
+/*140A*/ {0x5L, 0x0286L, 0xFEL, 0x00},
+/*140B*/ {0x5L, 0x018CL, 0xFEL, 0x00},
+/*140C*/ {0x5L, 0x028CL, 0xFEL, 0x00},
+/*140D*/ {0x5L, 0x038CL, 0xFEL, 0x00},
+/*140E*/ {0x5L, 0x048CL, 0xFEL, 0x00},
+/*140F*/ {0x5L, 0x0190L, 0xFEL, 0x00},
+/*1410*/ {0x5L, 0x0290L, 0xFEL, 0x00},
+/*1411*/ {0x5L, 0x0390L, 0xFEL, 0x00},
+/*1412*/ {0x5L, 0x0490L, 0xFEL, 0x00},
+/*1413*/ {0x5L, 0x0194L, 0xFEL, 0x00},
+/*1414*/ {0x5L, 0x0294L, 0xFEL, 0x00},
+/*1415*/ {0x5L, 0x0394L, 0xFEL, 0x00},
+/*1416*/ {0x5L, 0x0494L, 0xFEL, 0x00},
+/*1417*/ {0x5L, 0x0198L, 0xFEL, 0x00},
+/*1418*/ {0x5L, 0x0298L, 0xFEL, 0x00},
+/*1419*/ {0x5L, 0x0398L, 0xFEL, 0x00},
+/*141A*/ {0x5L, 0x0498L, 0xFEL, 0x00},
+/*141B*/ {0x5L, 0x01ACL, 0xFEL, 0x00},
+/*141C*/ {0x5L, 0x02ACL, 0xFEL, 0x00},
+/*141D*/ {0x5L, 0x03ACL, 0xFEL, 0x00},
+/*141E*/ {0x5L, 0x04ACL, 0xFEL, 0x00},
+/*141F*/ {0x5L, 0x01B4L, 0xFEL, 0x00},
+/*1420*/ {0x5L, 0x02B4L, 0xFEL, 0x00},
+/*1421*/ {0x5L, 0x03B4L, 0xFEL, 0x00},
+/*1422*/ {0x5L, 0x04B4L, 0xFEL, 0x00},
+/*1423*/ {0x5L, 0x01B5L, 0xFEL, 0x00},
+/*1424*/ {0x5L, 0x02B5L, 0xFEL, 0x00},
+/*1425*/ {0x5L, 0x03B5L, 0xFEL, 0x00},
+/*1426*/ {0x5L, 0x01B8L, 0xFEL, 0x00},
+/*1427*/ {0x5L, 0x02B8L, 0xFEL, 0x00},
+/*1428*/ {0x5L, 0x03B8L, 0xFEL, 0x00},
+/*1429*/ {0x5L, 0x04B8L, 0xFEL, 0x00},
+/*142A*/ {0x5L, 0x01B9L, 0xFEL, 0x00},
+/*142B*/ {0x5L, 0x02B9L, 0xFEL, 0x00},
+/*142C*/ {0x5L, 0x01CCL, 0xFEL, 0x00},
+/*142D*/ {0x5L, 0x02CCL, 0xFEL, 0x00},
+/*142E*/ {0x5L, 0x03CCL, 0xFEL, 0x00}},
+/*1600*/ {{0x1L, 0x20100040L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1601*/ {0x4L, 0x70010110L, 0x70010310L, 0x70010510L, 0x70010710L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1602*/ {0x3L, 0x70010910L, 0x70010B10L, 0x70010D10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1603*/ {0x4L, 0x70010F10L, 0x70011110L, 0x70011310L, 0x70011510L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1604*/ {0x4L, 0x70012310L, 0x70012510L, 0x70012710L, 0x70012910L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1605*/ {0x4L, 0x70011710L, 0x70011910L, 0x70012108L, 0x70012B08L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1606*/ {0x4L, 0x70010210L, 0x70010410L, 0x70010610L, 0x70010810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1607*/ {0x3L, 0x70010A10L, 0x70010C10L, 0x70010E10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1608*/ {0x4L, 0x70011010L, 0x70011210L, 0x70011410L, 0x70011610L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1609*/ {0x4L, 0x70012410L, 0x70012610L, 0x70012810L, 0x70012A10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*160A*/ {0x4L, 0x70011810L, 0x70011A10L, 0x70012208L, 0x70012C08L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*160B*/ {0x4L, 0x70030110L, 0x70030210L, 0x70030310L, 0x70030410L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*160C*/ {0x4L, 0x70030510L, 0x70030610L, 0x70030710L, 0x70030810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*160D*/ {0x2L, 0x70030910L, 0x70030A10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*160E*/ {0x6L, 0x70030B08L, 0x70030C08L, 0x70030D08L, 0x70030E08L, 0x70030F08L, 0x70031008L, 0x0000L, 0x0000L},
+/*160F*/ {0x4L, 0x70040110L, 0x70040210L, 0x70040310L, 0x70040410L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1610*/ {0x4L, 0x70040510L, 0x70040610L, 0x70040710L, 0x70040810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1611*/ {0x2L, 0x70040910L, 0x70040A10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1612*/ {0x6L, 0x70040B08L, 0x70040C08L, 0x70040D08L, 0x70040E08L, 0x70040F08L, 0x70041008L, 0x0000L, 0x0000L},
+/*1613*/ {0x4L, 0x70050110L, 0x70050210L, 0x70050310L, 0x70050410L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1614*/ {0x4L, 0x70050510L, 0x70050610L, 0x70050710L, 0x70050810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1615*/ {0x2L, 0x70050910L, 0x70050A10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1616*/ {0x6L, 0x70050B08L, 0x70050C08L, 0x70050D08L, 0x70050E08L, 0x70050F08L, 0x70051008L, 0x0000L, 0x0000L},
+/*1617*/ {0x4L, 0x70060110L, 0x70060210L, 0x70060310L, 0x70060410L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1618*/ {0x4L, 0x70060510L, 0x70060610L, 0x70060710L, 0x70060810L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1619*/ {0x2L, 0x70060910L, 0x70060A10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161A*/ {0x6L, 0x70060B08L, 0x70060C08L, 0x70060D08L, 0x70060E08L, 0x70060F08L, 0x70061008L, 0x0000L, 0x0000L},
+/*161B*/ {0x6L, 0x700B0108L, 0x700B0208L, 0x700B0308L, 0x700B0408L, 0x700B0508L, 0x700B0608L, 0x0000L, 0x0000L},
+/*161C*/ {0x2L, 0x700B0708L, 0x700B0808L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161D*/ {0x3L, 0x700B0910L, 0x700B0A10L, 0x700B0B10L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161E*/ {0x1L, 0x700B0C40L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*161F*/ {0x6L, 0x700D0108L, 0x700D0208L, 0x700D0308L, 0x700D0408L, 0x700D0508L, 0x700D0608L, 0x0000L, 0x0000L},
+/*1620*/ {0x2L, 0x700D0708L, 0x700D0808L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1621*/ {0x1L, 0x700D0940L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1622*/ {0x2L, 0x700D0C20L, 0x700D0D20L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1623*/ {0x2L, 0x700D0E20L, 0x700D0F20L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1624*/ {0x2L, 0x700D0908L, 0x700D0A08L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1625*/ {0x2L, 0x700D0E20L, 0x700D0F20L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1626*/ {0x3L, 0x700E0110L, 0x700E0210L, 0x700E0310L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1627*/ {0x3L, 0x700E0410L, 0x700E0510L, 0x700E0610L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1628*/ {0x1L, 0x700E0708L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1629*/ {0x4L, 0x700E0820L, 0x700E0920L, 0x700E0A20L, 0x700E0B20L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*162A*/ {0x4L, 0x700E0C20L, 0x700E0D20L, 0x700E0E20L, 0x700E0F20L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*162B*/ {0x4L, 0x700E1020L, 0x700E1120L, 0x700E1220L, 0x700E1320L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*162C*/ {0x6L, 0x70130108L, 0x70130208L, 0x70130308L, 0x70130408L, 0x70130508L, 0x70130608L, 0x0000L, 0x0000L},
+/*162D*/ {0x2L, 0x70130708L, 0x70130808L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*162E*/ {0x1L, 0x70130908L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1800*/ {{0x6L, 0xC0000180L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*1801*/ {0x6L, 0xC0000280L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*1802*/ {0x6L, 0xC0000380L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
@@ -146,7 +210,7 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 /*180D*/ {0x6L, 0xC0000280L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*180E*/ {0x6L, 0xC0000380L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L},
 /*180F*/ {0x6L, 0xC0000480L, 0xFEL, 0x00, 0x0L, 0x00, 0x0L}},
-/*1A00*/ {{0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1A00*/ {{0x1L, 0x20100040L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1A01*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1A02*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
 /*1A03*/ {0x0L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
@@ -343,6 +407,223 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[15].eventTimer, 0x8F, 0x2 },
 };
 
+/*0x1410*/ const CO_OD_entryRecord_t OD_record1410[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[16].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[16].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[16].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[16].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1411*/ const CO_OD_entryRecord_t OD_record1411[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[17].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[17].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[17].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[17].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1412*/ const CO_OD_entryRecord_t OD_record1412[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[18].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[18].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[18].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[18].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1413*/ const CO_OD_entryRecord_t OD_record1413[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[19].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[19].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[19].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[19].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1414*/ const CO_OD_entryRecord_t OD_record1414[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[20].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[20].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[20].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[20].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1415*/ const CO_OD_entryRecord_t OD_record1415[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[21].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[21].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[21].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[21].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1416*/ const CO_OD_entryRecord_t OD_record1416[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[22].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[22].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[22].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[22].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1417*/ const CO_OD_entryRecord_t OD_record1417[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[23].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[23].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[23].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[23].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1418*/ const CO_OD_entryRecord_t OD_record1418[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[24].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[24].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[24].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[24].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1419*/ const CO_OD_entryRecord_t OD_record1419[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[25].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[25].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[25].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[25].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141A*/ const CO_OD_entryRecord_t OD_record141A[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[26].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[26].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[26].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[26].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141B*/ const CO_OD_entryRecord_t OD_record141B[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[27].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[27].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[27].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[27].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141C*/ const CO_OD_entryRecord_t OD_record141C[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[28].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[28].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[28].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[28].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141D*/ const CO_OD_entryRecord_t OD_record141D[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[29].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[29].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[29].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[29].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141E*/ const CO_OD_entryRecord_t OD_record141E[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[30].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[30].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[30].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[30].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x141F*/ const CO_OD_entryRecord_t OD_record141F[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[31].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[31].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[31].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[31].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1420*/ const CO_OD_entryRecord_t OD_record1420[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[32].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[32].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[32].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[32].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1421*/ const CO_OD_entryRecord_t OD_record1421[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[33].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[33].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[33].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[33].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1422*/ const CO_OD_entryRecord_t OD_record1422[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[34].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[34].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[34].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[34].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1423*/ const CO_OD_entryRecord_t OD_record1423[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[35].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[35].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[35].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[35].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1424*/ const CO_OD_entryRecord_t OD_record1424[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[36].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[36].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[36].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[36].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1425*/ const CO_OD_entryRecord_t OD_record1425[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[37].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[37].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[37].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[37].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1426*/ const CO_OD_entryRecord_t OD_record1426[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[38].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[38].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[38].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[38].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1427*/ const CO_OD_entryRecord_t OD_record1427[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[39].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[39].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[39].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[39].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1428*/ const CO_OD_entryRecord_t OD_record1428[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[40].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[40].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[40].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[40].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x1429*/ const CO_OD_entryRecord_t OD_record1429[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[41].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[41].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[41].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[41].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x142A*/ const CO_OD_entryRecord_t OD_record142A[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[42].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[42].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[42].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[42].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x142B*/ const CO_OD_entryRecord_t OD_record142B[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[43].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[43].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[43].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[43].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x142C*/ const CO_OD_entryRecord_t OD_record142C[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[44].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[44].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[44].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[44].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x142D*/ const CO_OD_entryRecord_t OD_record142D[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[45].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[45].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[45].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[45].eventTimer, 0x8F, 0x2 },
+};
+
+/*0x142E*/ const CO_OD_entryRecord_t OD_record142E[4] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[46].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[46].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[46].transmissionType, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[46].eventTimer, 0x8F, 0x2 },
+};
+
 /*0x1600*/ const CO_OD_entryRecord_t OD_record1600[9] = {
            {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
            {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject1, 0x8F, 0x4 },
@@ -533,6 +814,378 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[15].applicationObject6, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[15].applicationObject7, 0x8F, 0x4 },
            {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[15].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1610*/ const CO_OD_entryRecord_t OD_record1610[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[16].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1611*/ const CO_OD_entryRecord_t OD_record1611[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[17].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1612*/ const CO_OD_entryRecord_t OD_record1612[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[18].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1613*/ const CO_OD_entryRecord_t OD_record1613[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[19].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1614*/ const CO_OD_entryRecord_t OD_record1614[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[20].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1615*/ const CO_OD_entryRecord_t OD_record1615[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[21].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1616*/ const CO_OD_entryRecord_t OD_record1616[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[22].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1617*/ const CO_OD_entryRecord_t OD_record1617[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[23].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1618*/ const CO_OD_entryRecord_t OD_record1618[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[24].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1619*/ const CO_OD_entryRecord_t OD_record1619[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[25].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161A*/ const CO_OD_entryRecord_t OD_record161A[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[26].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161B*/ const CO_OD_entryRecord_t OD_record161B[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[27].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161C*/ const CO_OD_entryRecord_t OD_record161C[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[28].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161D*/ const CO_OD_entryRecord_t OD_record161D[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[29].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161E*/ const CO_OD_entryRecord_t OD_record161E[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[30].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x161F*/ const CO_OD_entryRecord_t OD_record161F[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[31].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1620*/ const CO_OD_entryRecord_t OD_record1620[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[32].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1621*/ const CO_OD_entryRecord_t OD_record1621[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[33].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1622*/ const CO_OD_entryRecord_t OD_record1622[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[34].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1623*/ const CO_OD_entryRecord_t OD_record1623[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[35].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1624*/ const CO_OD_entryRecord_t OD_record1624[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[36].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1625*/ const CO_OD_entryRecord_t OD_record1625[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[37].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1626*/ const CO_OD_entryRecord_t OD_record1626[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[38].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1627*/ const CO_OD_entryRecord_t OD_record1627[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[39].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1628*/ const CO_OD_entryRecord_t OD_record1628[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[40].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x1629*/ const CO_OD_entryRecord_t OD_record1629[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[41].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x162A*/ const CO_OD_entryRecord_t OD_record162A[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[42].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x162B*/ const CO_OD_entryRecord_t OD_record162B[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[43].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x162C*/ const CO_OD_entryRecord_t OD_record162C[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[44].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x162D*/ const CO_OD_entryRecord_t OD_record162D[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[45].applicationObject8, 0x8F, 0x4 },
+};
+
+/*0x162E*/ const CO_OD_entryRecord_t OD_record162E[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[46].applicationObject8, 0x8F, 0x4 },
 };
 
 /*0x1800*/ const CO_OD_entryRecord_t OD_record1800[7] = {
@@ -945,85 +1598,192 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_PERSIST_STATE.persistentState.deployed, 0x0F, 0x1 },
 };
 
-/*0x7001*/ const CO_OD_entryRecord_t OD_record7001[23] = {
-           {(void*)&CO_OD_RAM.battery[0].highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.battery[0].vbatt, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCellMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCellMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCell, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCell1, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCell2, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].VCellAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].current, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].currentAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].currentMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].currentMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].fullCapacity, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].reportedCapacity, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].timeToEmpty, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].timeToFull, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].cycles, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].reportedStateOfCharge, 0x26, 0x1 },
-           {(void*)&CO_OD_RAM.battery[0].temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].temperatureAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].temperatureMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].temperatureMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[0].state, 0x26, 0x1 },
+/*0x7001*/ const CO_OD_entryRecord_t OD_record7001[45] = {
+           {(void*)&CO_OD_RAM.battery.highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.battery.vbattBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.vbattBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellMaxBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellMaxBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellMinBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellMinBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCell1BP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCell1BP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCell2BP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCell2BP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellAvgBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.VCellAvgBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentAvgBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentAvgBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentMaxBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentMaxBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentMinBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.currentMinBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.fullCapacityBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.fullCapacityBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.reportedCapacityBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.reportedCapacityBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.timeToEmptyBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.timeToEmptyBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.timeToFullBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.timeToFullBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.cyclesBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.cyclesBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.reportedStateOfChargeBP1, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.battery.reportedStateOfChargeBP2, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.battery.temperatureBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureAvgBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureAvgBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureMaxBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureMaxBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureMinBP1, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.temperatureMinBP2, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.battery.stateBP1, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.battery.stateBP2, 0x3E, 0x1 },
 };
 
-/*0x7002*/ const CO_OD_entryRecord_t OD_record7002[23] = {
-           {(void*)&CO_OD_RAM.battery[1].highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.battery[1].vbatt, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCellMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCellMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCell, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCell1, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCell2, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].VCellAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].current, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].currentAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].currentMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].currentMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].fullCapacity, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].reportedCapacity, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].timeToEmpty, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].timeToFull, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].cycles, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].reportedStateOfCharge, 0x26, 0x1 },
-           {(void*)&CO_OD_RAM.battery[1].temperature, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].temperatureAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].temperatureMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].temperatureMin, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.battery[1].state, 0x26, 0x1 },
+/*0x7003*/ const CO_OD_entryRecord_t OD_record7003[17] = {
+           {(void*)&CO_OD_RAM.solarPanel[0].highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].voltage, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].current, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].power, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].voltageAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].currentAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].powerAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].voltageMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].currentMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].powerMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].energy, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell1Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell2Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell1TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell2TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell1TempMax, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[0].cell2TempMax, 0x3E, 0x1 },
 };
 
-/*0x7003*/ const CO_OD_entryRecord_t OD_record7003[11] = {
-           {(void*)&CO_OD_RAM.solarPanel.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.solarPanel.voltage, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.current, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.power, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.voltageAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.currentAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.powerAvg, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.voltageMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.currentMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.powerMax, 0xA6, 0x2 },
-           {(void*)&CO_OD_RAM.solarPanel.energy, 0xA6, 0x2 },
+/*0x7004*/ const CO_OD_entryRecord_t OD_record7004[17] = {
+           {(void*)&CO_OD_RAM.solarPanel[1].highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].voltage, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].current, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].power, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].voltageAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].currentAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].powerAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].voltageMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].currentMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].powerMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].energy, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell1Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell2Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell1TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell2TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell1TempMax, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[1].cell2TempMax, 0x3E, 0x1 },
 };
 
-/*0x700B*/ const CO_OD_entryRecord_t OD_record700B[2] = {
+/*0x7005*/ const CO_OD_entryRecord_t OD_record7005[17] = {
+           {(void*)&CO_OD_RAM.solarPanel[2].highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].voltage, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].current, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].power, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].voltageAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].currentAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].powerAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].voltageMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].currentMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].powerMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].energy, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell1Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell2Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell1TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell2TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell1TempMax, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[2].cell2TempMax, 0x3E, 0x1 },
+};
+
+/*0x7006*/ const CO_OD_entryRecord_t OD_record7006[17] = {
+           {(void*)&CO_OD_RAM.solarPanel[3].highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].voltage, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].current, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].power, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].voltageAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].currentAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].powerAvg, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].voltageMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].currentMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].powerMax, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].energy, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell1Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell2Temp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell1TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell2TempMin, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell1TempMax, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.solarPanel[3].cell2TempMax, 0x3E, 0x1 },
+};
+
+/*0x700B*/ const CO_OD_entryRecord_t OD_record700B[13] = {
            {(void*)&CO_OD_RAM.starTracker.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.starTracker.subObject1, 0xB6, 0x2 },
+           {(void*)&CO_OD_RAM.starTracker.rootParitionPercent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.RAM_Percent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.freadCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.fwriteCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.activeApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.failedApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.updaterStatus, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.updatesAvailable, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.starTracker.rightAscension, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.starTracker.declination, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.starTracker.roll, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.starTracker.timestamp, 0xBE, 0x8 },
 };
 
-/*0x700D*/ const CO_OD_entryRecord_t OD_record700D[2] = {
+/*0x700D*/ const CO_OD_entryRecord_t OD_record700D[18] = {
            {(void*)&CO_OD_RAM.GPS.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.GPS.subObject1, 0xB6, 0x2 },
+           {(void*)&CO_OD_RAM.GPS.rootParitionPercent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.RAM_Percent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.freadCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.fwriteCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.activeApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.failedApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.updaterStatus, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.updatesAvailable, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.GPS_Status, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.satellitesLocked, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.GPS.timestamp, 0xBE, 0x8 },
+           {(void*)&CO_OD_RAM.GPS.positionX, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.GPS.positionY, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.GPS.positionZ, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.GPS.velocityX, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.GPS.velocityY, 0xBE, 0x4 },
+           {(void*)&CO_OD_RAM.GPS.velocityZ, 0xBE, 0x4 },
 };
 
-/*0x700E*/ const CO_OD_entryRecord_t OD_record700E[2] = {
+/*0x700E*/ const CO_OD_entryRecord_t OD_record700E[20] = {
            {(void*)&CO_OD_RAM.ACS.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.ACS.subObject1, 0xB6, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.gyroPitch, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.gyroYaw, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.gyroRoll, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.accelerationX, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.accelerationY, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.accelerationZ, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.IMUTemp, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ1X, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ1Y, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ1Z, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ2X, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ2Y, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerPZ2Z, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ1X, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ1Y, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ1Z, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ2X, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ2Y, 0xBE, 0x2 },
+           {(void*)&CO_OD_RAM.ACS.magnetometerMZ2Z, 0xBE, 0x2 },
 };
 
 /*0x700F*/ const CO_OD_entryRecord_t OD_record700F[2] = {
@@ -1031,14 +1791,29 @@ struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE = {
            {(void*)&CO_OD_RAM.RWB.subObject1, 0xB6, 0x2 },
 };
 
-/*0x7013*/ const CO_OD_entryRecord_t OD_record7013[2] = {
+/*0x7013*/ const CO_OD_entryRecord_t OD_record7013[10] = {
            {(void*)&CO_OD_RAM.dxWiFi.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.dxWiFi.subObject1, 0xB6, 0x2 },
+           {(void*)&CO_OD_RAM.dxWiFi.rootParitionPercent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.RAM_Percent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.freadCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.fwriteCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.activeApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.failedApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.updaterStatus, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.updatesAvailable, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.dxWiFi.transmitting, 0x3E, 0x1 },
 };
 
-/*0x7014*/ const CO_OD_entryRecord_t OD_record7014[2] = {
+/*0x7014*/ const CO_OD_entryRecord_t OD_record7014[9] = {
            {(void*)&CO_OD_RAM.CFC.highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.CFC.subObject1, 0xB6, 0x2 },
+           {(void*)&CO_OD_RAM.CFC.rootParitionPercent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.RAM_Percent, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.freadCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.fwriteCacheLength, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.activeApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.failedApps, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.updaterStatus, 0x3E, 0x1 },
+           {(void*)&CO_OD_RAM.CFC.updatesAvailable, 0x3E, 0x1 },
 };
 
 /*******************************************************************************
@@ -1083,6 +1858,37 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x140D, 0x03, 0x00,  0, (void*)&OD_record140D},
 {0x140E, 0x03, 0x00,  0, (void*)&OD_record140E},
 {0x140F, 0x03, 0x00,  0, (void*)&OD_record140F},
+{0x1410, 0x03, 0x00,  0, (void*)&OD_record1410},
+{0x1411, 0x03, 0x00,  0, (void*)&OD_record1411},
+{0x1412, 0x03, 0x00,  0, (void*)&OD_record1412},
+{0x1413, 0x03, 0x00,  0, (void*)&OD_record1413},
+{0x1414, 0x03, 0x00,  0, (void*)&OD_record1414},
+{0x1415, 0x03, 0x00,  0, (void*)&OD_record1415},
+{0x1416, 0x03, 0x00,  0, (void*)&OD_record1416},
+{0x1417, 0x03, 0x00,  0, (void*)&OD_record1417},
+{0x1418, 0x03, 0x00,  0, (void*)&OD_record1418},
+{0x1419, 0x03, 0x00,  0, (void*)&OD_record1419},
+{0x141A, 0x03, 0x00,  0, (void*)&OD_record141A},
+{0x141B, 0x03, 0x00,  0, (void*)&OD_record141B},
+{0x141C, 0x03, 0x00,  0, (void*)&OD_record141C},
+{0x141D, 0x03, 0x00,  0, (void*)&OD_record141D},
+{0x141E, 0x03, 0x00,  0, (void*)&OD_record141E},
+{0x141F, 0x03, 0x00,  0, (void*)&OD_record141F},
+{0x1420, 0x03, 0x00,  0, (void*)&OD_record1420},
+{0x1421, 0x03, 0x00,  0, (void*)&OD_record1421},
+{0x1422, 0x03, 0x00,  0, (void*)&OD_record1422},
+{0x1423, 0x03, 0x00,  0, (void*)&OD_record1423},
+{0x1424, 0x03, 0x00,  0, (void*)&OD_record1424},
+{0x1425, 0x03, 0x00,  0, (void*)&OD_record1425},
+{0x1426, 0x03, 0x00,  0, (void*)&OD_record1426},
+{0x1427, 0x03, 0x00,  0, (void*)&OD_record1427},
+{0x1428, 0x03, 0x00,  0, (void*)&OD_record1428},
+{0x1429, 0x03, 0x00,  0, (void*)&OD_record1429},
+{0x142A, 0x03, 0x00,  0, (void*)&OD_record142A},
+{0x142B, 0x03, 0x00,  0, (void*)&OD_record142B},
+{0x142C, 0x03, 0x00,  0, (void*)&OD_record142C},
+{0x142D, 0x03, 0x00,  0, (void*)&OD_record142D},
+{0x142E, 0x03, 0x00,  0, (void*)&OD_record142E},
 {0x1600, 0x08, 0x00,  0, (void*)&OD_record1600},
 {0x1601, 0x08, 0x00,  0, (void*)&OD_record1601},
 {0x1602, 0x08, 0x00,  0, (void*)&OD_record1602},
@@ -1099,6 +1905,37 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x160D, 0x08, 0x00,  0, (void*)&OD_record160D},
 {0x160E, 0x08, 0x00,  0, (void*)&OD_record160E},
 {0x160F, 0x08, 0x00,  0, (void*)&OD_record160F},
+{0x1610, 0x08, 0x00,  0, (void*)&OD_record1610},
+{0x1611, 0x08, 0x00,  0, (void*)&OD_record1611},
+{0x1612, 0x08, 0x00,  0, (void*)&OD_record1612},
+{0x1613, 0x08, 0x00,  0, (void*)&OD_record1613},
+{0x1614, 0x08, 0x00,  0, (void*)&OD_record1614},
+{0x1615, 0x08, 0x00,  0, (void*)&OD_record1615},
+{0x1616, 0x08, 0x00,  0, (void*)&OD_record1616},
+{0x1617, 0x08, 0x00,  0, (void*)&OD_record1617},
+{0x1618, 0x08, 0x00,  0, (void*)&OD_record1618},
+{0x1619, 0x08, 0x00,  0, (void*)&OD_record1619},
+{0x161A, 0x08, 0x00,  0, (void*)&OD_record161A},
+{0x161B, 0x08, 0x00,  0, (void*)&OD_record161B},
+{0x161C, 0x08, 0x00,  0, (void*)&OD_record161C},
+{0x161D, 0x08, 0x00,  0, (void*)&OD_record161D},
+{0x161E, 0x08, 0x00,  0, (void*)&OD_record161E},
+{0x161F, 0x08, 0x00,  0, (void*)&OD_record161F},
+{0x1620, 0x08, 0x00,  0, (void*)&OD_record1620},
+{0x1621, 0x08, 0x00,  0, (void*)&OD_record1621},
+{0x1622, 0x08, 0x00,  0, (void*)&OD_record1622},
+{0x1623, 0x08, 0x00,  0, (void*)&OD_record1623},
+{0x1624, 0x08, 0x00,  0, (void*)&OD_record1624},
+{0x1625, 0x08, 0x00,  0, (void*)&OD_record1625},
+{0x1626, 0x08, 0x00,  0, (void*)&OD_record1626},
+{0x1627, 0x08, 0x00,  0, (void*)&OD_record1627},
+{0x1628, 0x08, 0x00,  0, (void*)&OD_record1628},
+{0x1629, 0x08, 0x00,  0, (void*)&OD_record1629},
+{0x162A, 0x08, 0x00,  0, (void*)&OD_record162A},
+{0x162B, 0x08, 0x00,  0, (void*)&OD_record162B},
+{0x162C, 0x08, 0x00,  0, (void*)&OD_record162C},
+{0x162D, 0x08, 0x00,  0, (void*)&OD_record162D},
+{0x162E, 0x08, 0x00,  0, (void*)&OD_record162E},
 {0x1800, 0x06, 0x00,  0, (void*)&OD_record1800},
 {0x1801, 0x06, 0x00,  0, (void*)&OD_record1801},
 {0x1802, 0x06, 0x00,  0, (void*)&OD_record1802},
@@ -1147,14 +1984,16 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x6002, 0x03, 0x00,  0, (void*)&OD_record6002},
 {0x6003, 0x02, 0x00,  0, (void*)&OD_record6003},
 {0x6004, 0x07, 0x00,  0, (void*)&OD_record6004},
-{0x7001, 0x16, 0x00,  0, (void*)&OD_record7001},
-{0x7002, 0x16, 0x00,  0, (void*)&OD_record7002},
-{0x7003, 0x0A, 0x00,  0, (void*)&OD_record7003},
-{0x700B, 0x01, 0x00,  0, (void*)&OD_record700B},
-{0x700D, 0x01, 0x00,  0, (void*)&OD_record700D},
-{0x700E, 0x01, 0x00,  0, (void*)&OD_record700E},
+{0x7001, 0x2C, 0x00,  0, (void*)&OD_record7001},
+{0x7003, 0x10, 0x00,  0, (void*)&OD_record7003},
+{0x7004, 0x10, 0x00,  0, (void*)&OD_record7004},
+{0x7005, 0x10, 0x00,  0, (void*)&OD_record7005},
+{0x7006, 0x10, 0x00,  0, (void*)&OD_record7006},
+{0x700B, 0x0C, 0x00,  0, (void*)&OD_record700B},
+{0x700D, 0x11, 0x00,  0, (void*)&OD_record700D},
+{0x700E, 0x13, 0x00,  0, (void*)&OD_record700E},
 {0x700F, 0x01, 0x00,  0, (void*)&OD_record700F},
-{0x7013, 0x01, 0x00,  0, (void*)&OD_record7013},
-{0x7014, 0x01, 0x00,  0, (void*)&OD_record7014},
+{0x7013, 0x09, 0x00,  0, (void*)&OD_record7013},
+{0x7014, 0x08, 0x00,  0, (void*)&OD_record7014},
 };
 // clang-format on
