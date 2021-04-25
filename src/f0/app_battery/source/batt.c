@@ -192,7 +192,8 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 		palClearLine(LINE_HEATER_ON_2);
 		palClearLine(LINE_MOARPWR);
 
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING);
+		//FIXME CO_errorReport blocks indefinitely???
+		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING);
 	}
 }
 
@@ -236,7 +237,8 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 		palSetLine(line_dchg_dis);
 		palSetLine(line_chg_dis);
 
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING);
+		//FIXME CO_errorReport blocks indefinitely???
+		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING);
 	}
 }
 
@@ -582,7 +584,8 @@ THD_FUNCTION(batt, arg)
     		pack_1_data.pack_number = 1;
     		populate_od_pack_data(&OD_battery[0], &pack_1_data);
     	} else {
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+    		//FIXME CO_errorReport blocks indefinitely???
+            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
     	}
 
     	dbgprintf("\r\nPopulating Pack 2 Data\r\n");
@@ -591,7 +594,8 @@ THD_FUNCTION(batt, arg)
 			pack_2_data.pack_number = 2;
 			populate_od_pack_data(&OD_battery[1], &pack_2_data);
     	} else {
-    		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR);
+    		//FIXME CO_errorReport blocks indefinitely???
+    		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR);
     	}
 
 
