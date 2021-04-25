@@ -15,6 +15,7 @@
 #include "test_comms.h"
 #include "test_deploy.h"
 #include "test_crc.h"
+#include "test_bootloader.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -100,6 +101,7 @@ static const ShellCommand commands[] = {
     {"crc", cmd_crc},
     {"deploy", cmd_deploy},
     {"edl", cmd_edl},
+    {"bootloader", cmd_bootloader},
     {NULL, NULL}
 };
 

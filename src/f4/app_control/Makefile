@@ -113,6 +113,8 @@ include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/fs.mk
 include $(PROJ_SRC)/radio.mk
 include $(PROJ_SRC)/fram.mk
+include $(PROJ_SRC)/bootloader.mk
+
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
