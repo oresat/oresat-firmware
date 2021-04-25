@@ -3,7 +3,7 @@
     CANopen Object Dictionary definition for CANopenNode v1 to v2
 
     This file was automatically generated with
-    libedssharp Object Dictionary Editor v0.8-121-g3349c4d
+    libedssharp Object Dictionary Editor v0.8-123-g6c02323
 
     https://github.com/CANopenNode/CANopenNode
     https://github.com/robincornelius/libedssharp
@@ -84,7 +84,7 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 /*1017*/ 0x3E8,
 /*1019*/ 0x0L,
 /*1028*/ {0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
-/*1029*/ {0x0L, 0x0L},
+/*1029*/ {0x1L, 0x1L},
 /*1200*/ {{0x3L, 0x80000000L, 0x80000000L, 0x1L}},
 /*1280*/ {{0x3L, 0x80000000L, 0x80000000L, 0x1L}},
 /*1400*/ {{0x5L, 0x80000200L, 0xFEL, 0x00},
