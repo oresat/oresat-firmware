@@ -31,6 +31,13 @@ typedef enum {
 	BATTERY_STATE_MACHINE_STATE_HEATING,
 } battery_heating_state_machine_state_t;
 
+typedef enum {
+	STATUS_BIT_HEATER = 0,
+	STATUS_BIT_DCHG_DIS,
+	STATUS_BIT_CHG_DIS,
+	STATUS_BIT_DCHG_STAT,
+	STATUS_BIT_CHG_STAT
+} status_bits;
 
 static const I2CConfig i2cconfig_1 = {
     STM32_TIMINGR_PRESC(0xBU) |
@@ -106,12 +113,13 @@ typedef struct {
 	bool is_data_valid;
 	uint8_t pack_number;
 
-	uint16_t cell1_mV;
-	uint16_t cell2_mV;
-	uint16_t VCell_mV;
-	uint16_t VCell_max_volt_mV;
-	uint16_t VCell_min_volt_mV;
-	uint16_t batt_mV;//x
+	uint16_t batt_mV;
+	uint16_t v_cell_1_mV;
+	uint16_t v_cell_2_mV;
+	uint16_t v_cell_mV;
+	uint16_t v_cell_avg_mV;
+	uint16_t v_cell_max_volt_mV;
+	uint16_t v_cell_min_volt_mV;
 
 	int16_t avg_current_mA;
 	int16_t max_current_mA;
@@ -121,12 +129,12 @@ typedef struct {
 	uint16_t present_state_of_charge; //Percent
 	uint16_t reported_state_of_charge; //Percent
 
-	uint16_t time_to_full; // seconds
-	uint16_t time_to_empty; // seconds
+	uint16_t time_to_full_seconds;
+	uint16_t time_to_empty_seconds;
 
 	uint16_t full_capacity_mAh;
 	uint16_t available_capacity_mAh;
-	uint16_t mix_capacity;
+	uint16_t mix_capacity_mAh;
 	uint16_t reported_capacity_mAh;
 
 	uint16_t cycles; // count
@@ -194,7 +202,7 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 	dbgprintf("LINE_CHG_STAT_PK2 = %u\r\n", palReadLine(LINE_CHG_STAT_PK2));
 
 	if( pk_data->is_data_valid ) {
-		if( pk_data->VCell_mV < 3000 || pk_data->present_state_of_charge < 20 ) {
+		if( pk_data->v_cell_mV < 3000 || pk_data->present_state_of_charge < 20 ) {
 			//Disable discharge on both packs
 			dbgprintf("Disabling discharge on pack %u\r\n", pk_data->pack_number);
 			palSetLine(line_dchg_dis);
@@ -205,14 +213,14 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 		}
 
 
-		if( pk_data->VCell_mV > 4100 ) {
+		if( pk_data->v_cell_mV > 4100 ) {
 			dbgprintf("Disabling charging on pack %u\r\n", pk_data->pack_number);
 			palSetLine(line_chg_dis);
 		} else {
 			dbgprintf("Enabling charging on pack %u\r\n", pk_data->pack_number);
 			palClearLine(line_chg_dis);
 			if( pk_data->present_state_of_charge > 90 ) {
-				const int16_t vcell_delta_mV = pk_data->cell1_mV - pk_data->cell2_mV;
+				const int16_t vcell_delta_mV = pk_data->v_cell_1_mV - pk_data->v_cell_2_mV;
 
 				if( vcell_delta_mV < -50 || vcell_delta_mV > 50 ) {
 					//TODO command cell  balancing - this appears to be done in hardware based on config registers???
@@ -258,11 +266,14 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     dbgprintf("\r\n");
 
     /* Record pack and cell voltages to object dictionary */
-    if( (r = max17205ReadVoltage(driver, MAX17205_AD_AVGCELL1, &dest->cell1_mV)) != MSG_OK ) {
+    if( (r = max17205ReadVoltage(driver, MAX17205_AD_AVGCELL1, &dest->v_cell_1_mV)) != MSG_OK ) {
     	dest->is_data_valid = false;
     }
 
-    if( (r = max17205ReadVoltage(driver, MAX17205_AD_AVGVCELL, &dest->VCell_mV)) != MSG_OK ) {
+    if( (r = max17205ReadVoltage(driver, MAX17205_AD_AVGVCELL, &dest->v_cell_avg_mV)) != MSG_OK ) {
+	dest->is_data_valid = false;
+   }
+    if( (r = max17205ReadVoltage(driver, MAX17205_AD_VCELL, &dest->v_cell_mV)) != MSG_OK ) {
     	dest->is_data_valid = false;
     }
     if( (r = max17205ReadBattVoltage(driver, MAX17205_AD_BATT, &dest->batt_mV)) != MSG_OK ) {
@@ -270,18 +281,18 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     }
 
     if( dest->is_data_valid ) {
-    	dest->cell2_mV = dest->batt_mV - dest->cell1_mV;
+    	dest->v_cell_2_mV = dest->batt_mV - dest->v_cell_1_mV;
     }
 
-    dbgprintf("cell1_mV = %u, cell2_mV = %u, VCell_mV = %u, batt_mV = %u\r\n", dest->cell1_mV, dest->cell2_mV, dest->VCell_mV, dest->batt_mV);
+    dbgprintf("cell1_mV = %u, cell2_mV = %u, VCell_mV = %u, batt_mV = %u\r\n", dest->v_cell_1_mV, dest->v_cell_2_mV, dest->v_cell_mV, dest->batt_mV);
 
     uint16_t max_min_volt_raw = 0;
     if( (r = max17205ReadRaw(driver, MAX17205_AD_MAXMINVOLT, &max_min_volt_raw)) != MSG_OK ) {
 		dest->is_data_valid = false;
 	} else {
-		dest->VCell_max_volt_mV = (max_min_volt_raw >> 8) * 20;
-		dest->VCell_min_volt_mV = (max_min_volt_raw & 0xFF) * 20;
-		dbgprintf("VCell_max_volt_mV = %u, VCell_min_volt_mV = %u\r\n", dest->VCell_max_volt_mV, dest->VCell_min_volt_mV);
+		dest->v_cell_max_volt_mV = (max_min_volt_raw >> 8) * 20;
+		dest->v_cell_min_volt_mV = (max_min_volt_raw & 0xFF) * 20;
+		dbgprintf("VCell_max_volt_mV = %u, VCell_min_volt_mV = %u\r\n", dest->v_cell_max_volt_mV, dest->v_cell_min_volt_mV);
 	}
 
 
@@ -312,7 +323,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 	if( (r = max17205ReadCapacity(driver, MAX17205_AD_AVCAP, &dest->available_capacity_mAh)) != MSG_OK ) {
 		dest->is_data_valid = false;
 	}
-	if( (r = max17205ReadCapacity(driver, MAX17205_AD_MIXCAP, &dest->mix_capacity)) != MSG_OK ) {
+	if( (r = max17205ReadCapacity(driver, MAX17205_AD_MIXCAP, &dest->mix_capacity_mAh)) != MSG_OK ) {
 		dest->is_data_valid = false;
 	}
 	if( (r = max17205ReadCapacity(driver, MAX17205_AD_REPCAP, &dest->reported_capacity_mAh)) != MSG_OK ) {
@@ -321,15 +332,15 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 
 
 
-    dbgprintf("full_capacity_mAh = %u, available_capacity_mAh = %u, mix_capacity = %u\r\n", dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity);
+    dbgprintf("full_capacity_mAh = %u, available_capacity_mAh = %u, mix_capacity = %u\r\n", dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity_mAh);
 
 
 
     /* state of charge */
-    if( (r = max17205ReadTime(driver, MAX17205_AD_TTE, &dest->time_to_empty)) != MSG_OK ) {
+    if( (r = max17205ReadTime(driver, MAX17205_AD_TTE, &dest->time_to_empty_seconds)) != MSG_OK ) {
     	dest->is_data_valid = false;
 	}
-    if( (r = max17205ReadTime(driver, MAX17205_AD_TTF, &dest->time_to_full)) != MSG_OK ) {
+    if( (r = max17205ReadTime(driver, MAX17205_AD_TTF, &dest->time_to_full_seconds)) != MSG_OK ) {
     	dest->is_data_valid = false;
 	}
 
@@ -344,7 +355,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 	}
 
 
-    dbgprintf("time_to_empty = %u (seconds), time_to_full = %u (seconds), available_state_of_charge = %u%%, present_state_of_charge = %u%%\r\n", dest->time_to_empty, dest->time_to_full, dest->available_state_of_charge, dest->present_state_of_charge);
+    dbgprintf("time_to_empty = %u (seconds), time_to_full = %u (seconds), available_state_of_charge = %u%%, present_state_of_charge = %u%%\r\n", dest->time_to_empty_seconds, dest->time_to_full_seconds, dest->available_state_of_charge, dest->present_state_of_charge);
 
     /* other info */
     if( (r = max17205ReadRaw(driver, MAX17205_AD_CYCLES, &dest->cycles)) != MSG_OK ) {
@@ -435,6 +446,73 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, 
 	return(ret);
 }
 
+void populate_od_pack_data(OD_battery1_t *battery_data_ptr, batt_pack_data_t *pack_data) {
+	battery_data_ptr->vbatt = pack_data->batt_mV;
+	battery_data_ptr->VCellMax = pack_data->v_cell_max_volt_mV;
+	battery_data_ptr->VCellMin = pack_data->v_cell_min_volt_mV;
+	//battery_data_ptr->VCellAvg = pack_data->v_cell_avg_mV;
+
+	battery_data_ptr->VCell = pack_data->v_cell_mV;
+	//battery_data_ptr->VCell1 = pack_data->v_cell_1_mV;
+	battery_data_ptr->VCell2 = pack_data->v_cell_2_mV;
+
+	battery_data_ptr->currentAvg = pack_data->avg_current_mA;
+	battery_data_ptr->currentMax = pack_data->max_current_mA;
+	battery_data_ptr->currentMin = pack_data->min_current_mA;
+
+	battery_data_ptr->fullCapacity = pack_data->full_capacity_mAh;
+	battery_data_ptr->reportedCapacity = pack_data->reported_capacity_mAh;
+
+	battery_data_ptr->timeToEmpty = pack_data->time_to_empty_seconds;
+	battery_data_ptr->timeToFull = pack_data->time_to_full_seconds;
+
+	battery_data_ptr->cycles = pack_data->cycles;
+
+	battery_data_ptr->reportedStateOfCharge = pack_data->reported_state_of_charge;
+
+	battery_data_ptr->tempAvg1 = pack_data->avg_temp_1_C;
+	battery_data_ptr->tempAvg2 = pack_data->avg_temp_2_C;
+	battery_data_ptr->tempAvgInt = pack_data->avg_int_temp_C;
+
+    uint8_t status_bitmask = 0;
+	if (pack_data->pack_number == 1) {
+		if (palReadLine(LINE_HEATER_ON_1)) {
+			status_bitmask |= (1 << STATUS_BIT_HEATER);
+		}
+		if (palReadLine(LINE_DCHG_DIS_PK1)) {
+			status_bitmask |= (1 << STATUS_BIT_DCHG_DIS);
+		}
+		if (palReadLine(LINE_CHG_DIS_PK1)) {
+			status_bitmask |= (1 << STATUS_BIT_CHG_DIS);
+		}
+		if (palReadLine(LINE_DCHG_STAT_PK1)) {
+			status_bitmask |= (1 << STATUS_BIT_DCHG_STAT);
+		}
+		if (palReadLine(LINE_CHG_STAT_PK1)) {
+			status_bitmask |= (1 << STATUS_BIT_CHG_STAT);
+		}
+	} else if (pack_data->pack_number == 2) {
+		if (palReadLine(LINE_HEATER_ON_2)) {
+			status_bitmask |= (1 << STATUS_BIT_HEATER);
+		}
+		if (palReadLine(LINE_DCHG_DIS_PK2)) {
+			status_bitmask |= (1 << STATUS_BIT_DCHG_DIS);
+		}
+		if (palReadLine(LINE_CHG_DIS_PK2)) {
+			status_bitmask |= (1 << STATUS_BIT_CHG_DIS);
+		}
+		if (palReadLine(LINE_DCHG_STAT_PK2)) {
+			status_bitmask |= (1 << STATUS_BIT_DCHG_STAT);
+		}
+		if (palReadLine(LINE_CHG_STAT_PK2)) {
+			status_bitmask |= (1 << STATUS_BIT_CHG_STAT);
+		}
+	}
+
+	//battery_data_ptr->status_bitmask = status_bitmask;
+}
+
+
 /* Battery monitoring thread */
 THD_WORKING_AREA(batt_wa, 0x400);
 THD_FUNCTION(batt, arg)
@@ -471,61 +549,38 @@ THD_FUNCTION(batt, arg)
 #endif
 
 
-    uint16_t pack_1_comm_rx_error_count = 0;
-    uint16_t pack_2_comm_rx_error_count = 0;
     while (!chThdShouldTerminateX()) {
     	dbgprintf("================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
 
     	dbgprintf("Populating Pack 1 Data\r\n");
-    	if( ! populate_pack_data(&max17205devPack1, &pack_1_data) ) {
-    		pack_1_comm_rx_error_count++;
+    	if( populate_pack_data(&max17205devPack1, &pack_1_data) ) {
+    		pack_1_data.pack_number = 1;
+    		populate_od_pack_data(&OD_battery1, &pack_1_data);
+    	} else {
             CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
     	}
-    	pack_1_data.pack_number = 1;
 
     	dbgprintf("\r\nPopulating Pack 2 Data\r\n");
     	chThdSleepMilliseconds(100);
-    	if( ! populate_pack_data(&max17205devPack2, &pack_2_data) ) {
-    		pack_2_comm_rx_error_count++;
+    	if( populate_pack_data(&max17205devPack2, &pack_2_data) ) {
+			pack_2_data.pack_number = 2;
+			//populate_od_pack_data(&OD_battery2, &pack_2_data);
+    	} else {
     		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR);
     	}
-    	pack_2_data.pack_number = 2;
 
-
-		OD_battery1.vbatt = pack_1_data.batt_mV;
-		OD_battery1.VCellMax = pack_1_data.VCell_max_volt_mV;
-		OD_battery1.VCellMin = pack_1_data.VCell_min_volt_mV;
-		OD_battery1.VCell = pack_1_data.cell1_mV;
-		OD_battery1.VCell2 = pack_1_data.cell2_mV;
-		OD_battery1.currentAvg = pack_1_data.avg_current_mA;
-		OD_battery1.currentMax = pack_1_data.max_current_mA;
-		OD_battery1.currentMin = pack_1_data.min_current_mA;
-		OD_battery1.fullCapacity = pack_1_data.full_capacity_mAh;
-		OD_battery1.timeToEmpty = pack_1_data.time_to_empty;
-		OD_battery1.timeToFull = pack_1_data.time_to_full;
-		OD_battery1.cycles = pack_1_data.cycles;
-		OD_battery1.reportedStateOfCharge = pack_1_data.reported_state_of_charge;
-		OD_battery1.reportedCapacity = pack_1_data.reported_capacity_mAh;
-		OD_battery1.tempAvg1 = pack_1_data.avg_temp_1_C;
-		OD_battery1.tempAvg2 = pack_1_data.avg_temp_2_C;
-		OD_battery1.tempAvgInt = pack_1_data.avg_int_temp_C;
-		OD_battery1.dischargeDisable = palReadLine(LINE_DCHG_DIS_PK1);
-		OD_battery1.chargeDisable = palReadLine(LINE_CHG_DIS_PK1);
-		OD_battery1.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK1);
-		OD_battery1.chargeStatus = palReadLine(LINE_CHG_STAT_PK1);
-
-
+#if 0
 		OD_battery2.vbatt = pack_1_data.batt_mV;
-		OD_battery2.VCellMax = pack_1_data.VCell_max_volt_mV;
-		OD_battery2.VCellMin = pack_1_data.VCell_min_volt_mV;
-		OD_battery2.VCell = pack_1_data.cell1_mV;
-		OD_battery2.VCell2 = pack_1_data.cell2_mV;
+		OD_battery2.VCellMax = pack_1_data.v_cell_max_volt_mV;
+		OD_battery2.VCellMin = pack_1_data.v_cell_min_volt_mV;
+		OD_battery2.VCell = pack_1_data.v_cell_1_mV;
+		OD_battery2.VCell2 = pack_1_data.v_cell_2_mV;
 		OD_battery2.currentAvg = pack_1_data.avg_current_mA;
 		OD_battery2.currentMax = pack_1_data.max_current_mA;
 		OD_battery2.currentMin = pack_1_data.min_current_mA;
 		OD_battery2.fullCapacity = pack_1_data.full_capacity_mAh;
-		OD_battery2.timeToEmpty = pack_1_data.time_to_empty;
-		OD_battery2.timeToFull = pack_1_data.time_to_full;
+		OD_battery2.timeToEmpty = pack_1_data.time_to_empty_seconds;
+		OD_battery2.timeToFull = pack_1_data.time_to_full_seconds;
 		OD_battery2.cycles = pack_1_data.cycles;
 		OD_battery2.reportedStateOfCharge = pack_1_data.reported_state_of_charge;
 		OD_battery2.reportedCapacity = pack_1_data.reported_capacity_mAh;
@@ -536,12 +591,14 @@ THD_FUNCTION(batt, arg)
 		OD_battery2.chargeDisable = palReadLine(LINE_CHG_DIS_PK2);
 		OD_battery2.dischargeStatus = palReadLine(LINE_DCHG_STAT_PK2);
 		OD_battery2.chargeStatus = palReadLine(LINE_CHG_STAT_PK2);
+#endif
 
 		CO_OD_RAM.heaterStatus = palReadLine(LINE_MOARPWR);
 
         run_battery_heating_state_machine(&pack_1_data, &pack_2_data);
         update_battery_charging_state(&pack_1_data, LINE_DCHG_DIS_PK1, LINE_CHG_DIS_PK1);
         update_battery_charging_state(&pack_2_data, LINE_DCHG_DIS_PK2, LINE_CHG_DIS_PK2);
+
 
         palToggleLine(LINE_LED);
 
