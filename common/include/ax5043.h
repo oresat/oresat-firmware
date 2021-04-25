@@ -2799,6 +2799,10 @@ typedef struct{
      */
     uint32_t                    xtal_freq;
     /**
+     * @brief Optional frame buffer PHY argument
+     */
+    const void                  *phy_arg;
+    /**
      * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.
      *        Certain registers may be overwritten later, either by

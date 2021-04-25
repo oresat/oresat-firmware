@@ -9,6 +9,8 @@
 #ifndef _RADIO_H_
 #define _RADIO_H_
 
+#include "ch.h"
+#include "hal.h"
 #include "ax5043.h"
 #include "si41xx.h"
 #include "frame_buf.h"

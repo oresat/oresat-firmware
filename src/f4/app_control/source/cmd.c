@@ -1,118 +1,80 @@
-#include <stdlib.h>
-#include <string.h>
-
 #include "cmd.h"
 #include "c3.h"
-#include "CANopen.h"
-#include "test_fw.h"
-#include "test_canopen.h"
-#include "test_opd.h"
-#include "test_time.h"
-#include "test_fram.h"
-#include "test_lfs.h"
-#include "test_mmc.h"
-#include "test_radio.h"
-#include "test_comms.h"
-#include "test_deploy.h"
-#include "chprintf.h"
-#include "shell.h"
+#include "fw.h"
+#include "fs.h"
+#include "opd.h"
 
-static thread_t *shell_tp;
-extern thread_t *c3_tp;
-
-/*===========================================================================*/
-/* OreSat C3 State Control                                                   */
-/*===========================================================================*/
-void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
+void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
-    if (argc < 1) {
-        goto state_usage;
+    lfs_file_t *file;
+    void *ret;
+
+    switch (cmd->cmd) {
+    case CMD_TX_CTRL:
+        ret = fb_put(resp_fb, 1);
+        tx_enable(cmd->arg[0]);
+        *((uint8_t*)ret) = tx_enabled();
+        break;
+    case CMD_C3_FLASH:
+        ret = fb_put(resp_fb, sizeof(int));
+        *((int*)ret) = fw_flash(&EFLD1, (char*)&cmd->arg[4], *((uint32_t*)cmd->arg));
+        break;
+    case CMD_C3_BANK:
+        ret = fb_put(resp_fb, sizeof(int));
+        *((int*)ret) = fw_set_bank(&EFLD1, cmd->arg[0]);
+        break;
+    case CMD_FS_FORMAT:
+        ret = fb_put(resp_fb, sizeof(int));
+        *((int*)ret) = fs_format(&FSD1);
+        break;
+    case CMD_FS_UNMOUNT:
+        ret = fb_put(resp_fb, sizeof(int));
+        *((int*)ret) = fs_unmount(&FSD1);
+        break;
+    case CMD_FS_REMOVE:
+        ret = fb_put(resp_fb, sizeof(int));
+        *((int*)ret) = fs_remove(&FSD1, (char*)cmd->arg);
+        break;
+    case CMD_FS_CRC:
+        ret = fb_put(resp_fb, sizeof(uint32_t));
+        file = file_open(&FSD1, (char*)cmd->arg, LFS_O_RDONLY);
+        if (file == NULL)
+            return;
+        *((uint32_t*)ret) = file_crc(&FSD1, file);
+        file_close(&FSD1, file);
+        break;
+    case CMD_OPD_SYSENABLE:
+        ret = fb_put(resp_fb, 1);
+        opd_start();
+        *((uint8_t*)ret) = 0;
+        break;
+    case CMD_OPD_SYSDISABLE:
+        ret = fb_put(resp_fb, 1);
+        opd_stop();
+        *((uint8_t*)ret) = 0;
+        break;
+    case CMD_OPD_SCAN:
+        ret = fb_put(resp_fb, 1);
+        opd_scan(cmd->arg[0]);
+        *((uint8_t*)ret) = 0;
+        break;
+    case CMD_OPD_ENABLE:
+        ret = fb_put(resp_fb, 1);
+        *((int8_t *)ret) = opd_state(cmd->arg[0], true);
+        break;
+    case CMD_OPD_DISABLE:
+        ret = fb_put(resp_fb, 1);
+        *((int8_t *)ret) = opd_state(cmd->arg[0], false);
+        break;
+    case CMD_OPD_RESET:
+        ret = fb_put(resp_fb, 1);
+        *((int8_t *)ret) = opd_reset(cmd->arg[0]);
+        break;
+    case CMD_OPD_STATUS:
+        ret = fb_put(resp_fb, sizeof(opd_status_t));
+        opd_status(cmd->arg[0], ret);
+        break;
+    default:
+        break;
     }
-    if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "C3 State:  %c\r\n", OD_C3State[0]);
-        chprintf(chp, "TX Enable: %s\r\n", (tx_enabled() ? "TRUE" : "FALSE"));
-        chprintf(chp, "Bat Good:  %s\r\n", (bat_good() ? "TRUE" : "FALSE"));
-        chprintf(chp, "EDL Mode:  %s\r\n", (edl_enabled() ? "TRUE" : "FALSE"));
-        chprintf(chp, "===RTC===\r\n"
-                      "Date:      %08X\r\n"
-                      "Time:      %08X\r\n"
-                      "Wakeup:    %08X (%s)\r\n"
-                      "Alarm A:   %08X (%s)\r\n"
-                      "Alarm B:   %08X (%s)\r\n",
-                      RTCD1.rtc->DR, RTCD1.rtc->TR,
-                      RTCD1.rtc->WUTR, (RTCD1.rtc->CR & RTC_CR_WUTE ? "ENABLED" : "DISABLED"),
-                      RTCD1.rtc->ALRMAR, (RTCD1.rtc->CR & RTC_CR_ALRAE ? "ENABLED" : "DISABLED"),
-                      RTCD1.rtc->ALRMBR, (RTCD1.rtc->CR & RTC_CR_ALRBE ? "ENABLED" : "DISABLED"));
-    } else if (!strcmp(argv[0], "tx") && argc > 1) {
-        tx_enable(argv[1][0] == 't');
-    } else if (!strcmp(argv[0], "edl") && argc > 1) {
-        edl_enable(argv[1][0] == 't');
-    } else if (!strcmp(argv[0], "reset")) {
-        NVIC_SystemReset();
-    } else if (!strcmp(argv[0], "factoryreset")) {
-        chprintf(chp, "Initiating factory reset...");
-        factory_reset();
-    } else {
-        goto state_usage;
-    }
-
-    return;
-
-state_usage:
-    chprintf(chp,  "Usage: state <command>\r\n"
-                   "    status:         Get current system state\r\n"
-                   "    tx <t/f>:       Override TX enable state\r\n"
-                   "    edl <t/f>:      Override EDL state\r\n"
-                   "    reset:          Soft reset C3\r\n"
-                   "    factoryreset:   Reset C3 to factory defaults\r\n"
-                   "\r\n");
-    return;
-}
-
-/*===========================================================================*/
-/* Shell                                                                     */
-/*===========================================================================*/
-static const ShellCommand commands[] = {
-    {"fw", cmd_fw},
-    {"nmt", cmd_nmt},
-    /*{"sdo", cmd_sdo},*/
-    {"opd", cmd_opd},
-    {"mmc", cmd_mmc},
-    {"time", cmd_time},
-    {"lfs", cmd_lfs},
-    {"radio", cmd_radio},
-    {"synth", cmd_synth},
-    {"rf", cmd_rf},
-    {"rftest", cmd_rftest},
-    {"beacon", cmd_beacon},
-    {"state", cmd_state},
-    {"fram", cmd_fram},
-    {"deploy", cmd_deploy},
-    {"edl", cmd_edl},
-    {NULL, NULL}
-};
-
-static char histbuf[SHELL_MAX_HIST_BUFF];
-
-static const ShellConfig shell_cfg = {
-    (BaseSequentialStream *)&SD3,
-    commands,
-    histbuf,
-    sizeof(histbuf),
-};
-
-THD_WORKING_AREA(shell_wa, 0x1000);
-THD_WORKING_AREA(cmd_wa, 0x100);
-THD_FUNCTION(cmd, arg)
-{
-    (void)arg;
-
-    /* Start a shell */
-    while (!chThdShouldTerminateX()) {
-        shell_tp = chThdCreateStatic(shell_wa, sizeof(shell_wa), NORMALPRIO, shellThread, (void *)&shell_cfg);
-        chThdWait(shell_tp);
-        chThdSleepMilliseconds(500);
-    }
-
-    chThdExit(MSG_OK);
 }

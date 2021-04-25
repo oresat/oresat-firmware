@@ -211,6 +211,7 @@ void __early_init(void) {
 
   stm32_gpio_init();
   stm32_clock_init();
+  rccEnableCRC(true);
 }
 
 #if HAL_USE_SDC || defined(__DOXYGEN__)

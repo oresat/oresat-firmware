@@ -2,7 +2,7 @@
  * @file    uslp.h
  * @brief   Unified Space Data Link Protocol (USLP) support library.
  *
- * @addtogroup USLP
+ * @addtogroup CCSDS
  * @{
  */
 #ifndef _USLP_H_
@@ -114,6 +114,13 @@
 #define USLP_TFDF_HDR_UPID                  USLP_TFDF_HDR_UPID_Msk
 /** @} */
 
+/**
+ * Maximum possible header size for USLP frame, for reserving header space.
+ * Does not include a possible insert zone. If an insert zone is applicable,
+ * that length must also be reserved.
+ */
+#define USLP_MAX_HEADER_LEN                 (17U)
+
 /*===========================================================================*/
 /* Pre-compile time settings.                                                */
 /*===========================================================================*/
@@ -179,14 +186,25 @@ typedef enum {
 /** @} */
 
 /**
- * @name    USLP Communications Operation Procedure in Effect
+ * @name    USLP Communications Operation Procedure Types
  * @{
  */
 typedef enum {
     COP_NONE,                       /** No COP in effect                         */
-    COP_COP_1,                      /** COP-1 in effect                          */
-    COP_COP_P                       /** COP-P in effect                          */
+    COP_1,                          /** COP-1 in effect                          */
+    COP_P                           /** COP-P in effect                          */
 } uslp_cop_t;
+/** @} */
+
+/**
+ * @name    USLP Frame Error Control Field Type
+ * @{
+ */
+typedef enum {
+    FECF_NONE,                      /** No FECF implemented                      */
+    FECF_SW,                        /** Software FECF implemented                */
+    FECF_HW                         /** Hardware FECF implemented                */
+} uslp_fecf_t;
 /** @} */
 
 /**
@@ -199,6 +217,7 @@ typedef struct {
     /* For UPID_SPP_ENCAPS */
     size_t          max_pkt_len;    /** Maximum Packet Length                    */
     bool            incomplete;     /** Delivery of incomplete packets required  */
+    void (*map_recv)(fb_t *fb);     /** MAP Service Receive                      */
     size_t          pvn_cnt;        /** Count of valid packet version numbers    */
     ccsds_pvn_t     pvn[];          /** Valid Packet Version Numbers             */
 } uslp_map_t;
@@ -214,10 +233,15 @@ typedef struct {
     uint8_t         expedited_len;  /** VC Count Length for Expedited QoS        */
     uint64_t        *seq_ctrl_cnt;  /** Pointer to sequence control frame counter*/
     uint64_t        *expedited_cnt; /** Pointer to expedited frame counter       */
-    uslp_cop_t      cop;            /** COP in Effect                            */
+    uslp_cop_t      cop;            /** COP in effect                            */
     const uslp_map_t *mapid[16];    /** Multiplexer Access Points                */
     size_t          trunc_tf_len;   /** Truncated Transfer Frame Length          */
     bool            ocf;            /** OCF Allowed (Variable) / Required (Fixed)*/
+    void            *lock_arg;      /** Arugment to (un)lock functions           */
+    void (*lock)(void *arg);        /** Function to lock VC                      */
+    void (*unlock)(void *arg);      /** Function to unlock VC                    */
+    void (*mc_ocf_recv)(fb_t *fb);  /** Master Channel OCF Service Receive       */
+    void (*vcf_recv)(fb_t *fb);     /** Virtual Channel Frame Service Receive    */
 #if USLP_USE_SDLS == 1
     bool            has_sdls_hdr;   /** SDLS Header applicable                   */
     bool            has_sdls_tlr;   /** SDLS Trailer applicable                  */
@@ -235,6 +259,8 @@ typedef struct {
     bool            fixed;          /** (1) Fixed or (0) Variable Length Channel */
     uint16_t        scid;           /** Spacecraft Identifier                    */
     const uslp_vc_t *vcid[63];      /** Virtual Channels                         */
+    void (*insert_recv)(fb_t *fb);  /** Insert Service Receive                   */
+    void (*mcf_recv)(fb_t *fb);     /** Master Channel Frame Service Receive     */
 } uslp_mc_t;
 /** @} */
 
@@ -248,9 +274,13 @@ typedef struct {
     size_t          tf_len;         /** Transfer Frame Length (octets)           */
     bool            insert_zone;    /** Presence of Insert Zone                  */
     size_t          insert_zone_len;/** Insert Zone Length (octets)              */
-    bool            fecf;           /** Presence of Frame Error Control Field    */
+    uslp_fecf_t     fecf;           /** Frame Error Control Field Implementation */
     size_t          fecf_len;       /** Frame Error Control Field Length (octets)*/
     bool            gen_oid;        /** Generate OID Frame                       */
+    void (*phy_send)(fb_t *fb);     /** Function to send a frame                 */
+    void (*phy_send_prio)(fb_t *fb);/** Function to send a priority frame first  */
+    uint32_t (*crc32)(const uint8_t block[], size_t len, uint16_t crc);
+    uint16_t (*crc16)(const uint8_t block[], size_t len, uint16_t crc);
 } uslp_pc_t;
 /** @} */
 
@@ -309,10 +339,16 @@ typedef union __attribute__((packed)) {
 extern "C" {
 #endif
 
+int uslp_map_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid, uint8_t mapid, bool expedite);
+int uslp_mc_ocf_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
+int uslp_cop_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
+int uslp_vcf_send(const uslp_link_t *link, fb_t *fb, uint8_t vcid);
+int uslp_mcf_send(const uslp_link_t *link, fb_t *fb);
+void uslp_recv(const uslp_link_t *link, fb_t *fb);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _USLP_H_ */
-
 /** @} */
