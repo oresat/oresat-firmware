@@ -8,7 +8,7 @@
 
 #define DEBUG_SD    (BaseSequentialStream*) &SD2
 
-#if 0
+#if 1
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
 #else
 #define dbgprintf(str, ...)
@@ -148,7 +148,7 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
+        	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
         }
 
 
@@ -161,13 +161,16 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_gyro_chip_id != BMI088_GYR_CHIP_ID_EXPECTED ) {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
+        	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
         }
     }
     chprintf(DEBUG_SD, "Done initializing, starting loop...\r\n");
 
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
     	dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
+
+    	dbgprintf("Setting fake CO error state...\r\n");
+    	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
 
         if( update_imu_data() ) {
         	if( CO_isError(CO->em, CO_EM_GENERIC_ERROR) ) {
