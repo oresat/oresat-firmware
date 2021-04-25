@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             110
+   #define CO_OD_NoOfElements             111
 
 
 /*******************************************************************************
@@ -204,11 +204,41 @@
                }              OD_persistentState_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED16     vbatt;
+               UNSIGNED16     VCellMax;
+               UNSIGNED16     VCellMin;
+               UNSIGNED16     VCell;
+               UNSIGNED16     VCell1;
+               UNSIGNED16     VCell2;
+               UNSIGNED16     VCellAvg;
+               INTEGER16      current;
+               INTEGER16      currentAvg;
+               INTEGER16      currentMax;
+               INTEGER16      currentMin;
+               UNSIGNED16     fullCapacity;
+               UNSIGNED16     reportedCapacity;
+               UNSIGNED16     timeToEmpty;
+               UNSIGNED16     timeToFull;
+               UNSIGNED16     cycles;
+               UNSIGNED8      reportedStateOfCharge;
+               INTEGER16      temperature;
+               INTEGER16      temperatureAvg;
+               INTEGER16      temperatureMax;
+               INTEGER16      temperatureMin;
+               UNSIGNED8      state;
                }              OD_battery_t;
 /*7003      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     subObject1;
+               UNSIGNED16     voltage;
+               INTEGER16      current;
+               UNSIGNED16     power;
+               UNSIGNED16     voltageAvg;
+               INTEGER16      currentAvg;
+               UNSIGNED16     powerAvg;
+               UNSIGNED16     voltageMax;
+               INTEGER16      currentMax;
+               UNSIGNED16     powerMax;
+               UNSIGNED16     energy;
                }              OD_solarPanel_t;
 /*700B      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
@@ -317,6 +347,30 @@
         #define OD_1016_6_consumerHeartbeatTime_consumerHeartbeatTime 6
         #define OD_1016_7_consumerHeartbeatTime_consumerHeartbeatTime 7
         #define OD_1016_8_consumerHeartbeatTime_consumerHeartbeatTime 8
+        #define OD_1016_9_consumerHeartbeatTime_consumerHeartbeatTime 9
+        #define OD_1016_10_consumerHeartbeatTime_consumerHeartbeatTime 10
+        #define OD_1016_11_consumerHeartbeatTime_consumerHeartbeatTime 11
+        #define OD_1016_12_consumerHeartbeatTime_consumerHeartbeatTime 12
+        #define OD_1016_13_consumerHeartbeatTime_consumerHeartbeatTime 13
+        #define OD_1016_14_consumerHeartbeatTime_consumerHeartbeatTime 14
+        #define OD_1016_15_consumerHeartbeatTime_consumerHeartbeatTime 15
+        #define OD_1016_16_consumerHeartbeatTime_consumerHeartbeatTime 16
+        #define OD_1016_17_consumerHeartbeatTime_consumerHeartbeatTime 17
+        #define OD_1016_18_consumerHeartbeatTime_consumerHeartbeatTime 18
+        #define OD_1016_19_consumerHeartbeatTime_consumerHeartbeatTime 19
+        #define OD_1016_20_consumerHeartbeatTime_consumerHeartbeatTime 20
+        #define OD_1016_21_consumerHeartbeatTime_consumerHeartbeatTime 21
+        #define OD_1016_22_consumerHeartbeatTime_consumerHeartbeatTime 22
+        #define OD_1016_23_consumerHeartbeatTime_consumerHeartbeatTime 23
+        #define OD_1016_24_consumerHeartbeatTime_consumerHeartbeatTime 24
+        #define OD_1016_25_consumerHeartbeatTime_consumerHeartbeatTime 25
+        #define OD_1016_26_consumerHeartbeatTime_consumerHeartbeatTime 26
+        #define OD_1016_27_consumerHeartbeatTime_consumerHeartbeatTime 27
+        #define OD_1016_28_consumerHeartbeatTime_consumerHeartbeatTime 28
+        #define OD_1016_29_consumerHeartbeatTime_consumerHeartbeatTime 29
+        #define OD_1016_30_consumerHeartbeatTime_consumerHeartbeatTime 30
+        #define OD_1016_31_consumerHeartbeatTime_consumerHeartbeatTime 31
+        #define OD_1016_32_consumerHeartbeatTime_consumerHeartbeatTime 32
 
 /*1017 */
         #define OD_1017_producerHeartbeatTime                       0x1017
@@ -1448,13 +1502,70 @@
         #define OD_7001_battery                                     0x7001
 
         #define OD_7001_0_battery_maxSubIndex                       0
-        #define OD_7001_1_battery_subObject1                        1
+        #define OD_7001_1_battery_vbatt                             1
+        #define OD_7001_2_battery_VCellMax                          2
+        #define OD_7001_3_battery_VCellMin                          3
+        #define OD_7001_4_battery_VCell                             4
+        #define OD_7001_5_battery_VCell1                            5
+        #define OD_7001_6_battery_VCell2                            6
+        #define OD_7001_7_battery_VCellAvg                          7
+        #define OD_7001_8_battery_current                           8
+        #define OD_7001_9_battery_currentAvg                        9
+        #define OD_7001_10_battery_currentMax                       10
+        #define OD_7001_11_battery_currentMin                       11
+        #define OD_7001_12_battery_fullCapacity                     12
+        #define OD_7001_13_battery_reportedCapacity                 13
+        #define OD_7001_14_battery_timeToEmpty                      14
+        #define OD_7001_15_battery_timeToFull                       15
+        #define OD_7001_16_battery_cycles                           16
+        #define OD_7001_17_battery_reportedStateOfCharge            17
+        #define OD_7001_18_battery_temperature                      18
+        #define OD_7001_19_battery_temperatureAvg                   19
+        #define OD_7001_20_battery_temperatureMax                   20
+        #define OD_7001_21_battery_temperatureMin                   21
+        #define OD_7001_22_battery_state                            22
+
+/*7002 */
+        #define OD_7002_battery                                     0x7002
+
+        #define OD_7002_0_battery_maxSubIndex                       0
+        #define OD_7002_1_battery_vbatt                             1
+        #define OD_7002_2_battery_VCellMax                          2
+        #define OD_7002_3_battery_VCellMin                          3
+        #define OD_7002_4_battery_VCell                             4
+        #define OD_7002_5_battery_VCell1                            5
+        #define OD_7002_6_battery_VCell2                            6
+        #define OD_7002_7_battery_VCellAvg                          7
+        #define OD_7002_8_battery_current                           8
+        #define OD_7002_9_battery_currentAvg                        9
+        #define OD_7002_10_battery_currentMax                       10
+        #define OD_7002_11_battery_currentMin                       11
+        #define OD_7002_12_battery_fullCapacity                     12
+        #define OD_7002_13_battery_reportedCapacity                 13
+        #define OD_7002_14_battery_timeToEmpty                      14
+        #define OD_7002_15_battery_timeToFull                       15
+        #define OD_7002_16_battery_cycles                           16
+        #define OD_7002_17_battery_reportedStateOfCharge            17
+        #define OD_7002_18_battery_temperature                      18
+        #define OD_7002_19_battery_temperatureAvg                   19
+        #define OD_7002_20_battery_temperatureMax                   20
+        #define OD_7002_21_battery_temperatureMin                   21
+        #define OD_7002_22_battery_state                            22
 
 /*7003 */
         #define OD_7003_solarPanel                                  0x7003
 
         #define OD_7003_0_solarPanel_maxSubIndex                    0
-        #define OD_7003_1_solarPanel_subObject1                     1
+        #define OD_7003_1_solarPanel_voltage                        1
+        #define OD_7003_2_solarPanel_current                        2
+        #define OD_7003_3_solarPanel_power                          3
+        #define OD_7003_4_solarPanel_voltageAvg                     4
+        #define OD_7003_5_solarPanel_currentAvg                     5
+        #define OD_7003_6_solarPanel_powerAvg                       6
+        #define OD_7003_7_solarPanel_voltageMax                     7
+        #define OD_7003_8_solarPanel_currentMax                     8
+        #define OD_7003_9_solarPanel_powerMax                       9
+        #define OD_7003_10_solarPanel_energy                        10
 
 /*700B */
         #define OD_700B_starTracker                                 0x700B
@@ -1514,7 +1625,7 @@ struct sCO_OD_RAM{
 /*2022      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*6000      */ VISIBLE_STRING C3State[1];
-/*7001      */ OD_battery_t    battery;
+/*7001      */ OD_battery_t    battery[2];
 /*7003      */ OD_solarPanel_t solarPanel;
 /*700B      */ OD_starTracker_t starTracker;
 /*700D      */ OD_GPS_t        GPS;
@@ -1556,7 +1667,7 @@ struct sCO_OD_PERSIST_COMM{
 /*1007      */ UNSIGNED32     synchronousWindowLength;
 /*1014      */ UNSIGNED32     COB_ID_EMCY;
 /*1015      */ UNSIGNED16     inhibitTimeEMCY;
-/*1016      */ UNSIGNED32      consumerHeartbeatTime[8];
+/*1016      */ UNSIGNED32      consumerHeartbeatTime[32];
 /*1017      */ UNSIGNED16     producerHeartbeatTime;
 /*1019      */ UNSIGNED8      synchronousCounterOverflowValue;
 /*1028      */ UNSIGNED32      emergencyConsumerObject[8];
@@ -1678,9 +1789,9 @@ extern struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE;
 /*1015, Data Type: UNSIGNED16 */
         #define OD_inhibitTimeEMCY                                  CO_OD_PERSIST_COMM.inhibitTimeEMCY
 
-/*1016, Data Type: UNSIGNED32, Array[8] */
+/*1016, Data Type: UNSIGNED32, Array[32] */
         #define OD_consumerHeartbeatTime                            CO_OD_PERSIST_COMM.consumerHeartbeatTime
-        #define ODL_consumerHeartbeatTime_arrayLength               8
+        #define ODL_consumerHeartbeatTime_arrayLength               32
         #define ODA_consumerHeartbeatTime_consumerHeartbeatTime     0
 
 /*1017, Data Type: UNSIGNED16 */

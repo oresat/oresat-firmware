@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=4:07PM
+ModificationTime=9:27PM
 ModificationDate=04-24-2021
 ModifiedBy=
 
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=100
+SupportedObjects=101
 1=0x1002
 2=0x1003
 3=0x1005
@@ -218,13 +218,14 @@ SupportedObjects=100
 91=0x6003
 92=0x6004
 93=0x7001
-94=0x7003
-95=0x700B
-96=0x700D
-97=0x700E
-98=0x700F
-99=0x7013
-100=0x7014
+94=0x7002
+95=0x7003
+96=0x700B
+97=0x700D
+98=0x700E
+99=0x700F
+100=0x7013
+101=0x7014
 
 [1002]
 ParameterName=Manufacturer status register
@@ -500,7 +501,7 @@ PDOMapping=0
 ParameterName=Consumer heartbeat time
 ObjectType=0x8
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x9
+SubNumber=0x21
 
 [1016sub0]
 ParameterName=Highest sub-index supported
@@ -508,7 +509,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x08
+DefaultValue=0x20
 PDOMapping=0
 
 [1016sub1]
@@ -575,6 +576,222 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [1016sub8]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub9]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subA]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subB]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subC]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subD]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subE]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016subF]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub10]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub11]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub12]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub13]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub14]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub15]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub16]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub17]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub18]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub19]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1A]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1B]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1C]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1D]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1E]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub1F]
+ParameterName=Consumer heartbeat time
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1016sub20]
 ParameterName=Consumer heartbeat time
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -709,7 +926,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub2]
@@ -718,7 +935,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1200]
@@ -2873,7 +3090,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1800sub0]
 ParameterName=Highest sub-index supported
@@ -2911,6 +3128,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1800sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1800sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -2933,7 +3159,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1801sub0]
 ParameterName=Highest sub-index supported
@@ -2971,6 +3197,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1801sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1801sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -2993,7 +3228,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1802sub0]
 ParameterName=Highest sub-index supported
@@ -3031,6 +3266,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1802sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1802sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3053,7 +3297,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1803sub0]
 ParameterName=Highest sub-index supported
@@ -3091,6 +3335,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1803sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1803sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3113,7 +3366,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1804sub0]
 ParameterName=Highest sub-index supported
@@ -3151,6 +3404,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1804sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1804sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3173,7 +3435,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1805sub0]
 ParameterName=Highest sub-index supported
@@ -3211,6 +3473,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1805sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1805sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3233,7 +3504,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1806sub0]
 ParameterName=Highest sub-index supported
@@ -3271,6 +3542,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1806sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1806sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3293,7 +3573,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1807sub0]
 ParameterName=Highest sub-index supported
@@ -3331,6 +3611,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1807sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1807sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3353,7 +3642,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1808sub0]
 ParameterName=Highest sub-index supported
@@ -3391,6 +3680,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1808sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1808sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3413,7 +3711,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [1809sub0]
 ParameterName=Highest sub-index supported
@@ -3451,6 +3749,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[1809sub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [1809sub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3473,7 +3780,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Asub0]
 ParameterName=Highest sub-index supported
@@ -3511,6 +3818,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Asub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Asub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3533,7 +3849,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Bsub0]
 ParameterName=Highest sub-index supported
@@ -3571,6 +3887,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Bsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Bsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3593,7 +3918,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Csub0]
 ParameterName=Highest sub-index supported
@@ -3631,6 +3956,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Csub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Csub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3653,7 +3987,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Dsub0]
 ParameterName=Highest sub-index supported
@@ -3691,6 +4025,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Dsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Dsub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3713,7 +4056,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Esub0]
 ParameterName=Highest sub-index supported
@@ -3751,6 +4094,15 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[180Esub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
 [180Esub5]
 ParameterName=Event timer
 ObjectType=0x7
@@ -3773,7 +4125,7 @@ PDOMapping=0
 ParameterName=TPDO communication parameter
 ObjectType=0x9
 ;StorageLocation=PERSIST_COMM
-SubNumber=0x6
+SubNumber=0x7
 
 [180Fsub0]
 ParameterName=Highest sub-index supported
@@ -3808,6 +4160,15 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[180Fsub4]
+ParameterName=compatibility entry
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
 DefaultValue=0
 PDOMapping=0
 
@@ -7765,7 +8126,7 @@ PDOMapping=0
 ParameterName=Battery
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x2
+SubNumber=0x17
 
 [7001sub0]
 ParameterName=Highest sub-index supported
@@ -7773,14 +8134,416 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x01
+DefaultValue=0x16
 PDOMapping=0
 
 [7001sub1]
-ParameterName=Sub Object 1
+ParameterName=Vbatt
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub2]
+ParameterName=VCell max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub3]
+ParameterName=VCell min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub4]
+ParameterName=VCell
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub5]
+ParameterName=VCell1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub6]
+ParameterName=VCell2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub7]
+ParameterName=VCell avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub8]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub9]
+ParameterName=Current avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subA]
+ParameterName=Current max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subB]
+ParameterName=Current min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subC]
+ParameterName=Full Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subD]
+ParameterName=Reported Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subE]
+ParameterName=Time To Empty
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001subF]
+ParameterName=Time To Full
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub10]
+ParameterName=Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub11]
+ParameterName=Reported State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub12]
+ParameterName=Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub13]
+ParameterName=Temperature avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub14]
+ParameterName=Temperature max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub15]
+ParameterName=Temperature min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7001sub16]
+ParameterName=State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002]
+ParameterName=Battery
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x17
+
+[7002sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x16
+PDOMapping=0
+
+[7002sub1]
+ParameterName=Vbatt
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub2]
+ParameterName=VCell max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub3]
+ParameterName=VCell min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub4]
+ParameterName=VCell
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub5]
+ParameterName=VCell1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub6]
+ParameterName=VCell2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub7]
+ParameterName=VCell avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub8]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub9]
+ParameterName=Current avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subA]
+ParameterName=Current max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subB]
+ParameterName=Current min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subC]
+ParameterName=Full Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subD]
+ParameterName=Reported Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subE]
+ParameterName=Time To Empty
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002subF]
+ParameterName=Time To Full
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub10]
+ParameterName=Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub11]
+ParameterName=Reported State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub12]
+ParameterName=Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub13]
+ParameterName=Temperature avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub14]
+ParameterName=Temperature max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub15]
+ParameterName=Temperature min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7002sub16]
+ParameterName=State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
@@ -7789,7 +8552,7 @@ PDOMapping=1
 ParameterName=Solar Panel
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x2
+SubNumber=0xB
 
 [7003sub0]
 ParameterName=Highest sub-index supported
@@ -7797,16 +8560,97 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x01
+DefaultValue=0x0A
 PDOMapping=0
 
 [7003sub1]
-ParameterName=Sub Object 1
+ParameterName=Voltage
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=0
+DefaultValue=
+PDOMapping=1
+
+[7003sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub4]
+ParameterName=Voltage Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub5]
+ParameterName=Current Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub6]
+ParameterName=Power Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub7]
+ParameterName=Voltage Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub8]
+ParameterName=Current Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003sub9]
+ParameterName=Power Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
+PDOMapping=1
+
+[7003subA]
+ParameterName=Energy
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=
 PDOMapping=1
 
 [700B]
