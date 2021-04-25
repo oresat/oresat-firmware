@@ -5,7 +5,6 @@
  * @addtogroup CCSDS
  * @{
  */
-#include <string.h>
 #include "uslp.h"
 #include "cop.h"
 

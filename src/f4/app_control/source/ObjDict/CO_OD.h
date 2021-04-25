@@ -77,7 +77,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             175
+   #define CO_OD_NoOfElements             182
 
 
 /*******************************************************************************
@@ -202,6 +202,11 @@
                UNSIGNED32     lastEDL;
                BOOLEAN        deployed;
                }              OD_persistentState_t;
+/*7000      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     uptime;
+               UNSIGNED8      EMMC_Usage;
+               }              OD_C3Telemetry_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED16     vbattBP1;
@@ -2237,6 +2242,13 @@
         #define OD_6004_6_persistentState_lastEDL                   6
         #define OD_6004_7_persistentState_deployed                  7
 
+/*7000 */
+        #define OD_7000_C3Telemetry                                 0x7000
+
+        #define OD_7000_0_C3Telemetry_maxSubIndex                   0
+        #define OD_7000_1_C3Telemetry_uptime                        1
+        #define OD_7000_2_C3Telemetry_EMMC_Usage                    2
+
 /*7001 */
         #define OD_7001_battery                                     0x7001
 
@@ -2285,6 +2297,55 @@
         #define OD_7001_42_battery_temperatureMinBP2                42
         #define OD_7001_43_battery_stateBP1                         43
         #define OD_7001_44_battery_stateBP2                         44
+
+/*7002 */
+        #define OD_7002_battery                                     0x7002
+
+        #define OD_7002_0_battery_maxSubIndex                       0
+        #define OD_7002_1_battery_vbattBP1                          1
+        #define OD_7002_2_battery_vbattBP2                          2
+        #define OD_7002_3_battery_VCellMaxBP1                       3
+        #define OD_7002_4_battery_VCellMaxBP2                       4
+        #define OD_7002_5_battery_VCellMinBP1                       5
+        #define OD_7002_6_battery_VCellMinBP2                       6
+        #define OD_7002_7_battery_VCellBP1                          7
+        #define OD_7002_8_battery_VCellBP2                          8
+        #define OD_7002_9_battery_VCell1BP1                         9
+        #define OD_7002_10_battery_VCell1BP2                        10
+        #define OD_7002_11_battery_VCell2BP1                        11
+        #define OD_7002_12_battery_VCell2BP2                        12
+        #define OD_7002_13_battery_VCellAvgBP1                      13
+        #define OD_7002_14_battery_VCellAvgBP2                      14
+        #define OD_7002_15_battery_currentBP1                       15
+        #define OD_7002_16_battery_currentBP2                       16
+        #define OD_7002_17_battery_currentAvgBP1                    17
+        #define OD_7002_18_battery_currentAvgBP2                    18
+        #define OD_7002_19_battery_currentMaxBP1                    19
+        #define OD_7002_20_battery_currentMaxBP2                    20
+        #define OD_7002_21_battery_currentMinBP1                    21
+        #define OD_7002_22_battery_currentMinBP2                    22
+        #define OD_7002_23_battery_fullCapacityBP1                  23
+        #define OD_7002_24_battery_fullCapacityBP2                  24
+        #define OD_7002_25_battery_reportedCapacityBP1              25
+        #define OD_7002_26_battery_reportedCapacityBP2              26
+        #define OD_7002_27_battery_timeToEmptyBP1                   27
+        #define OD_7002_28_battery_timeToEmptyBP2                   28
+        #define OD_7002_29_battery_timeToFullBP1                    29
+        #define OD_7002_30_battery_timeToFullBP2                    30
+        #define OD_7002_31_battery_cyclesBP1                        31
+        #define OD_7002_32_battery_cyclesBP2                        32
+        #define OD_7002_33_battery_reportedStateOfChargeBP1         33
+        #define OD_7002_34_battery_reportedStateOfChargeBP2         34
+        #define OD_7002_35_battery_temperatureBP1                   35
+        #define OD_7002_36_battery_temperatureBP2                   36
+        #define OD_7002_37_battery_temperatureAvgBP1                37
+        #define OD_7002_38_battery_temperatureAvgBP2                38
+        #define OD_7002_39_battery_temperatureMaxBP1                39
+        #define OD_7002_40_battery_temperatureMaxBP2                40
+        #define OD_7002_41_battery_temperatureMinBP1                41
+        #define OD_7002_42_battery_temperatureMinBP2                42
+        #define OD_7002_43_battery_stateBP1                         43
+        #define OD_7002_44_battery_stateBP2                         44
 
 /*7003 */
         #define OD_7003_solarPanel                                  0x7003
@@ -2370,6 +2431,90 @@
         #define OD_7006_15_solarPanel_cell1TempMax                  15
         #define OD_7006_16_solarPanel_cell2TempMax                  16
 
+/*7007 */
+        #define OD_7007_solarPanel                                  0x7007
+
+        #define OD_7007_0_solarPanel_maxSubIndex                    0
+        #define OD_7007_1_solarPanel_voltage                        1
+        #define OD_7007_2_solarPanel_current                        2
+        #define OD_7007_3_solarPanel_power                          3
+        #define OD_7007_4_solarPanel_voltageAvg                     4
+        #define OD_7007_5_solarPanel_currentAvg                     5
+        #define OD_7007_6_solarPanel_powerAvg                       6
+        #define OD_7007_7_solarPanel_voltageMax                     7
+        #define OD_7007_8_solarPanel_currentMax                     8
+        #define OD_7007_9_solarPanel_powerMax                       9
+        #define OD_7007_10_solarPanel_energy                        10
+        #define OD_7007_11_solarPanel_cell1Temp                     11
+        #define OD_7007_12_solarPanel_cell2Temp                     12
+        #define OD_7007_13_solarPanel_cell1TempMin                  13
+        #define OD_7007_14_solarPanel_cell2TempMin                  14
+        #define OD_7007_15_solarPanel_cell1TempMax                  15
+        #define OD_7007_16_solarPanel_cell2TempMax                  16
+
+/*7008 */
+        #define OD_7008_solarPanel                                  0x7008
+
+        #define OD_7008_0_solarPanel_maxSubIndex                    0
+        #define OD_7008_1_solarPanel_voltage                        1
+        #define OD_7008_2_solarPanel_current                        2
+        #define OD_7008_3_solarPanel_power                          3
+        #define OD_7008_4_solarPanel_voltageAvg                     4
+        #define OD_7008_5_solarPanel_currentAvg                     5
+        #define OD_7008_6_solarPanel_powerAvg                       6
+        #define OD_7008_7_solarPanel_voltageMax                     7
+        #define OD_7008_8_solarPanel_currentMax                     8
+        #define OD_7008_9_solarPanel_powerMax                       9
+        #define OD_7008_10_solarPanel_energy                        10
+        #define OD_7008_11_solarPanel_cell1Temp                     11
+        #define OD_7008_12_solarPanel_cell2Temp                     12
+        #define OD_7008_13_solarPanel_cell1TempMin                  13
+        #define OD_7008_14_solarPanel_cell2TempMin                  14
+        #define OD_7008_15_solarPanel_cell1TempMax                  15
+        #define OD_7008_16_solarPanel_cell2TempMax                  16
+
+/*7009 */
+        #define OD_7009_solarPanel                                  0x7009
+
+        #define OD_7009_0_solarPanel_maxSubIndex                    0
+        #define OD_7009_1_solarPanel_voltage                        1
+        #define OD_7009_2_solarPanel_current                        2
+        #define OD_7009_3_solarPanel_power                          3
+        #define OD_7009_4_solarPanel_voltageAvg                     4
+        #define OD_7009_5_solarPanel_currentAvg                     5
+        #define OD_7009_6_solarPanel_powerAvg                       6
+        #define OD_7009_7_solarPanel_voltageMax                     7
+        #define OD_7009_8_solarPanel_currentMax                     8
+        #define OD_7009_9_solarPanel_powerMax                       9
+        #define OD_7009_10_solarPanel_energy                        10
+        #define OD_7009_11_solarPanel_cell1Temp                     11
+        #define OD_7009_12_solarPanel_cell2Temp                     12
+        #define OD_7009_13_solarPanel_cell1TempMin                  13
+        #define OD_7009_14_solarPanel_cell2TempMin                  14
+        #define OD_7009_15_solarPanel_cell1TempMax                  15
+        #define OD_7009_16_solarPanel_cell2TempMax                  16
+
+/*700A */
+        #define OD_700A_solarPanel                                  0x700A
+
+        #define OD_700A_0_solarPanel_maxSubIndex                    0
+        #define OD_700A_1_solarPanel_voltage                        1
+        #define OD_700A_2_solarPanel_current                        2
+        #define OD_700A_3_solarPanel_power                          3
+        #define OD_700A_4_solarPanel_voltageAvg                     4
+        #define OD_700A_5_solarPanel_currentAvg                     5
+        #define OD_700A_6_solarPanel_powerAvg                       6
+        #define OD_700A_7_solarPanel_voltageMax                     7
+        #define OD_700A_8_solarPanel_currentMax                     8
+        #define OD_700A_9_solarPanel_powerMax                       9
+        #define OD_700A_10_solarPanel_energy                        10
+        #define OD_700A_11_solarPanel_cell1Temp                     11
+        #define OD_700A_12_solarPanel_cell2Temp                     12
+        #define OD_700A_13_solarPanel_cell1TempMin                  13
+        #define OD_700A_14_solarPanel_cell2TempMin                  14
+        #define OD_700A_15_solarPanel_cell1TempMax                  15
+        #define OD_700A_16_solarPanel_cell2TempMax                  16
+
 /*700B */
         #define OD_700B_starTracker                                 0x700B
 
@@ -2386,6 +2531,23 @@
         #define OD_700B_10_starTracker_declination                  10
         #define OD_700B_11_starTracker_roll                         11
         #define OD_700B_12_starTracker_timestamp                    12
+
+/*700C */
+        #define OD_700C_starTracker                                 0x700C
+
+        #define OD_700C_0_starTracker_maxSubIndex                   0
+        #define OD_700C_1_starTracker_rootParitionPercent           1
+        #define OD_700C_2_starTracker_RAM_Percent                   2
+        #define OD_700C_3_starTracker_freadCacheLength              3
+        #define OD_700C_4_starTracker_fwriteCacheLength             4
+        #define OD_700C_5_starTracker_activeApps                    5
+        #define OD_700C_6_starTracker_failedApps                    6
+        #define OD_700C_7_starTracker_updaterStatus                 7
+        #define OD_700C_8_starTracker_updatesAvailable              8
+        #define OD_700C_9_starTracker_rightAscension                9
+        #define OD_700C_10_starTracker_declination                  10
+        #define OD_700C_11_starTracker_roll                         11
+        #define OD_700C_12_starTracker_timestamp                    12
 
 /*700D */
         #define OD_700D_GPS                                         0x700D
@@ -2488,9 +2650,10 @@ struct sCO_OD_RAM{
 /*2022      */ OD_MCU_Sensors_t MCU_Sensors;
 /*2100      */ OCTET_STRING   errorStatusBits[10];
 /*6000      */ VISIBLE_STRING C3State[1];
-/*7001      */ OD_battery_t    battery;
-/*7003      */ OD_solarPanel_t solarPanel[4];
-/*700B      */ OD_starTracker_t starTracker;
+/*7000      */ OD_C3Telemetry_t C3Telemetry;
+/*7001      */ OD_battery_t    battery[2];
+/*7003      */ OD_solarPanel_t solarPanel[8];
+/*700B      */ OD_starTracker_t starTracker[2];
 /*700D      */ OD_GPS_t        GPS;
 /*700E      */ OD_ACS_t        ACS;
 /*700F      */ OD_RWB_t        RWB;
@@ -2757,6 +2920,9 @@ extern struct sCO_OD_PERSIST_STATE CO_OD_PERSIST_STATE;
 
 /*6004, Data Type: persistentState_t */
         #define OD_persistentState                                  CO_OD_PERSIST_STATE.persistentState
+
+/*7000, Data Type: C3Telemetry_t */
+        #define OD_C3Telemetry                                      CO_OD_RAM.C3Telemetry
 
 /*7001, Data Type: battery_t */
         #define OD_battery                                          CO_OD_RAM.battery

@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="01:28:53.0858580-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="11:19:33.1517130-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -3160,6 +3160,17 @@
               <BOOL />
             </q1:varDeclaration>
           </q1:struct>
+          <q1:struct name="C3 Telemetry" uniqueID="UID_REC_7000">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700000">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Uptime" uniqueID="UID_RECSUB_700001">
+              <UDINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="eMMC Usage" uniqueID="UID_RECSUB_700002">
+              <USINT />
+            </q1:varDeclaration>
+          </q1:struct>
           <q1:struct name="Battery" uniqueID="UID_REC_7001">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700100">
               <USINT />
@@ -3294,6 +3305,143 @@
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="State BP2" uniqueID="UID_RECSUB_70012C">
+              <USINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Battery" uniqueID="UID_REC_7002">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700200">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Vbatt BP1" uniqueID="UID_RECSUB_700201">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Vbatt BP2" uniqueID="UID_RECSUB_700202">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell max BP1" uniqueID="UID_RECSUB_700203">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell max BP2" uniqueID="UID_RECSUB_700204">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell min BP1" uniqueID="UID_RECSUB_700205">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell min BP2" uniqueID="UID_RECSUB_700206">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell BP1" uniqueID="UID_RECSUB_700207">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell BP2" uniqueID="UID_RECSUB_700208">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell1 BP1" uniqueID="UID_RECSUB_700209">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell1 BP2" uniqueID="UID_RECSUB_70020A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell2 BP1" uniqueID="UID_RECSUB_70020B">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell2 BP2" uniqueID="UID_RECSUB_70020C">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell avg BP1" uniqueID="UID_RECSUB_70020D">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="VCell avg BP2" uniqueID="UID_RECSUB_70020E">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current BP1" uniqueID="UID_RECSUB_70020F">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current BP2" uniqueID="UID_RECSUB_700210">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current avg BP1" uniqueID="UID_RECSUB_700211">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current avg BP2" uniqueID="UID_RECSUB_700212">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current max BP1" uniqueID="UID_RECSUB_700213">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current max BP2" uniqueID="UID_RECSUB_700214">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current min BP1" uniqueID="UID_RECSUB_700215">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current min BP2" uniqueID="UID_RECSUB_700216">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Full Capacity BP1" uniqueID="UID_RECSUB_700217">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Full Capacity BP2" uniqueID="UID_RECSUB_700218">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Reported Capacity BP1" uniqueID="UID_RECSUB_700219">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Reported Capacity BP2" uniqueID="UID_RECSUB_70021A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Time To Empty BP1" uniqueID="UID_RECSUB_70021B">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Time To Empty BP2" uniqueID="UID_RECSUB_70021C">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Time To Full BP1" uniqueID="UID_RECSUB_70021D">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Time To Full BP2" uniqueID="UID_RECSUB_70021E">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cycles BP1" uniqueID="UID_RECSUB_70021F">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cycles BP2" uniqueID="UID_RECSUB_700220">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Reported State of Charge BP1" uniqueID="UID_RECSUB_700221">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Reported State of Charge BP2" uniqueID="UID_RECSUB_700222">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature BP1" uniqueID="UID_RECSUB_700223">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature BP2" uniqueID="UID_RECSUB_700224">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature avg BP1" uniqueID="UID_RECSUB_700225">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature avg BP2" uniqueID="UID_RECSUB_700226">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature max BP1" uniqueID="UID_RECSUB_700227">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature max BP2" uniqueID="UID_RECSUB_700228">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature min BP1" uniqueID="UID_RECSUB_700229">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Temperature min BP2" uniqueID="UID_RECSUB_70022A">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="State BP1" uniqueID="UID_RECSUB_70022B">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="State BP2" uniqueID="UID_RECSUB_70022C">
               <USINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -3509,6 +3657,218 @@
               <SINT />
             </q1:varDeclaration>
           </q1:struct>
+          <q1:struct name="Solar Panel" uniqueID="UID_REC_7007">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700700">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage" uniqueID="UID_RECSUB_700701">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_700702">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power" uniqueID="UID_RECSUB_700703">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Avg" uniqueID="UID_RECSUB_700704">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Avg" uniqueID="UID_RECSUB_700705">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Avg" uniqueID="UID_RECSUB_700706">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Max" uniqueID="UID_RECSUB_700707">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Max" uniqueID="UID_RECSUB_700708">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Max" uniqueID="UID_RECSUB_700709">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Energy" uniqueID="UID_RECSUB_70070A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp" uniqueID="UID_RECSUB_70070B">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp" uniqueID="UID_RECSUB_70070C">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Min" uniqueID="UID_RECSUB_70070D">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Min" uniqueID="UID_RECSUB_70070E">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Max" uniqueID="UID_RECSUB_70070F">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Max" uniqueID="UID_RECSUB_700710">
+              <SINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Solar Panel" uniqueID="UID_REC_7008">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700800">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage" uniqueID="UID_RECSUB_700801">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_700802">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power" uniqueID="UID_RECSUB_700803">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Avg" uniqueID="UID_RECSUB_700804">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Avg" uniqueID="UID_RECSUB_700805">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Avg" uniqueID="UID_RECSUB_700806">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Max" uniqueID="UID_RECSUB_700807">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Max" uniqueID="UID_RECSUB_700808">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Max" uniqueID="UID_RECSUB_700809">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Energy" uniqueID="UID_RECSUB_70080A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp" uniqueID="UID_RECSUB_70080B">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp" uniqueID="UID_RECSUB_70080C">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Min" uniqueID="UID_RECSUB_70080D">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Min" uniqueID="UID_RECSUB_70080E">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Max" uniqueID="UID_RECSUB_70080F">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Max" uniqueID="UID_RECSUB_700810">
+              <SINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Solar Panel" uniqueID="UID_REC_7009">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700900">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage" uniqueID="UID_RECSUB_700901">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_700902">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power" uniqueID="UID_RECSUB_700903">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Avg" uniqueID="UID_RECSUB_700904">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Avg" uniqueID="UID_RECSUB_700905">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Avg" uniqueID="UID_RECSUB_700906">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Max" uniqueID="UID_RECSUB_700907">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Max" uniqueID="UID_RECSUB_700908">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Max" uniqueID="UID_RECSUB_700909">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Energy" uniqueID="UID_RECSUB_70090A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp" uniqueID="UID_RECSUB_70090B">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp" uniqueID="UID_RECSUB_70090C">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Min" uniqueID="UID_RECSUB_70090D">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Min" uniqueID="UID_RECSUB_70090E">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Max" uniqueID="UID_RECSUB_70090F">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Max" uniqueID="UID_RECSUB_700910">
+              <SINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Solar Panel" uniqueID="UID_REC_700A">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700A00">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage" uniqueID="UID_RECSUB_700A01">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_700A02">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power" uniqueID="UID_RECSUB_700A03">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Avg" uniqueID="UID_RECSUB_700A04">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Avg" uniqueID="UID_RECSUB_700A05">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Avg" uniqueID="UID_RECSUB_700A06">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Voltage Max" uniqueID="UID_RECSUB_700A07">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Current Max" uniqueID="UID_RECSUB_700A08">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Power Max" uniqueID="UID_RECSUB_700A09">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Energy" uniqueID="UID_RECSUB_700A0A">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp" uniqueID="UID_RECSUB_700A0B">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp" uniqueID="UID_RECSUB_700A0C">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Min" uniqueID="UID_RECSUB_700A0D">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Min" uniqueID="UID_RECSUB_700A0E">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 1 Temp Max" uniqueID="UID_RECSUB_700A0F">
+              <SINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Cell 2 Temp Max" uniqueID="UID_RECSUB_700A10">
+              <SINT />
+            </q1:varDeclaration>
+          </q1:struct>
           <q1:struct name="Star Tracker" uniqueID="UID_REC_700B">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700B00">
               <USINT />
@@ -3547,6 +3907,47 @@
               <INT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Timestamp" uniqueID="UID_RECSUB_700B0C">
+              <ULINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Star Tracker" uniqueID="UID_REC_700C">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700C00">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_700C01">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_700C02">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Fread cache length" uniqueID="UID_RECSUB_700C03">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Fwrite cache length" uniqueID="UID_RECSUB_700C04">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Active apps" uniqueID="UID_RECSUB_700C05">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Failed apps" uniqueID="UID_RECSUB_700C06">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Updater Status" uniqueID="UID_RECSUB_700C07">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Updates available" uniqueID="UID_RECSUB_700C08">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Right Ascension" uniqueID="UID_RECSUB_700C09">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Declination" uniqueID="UID_RECSUB_700C0A">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Roll" uniqueID="UID_RECSUB_700C0B">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Timestamp" uniqueID="UID_RECSUB_700C0C">
               <ULINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -11237,6 +11638,25 @@ If true, skips antenna deployment attempt</description>
             <BOOL />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_7000">
+            <label lang="en">C3 Telemetry</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_7000" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700000">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x02" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700001">
+            <description lang="en">Uptime of C3 in seconds</description>
+            <UDINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700002">
+            <description lang="en">eMMC utilization in %</description>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_7001">
             <label lang="en">Battery</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_7001" />
@@ -11462,6 +11882,235 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_70012C" access="readWriteInput">
+            <label lang="en">State BP2</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_7002">
+            <label lang="en">Battery</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_7002" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700200">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x2C" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700201" access="readWriteInput">
+            <label lang="en">Vbatt BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700202" access="readWriteInput">
+            <label lang="en">Vbatt BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700203" access="readWriteInput">
+            <label lang="en">VCell max BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700204" access="readWriteInput">
+            <label lang="en">VCell max BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700205" access="readWriteInput">
+            <label lang="en">VCell min BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700206" access="readWriteInput">
+            <label lang="en">VCell min BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700207" access="readWriteInput">
+            <label lang="en">VCell BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700208" access="readWriteInput">
+            <label lang="en">VCell BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700209" access="readWriteInput">
+            <label lang="en">VCell1 BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020A" access="readWriteInput">
+            <label lang="en">VCell1 BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020B" access="readWriteInput">
+            <label lang="en">VCell2 BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020C" access="readWriteInput">
+            <label lang="en">VCell2 BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020D" access="readWriteInput">
+            <label lang="en">VCell avg BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020E" access="readWriteInput">
+            <label lang="en">VCell avg BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70020F" access="readWriteInput">
+            <label lang="en">Current BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700210" access="readWriteInput">
+            <label lang="en">Current BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700211" access="readWriteInput">
+            <label lang="en">Current avg BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700212" access="readWriteInput">
+            <label lang="en">Current avg BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700213" access="readWriteInput">
+            <label lang="en">Current max BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700214" access="readWriteInput">
+            <label lang="en">Current max BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700215" access="readWriteInput">
+            <label lang="en">Current min BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700216" access="readWriteInput">
+            <label lang="en">Current min BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700217" access="readWriteInput">
+            <label lang="en">Full Capacity BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700218" access="readWriteInput">
+            <label lang="en">Full Capacity BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700219" access="readWriteInput">
+            <label lang="en">Reported Capacity BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021A" access="readWriteInput">
+            <label lang="en">Reported Capacity BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021B" access="readWriteInput">
+            <label lang="en">Time To Empty BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021C" access="readWriteInput">
+            <label lang="en">Time To Empty BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021D" access="readWriteInput">
+            <label lang="en">Time To Full BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021E" access="readWriteInput">
+            <label lang="en">Time To Full BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70021F" access="readWriteInput">
+            <label lang="en">Cycles BP1</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700220" access="readWriteInput">
+            <label lang="en">Cycles BP2</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700221" access="readWriteInput">
+            <label lang="en">Reported State of Charge BP1</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700222" access="readWriteInput">
+            <label lang="en">Reported State of Charge BP2</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700223" access="readWriteInput">
+            <label lang="en">Temperature BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700224" access="readWriteInput">
+            <label lang="en">Temperature BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700225" access="readWriteInput">
+            <label lang="en">Temperature avg BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700226" access="readWriteInput">
+            <label lang="en">Temperature avg BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700227" access="readWriteInput">
+            <label lang="en">Temperature max BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700228" access="readWriteInput">
+            <label lang="en">Temperature max BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700229" access="readWriteInput">
+            <label lang="en">Temperature min BP1</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70022A" access="readWriteInput">
+            <label lang="en">Temperature min BP2</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70022B" access="readWriteInput">
+            <label lang="en">State BP1</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70022C" access="readWriteInput">
             <label lang="en">State BP2</label>
             <USINT />
             <q1:defaultValue value="0" />
@@ -11822,6 +12471,362 @@ If true, skips antenna deployment attempt</description>
             <SINT />
             <q1:defaultValue value="-128" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_7007">
+            <label lang="en">Solar Panel</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_7007" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700700">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x10" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700701" access="readWriteInput">
+            <label lang="en">Voltage</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700702" access="readWriteInput">
+            <label lang="en">Current</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700703" access="readWriteInput">
+            <label lang="en">Power</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700704" access="readWriteInput">
+            <label lang="en">Voltage Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700705" access="readWriteInput">
+            <label lang="en">Current Avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700706" access="readWriteInput">
+            <label lang="en">Power Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700707" access="readWriteInput">
+            <label lang="en">Voltage Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700708" access="readWriteInput">
+            <label lang="en">Current Max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700709" access="readWriteInput">
+            <label lang="en">Power Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070A" access="readWriteInput">
+            <label lang="en">Energy</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070B" access="readWriteInput">
+            <label lang="en">Cell 1 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070C" access="readWriteInput">
+            <label lang="en">Cell 2 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070D" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070E" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70070F" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700710" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_7008">
+            <label lang="en">Solar Panel</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_7008" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700800">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x10" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700801" access="readWriteInput">
+            <label lang="en">Voltage</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700802" access="readWriteInput">
+            <label lang="en">Current</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700803" access="readWriteInput">
+            <label lang="en">Power</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700804" access="readWriteInput">
+            <label lang="en">Voltage Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700805" access="readWriteInput">
+            <label lang="en">Current Avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700806" access="readWriteInput">
+            <label lang="en">Power Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700807" access="readWriteInput">
+            <label lang="en">Voltage Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700808" access="readWriteInput">
+            <label lang="en">Current Max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700809" access="readWriteInput">
+            <label lang="en">Power Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080A" access="readWriteInput">
+            <label lang="en">Energy</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080B" access="readWriteInput">
+            <label lang="en">Cell 1 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080C" access="readWriteInput">
+            <label lang="en">Cell 2 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080D" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080E" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70080F" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700810" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_7009">
+            <label lang="en">Solar Panel</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_7009" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700900">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x10" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700901" access="readWriteInput">
+            <label lang="en">Voltage</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700902" access="readWriteInput">
+            <label lang="en">Current</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700903" access="readWriteInput">
+            <label lang="en">Power</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700904" access="readWriteInput">
+            <label lang="en">Voltage Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700905" access="readWriteInput">
+            <label lang="en">Current Avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700906" access="readWriteInput">
+            <label lang="en">Power Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700907" access="readWriteInput">
+            <label lang="en">Voltage Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700908" access="readWriteInput">
+            <label lang="en">Current Max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700909" access="readWriteInput">
+            <label lang="en">Power Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090A" access="readWriteInput">
+            <label lang="en">Energy</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090B" access="readWriteInput">
+            <label lang="en">Cell 1 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090C" access="readWriteInput">
+            <label lang="en">Cell 2 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090D" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090E" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_70090F" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700910" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_700A">
+            <label lang="en">Solar Panel</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_700A" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A00">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x10" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A01" access="readWriteInput">
+            <label lang="en">Voltage</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A02" access="readWriteInput">
+            <label lang="en">Current</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A03" access="readWriteInput">
+            <label lang="en">Power</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A04" access="readWriteInput">
+            <label lang="en">Voltage Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A05" access="readWriteInput">
+            <label lang="en">Current Avg</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A06" access="readWriteInput">
+            <label lang="en">Power Avg</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A07" access="readWriteInput">
+            <label lang="en">Voltage Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A08" access="readWriteInput">
+            <label lang="en">Current Max</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A09" access="readWriteInput">
+            <label lang="en">Power Max</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0A" access="readWriteInput">
+            <label lang="en">Energy</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0B" access="readWriteInput">
+            <label lang="en">Cell 1 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0C" access="readWriteInput">
+            <label lang="en">Cell 2 Temp</label>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0D" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0E" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Min</label>
+            <SINT />
+            <q1:defaultValue value="127" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A0F" access="readWriteInput">
+            <label lang="en">Cell 1 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700A10" access="readWriteInput">
+            <label lang="en">Cell 2 Temp Max</label>
+            <SINT />
+            <q1:defaultValue value="-128" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_700B">
             <label lang="en">Star Tracker</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_700B" />
@@ -11887,6 +12892,75 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700B0C" access="readWriteInput">
+            <label lang="en">Timestamp</label>
+            <ULINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_700C">
+            <label lang="en">Star Tracker</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_700C" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C00">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x0C" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C01" access="readWriteInput">
+            <label lang="en">Root Parition Percent</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C02" access="readWriteInput">
+            <label lang="en">RAM Percent</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C03" access="readWriteInput">
+            <label lang="en">Fread cache length</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C04" access="readWriteInput">
+            <label lang="en">Fwrite cache length</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C05" access="readWriteInput">
+            <label lang="en">Active apps</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C06" access="readWriteInput">
+            <label lang="en">Failed apps</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C07" access="readWriteInput">
+            <label lang="en">Updater Status</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C08" access="readWriteInput">
+            <label lang="en">Updates available</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C09" access="readWriteInput">
+            <label lang="en">Right Ascension</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C0A" access="readWriteInput">
+            <label lang="en">Declination</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C0B" access="readWriteInput">
+            <label lang="en">Roll</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700C0C" access="readWriteInput">
             <label lang="en">Timestamp</label>
             <ULINT />
             <q1:defaultValue value="0" />
@@ -12223,7 +13297,7 @@ If true, skips antenna deployment attempt</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="01:28:53.0858580-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="11:19:33.1517130-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -13812,6 +14886,11 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="06" name="Last EDL" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600406" />
             <CANopenSubObject subIndex="07" name="Deployed" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600407" />
           </CANopenObject>
+          <CANopenObject index="7000" name="C3 Telemetry" objectType="9" uniqueIDRef="UID_OBJ_7000" subNumber="3">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700000" />
+            <CANopenSubObject subIndex="01" name="Uptime" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700001" />
+            <CANopenSubObject subIndex="02" name="eMMC Usage" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700002" />
+          </CANopenObject>
           <CANopenObject index="7001" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_7001" subNumber="45">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700100" />
             <CANopenSubObject subIndex="01" name="Vbatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700101" />
@@ -13858,6 +14937,53 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="2A" name="Temperature min BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70012A" />
             <CANopenSubObject subIndex="2B" name="State BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70012B" />
             <CANopenSubObject subIndex="2C" name="State BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70012C" />
+          </CANopenObject>
+          <CANopenObject index="7002" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_7002" subNumber="45">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700200" />
+            <CANopenSubObject subIndex="01" name="Vbatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700201" />
+            <CANopenSubObject subIndex="02" name="Vbatt BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700202" />
+            <CANopenSubObject subIndex="03" name="VCell max BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700203" />
+            <CANopenSubObject subIndex="04" name="VCell max BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700204" />
+            <CANopenSubObject subIndex="05" name="VCell min BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700205" />
+            <CANopenSubObject subIndex="06" name="VCell min BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700206" />
+            <CANopenSubObject subIndex="07" name="VCell BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700207" />
+            <CANopenSubObject subIndex="08" name="VCell BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700208" />
+            <CANopenSubObject subIndex="09" name="VCell1 BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700209" />
+            <CANopenSubObject subIndex="0A" name="VCell1 BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020A" />
+            <CANopenSubObject subIndex="0B" name="VCell2 BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020B" />
+            <CANopenSubObject subIndex="0C" name="VCell2 BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020C" />
+            <CANopenSubObject subIndex="0D" name="VCell avg BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020D" />
+            <CANopenSubObject subIndex="0E" name="VCell avg BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020E" />
+            <CANopenSubObject subIndex="0F" name="Current BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70020F" />
+            <CANopenSubObject subIndex="10" name="Current BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700210" />
+            <CANopenSubObject subIndex="11" name="Current avg BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700211" />
+            <CANopenSubObject subIndex="12" name="Current avg BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700212" />
+            <CANopenSubObject subIndex="13" name="Current max BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700213" />
+            <CANopenSubObject subIndex="14" name="Current max BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700214" />
+            <CANopenSubObject subIndex="15" name="Current min BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700215" />
+            <CANopenSubObject subIndex="16" name="Current min BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700216" />
+            <CANopenSubObject subIndex="17" name="Full Capacity BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700217" />
+            <CANopenSubObject subIndex="18" name="Full Capacity BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700218" />
+            <CANopenSubObject subIndex="19" name="Reported Capacity BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700219" />
+            <CANopenSubObject subIndex="1A" name="Reported Capacity BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021A" />
+            <CANopenSubObject subIndex="1B" name="Time To Empty BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021B" />
+            <CANopenSubObject subIndex="1C" name="Time To Empty BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021C" />
+            <CANopenSubObject subIndex="1D" name="Time To Full BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021D" />
+            <CANopenSubObject subIndex="1E" name="Time To Full BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021E" />
+            <CANopenSubObject subIndex="1F" name="Cycles BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70021F" />
+            <CANopenSubObject subIndex="20" name="Cycles BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700220" />
+            <CANopenSubObject subIndex="21" name="Reported State of Charge BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700221" />
+            <CANopenSubObject subIndex="22" name="Reported State of Charge BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700222" />
+            <CANopenSubObject subIndex="23" name="Temperature BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700223" />
+            <CANopenSubObject subIndex="24" name="Temperature BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700224" />
+            <CANopenSubObject subIndex="25" name="Temperature avg BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700225" />
+            <CANopenSubObject subIndex="26" name="Temperature avg BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700226" />
+            <CANopenSubObject subIndex="27" name="Temperature max BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700227" />
+            <CANopenSubObject subIndex="28" name="Temperature max BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700228" />
+            <CANopenSubObject subIndex="29" name="Temperature min BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700229" />
+            <CANopenSubObject subIndex="2A" name="Temperature min BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70022A" />
+            <CANopenSubObject subIndex="2B" name="State BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70022B" />
+            <CANopenSubObject subIndex="2C" name="State BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70022C" />
           </CANopenObject>
           <CANopenObject index="7003" name="Solar Panel" objectType="9" uniqueIDRef="UID_OBJ_7003" subNumber="17">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700300" />
@@ -13935,6 +15061,82 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="0F" name="Cell 1 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70060F" />
             <CANopenSubObject subIndex="10" name="Cell 2 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700610" />
           </CANopenObject>
+          <CANopenObject index="7007" name="Solar Panel" objectType="9" uniqueIDRef="UID_OBJ_7007" subNumber="17">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700700" />
+            <CANopenSubObject subIndex="01" name="Voltage" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700701" />
+            <CANopenSubObject subIndex="02" name="Current" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700702" />
+            <CANopenSubObject subIndex="03" name="Power" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700703" />
+            <CANopenSubObject subIndex="04" name="Voltage Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700704" />
+            <CANopenSubObject subIndex="05" name="Current Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700705" />
+            <CANopenSubObject subIndex="06" name="Power Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700706" />
+            <CANopenSubObject subIndex="07" name="Voltage Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700707" />
+            <CANopenSubObject subIndex="08" name="Current Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700708" />
+            <CANopenSubObject subIndex="09" name="Power Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700709" />
+            <CANopenSubObject subIndex="0A" name="Energy" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070A" />
+            <CANopenSubObject subIndex="0B" name="Cell 1 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070B" />
+            <CANopenSubObject subIndex="0C" name="Cell 2 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070C" />
+            <CANopenSubObject subIndex="0D" name="Cell 1 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070D" />
+            <CANopenSubObject subIndex="0E" name="Cell 2 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070E" />
+            <CANopenSubObject subIndex="0F" name="Cell 1 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70070F" />
+            <CANopenSubObject subIndex="10" name="Cell 2 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700710" />
+          </CANopenObject>
+          <CANopenObject index="7008" name="Solar Panel" objectType="9" uniqueIDRef="UID_OBJ_7008" subNumber="17">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700800" />
+            <CANopenSubObject subIndex="01" name="Voltage" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700801" />
+            <CANopenSubObject subIndex="02" name="Current" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700802" />
+            <CANopenSubObject subIndex="03" name="Power" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700803" />
+            <CANopenSubObject subIndex="04" name="Voltage Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700804" />
+            <CANopenSubObject subIndex="05" name="Current Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700805" />
+            <CANopenSubObject subIndex="06" name="Power Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700806" />
+            <CANopenSubObject subIndex="07" name="Voltage Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700807" />
+            <CANopenSubObject subIndex="08" name="Current Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700808" />
+            <CANopenSubObject subIndex="09" name="Power Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700809" />
+            <CANopenSubObject subIndex="0A" name="Energy" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080A" />
+            <CANopenSubObject subIndex="0B" name="Cell 1 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080B" />
+            <CANopenSubObject subIndex="0C" name="Cell 2 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080C" />
+            <CANopenSubObject subIndex="0D" name="Cell 1 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080D" />
+            <CANopenSubObject subIndex="0E" name="Cell 2 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080E" />
+            <CANopenSubObject subIndex="0F" name="Cell 1 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70080F" />
+            <CANopenSubObject subIndex="10" name="Cell 2 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700810" />
+          </CANopenObject>
+          <CANopenObject index="7009" name="Solar Panel" objectType="9" uniqueIDRef="UID_OBJ_7009" subNumber="17">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700900" />
+            <CANopenSubObject subIndex="01" name="Voltage" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700901" />
+            <CANopenSubObject subIndex="02" name="Current" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700902" />
+            <CANopenSubObject subIndex="03" name="Power" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700903" />
+            <CANopenSubObject subIndex="04" name="Voltage Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700904" />
+            <CANopenSubObject subIndex="05" name="Current Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700905" />
+            <CANopenSubObject subIndex="06" name="Power Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700906" />
+            <CANopenSubObject subIndex="07" name="Voltage Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700907" />
+            <CANopenSubObject subIndex="08" name="Current Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700908" />
+            <CANopenSubObject subIndex="09" name="Power Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700909" />
+            <CANopenSubObject subIndex="0A" name="Energy" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090A" />
+            <CANopenSubObject subIndex="0B" name="Cell 1 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090B" />
+            <CANopenSubObject subIndex="0C" name="Cell 2 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090C" />
+            <CANopenSubObject subIndex="0D" name="Cell 1 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090D" />
+            <CANopenSubObject subIndex="0E" name="Cell 2 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090E" />
+            <CANopenSubObject subIndex="0F" name="Cell 1 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_70090F" />
+            <CANopenSubObject subIndex="10" name="Cell 2 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700910" />
+          </CANopenObject>
+          <CANopenObject index="700A" name="Solar Panel" objectType="9" uniqueIDRef="UID_OBJ_700A" subNumber="17">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700A00" />
+            <CANopenSubObject subIndex="01" name="Voltage" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A01" />
+            <CANopenSubObject subIndex="02" name="Current" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A02" />
+            <CANopenSubObject subIndex="03" name="Power" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A03" />
+            <CANopenSubObject subIndex="04" name="Voltage Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A04" />
+            <CANopenSubObject subIndex="05" name="Current Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A05" />
+            <CANopenSubObject subIndex="06" name="Power Avg" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A06" />
+            <CANopenSubObject subIndex="07" name="Voltage Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A07" />
+            <CANopenSubObject subIndex="08" name="Current Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A08" />
+            <CANopenSubObject subIndex="09" name="Power Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A09" />
+            <CANopenSubObject subIndex="0A" name="Energy" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0A" />
+            <CANopenSubObject subIndex="0B" name="Cell 1 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0B" />
+            <CANopenSubObject subIndex="0C" name="Cell 2 Temp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0C" />
+            <CANopenSubObject subIndex="0D" name="Cell 1 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0D" />
+            <CANopenSubObject subIndex="0E" name="Cell 2 Temp Min" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0E" />
+            <CANopenSubObject subIndex="0F" name="Cell 1 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A0F" />
+            <CANopenSubObject subIndex="10" name="Cell 2 Temp Max" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700A10" />
+          </CANopenObject>
           <CANopenObject index="700B" name="Star Tracker" objectType="9" uniqueIDRef="UID_OBJ_700B" subNumber="13">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700B00" />
             <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B01" />
@@ -13949,6 +15151,21 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="0A" name="Declination" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B0A" />
             <CANopenSubObject subIndex="0B" name="Roll" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B0B" />
             <CANopenSubObject subIndex="0C" name="Timestamp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B0C" />
+          </CANopenObject>
+          <CANopenObject index="700C" name="Star Tracker" objectType="9" uniqueIDRef="UID_OBJ_700C" subNumber="13">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700C00" />
+            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C01" />
+            <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C02" />
+            <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C03" />
+            <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C04" />
+            <CANopenSubObject subIndex="05" name="Active apps" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C05" />
+            <CANopenSubObject subIndex="06" name="Failed apps" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C06" />
+            <CANopenSubObject subIndex="07" name="Updater Status" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C07" />
+            <CANopenSubObject subIndex="08" name="Updates available" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C08" />
+            <CANopenSubObject subIndex="09" name="Right Ascension" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C09" />
+            <CANopenSubObject subIndex="0A" name="Declination" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C0A" />
+            <CANopenSubObject subIndex="0B" name="Roll" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C0B" />
+            <CANopenSubObject subIndex="0C" name="Timestamp" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C0C" />
           </CANopenObject>
           <CANopenObject index="700D" name="GPS" objectType="9" uniqueIDRef="UID_OBJ_700D" subNumber="18">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700D00" />

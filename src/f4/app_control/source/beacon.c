@@ -12,8 +12,7 @@ static const ax25_link_t ax25 = {
     .sid = AX25_PID_NONE,
 };
 
-static uint32_t uptime;
-static time_t   unix_time;
+static time_t unix_time;
 
 static const tlm_item_t tlm_aprs0[] = {
     {   /* User-Defined APRS Start */
@@ -33,7 +32,7 @@ static const tlm_item_t tlm_aprs0[] = {
     {   /* Uptime */
         .type = TLM_PTR,
         .len = 4,
-        .ptr = &uptime,
+        .ptr = &OD_C3Telemetry.uptime,
     },
     {   /* RTC Time */
         .type = TLM_PTR,
@@ -108,7 +107,7 @@ void beacon_send(const radio_cfg_t *cfg)
         fb = fb_alloc(AX25_MAX_FRAME_LEN);
     }
 
-    uptime = TIME_I2S(chVTGetSystemTime());
+    OD_C3Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
     unix_time = rtcGetTimeUnix(NULL);
     fb_reserve(fb, AX25_MAX_HDR_LEN);
     fb->data_ptr = tlm_payload(fb, &aprs0);

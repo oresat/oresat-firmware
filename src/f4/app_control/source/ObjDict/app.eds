@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:28AM
+ModificationTime=11:19AM
 ModificationDate=04-25-2021
 ModifiedBy=
 
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=165
+SupportedObjects=172
 1=0x1002
 2=0x1003
 3=0x1005
@@ -279,17 +279,24 @@ SupportedObjects=165
 152=0x6002
 153=0x6003
 154=0x6004
-155=0x7001
-156=0x7003
-157=0x7004
-158=0x7005
-159=0x7006
-160=0x700B
-161=0x700D
-162=0x700E
-163=0x700F
-164=0x7013
-165=0x7014
+155=0x7000
+156=0x7001
+157=0x7002
+158=0x7003
+159=0x7004
+160=0x7005
+161=0x7006
+162=0x7007
+163=0x7008
+164=0x7009
+165=0x700A
+166=0x700B
+167=0x700C
+168=0x700D
+169=0x700E
+170=0x700F
+171=0x7013
+172=0x7014
 
 [1002]
 ParameterName=Manufacturer status register
@@ -12185,6 +12192,39 @@ AccessType=rw
 DefaultValue=0
 PDOMapping=0
 
+[7000]
+ParameterName=C3 Telemetry
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x3
+
+[7000sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x02
+PDOMapping=0
+
+[7000sub1]
+ParameterName=Uptime
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[7000sub2]
+ParameterName=eMMC Usage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
 [7001]
 ParameterName=Battery
 ObjectType=0x9
@@ -12588,6 +12628,417 @@ DefaultValue=0
 PDOMapping=1
 
 [7001sub2C]
+ParameterName=State BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002]
+ParameterName=Battery
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x2D
+
+[7002sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x2C
+PDOMapping=0
+
+[7002sub1]
+ParameterName=Vbatt BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub2]
+ParameterName=Vbatt BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub3]
+ParameterName=VCell max BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub4]
+ParameterName=VCell max BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub5]
+ParameterName=VCell min BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub6]
+ParameterName=VCell min BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub7]
+ParameterName=VCell BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub8]
+ParameterName=VCell BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub9]
+ParameterName=VCell1 BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subA]
+ParameterName=VCell1 BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subB]
+ParameterName=VCell2 BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subC]
+ParameterName=VCell2 BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subD]
+ParameterName=VCell avg BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subE]
+ParameterName=VCell avg BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002subF]
+ParameterName=Current BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub10]
+ParameterName=Current BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub11]
+ParameterName=Current avg BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub12]
+ParameterName=Current avg BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub13]
+ParameterName=Current max BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub14]
+ParameterName=Current max BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub15]
+ParameterName=Current min BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub16]
+ParameterName=Current min BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub17]
+ParameterName=Full Capacity BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub18]
+ParameterName=Full Capacity BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub19]
+ParameterName=Reported Capacity BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1A]
+ParameterName=Reported Capacity BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1B]
+ParameterName=Time To Empty BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1C]
+ParameterName=Time To Empty BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1D]
+ParameterName=Time To Full BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1E]
+ParameterName=Time To Full BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub1F]
+ParameterName=Cycles BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub20]
+ParameterName=Cycles BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub21]
+ParameterName=Reported State of Charge BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub22]
+ParameterName=Reported State of Charge BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub23]
+ParameterName=Temperature BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub24]
+ParameterName=Temperature BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub25]
+ParameterName=Temperature avg BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub26]
+ParameterName=Temperature avg BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub27]
+ParameterName=Temperature max BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub28]
+ParameterName=Temperature max BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub29]
+ParameterName=Temperature min BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub2A]
+ParameterName=Temperature min BP2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub2B]
+ParameterName=State BP1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7002sub2C]
 ParameterName=State BP2
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -13232,6 +13683,642 @@ AccessType=rwr
 DefaultValue=-128
 PDOMapping=1
 
+[7007]
+ParameterName=Solar Panel
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x11
+
+[7007sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x10
+PDOMapping=0
+
+[7007sub1]
+ParameterName=Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub4]
+ParameterName=Voltage Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub5]
+ParameterName=Current Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub6]
+ParameterName=Power Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub7]
+ParameterName=Voltage Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub8]
+ParameterName=Current Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007sub9]
+ParameterName=Power Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007subA]
+ParameterName=Energy
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007subB]
+ParameterName=Cell 1 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007subC]
+ParameterName=Cell 2 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7007subD]
+ParameterName=Cell 1 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7007subE]
+ParameterName=Cell 2 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7007subF]
+ParameterName=Cell 1 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[7007sub10]
+ParameterName=Cell 2 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[7008]
+ParameterName=Solar Panel
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x11
+
+[7008sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x10
+PDOMapping=0
+
+[7008sub1]
+ParameterName=Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub4]
+ParameterName=Voltage Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub5]
+ParameterName=Current Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub6]
+ParameterName=Power Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub7]
+ParameterName=Voltage Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub8]
+ParameterName=Current Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008sub9]
+ParameterName=Power Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008subA]
+ParameterName=Energy
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008subB]
+ParameterName=Cell 1 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008subC]
+ParameterName=Cell 2 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7008subD]
+ParameterName=Cell 1 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7008subE]
+ParameterName=Cell 2 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7008subF]
+ParameterName=Cell 1 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[7008sub10]
+ParameterName=Cell 2 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[7009]
+ParameterName=Solar Panel
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x11
+
+[7009sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x10
+PDOMapping=0
+
+[7009sub1]
+ParameterName=Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub4]
+ParameterName=Voltage Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub5]
+ParameterName=Current Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub6]
+ParameterName=Power Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub7]
+ParameterName=Voltage Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub8]
+ParameterName=Current Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009sub9]
+ParameterName=Power Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009subA]
+ParameterName=Energy
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009subB]
+ParameterName=Cell 1 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009subC]
+ParameterName=Cell 2 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7009subD]
+ParameterName=Cell 1 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7009subE]
+ParameterName=Cell 2 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[7009subF]
+ParameterName=Cell 1 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[7009sub10]
+ParameterName=Cell 2 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[700A]
+ParameterName=Solar Panel
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0x11
+
+[700Asub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x10
+PDOMapping=0
+
+[700Asub1]
+ParameterName=Voltage
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub2]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub3]
+ParameterName=Power
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub4]
+ParameterName=Voltage Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub5]
+ParameterName=Current Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub6]
+ParameterName=Power Avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub7]
+ParameterName=Voltage Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub8]
+ParameterName=Current Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Asub9]
+ParameterName=Power Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700AsubA]
+ParameterName=Energy
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700AsubB]
+ParameterName=Cell 1 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700AsubC]
+ParameterName=Cell 2 Temp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700AsubD]
+ParameterName=Cell 1 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[700AsubE]
+ParameterName=Cell 2 Temp Min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=127
+PDOMapping=1
+
+[700AsubF]
+ParameterName=Cell 1 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
+[700Asub10]
+ParameterName=Cell 2 Temp Max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=rwr
+DefaultValue=-128
+PDOMapping=1
+
 [700B]
 ParameterName=Star Tracker
 ObjectType=0x9
@@ -13347,6 +14434,129 @@ DefaultValue=0
 PDOMapping=1
 
 [700BsubC]
+ParameterName=Timestamp
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700C]
+ParameterName=Star Tracker
+ObjectType=0x9
+;StorageLocation=RAM
+SubNumber=0xD
+
+[700Csub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x0C
+PDOMapping=0
+
+[700Csub1]
+ParameterName=Root Parition Percent
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub2]
+ParameterName=RAM Percent
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub3]
+ParameterName=Fread cache length
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub4]
+ParameterName=Fwrite cache length
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub5]
+ParameterName=Active apps
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub6]
+ParameterName=Failed apps
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub7]
+ParameterName=Updater Status
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub8]
+ParameterName=Updates available
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700Csub9]
+ParameterName=Right Ascension
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700CsubA]
+ParameterName=Declination
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700CsubB]
+ParameterName=Roll
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[700CsubC]
 ParameterName=Timestamp
 ObjectType=0x7
 ;StorageLocation=RAM
