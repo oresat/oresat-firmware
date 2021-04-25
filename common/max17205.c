@@ -10,7 +10,7 @@
 #include "hal.h"
 #include "max17205.h"
 
-#if 0
+#if 1
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
 #else
@@ -802,6 +802,8 @@ const char* max17205RegToStr(const uint16_t reg) {
 			return ("MAX17205_AD_CYCLES");
 		case MAX17205_AD_TEMP:
 			return("MAX17205_AD_TEMP");
+		case MAX17205_AD_CURRENT:
+			return("MAX17205_AD_CURRENT");
 		case MAX17205_AD_AVGCURRENT:
 			return("MAX17205_AD_AVGCURRENT");
 		case MAX17205_AD_BATT:
@@ -818,6 +820,8 @@ const char* max17205RegToStr(const uint16_t reg) {
 			return("MAX17205_AD_PACKCFG");
 		case MAX17205_AD_DESIGNCAP:
 			return("MAX17205_AD_DESIGNCAP");
+		case MAX17205_AD_REPSOC:
+			return("MAX17205_AD_REPSOC");
 
 
 		case MAX17205_AD_NXTABLE0:
