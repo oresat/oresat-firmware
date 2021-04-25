@@ -8,10 +8,10 @@
 extern "C" {
 #endif
 
+void cmd_node(BaseSequentialStream *chp, int argc, char *argv[]);
 void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[]);
 
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
 #endif
-

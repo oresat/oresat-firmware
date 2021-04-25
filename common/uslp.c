@@ -5,6 +5,7 @@
  * @addtogroup CCSDS
  * @{
  */
+#include <string.h>
 #include "uslp.h"
 #include "cop.h"
 
@@ -39,12 +40,20 @@ static inline uint32_t uslp_gen_id(uint16_t scid, uint8_t vcid, uint8_t mapid)
 /**
  * Parse USLP TFPH ID field into component pieces
  */
-static inline bool uslp_parse_id(uint32_t id, uint16_t *scid, uint8_t *vcid, uint8_t *mapid)
+static inline bool uslp_parse_id(uint32_t id, uint16_t scid_match, uint16_t *scid, uint8_t *vcid, uint8_t *mapid)
 {
     id = __builtin_bswap32(id);
+    /* Must be USLP frame */
     if ((id & USLP_TFPH_ID_TFVN) >> USLP_TFPH_ID_TFVN_Pos != USLP_TFVN)
         return false;
+    /* Must be destination */
+    if (!(id & USLP_TFPH_ID_SRC_DST))
+        return false;
+    /* Must match SCID */
     *scid = (id & USLP_TFPH_ID_SCID) >> USLP_TFPH_ID_SCID_Pos;
+    if (*scid != scid_match)
+        return false;
+    /* Parse VC and MAP */
     *vcid = (id & USLP_TFPH_ID_VCID) >> USLP_TFPH_ID_VCID_Pos;
     *mapid = (id & USLP_TFPH_ID_MAPID) >> USLP_TFPH_ID_MAPID_Pos;
     return true;
@@ -124,6 +133,7 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
     void *crc;
     switch (pc->fecf) {
     case FECF_SW:
+#if (0)
         crc = fb_put(fb, pc->fecf_len);
         /* TODO: Verify this implements correctly */
         if (pc->fecf_len == 2 && pc->crc16) {
@@ -133,6 +143,9 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
         } else {
             break;
         }
+#else
+        (void)crc;
+#endif
     case FECF_HW:
         len += pc->fecf_len;
     case FECF_NONE:
@@ -140,6 +153,38 @@ static uint16_t uslp_fecf_gen(const uslp_pc_t *pc, fb_t *fb)
         break;
     }
     return __builtin_bswap16(len);
+}
+
+static bool uslp_fecf_recv(const uslp_pc_t *pc, fb_t *fb)
+{
+    uint16_t len = fb->len - pc->fecf_len;
+    uint32_t crc;
+    switch (pc->fecf) {
+    case FECF_SW:
+#if (0)
+        /* TODO: Verify this implements correctly */
+        if (pc->fecf_len == 2 && pc->crc16) {
+            crc = __builtin_bswap16(pc->crc16(fb->data, len, 0));
+        } else if (pc->fecf_len == 4 && pc->crc32) {
+            crc = __builtin_bswap32(pc->crc32(fb->data, len, 0));
+        } else {
+            return false;
+        }
+        if (memcmp(&crc, &fb->data[len], pc->fecf_len)) {
+            return false;
+        }
+#else
+        (void)crc;
+        (void)len;
+        return false;
+#endif
+    case FECF_HW:
+        fb_trim(fb, pc->fecf_len);
+    case FECF_NONE:
+    default:
+        break;
+    }
+    return true;
 }
 
 static void uslp_vc_recv(const uslp_vc_t *vc, fb_t *fb)
@@ -274,8 +319,12 @@ void uslp_recv(const uslp_link_t *link, fb_t *fb)
     uint16_t scid;
     uint8_t vcid, mapid;
 
+    /* Verify CRC */
+    if (!uslp_fecf_recv(pc, fb))
+        return;
+
     /* Parse out IDs */
-    if (!uslp_parse_id(tfph->id, &scid, &vcid, &mapid))
+    if (!uslp_parse_id(tfph->id, mc->scid, &scid, &vcid, &mapid))
         return;
 
     /* Insert Service */
