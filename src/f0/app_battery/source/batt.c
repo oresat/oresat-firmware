@@ -210,20 +210,20 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 		if( pk_data->v_cell_mV < 3000 || pk_data->present_state_of_charge < 20 ) {
 			//Disable discharge on both packs
 			dbgprintf("Disabling discharge on pack %u\r\n", pk_data->pack_number);
-			palSetLine(line_dchg_dis);
+			//palSetLine(line_dchg_dis);
 		} else {
 			dbgprintf("Enabling discharge on pack %u\r\n", pk_data->pack_number);
 			//Allow discharge on both packs
-			palClearLine(line_dchg_dis);
+			//palClearLine(line_dchg_dis);
 		}
 
 
 		if( pk_data->v_cell_mV > 4100 ) {
 			dbgprintf("Disabling charging on pack %u\r\n", pk_data->pack_number);
-			palSetLine(line_chg_dis);
+			//palSetLine(line_chg_dis);
 		} else {
 			dbgprintf("Enabling charging on pack %u\r\n", pk_data->pack_number);
-			palClearLine(line_chg_dis);
+			//palClearLine(line_chg_dis);
 			if( pk_data->present_state_of_charge > 90 ) {
 				const int16_t vcell_delta_mV = pk_data->v_cell_1_mV - pk_data->v_cell_2_mV;
 
@@ -234,8 +234,8 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 		}
 	} else {
 		//fail safe mode
-		palSetLine(line_dchg_dis);
-		palSetLine(line_chg_dis);
+		//palSetLine(line_dchg_dis);
+		//palSetLine(line_chg_dis);
 
 		//FIXME CO_errorReport blocks indefinitely???
 		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING);
@@ -267,8 +267,10 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     }
 
     dbgprintf("avg_temp_1_C = %d C, ", dest->avg_temp_1_C);
-    dbgprintf("avg_temp_2_C = %d C, ", dest->avg_temp_2_C);
-    dbgprintf("avg_int_temp_C = %d C", dest->avg_int_temp_C);
+    dbgprintf("temp_1_C = %d C, ", dest->temp_1_C);
+    dbgprintf("avg_int_temp_C = %d C, ", dest->avg_int_temp_C);
+    dbgprintf("temp_min_C = %d C, ", dest->temp_min_C);
+    dbgprintf("temp_max_C = %d C", dest->temp_max_C);
     dbgprintf("\r\n");
 
 
@@ -578,6 +580,13 @@ THD_FUNCTION(batt, arg)
 
     while (!chThdShouldTerminateX()) {
     	dbgprintf("================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
+
+    	//dbgprintf("faking an error...\r\n");chThdSleepMilliseconds(100);
+    	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+    	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+    	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_GENERIC, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+
+
 
     	dbgprintf("Populating Pack 1 Data\r\n");
     	if( populate_pack_data(&max17205devPack1, &pack_1_data) ) {
