@@ -8,6 +8,8 @@
 #include "fs.h"
 
 #include "app_solar.crc32.bin.h"
+#include "app_imu.crc32.bin.h"
+
 
 const uint32_t low_cpuid_of_protoboard = 0x1D000800;
 const uint32_t node_of_protoboard = 0x11;
@@ -164,7 +166,14 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
         goto bootloader_usage;
     }
 
-    char filename[] = "app_solar.crc32.bin";
+#if 1
+    char filename[] = "app_imu.crc32.bin";
+    uint32_t firmware_img_length = app_imu_crc32_bin_len;
+    uint8_t *firmware_buffer_memory_pointer = build_app_solar_crc32_bin;
+    const uint32_t target_unique_id = 0x38;
+#else
+#endif
+
 
     for(int i = 0; i < argc; i++ ) {
     	chprintf(chp, "argv[%u] = %s\r\n", i, argv[i]);
@@ -212,6 +221,7 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
     	}
 
     } else if (!strcmp(argv[0], "wfw") ) {
+    	//Write data from the firmware blob to the lfs file system
     	lfs_file_t *file;
     	file = file_open(&FSD1, filename, LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC);
 		if (file == NULL) {
@@ -219,7 +229,7 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 			return;
 		}
 
-		int ret = file_write(&FSD1, file, build_app_solar_crc32_bin, build_app_solar_crc32_bin_len);
+		int ret = file_write(&FSD1, file, firmware_buffer_memory_pointer, firmware_img_length);
 		if( ret < 0 ) {
 			chprintf(chp, "Error in file_write: %d\r\n", ret);
 		}
@@ -234,7 +244,7 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 
     } else if (!strcmp(argv[0], "w") ) {
     	//test_can_fw_update(chp, unique_id_of_solarcard);
-    	can_fw_update_from_lfs_file(chp, unique_id_of_solarcard, filename);
+    	can_fw_update_from_lfs_file(chp, target_unique_id, filename);
 
     } else {
         goto bootloader_usage;
