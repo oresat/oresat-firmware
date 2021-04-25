@@ -8,8 +8,8 @@ Description=OreSat IMU Application Object Dictionary
 CreationTime=3:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=4:06PM
-ModificationDate=04-24-2021
+ModificationTime=11:53AM
+ModificationDate=04-25-2021
 ModifiedBy=Ryan Meidick
 
 [DeviceInfo]
@@ -593,34 +593,70 @@ PDOMapping=0
 [1029]
 ParameterName=Error behavior
 ObjectType=0x8
-;StorageLocation=PERSIST_COMM
-SubNumber=0x3
+;StorageLocation=ROM
+SubNumber=0x7
 
 [1029sub0]
-ParameterName=Highest sub-index supported
+ParameterName=max sub-index
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x02
+DefaultValue=6
 PDOMapping=0
 
 [1029sub1]
-ParameterName=Communication error
+ParameterName=Communication
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub2]
-ParameterName=Profile- or manufacturer-specific error
+ParameterName=Communication other
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub3]
+ParameterName=Communication passive
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub4]
+ParameterName=Generic
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub5]
+ParameterName=Device profile
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1029sub6]
+ParameterName=Manufacturer specific
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
 PDOMapping=0
 
 [1200]
