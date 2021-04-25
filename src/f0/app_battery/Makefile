@@ -209,7 +209,8 @@ include $(TOOLCHAIN)/toolchain.mk
 ##############################################################################
 # Custom rules
 #
-
+xxd:
+	xxd -i build/$(PROJECT).crc32.bin > build/$(PROJECT).crc32.bin.h
 #
 # Custom rules
 ##############################################################################
