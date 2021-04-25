@@ -294,9 +294,14 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
 
 bootloader_usage:
     chprintf(chp, "Usage: bootloader <cmd>\r\n"
-                  "    wfw: Writes in memory file to LFS file system\r\n"
                   "    opt: <data 0> <data 1> <######## hex cpu unique ID or node ID>\r\n"
-                  "    w:   Write firmware to remote node\r\n"
+    			  "    flash_imu \r\n"
+    		      "    flash_battery \r\n"
+				  "    flash_solar_0C \r\n"
+				  "    flash_solar_10 \r\n"
+				  "    flash_solar_14 \r\n"
+				  "    flash_solar_18 \r\n"
+                  "    wfw: Writes in flash file to LFS file system for testing\r\n"
                   "\r\n");
     return;
 }

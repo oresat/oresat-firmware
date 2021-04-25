@@ -29,6 +29,7 @@
 #include "comms.h"
 #include "rtc.h"
 #include "CO_master.h"
+#include "can_bootloader.h"
 #ifdef SHELL_ENABLE
 #include "cli.h"
 #endif
@@ -104,9 +105,39 @@ static FSConfig fscfg = {
     .mmc_pwr = LINE_MMC_PWR,
 };
 
+
+static flt_reg_t fifo1_filters[] = {
+    {
+        .scale16.id_mask[0].STID = ORESAT_BOOTLOADER_CAN_COMMAND_GET,
+        .scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_READ_MEMORY,
+    },
+    {
+        .scale16.id_mask[0].STID = ORESAT_BOOTLOADER_CAN_COMMAND_GO,
+        .scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_WRITE_MEMORY,
+    },
+    {
+        .scale16.id_mask[0].STID = ORESAT_BOOTLOADER_CAN_COMMAND_ERASE,
+        .scale16.id_mask[1].STID = CAN_BOOTLOADER_WRITE_MEMORY_RESPONSE_SID,
+    },
+    {
+        .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ACK,
+        .scale16.id_mask[1].STID = STM32_BOOTLOADER_CAN_NACK,
+    },
+    {
+        .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
+        .scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA,
+    },
+    {
+        .scale16.id_mask[0].STID = STM32_BOOTLOADER_CAN_ANNOUNCE,
+        .scale16.id_mask[1].STID = ORESAT_BOOTLOADER_CAN_COMMAND_SET_OPT_DATA,
+    }
+};
+
 static oresat_config_t oresat_conf = {
     .cand = &CAND1,
     .node_id = 0x01,
+    .fifo1_filters = fifo1_filters,
+    .filter_count = sizeof(fifo1_filters) / sizeof(flt_reg_t),
     .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
