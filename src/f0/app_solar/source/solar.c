@@ -1,10 +1,11 @@
 #include "solar.h"
 #include "ina226.h"
 #include "CANopen.h"
+#include "chprintf.h"
+
+#define DEBUG_SD                (BaseSequentialStream *) &SD2
 
 #if 0
-#define DEBUG_SD                (BaseSequentialStream *) &SD2
-#include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
 #else
 #define dbgprintf(str, ...)
@@ -245,16 +246,17 @@ THD_FUNCTION(solar, arg)
 {
     (void)arg;
 
+    chprintf(DEBUG_SD, "\r\nRunning solar app...\r\n");
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
-    dbgprintf("Initializing DAC....\r\n");
+    chprintf(DEBUG_SD, "Initializing DAC....\r\n");
     dacStart(&DACD1, &dac1cfg);
 
-    dbgprintf("Initializing INA226....\r\n");
+    chprintf(DEBUG_SD, "Initializing INA226....\r\n");
     ina226Start(&ina226dev, &ina226config);
 
     if( ina226dev.state != INA226_READY ) {
-    	dbgprintf("Failed to initialize INA226!!!\r\n");
+    	chprintf(DEBUG_SD, "Failed to initialize INA226!!!\r\n");
     	chThdSleepMilliseconds(100);
     }
 
@@ -281,7 +283,7 @@ THD_FUNCTION(solar, arg)
 
 	dac_put_microvolts(&DACD1, 0, pao_state.iadj_uv);
 
-    dbgprintf("Done with init INA226....\r\n");
+	chprintf(DEBUG_SD, "Done with init INA226, running main loop....\r\n");
     systime_t loop_start_time_ms = TIME_I2MS(chVTGetSystemTime());
 
 	for (uint32_t loop_iteration = 0; !chThdShouldTerminateX(); loop_iteration++) {
