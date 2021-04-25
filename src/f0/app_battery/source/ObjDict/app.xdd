@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="11:58:28.5730570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="16:16:09.5497430-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -4027,7 +4027,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180001" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000180+$NODEID" />
+            <q1:defaultValue value="0x40000180+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180002" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4047,7 +4047,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180005" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180006" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4195,7 +4195,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180301" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000480+$NODEID" />
+            <q1:defaultValue value="0x40000480+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180302" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4215,7 +4215,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180305" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180306" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4251,7 +4251,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180401" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000180+$NODEID" />
+            <q1:defaultValue value="0x40000180+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180402" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4271,7 +4271,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180405" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180406" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4307,7 +4307,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180501" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000280+$NODEID" />
+            <q1:defaultValue value="0x40000280+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180502" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4327,7 +4327,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180505" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180506" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4363,7 +4363,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180601" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000380+$NODEID" />
+            <q1:defaultValue value="0x40000380+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180602" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4383,7 +4383,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180605" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180606" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4419,7 +4419,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180701" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000480+$NODEID" />
+            <q1:defaultValue value="0x40000480+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180702" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4439,7 +4439,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180705" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180706" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4475,7 +4475,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180801" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000180+$NODEID" />
+            <q1:defaultValue value="0x40000180+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180802" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4495,7 +4495,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180805" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180806" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4531,7 +4531,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180901" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000280+$NODEID" />
+            <q1:defaultValue value="0x40000280+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180902" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4551,7 +4551,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180905" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="10000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180906" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -6281,7 +6281,7 @@ all 10s</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="11:58:28.5730570-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="15:51:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="16:16:09.5497430-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
