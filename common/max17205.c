@@ -784,10 +784,14 @@ const char* max17205RegToStr(const uint16_t reg) {
 			return ("MAX17205_AD_AVGCELL2");
 		case MAX17205_AD_AVGVCELL:
 			return("MAX17205_AD_AVGVCELL");
+		case MAX17205_AD_VCELL:
+			return("MAX17205_AD_VCELL");
 		case MAX17205_AD_FULLCAP:
 			return ("MAX17205_AD_FULLCAP");
 		case MAX17205_AD_AVCAP:
 			return ("MAX17205_AD_AVCAP");
+		case MAX17205_AD_FULLCAPREP:
+			return("MAX17205_AD_FULLCAPREP");
 		case MAX17205_AD_MIXCAP:
 			return ("MAX17205_AD_MIXCAP");
 		case MAX17205_AD_TTE:
@@ -810,6 +814,8 @@ const char* max17205RegToStr(const uint16_t reg) {
 			return("MAX17205_AD_BATT");
 		case MAX17205_AD_AVGTEMP1:
 			return("MAX17205_AD_AVGTEMP1");
+		case MAX17205_AD_TEMP1:
+			return("MAX17205_AD_TEMP1");
 		case MAX17205_AD_AVGTEMP2:
 			return("MAX17205_AD_AVGTEMP2");
 		case MAX17205_AD_AVGINTTEMP:

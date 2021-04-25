@@ -7,7 +7,7 @@
 
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
 
-#if 1 || ENABLE_NV_MEMORY_UPDATE_CODE
+#if 0 || ENABLE_NV_MEMORY_UPDATE_CODE
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
