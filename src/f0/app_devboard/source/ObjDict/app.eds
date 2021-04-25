@@ -8,8 +8,8 @@ Description=OreSat Template Application Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=2:40PM
-ModificationDate=04-24-2021
+ModificationTime=11:23AM
+ModificationDate=04-25-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -604,7 +604,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1029sub2]
@@ -613,7 +613,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x00
+DefaultValue=0x01
 PDOMapping=0
 
 [1200]
