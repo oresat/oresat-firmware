@@ -34,7 +34,7 @@ uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
  *
  * @return true on success, false otherwise.
  */
-bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, void *read_function_arg0) {
+bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config, CANDriver *canp, BaseSequentialStream *chp, const uint32_t low_cpu_id, const bool stm32_bootloader_mode, void *read_function_arg0, const uint8_t opd_addr) {
     if (can_bl_config == NULL) {
         return (false);
     }
@@ -45,6 +45,7 @@ bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config
     can_bl_config->low_cpu_id = low_cpu_id;
     can_bl_config->stm32_bootloader_mode = stm32_bootloader_mode;
     can_bl_config->read_function_arg0 = read_function_arg0;
+    can_bl_config->opd_addr = opd_addr;
 
     return (true);
 }
@@ -55,6 +56,7 @@ bool can_api_init_can_bootloader_config_t(can_bootloader_config_t *can_bl_config
 void print_can_bootloader_config_t(BaseSequentialStream *chp, can_bootloader_config_t *can_bl_config) {
     chprintf(chp, "can_bootloader_config_t:\r\n");
     chprintf(chp, "  low_cpu_id:                   0x%X\r\n", can_bl_config->low_cpu_id);
+    chprintf(chp, "  opd_addr:                     0x%X\r\n", can_bl_config->opd_addr);
     chprintf(chp, "  stm32_bootloader_mode:        %u\r\n", can_bl_config->stm32_bootloader_mode);
     chprintf(chp, "  read_fail_count:              %u\r\n", can_bl_config->read_fail_count);
     chprintf(chp, "  write_fail_count:             %u\r\n", can_bl_config->write_fail_count);
@@ -847,11 +849,32 @@ bool oresat_firmware_update_m0(can_bootloader_config_t *can_bl_config, const uin
 
     BaseSequentialStream *chp = can_bl_config->chp;
 
-    chprintf(chp, "Trying to put node into bootloader mode...\r\n");
+    chprintf(chp, "Trying to put node into bootloader mode: OPD-ID 0x%X\r\n", can_bl_config->opd_addr);
     chThdSleepMilliseconds(10);
+
+    if( can_bl_config->opd_addr != 0 ) {
+		//Turn off the card
+		if (!opd_state(can_bl_config->opd_addr, false)) {
+			chprintf(chp, "DISABLED\r\n");
+		} else {
+			chprintf(chp, "NOT CONNECTED\r\n");
+		}
+    }
+
 
     // CAN FIFO 1 on the C3 Node will almost certainly have some cruft bootloader related can messages in it that need to be discarded
     can_api_purge_rx_buffer(can_bl_config);
+
+    // FIXME add support for CANOpen reset of solar cards
+
+    if (can_bl_config->opd_addr != 0) {
+		//Turn the card back on
+		if (!opd_state(can_bl_config->opd_addr, true)) {
+			chprintf(chp, "ENABLED\r\n");
+		} else {
+			chprintf(chp, "NOT CONNECTED\r\n");
+		}
+	}
 
     if( ! can_bootloader_initiate(can_bl_config, 5000) ) {
         chprintf(chp, "Failed to put node into bootloader mode...\r\n");

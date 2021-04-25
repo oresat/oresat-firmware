@@ -7,6 +7,8 @@
 #include "oresat_f0.h"
 #include "fs.h"
 
+
+
 #if 0
 #include "app_solar.crc32.bin.h"
 #else
@@ -28,11 +30,13 @@ uint32_t build_app_battery_crc32_bin_len = 0;
 unsigned char *build_app_battery_crc32_bin = NULL;
 #endif
 
-
-//const uint32_t low_cpuid_of_protoboard = 0x1D000800;
-//const uint32_t node_of_protoboard = 0x11;
-
-//const uint32_t unique_id_of_solarcard = 0x1800500;
+typedef struct {
+	char *filename;
+	uint32_t length;
+	uint8_t *flash_buffer_ptr;
+	uint32_t target_unique_id;
+	uint8_t opd_addr;
+} app_spec_t;
 
 BaseSequentialStream *bootloader_chp_global = NULL;
 
@@ -90,11 +94,8 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
 
 	char *lsf_filepath = (char*) arg0;
 
-	//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Opening %s\r\n", lsf_filepath);
-
 	lfs_file_t *lsf_file_handle = file_open(&FSD1, lsf_filepath, LFS_O_RDONLY);
 	if( lsf_file_handle == NULL ) {
-		//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error in file_open: %d\r\n", FSD1.err);
 		return(0);
 	}
 
@@ -106,20 +107,14 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
 		} else {
 			int ret = file_read(&FSD1, lsf_file_handle, dest_buffer, number_of_bytes);
 			if( ret < 0 ) {
-				//chprintf(bootloader_chp_global, "Failed file_read(), %d\r\n", ret);
 				//FIXME error
 			} else {
 				return_value = ret;
 			}
 		}
-
-		//chprintf(bootloader_chp_global, "Read %u bytes from offset %u from file %s\r\n", return_value, of, lsf_filepath);
-	} else {
-		//chprintf(bootloader_chp_global, "firmware_blob_read_function_from_lfs(): Error lfs_file_length = %d\r\n", lfs_file_length);
 	}
 
 	file_close(&FSD1, lsf_file_handle);
-
 
 	return(return_value);
 }
@@ -134,9 +129,9 @@ uint32_t firmware_blob_read_function_from_lfs(const uint32_t offset, uint8_t *de
  *
  * @return true on success, false otherwise
  */
-bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_unique_id, char *lfs_filepath) {
+bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_unique_id, char *lfs_filepath, const uint8_t opd_addr) {
   can_bootloader_config_t can_bl_config;
-  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, lfs_filepath);
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, lfs_filepath, opd_addr);
 
   const lfs_soff_t lfs_file_length = get_lfs_filesize(lfs_filepath);
 
@@ -152,7 +147,7 @@ bool can_fw_update_from_lfs_file(BaseSequentialStream *chp, const uint32_t card_
 
 bool can_write_node_id(BaseSequentialStream *chp, const uint32_t card_unique_id, const uint8_t data_0_value, const uint8_t data_1_value) {
   can_bootloader_config_t can_bl_config;
-  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, NULL);
+  can_api_init_can_bootloader_config_t(&can_bl_config, canp, chp, card_unique_id, false, NULL, 0);
 
   chprintf(chp, "Trying to put node 0x%X into bootloader mode...\r\n", card_unique_id);
   chThdSleepMilliseconds(10);
@@ -172,12 +167,7 @@ bool can_write_node_id(BaseSequentialStream *chp, const uint32_t card_unique_id,
   return(ret);
 }
 
-typedef struct {
-	char *filename;
-	uint32_t length;
-	uint8_t *flash_buffer_ptr;
-	uint32_t target_unique_id;
-} app_spec_t;
+
 
 /*===========================================================================*/
 /*                                                                       */
@@ -216,38 +206,31 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     app_spec_t app_list[NUM_TEST_APPS] = {
-    		{"app_imu.crc32.bin", build_app_imu_crc32_bin_len, build_app_imu_crc32_bin, 0x38},
-			{"app_battery.crc32.bin", build_app_battery_crc32_bin_len, build_app_battery_crc32_bin, 0x04},
-			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x0C},
-			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x10},
-			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x14},
-			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x18},
+    		{"app_imu.crc32.bin", build_app_imu_crc32_bin_len, build_app_imu_crc32_bin, 0x38, 0x1A},
+			{"app_battery.crc32.bin", build_app_battery_crc32_bin_len, build_app_battery_crc32_bin, 0x04, 0x18},
+			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x0C, 0},
+			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x10, 0},
+			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x14, 0},
+			{"app_solar.crc32.bin", build_app_solar_crc32_bin_len, build_app_solar_crc32_bin, 0x18, 0},
     };
-#if 0
-    char filename[] = "app_imu.crc32.bin";
-    uint32_t firmware_img_length = build_app_imu_crc32_bin_len;
-    uint8_t *firmware_buffer_memory_pointer = build_app_imu_crc32_bin;
-    const uint32_t target_unique_id = 0x38;
-#else
-#endif
-
 
     for(int i = 0; i < argc; i++ ) {
     	chprintf(chp, "argv[%u] = %s\r\n", i, argv[i]);
     }
 
+    //FIXME indexing directly into the array need to be refoactored to something more correct/elegant
     if (!strcmp(argv[0], "flash_imu") ) {
-		can_fw_update_from_lfs_file(chp, app_list[0].target_unique_id, app_list[0].filename);
+		can_fw_update_from_lfs_file(chp, app_list[0].target_unique_id, app_list[0].filename, app_list[0].opd_addr);
     } else if (!strcmp(argv[0], "flash_battery") ) {
-    	can_fw_update_from_lfs_file(chp, app_list[1].target_unique_id, app_list[1].filename);
+    	can_fw_update_from_lfs_file(chp, app_list[1].target_unique_id, app_list[1].filename, app_list[1].opd_addr);
     } else if (!strcmp(argv[0], "flash_solar_0C") ) {
-		can_fw_update_from_lfs_file(chp, app_list[2].target_unique_id, app_list[2].filename);
+		can_fw_update_from_lfs_file(chp, app_list[2].target_unique_id, app_list[2].filename, app_list[2].opd_addr);
     } else if (!strcmp(argv[0], "flash_solar_10") ) {
-    	can_fw_update_from_lfs_file(chp, app_list[3].target_unique_id, app_list[3].filename);
+    	can_fw_update_from_lfs_file(chp, app_list[3].target_unique_id, app_list[3].filename, app_list[3].opd_addr);
     } else if (!strcmp(argv[0], "flash_solar_14") ) {
-    	can_fw_update_from_lfs_file(chp, app_list[4].target_unique_id, app_list[4].filename);
+    	can_fw_update_from_lfs_file(chp, app_list[4].target_unique_id, app_list[4].filename, app_list[4].opd_addr);
     } else if (!strcmp(argv[0], "flash_solar_18") ) {
-    	can_fw_update_from_lfs_file(chp, app_list[5].target_unique_id, app_list[5].filename);
+    	can_fw_update_from_lfs_file(chp, app_list[5].target_unique_id, app_list[5].filename, app_list[5].opd_addr);
 
     } else if (!strcmp(argv[0], "wfw") && argc >= 1 ) {
     	for(int idx = 0; idx < 3; idx++) {
@@ -279,12 +262,6 @@ void cmd_bootloader(BaseSequentialStream *chp, int argc, char *argv[])
     	} else {
     		chprintf(chp, "Failed to write data 0 and data 1 OPT bytes...\r\n");
     	}
-
-
-
-//    } else if (!strcmp(argv[0], "w") ) {
-//    	//test_can_fw_update(chp, unique_id_of_solarcard);
-//    	can_fw_update_from_lfs_file(chp, target_unique_id, filename);
 
     } else {
         goto bootloader_usage;
