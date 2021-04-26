@@ -19,7 +19,7 @@ static time_t unix_time;
 
 static const tlm_item_t tlm_aprs0[] = {
     /* User-Defined APRS Start */
-    { .type = TLM_MSG, .msg = "{" },
+    { .type = TLM_MSG, .msg = "{{z" },
     /* Telemetry Version */
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* C3 State */
@@ -264,8 +264,6 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* DxWiFi Transmitting */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.transmitting },
-    /* User-Defined APRS End */
-    { .type = TLM_MSG, .msg = "}" }
 };
 
 static const tlm_pkt_t aprs0 = {
