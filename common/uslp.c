@@ -315,7 +315,7 @@ bool uslp_recv(const uslp_link_t *link, fb_t *fb)
     uint16_t scid;
     uint8_t vcid, mapid;
 
-    if (fb->len < USLP_MAX_HEADER_LEN + pc->fecf_len)
+    if (fb->len < sizeof(uint32_t) + pc->fecf_len)
         return false;
 
     /* Verify CRC */

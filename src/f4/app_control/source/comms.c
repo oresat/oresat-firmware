@@ -585,9 +585,9 @@ THD_FUNCTION(edl_thd, arg)
         if (rx_fb == NULL) {
             continue;
         }
-        edl_enable(true);
-        len = rx_fb->len;
         if (uslp_recv(rx_fb->phy_arg, rx_fb)) {
+            edl_enable(true);
+            len = rx_fb->len;
             if (rx_fb->phy_arg == &edl_lband_link) {
                 OD_persistentState.LBandRX_Bytes += len;
                 OD_persistentState.LBandRX_Packets += 1;
