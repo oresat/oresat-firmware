@@ -286,7 +286,7 @@
                }              OD_solarPanel_t;
 /*700B      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      rootPartitionPercent;
                UNSIGNED8      RAM_Percent;
                UNSIGNED8      freadCacheLength;
                UNSIGNED8      fwriteCacheLength;
@@ -301,7 +301,7 @@
                }              OD_starTracker_t;
 /*700D      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      rootPartitionPercent;
                UNSIGNED8      RAM_Percent;
                UNSIGNED8      freadCacheLength;
                UNSIGNED8      fwriteCacheLength;
@@ -347,7 +347,7 @@
                }              OD_RWB_t;
 /*7013      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      rootPartitionPercent;
                UNSIGNED8      RAM_Percent;
                UNSIGNED8      freadCacheLength;
                UNSIGNED8      fwriteCacheLength;
@@ -359,7 +359,7 @@
                }              OD_dxWiFi_t;
 /*7014      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED8      rootParitionPercent;
+               UNSIGNED8      rootPartitionPercent;
                UNSIGNED8      RAM_Percent;
                UNSIGNED8      freadCacheLength;
                UNSIGNED8      fwriteCacheLength;
@@ -2545,7 +2545,7 @@
         #define OD_700B_starTracker                                 0x700B
 
         #define OD_700B_0_starTracker_maxSubIndex                   0
-        #define OD_700B_1_starTracker_rootParitionPercent           1
+        #define OD_700B_1_starTracker_rootPartitionPercent          1
         #define OD_700B_2_starTracker_RAM_Percent                   2
         #define OD_700B_3_starTracker_freadCacheLength              3
         #define OD_700B_4_starTracker_fwriteCacheLength             4
@@ -2562,7 +2562,7 @@
         #define OD_700C_starTracker                                 0x700C
 
         #define OD_700C_0_starTracker_maxSubIndex                   0
-        #define OD_700C_1_starTracker_rootParitionPercent           1
+        #define OD_700C_1_starTracker_rootPartitionPercent          1
         #define OD_700C_2_starTracker_RAM_Percent                   2
         #define OD_700C_3_starTracker_freadCacheLength              3
         #define OD_700C_4_starTracker_fwriteCacheLength             4
@@ -2579,7 +2579,7 @@
         #define OD_700D_GPS                                         0x700D
 
         #define OD_700D_0_GPS_maxSubIndex                           0
-        #define OD_700D_1_GPS_rootParitionPercent                   1
+        #define OD_700D_1_GPS_rootPartitionPercent                  1
         #define OD_700D_2_GPS_RAM_Percent                           2
         #define OD_700D_3_GPS_freadCacheLength                      3
         #define OD_700D_4_GPS_fwriteCacheLength                     4
@@ -2631,7 +2631,7 @@
         #define OD_7013_dxWiFi                                      0x7013
 
         #define OD_7013_0_dxWiFi_maxSubIndex                        0
-        #define OD_7013_1_dxWiFi_rootParitionPercent                1
+        #define OD_7013_1_dxWiFi_rootPartitionPercent               1
         #define OD_7013_2_dxWiFi_RAM_Percent                        2
         #define OD_7013_3_dxWiFi_freadCacheLength                   3
         #define OD_7013_4_dxWiFi_fwriteCacheLength                  4
@@ -2645,7 +2645,7 @@
         #define OD_7014_CFC                                         0x7014
 
         #define OD_7014_0_CFC_maxSubIndex                           0
-        #define OD_7014_1_CFC_rootParitionPercent                   1
+        #define OD_7014_1_CFC_rootPartitionPercent                  1
         #define OD_7014_2_CFC_RAM_Percent                           2
         #define OD_7014_3_CFC_freadCacheLength                      3
         #define OD_7014_4_CFC_fwriteCacheLength                     4

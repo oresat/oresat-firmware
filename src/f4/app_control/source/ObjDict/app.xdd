@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="22:57:58.3428280-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-26" fileModificationTime="03:07:24.5555650-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -3906,7 +3906,7 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700B00">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_700B01">
+            <q1:varDeclaration name="Root Partition Percent" uniqueID="UID_RECSUB_700B01">
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_700B02">
@@ -3947,7 +3947,7 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700C00">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_700C01">
+            <q1:varDeclaration name="Root Partition Percent" uniqueID="UID_RECSUB_700C01">
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_700C02">
@@ -3988,7 +3988,7 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700D00">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_700D01">
+            <q1:varDeclaration name="Root Partition Percent" uniqueID="UID_RECSUB_700D01">
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_700D02">
@@ -4114,7 +4114,7 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_701300">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_701301">
+            <q1:varDeclaration name="Root Partition Percent" uniqueID="UID_RECSUB_701301">
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_701302">
@@ -4146,7 +4146,7 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_701400">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Root Parition Percent" uniqueID="UID_RECSUB_701401">
+            <q1:varDeclaration name="Root Partition Percent" uniqueID="UID_RECSUB_701401">
               <USINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="RAM Percent" uniqueID="UID_RECSUB_701402">
@@ -12015,12 +12015,12 @@ If true, skips antenna deployment attempt</description>
           <q1:parameter uniqueID="UID_SUB_700201" access="readWriteInput">
             <label lang="en">VBatt BP1</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="7200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700202" access="readWriteInput">
             <label lang="en">VBatt BP2</label>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="7200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700203" access="readWriteInput">
             <label lang="en">VCell max BP1</label>
@@ -12954,7 +12954,7 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x0C" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700B01" access="readWriteInput">
-            <label lang="en">Root Parition Percent</label>
+            <label lang="en">Root Partition Percent</label>
             <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13023,7 +13023,7 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x0C" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700C01" access="readWriteInput">
-            <label lang="en">Root Parition Percent</label>
+            <label lang="en">Root Partition Percent</label>
             <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13092,7 +13092,7 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x11" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700D01" access="readWriteInput">
-            <label lang="en">Root Parition Percent</label>
+            <label lang="en">Root Partition Percent</label>
             <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13304,7 +13304,7 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x09" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_701301" access="readWriteInput">
-            <label lang="en">Root Parition Percent</label>
+            <label lang="en">Root Partition Percent</label>
             <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13358,7 +13358,7 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_701401" access="readWriteInput">
-            <label lang="en">Root Parition Percent</label>
+            <label lang="en">Root Partition Percent</label>
             <USINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13414,7 +13414,7 @@ If true, skips antenna deployment attempt</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="22:57:58.3428280-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-26" fileModificationTime="03:07:24.5555650-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -15271,7 +15271,7 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="700B" name="Star Tracker" objectType="9" uniqueIDRef="UID_OBJ_700B" subNumber="13">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700B00" />
-            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B01" />
+            <CANopenSubObject subIndex="01" name="Root Partition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B01" />
             <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B02" />
             <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B03" />
             <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700B04" />
@@ -15286,7 +15286,7 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="700C" name="Star Tracker" objectType="9" uniqueIDRef="UID_OBJ_700C" subNumber="13">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700C00" />
-            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C01" />
+            <CANopenSubObject subIndex="01" name="Root Partition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C01" />
             <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C02" />
             <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C03" />
             <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700C04" />
@@ -15301,7 +15301,7 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="700D" name="GPS" objectType="9" uniqueIDRef="UID_OBJ_700D" subNumber="18">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700D00" />
-            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700D01" />
+            <CANopenSubObject subIndex="01" name="Root Partition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700D01" />
             <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700D02" />
             <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700D03" />
             <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700D04" />
@@ -15347,7 +15347,7 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="7013" name="DxWiFi" objectType="9" uniqueIDRef="UID_OBJ_7013" subNumber="10">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_701300" />
-            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701301" />
+            <CANopenSubObject subIndex="01" name="Root Partition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701301" />
             <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701302" />
             <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701303" />
             <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701304" />
@@ -15359,7 +15359,7 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="7014" name="CFC" objectType="9" uniqueIDRef="UID_OBJ_7014" subNumber="9">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_701400" />
-            <CANopenSubObject subIndex="01" name="Root Parition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701401" />
+            <CANopenSubObject subIndex="01" name="Root Partition Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701401" />
             <CANopenSubObject subIndex="02" name="RAM Percent" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701402" />
             <CANopenSubObject subIndex="03" name="Fread cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701403" />
             <CANopenSubObject subIndex="04" name="Fwrite cache length" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_701404" />

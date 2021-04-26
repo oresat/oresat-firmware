@@ -8,8 +8,8 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:46PM
-ModificationDate=04-25-2021
+ModificationTime=3:07AM
+ModificationDate=04-26-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -12355,7 +12355,7 @@ PDOMapping=0
 ParameterName=OPD Current
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0006
+DataType=0x0005
 AccessType=ro
 DefaultValue=0
 PDOMapping=0
@@ -12376,7 +12376,7 @@ DefaultValue=0x2C
 PDOMapping=0
 
 [7001sub1]
-ParameterName=Vbatt BP1
+ParameterName=VBatt BP1
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -12385,7 +12385,7 @@ DefaultValue=7200
 PDOMapping=1
 
 [7001sub2]
-ParameterName=Vbatt BP2
+ParameterName=VBatt BP2
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -12787,21 +12787,21 @@ DefaultValue=0x2C
 PDOMapping=0
 
 [7002sub1]
-ParameterName=Vbatt BP1
+ParameterName=VBatt BP1
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rwr
-DefaultValue=0
+DefaultValue=7200
 PDOMapping=1
 
 [7002sub2]
-ParameterName=Vbatt BP2
+ParameterName=VBatt BP2
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rwr
-DefaultValue=0
+DefaultValue=7200
 PDOMapping=1
 
 [7002sub3]
@@ -14470,7 +14470,7 @@ DefaultValue=0x0C
 PDOMapping=0
 
 [700Bsub1]
-ParameterName=Root Parition Percent
+ParameterName=Root Partition Percent
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
@@ -14593,7 +14593,7 @@ DefaultValue=0x0C
 PDOMapping=0
 
 [700Csub1]
-ParameterName=Root Parition Percent
+ParameterName=Root Partition Percent
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
@@ -14716,7 +14716,7 @@ DefaultValue=0x11
 PDOMapping=0
 
 [700Dsub1]
-ParameterName=Root Parition Percent
+ParameterName=Root Partition Percent
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
@@ -15094,7 +15094,7 @@ DefaultValue=0x09
 PDOMapping=0
 
 [7013sub1]
-ParameterName=Root Parition Percent
+ParameterName=Root Partition Percent
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
@@ -15190,7 +15190,7 @@ DefaultValue=0x08
 PDOMapping=0
 
 [7014sub1]
-ParameterName=Root Parition Percent
+ParameterName=Root Partition Percent
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
