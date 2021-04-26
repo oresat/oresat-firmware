@@ -40,12 +40,12 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "CRC16_HW NOT SUPPORTED\r\n");
 #endif
         chprintf(chp, "=== All At Once ===\r\n");
-        chprintf(chp, "CRC32_HW:    %08X\r\n"
-                      "CRC32_SW:    %08X\r\n"
-                      "LFS_CRC:     %08X\r\n"
-                      "CRC16_HW:    %04X\r\n"
-                      "CRC16_SW:    %04X\r\n"
-                      "CCITT:       %04X\r\n\r\n",
+        chprintf(chp, "CRC32_HW:    0x%08X\r\n"
+                      "CRC32_SW:    0x%08X\r\n"
+                      "LFS_CRC:     0x%08X\r\n"
+                      "CRC16_HW:    0x%04X\r\n"
+                      "CRC16_SW:    0x%04X\r\n"
+                      "CCITT:       0x%04X\r\n\r\n",
                       ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
 
         hw_32 = sw_32 = lfscrc = 0xFFFFFFFFU;
@@ -71,12 +71,12 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
             ccitt = crc16_ccitt(&test[i], sizeof(uint32_t), ccitt);
         }
         chprintf(chp, "=== Word At A Time ===\r\n");
-        chprintf(chp, "CRC32_HW:    %08X\r\n"
-                      "CRC32_SW:    %08X\r\n"
-                      "LFS_CRC:     %08X\r\n"
-                      "CRC16_HW:    %04X\r\n"
-                      "CRC16_SW:    %04X\r\n"
-                      "CCITT:       %04X\r\n\r\n",
+        chprintf(chp, "CRC32_HW:    0x%08X\r\n"
+                      "CRC32_SW:    0x%08X\r\n"
+                      "LFS_CRC:     0x%08X\r\n"
+                      "CRC16_HW:    0x%04X\r\n"
+                      "CRC16_SW:    0x%04X\r\n"
+                      "CCITT:       0x%04X\r\n\r\n",
                       ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
         hw_32 = sw_32 = lfscrc = 0xFFFFFFFFU;
         hw_16 = sw_16 = ccitt = 0xFFFFU;
@@ -101,12 +101,12 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
             ccitt = crc16_ccitt(&test[i], 1, ccitt);
         }
         chprintf(chp, "=== Byte At A Time ===\r\n");
-        chprintf(chp, "CRC32_HW:    %08X\r\n"
-                      "CRC32_SW:    %08X\r\n"
-                      "LFS_CRC:     %08X\r\n"
-                      "CRC16_HW:    %04X\r\n"
-                      "CRC16_SW:    %04X\r\n"
-                      "CCITT:       %04X\r\n\r\n",
+        chprintf(chp, "CRC32_HW:    0x%08X\r\n"
+                      "CRC32_SW:    0x%08X\r\n"
+                      "LFS_CRC:     0x%08X\r\n"
+                      "CRC16_HW:    0x%04X\r\n"
+                      "CRC16_SW:    0x%04X\r\n"
+                      "CCITT:       0x%04X\r\n\r\n",
                       ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
     } else {
         goto crc_usage;

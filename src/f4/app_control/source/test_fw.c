@@ -104,8 +104,21 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "Done!\r\n");
+    } else if (!strcmp(argv[0], "crc") && argc > 2) {
+        fw_bank_t bank;
+        size_t len = strtoul(argv[2], NULL, 0);
+        if (argv[1][0] == '0') {
+            bank = BANK_0;
+        } else if (argv[1][0] == '1') {
+            bank = BANK_1;
+        } else {
+            goto fw_usage;
+        }
+
+        chprintf(chp, "Bank %d CRC: 0x%08X\r\n\r\n", bank, fw_crc(&EFLD1, bank, len));
     } else if (!strcmp(argv[0], "verify") && argc > 1) {
         fw_bank_t bank;
+        uint32_t crc;
         if (argv[1][0] == '0') {
             bank = BANK_0;
         } else if (argv[1][0] == '1') {
@@ -115,7 +128,24 @@ void cmd_fw(BaseSequentialStream *chp, int argc, char *argv[])
         }
 
         chprintf(chp, "Verifying FW in bank %d... ", bank);
-        chprintf(chp, "%s!\r\n\r\n", (fw_verify(&EFLD1, bank) ? "VALID" : "INVALID"));
+        crc = fw_verify(&EFLD1, bank);
+        chprintf(chp, "%s! CRC: 0x%08X\r\n\r\n", (crc ? "VALID" : "INVALID"), crc);
+    } else if (!strcmp(argv[0], "setinfo") && argc > 3) {
+        fw_bank_t bank;
+        fw_info_t fw_info;
+        fw_info.crc  = strtoul(argv[2], NULL, 0);
+        fw_info.len  = strtoul(argv[3], NULL, 0);
+        if (argv[1][0] == '0') {
+            bank = BANK_0;
+        } else if (argv[1][0] == '1') {
+            bank = BANK_1;
+        } else {
+            goto fw_usage;
+        }
+
+        chprintf(chp, "Setting FW info for bank %d... ", bank);
+        fw_set_info(fw_info, bank);
+        chprintf(chp, "Done\r\n");
     } else if (!strcmp(argv[0], "bank") && argc > 1) {
         uint32_t bank;
         if (argv[1][0] == '0') {
@@ -151,8 +181,12 @@ fw_usage:
                    "        Write <file> to flash starting at <offset>\r\n"
                    "    flash <file> <expected_crc>:\r\n"
                    "        Write <file> to offline bank\r\n"
+                   "    crc <bank> <len>:\r\n"
+                   "        Print CRC for <bank> assuming length <len>\r\n"
                    "    verify <bank>:\r\n"
                    "        Verify firmware in <bank> against CRC\r\n"
+                   "    setinfo <bank> <crc> <length>:\r\n"
+                   "        Set <bank> health info to <crc> and <length>\r\n"
                    "    bank <num>:\r\n"
                    "        Set flash bank to <num> for next boot\r\n"
                    "\r\n");

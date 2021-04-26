@@ -64,7 +64,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
 
-        chprintf(chp, "CRC32: %08X\r\n", file_crc(&FSD1, file));
+        chprintf(chp, "CRC32: 0x%08X\r\n", file_crc(&FSD1, file));
 
         ret = file_close(&FSD1, file);
         if (ret < 0) {

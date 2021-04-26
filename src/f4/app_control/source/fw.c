@@ -74,20 +74,12 @@ int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset)
     return ret;
 }
 
-bool fw_verify(EFlashDriver *eflp, fw_bank_t bank)
+uint32_t fw_crc(EFlashDriver *eflp, fw_bank_t bank, size_t len)
 {
-    fw_info_t fw_info[2] = {0};
     uint32_t crc = 0;
     flash_offset_t offset;
-    size_t len;
-
     offset = (((SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE) >> SYSCFG_MEMRMP_UFB_MODE_Pos) ^ bank ? FLASH_BANK_OFFSET : 0);
-    framRead(&FRAMD1, FRAM_FWINFO_ADDR, &fw_info, sizeof(fw_info));
-    len = fw_info[bank].len;
-    if (len == 0)
-        return false;
-
-    eflStart(&EFLD1, NULL);
+    eflStart(eflp, NULL);
     while (len) {
         ssize_t n = len;
         if (n > BUF_SIZE) {
@@ -101,9 +93,30 @@ bool fw_verify(EFlashDriver *eflp, fw_bank_t bank)
         offset += n;
         len -= n;
     };
-    eflStop(&EFLD1);
+    eflStop(eflp);
+    return crc;
+}
 
-    return (crc == fw_info[bank].crc);
+uint32_t fw_verify(EFlashDriver *eflp, fw_bank_t bank)
+{
+    fw_info_t fw_info[2] = {0};
+    uint32_t crc = 0;
+    size_t len;
+
+    framRead(&FRAMD1, FRAM_FWINFO_ADDR, &fw_info, sizeof(fw_info));
+    len = fw_info[bank].len;
+    if (len == 0)
+        return 0;
+
+    crc = fw_crc(eflp, bank, len);
+
+    return (crc == fw_info[bank].crc ? crc : 0);
+}
+
+void fw_set_info(fw_info_t fw_info, fw_bank_t bank)
+{
+    uint16_t addr = (bank ? FRAM_FWINFO_ADDR + sizeof(fw_info_t) : FRAM_FWINFO_ADDR);
+    framWrite(&FRAMD1, addr, &fw_info, sizeof(fw_info_t));
 }
 
 int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
@@ -144,8 +157,7 @@ int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc)
         return ret;
 
     /* Commit new FW info to FRAM */
-    uint16_t addr = (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? FRAM_FWINFO_ADDR : FRAM_FWINFO_ADDR + sizeof(fw_info_t));
-    framWrite(&FRAMD1, addr, &fw_info, sizeof(fw_info_t));
+    fw_set_info(fw_info, !(SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE));
 
     return !fw_verify(eflp, !(SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE));
 }

@@ -20,7 +20,9 @@ typedef struct {
 
 int fw_read(EFlashDriver *eflp, char *filename, flash_offset_t offset, size_t len);
 int fw_write(EFlashDriver *eflp, char *filename, flash_offset_t offset);
-bool fw_verify(EFlashDriver *eflp, fw_bank_t bank);
+uint32_t fw_crc(EFlashDriver *eflp, fw_bank_t bank, size_t len);
+uint32_t fw_verify(EFlashDriver *eflp, fw_bank_t bank);
+void fw_set_info(fw_info_t fw_info, fw_bank_t bank);
 int fw_flash(EFlashDriver *eflp, char *filename, uint32_t expected_crc);
 int fw_set_bank(EFlashDriver *eflp, fw_bank_t bank);
 
