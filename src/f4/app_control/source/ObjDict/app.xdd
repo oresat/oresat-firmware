@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="16:02:23.1333830-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2021-04-25" fileModificationTime="22:57:58.3428280-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -3200,15 +3200,18 @@
             <q1:varDeclaration name="UHF REV Pwr" uniqueID="UID_RECSUB_700005">
               <UINT />
             </q1:varDeclaration>
+            <q1:varDeclaration name="OPD Current" uniqueID="UID_RECSUB_700006">
+              <USINT />
+            </q1:varDeclaration>
           </q1:struct>
           <q1:struct name="Battery" uniqueID="UID_REC_7001">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700100">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Vbatt BP1" uniqueID="UID_RECSUB_700101">
+            <q1:varDeclaration name="VBatt BP1" uniqueID="UID_RECSUB_700101">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Vbatt BP2" uniqueID="UID_RECSUB_700102">
+            <q1:varDeclaration name="VBatt BP2" uniqueID="UID_RECSUB_700102">
               <UINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="VCell max BP1" uniqueID="UID_RECSUB_700103">
@@ -3342,10 +3345,10 @@
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_700200">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Vbatt BP1" uniqueID="UID_RECSUB_700201">
+            <q1:varDeclaration name="VBatt BP1" uniqueID="UID_RECSUB_700201">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Vbatt BP2" uniqueID="UID_RECSUB_700202">
+            <q1:varDeclaration name="VBatt BP2" uniqueID="UID_RECSUB_700202">
               <UINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="VCell max BP1" uniqueID="UID_RECSUB_700203">
@@ -11739,7 +11742,7 @@ If true, skips antenna deployment attempt</description>
           <q1:parameter uniqueID="UID_SUB_700000">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x05" />
+            <q1:defaultValue value="0x06" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700001">
             <description lang="en">Uptime of C3 in seconds</description>
@@ -11766,6 +11769,11 @@ If true, skips antenna deployment attempt</description>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_700006">
+            <description lang="en">OPD current draw in 0.02mA</description>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_7001">
             <label lang="en">Battery</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_7001" />
@@ -11776,12 +11784,12 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x2C" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700101" access="readWriteInput">
-            <label lang="en">Vbatt BP1</label>
+            <label lang="en">VBatt BP1</label>
             <UINT />
             <q1:defaultValue value="7200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700102" access="readWriteInput">
-            <label lang="en">Vbatt BP2</label>
+            <label lang="en">VBatt BP2</label>
             <UINT />
             <q1:defaultValue value="7200" />
           </q1:parameter>
@@ -12005,12 +12013,12 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0x2C" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700201" access="readWriteInput">
-            <label lang="en">Vbatt BP1</label>
+            <label lang="en">VBatt BP1</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_700202" access="readWriteInput">
-            <label lang="en">Vbatt BP2</label>
+            <label lang="en">VBatt BP2</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -13406,7 +13414,7 @@ If true, skips antenna deployment attempt</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="16:02:23.1333830-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2021-04-25" fileModificationTime="22:57:58.3428280-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -15006,18 +15014,19 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="0D" name="VC1 Sequence Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040D" />
             <CANopenSubObject subIndex="0E" name="VC1 Expedite Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040E" />
           </CANopenObject>
-          <CANopenObject index="7000" name="C3 Telemetry" objectType="9" uniqueIDRef="UID_OBJ_7000" subNumber="6">
+          <CANopenObject index="7000" name="C3 Telemetry" objectType="9" uniqueIDRef="UID_OBJ_7000" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700000" />
             <CANopenSubObject subIndex="01" name="Uptime" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700001" />
             <CANopenSubObject subIndex="02" name="eMMC Usage" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700002" />
             <CANopenSubObject subIndex="03" name="UHF Temperature" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700003" />
             <CANopenSubObject subIndex="04" name="UHF FWD Pwr" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700004" />
             <CANopenSubObject subIndex="05" name="UHF REV Pwr" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700005" />
+            <CANopenSubObject subIndex="06" name="OPD Current" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700006" />
           </CANopenObject>
           <CANopenObject index="7001" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_7001" subNumber="45">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700100" />
-            <CANopenSubObject subIndex="01" name="Vbatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700101" />
-            <CANopenSubObject subIndex="02" name="Vbatt BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700102" />
+            <CANopenSubObject subIndex="01" name="VBatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700101" />
+            <CANopenSubObject subIndex="02" name="VBatt BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700102" />
             <CANopenSubObject subIndex="03" name="VCell max BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700103" />
             <CANopenSubObject subIndex="04" name="VCell max BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700104" />
             <CANopenSubObject subIndex="05" name="VCell min BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700105" />
@@ -15063,8 +15072,8 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="7002" name="Battery" objectType="9" uniqueIDRef="UID_OBJ_7002" subNumber="45">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700200" />
-            <CANopenSubObject subIndex="01" name="Vbatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700201" />
-            <CANopenSubObject subIndex="02" name="Vbatt BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700202" />
+            <CANopenSubObject subIndex="01" name="VBatt BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700201" />
+            <CANopenSubObject subIndex="02" name="VBatt BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700202" />
             <CANopenSubObject subIndex="03" name="VCell max BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700203" />
             <CANopenSubObject subIndex="04" name="VCell max BP2" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700204" />
             <CANopenSubObject subIndex="05" name="VCell min BP1" objectType="7" PDOmapping="RPDO" uniqueIDRef="UID_SUB_700205" />

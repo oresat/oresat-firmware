@@ -216,11 +216,12 @@
                INTEGER8       UHF_Temperature;
                UNSIGNED16     UHF_FWD_Pwr;
                UNSIGNED16     UHF_REV_Pwr;
+               UNSIGNED8      OPD_Current;
                }              OD_C3Telemetry_t;
 /*7001      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
-               UNSIGNED16     vbattBP1;
-               UNSIGNED16     vbattBP2;
+               UNSIGNED16     VBattBP1;
+               UNSIGNED16     VBattBP2;
                UNSIGNED16     VCellMaxBP1;
                UNSIGNED16     VCellMaxBP2;
                UNSIGNED16     VCellMinBP1;
@@ -2272,13 +2273,14 @@
         #define OD_7000_3_C3Telemetry_UHF_Temperature               3
         #define OD_7000_4_C3Telemetry_UHF_FWD_Pwr                   4
         #define OD_7000_5_C3Telemetry_UHF_REV_Pwr                   5
+        #define OD_7000_6_C3Telemetry_OPD_Current                   6
 
 /*7001 */
         #define OD_7001_battery                                     0x7001
 
         #define OD_7001_0_battery_maxSubIndex                       0
-        #define OD_7001_1_battery_vbattBP1                          1
-        #define OD_7001_2_battery_vbattBP2                          2
+        #define OD_7001_1_battery_VBattBP1                          1
+        #define OD_7001_2_battery_VBattBP2                          2
         #define OD_7001_3_battery_VCellMaxBP1                       3
         #define OD_7001_4_battery_VCellMaxBP2                       4
         #define OD_7001_5_battery_VCellMinBP1                       5
@@ -2326,8 +2328,8 @@
         #define OD_7002_battery                                     0x7002
 
         #define OD_7002_0_battery_maxSubIndex                       0
-        #define OD_7002_1_battery_vbattBP1                          1
-        #define OD_7002_2_battery_vbattBP2                          2
+        #define OD_7002_1_battery_VBattBP1                          1
+        #define OD_7002_2_battery_VBattBP2                          2
         #define OD_7002_3_battery_VCellMaxBP1                       3
         #define OD_7002_4_battery_VCellMaxBP2                       4
         #define OD_7002_5_battery_VCellMinBP1                       5

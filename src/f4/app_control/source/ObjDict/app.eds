@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=4:01PM
+ModificationTime=10:46PM
 ModificationDate=04-25-2021
 ModifiedBy=
 
@@ -12295,7 +12295,7 @@ PDOMapping=0
 ParameterName=C3 Telemetry
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x6
+SubNumber=0x7
 
 [7000sub0]
 ParameterName=Highest sub-index supported
@@ -12303,7 +12303,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x05
+DefaultValue=0x06
 PDOMapping=0
 
 [7000sub1]
@@ -12344,6 +12344,15 @@ PDOMapping=0
 
 [7000sub5]
 ParameterName=UHF REV Pwr
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=0
+
+[7000sub6]
+ParameterName=OPD Current
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
