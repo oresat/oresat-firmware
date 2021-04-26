@@ -124,7 +124,7 @@ static void print_response(BaseSequentialStream *chp)
     }
 }
 
-static void send_cmd(cmd_code_t cmd_code, uint8_t arg[], size_t arg_len)
+static void send_cmd(cmd_code_t cmd_code, void *arg, size_t arg_len)
 {
     cmd_t *cmd;
     tx_fb = fb_alloc(CMD_RESP_ALLOC);
@@ -226,12 +226,21 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         } arg;
         arg.crc = strtoul(argv[2], NULL, 0);
         memcpy(arg.filename, argv[1], strlen(argv[1]) + 1);
-        send_cmd(CMD_C3_FLASH, (uint8_t*)&arg, sizeof(arg));
+        send_cmd(CMD_C3_FLASH, &arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "c3_bank") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_C3_BANK, &arg, sizeof(arg));
         print_response(chp);
+    } else if (!strcmp(argv[0], "c3_softreset")) {
+        uint32_t arg[] = {0x01234567U, 0x89ABCDEFU};
+        send_cmd(CMD_C3_SOFTRESET, arg, sizeof(arg));
+    } else if (!strcmp(argv[0], "c3_hardreset")) {
+        uint32_t arg[] = {0x01234567U, 0x89ABCDEFU};
+        send_cmd(CMD_C3_HARDRESET, arg, sizeof(arg));
+    } else if (!strcmp(argv[0], "c3_factoryreset")) {
+        uint32_t arg[] = {0x01234567U, 0x89ABCDEFU};
+        send_cmd(CMD_C3_FACTORYRESET, arg, sizeof(arg));
     } else if (!strcmp(argv[0], "fs_upload") && argc > 2) {
         chprintf(chp, "File send result: %d\r\n", send_file(chp, argv[1], argv[2]));
     } else if (!strcmp(argv[0], "fs_upload_seg") && argc > 4) {
@@ -245,10 +254,10 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         send_cmd(CMD_FS_UNMOUNT, NULL, 0);
         print_response(chp);
     } else if (!strcmp(argv[0], "fs_remove") && argc > 1) {
-        send_cmd(CMD_FS_REMOVE, (uint8_t*)argv[1], strlen(argv[1]) + 1);
+        send_cmd(CMD_FS_REMOVE, argv[1], strlen(argv[1]) + 1);
         print_response(chp);
     } else if (!strcmp(argv[0], "fs_crc") && argc > 1) {
-        send_cmd(CMD_FS_CRC, (uint8_t*)argv[1], strlen(argv[1]) + 1);
+        send_cmd(CMD_FS_CRC, argv[1], strlen(argv[1]) + 1);
         print_response(chp);
     } else if (!strcmp(argv[0], "node_enable") && argc > 2) {
         uint8_t arg[2];

@@ -8,6 +8,7 @@
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
     lfs_file_t *file;
+    uint32_t *key;
     void *ret;
 
     switch (cmd->cmd) {
@@ -23,6 +24,28 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     case CMD_C3_BANK:
         ret = fb_put(resp_fb, sizeof(int));
         *((int*)ret) = fw_set_bank(&EFLD1, cmd->arg[0]);
+        break;
+    case CMD_C3_SOFTRESET:
+        key = (uint32_t*)cmd->arg;
+        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+            NVIC_SystemReset();
+        break;
+    case CMD_C3_HARDRESET:
+        key = (uint32_t*)cmd->arg;
+        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+            chSysHalt("HARD RESET");
+        break;
+    case CMD_C3_FACTORYRESET:
+        key = (uint32_t*)cmd->arg;
+        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+            factory_reset();
+        break;
+    case CMD_I2C_RESET:
+        ret = fb_put(resp_fb, 1);
+        palSetLine(LINE_I2C_PWROFF);
+        chThdSleepMilliseconds(10);
+        palClearLine(LINE_I2C_PWROFF);
+        *((uint8_t*)ret) = 0;
         break;
     case CMD_FS_FORMAT:
         ret = fb_put(resp_fb, sizeof(int));
