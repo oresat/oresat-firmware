@@ -17,13 +17,17 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         tx_enable(cmd->arg[0]);
         *((uint8_t*)ret) = tx_enabled();
         break;
-    case CMD_C3_FLASH:
+    case CMD_FW_FLASH:
         ret = fb_put(resp_fb, sizeof(int));
         *((int*)ret) = fw_flash(&EFLD1, (char*)&cmd->arg[4], *((uint32_t*)cmd->arg));
         break;
-    case CMD_C3_BANK:
+    case CMD_FW_BANK:
         ret = fb_put(resp_fb, sizeof(int));
         *((int*)ret) = fw_set_bank(&EFLD1, cmd->arg[0]);
+        break;
+    case CMD_FW_VERIFY:
+        ret = fb_put(resp_fb, sizeof(uint8_t));
+        *((uint8_t*)ret) = fw_verify(&EFLD1, cmd->arg[0]);
         break;
     case CMD_C3_SOFTRESET:
         key = (uint32_t*)cmd->arg;

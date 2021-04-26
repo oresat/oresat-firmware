@@ -219,18 +219,22 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_TX_CTRL, &arg, sizeof(arg));
         print_response(chp);
-    } else if (!strcmp(argv[0], "c3_flash") && argc > 2) {
+    } else if (!strcmp(argv[0], "fw_flash") && argc > 2) {
         struct {
             uint32_t crc;
             char filename[strlen(argv[1]) + 1];
         } arg;
         arg.crc = strtoul(argv[2], NULL, 0);
         memcpy(arg.filename, argv[1], strlen(argv[1]) + 1);
-        send_cmd(CMD_C3_FLASH, &arg, sizeof(arg));
+        send_cmd(CMD_FW_FLASH, &arg, sizeof(arg));
         print_response(chp);
-    } else if (!strcmp(argv[0], "c3_bank") && argc > 1) {
+    } else if (!strcmp(argv[0], "fw_bank") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);
-        send_cmd(CMD_C3_BANK, &arg, sizeof(arg));
+        send_cmd(CMD_FW_BANK, &arg, sizeof(arg));
+        print_response(chp);
+    } else if (!strcmp(argv[0], "fw_verify") && argc > 1) {
+        uint8_t arg = strtoul(argv[1], NULL, 0);
+        send_cmd(CMD_FW_VERIFY, &arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "c3_softreset")) {
         uint32_t arg[] = {0x01234567U, 0x89ABCDEFU};
@@ -319,10 +323,18 @@ edl_usage:
     chprintf(chp,  "Usage: edl <command>\r\n"
                    "    tx_enable <value>:\r\n"
                    "        Post a TX Enable command to EDL RX queue with <value>\r\n"
-                   "    c3_flash <filename> <crc32>:\r\n"
-                   "        Post a C3 Flash command to EDL RX queue\r\n"
-                   "    c3_bank <bank>:\r\n"
-                   "        Post a C3 Bank command to EDL RX queue\r\n"
+                   "    fw_flash <filename> <crc32>:\r\n"
+                   "        Post a FW Flash command to EDL RX queue\r\n"
+                   "    fw_bank <bank>:\r\n"
+                   "        Post a FW Bank command to EDL RX queue\r\n"
+                   "    fw_verify <bank>:\r\n"
+                   "        Post a FW Verify command to EDL RX queue\r\n"
+                   "    c3_softreset:\r\n"
+                   "        Post a C3 Soft Reset command to EDL RX queue\r\n"
+                   "    c3_hardreset:\r\n"
+                   "        Post a C3 Hard Reset command to EDL RX queue\r\n"
+                   "    c3_factoryreset:\r\n"
+                   "        Post a C3 Factory Reset command to EDL RX queue\r\n"
                    "    fs_upload <src> <dest>:\r\n"
                    "        Upload <src> to <dest> via EDL\r\n"
                    "    fs_upload_seg <src> <dest> <offset> <len>:\r\n"
@@ -335,16 +347,18 @@ edl_usage:
                    "        Post FS Remove command to EDL RX queue\r\n"
                    "    fs_crc <filename>:\r\n"
                    "        Post FS CRC command to EDL RX queue\r\n"
+                   "    node_enable <nodeid> <enable>:\r\n"
+                   "        Post a Node Enable command for <nodeid> to EDL RX queue\r\n"
+                   "    node_status <nodeid>:\r\n"
+                   "        Post a Node Status command for <nodeid> to EDL RX queue\r\n"
                    "    opd_sysenable:\r\n"
                    "        Post a OPD SysEnable command to EDL RX queue\r\n"
                    "    opd_sysdisable:\r\n"
                    "        Post a OPD SysDisable command to EDL RX queue\r\n"
                    "    opd_scan <restart>:\r\n"
                    "        Post a OPD Scan command for <addr> to EDL RX queue\r\n"
-                   "    opd_enable <addr>:\r\n"
+                   "    opd_enable <addr> <enable>:\r\n"
                    "        Post a OPD Enable command for <addr> to EDL RX queue\r\n"
-                   "    opd_disable <addr>:\r\n"
-                   "        Post a OPD Disable command for <addr> to EDL RX queue\r\n"
                    "    opd_reset <addr>:\r\n"
                    "        Post a OPD Reset command for <addr> to EDL RX queue\r\n"
                    "    opd_status <addr>:\r\n"

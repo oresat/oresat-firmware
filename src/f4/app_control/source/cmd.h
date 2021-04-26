@@ -5,8 +5,9 @@
 
 typedef enum {
     CMD_TX_CTRL,
-    CMD_C3_FLASH,
-    CMD_C3_BANK,
+    CMD_FW_FLASH,
+    CMD_FW_BANK,
+    CMD_FW_VERIFY,
     CMD_C3_SOFTRESET,
     CMD_C3_HARDRESET,
     CMD_C3_FACTORYRESET,
