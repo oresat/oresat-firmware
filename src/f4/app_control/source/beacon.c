@@ -204,6 +204,66 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].powerMax },
     /* Solar 3 Energy */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].energy },
+    /* Star Tracker FS Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_starTracker[0].rootPartitionPercent },
+    /* Star Tracker Readable Files TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* Star Tracker Updater Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_starTracker[0].updaterStatus },
+    /* Star Tracker Updates Cached TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* Star Tracker Right Ascension */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].rightAscension },
+    /* Star Tracker Declination */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].declination },
+    /* Star Tracker Roll */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].roll },
+    /* Star Tracker Timestamp TODO */
+    { .type = TLM_VAL, .len = 4, .val = 0 },
+    /* GPS FS Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.rootPartitionPercent },
+    /* GPS Readable Files TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* GPS Updater Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.updaterStatus },
+    /* GPS Updates Cached TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* GPS Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.GPS_Status },
+    /* GPS Number of Satellites Locked */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.satellitesLocked },
+    /* GPS X Pos */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionX },
+    /* GPS Y Pos */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionY },
+    /* GPS Z Pos */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionZ },
+    /* GPS X Velocity */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityX },
+    /* GPS Y Velocity */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityY },
+    /* GPS Z Velocity */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityZ },
+    /* GPS Timestamp TODO */
+    { .type = TLM_VAL, .len = 4, .val = 0 },
+    /* ACS Roll */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroRoll },
+    /* ACS Pitch */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroPitch },
+    /* ACS Yaw */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroYaw },
+    /* ACS IMU Temperature */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_ACS.IMUTemp },
+    /* DxWiFi FS Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.rootPartitionPercent },
+    /* DxWiFi Readable Files TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* DxWiFi Updater Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.updaterStatus },
+    /* DxWiFi Updates Cached TODO */
+    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* DxWiFi Transmitting */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.transmitting },
     /* User-Defined APRS End */
     { .type = TLM_MSG, .msg = "}" }
 };
