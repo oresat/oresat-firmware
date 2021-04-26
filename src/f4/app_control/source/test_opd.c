@@ -37,6 +37,24 @@ void cmd_node(BaseSequentialStream *chp, int argc, char *argv[])
         } else {
             chprintf(chp, "NOT CONNECTED\r\n");
         }
+    } else if (!strcmp(argv[0], "status")) {
+        CO_NMT_internalState_t state;
+        chprintf(chp, "Status of node 0x%02X: ", node_id);
+        switch (node_status(node_id, &state)) {
+        case -1:
+            chprintf(chp, "NOT CONNECTED\r\n");
+            break;
+        case 0:
+            chprintf(chp, "DISABLED\r\n");
+            break;
+        case 1:
+            chprintf(chp, "ENABLED\r\n");
+            chprintf(chp, "State: %d\r\n", state);
+            break;
+        default:
+            chprintf(chp, "Invalid return code!\r\n");
+            break;
+        }
     } else {
         goto node_usage;
     }
@@ -45,8 +63,9 @@ void cmd_node(BaseSequentialStream *chp, int argc, char *argv[])
 
 node_usage:
     chprintf(chp, "Usage: node <cmd> <node_id>\r\n"
-                  "    enable:          Enable an node attached card\r\n"
-                  "    disable:         Disable an node attached card\r\n"
+                  "    enable:          Enable managing a node\r\n"
+                  "    disable:         Disable managing a node\r\n"
+                  "    status:          Get Node Status\r\n"
                   "\r\n");
     return;
 }
@@ -97,14 +116,14 @@ void cmd_opd(BaseSequentialStream *chp, int argc, char *argv[])
         }
         if (!strcmp(argv[0], "enable")) {
             chprintf(chp, "Enabling board 0x%02X: ", opd_addr);
-            if (!opd_state(opd_addr, true)) {
+            if (!opd_enable(opd_addr, true)) {
                 chprintf(chp, "ENABLED\r\n");
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");
             }
         } else if (!strcmp(argv[0], "disable")) {
             chprintf(chp, "Disabling board 0x%02X: ", opd_addr);
-            if (!opd_state(opd_addr, false)) {
+            if (!opd_enable(opd_addr, false)) {
                 chprintf(chp, "DISABLED\r\n");
             } else {
                 chprintf(chp, "NOT CONNECTED\r\n");

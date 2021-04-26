@@ -62,7 +62,7 @@ void opd_start(void);
 void opd_stop(void);
 void opd_scan(bool restart);
 bool opd_probe(i2caddr_t addr, bool restart);
-int opd_state(i2caddr_t addr, bool enable);
+int opd_enable(i2caddr_t addr, bool enable);
 int opd_disable(i2caddr_t addr);
 int opd_reset(i2caddr_t addr);
 int opd_status(i2caddr_t addr, opd_status_t *status);

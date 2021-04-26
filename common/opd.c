@@ -104,7 +104,7 @@ bool opd_probe(i2caddr_t addr, bool restart)
     return opd_dev[addr].valid;
 }
 
-int opd_state(i2caddr_t addr, bool enable)
+int opd_enable(i2caddr_t addr, bool enable)
 {
     /* Ensure device is valid */
     if (opd_dev[addr].valid != true) {

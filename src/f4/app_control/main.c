@@ -34,27 +34,27 @@
 #endif
 
 static const oresat_node_t nodes[] = {
-    {0x04, 0x18, 2000, "Battery 0"},
-    {0x08, 0x1D, 2000, "Battery 1"},
-    {0x0C, 0x00, 2000, "Solar Panel 0"},
-    {0x10, 0x00, 2000, "Solar Panel 1"},
-    {0x14, 0x00, 2000, "Solar Panel 2"},
-    {0x18, 0x00, 2000, "Solar Panel 3"},
-    {0x1C, 0x00, 2000, "Solar Panel 4"},
-    {0x20, 0x00, 2000, "Solar Panel 5"},
-    {0x24, 0x00, 2000, "Solar Panel 6"},
-    {0x28, 0x00, 2000, "Solar Panel 7"},
-    {0x2C, 0x1C, 2000, "Star Tracker 0"},
-    {0x30, 0x00, 2000, "Star Tracker 1"},
-    {0x34, 0x19, 2000, "GPS"},
-    {0x38, 0x1A, 2000, "ACS"},
-    {0x3C, 0x20, 2000, "RWB 0"},
-    {0x40, 0x21, 2000, "RWB 1"},
-    {0x44, 0x22, 2000, "RWB 2"},
-    {0x48, 0x23, 2000, "RWB 3"},
-    {0x4C, 0x1B, 2000, "DxWiFi"},
-    {0x50, 0x1E, 2000, "CRC"},
-    {0, 0, 0, NULL}
+    {0x04, 0x18, 10000, true, "Battery 0"},
+    /*{0x08, 0x1D, 10000, true, "Battery 1"},*/
+    {0x0C, 0x00, 10000, false, "Solar Panel 0"},
+    {0x10, 0x00, 10000, false, "Solar Panel 1"},
+    {0x14, 0x00, 10000, false, "Solar Panel 2"},
+    {0x18, 0x00, 10000, false, "Solar Panel 3"},
+    /*{0x1C, 0x00, 10000, false, "Solar Panel 4"},*/
+    /*{0x20, 0x00, 10000, false, "Solar Panel 5"},*/
+    /*{0x24, 0x00, 10000, false, "Solar Panel 6"},*/
+    /*{0x28, 0x00, 10000, false, "Solar Panel 7"},*/
+    {0x2C, 0x1C, 10000, false, "Star Tracker 0"},
+    /*{0x30, 0x00, 10000, false, "Star Tracker 1"},*/
+    {0x34, 0x19, 10000, false, "GPS"},
+    {0x38, 0x1A, 10000, false, "ACS"},
+    /*{0x3C, 0x20, 10000, false, "RWB 0"},*/
+    /*{0x40, 0x21, 10000, false, "RWB 1"},*/
+    /*{0x44, 0x22, 10000, false, "RWB 2"},*/
+    /*{0x48, 0x23, 10000, false, "RWB 3"},*/
+    {0x4C, 0x1B, 10000, false, "DxWiFi"},
+    /*{0x50, 0x1E, 10000, false, "CFC"},*/
+    {0, 0, 0, 0, NULL}
 };
 
 #ifdef SHELL_ENABLE
@@ -139,8 +139,8 @@ static void app_init(void)
 
     /* Register WDT and C3 worker thread */
     reg_worker(&wdt_worker, &wdt_desc, true, true);
-    reg_worker(&c3_worker, &c3_desc, true, true);
     reg_worker(&node_mgr_worker, &node_mgr_desc, true, true);
+    reg_worker(&c3_worker, &c3_desc, true, true);
     start_worker(&wdt_worker);
 
     /* Initialize FRAM */

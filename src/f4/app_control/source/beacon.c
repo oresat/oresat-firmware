@@ -3,6 +3,7 @@
 #include "CANopen.h"
 #include "ax25.h"
 #include "rtc.h"
+#include "crc.h"
 #include "fs.h"
 
 static const ax25_link_t ax25 = {
@@ -215,9 +216,8 @@ static const tlm_pkt_t aprs0 = {
 void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
 {
     void *tlm_start = fb->tail;
-    uint16_t od_entry;
-    void *data;
-    size_t len;
+    size_t len, total = 0;;
+    uint32_t crc;
 
     for (unsigned int i = 0; i < pkt->item_cnt; i++) {
         const tlm_item_t *item = &pkt->item[i];
@@ -226,28 +226,21 @@ void *tlm_payload(fb_t *fb, const tlm_pkt_t *pkt)
             len = strlen(item->msg);
             memcpy(fb_put(fb, len), item->msg, len);
             break;
-        case TLM_VAL:
-            len = item->len;
-            memcpy(fb_put(fb, len), &item->val, len);
-            break;
         case TLM_PTR:
             len = item->len;
             memcpy(fb_put(fb, len), item->ptr, len);
             break;
-        case TLM_OD:
-            od_entry = CO_OD_find(CO->SDO[0], item->index);
-            if (od_entry != 0xFFFF) {
-                len = CO_OD_getLength(CO->SDO[0], od_entry, item->subindex);
-                data = CO_OD_getDataPointer(CO->SDO[0], od_entry, item->subindex);
-                if (len == item->len && data != NULL) {
-                    memcpy(fb_put(fb, len), data, len);
-                }
-            }
+        case TLM_VAL:
+            len = item->len;
+            memcpy(fb_put(fb, len), &item->val, len);
             break;
         default:
             return NULL;
         }
+        total += len;
     }
+    crc = crc32(tlm_start, total, 0);
+    memcpy(fb_put(fb, sizeof(crc)), &crc, sizeof(crc));
 
     return tlm_start;
 }

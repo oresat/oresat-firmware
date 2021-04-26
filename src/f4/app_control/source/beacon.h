@@ -7,9 +7,8 @@
 
 typedef enum {
     TLM_MSG,
-    TLM_VAL,
     TLM_PTR,
-    TLM_OD
+    TLM_VAL,
 } tlm_type_t;
 
 typedef struct tlm_item {
@@ -17,12 +16,8 @@ typedef struct tlm_item {
     size_t              len;
     union {
         char            *msg;
-        uint32_t        val;
         void            *ptr;
-        struct {
-            uint32_t    index   : 16;
-            uint32_t    subindex: 8;
-        };
+        uint32_t        val;
     };
 } tlm_item_t;
 

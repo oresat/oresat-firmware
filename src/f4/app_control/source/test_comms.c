@@ -250,6 +250,16 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "fs_crc") && argc > 1) {
         send_cmd(CMD_FS_CRC, (uint8_t*)argv[1], strlen(argv[1]) + 1);
         print_response(chp);
+    } else if (!strcmp(argv[0], "node_enable") && argc > 2) {
+        uint8_t arg[2];
+        arg[0] = strtoul(argv[1], NULL, 0);
+        arg[1] = strtoul(argv[2], NULL, 0);
+        send_cmd(CMD_NODE_ENABLE, arg, sizeof(arg));
+        print_response(chp);
+    } else if (!strcmp(argv[0], "node_status") && argc > 1) {
+        uint8_t arg = strtoul(argv[1], NULL, 0);
+        send_cmd(CMD_NODE_STATUS, &arg, sizeof(arg));
+        print_response(chp);
     } else if (!strcmp(argv[0], "opd_sysenable")) {
         send_cmd(CMD_OPD_SYSENABLE, NULL, 0);
         print_response(chp);
@@ -260,13 +270,11 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_OPD_SCAN, &arg, sizeof(arg));
         print_response(chp);
-    } else if (!strcmp(argv[0], "opd_enable") && argc > 1) {
-        uint8_t arg = strtoul(argv[1], NULL, 0);
-        send_cmd(CMD_OPD_ENABLE, &arg, sizeof(arg));
-        print_response(chp);
-    } else if (!strcmp(argv[0], "opd_disable") && argc > 1) {
-        uint8_t arg = strtoul(argv[1], NULL, 0);
-        send_cmd(CMD_OPD_DISABLE, &arg, sizeof(arg));
+    } else if (!strcmp(argv[0], "opd_enable") && argc > 2) {
+        uint8_t arg[2];
+        arg[0] = strtoul(argv[1], NULL, 0);
+        arg[1] = strtoul(argv[2], NULL, 0);
+        send_cmd(CMD_OPD_ENABLE, arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "opd_reset") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);

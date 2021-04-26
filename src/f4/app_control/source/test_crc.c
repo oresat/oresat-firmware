@@ -28,10 +28,10 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
         uint16_t sw_16 = 0xFFFFU;
         uint16_t ccitt = 0xFFFFU;
 
-        hw_32 = crc32_hw((uint32_t*)test, sizeof(test)/sizeof(uint32_t), hw_32);
+        hw_32 = crc32_hw(test, sizeof(test), hw_32);
         sw_32 = crc32_sw(test, sizeof(test), sw_32);
 #if (STM32_CRC_PROGRAMMABLE == TRUE)
-        hw_16 = crc16_ccitt_hw((uint16_t*)test, sizeof(test)/sizeof(uint16_t), hw_16);
+        hw_16 = crc16_ccitt_hw(test, sizeof(test), hw_16);
 #endif
         sw_16 = crc16_ccitt_sw(test, sizeof(test), sw_16);
         ccitt = crc16_ccitt(test, sizeof(test), ccitt);
@@ -39,6 +39,7 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
 #if (STM32_CRC_PROGRAMMABLE == FALSE)
         chprintf(chp, "CRC16_HW NOT SUPPORTED\r\n");
 #endif
+        chprintf(chp, "=== All At Once ===\r\n");
         chprintf(chp, "CRC32_HW:    %08X\r\n"
                       "CRC32_SW:    %08X\r\n"
                       "LFS_CRC:     %08X\r\n"
@@ -50,7 +51,7 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
         hw_32 = sw_32 = lfscrc = 0xFFFFFFFFU;
         hw_16 = sw_16 = ccitt = 0xFFFFU;
         for (size_t i = 0; i < sizeof(test); i+=4) {
-            hw_32 = crc32_hw((uint32_t*)(&test[i]), 1, hw_32);
+            hw_32 = crc32_hw(&test[i], sizeof(uint32_t), hw_32);
         }
         for (size_t i = 0; i < sizeof(test); i+=4) {
             sw_32 = crc32_sw(&test[i], sizeof(uint32_t), sw_32);
@@ -60,7 +61,7 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
         }
 #if (STM32_CRC_PROGRAMMABLE == TRUE)
         for (size_t i = 0; i < sizeof(test); i+=4) {
-            hw_16 = crc16_ccitt_hw((uint16_t*)(&test[i]), sizeof(uint32_t)/sizeof(uint16_t), hw_16);
+            hw_16 = crc16_ccitt_hw(&test[i], sizeof(uint32_t), hw_16);
         }
 #endif
         for (size_t i = 0; i < sizeof(test); i+=4) {
@@ -69,6 +70,37 @@ void cmd_crc(BaseSequentialStream *chp, int argc, char *argv[])
         for (size_t i = 0; i < sizeof(test); i+=4) {
             ccitt = crc16_ccitt(&test[i], sizeof(uint32_t), ccitt);
         }
+        chprintf(chp, "=== Word At A Time ===\r\n");
+        chprintf(chp, "CRC32_HW:    %08X\r\n"
+                      "CRC32_SW:    %08X\r\n"
+                      "LFS_CRC:     %08X\r\n"
+                      "CRC16_HW:    %04X\r\n"
+                      "CRC16_SW:    %04X\r\n"
+                      "CCITT:       %04X\r\n\r\n",
+                      ~hw_32, ~sw_32, ~lfscrc, hw_16, sw_16, ccitt);
+        hw_32 = sw_32 = lfscrc = 0xFFFFFFFFU;
+        hw_16 = sw_16 = ccitt = 0xFFFFU;
+        for (size_t i = 0; i < sizeof(test); i++) {
+            hw_32 = crc32_hw(&test[i], 1, hw_32);
+        }
+        for (size_t i = 0; i < sizeof(test); i++) {
+            sw_32 = crc32_sw(&test[i], 1, sw_32);
+        }
+        for (size_t i = 0; i < sizeof(test); i++) {
+            lfscrc = lfs_crc(lfscrc, &test[i], 1);
+        }
+#if (STM32_CRC_PROGRAMMABLE == TRUE)
+        for (size_t i = 0; i < sizeof(test); i++) {
+            hw_16 = crc16_ccitt_hw(&test[i], 1, hw_16);
+        }
+#endif
+        for (size_t i = 0; i < sizeof(test); i++) {
+            sw_16 = crc16_ccitt_sw(&test[i], 1, sw_16);
+        }
+        for (size_t i = 0; i < sizeof(test); i++) {
+            ccitt = crc16_ccitt(&test[i], 1, ccitt);
+        }
+        chprintf(chp, "=== Byte At A Time ===\r\n");
         chprintf(chp, "CRC32_HW:    %08X\r\n"
                       "CRC32_SW:    %08X\r\n"
                       "LFS_CRC:     %08X\r\n"

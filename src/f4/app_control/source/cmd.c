@@ -3,6 +3,7 @@
 #include "fw.h"
 #include "fs.h"
 #include "opd.h"
+#include "node_mgr.h"
 
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
@@ -43,6 +44,14 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         *((uint32_t*)ret) = file_crc(&FSD1, file);
         file_close(&FSD1, file);
         break;
+    case CMD_NODE_ENABLE:
+        ret = fb_put(resp_fb, 1);
+        *((int8_t *)ret) = node_enable(cmd->arg[0], cmd->arg[1]);
+        break;
+    case CMD_NODE_STATUS:
+        ret = fb_put(resp_fb, sizeof(CO_NMT_internalState_t));
+        node_status(cmd->arg[0], ret);
+        break;
     case CMD_OPD_SYSENABLE:
         ret = fb_put(resp_fb, 1);
         opd_start();
@@ -60,11 +69,7 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         break;
     case CMD_OPD_ENABLE:
         ret = fb_put(resp_fb, 1);
-        *((int8_t *)ret) = opd_state(cmd->arg[0], true);
-        break;
-    case CMD_OPD_DISABLE:
-        ret = fb_put(resp_fb, 1);
-        *((int8_t *)ret) = opd_state(cmd->arg[0], false);
+        *((int8_t *)ret) = opd_enable(cmd->arg[0], cmd->arg[1]);
         break;
     case CMD_OPD_RESET:
         ret = fb_put(resp_fb, 1);

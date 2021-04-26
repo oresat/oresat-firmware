@@ -1,6 +1,5 @@
 #include "node_mgr.h"
 #include "opd.h"
-#include "CANopen.h"
 
 #define MGR_EVENT_WAKEUP            EVENT_MASK(0)
 #define MGR_EVENT_TERMINATE         EVENT_MASK(1)
@@ -45,8 +44,8 @@ THD_FUNCTION(node_mgr, arg)
         CO_HBconsumer_initEntry(CO->HBcons, i, node[i].id, node[i].timeout);
         node_state[i].desc = &node[i];
         node_state[i].attempts = 0;
-        if (node[i].opd_addr == 0x00)
-            node_enable(i, true);
+        if (node[i].opd_addr == 0x00 || node[i].autostart)
+            node_enable(node[i].id, true);
     }
 
     chEvtRegisterMaskWithFlags(&mgr_change_event, &mgr_change_el, MGR_EVENT_CHANGE, ALL_EVENTS);
@@ -62,12 +61,12 @@ THD_FUNCTION(node_mgr, arg)
             case CO_NMT_UNKNOWN:
                 if (node->desc->opd_addr && node->enable) {
                     if (node->attempts < 3) {
-                        node_enable(idx, false);
+                        node_enable(node->desc->id, false);
                         chThdSleepMilliseconds(500);
-                        node_enable(idx, true);
+                        node_enable(node->desc->id, true);
                         node->attempts++;
                     } else {
-                        node_enable(idx, false);
+                        node_enable(node->desc->id, false);
                     }
                 }
                 break;
@@ -87,15 +86,17 @@ THD_FUNCTION(node_mgr, arg)
 
     chEvtUnregister(&mgr_change_event, &mgr_change_el);
     for (int i = 0; node[i].id != 0; i++) {
-        node_enable(i, false);
+        node_enable(node[i].id, false);
         CO_HBconsumer_initEntry(CO->HBcons, i, 0, 0);
     }
     opd_stop();
 }
 
-bool node_enable(uint8_t id, bool enable)
+int node_enable(uint8_t id, bool enable)
 {
-    uint8_t idx = CO_HBconsumer_getIdxByNodeId(CO->HBcons, id);
+    int8_t idx = CO_HBconsumer_getIdxByNodeId(CO->HBcons, id);
+    if (idx < 0)
+        return -1;
     node_state_t *node = &node_state[idx];
     node->enable = enable;
     if (enable) {
@@ -104,7 +105,18 @@ bool node_enable(uint8_t id, bool enable)
         CO_HBconsumer_initCallbackNmtChanged(CO->HBcons, idx, NULL, NULL);
     }
     if (node->desc->opd_addr) {
-        return opd_state(node->desc->opd_addr, enable);
+        return opd_enable(node->desc->opd_addr, enable);
     }
-    return false;
+    return 0;
+}
+
+int node_status(uint8_t id, CO_NMT_internalState_t *state)
+{
+    int8_t idx = CO_HBconsumer_getIdxByNodeId(CO->HBcons, id);
+    if (idx < 0)
+        return -1;
+    node_state_t *node = &node_state[idx];
+    if (state)
+        *state = node->state;
+    return node->enable;
 }
