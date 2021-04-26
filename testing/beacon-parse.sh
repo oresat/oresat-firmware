@@ -4,6 +4,7 @@
 import sys
 import struct
 from serial import Serial, SerialException
+from tabulate import tabulate
 
 def _readline(ser):
     eol = b'\r\n'
@@ -21,7 +22,7 @@ def _readline(ser):
 
 def main():
     """loop and print data"""
-    tty = '/dev/ttyUSB0'
+    tty = '/dev/serial/by-id/usb-SCS_SCS_Tracker___DSP_TNC_PT2HJ743-if00-port0'
 
     # open serial
     ser = Serial(tty, 38400, timeout=15.0)
@@ -173,6 +174,8 @@ def main():
         #{'name': 'APRS Data Type', 't': uint8},
     ]
 
+    print(tabulate(parts))
+
     # build the struct unpack string
     unpack_str = '<'
     for p in parts:
@@ -205,15 +208,20 @@ def main():
             print('Parse error: {}\n'.format(exc))
             continue
 
-        #print(data)
-        #print(line.hex())
-
+        # generate the header
         header = "========= Beacon: " + str(len(line))  + " bytes ========="
         print(header)
+
         print("RAW: ", line.hex())
+
+
+        disp = []
+        # add the parsed values to the table
         for i in range(len(data)):
             p = parts[i]
-            print(p['name'] + ": " + str(data[i]))
+            disp[i] = [p['name'], data[i], p['t']]
+
+        print(tabulate(disp))
         footer = '='
         for i in range(len(header)):
             footer += '='
