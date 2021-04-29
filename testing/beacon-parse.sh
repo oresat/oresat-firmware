@@ -5,6 +5,7 @@ import sys
 import struct
 from serial import Serial, SerialException
 from tabulate import tabulate
+from datetime import datetime
 
 def _readline(ser):
     eol = b'\r\n'
@@ -44,7 +45,7 @@ def t_to_type(t):
     elif t == state:
         return 'state'
     else:
-        raise Exception("unknown type: " + str(t))
+        return 'other: ' + str(t)
 
 def main():
     # open serial
@@ -61,14 +62,15 @@ def main():
         # filter out too short lines
         if len(line) < 3:
             continue
-
+        print("LINE:", line)
         # filter out header
         if 'KJ7SAT' in str(line):
             continue
 
         # generate the header
         beacon_len = len(line)
-        print("========= Beacon: " + str(beacon_len) + " bytes =========")
+        ts = datetime.now().isoformat('T')
+        print("========= " + ts + " Beacon: " + str(beacon_len) + " bytes =========")
         print("RAW: ", line.hex())
 
         # initialize the print table
@@ -83,8 +85,6 @@ def main():
         b = 0
         next = 0
         for i in range(len(parts)):
-            if b >= beacon_len:
-                break
 
             # get the current data part to parse
             p = parts[i]
@@ -95,8 +95,12 @@ def main():
             # extract the raw bytes for the current part
             chunk = line[b:next]
 
-            # unpack the raw bytes into the expected type
-            d = struct.unpack(p['t'], chunk)
+            # unpack the raw bytes into the expected type. If there are not
+            # enough bytes for the field, just just break out of the loop
+            try:
+                d = struct.unpack(p['t'], chunk)
+            except struct.error:
+                break
 
             # increment the byte counter
             b += struct.calcsize(p['t'])
@@ -118,7 +122,7 @@ int32 = 'i'
 state = 'c' # state represented as char
 
 parts = [
-    {'name': 'APRS Data Type', 't': uint8}, 
+    {'name': 'APRS Data Type 1', 't': uint8 + uint8 + uint8}, 
     {'name': 'APRS Revision', 't': uint8}, 
     {'name': 'Oresat0 State', 't': state},
     {'name': 'Uptime', 't': uint32}, 
@@ -253,7 +257,6 @@ parts = [
     {'name': 'DxWifi Transmitting', 't': uint8}, # bool
 
     {'name': 'APRS CRC-32', 't': uint32},
-    {'name': 'APRS Data Type', 't': uint8},
 ]
 
 try:
