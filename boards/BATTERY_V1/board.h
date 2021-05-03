@@ -215,8 +215,6 @@
 #define LINE_CHG_STAT_PK2           PAL_LINE(GPIOB, 10U)
 #define LINE_DCHG_STAT_PK2          PAL_LINE(GPIOB, 11U)
 #define LINE_MOARPWR                PAL_LINE(GPIOB, 14U)
-#define LINE_HEATER_ON_1            PAL_LINE(GPIOC, 14U)
-#define LINE_HEATER_ON_2            PAL_LINE(GPIOC, 15U)
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */

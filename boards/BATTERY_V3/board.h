@@ -212,7 +212,7 @@
 #define LINE_ALERT_PK1              PAL_LINE(GPIOB, 5U)
 #define LINE_CHG_STAT_PK2           PAL_LINE(GPIOB, 10U)
 #define LINE_DCHG_STAT_PK2          PAL_LINE(GPIOB, 11U)
-#define LINE_MOARPWR                PAL_LINE(GPIOB, GPIOB_MOARPWR)
+#define LINE_MOARPWR                PAL_LINE(GPIOB, 15U)
 #define LINE_HEATER_ON_1            PAL_LINE(GPIOC, 14U)
 #define LINE_HEATER_ON_2            PAL_LINE(GPIOC, 15U)
 
@@ -404,8 +404,8 @@
                                      PIN_MODE_INPUT(GPIOB_CHG_STAT_PK2) |   \
                                      PIN_MODE_INPUT(GPIOB_DCHG_STAT_PK2) |  \
                                      PIN_MODE_ANALOG(GPIOB_PIN12) |         \
-                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SCL) |         \
-                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SDA) |       \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SCL) |   \
+                                     PIN_MODE_ALTERNATE(GPIOB_I2C2_SDA) |   \
                                      PIN_MODE_OUTPUT(GPIOB_MOARPWR))
 #define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_CHG_DIS_PK2) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_DCHG_DIS_PK2) |\
@@ -420,8 +420,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_CHG_STAT_PK2) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_DCHG_STAT_PK2) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_PIN12) |      \
-                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SCL) |      \
-                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SDA) |    \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SCL) |  \
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_I2C2_SDA) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MOARPWR))
 #define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_CHG_DIS_PK2) |   \
                                      PIN_OSPEED_HIGH(GPIOB_DCHG_DIS_PK2) |  \
@@ -436,8 +436,8 @@
                                      PIN_OSPEED_HIGH(GPIOB_CHG_STAT_PK2) |  \
                                      PIN_OSPEED_HIGH(GPIOB_DCHG_STAT_PK2) | \
                                      PIN_OSPEED_HIGH(GPIOB_PIN12) |         \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SCL) |         \
-                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SDA) |       \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SCL) |      \
+                                     PIN_OSPEED_HIGH(GPIOB_I2C2_SDA) |      \
                                      PIN_OSPEED_HIGH(GPIOB_MOARPWR))
 #define VAL_GPIOB_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOB_CHG_DIS_PK2) |\
                                      PIN_PUPDR_PULLDOWN(GPIOB_DCHG_DIS_PK2) |\
@@ -449,11 +449,11 @@
                                      PIN_PUPDR_PULLUP(GPIOB_I2C1_SDA) |     \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN8) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN9) |       \
-                                     PIN_PUPDR_PULLUP(GPIOB_CHG_STAT_PK2) |\
+                                     PIN_PUPDR_PULLUP(GPIOB_CHG_STAT_PK2) | \
                                      PIN_PUPDR_PULLUP(GPIOB_DCHG_STAT_PK2) |\
                                      PIN_PUPDR_FLOATING(GPIOB_PIN12) |      \
-                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SCL) |      \
-                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SDA) |    \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SCL) |     \
+                                     PIN_PUPDR_PULLUP(GPIOB_I2C2_SDA) |     \
                                      PIN_PUPDR_PULLDOWN(GPIOB_MOARPWR))
 #define VAL_GPIOB_ODR               (PIN_ODR_LOW(GPIOB_CHG_DIS_PK2) |       \
                                      PIN_ODR_LOW(GPIOB_DCHG_DIS_PK2) |      \
@@ -468,8 +468,8 @@
                                      PIN_ODR_HIGH(GPIOB_CHG_STAT_PK2) |     \
                                      PIN_ODR_HIGH(GPIOB_DCHG_STAT_PK2) |    \
                                      PIN_ODR_HIGH(GPIOB_PIN12) |            \
-                                     PIN_ODR_HIGH(GPIOB_I2C2_SCL) |            \
-                                     PIN_ODR_HIGH(GPIOB_I2C2_SDA) |          \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SCL) |         \
+                                     PIN_ODR_HIGH(GPIOB_I2C2_SDA) |         \
                                      PIN_ODR_HIGH(GPIOB_MOARPWR))
 #define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_CHG_DIS_PK2, 0U) |   \
                                      PIN_AFIO_AF(GPIOB_DCHG_DIS_PK2, 0U) |  \
@@ -484,8 +484,8 @@
                                      PIN_AFIO_AF(GPIOB_CHG_STAT_PK2, 0U) |  \
                                      PIN_AFIO_AF(GPIOB_DCHG_STAT_PK2, 0U) | \
                                      PIN_AFIO_AF(GPIOB_PIN12, 0U) |         \
-                                     PIN_AFIO_AF(GPIOB_I2C2_SCL, 5U) |         \
-                                     PIN_AFIO_AF(GPIOB_I2C2_SDA, 5U) |       \
+                                     PIN_AFIO_AF(GPIOB_I2C2_SCL, 5U) |      \
+                                     PIN_AFIO_AF(GPIOB_I2C2_SDA, 5U) |      \
                                      PIN_AFIO_AF(GPIOB_MOARPWR, 0U))
 
 /*
