@@ -12,10 +12,10 @@
 extern "C" {
 #endif
 
-uint32_t crc32_hw(const uint32_t block[], size_t len, uint32_t crc);
+uint32_t crc32_hw(const uint8_t block[], size_t len, uint32_t crc);
 uint32_t crc32_sw(const uint8_t block[], size_t len, uint32_t crc);
 uint32_t crc32(const uint8_t block[], size_t len, uint32_t crc);
-uint16_t crc16_ccitt_hw(const uint16_t block[], size_t len, uint16_t crc);
+uint16_t crc16_ccitt_hw(const uint8_t block[], size_t len, uint16_t crc);
 uint16_t crc16_ccitt_sw(const uint8_t block[], size_t len, uint16_t crc);
 uint16_t crc16_ccitt_new(const uint8_t block[], size_t len, uint16_t crc);
 

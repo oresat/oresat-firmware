@@ -82,7 +82,7 @@ static oresat_config_t oresat_conf = {
     .node_id = 0x01,
     .bitrate = ORESAT_DEFAULT_BITRATE,
     .fifo1_filters = fifo1_filters,
-    .filter_count = 2,
+    .filter_count = sizeof(fifo1_filters),
 };
 
 /**
