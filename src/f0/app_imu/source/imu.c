@@ -16,10 +16,10 @@
 
 
 typedef enum {
-	IMU_OD_ERROR_INFO_CODE_NONE = 0,
-	IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE,
-	IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH,
-	IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH,
+    IMU_OD_ERROR_INFO_CODE_NONE = 0,
+    IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE,
+    IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH,
+    IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH,
 } imu_od_error_info_code_t;
 
 
@@ -45,9 +45,9 @@ static BMI088Driver imudev;
  * @return true if update process successful, false otherwise
  */
 bool update_imu_data(void) {
-	bool ret = true;
+    bool ret = true;
     if( imudev.state != BMI088_READY ) {
-        return(false);
+        return false;
     }
 
     //TODO Power up out of suspend
@@ -59,7 +59,7 @@ bool update_imu_data(void) {
     if( bmi088ReadAccelerometerXYZmG(&imudev, &accl_data ) == MSG_OK ) {
         dbgprintf("Acc readings mG X = %d, Y = %d, Z = %d\r\n", accl_data.accl_x, accl_data.accl_y, accl_data.accl_z);
     } else {
-    	ret = false;
+        ret = false;
         dbgprintf("Failed to read accelerometer readings\r\n");
     }
 
@@ -68,7 +68,7 @@ bool update_imu_data(void) {
     if( bmi088ReadGyroXYZ(&imudev, &gyro_sample) == MSG_OK ) {
         dbgprintf("Gyro readings X = %d, Y = %d, Z = %d\r\n", gyro_sample.gyro_x, gyro_sample.gyro_y, gyro_sample.gyro_z);
     } else {
-    	ret = false;
+        ret = false;
         dbgprintf("Failed to read gyro readings\r\n");
     }
 
@@ -76,7 +76,7 @@ bool update_imu_data(void) {
     if( bmi088ReadTemp(&imudev, &temp_c) == MSG_OK ) {
         dbgprintf("Accelerator temp_c = %d C\r\n", temp_c);
     } else {
-    	ret = false;
+        ret = false;
         dbgprintf("Failed to read temperature data...\r\n");
     }
 
@@ -119,7 +119,7 @@ bool update_imu_data(void) {
     OD_magnetometerMZ2.y = 0;
     OD_magnetometerMZ2.z = 0;
 
-    return(ret);
+    return ret;
 }
 
 
@@ -148,7 +148,7 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
+            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
         }
 
 
@@ -161,22 +161,22 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_gyro_chip_id != BMI088_GYR_CHIP_ID_EXPECTED ) {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
+            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
         }
     }
     chprintf(DEBUG_SD, "Done initializing, starting loop...\r\n");
 
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
-    	dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
+        dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
         if( update_imu_data() ) {
-        	if( CO_isError(CO->em, CO_EM_GENERIC_ERROR) ) {
-        		dbgprintf("Clearing CO error state...\r\n");
-        		CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, IMU_OD_ERROR_INFO_CODE_NONE);
-        	}
+            if( CO_isError(CO->em, CO_EM_GENERIC_ERROR) ) {
+                dbgprintf("Clearing CO error state...\r\n");
+                CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, IMU_OD_ERROR_INFO_CODE_NONE);
+            }
         } else {
-        	dbgprintf("Setting CO error state...\r\n");
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
+            dbgprintf("Setting CO error state...\r\n");
+            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
         }
 
         chThdSleepMilliseconds(1000);
