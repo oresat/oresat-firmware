@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-bool deploy_heli(void);
-bool deploy_turn(void);
+void deploy_heli(uint32_t duration);
+void deploy_turn(uint32_t duration);
 
 #ifdef __cplusplus
 }

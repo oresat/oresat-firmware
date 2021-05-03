@@ -12,6 +12,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[]);
 void cmd_synth(BaseSequentialStream *chp, int argc, char *argv[]);
 void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[]);
 void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[]);
+void cmd_beacon(BaseSequentialStream *chp, int argc, char *argv[]);
 
 #ifdef __cplusplus
 }

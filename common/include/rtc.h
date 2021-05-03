@@ -1,10 +1,6 @@
 #ifndef RTC_H
 #define RTC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <time.h>
 #include "ch.h"
 #include "hal.h"
@@ -19,6 +15,12 @@ extern "C" {
  */
 #define TIME_CUC_PREAMBLE   0x2E    /* CCSDS Unsegmented Time Code (CUC) Preamble */
 #define TIME_CDS_PREAMBLE   0x49    /* CCSDS Day Segmented Time Code (CDS) Preamble */
+
+#define RTC_WEEKDAY_SEL     RTC_ALRMAR_WDSEL
+#define RTC_DATE_MASK       RTC_ALRMAR_MSK4
+#define RTC_HOUR_MASK       RTC_ALRMAR_MSK3
+#define RTC_MIN_MASK        RTC_ALRMAR_MSK2
+#define RTC_SEC_MASK        RTC_ALRMAR_MSK1
 
 /* CCSDS Unsegmented Time Code (CUC) data type */
 typedef union {
@@ -39,16 +41,24 @@ typedef union {
     };
 } time_utc_t;
 
-extern RTCDriver *rtcp;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void rtc_init(void);
+time_t rtcConvertDateTimeToUnix(const RTCDateTime *timespec, uint32_t *msec);
+void rtcConvertUnixToDateTime(RTCDateTime *timespec, time_t unix_time, uint32_t msec);
 
-time_t get_time_unix(uint32_t *msec);
-void set_time_unix(time_t unix_time, uint32_t msec);
-void get_time_scet(time_scet_t *scet);
-void set_time_scet(const time_scet_t *scet);
-void get_time_utc(time_utc_t *utc);
-void set_time_utc(const time_utc_t *utc);
+void rtcGetTimeTm(struct tm *tim, uint32_t *msec);
+void rtcSetTimeTm(const struct tm *tim, uint32_t msec);
+time_t rtcGetTimeUnix(uint32_t *msec);
+void rtcSetTimeUnix(time_t unix_time, uint32_t msec);
+void rtcGetTimeSCET(time_scet_t *scet);
+void rtcSetTimeSCET(const time_scet_t *scet);
+void rtcGetTimeUTC(time_utc_t *utc);
+void rtcSetTimeUTC(const time_utc_t *utc);
+
+uint32_t rtcEncodeAlarm(const RTCDateTime *timespec, uint32_t flags);
+uint32_t rtcEncodeRelAlarm(const RTCDateTime *timespec, int days, int hours, int minutes, int seconds);
 
 CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg);
 CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg);

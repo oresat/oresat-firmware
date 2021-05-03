@@ -8,7 +8,7 @@
 #ifndef _AX25_H_
 #define _AX25_H_
 
-#include "pdu.h"
+#include "frame_buf.h"
 
 /*===========================================================================*/
 /* Constants.                                                                */
@@ -40,12 +40,13 @@
 #define AX25_SSID_VAL_Pos                   (1U)
 #define AX25_SSID_VAL_Msk                   (0xFU << AX25_SSID_VAL_Pos)
 #define AX25_SSID_VAL                       AX25_SSID_VAL_Msk
-#define AX25_SSID_RES_Pos                   (5U)
-#define AX25_SSID_RES_Msk                   (0x3U << AX25_SSID_RES_Pos)
-#define AX25_SSID_RES                       AX25_SSID_RES_Msk
+#define AX25_SSID_RESERVED_Pos              (5U)
+#define AX25_SSID_RESERVED_Msk              (0x3U << AX25_SSID_RESERVED_Pos)
+#define AX25_SSID_RESERVED                  AX25_SSID_RESERVED_Msk
 #define AX25_SSID_CMD_RESP_Pos              (7U)
 #define AX25_SSID_CMD_RESP_Msk              (0x1U << AX25_SSID_CMD_RESP_Pos)
 #define AX25_SSID_CMD_RESP                  AX25_SSID_CMD_RESP_Msk
+#define AX25_SSID(ssid)                     (((ssid << AX25_SSID_VAL_Pos) & AX25_SSID_VAL_Msk) | AX25_SSID_RESERVED)
 /** @} */
 
 /**
@@ -92,6 +93,15 @@
 #define AX25_PID_NONE                       (0xF0U)
 /** @} */
 
+/**
+ * @name    AX.25 Maximum values size
+ * @{
+ */
+#define AX25_MAX_PAYLOAD_LEN                (256U)
+#define AX25_MAX_HDR_LEN                    (sizeof(ax25_hdr_t))
+#define AX25_MAX_FRAME_LEN                  (AX25_MAX_PAYLOAD_LEN + AX25_MAX_HDR_LEN)
+/** @} */
+
 /** @} */
 
 /*===========================================================================*/
@@ -112,16 +122,13 @@
  */
 typedef struct {
     char            dest[6];
+    uint8_t         dest_ssid;
     char            src[6];
-    void            (*phy_send)(const void *pdu, size_t len, const void *phy_arg);
-    const void      *phy_arg;
+    uint8_t         src_ssid;
+    uint8_t         control;
+    uint8_t         sid;
 } ax25_link_t;
 /** @} */
-
-typedef struct __attribute__((packed)) {
-    uint8_t         pid;
-    uint8_t         data[];
-} ax25_info_t;
 
 /**
  * @name    AX.25 frame data structure.
@@ -133,8 +140,8 @@ typedef struct __attribute__((packed)) {
     char            src[6];
     uint8_t         src_ssid;
     uint8_t         control;
-    uint8_t         data[];
-} ax25_frame_t;
+    uint8_t         sid;
+} ax25_hdr_t;
 /** @} */
 
 /*===========================================================================*/
@@ -148,8 +155,7 @@ typedef struct __attribute__((packed)) {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void ax25_send(pdu_t *pdu, void *arg);
-void ax25_recv(const pdu_t *pdu, const void *next_hdr, void *arg);
+void *ax25_sdu(fb_t *fb, const void *arg);
 
 #ifdef __cplusplus
 }

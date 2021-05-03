@@ -2,28 +2,24 @@
 #include "hal.h"
 #include "deployer.h"
 
-bool deploy_heli(void)
+void deploy_heli(uint32_t duration)
 {
-    bool deployed = false;
-
     palSetLine(LINE_FIRE_HELI_1);
     palSetLine(LINE_FIRE_HELI_2);
-    chThdSleepMilliseconds(1000);
+    chThdSleepMilliseconds(duration);
     palClearLine(LINE_FIRE_HELI_1);
     palClearLine(LINE_FIRE_HELI_2);
 
-    return deployed;
+    return;
 }
 
-bool deploy_turn(void)
+void deploy_turn(uint32_t duration)
 {
-    bool deployed = false;
-
     palSetLine(LINE_FIRE_TURN_1);
     palSetLine(LINE_FIRE_TURN_2);
-    chThdSleepMilliseconds(1000);
+    chThdSleepMilliseconds(duration);
     palClearLine(LINE_FIRE_TURN_1);
     palClearLine(LINE_FIRE_TURN_2);
 
-    return deployed;
+    return;
 }

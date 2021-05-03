@@ -128,7 +128,7 @@ thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subin
     sdo_client[i].buf_cb = buf_cb;
     sdo_client[i].buf_cb_arg = buf_cb_arg;
 
-    sdo_client[i].tp = chThdCreateFromHeap(NULL, 0x1000, "SDO Client", HIGHPRIO-1, sdo_client_thd, &sdo_client[i]);
+    sdo_client[i].tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Client", HIGHPRIO-1, sdo_client_thd, &sdo_client[i]);
 
     return sdo_client[i].tp;
 }

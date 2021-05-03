@@ -160,6 +160,8 @@ int fs_stat(FSDriver *fsp, const char *path, struct lfs_info *info);
 lfs_ssize_t fs_getattr(FSDriver *fsp, const char *path, uint8_t type, void *buffer, lfs_size_t size);
 int fs_setattr(FSDriver *fsp, const char *path, uint8_t type, const void *buffer, lfs_size_t size);
 int fs_removeattr(FSDriver *fsp, const char *path, uint8_t type);
+lfs_size_t fs_size(FSDriver *fsp);
+uint8_t fs_usage(FSDriver *fsp);
 
 /* File operations */
 lfs_file_t *file_open(FSDriver *fsp, const char *path, int flags);
@@ -172,6 +174,7 @@ int file_truncate(FSDriver *fsp, lfs_file_t *file, lfs_soff_t size);
 lfs_soff_t file_tell(FSDriver *fsp, lfs_file_t *file);
 int file_rewind(FSDriver *fsp, lfs_file_t *file);
 lfs_soff_t file_size(FSDriver *fsp, lfs_file_t *file);
+uint32_t file_crc(FSDriver *fsp, lfs_file_t *file);
 
 /* Directory operations */
 int fs_mkdir(FSDriver *fsp, const char *path);

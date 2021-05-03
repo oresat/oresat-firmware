@@ -197,11 +197,11 @@ THD_FUNCTION(nmt, arg)
     /* Start CANopen threads */
     /* TODO: Optimize stack usage */
     for (int i = 0; i < CO_NO_SDO_SERVER; i++) {
-        sdo_tp[i] = chThdCreateFromHeap(NULL, 0x1000, "SDO Server", HIGHPRIO-1, sdo_server, CO->SDO[i]);
+        sdo_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Server", HIGHPRIO-1, sdo_server, CO->SDO[i]);
     }
-    em_tp = chThdCreateFromHeap(NULL, 0x200, "Emergency", HIGHPRIO-2, em, CO->emPr);
-    pdo_sync_tp = chThdCreateFromHeap(NULL, 0x200, "PDO SYNC", HIGHPRIO-2, pdo_sync, CO);
-    hbcons_tp = chThdCreateFromHeap(NULL, 0x200, "HB Consumer", HIGHPRIO-3, hb_cons, CO->HBcons);
+    em_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "Emergency", HIGHPRIO-2, em, CO->emPr);
+    pdo_sync_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "PDO SYNC", HIGHPRIO-2, pdo_sync, CO);
+    hbcons_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "HB Consumer", HIGHPRIO-3, hb_cons, CO->HBcons);
 
     /* Enter normal operating mode */
     CO_CANsetNormalMode(CO->CANmodule[0]);
@@ -285,7 +285,7 @@ void CO_run(CO_t *CO)
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
 
     do {
-        nmt_tp = chThdCreateFromHeap(NULL, 0x200, "NMT", HIGHPRIO, nmt, CO);
+        nmt_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "NMT", HIGHPRIO, nmt, CO);
         reset = chThdWait(nmt_tp);
     } while (reset != CO_RESET_APP);
 

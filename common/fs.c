@@ -13,6 +13,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "fs.h"
+#include "crc.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -777,6 +778,50 @@ int fs_removeattr(FSDriver *fsp, const char *path, uint8_t type)
 }
 
 /**
+ * @brief   Return filesystem size in blocks.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ *
+ * @return              Filesystem size in blocks or negative error code on failure
+ * @api
+ */
+lfs_size_t fs_size(FSDriver *fsp)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL);
+    osalDbgAssert((fsp->state != FS_UNINIT) && (fsp->state != FS_STOP),
+            "fs_size(), invalid state");
+
+    lfs_ssize_t ret_size;
+    fsp->err = fs_access_start(fsp);
+    if (fsp->err != LFS_ERR_OK) {
+        return fsp->err;
+    }
+
+    ret_size = lfs_fs_size(&fsp->lfs);
+    if (ret_size < 0) {
+        fsp->err = ret_size;
+        return ret_size;
+    }
+
+    fsp->err = fs_access_end(fsp);
+    return ret_size;
+}
+
+/**
+ * @brief   Return filesystem utilization as percentage.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ *
+ * @return              Filesystem utilization percent or negative error code on failure
+ * @api
+ */
+uint8_t fs_usage(FSDriver *fsp)
+{
+    return fs_size(fsp) / fsp->lfscfg.block_count;
+}
+
+/**
  * @brief   Opens a file.
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
@@ -804,6 +849,10 @@ lfs_file_t *file_open(FSDriver *fsp, const char *path, int flags)
 
     if (file != NULL) {
         fsp->err = lfs_file_open(&fsp->lfs, file, path, flags);
+        if (fsp->err != LFS_ERR_OK) {
+            fs_free_file(fsp, file);
+            file = NULL;
+        }
     }
 
     return file;
@@ -1044,6 +1093,37 @@ lfs_soff_t file_size(FSDriver *fsp, lfs_file_t *file)
 }
 
 /**
+ * @brief   Return CRC32 of a file.
+ *
+ * @param[in]  fsp      Pointer to the @p FSDriver object
+ * @param[in]  file     Open file pointer
+ *
+ * @return              CRC32 of file
+ * @api
+ */
+uint32_t file_crc(FSDriver *fsp, lfs_file_t *file)
+{
+    /* Sanity checks */
+    osalDbgCheck(fsp != NULL && file != NULL);
+    osalDbgAssert(fsp->state == FS_MOUNTED,
+            "file_crc(), invalid state");
+
+    lfs_ssize_t ret_size;
+    fsp->err = LFS_ERR_OK;
+    uint32_t crc = 0;
+    uint8_t buf[512];
+
+    while ((ret_size = file_read(fsp, file, buf, 512)) > 0) {
+        crc = crc32(buf, ret_size, crc);
+    }
+    if (ret_size < 0) {
+        fsp->err = ret_size;
+    }
+
+    return crc;
+}
+
+/**
  * @brief   Create a directory.
  *
  * @param[in]  fsp      Pointer to the @p FSDriver object
@@ -1100,6 +1180,10 @@ lfs_dir_t *dir_open(FSDriver *fsp, const char *path)
 
     if (dir != NULL) {
         fsp->err = lfs_dir_open(&fsp->lfs, dir, path);
+        if (fsp->err != LFS_ERR_OK) {
+            fs_free_dir(fsp, dir);
+            dir = NULL;
+        }
     }
 
     return dir;
