@@ -2,7 +2,7 @@
  * @file    sdls.c
  * @brief   Space Data Link Security (SDLS) support library.
  *
- * @addtogroup SDLS
+ * @addtogroup CCSDS
  * @{
  */
 #include <stdint.h>

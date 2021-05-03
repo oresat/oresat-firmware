@@ -9,6 +9,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "ax5043.h"
+#include "frame_buf.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -19,6 +20,11 @@
  */
 #define AX5043_EVENT_IRQ                    EVENT_MASK(0)
 #define AX5043_EVENT_TERMINATE              EVENT_MASK(1)
+
+/**
+ * @brief   ChibiOS Event masks for AX5043.
+ */
+#define AX5043_FIFO_SIZE                    256U
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -33,9 +39,9 @@ typedef union __attribute__((packed)) {
             uint16_t    reg;
             uint16_t    status;
         };
-        uint8_t         data[256];
+        uint8_t         data[AX5043_FIFO_SIZE];
     };
-    uint8_t             buf[256 + sizeof(uint16_t)];
+    uint8_t             buf[AX5043_FIFO_SIZE + sizeof(uint16_t)];
 } spibuf_t;
 
 /*===========================================================================*/
@@ -64,7 +70,7 @@ ax5043_status_t ax5043SPIExchange(SPIDriver *spip, uint16_t reg, bool write, con
     spibuf_t recvbuf;
 
     /* Ensure we don't exceed 256 bytes of data */
-    n = (n <= 256 ? n : 256);
+    n = (n < AX5043_FIFO_SIZE ? n : AX5043_FIFO_SIZE);
 
     /* Set the register address to perform the transaction with */
     sendbuf.reg = __REVSH((reg & 0x0FFFU) | 0x7000U | (write << 15));
@@ -177,16 +183,13 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
  */
 THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
-    objects_fifo_t *pdu_fifo;
     ax5043_chunk_t *chunkp = NULL;
-    uint8_t *pdu = NULL;
-    uint8_t buf[256];
+    fb_t *fb = NULL;
+    uint8_t buf[AX5043_FIFO_SIZE];
+    uint8_t *pos;
     size_t fifo_len;
-    size_t pdu_offset;
 
     osalDbgCheck(devp != NULL);
-
-    pdu_fifo = devp->config->pdu_fifo;
 
     while (!chThdShouldTerminateX()) {
         /* Wait for FIFO data */
@@ -219,23 +222,34 @@ THD_FUNCTION(rx_worker, arg) {
                 /* TODO: Handle error flags */
                 /* Start of new packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
-                    /* Acquire PDU object if needed */
-                    if (pdu == NULL) {
-                        pdu = chFifoTakeObjectTimeout(pdu_fifo, TIME_INFINITE);
+                    /* Acquire frame buffer object if needed */
+                    while (fb == NULL) {
+                        fb = fb_alloc(FB_MAX_LEN);
                     }
-                    pdu_offset = 0;
+                    fb->phy_rx = devp;
+                    fb->phy_arg = (void*)devp->config->phy_arg;
                 }
 
-                /* Copy packet data */
-                osalDbgAssert(pdu != NULL, "rx_worker(), NULL PDU object");
-                osalDbgAssert(pdu_offset + data_len < devp->config->pdu_size, "rx_worker(), data exceeds PDU object size");
-                memcpy(&pdu[pdu_offset], chunkp->data.data, data_len);
-                pdu_offset += data_len;
+                osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");
+                pos = fb_put(fb, data_len);
+                if (pos != NULL) {
+                    /* Copy packet data */
+                    memcpy(pos, chunkp->data.data, data_len);
+                } else {
+                    /* Length exceeds maximum frame buffer length, abort receive */
+                    uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
+                    reg |= AX5043_FRAMING_FABORT;
+                    ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
+                    fb_free(fb);
+                    fb = NULL;
+                }
 
                 /* End of packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
-                    chFifoSendObject(pdu_fifo, pdu);
-                    pdu = NULL;
+                    if (fb != NULL) {
+                        fb_post(fb);
+                        fb = NULL;
+                    }
                 }
                 break;
             case AX5043_CHUNKCMD_TIMER:
@@ -269,9 +283,9 @@ THD_FUNCTION(rx_worker, arg) {
         }
     }
 
-    if (pdu != NULL) {
-        chFifoReturnObject(pdu_fifo, pdu);
-        pdu = NULL;
+    if (fb != NULL) {
+        fb_free(fb);
+        fb = NULL;
     }
     chThdExit(MSG_OK);
 }
@@ -386,6 +400,8 @@ void ax5043SetRFDIV(AX5043Driver *devp, uint32_t freq) {
 void ax5043ObjectInit(AX5043Driver *devp) {
     devp->config = NULL;
 
+    chMtxObjectInit(&devp->tx_lock);
+
     devp->irq_worker = NULL;
     chEvtObjectInit(&devp->irq_event);
 
@@ -450,7 +466,7 @@ void ax5043Start(AX5043Driver *devp, const AX5043Config *config) {
 
     /* Register interrupt handler for device and start worker */
     if (devp->irq_worker == NULL) {
-        devp->irq_worker = chThdCreateFromHeap(NULL, 0x1000, "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
+        devp->irq_worker = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "ax5043_irq_worker", HIGHPRIO, irq_worker, devp);
         palSetLineCallback(config->irq, ax5043IRQHandler, devp);
         palEnableLineEvent(config->irq, PAL_EVENT_MODE_RISING_EDGE);
     }
@@ -478,7 +494,17 @@ void ax5043Stop(AX5043Driver *devp) {
             "ax5043Stop(), invalid state");
 
     if (devp->state != AX5043_STOP) {
+        /* Power down device */
         ax5043SetPWRMode(devp, AX5043_PWRMODE_POWERDOWN);
+
+        /* Disable the interrupt handler and worker thread */
+        palDisableLineEvent(devp->config->irq);
+        palSetLineCallback(devp->config->irq, NULL, NULL);
+        chThdTerminate(devp->irq_worker);
+        chEvtSignal(devp->irq_worker, AX5043_EVENT_TERMINATE);
+        chThdWait(devp->irq_worker);
+        devp->irq_worker = NULL;
+
 #if AX5043_USE_SPI
 #if AX5043_SHARED_SPI
         spiAcquireBus(devp->config->spip);
@@ -492,14 +518,6 @@ void ax5043Stop(AX5043Driver *devp) {
         spiReleaseBus(devp->config->spip);
 #endif /* AX5043_SHARED_SPI */
 #endif /* AX5043_USE_SPI */
-
-        /* Disable the interrupt handler and worker thread */
-        palDisableLineEvent(devp->config->irq);
-        palSetLineCallback(devp->config->irq, NULL, NULL);
-        chThdTerminate(devp->irq_worker);
-        chEvtSignal(devp->irq_worker, AX5043_EVENT_TERMINATE);
-        chThdWait(devp->irq_worker);
-        devp->irq_worker = NULL;
     }
 
     /* Transition to stop state */
@@ -595,7 +613,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
         }
 
         /* Start the FIFO worker */
-        devp->rx_worker = chThdCreateFromHeap(NULL, 0x800, "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
+        devp->rx_worker = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x400), "ax5043_rx_worker", HIGHPRIO-1, rx_worker, devp);
     }
 }
 
@@ -612,7 +630,8 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
  *
  * @api
  */
-void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+    const ax5043_profile_t *prev_profile;
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -625,12 +644,19 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TX(), no callback when len != total_len");
 
+    chMtxLock(&devp->tx_lock);
     devp->error = AX5043_ERR_NOERROR;
 
     /* Record previous state and enter idle state */
     prev_state = devp->state;
     prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
     ax5043Idle(devp);
+
+    /* Set TX profile */
+    if (profile != NULL) {
+        prev_profile = ax5043GetProfile(devp);
+        ax5043SetProfile(devp, profile);
+    }
 
     /* Set Frequency Selection */
     uint32_t freq;
@@ -732,6 +758,9 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     /* Return to original state */
+    if (profile != NULL) {
+        ax5043SetProfile(devp, prev_profile);
+    }
     switch (prev_state) {
     case AX5043_RX:
         ax5043RX(devp, prev_chan, false);
@@ -743,6 +772,7 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
     default:
         ax5043Idle(devp);
     }
+    chMtxUnlock(&devp->tx_lock);
 }
 
 /**
@@ -758,7 +788,8 @@ void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len,
  *
  * @api
  */
-void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+void ax5043TXRaw(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b) {
+    const ax5043_profile_t *prev_profile;
     ax5043_state_t prev_state;
     bool prev_chan;
 
@@ -771,12 +802,19 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     osalDbgAssert(tx_cb != NULL || len == total_len,
             "ax5043TXRaw(), no callback when len != total_len");
 
+    chMtxLock(&devp->tx_lock);
     devp->error = AX5043_ERR_NOERROR;
 
     /* Record previous state and enter idle state */
     prev_state = devp->state;
     prev_chan = ax5043ReadU8(devp, AX5043_REG_PLLLOOP) & AX5043_PLLLOOP_FREQSEL;
     ax5043Idle(devp);
+
+    /* Set TX profile */
+    if (profile != NULL) {
+        prev_profile = ax5043GetProfile(devp);
+        ax5043SetProfile(devp, profile);
+    }
 
     /* Set Frequency Selection */
     uint32_t freq;
@@ -842,6 +880,9 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     ax5043ReadU16(devp, AX5043_REG_RADIOEVENTREQ);
 
     /* Return to original state */
+    if (profile != NULL) {
+        ax5043SetProfile(devp, prev_profile);
+    }
     switch (prev_state) {
     case AX5043_RX:
         ax5043RX(devp, prev_chan, false);
@@ -853,6 +894,7 @@ void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_l
     default:
         ax5043Idle(devp);
     }
+    chMtxUnlock(&devp->tx_lock);
 }
 
 /**
@@ -1049,7 +1091,7 @@ uint32_t ax5043GetFreq(AX5043Driver *devp) {
  */
 void ax5043SetPreamble(AX5043Driver *devp, const void *preamble, size_t len) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(len <= 256, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
+    osalDbgAssert(len <= AX5043_FIFO_SIZE, "ax5043SetPreamble(), Preamble length exceeds max FIFO size");
 
     devp->preamble = preamble;
     devp->preamble_len = len;
@@ -1078,7 +1120,7 @@ const void *ax5043GetPreamble(AX5043Driver *devp) {
  */
 void ax5043SetPostamble(AX5043Driver *devp, const void *postamble, size_t len) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(len <= 256, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
+    osalDbgAssert(len <= AX5043_FIFO_SIZE, "ax5043SetPostamble(), Postamble length exceeds max FIFO size");
 
     devp->postamble = postamble;
     devp->postamble_len = len;
