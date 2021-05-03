@@ -2,7 +2,7 @@
  * @file    spp.c
  * @brief   Space Packet Protocol (SPP) suppory library.
  *
- * @addtogroup SPP
+ * @addtogroup CCSDS
  * @{
  */
 #include <stdint.h>

@@ -107,8 +107,10 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/rtc.mk
 include $(PROJ_SRC)/CO_master.mk
+include $(PROJ_SRC)/bootloader.mk
+include $(PROJ_SRC)/rtc.mk
+include $(PROJ_SRC)/fs.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -169,7 +171,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE
+UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DLFS_CONFIG=lfs_util_custom.h
 
 # Define ASM defines here
 UADEFS =
