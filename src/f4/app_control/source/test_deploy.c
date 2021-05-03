@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 
 #include "test_deploy.h"
@@ -9,30 +10,27 @@
 /* Deployer Testing                                                          */
 /*===========================================================================*/
 void cmd_deploy(BaseSequentialStream *chp, int argc, char *argv[]) {
-    bool deployed = false;
-
-    if (argc < 1) {
+    if (argc < 2) {
         goto deploy_usage;
     }
+
+    uint32_t duration = strtoul(argv[1], NULL, 0);
 
     if (argv[0][0] == 'h') {
         chprintf(chp, "Attempting to deploy helical antenna...");
-        deployed = deploy_heli();
+        deploy_heli(duration);
     } else if (argv[0][0] == 't') {
-        chprintf(chp, "Attempting to deploy helical antenna...");
-        deployed = deploy_turn();
+        chprintf(chp, "Attempting to deploy turnstile antenna...");
+        deploy_turn(duration);
     } else {
         goto deploy_usage;
     }
 
-    if (deployed) {
-        chprintf(chp, "Success!\r\n");
-    } else {
-        chprintf(chp, "Failed!\r\n");
-    }
+    chprintf(chp, "Done!\r\n");
+
     return;
 
 deploy_usage:
-    chprintf(chp, "Usage: deploy (h)eli|(t)urn\r\n");
+    chprintf(chp, "Usage: deploy (h)eli|(t)urn <duration>\r\n");
     return;
 }

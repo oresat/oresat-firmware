@@ -1,17 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "test_radio.h"
-#include "comms.h"
 #include "radio.h"
-#include "ax5043.h"
-#include "si41xx.h"
+#include "beacon.h"
 #include "chprintf.h"
 
 #define PA_SAMPLES 8
-
-extern radio_dev_t radio_devices[];
-extern radio_profile_t radio_profiles[];
-extern synth_dev_t synth_devices[];
 
 typedef struct {
     adcsample_t therm;
@@ -63,6 +57,9 @@ static const ADCConversionGroup pa_pwr_cfg = {
     ADC_SQR3_SQ3_N(ADC_CHANNEL_IN15) | ADC_SQR3_SQ2_N(ADC_CHANNEL_IN14) |   /* SQR3 */
     ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)
 };
+
+extern const radio_cfg_t *tx_eng;
+extern const radio_cfg_t *tx_ax25;
 
 /*===========================================================================*/
 /* OreSat Radio Control                                                      */
@@ -146,25 +143,25 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
         if (argc > 1) {
             uint32_t i, index;
             /* Find max index */
-            for (i = 0; radio_profiles[i].profile != NULL; i++);
+            for (i = 0; radio_cfgs[i].profile != NULL; i++);
             index = strtoul(argv[1], NULL, 0);
             if (index >= i) {
                 chprintf(chp, "ERROR: Invalid profile\r\n");
                 goto radio_usage;
             }
-            ax5043SetProfile(devp, radio_profiles[index].profile);
+            ax5043SetProfile(devp, radio_cfgs[index].profile);
             return;
         } else {
             const ax5043_profile_t *profile;
             profile = ax5043GetProfile(devp);
-            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
-                if (radio_profiles[i].profile == profile) {
-                    chprintf(chp, "Current profile is %s\r\n", radio_profiles[i].name);
+            for (uint32_t i = 0; radio_cfgs[i].profile != NULL; i++) {
+                if (radio_cfgs[i].profile == profile) {
+                    chprintf(chp, "Current profile is %s\r\n", radio_cfgs[i].name);
                 }
             }
             chprintf(chp, "Available profiles:\r\n");
-            for (uint32_t i = 0; radio_profiles[i].profile != NULL; i++) {
-                chprintf(chp, "%u:\t%s\r\n", i, radio_profiles[i].name);
+            for (uint32_t i = 0; radio_cfgs[i].profile != NULL; i++) {
+                chprintf(chp, "%u:\t%s\r\n", i, radio_cfgs[i].name);
             }
             chprintf(chp, "\r\n");
             return;
@@ -409,25 +406,25 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
 
     palClearLine(LINE_LNA_ENABLE);
     palSetLine(LINE_PA_ENABLE);
-    ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, 0);
-    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 1);
+    ax5043WriteU16(tx_eng->devp, AX5043_REG_TXPWRCOEFFB, 0);
+    ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 1);
 
     if (!strcmp(argv[0], "cw") && argc > 2) {
         uint16_t txpwr = strtoul(argv[1], NULL, 0);
         uint32_t cnt = strtoul(argv[2], NULL, 0);
         if (cnt == 0)  cnt = 1;
-        ax5043WriteU16(radio_devices[1].devp, AX5043_REG_TXPWRCOEFFB, txpwr);
+        ax5043WriteU16(tx_eng->devp, AX5043_REG_TXPWRCOEFFB, txpwr);
         adcStartConversion(&ADCD1, &pa_pwr_cfg, (adcsample_t*)pa_samples, PA_SAMPLES * 2);
-        ax5043TXRaw(radio_devices[1].devp, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
+        ax5043TXRaw(tx_eng->devp, NULL, &cw, sizeof(cw), sizeof(cw) * cnt, tx_cb, NULL, false);
         adcStopConversion(&ADCD1);
     } else {
-        ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
+        ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
         palClearLine(LINE_PA_ENABLE);
         palSetLine(LINE_LNA_ENABLE);
         goto rftest_usage;
     }
 
-    ax5043WriteU8(radio_devices[1].devp, AX5043_REG_PWRAMP, 0);
+    ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
     palClearLine(LINE_PA_ENABLE);
     palSetLine(LINE_LNA_ENABLE);
     return;
@@ -436,6 +433,29 @@ rftest_usage:
                   "Usage: rftest <cmd>\r\n"
                   "    cw <txpwr> <cnt>:\r\n"
                   "         Transmit CW with <txpwr> for <cnt> iterations of a CW REPEATDATA buffer\r\n"
+                  "\r\n");
+    return;
+}
+
+void cmd_beacon(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    int count = 1;
+    if (argc > 0) {
+        count = strtoul(argv[0], NULL, 0);
+        if (count < 1 || count > 10)
+            goto beacon_usage;
+    }
+
+    for (int i = 0; i < count; i++) {
+        beacon_send(tx_ax25);
+        if (count > 1)
+            chThdSleepMilliseconds(1000);
+    }
+
+    return;
+beacon_usage:
+    chprintf(chp, "\r\n"
+                  "Usage: beacon [count]\r\n"
                   "\r\n");
     return;
 }

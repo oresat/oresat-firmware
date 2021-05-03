@@ -107,11 +107,12 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/opd.mk
+include $(PROJ_SRC)/node_mgr.mk
 include $(PROJ_SRC)/rtc.mk
 include $(PROJ_SRC)/CO_master.mk
 include $(PROJ_SRC)/fs.mk
 include $(PROJ_SRC)/radio.mk
+include $(PROJ_SRC)/fram.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -172,7 +173,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DMAX7310_SHARED_I2C=TRUE -DAX5043_SHARED_SPI=TRUE -DSI41XX_DEVICE=SI4112 -DLFS_CONFIG=lfs_util_custom.h -DSTM32_FLASH_DUAL_BANK_PERMANENT=TRUE
+UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DFRAM_SHARED_I2C=TRUE -DMAX7310_SHARED_I2C=TRUE -DAX5043_SHARED_SPI=TRUE -DSI41XX_DEVICE=SI4112 -DUSLP_USE_SDLS=0 -DLFS_CONFIG=lfs_util_custom.h -DSTM32_FLASH_DUAL_BANK_PERMANENT=TRUE
 
 # Define ASM defines here
 UADEFS =

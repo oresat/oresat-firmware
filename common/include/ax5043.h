@@ -414,8 +414,11 @@
 
 /* Performance Tuning Registers */
 #define AX5043_REG_0xF00                    0xF00U
+#define AX5043_REG_0xF08                    0xF08U
+#define AX5043_REG_POWCTRL1                 0xF08U
 #define AX5043_REG_0xF0C                    0xF0CU
 #define AX5043_REG_0xF0D                    0xF0DU
+#define AX5043_REG_REF                      0xF0DU
 #define AX5043_REG_0xF10                    0xF10U
 #define AX5043_REG_XTALOSC                  0xF10U
 #define AX5043_REG_0xF11                    0xF11U
@@ -2281,6 +2284,7 @@
  * @{
  */
 #define AX5043_0xF00_DEFVAL                 (0x0FU)
+#define AX5043_0xF08_DEFVAL                 (0x04U)
 #define AX5043_0xF0C_DEFVAL                 (0x00U)
 #define AX5043_0xF0D_DEFVAL                 (0x03U)
 #define AX5043_0xF10_CRYSTAL                (0x03U)
@@ -2795,17 +2799,9 @@ typedef struct{
      */
     uint32_t                    xtal_freq;
     /**
-     * @brief Radio Address
+     * @brief Optional frame buffer PHY argument
      */
-    uint32_t                    addr;
-    /**
-     * @brief PDU Object FIFO pointer
-     */
-    objects_fifo_t              *pdu_fifo;
-    /**
-     * @brief PDU Object maximum size
-     */
-    size_t                      pdu_size;
+    const void                  *phy_arg;
     /**
      * @brief Profile register values table
      * @note  This is for initial configuration and performance tuning.
@@ -2837,6 +2833,9 @@ struct AX5043Driver {
     ax5043_status_t             status;
     /* Error state of device */
     ax5043_err_t                error;
+
+    /* TX state lock */
+    mutex_t                     tx_lock;
 
     /* IRQ worker thread */
     thread_t                    *irq_worker;
@@ -2891,8 +2890,8 @@ void ax5043Stop(AX5043Driver *devp);
 
 void ax5043Idle(AX5043Driver *devp);
 void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor);
-void ax5043TX(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
-void ax5043TXRaw(AX5043Driver *devp, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
+void ax5043TXRaw(AX5043Driver *devp, const ax5043_profile_t *profile, const void *buf, size_t len, size_t total_len, ax5043_tx_cb_t tx_cb, void *tx_cb_arg, bool chan_b);
 
 void ax5043SetProfile(AX5043Driver *devp, const ax5043_profile_t *profile);
 const ax5043_profile_t *ax5043GetProfile(AX5043Driver *devp);
