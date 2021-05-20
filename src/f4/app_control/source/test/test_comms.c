@@ -19,15 +19,15 @@ static thread_t *cli_tp;
 static uint8_t resp_buf[CMD_RESP_LEN];
 static size_t buf_len;
 
-static void loopback_tx(fb_t *fb);
-static void loopback_rx(fb_t *fb);
+static void pdu_loopback(fb_t *fb, void *arg);
+static void resp_recv(fb_t *fb, void *arg);
 
 static const uslp_map_t map_cmd = {
     .sdu            = SDU_MAP_ACCESS,
     .upid           = UPID_MAPA_SDU,
     .max_pkt_len    = CMD_RESP_LEN,
     .incomplete     = false,
-    .map_recv       = loopback_rx,
+    .map_recv       = resp_recv,
 };
 
 static const uslp_map_t map_file = {
@@ -35,7 +35,7 @@ static const uslp_map_t map_file = {
     .upid           = UPID_MAPA_SDU,
     .max_pkt_len    = FILE_BUF_LEN + sizeof(file_xfr_t),
     .incomplete     = false,
-    .map_recv       = loopback_rx,
+    .map_recv       = resp_recv,
 };
 
 static const uslp_vc_t vc0 = {
@@ -56,54 +56,40 @@ static const uslp_vc_t vc0 = {
 
 static const uslp_mc_t loopback_mc = {
     .scid           = SCID,
+    .owner          = false,
     .vcid[0]        = &vc0,
 };
 
 static const uslp_pc_t loopback_pc = {
     .name           = "Loopback",
     .tf_len         = USLP_MAX_LEN,
-    .fecf           = FECF_HW,
+    .fecf           = FECF_SW,
     .fecf_len       = FECF_LEN,
-    .phy_send       = loopback_tx,
-    .phy_send_prio  = loopback_tx,
+    .phy_send       = pdu_loopback,
+    .phy_send_ahead = pdu_loopback,
 };
 
-static const uslp_link_t edl_loopback_tx_link = {
-    .mc = &mc,
-    .pc_rx = &loopback_pc,
-    .pc_tx = &loopback_pc,
-};
-
-static const uslp_link_t edl_loopback_rx_link = {
+static const uslp_link_t edl_loopback_link = {
     .mc = &loopback_mc,
     .pc_rx = &loopback_pc,
     .pc_tx = &loopback_pc,
 };
 
-static void loopback_tx(fb_t *fb)
+static void pdu_loopback(fb_t *fb, void *arg)
 {
-    osalDbgCheck(fb != NULL);
-
-    /* Implement 10% chance of dropped frame */
-    if (0) {
-        fb_free(fb);
-        return;
-    }
-
-    /* Add empty FECF */
-    fb_put(fb, 2);
-
+    (void)arg;
     if (fb == tx_fb) {
-        fb->phy_arg = (void*)&edl_loopback_tx_link;
-        fb_post(fb);
+        fb->phy_arg = (void*)&edl_loopback_link;
+        pdu_send(fb, &rx_fifo);
     } else {
-        uslp_recv(&edl_loopback_rx_link, fb);
-        fb_free(fb);
+        uslp_recv(&edl_loopback_link, fb);
+        fb_free(fb, &tx_fifo);
     }
 }
 
-static void loopback_rx(fb_t *fb)
+static void resp_recv(fb_t *fb, void *arg)
 {
+    (void)arg;
     osalDbgCheck(fb != NULL);
     memcpy(resp_buf, fb->data, fb->len);
     buf_len = fb->len;
@@ -127,13 +113,13 @@ static void print_response(BaseSequentialStream *chp)
 static void send_cmd(cmd_code_t cmd_code, void *arg, size_t arg_len)
 {
     cmd_t *cmd;
-    tx_fb = fb_alloc(CMD_RESP_ALLOC);
+    tx_fb = fb_alloc(CMD_RESP_ALLOC, &rx_fifo);
     fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + 2);
     cmd = fb_put(tx_fb, sizeof(cmd_t) + arg_len);
     cmd->cmd = cmd_code;
     if (arg != NULL)
         memcpy(cmd->arg, arg, arg_len);
-    uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
+    uslp_map_send(&edl_loopback_link, tx_fb, 0, 0, true);
 }
 
 static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_soff_t off, lfs_size_t len)
@@ -153,13 +139,13 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
         return ret;
     }
 
-    tx_fb = fb_alloc(FB_MAX_LEN);
+    tx_fb = fb_alloc(FB_MAX_LEN, &rx_fifo);
     fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t) + 2);
     data = fb_put(tx_fb, len);
     ret = file_read(&FSD1, file, data, len);
     file_close(&FSD1, file);
     if (ret < 0) {
-        fb_free(tx_fb);
+        fb_free(tx_fb, &rx_fifo);
         return ret;
     }
     xfr = fb_push(tx_fb, sizeof(file_xfr_t));
@@ -167,7 +153,7 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
     xfr->off = off;
     xfr->len = len;
     chprintf(chp, "Sending %d byte block to offset %d...\r\n", len, off);
-    uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 1, true);
+    uslp_map_send(&edl_loopback_link, tx_fb, 0, 1, true);
     print_response(chp);
 
     return ret;
@@ -195,7 +181,7 @@ static int send_file(BaseSequentialStream *chp, char *src, char *dest)
 
     while (len) {
         lfs_ssize_t n = (len > FILE_BUF_LEN ? FILE_BUF_LEN : len);
-        n =  send_file_seg(chp, src, dest, off, n);
+        n = send_file_seg(chp, src, dest, off, n);
         if (n < 0) {
             return n;
         }
@@ -309,10 +295,10 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
             0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F
         };
         edl_enable(true);
-        tx_fb = fb_alloc(sizeof(buf));
+        tx_fb = fb_alloc(sizeof(buf), &tx_fifo);
         tx_fb->data_ptr = fb_put(tx_fb, sizeof(buf));
         memcpy(tx_fb->data_ptr, buf, sizeof(buf));
-        comms_send(tx_fb);
+        pdu_send(tx_fb, &tx_fifo);
     } else {
         goto edl_usage;
     }

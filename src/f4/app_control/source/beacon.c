@@ -307,7 +307,7 @@ void beacon_send(const radio_cfg_t *cfg)
 {
     fb_t *fb = NULL;
     while (fb == NULL) {
-        fb = fb_alloc(AX25_MAX_FRAME_LEN);
+        fb = fb_alloc(AX25_MAX_FRAME_LEN, &tx_fifo);
     }
 
     OD_C3Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
@@ -320,7 +320,7 @@ void beacon_send(const radio_cfg_t *cfg)
 
     /* APRS Beacon */
     ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
-    fb_free(fb);
+    fb_free(fb, &tx_fifo);
     fb = NULL;
 }
 

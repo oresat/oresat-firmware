@@ -73,6 +73,7 @@ static const uslp_vc_t vc1 = {
 
 const uslp_mc_t mc = {
     .scid           = SCID,
+    .owner          = true,
     .vcid[0]        = &vc0,
     /*.vcid[1]        = &vc1,*/
 };
@@ -89,8 +90,10 @@ static const uslp_pc_t uhf_pc = {
     .tf_len         = USLP_MAX_LEN,
     .fecf           = FECF_HW,
     .fecf_len       = FECF_LEN,
-    .phy_send       = comms_send,
-    .phy_send_prio  = comms_send_ahead,
+    .phy_send       = pdu_send,
+    .phy_send_ahead = pdu_send_ahead,
+    .send_arg       = &tx_fifo,
+    .send_ahead_arg = &tx_fifo,
 };
 
 static const uslp_link_t edl_lband_link = {
@@ -489,6 +492,7 @@ static const AX5043Config lbandcfg = {
     .miso           = LINE_SPI1_MISO,
     .irq            = LINE_LBAND_IRQ,
     .xtal_freq      = XTAL_CLK,
+    .fifo           = &rx_fifo,
     .phy_arg        = &edl_lband_link,
     .profile        = lband_low,
 };
@@ -499,6 +503,7 @@ static const AX5043Config uhfcfg = {
     .miso           = LINE_SPI1_MISO,
     .irq            = LINE_UHF_IRQ,
     .xtal_freq      = XTAL_CLK,
+    .fifo           = &rx_fifo,
     .phy_arg        = &edl_uhf_link,
     .profile        = uhf_eng,
     .preamble       = preamble,
@@ -571,32 +576,27 @@ static thread_t *edl_tp[EDL_WORKERS] = {NULL};
 static thread_t *tx_tp = NULL;
 static thread_t *beacon_tp = NULL;
 
-static mailbox_t tx_mb;
-static msg_t tx_mb_msgs[RADIO_FB_COUNT];
-
 THD_FUNCTION(edl_thd, arg)
 {
     (void)arg;
-    fb_t *rx_fb;
+    fb_t *fb;
     size_t len;
 
     while (!chThdShouldTerminateX()) {
-        rx_fb = fb_get();
-        if (rx_fb == NULL) {
+        if ((fb = pdu_recv(&rx_fifo)) == NULL)
             continue;
-        }
-        if (uslp_recv(rx_fb->phy_arg, rx_fb)) {
+        if (uslp_recv(fb->phy_arg, fb)) {
             edl_enable(true);
-            len = rx_fb->len;
-            if (rx_fb->phy_arg == &edl_lband_link) {
+            len = fb->len;
+            if (fb->phy_arg == &edl_lband_link) {
                 OD_persistentState.LBandRX_Bytes += len;
                 OD_persistentState.LBandRX_Packets += 1;
-            } else if (rx_fb->phy_arg == &edl_uhf_link) {
+            } else if (fb->phy_arg == &edl_uhf_link) {
                 OD_persistentState.UHF_RX_Bytes += len;
                 OD_persistentState.UHF_RX_Packets += 1;
             }
         }
-        fb_free(rx_fb);
+        fb_free(fb, &rx_fifo);
     }
 
     chThdExit(MSG_OK);
@@ -608,15 +608,15 @@ THD_FUNCTION(tx_worker, arg)
     fb_t *fb;
 
     while (!chThdShouldTerminateX()) {
-        if (chMBFetchTimeout(&tx_mb, (msg_t*)(&fb), TIME_MS2I(1000)) != MSG_OK)
+        if ((fb = pdu_recv(&tx_fifo)) == NULL)
             continue;
         ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
-        fb_free(fb);
+        fb_free(fb, &tx_fifo);
     }
 
     /* Free remaining frame buffers */
-    while (chMBFetchTimeout(&tx_mb, (msg_t*)(&fb), TIME_IMMEDIATE) == MSG_OK) {
-        fb_free(fb);
+    while ((fb = pdu_recv(&tx_fifo)) != NULL) {
+        fb_free(fb, &tx_fifo);
     }
 
     chThdExit(MSG_OK);
@@ -625,7 +625,6 @@ THD_FUNCTION(tx_worker, arg)
 void comms_init(void)
 {
     radio_init();
-    chMBObjectInit(&tx_mb, tx_mb_msgs, RADIO_FB_COUNT);
 }
 
 void comms_start(void)
@@ -658,17 +657,21 @@ void comms_stop(void)
     }
 }
 
-void comms_cmd(fb_t *fb)
+void comms_cmd(fb_t *fb, void *arg)
 {
-    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC);
+    (void)arg;
+    osalDbgCheck(fb != NULL);
+    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
     cmd_process((cmd_t*)fb->data, resp_fb);
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 
-void comms_file(fb_t *fb)
+void comms_file(fb_t *fb, void *arg)
 {
-    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC);
+    (void)arg;
+    osalDbgCheck(fb != NULL);
+    fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
     int *ret = fb_put(resp_fb, sizeof(int));
     *ret = file_recv((file_xfr_t*)fb->data);
@@ -684,16 +687,4 @@ void comms_beacon(bool enable)
         chThdWait(beacon_tp);
         beacon_tp = NULL;
     }
-}
-
-void comms_send(fb_t *fb)
-{
-    osalDbgCheck(fb != NULL);
-    chMBPostTimeout(&tx_mb, (msg_t)(fb), TIME_INFINITE);
-}
-
-void comms_send_ahead(fb_t *fb)
-{
-    osalDbgCheck(fb != NULL);
-    chMBPostAheadTimeout(&tx_mb, (msg_t)(fb), TIME_INFINITE);
 }
