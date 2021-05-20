@@ -3,6 +3,7 @@
 #include "fw.h"
 #include "fs.h"
 #include "opd.h"
+#include "rtc.h"
 #include "node_mgr.h"
 
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
@@ -107,6 +108,11 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     case CMD_OPD_STATUS:
         ret = fb_put(resp_fb, sizeof(opd_status_t));
         opd_status(cmd->arg[0], ret);
+        break;
+    case CMD_RTC_SETTIME:
+        ret = fb_put(resp_fb, sizeof(uint32_t));
+        rtcSetTimeUnix(*((uint32_t*)cmd->arg), 0);
+        *((uint32_t*)ret) = rtcGetTimeUnix(NULL);
         break;
     default:
         break;

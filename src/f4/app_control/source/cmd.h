@@ -24,6 +24,7 @@ typedef enum {
     CMD_OPD_ENABLE,
     CMD_OPD_RESET,
     CMD_OPD_STATUS,
+    CMD_RTC_SETTIME,
 } cmd_code_t;
 
 typedef struct {

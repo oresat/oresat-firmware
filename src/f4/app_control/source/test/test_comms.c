@@ -69,7 +69,13 @@ static const uslp_pc_t loopback_pc = {
     .phy_send_ahead = pdu_loopback,
 };
 
-static const uslp_link_t edl_loopback_link = {
+static const uslp_link_t edl_loopback_rx_link = {
+    .mc = &mc,
+    .pc_rx = &loopback_pc,
+    .pc_tx = &loopback_pc,
+};
+
+static const uslp_link_t edl_loopback_tx_link = {
     .mc = &loopback_mc,
     .pc_rx = &loopback_pc,
     .pc_tx = &loopback_pc,
@@ -79,10 +85,10 @@ static void pdu_loopback(fb_t *fb, void *arg)
 {
     (void)arg;
     if (fb == tx_fb) {
-        fb->phy_arg = (void*)&edl_loopback_link;
+        fb->phy_arg = (void*)&edl_loopback_rx_link;
         pdu_send(fb, &rx_fifo);
     } else {
-        uslp_recv(&edl_loopback_link, fb);
+        uslp_recv(&edl_loopback_tx_link, fb);
         fb_free(fb, &tx_fifo);
     }
 }
@@ -119,7 +125,7 @@ static void send_cmd(cmd_code_t cmd_code, void *arg, size_t arg_len)
     cmd->cmd = cmd_code;
     if (arg != NULL)
         memcpy(cmd->arg, arg, arg_len);
-    uslp_map_send(&edl_loopback_link, tx_fb, 0, 0, true);
+    uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 0, true);
 }
 
 static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_soff_t off, lfs_size_t len)
@@ -153,7 +159,7 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
     xfr->off = off;
     xfr->len = len;
     chprintf(chp, "Sending %d byte block to offset %d...\r\n", len, off);
-    uslp_map_send(&edl_loopback_link, tx_fb, 0, 1, true);
+    uslp_map_send(&edl_loopback_tx_link, tx_fb, 0, 1, true);
     print_response(chp);
 
     return ret;
@@ -282,6 +288,10 @@ void cmd_edl(BaseSequentialStream *chp, int argc, char *argv[])
     } else if (!strcmp(argv[0], "opd_status") && argc > 1) {
         uint8_t arg = strtoul(argv[1], NULL, 0);
         send_cmd(CMD_OPD_STATUS, &arg, sizeof(arg));
+        print_response(chp);
+    } else if (!strcmp(argv[0], "rtc_settime") && argc > 1) {
+        uint32_t arg = strtoul(argv[1], NULL, 0);
+        send_cmd(CMD_RTC_SETTIME, &arg, sizeof(arg));
         print_response(chp);
     } else if (!strcmp(argv[0], "send")) {
         uint8_t buf[] = {
