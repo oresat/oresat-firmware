@@ -1,4 +1,9 @@
-# Application Main Directory
+# Field-Oriented Control Application Main Directory
+
+
+`app_foc` is an attempt to port [Version 2.1](https://github.com/simplefoc/Arduino-FOC/tree/v2.1) of the [Simple FOC project](https://simplefoc.com/) from Arduino to ChibiOS.
+
+
 ## Directory Structure
 This folder contains the root of an applications sources. It contains
 several files and folders:
