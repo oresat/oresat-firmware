@@ -2,6 +2,7 @@
 #include "hal.h"
 
 #include "CANopen.h"
+#include "OD.h"
 #include "sensors.h"
 
 typedef struct {
@@ -21,10 +22,11 @@ static void sensors_cb(ADCDriver *adcp)
     temperature = ((sensors->ts * VREFINT_CAL_VAL * 10 / sensors->vrefint) - TS_CAL1_VAL * 10);
     temperature = temperature * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2_VAL - TS_CAL1_VAL) + TS_CAL1_TEMP * 10;
 
-    OD_MCU_Sensors.temperatureRaw = sensors->ts;
-    OD_MCU_Sensors.VREFINT_Raw = sensors->vrefint;
-    OD_MCU_Sensors.temperatureRaw = temperature;
-    OD_MCU_Sensors.VREFINT_Raw = vdda;
+    /* TODO: Use proper OD interface */
+    OD_RAM.x2022_MCU_Sensors.temperatureRaw = sensors->ts;
+    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = sensors->vrefint;
+    OD_RAM.x2022_MCU_Sensors.temperatureRaw = temperature;
+    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = vdda;
 }
 
 static void sensors_err_cb(ADCDriver *adcp, adcerror_t err)
@@ -44,9 +46,10 @@ static ADCConversionGroup adcgrpcfg = {
 void sensors_init(void)
 {
     ADC_ENABLE_SENSORS(&ADCD1);
-    OD_MCU_Calibration.TS_CAL1 = TS_CAL1_VAL;
-    OD_MCU_Calibration.TS_CAL2 = TS_CAL2_VAL;
-    OD_MCU_Calibration.VREFINT_CAL = VREFINT_CAL_VAL;
+    /* TODO: Use proper OD interface */
+    OD_RAM.x2021_MCU_Calibration.TS_CAL1 = TS_CAL1_VAL;
+    OD_RAM.x2021_MCU_Calibration.TS_CAL2 = TS_CAL2_VAL;
+    OD_RAM.x2021_MCU_Calibration.VREFINT_CAL = VREFINT_CAL_VAL;
 }
 
 void sensors_start(void)

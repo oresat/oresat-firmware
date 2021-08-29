@@ -3,7 +3,10 @@
 
 #define SDOCLI_TIMEOUT 1000
 
-sdocli_t sdo_client[CO_NO_SDO_CLIENT];
+/* TODO: Don't use extern, switch to some system config/object struct */
+extern CO_t *CO;
+
+sdocli_t sdo_client[OD_CNT_SDO_CLI];
 
 /* CANopen SDO client thread */
 THD_FUNCTION(sdo_client_thd, arg)
@@ -76,10 +79,10 @@ THD_FUNCTION(sdo_client_thd, arg)
 
 void sdo_init(void)
 {
-    for (int i = 0; i < CO_NO_SDO_CLIENT; i++) {
+    for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
         sdo_client[i].tp = NULL;
         chSemObjectInit(&sdo_client[i].sem, 1);
-        sdo_client[i].sdo_c = CO->SDOclient[i];
+        sdo_client[i].sdo_c = &CO->SDOclient[i];
         sdo_client[i].state = SDOCLI_ST_IDLE;
         sdo_client[i].size_transferred = 0;
         sdo_client[i].size_indicated = 0;
@@ -93,11 +96,11 @@ thread_t *sdo_transfer(char type, uint8_t node_id, uint16_t index, uint8_t subin
     int i;
 
     /* Attempt to acquire an SDO client object for the transfer */
-    for (i = 0; i < CO_NO_SDO_CLIENT; i++) {
+    for (i = 0; i < OD_CNT_SDO_CLI; i++) {
         if (chSemWaitTimeout(&sdo_client[i].sem, TIME_IMMEDIATE) == MSG_OK)
             break;
     }
-    if (i == CO_NO_SDO_CLIENT) {
+    if (i == OD_CNT_SDO_CLI) {
         /* Failed to acquire a free SDO client object */
         return NULL;
     }

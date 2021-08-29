@@ -8,6 +8,7 @@
 #include "rtc.h"
 #include "uslp.h"
 #include "CANopen.h"
+#include "OD.h"
 
 static inline void vc_lock(void *arg) {
     mutex_t *mutex = arg;
@@ -53,10 +54,10 @@ static const uslp_vc_t vc0 = {
 
 static MUTEX_DECL(vc1_lock);
 static const uslp_vc_t vc1 = {
-    .seq_ctrl_len   = sizeof(OD_persistentState.VC1SequenceCount),
-    .expedited_len  = sizeof(OD_persistentState.VC1ExpediteCount),
-    .seq_ctrl_cnt   = &OD_persistentState.VC1SequenceCount,
-    .expedited_cnt  = &OD_persistentState.VC1ExpediteCount,
+    .seq_ctrl_len   = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC1_SequenceCount),
+    .expedited_len  = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC1_ExpediteCount),
+    .seq_ctrl_cnt   = &OD_PERSIST_STATE.x6004_persistentState.VC1_SequenceCount,
+    .expedited_cnt  = &OD_PERSIST_STATE.x6004_persistentState.VC1_ExpediteCount,
     .cop            = COP_1,
     .mapid[0]       = &map_cmd,
     .mapid[1]       = &map_file,
@@ -589,11 +590,11 @@ THD_FUNCTION(edl_thd, arg)
             edl_enable(true);
             len = fb->len;
             if (fb->phy_arg == &edl_lband_link) {
-                OD_persistentState.LBandRX_Bytes += len;
-                OD_persistentState.LBandRX_Packets += 1;
+                OD_PERSIST_STATE.x6004_persistentState.LBandRX_Bytes += len;
+                OD_PERSIST_STATE.x6004_persistentState.LBandRX_Packets += 1;
             } else if (fb->phy_arg == &edl_uhf_link) {
-                OD_persistentState.UHF_RX_Bytes += len;
-                OD_persistentState.UHF_RX_Packets += 1;
+                OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes += len;
+                OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Packets += 1;
             }
         }
         fb_free(fb, &rx_fifo);

@@ -4,6 +4,7 @@
 #include "cli.h"
 #include "c3.h"
 #include "CANopen.h"
+#include "OD.h"
 #include "test_fw.h"
 #include "test_canopen.h"
 #include "test_opd.h"
@@ -30,7 +31,7 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         goto state_usage;
     }
     if (!strcmp(argv[0], "status")) {
-        chprintf(chp, "C3 State:  %c\r\n", OD_C3State[0]);
+        chprintf(chp, "C3 State:  %c\r\n", OD_RAM.x6000_C3_State[0]);
         chprintf(chp, "TX Enable: %s\r\n", (tx_enabled() ? "TRUE" : "FALSE"));
         chprintf(chp, "Bat Good:  %s\r\n", (bat_good() ? "TRUE" : "FALSE"));
         chprintf(chp, "EDL Mode:  %s\r\n", (edl_enabled() ? "TRUE" : "FALSE"));
