@@ -86,7 +86,7 @@ state_usage:
 static const ShellCommand commands[] = {
     {"fw", cmd_fw},
     {"nmt", cmd_nmt},
-    /*{"sdo", cmd_sdo},*/
+    {"sdo", cmd_sdo},
     {"opd", cmd_opd},
     {"node", cmd_node},
     {"mmc", cmd_mmc},

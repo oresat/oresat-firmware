@@ -90,47 +90,40 @@ nmt_usage:
 /*===========================================================================*/
 /* OreSat CAN Bus SDO Client                                                 */
 /*===========================================================================*/
-/*
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    struct cb_arg data;
-    thread_t *tp;
     int err = 0;
+    sdocli_op_t op;
     uint16_t index = 0;
     uint8_t node_id = 0, subindex = 0;
     size_t size = 0;
+    uint32_t value = 0;
 
-    if (argc < 5 || (argv[0][0] != 'r' && argv[0][0] != 'w')) {
+    if (argc < 5) {
         goto sdo_usage;
     }
 
+    if (argv[0][0] == 'w') {
+        op = SDO_CLI_WRITE;
+    } else if (argv[0][0] == 'r') {
+        op = SDO_CLI_READ;
+    } else {
+        goto sdo_usage;
+    }
     node_id = strtoul(argv[1], NULL, 0);
     index = strtoul(argv[2], NULL, 0);
     subindex = strtoul(argv[3], NULL, 0);
-
-    data.file = file_open(&FSD1, argv[4], LFS_O_RDWR | LFS_O_CREAT);
-    if (data.file == NULL) {
-        chprintf(chp, "Error in file open: %d\r\n", err);
-        goto sdo_usage;
-    }
-    if (argv[0][0] == 'w') {
-        size = file_size(&FSD1, data.file);
+    size = strtoul(argv[4], NULL, 0);
+    if (op == SDO_CLI_WRITE) {
+        value = strtoul(argv[5], NULL, 0);
     }
 
     chprintf(chp, "Initiating transfer... ");
-    tp = sdo_transfer(argv[0][0], node_id, index, subindex, size, sdo_file_cb, &data);
-    if (tp == NULL) {
-        chprintf(chp, "Failed to initiate transfer\r\n");
-        return;
-    }
-    chThdWait(tp);
-    file_close(&FSD1, data.file);
-    chprintf(chp, "Done!\r\n");
+    sdo_transfer(op, node_id, index, subindex, size, size, &value);
+    chprintf(chp, "Started!\r\n");
     return;
 
 sdo_usage:
-    chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <filename>\r\n");
+    chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <size> [value]\r\n");
     return;
 }
-*/
-

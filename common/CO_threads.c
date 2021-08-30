@@ -7,7 +7,8 @@
                         NMTstate == CO_NMT_OPERATIONAL)
 
 static thread_t *nmt_tp;
-static thread_t *sdo_tp[OD_CNT_SDO_SRV];
+static thread_t *sdo_srv_tp[OD_CNT_SDO_SRV];
+static thread_t *sdo_cli_tp[OD_CNT_SDO_CLI];
 static thread_t *em_tp;
 static thread_t *pdo_sync_tp;
 static thread_t *hbcons_tp;
@@ -36,15 +37,17 @@ void nmt_change_cb(CO_NMT_internalState_t state)
 }
 
 #if OD_CNT_SDO_CLI > 0
+#include "CO_master.h"
 /* CANopen SDO client thread */
 /* TODO: Implement CO_master code here */
-THD_FUNCTION(sdo_client_wip, arg)
+THD_FUNCTION(sdo_client, arg)
 {
     CO_SDOclient_t *SDOclient = arg;
+    sdocli_job_t *job = NULL;
     systime_t prev_time;
     CO_SDO_return_t ret = CO_SDO_RT_waitingResponse;
-    CO_SDO_abortCode_t abort_code = CO_SDO_AB_NONE;
     bool abort = false;
+    size_t n;
 
     /* Register the callback function to wake up thread when message received */
     CO_SDOclient_initCallbackPre(SDOclient, chThdGetSelfX(), process_cb);
@@ -54,25 +57,75 @@ THD_FUNCTION(sdo_client_wip, arg)
         uint32_t timeout = ((typeof(timeout))-1);
 
         if (SDOclient->state & CO_SDO_ST_FLAG_DOWNLOAD) {
+            /* SDO write */
+
+            /* TODO: Refill buffer when total_size != buf_size */
+            /* Copy data into SDO client buffer */
+            if (job->buf_size > 0) {
+                n = CO_SDOclientDownloadBufWrite(SDOclient, &job->buf[job->offset], job->buf_size);
+                job->buf_size -= n;
+                job->offset += n;
+            }
+
+            /* Send next block(s) */
             do {
                 ret = CO_SDOclientDownload(SDOclient,
                         TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                        abort,          /* TODO: Implement logic for this */
-                        false,          /* TODO: Implement logic for this */
-                        &abort_code,    /* TODO: Implement logic for this */
-                        NULL,           /* TODO: Implement logic for this */
+                        abort,
+                        (job->buf_size > 0 ? true : false),
+                        &job->abort_code,
+                        &n,
                         &timeout);
+                job->transferred += n;
             } while (ret == CO_SDO_RT_blockDownldInProgress);
         } else if (SDOclient->state & CO_SDO_ST_FLAG_UPLOAD) {
-            ret = CO_SDOclientUpload(SDOclient,
-                    TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
-                    abort,          /* TODO: Implement logic for this */
-                    &abort_code,    /* TODO: Implement logic for this */
-                    NULL,           /* TODO: Implement logic for this */
-                    NULL,           /* TODO: Implement logic for this */
-                    &timeout);
-        } else {
+            /* SDO read */
 
+            /* Receive next block */
+            do {
+                ret = CO_SDOclientUpload(SDOclient,
+                        TIME_I2US(chVTTimeElapsedSinceX(prev_time)),
+                        abort,
+                        &job->abort_code,
+                        &job->total_size,
+                        &n,
+                        &timeout);
+                job->transferred += n;
+                /* TODO: Remove this DbgCheck when segmented transfer and callbacks are implemented */
+                osalDbgCheck(job->total_size < job->buf_size);
+            } while (ret == CO_SDO_RT_blockUploadInProgress);
+
+            /* Copy data out of SDO client buffer */
+            n = CO_SDOclientUploadBufRead(SDOclient, job->buf, job->buf_size);
+            job->transferred += n;
+        } else {
+            if (chFifoReceiveObjectTimeout(&sdocli_fifo, (void**)&job, TIME_US2I(timeout)) == MSG_OK) {
+                ret = CO_SDOclient_setup(SDOclient,
+                        CO_CAN_ID_SDO_CLI + job->node_id,
+                        CO_CAN_ID_SDO_SRV + job->node_id,
+                        job->node_id);
+                /* TODO: Error check */
+                switch (job->op) {
+                case SDO_CLI_WRITE:
+                    ret = CO_SDOclientDownloadInitiate(SDOclient, job->index, job->subindex, job->total_size, job->timeout, true);
+                    /* TODO: Error check */
+                    break;
+                case SDO_CLI_READ:
+                    ret = CO_SDOclientUploadInitiate(SDOclient, job->index, job->subindex, job->timeout, true);
+                    /* TODO: Error check */
+                    break;
+                default:
+                    break;
+                }
+                timeout = 0;
+            }
+        }
+
+        /* If no further communications or abort, free job slot */
+        if (job != NULL && (SDOclient->state == CO_SDO_ST_IDLE || SDOclient->state == CO_SDO_ST_ABORT)) {
+            chFifoReturnObject(&sdocli_fifo, job);
+            job = NULL;
+            timeout = 0;
         }
 
         prev_time = chVTGetSystemTime();
@@ -200,7 +253,10 @@ THD_FUNCTION(nmt, arg)
     /* Start CANopen threads */
     /* TODO: Optimize stack usage */
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
-        sdo_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Server", HIGHPRIO-1, sdo_server, &co->SDOserver[i]);
+        sdo_srv_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Server", HIGHPRIO-1, sdo_server, &co->SDOserver[i]);
+    }
+    for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
+        sdo_cli_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Client", HIGHPRIO-1, sdo_client, &co->SDOclient[i]);
     }
     em_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "Emergency", HIGHPRIO-2, em, co->em);
     pdo_sync_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "PDO SYNC", HIGHPRIO-2, pdo_sync, co);
@@ -232,9 +288,13 @@ THD_FUNCTION(nmt, arg)
     CO_NMT_initCallbackPre(co->NMT, NULL, NULL);
 
     /* Terminate CANopen threads */
+    for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
+        chThdTerminate(sdo_cli_tp[i]);
+        chEvtSignal(sdo_cli_tp[i], CO_EVT_TERMINATE);
+    }
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
-        chThdTerminate(sdo_tp[i]);
-        chEvtSignal(sdo_tp[i], CO_EVT_TERMINATE);
+        chThdTerminate(sdo_srv_tp[i]);
+        chEvtSignal(sdo_srv_tp[i], CO_EVT_TERMINATE);
     }
     chThdTerminate(em_tp);
     chEvtSignal(em_tp, CO_EVT_TERMINATE);
@@ -244,8 +304,11 @@ THD_FUNCTION(nmt, arg)
     chEvtSignal(hbcons_tp, CO_EVT_TERMINATE);
 
     /* Wait for CANopen threads to end */
+    for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
+        chThdWait(sdo_cli_tp[i]);
+    }
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
-        chThdWait(sdo_tp[i]);
+        chThdWait(sdo_srv_tp[i]);
     }
     chThdWait(em_tp);
     chThdWait(pdo_sync_tp);
