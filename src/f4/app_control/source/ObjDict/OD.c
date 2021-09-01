@@ -1292,7 +1292,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .applicationObject_8 = 0x00000000
     },
     .x1631_RPDOMappingParameter = {
-        .numberOfMappedApplicationObjectsInPDO = 0x01,
+        .numberOfMappedApplicationObjectsInPDO = 0x04,
         .applicationObject_1 = 0x70140908,
         .applicationObject_2 = 0x70140A08,
         .applicationObject_3 = 0x70140B08,
