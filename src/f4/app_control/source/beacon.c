@@ -208,12 +208,12 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.energy },
     /* Star Tracker FS Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.rootPartitionPercent },
-    /* Star Tracker Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* Star Tracker Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.freadCacheLength },
     /* Star Tracker Updater Status */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.updaterStatus },
-    /* Star Tracker Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* Star Tracker Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.updatesAvailable },
     /* Star Tracker Right Ascension */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700B_starTracker.rightAscension },
     /* Star Tracker Declination */
@@ -224,12 +224,12 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_VAL, .len = 4, .val = 0 },
     /* GPS FS Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.rootPartitionPercent },
-    /* GPS Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* GPS Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.freadCacheLength },
     /* GPS Updater Status */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.updaterStatus },
-    /* GPS Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* GPS Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.updatesAvailable },
     /* GPS Status */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.GPS_Status },
     /* GPS Number of Satellites Locked */
@@ -258,14 +258,30 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700E_ACS.IMUTemp },
     /* DxWiFi FS Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.rootPartitionPercent },
-    /* DxWiFi Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* DxWiFi Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.freadCacheLength },
     /* DxWiFi Updater Status */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updaterStatus },
-    /* DxWiFi Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* DxWiFi Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updatesAvailable },
     /* DxWiFi Transmitting */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.transmitting },
+    /* CFC FS Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.rootPartitionPercent },
+    /* CFC Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.freadCacheLength },
+    /* CFC Updater Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.updaterStatus },
+    /* CFC Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.updatesAvailable },
+    /* CFC Enable */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Enable },
+    /* CFC Saturated */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Saturated },
+    /* CFC Temperature */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Temperature },
+    /* CFC Captures */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x7014_CFC.TEC_Captures },
 };
 
 static const tlm_pkt_t aprs0 = {
