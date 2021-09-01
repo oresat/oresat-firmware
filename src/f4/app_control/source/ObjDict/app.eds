@@ -8,8 +8,8 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=12:18PM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:10AM
-ModificationDate=08-28-2021
+ModificationTime=8:49PM
+ModificationDate=08-31-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -32,7 +32,7 @@ Granularity=0
 DynamicChannelsSupported=0
 CompactPDO=0
 GroupMessaging=0
-NrOfRXPDO=47
+NrOfRXPDO=50
 NrOfTXPDO=16
 LSS_Supported=0
 
@@ -124,7 +124,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=172
+SupportedObjects=178
 1=0x1002
 2=0x1003
 3=0x1005
@@ -191,112 +191,118 @@ SupportedObjects=172
 64=0x142C
 65=0x142D
 66=0x142E
-67=0x1600
-68=0x1601
-69=0x1602
-70=0x1603
-71=0x1604
-72=0x1605
-73=0x1606
-74=0x1607
-75=0x1608
-76=0x1609
-77=0x160A
-78=0x160B
-79=0x160C
-80=0x160D
-81=0x160E
-82=0x160F
-83=0x1610
-84=0x1611
-85=0x1612
-86=0x1613
-87=0x1614
-88=0x1615
-89=0x1616
-90=0x1617
-91=0x1618
-92=0x1619
-93=0x161A
-94=0x161B
-95=0x161C
-96=0x161D
-97=0x161E
-98=0x161F
-99=0x1620
-100=0x1621
-101=0x1622
-102=0x1623
-103=0x1624
-104=0x1625
-105=0x1626
-106=0x1627
-107=0x1628
-108=0x1629
-109=0x162A
-110=0x162B
-111=0x162C
-112=0x162D
-113=0x162E
-114=0x1800
-115=0x1801
-116=0x1802
-117=0x1803
-118=0x1804
-119=0x1805
-120=0x1806
-121=0x1807
-122=0x1808
-123=0x1809
-124=0x180A
-125=0x180B
-126=0x180C
-127=0x180D
-128=0x180E
-129=0x180F
-130=0x1A00
-131=0x1A01
-132=0x1A02
-133=0x1A03
-134=0x1A04
-135=0x1A05
-136=0x1A06
-137=0x1A07
-138=0x1A08
-139=0x1A09
-140=0x1A0A
-141=0x1A0B
-142=0x1A0C
-143=0x1A0D
-144=0x1A0E
-145=0x1A0F
-146=0x1F80
-147=0x1F81
-148=0x1F82
-149=0x1F89
-150=0x6000
-151=0x6001
-152=0x6002
-153=0x6003
-154=0x6004
-155=0x7000
-156=0x7001
-157=0x7002
-158=0x7003
-159=0x7004
-160=0x7005
-161=0x7006
-162=0x7007
-163=0x7008
-164=0x7009
-165=0x700A
-166=0x700B
-167=0x700C
-168=0x700D
-169=0x700E
-170=0x700F
-171=0x7013
-172=0x7014
+67=0x142F
+68=0x1430
+69=0x1431
+70=0x1600
+71=0x1601
+72=0x1602
+73=0x1603
+74=0x1604
+75=0x1605
+76=0x1606
+77=0x1607
+78=0x1608
+79=0x1609
+80=0x160A
+81=0x160B
+82=0x160C
+83=0x160D
+84=0x160E
+85=0x160F
+86=0x1610
+87=0x1611
+88=0x1612
+89=0x1613
+90=0x1614
+91=0x1615
+92=0x1616
+93=0x1617
+94=0x1618
+95=0x1619
+96=0x161A
+97=0x161B
+98=0x161C
+99=0x161D
+100=0x161E
+101=0x161F
+102=0x1620
+103=0x1621
+104=0x1622
+105=0x1623
+106=0x1624
+107=0x1625
+108=0x1626
+109=0x1627
+110=0x1628
+111=0x1629
+112=0x162A
+113=0x162B
+114=0x162C
+115=0x162D
+116=0x162E
+117=0x162F
+118=0x1630
+119=0x1631
+120=0x1800
+121=0x1801
+122=0x1802
+123=0x1803
+124=0x1804
+125=0x1805
+126=0x1806
+127=0x1807
+128=0x1808
+129=0x1809
+130=0x180A
+131=0x180B
+132=0x180C
+133=0x180D
+134=0x180E
+135=0x180F
+136=0x1A00
+137=0x1A01
+138=0x1A02
+139=0x1A03
+140=0x1A04
+141=0x1A05
+142=0x1A06
+143=0x1A07
+144=0x1A08
+145=0x1A09
+146=0x1A0A
+147=0x1A0B
+148=0x1A0C
+149=0x1A0D
+150=0x1A0E
+151=0x1A0F
+152=0x1F80
+153=0x1F81
+154=0x1F82
+155=0x1F89
+156=0x6000
+157=0x6001
+158=0x6002
+159=0x6003
+160=0x6004
+161=0x7000
+162=0x7001
+163=0x7002
+164=0x7003
+165=0x7004
+166=0x7005
+167=0x7006
+168=0x7007
+169=0x7008
+170=0x7009
+171=0x700A
+172=0x700B
+173=0x700C
+174=0x700D
+175=0x700E
+176=0x700F
+177=0x7013
+178=0x7014
 
 [1002]
 ParameterName=Manufacturer status register
@@ -3095,6 +3101,132 @@ DefaultValue=254
 PDOMapping=0
 
 [142Esub5]
+ParameterName=Event timer
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[142F]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x4
+
+[142Fsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x05
+PDOMapping=0
+
+[142Fsub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000001D0
+PDOMapping=0
+
+[142Fsub2]
+ParameterName=Transmission type
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[142Fsub5]
+ParameterName=Event timer
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[1430]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x4
+
+[1430sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x05
+PDOMapping=0
+
+[1430sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000002D0
+PDOMapping=0
+
+[1430sub2]
+ParameterName=Transmission type
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1430sub5]
+ParameterName=Event timer
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[1431]
+ParameterName=RPDO communication parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x4
+
+[1431sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x05
+PDOMapping=0
+
+[1431sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x000003D0
+PDOMapping=0
+
+[1431sub2]
+ParameterName=Transmission type
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+PDOMapping=0
+
+[1431sub5]
 ParameterName=Event timer
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -7184,6 +7316,267 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [162Esub8]
+ParameterName=Application object 8
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[162F]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x9
+
+[162Fsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x06
+PDOMapping=0
+
+[162Fsub1]
+ParameterName=Application object 1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140108
+PDOMapping=0
+
+[162Fsub2]
+ParameterName=Application object 2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140208
+PDOMapping=0
+
+[162Fsub3]
+ParameterName=Application object 3
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140308
+PDOMapping=0
+
+[162Fsub4]
+ParameterName=Application object 4
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140408
+PDOMapping=0
+
+[162Fsub5]
+ParameterName=Application object 5
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140508
+PDOMapping=0
+
+[162Fsub6]
+ParameterName=Application object 6
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140608
+PDOMapping=0
+
+[162Fsub7]
+ParameterName=Application object 7
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[162Fsub8]
+ParameterName=Application object 8
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x9
+
+[1630sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x02
+PDOMapping=0
+
+[1630sub1]
+ParameterName=Application object 1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140708
+PDOMapping=0
+
+[1630sub2]
+ParameterName=Application object 2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140808
+PDOMapping=0
+
+[1630sub3]
+ParameterName=Application object 3
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630sub4]
+ParameterName=Application object 4
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630sub5]
+ParameterName=Application object 5
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630sub6]
+ParameterName=Application object 6
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630sub7]
+ParameterName=Application object 7
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1630sub8]
+ParameterName=Application object 8
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1631]
+ParameterName=RPDO mapping parameter
+ObjectType=0x9
+;StorageLocation=PERSIST_COMM
+SubNumber=0x9
+
+[1631sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+PDOMapping=0
+
+[1631sub1]
+ParameterName=Application object 1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140908
+PDOMapping=0
+
+[1631sub2]
+ParameterName=Application object 2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140A08
+PDOMapping=0
+
+[1631sub3]
+ParameterName=Application object 3
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140B08
+PDOMapping=0
+
+[1631sub4]
+ParameterName=Application object 4
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x70140C20
+PDOMapping=0
+
+[1631sub5]
+ParameterName=Application object 5
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1631sub6]
+ParameterName=Application object 6
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1631sub7]
+ParameterName=Application object 7
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+PDOMapping=0
+
+[1631sub8]
 ParameterName=Application object 8
 ObjectType=0x7
 ;StorageLocation=RAM
@@ -15178,7 +15571,7 @@ PDOMapping=1
 ParameterName=CFC
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x9
+SubNumber=0xD
 
 [7014sub0]
 ParameterName=Highest sub-index supported
@@ -15186,7 +15579,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x08
+DefaultValue=0x0C
 PDOMapping=0
 
 [7014sub1]
@@ -15257,6 +15650,42 @@ ParameterName=Updates available
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7014sub9]
+ParameterName=TEC Enable
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7014subA]
+ParameterName=TEC Saturated
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0001
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7014subB]
+ParameterName=TEC Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rwr
+DefaultValue=0
+PDOMapping=1
+
+[7014subC]
+ParameterName=TEC Captures
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
 AccessType=rwr
 DefaultValue=0
 PDOMapping=1
