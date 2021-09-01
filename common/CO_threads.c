@@ -360,6 +360,8 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
     /* TODO: Don't use magic numbers here, figure out OD interface */
     err = CO_CANopenInit(CO, NULL, NULL, OD, NULL, CO_NMT_STARTUP_TO_OPERATIONAL, 500, 500, 500, true, node_id, NULL);
     chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInit failed");
+    err = CO_CANopenInitPDO(CO, CO->em, OD, node_id, NULL);
+    chDbgAssert(err == CO_ERROR_NO, "CO_CANopenInitPDO failed");
     chEvtObjectInit(&nmt_event);
 }
 

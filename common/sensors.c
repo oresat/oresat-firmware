@@ -10,23 +10,24 @@ typedef struct {
     adcsample_t vrefint;
 } sensors_t;
 
-sensors_t sensors;
+sensors_t sensors[2];
 
 static void sensors_cb(ADCDriver *adcp)
 {
     sensors_t *sensors = (sensors_t*)adcp->samples;
     int16_t temperature;
     int16_t vdda;
+    int i = adcIsBufferComplete(adcp);
 
-    vdda = VREFINT_CAL_VOLT * VREFINT_CAL_VAL / sensors->vrefint;
-    temperature = ((sensors->ts * VREFINT_CAL_VAL * 10 / sensors->vrefint) - TS_CAL1_VAL * 10);
+    vdda = VREFINT_CAL_VOLT * VREFINT_CAL_VAL / sensors[i].vrefint;
+    temperature = ((sensors[i].ts * VREFINT_CAL_VAL * 10 / sensors[i].vrefint) - TS_CAL1_VAL * 10);
     temperature = temperature * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2_VAL - TS_CAL1_VAL) + TS_CAL1_TEMP * 10;
 
     /* TODO: Use proper OD interface */
-    OD_RAM.x2022_MCU_Sensors.temperatureRaw = sensors->ts;
-    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = sensors->vrefint;
-    OD_RAM.x2022_MCU_Sensors.temperatureRaw = temperature;
-    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = vdda;
+    OD_RAM.x2022_MCU_Sensors.temperatureRaw = sensors[i].ts;
+    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = sensors[i].vrefint;
+    OD_RAM.x2022_MCU_Sensors.temperature= temperature;
+    OD_RAM.x2022_MCU_Sensors.VREFINT= vdda;
 }
 
 static void sensors_err_cb(ADCDriver *adcp, adcerror_t err)
@@ -36,7 +37,7 @@ static void sensors_err_cb(ADCDriver *adcp, adcerror_t err)
 }
 
 static ADCConversionGroup adcgrpcfg = {
-    FALSE,
+    true,
     sizeof(sensors_t)/sizeof(adcsample_t),
     sensors_cb,
     sensors_err_cb,
@@ -56,6 +57,6 @@ void sensors_start(void)
 {
     adcAcquireBus(&ADCD1);
     adcStart(&ADCD1, NULL);
-    /*adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)(&sensors), sizeof(sensors)/sizeof(sensors_t));*/
+    adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)sensors, sizeof(sensors)/sizeof(sensors_t));
     adcReleaseBus(&ADCD1);
 }
