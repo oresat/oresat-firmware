@@ -5,6 +5,7 @@
 #include "opd.h"
 #include "rtc.h"
 #include "node_mgr.h"
+#include "CO_master.h"
 
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
@@ -114,6 +115,17 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         rtcSetTimeUnix(*((uint32_t*)cmd->arg), 0);
         *((uint32_t*)ret) = rtcGetTimeUnix(NULL);
         break;
+    case CMD_SDO_WRITE:
+        ret = fb_put(resp_fb, 1);
+        struct __attribute__((packed)) {
+            uint8_t node_id;
+            uint16_t index;
+            uint8_t subindex;
+            size_t size;
+            uint8_t data[];
+        } *sdo_arg = (void*)cmd->arg;
+        sdo_transfer(SDO_CLI_WRITE, sdo_arg->node_id, sdo_arg->index, sdo_arg->subindex, sdo_arg->size, sdo_arg->size, sdo_arg->data);
+        *((uint8_t*)ret) = 0;
     default:
         break;
     }
