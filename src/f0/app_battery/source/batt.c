@@ -7,7 +7,7 @@
 
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
 
-#if 0 || ENABLE_NV_MEMORY_UPDATE_CODE
+#if 1 || ENABLE_NV_MEMORY_UPDATE_CODE
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
@@ -57,6 +57,24 @@ static const I2CConfig i2cconfig_2 = {
 };
 
 //The values for batt_nv_programing_cfg are detailed in the google document "MAX17205 Register Values"
+#if 1
+//These values were generated using the windows tool from Maxim and while they are probably not totally correct yield generally reasonable read back values from the MAX17 chip.
+static const max17205_regval_t batt_nv_programing_cfg[] = {
+	//{MAX17205_AD_NFULLCAPNOM, 0x1794 },
+	{MAX17205_AD_NDESIGNCAP, 0x1450}, /*5200 (0.5 increments)*/
+    {MAX17205_AD_NPACKCFG, 0x3EA2 },
+	{MAX17205_AD_NNVCFG0, 0x00B0 },//0x0920
+	{MAX17205_AD_NNVCFG1, 0xC000 },//0x8006
+	{MAX17205_AD_NNVCFG2, 0xFF0A },
+	{MAX17205_AD_NICHGTERM, 0x0034 },
+	{MAX17205_AD_NVEMPTY, 0x965A },
+	{MAX17205_AD_NTCURVE, 0x0064 },
+	{MAX17205_AD_NTGAIN, 0xF49A },
+	{MAX17205_AD_NTOFF, 0x16A1 },
+    {0,0}
+};
+
+#else
 static const max17205_regval_t batt_nv_programing_cfg[] = {
     {MAX17205_AD_NPACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
                                           _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
@@ -78,6 +96,7 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
 							(1<<4)},
     {0,0}
 };
+#endif
 
 
 static const max17205_regval_t batt_cfg[] = {
@@ -564,8 +583,18 @@ THD_FUNCTION(batt, arg)
 
 
 #if 1
-    prompt_nv_memory_write(&max17205devPack1, &max17205configPack1, "Pack 1");
-    prompt_nv_memory_write(&max17205devPack2, &max17205configPack2, "Pack 2");
+    if( pack_1_init_flag ) {
+    	prompt_nv_memory_write(&max17205devPack1, &max17205configPack1, "Pack 1");
+    } else {
+    	dbgprintf("Skipping NV prompt for pack 1 as it failed to initialize...\r\n");
+    }
+
+    if( pack_2_init_flag ) {
+    	prompt_nv_memory_write(&max17205devPack2, &max17205configPack2, "Pack 2");
+    } else {
+    	dbgprintf("Skipping NV prompt for pack 2 as it failed to initialize...\r\n");
+    }
+
 #if ENABLE_NV_MEMORY_UPDATE_CODE
     dbgprintf("Done with NV RAM update code, disable ENABLE_NV_MEMORY_UPDATE_CODE and re-write firmware.\r\n");
 	for (;;) {
