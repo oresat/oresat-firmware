@@ -56,9 +56,11 @@ static const I2CConfig i2cconfig_2 = {
     0
 };
 
-//The values for batt_nv_programing_cfg are detailed in the google document "MAX17205 Register Values"
-#if 1
-//These values were generated using the windows tool from Maxim and while they are probably not totally correct yield generally reasonable read back values from the MAX17 chip.
+/*
+  The values for batt_nv_programing_cfg are detailed in the google document "MAX17205 Register Values"
+  These values were generated using the windows tool from Maxim and while they are probably not totally
+  correct yield generally reasonable read back values from the MAX17 chip.
+ */
 static const max17205_regval_t batt_nv_programing_cfg[] = {
 	//{MAX17205_AD_NFULLCAPNOM, 0x1794 },
 	{MAX17205_AD_NDESIGNCAP, 0x1450}, /*5200 (0.5 increments)*/
@@ -73,30 +75,6 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
 	{MAX17205_AD_NTOFF, 0x16A1 },
     {0,0}
 };
-
-#else
-static const max17205_regval_t batt_nv_programing_cfg[] = {
-    {MAX17205_AD_NPACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
-                                          _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
-                                          MAX17205_PACKCFG_BALCFG_40 |
-										  MAX17205_PACKCFG_CHEN |
-										  MAX17205_PACKCFG_TDEN |
-										  MAX17205_PACKCFG_A1EN |
-										  MAX17205_PACKCFG_A2EN )}, /* 0x3CA2 */
-	{MAX17205_AD_NDESIGNCAP, 5200}, /*0x1450*/
-	{MAX17205_AD_NNVCFG0, MAX17205_NNVCFG0_ENOCV |
-							MAX17205_NNVCFG0_ENX |
-							MAX17205_NNVCFG0_ENCFG |
-							MAX17205_NNVCFG0_ENLCFG |
-							MAX17205_NNVCFG0_ENDC },
-	{MAX17205_AD_NNVCFG1, MAX17205_NNVCFG1_ENTTF | MAX17205_NNVCFG1_ENCTE},
-	{MAX17205_AD_NNVCFG2, MAX17205_NNVCFG2_ENFC |
-							(9 & MAX17205_NNVCFG2_CYCLESPSAVE_Msk)},
-	{MAX17205_AD_NCONFIG, MAX17205_NCONFIG_TEN |
-							(1<<4)},
-    {0,0}
-};
-#endif
 
 
 static const max17205_regval_t batt_cfg[] = {
@@ -173,7 +151,10 @@ battery_heating_state_machine_state_t current_batery_state_machine_state = BATTE
 
 
 /**
- * TODO document this
+ * @brief Runs the battery state machine, responsible for turning on/off heaters, charging, discharging etc.
+ *
+ * @*pk1_data[in] Current data for pack 1
+ * @*pk2_data[in] Current data for pack 2
  */
 void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_data_t *pk2_data) {
 	if( pk1_data->is_data_valid && pk2_data->is_data_valid ) {
@@ -216,7 +197,11 @@ void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_dat
 }
 
 /**
- * TODO document this
+ * @brief Query the MAX17 chip for a given pack and populate *pk_data with the current status/state represented in the MAX17
+ *
+ * @param[in] *pk_data Destination into which to store MAX17 pack data.
+ * @param[in] line_dchg_dis ioline to control the discharge disable pin.
+ * @param[in] line_chg_dis ioline to control of the charge disable pin.
  */
 void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t line_dchg_dis, const ioline_t line_chg_dis) {
 	dbgprintf("LINE_DCHG_STAT_PK1 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK1));
@@ -260,7 +245,10 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
 }
 
 /**
- * TODO document this
+ * @param *driver[in] The MAX17 driver object to use to query pack data from
+ * @param *dest[out] Destination into which to store pack data currently tracked in the MAX17
+ *
+ * @return true on success, false otherwise
  */
 bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 	msg_t r = 0;
@@ -414,7 +402,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 }
 
 /**
- * Helper function to trigger write of volatile memory on MAX71205 chip
+ * Helper function to trigger write of volatile memory on MAX71205 chip.
  */
 bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, const char *pack_str) {
 	bool ret = false;
@@ -491,6 +479,12 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, 
 	return(ret);
 }
 
+/**
+ * @brief Populates CANOpen data structure values with values from the current battery pack data.
+ *
+ * @param *battery_data_ptr[out] Destination into which to store pack data that is published via CANOpen
+ * @param *pack_data[in] Source of data for populating/publishing pack data.
+ */
 void populate_od_pack_data(OD_battery_t *battery_data_ptr, batt_pack_data_t *pack_data) {
 	battery_data_ptr->vbatt = pack_data->batt_mV;
 	battery_data_ptr->VCellMax = pack_data->v_cell_max_volt_mV;
