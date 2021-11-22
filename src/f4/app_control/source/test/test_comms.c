@@ -104,7 +104,7 @@ static void resp_recv(fb_t *fb, void *arg)
 
 static void print_response(BaseSequentialStream *chp)
 {
-    if (chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(10)) != 0) {
+    if (chEvtWaitAnyTimeout(COMMS_EVENT_LOOPBACK_RX, TIME_S2I(30)) != 0) {
         chprintf(chp, "Response buffer:");
         for (size_t i = 0; i < buf_len; i++) {
             if (i % 0x10 == 0) chprintf(chp, "\r\n%04X:", i);
