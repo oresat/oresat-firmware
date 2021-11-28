@@ -165,7 +165,7 @@ uint16_t crc16_ccitt_hw(const uint8_t block[], size_t len, uint16_t crc)
         len -= 2;
         i += 2;
     }
-    crc = crc16_sw(&block[i], len, crc);
+    crc = crc16_ccitt_sw(&block[i], len, crc);
     return crc;
 }
 #endif

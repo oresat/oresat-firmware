@@ -2799,6 +2799,10 @@ typedef struct{
      */
     uint32_t                    xtal_freq;
     /**
+     * @brief Receive FIFO
+     */
+    objects_fifo_t              *fifo;
+    /**
      * @brief Optional frame buffer PHY argument
      */
     const void                  *phy_arg;

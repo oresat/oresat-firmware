@@ -13,6 +13,7 @@ POST_MAKE_ALL_RULE_HOOK:
 	srec_cat $(BUILDDIR)/$(PROJECT).crc32.bin -binary -offset 0x0800A000 -o $(BUILDDIR)/$(PROJECT).bin.hex -Intel -Line_Length 44
 	mv $(BUILDDIR)/$(PROJECT).hex $(BUILDDIR)/$(PROJECT).origional.hex
 	cp $(BUILDDIR)/$(PROJECT).bin.hex $(BUILDDIR)/$(PROJECT).hex
+	xxd -i $(BUILDDIR)/$(PROJECT).crc32.bin > $(BUILDDIR)/$(PROJECT).crc32.bin.h
 endif
 
 write: $(OUTFILES) POST_MAKE_ALL_RULE_HOOK write_ocd

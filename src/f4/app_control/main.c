@@ -53,7 +53,7 @@ static const oresat_node_t nodes[] = {
     /*{0x44, 0x22, 10000, false, "RWB 2"},*/
     /*{0x48, 0x23, 10000, false, "RWB 3"},*/
     {0x4C, 0x1B, 10000, false, "DxWiFi"},
-    /*{0x50, 0x1E, 10000, false, "CFC"},*/
+    {0x50, 0x1E, 10000, false, "CFC"},
     {0, 0, 0, 0, NULL}
 };
 

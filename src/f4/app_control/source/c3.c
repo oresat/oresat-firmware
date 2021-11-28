@@ -6,6 +6,9 @@
 #include "deployer.h"
 #include "fw.h"
 #include "CANopen.h"
+#include "OD.h"
+
+/* TODO: Re-implement with OD interface */
 
 #define CHIBIOS_EPOCH                       315532800U  /* ChibiOS Epoch in Unix Time */
 
@@ -18,7 +21,7 @@
 
 #define BAT_LEVEL_LOW                       6500U
 #define BAT_LEVEL_HIGH                      7000U
-#define BAT_LOW                             (OD_battery[0].VBattBP1 < BAT_LEVEL_LOW && OD_battery[0].VBattBP2 < BAT_LEVEL_LOW)
+#define BAT_LOW                             (OD_RAM.x7001_battery.VBattBP1 < BAT_LEVEL_LOW && OD_RAM.x7001_battery.VBattBP2 < BAT_LEVEL_LOW)
 
 /* Global State Variables */
 thread_t *c3_tp;
@@ -55,28 +58,28 @@ static void alarmcb(RTCDriver *rtcp, rtcevent_t event)
 static void c3StateSave(void)
 {
     /* Do not store state in predeploy */
-    if (OD_C3State[0] == PREDEPLOY)
+    if (OD_RAM.x6000_C3_State[0] == PREDEPLOY)
         return;
 
     /* Get the current state of RTC */
-    rtcGetTime(&RTCD1, (RTCDateTime*)(&OD_persistentState.timestamp));
+    rtcGetTime(&RTCD1, (RTCDateTime*)(&OD_PERSIST_STATE.x6004_persistentState.timestamp));
     if (RTCD1.rtc->CR & RTC_CR_ALRAE) {
-        rtcGetAlarm(&RTCD1, ALARM_A, (RTCAlarm*)(&OD_persistentState.alarmA));
+        rtcGetAlarm(&RTCD1, ALARM_A, (RTCAlarm*)(&OD_PERSIST_STATE.x6004_persistentState.alarmA));
     } else {
-        OD_persistentState.alarmA = 0;
+        OD_PERSIST_STATE.x6004_persistentState.alarmA = 0;
     }
     if (RTCD1.rtc->CR & RTC_CR_ALRBE) {
-        rtcGetAlarm(&RTCD1, ALARM_B, (RTCAlarm*)(&OD_persistentState.alarmB));
+        rtcGetAlarm(&RTCD1, ALARM_B, (RTCAlarm*)(&OD_PERSIST_STATE.x6004_persistentState.alarmB));
     } else {
-        OD_persistentState.alarmB = 0;
+        OD_PERSIST_STATE.x6004_persistentState.alarmB = 0;
     }
     if (RTCD1.rtc->CR & RTC_CR_WUTE) {
-        rtcSTM32GetPeriodicWakeup(&RTCD1, (RTCWakeup*)(&OD_persistentState.wakeup));
+        rtcSTM32GetPeriodicWakeup(&RTCD1, (RTCWakeup*)(&OD_PERSIST_STATE.x6004_persistentState.wakeup));
     } else {
-        OD_persistentState.wakeup = 0;
+        OD_PERSIST_STATE.x6004_persistentState.wakeup = 0;
     }
     /* Write state to FRAM */
-    storeGroup(&CO_OD_PERSIST_STATE);
+    storeGroup(&OD_PERSIST_STATE);
     /* TODO: Backup/sync with external RTC */
 }
 
@@ -85,32 +88,34 @@ static void c3StateRestore(void)
     time_t unix;
 
     /* Read the stored state from FRAM */
-    restoreGroup(&CO_OD_PERSIST_STATE);
-    unix = rtcConvertDateTimeToUnix((RTCDateTime*)(&OD_persistentState.timestamp), NULL);
+    restoreGroup(&OD_PERSIST_STATE);
+    unix = rtcConvertDateTimeToUnix((RTCDateTime*)(&OD_PERSIST_STATE.x6004_persistentState.timestamp), NULL);
 
     /* TODO: Get RTC values from external RTC and reach quorum */
     if (difftime(unix, rtcGetTimeUnix(NULL)) > 0) {
         /* Stored state timestamp is greater */
-        rtcSetTime(&RTCD1, (RTCDateTime*)(&OD_persistentState.timestamp));
+        rtcSetTime(&RTCD1, (RTCDateTime*)(&OD_PERSIST_STATE.x6004_persistentState.timestamp));
     }
 
     /* Apply state */
-    if (OD_persistentState.alarmA != 0) {
-        rtcSetAlarm(&RTCD1, ALARM_A, (RTCAlarm*)(&OD_persistentState.alarmA));
+    if (OD_PERSIST_STATE.x6004_persistentState.alarmA != 0) {
+        rtcSetAlarm(&RTCD1, ALARM_A, (RTCAlarm*)(&OD_PERSIST_STATE.x6004_persistentState.alarmA));
     }
-    if (OD_persistentState.alarmB != 0) {
-        rtcSetAlarm(&RTCD1, ALARM_B, (RTCAlarm*)(&OD_persistentState.alarmB));
+    if (OD_PERSIST_STATE.x6004_persistentState.alarmB != 0) {
+        rtcSetAlarm(&RTCD1, ALARM_B, (RTCAlarm*)(&OD_PERSIST_STATE.x6004_persistentState.alarmB));
     }
-    if (OD_persistentState.wakeup != 0) {
-        rtcSTM32SetPeriodicWakeup(&RTCD1, (RTCWakeup*)(&OD_persistentState.wakeup));
+    if (OD_PERSIST_STATE.x6004_persistentState.wakeup != 0) {
+        rtcSTM32SetPeriodicWakeup(&RTCD1, (RTCWakeup*)(&OD_PERSIST_STATE.x6004_persistentState.wakeup));
     }
 }
 
 bool delay_deploy(void)
 {
-    return (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_deploymentControl.timeout);
+    return (difftime(rtcGetTimeUnix(NULL), CHIBIOS_EPOCH) < OD_PERSIST_APP.x6002_deploymentControl.timeout);
 }
 
+/* TODO: Re-enable battery monitoring using new OD interface */
+/*
 CO_SDO_abortCode_t OD_BATT_CALLBACK(CO_ODF_arg_t *ODF_arg)
 {
     if (!ODF_arg->reading) {
@@ -119,6 +124,7 @@ CO_SDO_abortCode_t OD_BATT_CALLBACK(CO_ODF_arg_t *ODF_arg)
 
     return CO_SDO_AB_NONE;
 }
+*/
 
 bool bat_good(void)
 {
@@ -135,12 +141,12 @@ bool bat_good(void)
 
 bool tx_enabled(void)
 {
-    return (difftime(rtcGetTimeUnix(NULL), OD_persistentState.lastTX_Enable) < OD_TX_Control.timeout);
+    return (difftime(rtcGetTimeUnix(NULL), OD_PERSIST_STATE.x6004_persistentState.lastTX_Enable) < OD_PERSIST_APP.x6003_TX_Control.timeout);
 }
 
 bool edl_enabled(void)
 {
-    return (difftime(rtcGetTimeUnix(NULL), OD_persistentState.lastEDL) < OD_stateControl.EDL_Timeout);
+    return (difftime(rtcGetTimeUnix(NULL), OD_PERSIST_STATE.x6004_persistentState.lastEDL) < OD_PERSIST_APP.x6001_stateControl.EDL_Timeout);
 }
 
 void set_alarm(rtcalarm_t alrm, time_t start, int days, int hours, int minutes, int seconds)
@@ -164,50 +170,50 @@ THD_FUNCTION(c3, arg)
 
     c3_tp = chThdGetSelfX();
     rtcSetCallback(&RTCD1, alarmcb);
-    CO_OD_configure(CO->SDO[0], OD_7001_battery, OD_BATT_CALLBACK, NULL, NULL, 0);
+    /*CO_OD_configure(CO->SDO[0], OD_7001_battery, OD_BATT_CALLBACK, NULL, NULL, 0);*/
 
     /* Restore saved state */
     c3StateRestore();
 
     /* Increment power cycles */
-    OD_persistentState.powerCycles++;
+    OD_PERSIST_STATE.x6004_persistentState.powerCycles++;
 
     /* State loop */
     while (!chThdShouldTerminateX()) {
         RTCWakeup wakeup;
-        switch (OD_C3State[0]) {
+        switch (OD_RAM.x6000_C3_State[0]) {
         case PREDEPLOY:
             /* Check if pre-deployment timeout has occured */
             if (delay_deploy()) {
                 /* Must wait for pre-deployment timeout */
-                set_alarm(PREDEPLOY_ALARM, CHIBIOS_EPOCH, 0, 0, 0, OD_deploymentControl.timeout);
+                set_alarm(PREDEPLOY_ALARM, CHIBIOS_EPOCH, 0, 0, 0, OD_PERSIST_APP.x6002_deploymentControl.timeout);
                 /* Initially enable TX */
                 tx_enable(true);
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE);
             } else {
                 /* Enter deploy state */
-                OD_C3State[0] = DEPLOY;
+                OD_RAM.x6000_C3_State[0] = DEPLOY;
             }
             break;
         case DEPLOY:
             /* Set RTC wakeup alarm for state saving */
-            wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | (OD_stateControl.saveInterval - 1);
+            wakeup.wutr = (RTC_CR_WUCKSEL_2 << 16) | (OD_PERSIST_APP.x6001_stateControl.saveInterval - 1);
             rtcSTM32SetPeriodicWakeup(&RTCD1, &wakeup);
 
             /* Initiate antenna deployment if needed */
             static uint8_t attempts = 0;
-            if (!OD_persistentState.deployed && attempts < OD_deploymentControl.attempts) {
+            if (!OD_PERSIST_STATE.x6004_persistentState.deployed && attempts < OD_PERSIST_APP.x6002_deploymentControl.attempts) {
                 if (bat_good()) {
-                    deploy_heli(OD_deploymentControl.actuationTime);
-                    deploy_turn(OD_deploymentControl.actuationTime);
+                    deploy_heli(OD_PERSIST_APP.x6002_deploymentControl.actuationTime);
+                    deploy_turn(OD_PERSIST_APP.x6002_deploymentControl.actuationTime);
                     attempts++;
                 } else {
                     chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_BAT);
                 }
             } else {
                 /* Enter standy state */
-                OD_C3State[0] = STANDBY;
-                OD_persistentState.deployed = 1;
+                OD_RAM.x6000_C3_State[0] = STANDBY;
+                OD_PERSIST_STATE.x6004_persistentState.deployed = 1;
                 attempts = 0;
             }
             break;
@@ -215,9 +221,9 @@ THD_FUNCTION(c3, arg)
             comms_beacon(false);
 
             if (edl_enabled()) {
-                OD_C3State[0] = EDL;
+                OD_RAM.x6000_C3_State[0] = EDL;
             } else if (tx_enabled() && bat_good()) {
-                OD_C3State[0] = BEACON;
+                OD_RAM.x6000_C3_State[0] = BEACON;
             } else {
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
             }
@@ -226,9 +232,9 @@ THD_FUNCTION(c3, arg)
             comms_beacon(true);
 
             if (edl_enabled()) {
-                OD_C3State[0] = EDL;
+                OD_RAM.x6000_C3_State[0] = EDL;
             } else if (!tx_enabled() || !bat_good()) {
-                OD_C3State[0] = STANDBY;
+                OD_RAM.x6000_C3_State[0] = STANDBY;
             } else {
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_TX | C3_EVENT_BAT | C3_EVENT_EDL);
             }
@@ -238,16 +244,16 @@ THD_FUNCTION(c3, arg)
 
             if (!edl_enabled()) {
                 if (tx_enabled() && bat_good()) {
-                    OD_C3State[0] = BEACON;
+                    OD_RAM.x6000_C3_State[0] = BEACON;
                 } else {
-                    OD_C3State[0] = STANDBY;
+                    OD_RAM.x6000_C3_State[0] = STANDBY;
                 }
             } else {
                 chEvtWaitAny(C3_EVENT_WAKEUP | C3_EVENT_TERMINATE | C3_EVENT_EDL);
             }
             break;
         default:
-            OD_C3State[0] = PREDEPLOY;
+            OD_RAM.x6000_C3_State[0] = PREDEPLOY;
             break;
         };
 
@@ -264,10 +270,10 @@ THD_FUNCTION(c3, arg)
 void tx_enable(bool state)
 {
     if (state) {
-        OD_persistentState.lastTX_Enable = rtcGetTimeUnix(NULL);
-        set_alarm(TX_ENABLE_ALARM, OD_persistentState.lastTX_Enable, 0, 0, 0, OD_TX_Control.timeout);
+        OD_PERSIST_STATE.x6004_persistentState.lastTX_Enable = rtcGetTimeUnix(NULL);
+        set_alarm(TX_ENABLE_ALARM, OD_PERSIST_STATE.x6004_persistentState.lastTX_Enable, 0, 0, 0, OD_PERSIST_APP.x6003_TX_Control.timeout);
     } else {
-        OD_persistentState.lastTX_Enable = 0;
+        OD_PERSIST_STATE.x6004_persistentState.lastTX_Enable = 0;
         rtcSetAlarm(&RTCD1, TX_ENABLE_ALARM, NULL);
     }
     chEvtSignal(c3_tp, C3_EVENT_TX);
@@ -276,14 +282,14 @@ void tx_enable(bool state)
 void edl_enable(bool state)
 {
     /* Do not enable EDL if in predeploy state */
-    if (OD_C3State[0] == PREDEPLOY)
+    if (OD_RAM.x6000_C3_State[0] == PREDEPLOY)
         return;
 
     if (state) {
-        OD_persistentState.lastEDL = rtcGetTimeUnix(NULL);
-        set_alarm(EDL_ALARM, OD_persistentState.lastEDL, 0, 0, 0, OD_stateControl.EDL_Timeout);
+        OD_PERSIST_STATE.x6004_persistentState.lastEDL = rtcGetTimeUnix(NULL);
+        set_alarm(EDL_ALARM, OD_PERSIST_STATE.x6004_persistentState.lastEDL, 0, 0, 0, OD_PERSIST_APP.x6001_stateControl.EDL_Timeout);
     } else {
-        OD_persistentState.lastEDL = 0;
+        OD_PERSIST_STATE.x6004_persistentState.lastEDL = 0;
         rtcSetAlarm(&RTCD1, EDL_ALARM, NULL);
     }
     chEvtSignal(c3_tp, C3_EVENT_EDL);
