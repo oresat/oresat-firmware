@@ -5,11 +5,11 @@ FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat IMU Application Object Dictionary
-CreationTime=3:51PM
+CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:53AM
-ModificationDate=04-25-2021
+ModificationTime=11:21AM
+ModificationDate=11-28-2021
 ModifiedBy=Ryan Meidick
 
 [DeviceInfo]
@@ -5355,7 +5355,7 @@ DefaultValue=0x06
 PDOMapping=0
 
 [6001sub1]
-ParameterName=X
+ParameterName=accX
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5364,7 +5364,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001sub2]
-ParameterName=Y
+ParameterName=accY
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5373,7 +5373,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001sub3]
-ParameterName=Z
+ParameterName=accZ
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5382,7 +5382,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001sub4]
-ParameterName=X raw
+ParameterName=acc X raw
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5391,7 +5391,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001sub5]
-ParameterName=Y raw
+ParameterName=accY raw
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5400,7 +5400,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001sub6]
-ParameterName=Z raw
+ParameterName=accZ raw
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5433,7 +5433,7 @@ DefaultValue=0x03
 PDOMapping=0
 
 [6003sub1]
-ParameterName=X
+ParameterName=magX
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5442,7 +5442,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6003sub2]
-ParameterName=Y
+ParameterName=magY
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5451,7 +5451,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6003sub3]
-ParameterName=Z
+ParameterName=magZ
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5475,7 +5475,7 @@ DefaultValue=0x03
 PDOMapping=0
 
 [6004sub1]
-ParameterName=X
+ParameterName=magX
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5484,7 +5484,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6004sub2]
-ParameterName=Y
+ParameterName=magY
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5493,7 +5493,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6004sub3]
-ParameterName=Z
+ParameterName=magZ
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5517,7 +5517,7 @@ DefaultValue=0x03
 PDOMapping=0
 
 [6005sub1]
-ParameterName=X
+ParameterName=magX
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5526,7 +5526,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6005sub2]
-ParameterName=Y
+ParameterName=magY
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5535,7 +5535,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6005sub3]
-ParameterName=Z
+ParameterName=magZ
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5559,7 +5559,7 @@ DefaultValue=0x03
 PDOMapping=0
 
 [6006sub1]
-ParameterName=X
+ParameterName=magX
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5568,7 +5568,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6006sub2]
-ParameterName=Y
+ParameterName=magY
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5577,7 +5577,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6006sub3]
-ParameterName=Z
+ParameterName=magZ
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
