@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "CANopen.h"
+#include "OD.h"
 
 typedef struct oresat_node {
     uint8_t         id;

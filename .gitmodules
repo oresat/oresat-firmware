@@ -7,3 +7,6 @@
 [submodule "ext/littlefs"]
 	path = ext/littlefs
 	url = https://github.com/littlefs-project/littlefs
+[submodule "ext/OpenCCSDS"]
+	path = ext/OpenCCSDS
+	url = https://github.com/oresat/OpenCCSDS.git

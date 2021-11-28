@@ -3,11 +3,14 @@
 #include "fw.h"
 #include "fs.h"
 #include "opd.h"
+#include "rtc.h"
 #include "node_mgr.h"
+#include "CO_master.h"
 
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
     lfs_file_t *file;
+    cmd_flash_t *flash_arg;
     uint32_t *key;
     void *ret;
 
@@ -19,15 +22,16 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         break;
     case CMD_FW_FLASH:
         ret = fb_put(resp_fb, sizeof(int));
-        *((int*)ret) = fw_flash(&EFLD1, (char*)&cmd->arg[4], *((uint32_t*)cmd->arg));
+        flash_arg = (cmd_flash_t*)cmd->arg;
+        *((int*)ret) = fw_flash(&EFLD1, flash_arg->filename, flash_arg->crc);
         break;
     case CMD_FW_BANK:
         ret = fb_put(resp_fb, sizeof(int));
         *((int*)ret) = fw_set_bank(&EFLD1, cmd->arg[0]);
         break;
     case CMD_FW_VERIFY:
-        ret = fb_put(resp_fb, sizeof(uint8_t));
-        *((uint8_t*)ret) = fw_verify(&EFLD1, cmd->arg[0]);
+        ret = fb_put(resp_fb, sizeof(uint32_t));
+        *((uint32_t*)ret) = fw_verify(&EFLD1, cmd->arg[0]);
         break;
     case CMD_C3_SOFTRESET:
         key = (uint32_t*)cmd->arg;
@@ -106,6 +110,22 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         ret = fb_put(resp_fb, sizeof(opd_status_t));
         opd_status(cmd->arg[0], ret);
         break;
+    case CMD_RTC_SETTIME:
+        ret = fb_put(resp_fb, sizeof(uint32_t));
+        rtcSetTimeUnix(*((uint32_t*)cmd->arg), 0);
+        *((uint32_t*)ret) = rtcGetTimeUnix(NULL);
+        break;
+    case CMD_SDO_WRITE:
+        ret = fb_put(resp_fb, 1);
+        struct __attribute__((packed)) {
+            uint8_t node_id;
+            uint16_t index;
+            uint8_t subindex;
+            size_t size;
+            uint8_t data[];
+        } *sdo_arg = (void*)cmd->arg;
+        sdo_transfer(SDO_CLI_WRITE, sdo_arg->node_id, sdo_arg->index, sdo_arg->subindex, sdo_arg->size, sdo_arg->size, sdo_arg->data);
+        *((uint8_t*)ret) = 0;
     default:
         break;
     }

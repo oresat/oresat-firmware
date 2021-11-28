@@ -26,12 +26,9 @@ void comms_init(void);
 void comms_start(void);
 void comms_stop(void);
 
-void comms_cmd(fb_t *fb);
-void comms_file(fb_t *fb);
+void comms_cmd(fb_t *fb, void *arg);
+void comms_file(fb_t *fb, void *arg);
 void comms_beacon(bool enable);
-
-void comms_send(fb_t *fb);
-void comms_send_ahead(fb_t *fb);
 
 #ifdef __cplusplus
 }

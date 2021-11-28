@@ -265,6 +265,8 @@ uint32_t rtcEncodeRelAlarm(const RTCDateTime *timespec, int days, int hours, int
 }
 
 /* TODO: Move these out of RTC probably */
+/* TODO: Re-implement these using new OD interface */
+/*
 CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg)
 {
     if (ODF_arg->reading) {
@@ -286,3 +288,4 @@ CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg)
 
     return CO_SDO_AB_NONE;
 }
+*/

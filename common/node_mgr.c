@@ -15,7 +15,10 @@ typedef struct oresat_node_state {
     bool                    enable;
 } node_state_t;
 
-node_state_t node_state[CO_NO_HB_CONS];
+/* TODO: Don't use extern, switch to some system config/object struct */
+extern CO_t *CO;
+
+node_state_t node_state[OD_CNT_HB_CONS];
 EVENTSOURCE_DECL(mgr_change_event);
 
 void node_change_cb(uint8_t nodeId, uint8_t idx, CO_NMT_internalState_t state, void *object)
@@ -41,7 +44,11 @@ THD_FUNCTION(node_mgr, arg)
     opd_start();
 
     for (int i = 0; node[i].id != 0; i++) {
-        CO_HBconsumer_initEntry(CO->HBcons, i, node[i].id, node[i].timeout);
+        OD_IO_t hbcons_io;
+        uint32_t hbcons_entry = node[i].id << 16 | node[i].timeout;
+        OD_size_t count;
+        OD_getSub(OD_ENTRY_H1016_consumerHeartbeatTime, i + 1, &hbcons_io, false);
+        hbcons_io.write(&hbcons_io.stream, &hbcons_entry, sizeof(hbcons_entry), &count);
         node_state[i].desc = &node[i];
         node_state[i].attempts = 0;
         if (node[i].opd_addr == 0x00 || node[i].autostart)
@@ -87,7 +94,11 @@ THD_FUNCTION(node_mgr, arg)
     chEvtUnregister(&mgr_change_event, &mgr_change_el);
     for (int i = 0; node[i].id != 0; i++) {
         node_enable(node[i].id, false);
-        CO_HBconsumer_initEntry(CO->HBcons, i, 0, 0);
+        OD_IO_t hbcons_io;
+        uint32_t hbcons_entry = 0;
+        OD_size_t count;
+        OD_getSub(OD_ENTRY_H1016_consumerHeartbeatTime, i + 1, &hbcons_io, false);
+        hbcons_io.write(&hbcons_io.stream, &hbcons_entry, sizeof(hbcons_entry), &count);
     }
     opd_stop();
 }
