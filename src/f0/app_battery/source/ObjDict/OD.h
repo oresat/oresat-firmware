@@ -11,12 +11,12 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: app.eds
+        Project File: app.xdd
         File Version: 0
 
-        Created:      8/12/2019 3:51:00 PM
+        Created:      8/12/2019 2:51:00 PM
         Created By:   Miles Simpson
-        Modified:     4/25/2021 4:16:00 PM
+        Modified:     11/27/2021 8:34:58 PM
         Modified By:  
 
     Device Info:
@@ -33,17 +33,17 @@
 /*******************************************************************************
     Counters of OD objects
 *******************************************************************************/
-#define OD_CNT_HB_CONS 1
 #define OD_CNT_NMT 1
 #define OD_CNT_EM 1
-#define OD_CNT_SDO_SRV 1
-#define OD_CNT_SDO_CLI 0
-#define OD_CNT_TIME 0
 #define OD_CNT_SYNC 1
+#define OD_CNT_SYNC_PROD 1
+#define OD_CNT_STORAGE 1
+#define OD_CNT_EM_PROD 1
+#define OD_CNT_HB_CONS 1
+#define OD_CNT_HB_PROD 1
+#define OD_CNT_SDO_SRV 1
 #define OD_CNT_RPDO 16
 #define OD_CNT_TPDO 16
-#define OD_CNT_GFC 0
-#define OD_CNT_SRDO 0
 
 
 /*******************************************************************************
@@ -106,7 +106,7 @@ typedef struct {
         uint16_t VBAT_Raw;
         uint16_t VBUSP_CurrentRaw;
     } x2022_MCU_Sensors;
-    uint8_t x2100_errorStatusBits[1];
+    uint8_t x2100_errorStatusBits[10];
     struct {
         uint8_t maxSub_index;
         uint16_t vbatt;
@@ -1025,9 +1025,9 @@ extern OD_ATTR_OD OD_t *OD;
     (config).ENTRY_H1003 = OD_ENTRY_H1003;\
     (config).CNT_SDO_SRV = OD_CNT_SDO_SRV;\
     (config).ENTRY_H1200 = OD_ENTRY_H1200;\
-    (config).CNT_SDO_CLI = OD_CNT_SDO_CLI;\
-    (config).ENTRY_H1280 = NULL;\
-    (config).CNT_TIME = OD_CNT_TIME;\
+    (config).CNT_SDO_CLI = 0;\
+    (config).ENTRY_H1280 = OD_ENTRY_H1280;\
+    (config).CNT_TIME = 0;\
     (config).ENTRY_H1012 = NULL;\
     (config).CNT_SYNC = OD_CNT_SYNC;\
     (config).ENTRY_H1005 = OD_ENTRY_H1005;\
@@ -1041,9 +1041,9 @@ extern OD_ATTR_OD OD_t *OD;
     (config).ENTRY_H1800 = OD_ENTRY_H1800;\
     (config).ENTRY_H1A00 = OD_ENTRY_H1A00;\
     (config).CNT_LEDS = 0;\
-    (config).CNT_GFC = OD_CNT_GFC;\
+    (config).CNT_GFC = 0;\
     (config).ENTRY_H1300 = NULL;\
-    (config).CNT_SRDO = OD_CNT_SRDO;\
+    (config).CNT_SRDO = 0;\
     (config).ENTRY_H1301 = NULL;\
     (config).ENTRY_H1381 = NULL;\
     (config).ENTRY_H13FE = NULL;\
