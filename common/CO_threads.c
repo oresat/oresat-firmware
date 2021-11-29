@@ -255,9 +255,11 @@ THD_FUNCTION(nmt, arg)
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
         sdo_srv_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Server", HIGHPRIO-1, sdo_server, &co->SDOserver[i]);
     }
+#if OD_CNT_SDO_CLI > 0
     for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
         sdo_cli_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Client", HIGHPRIO-1, sdo_client, &co->SDOclient[i]);
     }
+#endif
     em_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "Emergency", HIGHPRIO-2, em, co->em);
     pdo_sync_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "PDO SYNC", HIGHPRIO-2, pdo_sync, co);
     hbcons_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "HB Consumer", HIGHPRIO-3, hb_cons, co->HBcons);
@@ -288,10 +290,12 @@ THD_FUNCTION(nmt, arg)
     CO_NMT_initCallbackPre(co->NMT, NULL, NULL);
 
     /* Terminate CANopen threads */
+#if OD_CNT_SDO_CLI > 0
     for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
         chThdTerminate(sdo_cli_tp[i]);
         chEvtSignal(sdo_cli_tp[i], CO_EVT_TERMINATE);
     }
+#endif
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
         chThdTerminate(sdo_srv_tp[i]);
         chEvtSignal(sdo_srv_tp[i], CO_EVT_TERMINATE);
@@ -304,9 +308,11 @@ THD_FUNCTION(nmt, arg)
     chEvtSignal(hbcons_tp, CO_EVT_TERMINATE);
 
     /* Wait for CANopen threads to end */
+#if OD_CNT_SDO_CLI > 0
     for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
         chThdWait(sdo_cli_tp[i]);
     }
+#endif
     for (int i = 0; i < OD_CNT_SDO_SRV; i++) {
         chThdWait(sdo_srv_tp[i]);
     }
