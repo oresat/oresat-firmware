@@ -300,17 +300,17 @@ THD_FUNCTION(solar, arg)
 
     	itterate_mppt_perturb_and_observe(&pao_state);
 
-    	OD_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
-    	OD_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
-    	OD_PV_Power.current = pao_state.avg_current_initial_uA / 1000;
-    	OD_PV_Power.currentAvg = pao_state.avg_current_initial_uA / 1000;
-    	OD_PV_Power.power = pao_state.avg_power_initial_mW;
-    	OD_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
+    	OD_RAM.x6000_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.current = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.currentAvg = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.power = pao_state.avg_power_initial_mW;
+    	OD_RAM.x6000_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
 
-    	OD_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
-    	OD_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
-    	OD_PV_Power.powerMax = pao_state.max_power_initial_mW;
-    	OD_PV_Power.energy = 0;//TODO Accumulate power output from INA226 and track mAh
+    	OD_RAM.x6000_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.powerMax = pao_state.max_power_initial_mW;
+    	OD_RAM.x6000_PV_Power.energy = 0;//TODO Accumulate power output from INA226 and track mAh
 
 
     	OD_MPPT.LT1618IADJ = pao_state.iadj_uv / 1000;
@@ -329,4 +329,3 @@ THD_FUNCTION(solar, arg)
 
     chThdExit(MSG_OK);
 }
-
