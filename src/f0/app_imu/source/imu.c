@@ -170,16 +170,20 @@ THD_FUNCTION(imu, arg)
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
+/*	
         if( update_imu_data() ) {
+		
             if( CO_isError(CO->em, CO_EM_GENERIC_ERROR) ) {
                 dbgprintf("Clearing CO error state...\r\n");
                 //CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, IMU_OD_ERROR_INFO_CODE_NONE);
+		
             }
         } else {
             dbgprintf("Setting CO error state...\r\n");
             //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
-        }
-
+        
+	}
+*/
         chThdSleepMilliseconds(1000);
     }
 
