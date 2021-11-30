@@ -2,6 +2,7 @@
 #include "bmi088.h"
 #include "chprintf.h"
 #include "CANopen.h"
+#include "OD.h"
 
 #define BMI088_GYRO_SADDR     0x68U
 #define BMI088_ACC_SADDR      0x18U
@@ -100,7 +101,7 @@ bool update_imu_data(void) {
     OD_RAM.x6001_acceleration.accYRaw = accl_data.accl_y_raw;
     OD_RAM.x6001_acceleration.accZRaw = accl_data.accl_z_raw;
 
-    OD_IMU_Temperature = temp_c;
+    OD_RAM.x6002_IMU_Temperature = temp_c;
 
     //TODO Implement magnetometer driver and populate this info
     OD_RAM.x6003_magnetometerPZ1.magX = 0;
