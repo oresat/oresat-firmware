@@ -73,6 +73,10 @@ static const DACConfig dac1cfg = {
     .cr           = 0                     /* No control reg options */
 };
 
+//Need some static variables to calculate the energy:
+static systime_t tLast = 0;
+
+
 static INA226Driver ina226dev;
 
 typedef enum {
@@ -311,8 +315,15 @@ THD_FUNCTION(solar, arg)
     	OD_RAM.x6000_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
     	OD_RAM.x6000_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
     	OD_RAM.x6000_PV_Power.powerMax = pao_state.max_power_initial_mW;
-    	OD_RAM.x6000_PV_Power.energy = 0;//TODO Accumulate power output from INA226 and track mAh
 
+
+        if (tLast != 0)
+        {
+            systime_t tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
+            OD_RAM.x6000_PV_Power.energy = OD_RAM.x6000_PV_Power.power * tDiff;//TODO Accumulate power output from INA226 and track mAh
+            //Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the current pSample;
+
+        }
 
     	OD_RAM.x6002_MPPT.LT1618_IADJ = pao_state.iadj_uv / 1000;
 
@@ -320,6 +331,9 @@ THD_FUNCTION(solar, arg)
 		OD_RAM.x6002_MPPT.algorithm = MPPT_ALGORITHM_PAO;
 
     }
+
+    //Update tLast for the next loop's energy calculation
+    tLast = TIME_I2MS(chVTGetSystemTime());
 
     /* Stop drivers */
     dacStop(&DACD1);
