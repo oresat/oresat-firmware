@@ -2,6 +2,7 @@
 #include "ina226.h"
 #include "CANopen.h"
 #include "chprintf.h"
+#include "OD.h"
 
 #define DEBUG_SD                (BaseSequentialStream *) &SD2
 
@@ -141,7 +142,7 @@ bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_
 		ret = false;
 	}
 	if( ! ret ) {
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
+		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
 	}
 
 	return(ret);
@@ -212,7 +213,7 @@ bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
 				pao_state->iadj_uv = I_ADJ_FAILSAFE;
 			}
 
-			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
+			//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
 
 			return(false);
 
@@ -313,10 +314,10 @@ THD_FUNCTION(solar, arg)
     	OD_RAM.x6000_PV_Power.energy = 0;//TODO Accumulate power output from INA226 and track mAh
 
 
-    	OD_MPPT.LT1618IADJ = pao_state.iadj_uv / 1000;
+    	OD_RAM.x6002_MPPT.LT1618_IADJ = pao_state.iadj_uv / 1000;
 
 		//Only PAO implemented for the time being
-		OD_MPPT.algorithm = MPPT_ALGORITHM_PAO;
+		OD_RAM.x6002_MPPT.algorithm = MPPT_ALGORITHM_PAO;
 
     }
 
