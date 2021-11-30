@@ -109,7 +109,7 @@ static const uint16_t crc16_ccitt_table[256] = {
     0xEF1FU, 0xFF3EU, 0xCF5DU, 0xDF7CU, 0xAF9BU, 0xBFBAU, 0x8FD9U, 0x9FF8U,
     0x6E17U, 0x7E36U, 0x4E55U, 0x5E74U, 0x2E93U, 0x3EB2U, 0x0ED1U, 0x1EF0U };
 
-uint32_t crc32_hw(const uint32_t block[], size_t len, uint32_t crc)
+uint32_t crc32_hw(const uint8_t block[], size_t len, uint32_t crc)
 {
 #if (STM32_CRC_PROGRAMMABLE == TRUE)
     /* Configure CRC32 polynomial */
@@ -119,10 +119,15 @@ uint32_t crc32_hw(const uint32_t block[], size_t len, uint32_t crc)
     if (crc == 0xFFFFFFFFU) {
         CRC->CR |= CRC_CR_RESET;
     }
-    for (size_t i = 0; i < len; i++) {
-        CRC->DR = REVBIT(block[i]);
+    size_t i = 0;
+    while (len && (len % 4) == 0) {
+        CRC->DR = REVBIT(*((uint32_t*)&block[i]));
+        crc = REVBIT(CRC->DR);
+        len -= 4;
+        i += 4;
     }
-    return REVBIT(CRC->DR);
+    crc = crc32_sw(&block[i], len, crc);
+    return crc;
 }
 
 uint32_t crc32_sw(const uint8_t block[], size_t len, uint32_t crc)
@@ -137,7 +142,7 @@ uint32_t crc32(const uint8_t block[], size_t len, uint32_t crc)
 {
     crc = ~crc;
 #if (USE_CRC_HW == TRUE && STM32_HAS_CRC == TRUE)
-    crc = crc32_hw((uint32_t*)block, len / 4, crc);
+    crc = crc32_hw(block, len, crc);
 #else /* USE_CRC_HW == FALSE || STM32_HAS_CRC == FALSE */
     crc = crc32_sw(block, len, crc);
 #endif
@@ -145,7 +150,7 @@ uint32_t crc32(const uint8_t block[], size_t len, uint32_t crc)
 }
 
 #if (STM32_CRC_PROGRAMMABLE == TRUE)
-uint16_t crc16_ccitt_hw(const uint16_t block[], size_t len, uint16_t crc)
+uint16_t crc16_ccitt_hw(const uint8_t block[], size_t len, uint16_t crc)
 {
     /* Configure CRC-16-CCITT polynomial */
     CRC->POL = CRC16_CCITT_POLYNOMIAL;
@@ -153,10 +158,15 @@ uint16_t crc16_ccitt_hw(const uint16_t block[], size_t len, uint16_t crc)
     if (crc == 0xFFFFU) {
         CRC->CR |= CRC_CR_RESET;
     }
-    for (size_t i = 0; i < len; i++) {
-        CRC->DR = block[i];
+    size_t i = 0;
+    while (len && (len % 2) == 0) {
+        CRC->DR = *((uint16_t*)&block[i]);
+        crc = CRC->DR;
+        len -= 2;
+        i += 2;
     }
-    return CRC->DR;
+    crc = crc16_ccitt_sw(&block[i], len, crc);
+    return crc;
 }
 #endif
 
@@ -172,7 +182,7 @@ uint16_t crc16_ccitt_sw(const uint8_t block[], size_t len, uint16_t crc)
 uint16_t crc16_ccitt_new(const uint8_t block[], size_t len, uint16_t crc)
 {
 #if (USE_CRC_HW == TRUE && STM32_HAS_CRC == TRUE && STM32_CRC_PROGRAMMABLE == TRUE)
-    crc = crc16_ccitt_hw((uint16_t*)block, len / 2, crc);
+    crc = crc16_ccitt_hw(block, len, crc);
 #else /* USE_CRC_HW == FALSE || STM32_HAS_CRC == FALSE || STM32_CRC_PROGRAMMABLE == FALSE */
     crc = crc16_ccitt_sw(block, len, crc);
 #endif
