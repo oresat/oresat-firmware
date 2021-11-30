@@ -320,7 +320,7 @@ THD_FUNCTION(solar, arg)
         if (tLast != 0)
         {
             systime_t tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
-            OD_RAM.x6000_PV_Power.energy = OD_RAM.x6000_PV_Power.power * tDiff;//TODO Accumulate power output from INA226 and track mAh
+            OD_RAM.x6000_PV_Power.energy = (uint16_t)(OD_RAM.x6000_PV_Power.power * tDiff);//TODO Accumulate power output from INA226 and track mAh
             //Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the current pSample;
 
         }
