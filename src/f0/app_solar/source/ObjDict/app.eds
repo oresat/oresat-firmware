@@ -2,13 +2,13 @@
 FileName=app.eds
 FileVersion=0
 FileRevision=1
-LastEDS=
+LastEDS=/home/ryan/PSAS/repos/oresat-firmware/src/f0/app_solar/source/ObjDict/app.eds
 EDSVersion=4.0
 Description=OreSat Solar Board Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=7:43PM
+ModificationTime=8:19PM
 ModificationDate=11-29-2021
 ModifiedBy=
 
@@ -5287,7 +5287,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub2]
@@ -5296,7 +5296,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub3]
@@ -5305,7 +5305,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub4]
@@ -5314,7 +5314,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub5]
@@ -5323,7 +5323,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub6]
@@ -5332,7 +5332,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub7]
@@ -5341,7 +5341,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub8]
@@ -5350,7 +5350,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000sub9]
@@ -5359,7 +5359,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6000subA]
@@ -5368,7 +5368,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
-DefaultValue=
+DefaultValue=0
 PDOMapping=1
 
 [6001]

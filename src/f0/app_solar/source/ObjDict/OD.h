@@ -16,7 +16,7 @@
 
         Created:      8/12/2019 2:51:00 PM
         Created By:   Miles Simpson
-        Modified:     11/29/2021 4:15:46 PM
+        Modified:     11/29/2021 8:19:03 PM
         Modified By:  
 
     Device Info:
@@ -53,7 +53,7 @@
 #define OD_CNT_ARR_1010 4
 #define OD_CNT_ARR_1011 4
 #define OD_CNT_ARR_1016 8
-#define OD_CNT_ARR_1029 2
+#define OD_CNT_ARR_1029 6
 #define OD_CNT_ARR_2020 3
 
 
@@ -72,6 +72,8 @@ typedef struct {
         uint32_t revisionNumber;
         uint32_t serialNumber;
     } x1018_identity;
+    uint8_t x1029_errorBehavior_sub0;
+    uint8_t x1029_errorBehavior[OD_CNT_ARR_1029];
 } OD_ROM_t;
 
 typedef struct {
@@ -130,7 +132,7 @@ typedef struct {
     struct {
         uint8_t highestSub_indexSupported;
         uint8_t algorithm;
-        uint8_t LT1618_IADJ;
+        uint16_t LT1618_IADJ;
     } x6002_MPPT;
 } OD_RAM_t;
 
@@ -144,8 +146,6 @@ typedef struct {
     uint32_t x1016_consumerHeartbeatTime[OD_CNT_ARR_1016];
     uint16_t x1017_producerHeartbeatTime;
     uint8_t x1019_synchronousCounterOverflowValue;
-    uint8_t x1029_errorBehavior_sub0;
-    uint8_t x1029_errorBehavior[OD_CNT_ARR_1029];
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDClientToServer;
@@ -465,6 +465,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1804_TPDOCommunicationParameter;
@@ -473,6 +474,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1805_TPDOCommunicationParameter;
@@ -481,6 +483,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1806_TPDOCommunicationParameter;
@@ -489,6 +492,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1807_TPDOCommunicationParameter;
@@ -497,6 +501,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1808_TPDOCommunicationParameter;
@@ -505,6 +510,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x1809_TPDOCommunicationParameter;
@@ -513,6 +519,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180A_TPDOCommunicationParameter;
@@ -521,6 +528,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180B_TPDOCommunicationParameter;
@@ -529,6 +537,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180C_TPDOCommunicationParameter;
@@ -537,6 +546,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180D_TPDOCommunicationParameter;
@@ -545,6 +555,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180E_TPDOCommunicationParameter;
@@ -553,6 +564,7 @@ typedef struct {
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
+        uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
     } x180F_TPDOCommunicationParameter;
