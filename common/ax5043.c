@@ -183,104 +183,103 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
  */
 THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
-    ax5043_chunk_t *chunkp = NULL;
     objects_fifo_t *fifo = devp->config->fifo;
     fb_t *fb = NULL;
     uint8_t buf[AX5043_FIFO_SIZE];
+    ax5043_rx_chunk_t *chunkp = (ax5043_rx_chunk_t*)buf;
+    uint8_t header;
+    size_t length, data_len;
     uint8_t *pos;
-    size_t fifo_len;
 
     osalDbgCheck(devp != NULL);
 
     while (!chThdShouldTerminateX()) {
+
         /* Wait for FIFO data */
         if (ax5043WaitIRQ(devp, AX5043_IRQ_FIFONOTEMPTY, TIME_INFINITE) & AX5043_EVENT_TERMINATE) {
             continue;
         }
 
-        /* Get data from FIFO */
-        fifo_len = ax5043ReadU16(devp, AX5043_REG_FIFOCOUNT);
-        ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, buf, fifo_len);
+        /* Get chunk header from FIFO */
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, &header, 1);
 
-        /* Decode chunks */
-        size_t fifo_pos = 0;
-        while (fifo_pos != fifo_len) {
-            size_t chunk_len, data_len;
-            /* Set chunk pointer to base of next chunk */
-            chunkp = (ax5043_chunk_t*)&buf[fifo_pos];
-            /* Determine chunk length */
-            chunk_len = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, chunkp->header);
-            if (chunk_len == AX5043_CHUNKSIZE_VAR) {
-                chunk_len = chunkp->length + 2;
-            } else {
-                chunk_len += 1;
-            }
-            fifo_pos += chunk_len;
-            /* Process chunk */
-            switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, chunkp->header)) {
-            case AX5043_CHUNKCMD_DATA:
-                data_len = chunk_len - sizeof(ax5043_chunk_data_t);
-                /* TODO: Handle error flags */
-                /* Start of new packet */
-                if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
-                    /* Acquire frame buffer object if needed */
-                    while (fb == NULL) {
-                        fb = fb_alloc(FB_MAX_LEN, fifo);
-                    }
-                    fb->phy_rx = devp;
-                    fb->phy_arg = (void*)devp->config->phy_arg;
-                }
+        /* Determine chunk length */
+        length = _FLD2VAL(AX5043_FIFOCHUNK_SIZE, header);
+        if (length == AX5043_CHUNKSIZE_VAR) {
+            ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, &length, 1);
+        }
 
-                osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");
-                pos = fb_put(fb, data_len);
-                if (pos != NULL) {
-                    /* Copy packet data */
-                    memcpy(pos, chunkp->data.data, data_len);
-                } else {
-                    /* Length exceeds maximum frame buffer length, abort receive */
-                    uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
-                    reg |= AX5043_FRAMING_FABORT;
-                    ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
+        /* Get chunk */
+        ax5043Exchange(devp, AX5043_REG_FIFODATA, false, NULL, buf, length);
+
+        /* Process chunk */
+        switch (_FLD2VAL(AX5043_FIFOCHUNK_CMD, header)) {
+        case AX5043_CHUNKCMD_DATA:
+            data_len = length - sizeof(ax5043_chunk_data_t);
+            /* TODO: Handle error flags */
+            /* Start of new packet */
+            if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
+                /* Acquire frame buffer object if needed */
+                if (fb != NULL) {
                     fb_free(fb, fifo);
                     fb = NULL;
                 }
-
-                /* End of packet */
-                if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
-                    if (fb != NULL) {
-                        pdu_send(fb, fifo);
-                        fb = NULL;
-                    }
+                while (fb == NULL) {
+                    fb = fb_alloc(FB_MAX_LEN, fifo);
                 }
-                break;
-            case AX5043_CHUNKCMD_TIMER:
-                devp->timer = __REV(chunkp->timer.timer << 8);
-                break;
-            case AX5043_CHUNKCMD_RSSI:
-                devp->rssi = chunkp->rssi.rssi;
-                break;
-            case AX5043_CHUNKCMD_FREQOFFS:
-                devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
-                break;
-            case AX5043_CHUNKCMD_RFFREQOFFS:
-                devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
-                break;
-            case AX5043_CHUNKCMD_DATARATE:
-                devp->datarate = __REV(chunkp->datarate.datarate << 8);
-                break;
-            case AX5043_CHUNKCMD_ANTRSSI:
-                if (chunk_len == 3) {
-                    devp->ant0rssi = chunkp->antrssi2.rssi;
-                    devp->bgndnoise = chunkp->antrssi2.bgndnoise;
-                } else if (chunk_len == 4) {
-                    devp->ant0rssi = chunkp->antrssi3.ant0rssi;
-                    devp->ant1rssi = chunkp->antrssi3.ant1rssi;
-                    devp->bgndnoise = chunkp->antrssi3.bgndnoise;
-                }
-                break;
-            default:
-                break;
+                fb->phy_rx = devp;
+                fb->phy_arg = (void*)devp->config->phy_arg;
             }
+
+            osalDbgAssert(fb != NULL, "rx_worker(), NULL frame buffer object");
+            pos = fb_put(fb, data_len);
+            if (pos != NULL) {
+                /* Copy packet data */
+                memcpy(pos, chunkp->data.data, data_len);
+            } else {
+                /* Length exceeds maximum frame buffer length, abort receive */
+                uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
+                reg |= AX5043_FRAMING_FABORT;
+                ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
+                fb_free(fb, fifo);
+                fb = NULL;
+            }
+
+            /* End of packet */
+            if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
+                if (fb != NULL) {
+                    pdu_send(fb, fifo);
+                    fb = NULL;
+                }
+            }
+            break;
+        case AX5043_CHUNKCMD_TIMER:
+            devp->timer = __REV(chunkp->timer.timer << 8);
+            break;
+        case AX5043_CHUNKCMD_RSSI:
+            devp->rssi = chunkp->rssi.rssi;
+            break;
+        case AX5043_CHUNKCMD_FREQOFFS:
+            devp->freq_off = __REV(chunkp->freqoffs.freqoffs << 8);
+            break;
+        case AX5043_CHUNKCMD_RFFREQOFFS:
+            devp->rf_freq_off = __REV(chunkp->rffreqoffs.rffreqoffs << 8);
+            break;
+        case AX5043_CHUNKCMD_DATARATE:
+            devp->datarate = __REV(chunkp->datarate.datarate << 8);
+            break;
+        case AX5043_CHUNKCMD_ANTRSSI:
+            if (length == 2) {
+                devp->ant0rssi = chunkp->antrssi2.rssi;
+                devp->bgndnoise = chunkp->antrssi2.bgndnoise;
+            } else if (length == 3) {
+                devp->ant0rssi = chunkp->antrssi3.ant0rssi;
+                devp->ant1rssi = chunkp->antrssi3.ant1rssi;
+                devp->bgndnoise = chunkp->antrssi3.bgndnoise;
+            }
+            break;
+        default:
+            break;
         }
     }
 
@@ -602,7 +601,7 @@ void ax5043RX(AX5043Driver *devp, bool chan_b, bool wor) {
         }
         /* Clear FIFO and set threshold */
         ax5043WriteU8(devp, AX5043_REG_FIFOSTAT, AX5043_FIFOCMD_CLEAR_FIFODAT);
-        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 128);
+        ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, 0);
 
         /* Activate RX or WOR */
         if (wor) {
@@ -702,7 +701,7 @@ void ax5043TX(AX5043Driver *devp, const ax5043_profile_t *profile, const void *b
     size_t offset = 0;
     ax5043WriteU16(devp, AX5043_REG_FIFOTHRESH, AX5043_FIFO_WRITE_LEN);
     while (transferred < total_len) {
-        ax5043_chunk_data_t data;
+        ax5043_chunk_data_tx_t data;
         size_t write_len;
 
         /* Refill buffer if needed */
