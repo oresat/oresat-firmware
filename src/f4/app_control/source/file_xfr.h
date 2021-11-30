@@ -5,8 +5,8 @@
 
 typedef struct {
     char filename[32];
-    lfs_soff_t off;
-    lfs_size_t len;
+    uint32_t off;
+    uint32_t len;
     uint8_t data[];
 } file_xfr_t;
 

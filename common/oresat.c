@@ -3,6 +3,7 @@
 #include "CO_threads.h"
 #include "CANopen.h"
 
+CO_t *CO;
 CANDriver *cand;
 
 void oresat_init(oresat_config_t *config)
@@ -19,7 +20,7 @@ void oresat_init(oresat_config_t *config)
 
     /* Enumerate UID */
     for (int i = 0; i < 3; i++) {
-        OD_MCU_UniqueDeviceID[i] = ((uint32_t*)UID_BASE)[i];
+        OD_RAM.x2020_MCU_UniqueDeviceID[i] = ((uint32_t*)UID_BASE)[i];
     }
 
     /* Init sensors */
@@ -41,7 +42,7 @@ void oresat_init(oresat_config_t *config)
     }
 
     /* Initialize CANopen Subsystem */
-    CO_init(cand, config->node_id, config->bitrate, config->fifo1_filters, config->filter_count);
+    CO_init(&CO, cand, config->node_id, config->bitrate, config->fifo1_filters, config->filter_count);
 
     return;
 }
@@ -69,7 +70,7 @@ void oresat_start(void)
     chThdWait(thread_mgr_tp);
 
     /* Deinitialize CO stack */
-    CO_delete(cand);
+    CO_delete(CO);
 
     /* Initiate System Reset */
     NVIC_SystemReset();

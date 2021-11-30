@@ -1,11 +1,13 @@
 #include "beacon.h"
 #include "comms.h"
 #include "CANopen.h"
+#include "OD.h"
 #include "ax25.h"
 #include "rtc.h"
 #include "crc.h"
 #include "fs.h"
 
+/* TODO: Re-implement with OD interface */
 static const ax25_link_t ax25 = {
     .dest = "SPACE ",
     .dest_ssid = 0,
@@ -23,41 +25,41 @@ static const tlm_item_t tlm_aprs0[] = {
     /* Telemetry Version */
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* C3 State */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3State },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x6000_C3_State },
     /* Uptime */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_C3Telemetry.uptime },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x7000_C3_Telemetry.uptime },
     /* RTC Time */
     { .type = TLM_PTR, .len = 4, .ptr = &unix_time },
     /* MCU Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.temperature },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.temperature },
     /* MCU VREFINT */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VREFINT },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VREFINT },
     /* VBUSP Voltage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VBAT },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBAT },
     /* VBUSP Current */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_MCU_Sensors.VBUSP_Current },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBUSP_Current },
     /* WDT Timeouts */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_persistentState.powerCycles },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_PERSIST_STATE.x6004_persistentState.powerCycles },
     /* eMMC Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.EMMC_Usage },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.eMMC_Usage },
     /* L-Band RX Bytes */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.LBandRX_Bytes },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.LBandRX_Bytes },
     /* L-Band Valid Packets */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.LBandRX_Packets },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.LBandRX_Packets },
     /* L-Band Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &lband.rssi },
     /* L-Band PLL Lock TODO */
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* UHF Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.UHF_Temperature },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_Temperature },
     /* UHF Forward Power */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_C3Telemetry.UHF_FWD_Pwr },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_FWD_Pwr },
     /* UHF Reverse Power */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_C3Telemetry.UHF_REV_Pwr },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_REV_Pwr },
     /* UHF RX Bytes */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.UHF_RX_Bytes },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes },
     /* UHF Valid Packets */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_persistentState.UHF_RX_Packets },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Packets },
     /* UHF Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &uhf.rssi },
     /* UHF PLL Lock TODO */
@@ -69,201 +71,217 @@ static const tlm_item_t tlm_aprs0[] = {
     /* CAN2 Status TODO */
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* OPD Current */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_C3Telemetry.OPD_Current },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.OPD_Current },
     /* OPD State TODO */
     { .type = TLM_VAL, .len = 1, .val = 0 },
     /* Battery 0 Pack 1 VBatt */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VBattBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VBattBP1 },
     /* Battery 0 Pack 1 VCell */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellBP1 },
     /* Battery 0 Pack 1 VCell Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellMaxBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMaxBP1 },
     /* Battery 0 Pack 1 VCell Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellMinBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMinBP1 },
     /* Battery 0 Pack 1 VCell 1 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCell1BP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell1_BP1 },
     /* Battery 0 Pack 1 VCell 2 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCell2BP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell2_BP1 },
     /* Battery 0 Pack 1 VCell Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellAvgBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellAvgBP1 },
     /* Battery 0 Pack 1 Temperature */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureBP1 },
     /* Battery 0 Pack 1 Temperature Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureAvgBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureAvgBP1 },
     /* Battery 0 Pack 1 Temperature Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureMaxBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureMaxBP1 },
     /* Battery 0 Pack 1 Temperature Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureMinBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureMinBP1 },
     /* Battery 0 Pack 1 Current */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentBP1 },
     /* Battery 0 Pack 1 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentAvgBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentAvgBP1 },
     /* Battery 0 Pack 1 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentMaxBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentMaxBP1 },
     /* Battery 0 Pack 1 Current Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentMinBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentMinBP1 },
     /* Battery 0 Pack 1 State */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_battery[0].stateBP1 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7001_battery.stateBP1 },
     /* Battery 0 Pack 1 Reported State Of Charge */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_battery[0].reportedStateOfChargeBP1 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7001_battery.reportedStateOfChargeBP1 },
     /* Battery 0 Pack 1 Full Capacity */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].fullCapacityBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.fullCapacityBP1 },
     /* Battery 0 Pack 1 Reported Capacity */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].reportedCapacityBP1 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.reportedCapacityBP1 },
     /* Battery 0 Pack 2 VBatt */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VBattBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VBattBP2 },
     /* Battery 0 Pack 2 VCell */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellBP2 },
     /* Battery 0 Pack 2 VCell Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellMaxBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMaxBP2 },
     /* Battery 0 Pack 2 VCell Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellMinBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMinBP2 },
     /* Battery 0 Pack 2 VCell 1 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCell1BP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell1_BP2 },
     /* Battery 0 Pack 2 VCell 2 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCell2BP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell2_BP2 },
     /* Battery 0 Pack 2 VCell Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].VCellAvgBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellAvgBP2 },
     /* Battery 0 Pack 2 Temperature */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureBP2 },
     /* Battery 0 Pack 2 Temperature Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureAvgBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureAvgBP2 },
     /* Battery 0 Pack 2 Temperature Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureMaxBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureMaxBP2 },
     /* Battery 0 Pack 2 Temperature Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].temperatureMinBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureMinBP2 },
     /* Battery 0 Pack 2 Current */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentBP2 },
     /* Battery 0 Pack 2 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentAvgBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentAvgBP2 },
     /* Battery 0 Pack 2 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentMaxBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentMaxBP2 },
     /* Battery 0 Pack 2 Current Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].currentMinBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.currentMinBP2 },
     /* Battery 0 Pack 2 State */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_battery[0].stateBP2 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7001_battery.stateBP2 },
     /* Battery 0 Pack 2 Reported State Of Charge */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_battery[0].reportedStateOfChargeBP2 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7001_battery.reportedStateOfChargeBP2 },
     /* Battery 0 Pack 2 Full Capacity */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].fullCapacityBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.fullCapacityBP2 },
     /* Battery 0 Pack 2 Reported Capacity */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_battery[0].reportedCapacityBP2 },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.reportedCapacityBP2 },
     /* Solar 0 Voltage Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].voltageAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.voltageAvg },
     /* Solar 0 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].currentAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.currentAvg },
     /* Solar 0 Power Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].powerAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.powerAvg },
     /* Solar 0 Voltage Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].voltageMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.voltageMax },
     /* Solar 0 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].currentMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.currentMax },
     /* Solar 0 Power Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].powerMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.powerMax },
     /* Solar 0 Energy */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[0].energy },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7003_solarPanel.energy },
     /* Solar 1 Voltage Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].voltageAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.voltageAvg },
     /* Solar 1 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].currentAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.currentAvg },
     /* Solar 1 Power Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].powerAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.powerAvg },
     /* Solar 1 Voltage Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].voltageMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.voltageMax },
     /* Solar 1 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].currentMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.currentMax },
     /* Solar 1 Power Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].powerMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.powerMax },
     /* Solar 1 Energy */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[1].energy },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7004_solarPanel.energy },
     /* Solar 2 Voltage Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].voltageAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.voltageAvg },
     /* Solar 2 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].currentAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.currentAvg },
     /* Solar 2 Power Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].powerAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.powerAvg },
     /* Solar 2 Voltage Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].voltageMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.voltageMax },
     /* Solar 2 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].currentMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.currentMax },
     /* Solar 2 Power Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].powerMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.powerMax },
     /* Solar 2 Energy */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[2].energy },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7005_solarPanel.energy },
     /* Solar 3 Voltage Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].voltageAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.voltageAvg },
     /* Solar 3 Current Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].currentAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.currentAvg },
     /* Solar 3 Power Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].powerAvg },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.powerAvg },
     /* Solar 3 Voltage Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].voltageMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.voltageMax },
     /* Solar 3 Current Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].currentMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.currentMax },
     /* Solar 3 Power Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].powerMax },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.powerMax },
     /* Solar 3 Energy */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_solarPanel[3].energy },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7006_solarPanel.energy },
     /* Star Tracker FS Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_starTracker[0].rootPartitionPercent },
-    /* Star Tracker Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.rootPartitionPercent },
+    /* Star Tracker Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.freadCacheLength },
     /* Star Tracker Updater Status */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_starTracker[0].updaterStatus },
-    /* Star Tracker Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.updaterStatus },
+    /* Star Tracker Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700B_starTracker.updatesAvailable },
     /* Star Tracker Right Ascension */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].rightAscension },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700B_starTracker.rightAscension },
     /* Star Tracker Declination */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].declination },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700B_starTracker.declination },
     /* Star Tracker Roll */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_starTracker[0].roll },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700B_starTracker.roll },
     /* Star Tracker Timestamp TODO */
     { .type = TLM_VAL, .len = 4, .val = 0 },
     /* GPS FS Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.rootPartitionPercent },
-    /* GPS Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.rootPartitionPercent },
+    /* GPS Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.freadCacheLength },
     /* GPS Updater Status */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.updaterStatus },
-    /* GPS Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.updaterStatus },
+    /* GPS Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.updatesAvailable },
     /* GPS Status */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.GPS_Status },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.GPS_Status },
     /* GPS Number of Satellites Locked */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_GPS.satellitesLocked },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700D_GPS.satellitesLocked },
     /* GPS X Pos */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionX },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.positionX },
     /* GPS Y Pos */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionY },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.positionY },
     /* GPS Z Pos */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.positionZ },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.positionZ },
     /* GPS X Velocity */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityX },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.velocityX },
     /* GPS Y Velocity */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityY },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.velocityY },
     /* GPS Z Velocity */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_GPS.velocityZ },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x700D_GPS.velocityZ },
     /* GPS Timestamp TODO */
     { .type = TLM_VAL, .len = 4, .val = 0 },
     /* ACS Roll */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroRoll },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700E_ACS.gyroRoll },
     /* ACS Pitch */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroPitch },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700E_ACS.gyroPitch },
     /* ACS Yaw */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_ACS.gyroYaw },
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700E_ACS.gyroYaw },
     /* ACS IMU Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_ACS.IMUTemp },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700E_ACS.IMUTemp },
     /* DxWiFi FS Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.rootPartitionPercent },
-    /* DxWiFi Readable Files TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.rootPartitionPercent },
+    /* DxWiFi Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.freadCacheLength },
     /* DxWiFi Updater Status */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.updaterStatus },
-    /* DxWiFi Updates Cached TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updaterStatus },
+    /* DxWiFi Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updatesAvailable },
     /* DxWiFi Transmitting */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_dxWiFi.transmitting },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.transmitting },
+    /* CFC FS Usage */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.rootPartitionPercent },
+    /* CFC Readable Files */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.freadCacheLength },
+    /* CFC Updater Status */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.updaterStatus },
+    /* CFC Updates Cached */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.updatesAvailable },
+    /* CFC Enable */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Enable },
+    /* CFC Saturated */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Saturated },
+    /* CFC Temperature */
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Temperature },
+    /* CFC Captures */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x7014_CFC.TEC_Captures },
 };
 
 static const tlm_pkt_t aprs0 = {
@@ -307,12 +325,12 @@ void beacon_send(const radio_cfg_t *cfg)
 {
     fb_t *fb = NULL;
     while (fb == NULL) {
-        fb = fb_alloc(AX25_MAX_FRAME_LEN);
+        fb = fb_alloc(AX25_MAX_FRAME_LEN, &tx_fifo);
     }
 
-    OD_C3Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
+    OD_RAM.x7000_C3_Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
     unix_time = rtcGetTimeUnix(NULL);
-    OD_C3Telemetry.EMMC_Usage = fs_usage(&FSD1);
+    OD_RAM.x7000_C3_Telemetry.eMMC_Usage = fs_usage(&FSD1);
 
     fb_reserve(fb, AX25_MAX_HDR_LEN);
     fb->data_ptr = tlm_payload(fb, &aprs0);
@@ -320,7 +338,7 @@ void beacon_send(const radio_cfg_t *cfg)
 
     /* APRS Beacon */
     ax5043TX(cfg->devp, cfg->profile, fb->data, fb->len, fb->len, NULL, NULL, false);
-    fb_free(fb);
+    fb_free(fb, &tx_fifo);
     fb = NULL;
 }
 
@@ -330,7 +348,7 @@ THD_FUNCTION(beacon, arg)
 
     while (!chThdShouldTerminateX()) {
         beacon_send(cfg);
-        chThdSleepMilliseconds(OD_TX_Control.beaconInterval);
+        chThdSleepMilliseconds(OD_PERSIST_APP.x6003_TX_Control.beaconInterval);
     }
 
     chThdExit(MSG_OK);

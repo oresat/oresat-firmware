@@ -4,7 +4,7 @@
 #include "frame_buf.h"
 
 typedef enum {
-    CMD_TX_CTRL,
+    CMD_TX_CTRL = 0,
     CMD_FW_FLASH,
     CMD_FW_BANK,
     CMD_FW_VERIFY,
@@ -24,22 +24,19 @@ typedef enum {
     CMD_OPD_ENABLE,
     CMD_OPD_RESET,
     CMD_OPD_STATUS,
+    CMD_RTC_SETTIME,
+    CMD_SDO_WRITE,
 } cmd_code_t;
+
+typedef struct {
+    uint32_t crc;
+    char filename[];
+} cmd_flash_t;
 
 typedef struct {
     cmd_code_t cmd;
     uint8_t arg[];
 } cmd_t;
-
-typedef enum {
-    CMD_TXCTRL_DISABLE = 0,
-    CMD_TXCTRL_ENABLE
-} cmd_txctrl_t;
-
-typedef enum {
-    CMD_OPD_SCAN_NORESET = 0,
-    CMD_OPD_SCAN_RESET
-} cmd_opd_scan_t;
 
 #ifdef __cplusplus
 extern "C" {
