@@ -72,24 +72,24 @@ THD_FUNCTION(sensor_mon, arg)
     int16_t temp_c = 0;
     int32_t temp_mC = 0;
     if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
-    	OD_PV_Temp.cell1Temp = temp_c;
-    	OD_PV_Temp.cell1TempMax = temp_c;
-    	OD_PV_Temp.cell1TempMin = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_1_Temp = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_1_TempMax = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_1_TempMin = temp_c;
     }
 
     if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
-    	OD_PV_Temp.cell2Temp = temp_c;
-    	OD_PV_Temp.cell2TempMax = temp_c;
-    	OD_PV_Temp.cell2TempMin = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_2_Temp = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_2_TempMax = temp_c;
+    	OD_RAM.x6001_PV_Temp.cell_2_TempMin = temp_c;
     }
 
 
     while (!chThdShouldTerminateX())
     {
         if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
-        	OD_PV_Temp.cell1Temp = temp_c;
-        	OD_PV_Temp.cell1TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell1TempMax);
-        	OD_PV_Temp.cell1TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell1TempMin);
+        	OD_RAM.x6001_PV_Temp.cell1Temp = temp_c;
+        	OD_RAM.x6001_PV_Temp.cell_1_TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell1TempMax);
+        	OD_RAM.x6001_PV_Temp.cell_1_TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell1TempMin);
 
         	dbgprintf("temp_c 1 = %d C  (%d mC)\r\n", temp_c, temp_mC);
         } else {
@@ -98,9 +98,9 @@ THD_FUNCTION(sensor_mon, arg)
         }
 
         if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
-        	OD_PV_Temp.cell2Temp = temp_c;
-			OD_PV_Temp.cell2TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell2TempMax);
-			OD_PV_Temp.cell2TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell2TempMin);
+        	OD_RAM.x6001_PV_Temp.cell_2_Temp = temp_c;
+			OD_RAM.x6001_PV_Temp.cell_2_TempMax = MAX(temp_c, CO_OD_RAM.PV_Temp.cell2TempMax);
+			OD_RAM.x6001_PV_Temp.cell_2_TempMin = MIN(temp_c, CO_OD_RAM.PV_Temp.cell2TempMin);
 
 			dbgprintf("temp_c 2 = %d C  (%d mC)\r\n", temp_c, temp_mC);
         } else {
@@ -114,5 +114,3 @@ THD_FUNCTION(sensor_mon, arg)
     palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }
-
-
