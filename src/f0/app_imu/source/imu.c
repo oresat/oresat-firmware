@@ -103,21 +103,21 @@ bool update_imu_data(void) {
     OD_IMU_Temperature = temp_c;
 
     //TODO Implement magnetometer driver and populate this info
-    OD_magnetometerPZ1.x = 0;
-    OD_magnetometerPZ1.y = 0;
-    OD_magnetometerPZ1.z = 0;
+    OD_RAM.x6003_magnetometerPZ1.magX = 0;
+    OD_RAM.x6003_magnetometerPZ1.magY = 0;
+    OD_RAM.x6003_magnetometerPZ1.magZ = 0;
 
-    OD_magnetometerPZ2.x = 0;
-    OD_magnetometerPZ2.y = 0;
-    OD_magnetometerPZ2.z = 0;
+    OD_RAM.x6004_magnetometerPZ2.magX = 0;
+    OD_RAM.x6004_magnetometerPZ2.magY = 0;
+    OD_RAM.x6004_magnetometerPZ2.magZ = 0;
 
-    OD_magnetometerMZ1.x = 0;
-    OD_magnetometerMZ1.y = 0;
-    OD_magnetometerMZ1.z = 0;
+    OD_RAM.x6005_magnetometerMZ1.magX = 0;
+    OD_RAM.x6005_magnetometerMZ1.magY = 0;
+    OD_RAM.x6005_magnetometerMZ1.magZ = 0;
 
-    OD_magnetometerMZ2.x = 0;
-    OD_magnetometerMZ2.y = 0;
-    OD_magnetometerMZ2.z = 0;
+    OD_RAM.x6006_magnetometerMZ2.magX = 0;
+    OD_RAM.x6006_magnetometerMZ2.magY = 0;
+    OD_RAM.x6006_magnetometerMZ2.magZ = 0;
 
     return ret;
 }
@@ -161,7 +161,7 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_gyro_chip_id != BMI088_GYR_CHIP_ID_EXPECTED ) {
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
+            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
         }
     }
     chprintf(DEBUG_SD, "Done initializing, starting loop...\r\n");
@@ -172,11 +172,11 @@ THD_FUNCTION(imu, arg)
         if( update_imu_data() ) {
             if( CO_isError(CO->em, CO_EM_GENERIC_ERROR) ) {
                 dbgprintf("Clearing CO error state...\r\n");
-                CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, IMU_OD_ERROR_INFO_CODE_NONE);
+                //CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, IMU_OD_ERROR_INFO_CODE_NONE);
             }
         } else {
             dbgprintf("Setting CO error state...\r\n");
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
+            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, IMU_OD_ERROR_INFO_CODE_IMU_COMM_FAILURE);
         }
 
         chThdSleepMilliseconds(1000);
