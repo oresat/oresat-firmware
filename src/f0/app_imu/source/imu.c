@@ -86,19 +86,19 @@ bool update_imu_data(void) {
     //BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_SUSPEND);
 
 
-    OD_gyroscope.pitchRate = gyro_sample.gyro_x;
-    OD_gyroscope.yawRate = gyro_sample.gyro_y;
-    OD_gyroscope.rollRate = gyro_sample.gyro_z;
-    OD_gyroscope.pitchRateRaw = gyro_sample.gyro_x_raw;
-    OD_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
-    OD_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
+    OD_RAM.x6000_gyroscope.pitchRate = gyro_sample.gyro_x;
+    OD_RAM.x6000_gyroscope.yawRate = gyro_sample.gyro_y;
+    OD_RAM.x6000_gyroscope.rollRate = gyro_sample.gyro_z;
+    OD_RAM.x6000_gyroscope.pitchRateRaw = gyro_sample.gyro_x_raw;
+    OD_RAM.x6000_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
+    OD_RAM.x6000_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
 
-    OD_acceleration.x = accl_data.accl_x;
-    OD_acceleration.y = accl_data.accl_y;
-    OD_acceleration.z = accl_data.accl_z;
-    OD_acceleration.XRaw = accl_data.accl_x_raw;
-    OD_acceleration.YRaw = accl_data.accl_y_raw;
-    OD_acceleration.ZRaw = accl_data.accl_z_raw;
+    OD_RAM.x6001_acceleration.accX = accl_data.accl_x;
+    OD_RAM.x6001_acceleration.accY = accl_data.accl_y;
+    OD_RAM.x6001_acceleration.accZ = accl_data.accl_z;
+    OD_RAM.x6001_acceleration.accXRaw = accl_data.accl_x_raw;
+    OD_RAM.x6001_acceleration.accYRaw = accl_data.accl_y_raw;
+    OD_RAM.x6001_acceleration.accZRaw = accl_data.accl_z_raw;
 
     OD_IMU_Temperature = temp_c;
 
@@ -148,7 +148,7 @@ THD_FUNCTION(imu, arg)
         }
 
         if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
+            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
         }
 
 
