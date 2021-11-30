@@ -171,7 +171,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2 -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DLFS_CONFIG=lfs_util_custom.h
+UDEFS = -DSHELL_ENABLE -DSHELL_CONFIG_FILE -DLFS_CONFIG=lfs_util_custom.h
 
 # Define ASM defines here
 UADEFS =
