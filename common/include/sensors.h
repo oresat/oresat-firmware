@@ -14,7 +14,7 @@ extern "C" {
 #define VREFINT_CAL_VOLT        330
 #define ADC_REG_CFG             ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,               /* CFGR1    */  \
                                 ADC_TR(0, 0),                                       /* TR       */  \
-                                ADC_SMPR_SMP_55P5,                                  /* SMPR     */  \
+                                ADC_SMPR_SMP_239P5,                                 /* SMPR     */  \
                                 ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17             /* CHSELR   */
 #define ADC_ENABLE_SENSORS(adc) {adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);}
 #elif defined(STM32F4xx_MCUCONF)
