@@ -487,39 +487,39 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const MAX17205Config *config, 
  */
 
 void populate_od_pack_data(OD_RAM_t *battery_data_ptr, batt_pack_data_t *pack_data, int isPack) {
-//May need to change this function definition to pass in pointer to x6001_battery as well for CO4 data structures. Or redefine the old OD_battery_t locally
+//May need to change this function definition to pass in pointer to x6001_pack2 as well for CO4 data structures. Or redefine the old OD_battery_t locally
 	uint8_t state_bitmask = 0;
 
 	if (isPack == 1) {
-	battery_data_ptr->x6000_battery.vbatt = pack_data->batt_mV;
-	battery_data_ptr->x6000_battery.VCellMax = pack_data->v_cell_max_volt_mV;
-	battery_data_ptr->x6000_battery.VCellMin = pack_data->v_cell_min_volt_mV;
-	battery_data_ptr->x6000_battery.VCell = pack_data->v_cell_mV;
-	battery_data_ptr->x6000_battery.VCell1 = pack_data->v_cell_1_mV;
-	battery_data_ptr->x6000_battery.VCell2 = pack_data->v_cell_2_mV;
-	battery_data_ptr->x6000_battery.VCellAvg = pack_data->v_cell_avg_mV;
+	battery_data_ptr->x6000_pack1.vbatt = pack_data->batt_mV;
+	battery_data_ptr->x6000_pack1.VCellMax = pack_data->v_cell_max_volt_mV;
+	battery_data_ptr->x6000_pack1.VCellMin = pack_data->v_cell_min_volt_mV;
+	battery_data_ptr->x6000_pack1.VCell = pack_data->v_cell_mV;
+	battery_data_ptr->x6000_pack1.VCell1 = pack_data->v_cell_1_mV;
+	battery_data_ptr->x6000_pack1.VCell2 = pack_data->v_cell_2_mV;
+	battery_data_ptr->x6000_pack1.VCellAvg = pack_data->v_cell_avg_mV;
 
-	battery_data_ptr->x6000_battery.current = pack_data->current_mA;
-	battery_data_ptr->x6000_battery.currentAvg = pack_data->avg_current_mA;
-	battery_data_ptr->x6000_battery.currentMax = pack_data->max_current_mA;
-	battery_data_ptr->x6000_battery.currentMin = pack_data->min_current_mA;
+	battery_data_ptr->x6000_pack1.current = pack_data->current_mA;
+	battery_data_ptr->x6000_pack1.currentAvg = pack_data->avg_current_mA;
+	battery_data_ptr->x6000_pack1.currentMax = pack_data->max_current_mA;
+	battery_data_ptr->x6000_pack1.currentMin = pack_data->min_current_mA;
 
-	battery_data_ptr->x6000_battery.fullCapacity = pack_data->full_capacity_mAh;
-	battery_data_ptr->x6000_battery.reportedCapacity = pack_data->reported_capacity_mAh;
+	battery_data_ptr->x6000_pack1.fullCapacity = pack_data->full_capacity_mAh;
+	battery_data_ptr->x6000_pack1.reportedCapacity = pack_data->reported_capacity_mAh;
 
-	battery_data_ptr->x6000_battery.timeToEmpty = pack_data->time_to_empty_seconds;
-	battery_data_ptr->x6000_battery.timeToFull = pack_data->time_to_full_seconds;
+	battery_data_ptr->x6000_pack1.timeToEmpty = pack_data->time_to_empty_seconds;
+	battery_data_ptr->x6000_pack1.timeToFull = pack_data->time_to_full_seconds;
 
-	battery_data_ptr->x6000_battery.cycles = pack_data->cycles;
+	battery_data_ptr->x6000_pack1.cycles = pack_data->cycles;
 
-	battery_data_ptr->x6000_battery.reportedStateOfCharge = pack_data->reported_state_of_charge;
+	battery_data_ptr->x6000_pack1.reportedStateOfCharge = pack_data->reported_state_of_charge;
 
-	battery_data_ptr->x6000_battery.temperature = pack_data->temp_1_C;
-	battery_data_ptr->x6000_battery.temperatureAvg = pack_data->avg_temp_1_C;
-	battery_data_ptr->x6000_battery.temperatureMin = pack_data->temp_min_C;
-	battery_data_ptr->x6000_battery.temperatureMax = pack_data->temp_max_C;
+	battery_data_ptr->x6000_pack1.temperature = pack_data->temp_1_C;
+	battery_data_ptr->x6000_pack1.temperatureAvg = pack_data->avg_temp_1_C;
+	battery_data_ptr->x6000_pack1.temperatureMin = pack_data->temp_min_C;
+	battery_data_ptr->x6000_pack1.temperatureMax = pack_data->temp_max_C;
 
-    
+
 	if (pack_data->pack_number == 1) {
 		if (palReadLine(LINE_HEATER_ON_1)) {
 			state_bitmask |= (1 << STATUS_BIT_HEATER);
@@ -536,39 +536,39 @@ void populate_od_pack_data(OD_RAM_t *battery_data_ptr, batt_pack_data_t *pack_da
 		if (palReadLine(LINE_CHG_STAT_PK1)) {
 			state_bitmask |= (1 << STATUS_BIT_CHG_STAT);
 		}
-		battery_data_ptr->x6000_battery.state = state_bitmask;
+		battery_data_ptr->x6000_pack1.state = state_bitmask;
 		}
 	}
 
 	else if (isPack == 2) {
 
-		battery_data_ptr->x6001_battery.vbatt = pack_data->batt_mV;
-		battery_data_ptr->x6001_battery.VCellMax = pack_data->v_cell_max_volt_mV;
-		battery_data_ptr->x6001_battery.VCellMin = pack_data->v_cell_min_volt_mV;
-		battery_data_ptr->x6001_battery.VCell = pack_data->v_cell_mV;
-		battery_data_ptr->x6001_battery.VCell1 = pack_data->v_cell_1_mV;
-		battery_data_ptr->x6001_battery.VCell2 = pack_data->v_cell_2_mV;
-		battery_data_ptr->x6001_battery.VCellAvg = pack_data->v_cell_avg_mV;
+		battery_data_ptr->x6001_pack2.vbatt = pack_data->batt_mV;
+		battery_data_ptr->x6001_pack2.VCellMax = pack_data->v_cell_max_volt_mV;
+		battery_data_ptr->x6001_pack2.VCellMin = pack_data->v_cell_min_volt_mV;
+		battery_data_ptr->x6001_pack2.VCell = pack_data->v_cell_mV;
+		battery_data_ptr->x6001_pack2.VCell1 = pack_data->v_cell_1_mV;
+		battery_data_ptr->x6001_pack2.VCell2 = pack_data->v_cell_2_mV;
+		battery_data_ptr->x6001_pack2.VCellAvg = pack_data->v_cell_avg_mV;
 
-		battery_data_ptr->x6001_battery.current = pack_data->current_mA;
-		battery_data_ptr->x6001_battery.currentAvg = pack_data->avg_current_mA;
-		battery_data_ptr->x6001_battery.currentMax = pack_data->max_current_mA;
-		battery_data_ptr->x6001_battery.currentMin = pack_data->min_current_mA;
+		battery_data_ptr->x6001_pack2.current = pack_data->current_mA;
+		battery_data_ptr->x6001_pack2.currentAvg = pack_data->avg_current_mA;
+		battery_data_ptr->x6001_pack2.currentMax = pack_data->max_current_mA;
+		battery_data_ptr->x6001_pack2.currentMin = pack_data->min_current_mA;
 
-		battery_data_ptr->x6001_battery.fullCapacity = pack_data->full_capacity_mAh;
-		battery_data_ptr->x6001_battery.reportedCapacity = pack_data->reported_capacity_mAh;
+		battery_data_ptr->x6001_pack2.fullCapacity = pack_data->full_capacity_mAh;
+		battery_data_ptr->x6001_pack2.reportedCapacity = pack_data->reported_capacity_mAh;
 
-		battery_data_ptr->x6001_battery.timeToEmpty = pack_data->time_to_empty_seconds;
-		battery_data_ptr->x6001_battery.timeToFull = pack_data->time_to_full_seconds;
+		battery_data_ptr->x6001_pack2.timeToEmpty = pack_data->time_to_empty_seconds;
+		battery_data_ptr->x6001_pack2.timeToFull = pack_data->time_to_full_seconds;
 
-		battery_data_ptr->x6001_battery.cycles = pack_data->cycles;
+		battery_data_ptr->x6001_pack2.cycles = pack_data->cycles;
 
-		battery_data_ptr->x6001_battery.reportedStateOfCharge = pack_data->reported_state_of_charge;
+		battery_data_ptr->x6001_pack2.reportedStateOfCharge = pack_data->reported_state_of_charge;
 
-		battery_data_ptr->x6001_battery.temperature = pack_data->temp_1_C;
-		battery_data_ptr->x6001_battery.temperatureAvg = pack_data->avg_temp_1_C;
-		battery_data_ptr->x6001_battery.temperatureMin = pack_data->temp_min_C;
-		battery_data_ptr->x6001_battery.temperatureMax = pack_data->temp_max_C;
+		battery_data_ptr->x6001_pack2.temperature = pack_data->temp_1_C;
+		battery_data_ptr->x6001_pack2.temperatureAvg = pack_data->avg_temp_1_C;
+		battery_data_ptr->x6001_pack2.temperatureMin = pack_data->temp_min_C;
+		battery_data_ptr->x6001_pack2.temperatureMax = pack_data->temp_max_C;
 
 
 
@@ -588,12 +588,12 @@ void populate_od_pack_data(OD_RAM_t *battery_data_ptr, batt_pack_data_t *pack_da
 		if (palReadLine(LINE_CHG_STAT_PK2)) {
 			state_bitmask |= (1 << STATUS_BIT_CHG_STAT);
 		}
-		battery_data_ptr->x6001_battery.state = state_bitmask;
+		battery_data_ptr->x6001_pack2.state = state_bitmask;
 	}
 
 	}
 
-	
+
 }
 
 
