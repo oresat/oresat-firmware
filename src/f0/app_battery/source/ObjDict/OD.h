@@ -16,7 +16,7 @@
 
         Created:      8/12/2019 2:51:00 PM
         Created By:   Miles Simpson
-        Modified:     11/27/2021 8:34:58 PM
+        Modified:     11/29/2021 6:43:06 PM
         Modified By:  
 
     Device Info:
@@ -131,7 +131,7 @@ typedef struct {
         int16_t temperatureMax;
         int16_t temperatureMin;
         uint8_t state;
-    } x6000_battery;
+    } x6000_pack1;
     struct {
         uint8_t maxSub_index;
         uint16_t vbatt;
@@ -156,7 +156,7 @@ typedef struct {
         int16_t temperatureMax;
         int16_t temperatureMin;
         uint8_t state;
-    } x6001_battery;
+    } x6001_pack2;
     uint16_t x6002_modelGaugeAlgStatus;
 } OD_RAM_t;
 
@@ -1002,8 +1002,8 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H2021_MCU_Calibration &OD->list[89]
 #define OD_ENTRY_H2022_MCU_Sensors &OD->list[90]
 #define OD_ENTRY_H2100_errorStatusBits &OD->list[91]
-#define OD_ENTRY_H6000_battery &OD->list[92]
-#define OD_ENTRY_H6001_battery &OD->list[93]
+#define OD_ENTRY_H6000_pack1 &OD->list[92]
+#define OD_ENTRY_H6001_pack2 &OD->list[93]
 #define OD_ENTRY_H6002_modelGaugeAlgStatus &OD->list[94]
 
 

@@ -67,7 +67,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .VBUSP_CurrentRaw = 0x0000
     },
     .x2100_errorStatusBits = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-    .x6000_battery = {
+    .x6000_pack1 = {
         .maxSub_index = 0x16,
         .vbatt = 0x2008,
         .VCellMax = 0x0000,
@@ -92,7 +92,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .temperatureMin = 0,
         .state = 0x00
     },
-    .x6001_battery = {
+    .x6001_pack2 = {
         .maxSub_index = 0x16,
         .vbatt = 0x2008,
         .VCellMax = 0x0000,
@@ -839,8 +839,8 @@ typedef struct {
     OD_obj_record_t o_2021_MCU_Calibration[4];
     OD_obj_record_t o_2022_MCU_Sensors[9];
     OD_obj_var_t o_2100_errorStatusBits;
-    OD_obj_record_t o_6000_battery[23];
-    OD_obj_record_t o_6001_battery[23];
+    OD_obj_record_t o_6000_pack1[23];
+    OD_obj_record_t o_6001_pack2[23];
     OD_obj_var_t o_6002_modelGaugeAlgStatus;
 } ODObjs_t;
 
@@ -4062,281 +4062,281 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .attribute = ODA_SDO_R,
         .dataLength = 10
     },
-    .o_6000_battery = {
+    .o_6000_pack1 = {
         {
-            .dataOrig = &OD_RAM.x6000_battery.maxSub_index,
+            .dataOrig = &OD_RAM.x6000_pack1.maxSub_index,
             .subIndex = 0,
             .attribute = ODA_SDO_R,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.vbatt,
+            .dataOrig = &OD_RAM.x6000_pack1.vbatt,
             .subIndex = 1,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCellMax,
+            .dataOrig = &OD_RAM.x6000_pack1.VCellMax,
             .subIndex = 2,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCellMin,
+            .dataOrig = &OD_RAM.x6000_pack1.VCellMin,
             .subIndex = 3,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCell,
+            .dataOrig = &OD_RAM.x6000_pack1.VCell,
             .subIndex = 4,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCell1,
+            .dataOrig = &OD_RAM.x6000_pack1.VCell1,
             .subIndex = 5,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCell2,
+            .dataOrig = &OD_RAM.x6000_pack1.VCell2,
             .subIndex = 6,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.VCellAvg,
+            .dataOrig = &OD_RAM.x6000_pack1.VCellAvg,
             .subIndex = 7,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.current,
+            .dataOrig = &OD_RAM.x6000_pack1.current,
             .subIndex = 8,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.currentAvg,
+            .dataOrig = &OD_RAM.x6000_pack1.currentAvg,
             .subIndex = 9,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.currentMax,
+            .dataOrig = &OD_RAM.x6000_pack1.currentMax,
             .subIndex = 10,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.currentMin,
+            .dataOrig = &OD_RAM.x6000_pack1.currentMin,
             .subIndex = 11,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.fullCapacity,
+            .dataOrig = &OD_RAM.x6000_pack1.fullCapacity,
             .subIndex = 12,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.reportedCapacity,
+            .dataOrig = &OD_RAM.x6000_pack1.reportedCapacity,
             .subIndex = 13,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.timeToEmpty,
+            .dataOrig = &OD_RAM.x6000_pack1.timeToEmpty,
             .subIndex = 14,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.timeToFull,
+            .dataOrig = &OD_RAM.x6000_pack1.timeToFull,
             .subIndex = 15,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.cycles,
+            .dataOrig = &OD_RAM.x6000_pack1.cycles,
             .subIndex = 16,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.reportedStateOfCharge,
+            .dataOrig = &OD_RAM.x6000_pack1.reportedStateOfCharge,
             .subIndex = 17,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.temperature,
+            .dataOrig = &OD_RAM.x6000_pack1.temperature,
             .subIndex = 18,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.temperatureAvg,
+            .dataOrig = &OD_RAM.x6000_pack1.temperatureAvg,
             .subIndex = 19,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.temperatureMax,
+            .dataOrig = &OD_RAM.x6000_pack1.temperatureMax,
             .subIndex = 20,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.temperatureMin,
+            .dataOrig = &OD_RAM.x6000_pack1.temperatureMin,
             .subIndex = 21,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6000_battery.state,
+            .dataOrig = &OD_RAM.x6000_pack1.state,
             .subIndex = 22,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 1
         }
     },
-    .o_6001_battery = {
+    .o_6001_pack2 = {
         {
-            .dataOrig = &OD_RAM.x6001_battery.maxSub_index,
+            .dataOrig = &OD_RAM.x6001_pack2.maxSub_index,
             .subIndex = 0,
             .attribute = ODA_SDO_R,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.vbatt,
+            .dataOrig = &OD_RAM.x6001_pack2.vbatt,
             .subIndex = 1,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCellMax,
+            .dataOrig = &OD_RAM.x6001_pack2.VCellMax,
             .subIndex = 2,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCellMin,
+            .dataOrig = &OD_RAM.x6001_pack2.VCellMin,
             .subIndex = 3,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCell,
+            .dataOrig = &OD_RAM.x6001_pack2.VCell,
             .subIndex = 4,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCell1,
+            .dataOrig = &OD_RAM.x6001_pack2.VCell1,
             .subIndex = 5,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCell2,
+            .dataOrig = &OD_RAM.x6001_pack2.VCell2,
             .subIndex = 6,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.VCellAvg,
+            .dataOrig = &OD_RAM.x6001_pack2.VCellAvg,
             .subIndex = 7,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.current,
+            .dataOrig = &OD_RAM.x6001_pack2.current,
             .subIndex = 8,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.currentAvg,
+            .dataOrig = &OD_RAM.x6001_pack2.currentAvg,
             .subIndex = 9,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.currentMax,
+            .dataOrig = &OD_RAM.x6001_pack2.currentMax,
             .subIndex = 10,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.currentMin,
+            .dataOrig = &OD_RAM.x6001_pack2.currentMin,
             .subIndex = 11,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.fullCapacity,
+            .dataOrig = &OD_RAM.x6001_pack2.fullCapacity,
             .subIndex = 12,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.reportedCapacity,
+            .dataOrig = &OD_RAM.x6001_pack2.reportedCapacity,
             .subIndex = 13,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.timeToEmpty,
+            .dataOrig = &OD_RAM.x6001_pack2.timeToEmpty,
             .subIndex = 14,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.timeToFull,
+            .dataOrig = &OD_RAM.x6001_pack2.timeToFull,
             .subIndex = 15,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.cycles,
+            .dataOrig = &OD_RAM.x6001_pack2.cycles,
             .subIndex = 16,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.reportedStateOfCharge,
+            .dataOrig = &OD_RAM.x6001_pack2.reportedStateOfCharge,
             .subIndex = 17,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.temperature,
+            .dataOrig = &OD_RAM.x6001_pack2.temperature,
             .subIndex = 18,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.temperatureAvg,
+            .dataOrig = &OD_RAM.x6001_pack2.temperatureAvg,
             .subIndex = 19,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.temperatureMax,
+            .dataOrig = &OD_RAM.x6001_pack2.temperatureMax,
             .subIndex = 20,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.temperatureMin,
+            .dataOrig = &OD_RAM.x6001_pack2.temperatureMin,
             .subIndex = 21,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6001_battery.state,
+            .dataOrig = &OD_RAM.x6001_pack2.state,
             .subIndex = 22,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 1
@@ -4446,8 +4446,8 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x2021, 0x04, ODT_REC, &ODObjs.o_2021_MCU_Calibration, NULL},
     {0x2022, 0x09, ODT_REC, &ODObjs.o_2022_MCU_Sensors, NULL},
     {0x2100, 0x01, ODT_VAR, &ODObjs.o_2100_errorStatusBits, NULL},
-    {0x6000, 0x17, ODT_REC, &ODObjs.o_6000_battery, NULL},
-    {0x6001, 0x17, ODT_REC, &ODObjs.o_6001_battery, NULL},
+    {0x6000, 0x17, ODT_REC, &ODObjs.o_6000_pack1, NULL},
+    {0x6001, 0x17, ODT_REC, &ODObjs.o_6001_pack2, NULL},
     {0x6002, 0x01, ODT_VAR, &ODObjs.o_6002_modelGaugeAlgStatus, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };

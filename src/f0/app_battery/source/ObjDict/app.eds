@@ -8,8 +8,8 @@ Description=OreSat Battery Application Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=8:34PM
-ModificationDate=11-27-2021
+ModificationTime=6:43PM
+ModificationDate=11-29-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -5267,7 +5267,7 @@ DefaultValue=0x00000008
 PDOMapping=0
 
 [6000]
-ParameterName=Battery
+ParameterName=Pack1
 ObjectType=0x9
 ;StorageLocation=RAM
 SubNumber=0x17
@@ -5480,7 +5480,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6001]
-ParameterName=Battery
+ParameterName=Pack2
 ObjectType=0x9
 ;StorageLocation=RAM
 SubNumber=0x17
