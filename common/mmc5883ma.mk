@@ -1,4 +1,4 @@
-# List of all the AX5043 device files.
+# List of all the MMC5883MA device files.
 MMC5883MASRC := $(PROJ_SRC)/mmc5883ma.c
 
 # Required include directories

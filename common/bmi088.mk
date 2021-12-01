@@ -1,4 +1,4 @@
-# List of all the AX5043 device files.
+# List of all the BMI088 device files.
 BMI088SRC := $(PROJ_SRC)/bmi088.c
 
 # Required include directories
