@@ -4,7 +4,7 @@
 #include "radio.h"
 
 #define XTAL_CLK                            16000000U
-#define EDL_WORKERS                         2
+#define EDL_WORKERS                         1
 
 #define SCID                                0x4F53U
 #define MCID                                ((USLP_TFVN << 16) | SCID)
