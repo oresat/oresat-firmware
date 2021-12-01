@@ -320,7 +320,7 @@ THD_FUNCTION(solar, arg)
 
 
             systime_t tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
-            OD_RAM.x6000_PV_Power.energy = OD_RAM.x6000_PV_Power.energy + (uint16_t)(OD_RAM.x6000_PV_Power.power * tDiff);
+            OD_RAM.x6000_PV_Power.energy = (uint16_t)((OD_RAM.x6000_PV_Power.energy) + (uint16_t)(OD_RAM.x6000_PV_Power.power * tDiff))/1000;
 	    //TODO - divide by 1000 and make sure we still get useful values or energy - going to div by 10e3 bc the OD only allows 16 bit values, rollover fast at m scale
             //Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the current pSample;
 
