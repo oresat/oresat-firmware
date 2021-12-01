@@ -10,7 +10,6 @@
 #include "hal.h"
 #include "tmp101.h"             // driver for Texas Instruments' TMP101 temperature sensor
 #include "CANopen.h"
-#include <string.h>
 #include "solar.h"
 #include "OD.h"
 
