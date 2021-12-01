@@ -113,7 +113,7 @@ endif
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/bmi088.mk
-include $(PROJ_SRC)mmc5883ma.mk
+include $(PROJ_SRC)/mmc5883ma.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
