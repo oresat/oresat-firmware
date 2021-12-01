@@ -35,10 +35,19 @@ static thread_descriptor_t blink_desc = {
 static worker_t solar_worker;
 static thread_descriptor_t solar_desc = {
     .name = "Solar MPPT",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
+    .wbase = THD_WORKING_AREA_BASE(solar_wa),
+    .wend = THD_WORKING_AREA_END(solar_wa),
     .prio = NORMALPRIO,
     .funcp = solar,
+    .arg = NULL
+};
+static worker_t sensor_mon_worker;
+static thread_descriptor_t sensor_mon_desc = {
+    .name = "Sensor Monitor",
+    .wbase = THD_WORKING_AREA_BASE(sensor_mon_wa),
+    .wend = THD_WORKING_AREA_END(sensor_mon_wa),
+    .prio = NORMALPRIO,
+    .funcp = sensor_mon,
     .arg = NULL
 };
 
@@ -64,6 +73,7 @@ static void app_init(void)
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
     reg_worker(&solar_worker, &solar_desc, true, true);
+    reg_worker(&sensor_mon_worker, &sensor_mon_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
