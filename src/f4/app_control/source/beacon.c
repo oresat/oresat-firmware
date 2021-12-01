@@ -266,6 +266,7 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updatesAvailable },
     /* DxWiFi Transmitting */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.transmitting },
+#ifdef ORESAT1
     /* CFC FS Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.rootPartitionPercent },
     /* CFC Readable Files */
@@ -282,6 +283,7 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.TEC_Temperature },
     /* CFC Captures */
     { .type = TLM_PTR, .len = 4, .ptr = &OD_RAM.x7014_CFC.TEC_Captures },
+#endif /* ORESAT1 */
 };
 
 static const tlm_pkt_t aprs0 = {

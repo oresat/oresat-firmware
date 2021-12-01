@@ -26,8 +26,8 @@ extern "C" {
 #define VREFINT_CAL_VOLT        330
 #define ADC_REG_CFG             0,                                                  /* CR1      */  \
                                 ADC_CR2_SWSTART,                                    /* CR2      */  \
-                                ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_144)                /* SMPR1    */  \
-                                | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_144),                               \
+                                ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_480)                /* SMPR1    */  \
+                                | ADC_SMPR1_SMP_VREF(ADC_SAMPLE_480),                               \
                                 0,                                                  /* SMPR2    */  \
                                 0,                                                  /* HTR      */  \
                                 0,                                                  /* LTR      */  \
