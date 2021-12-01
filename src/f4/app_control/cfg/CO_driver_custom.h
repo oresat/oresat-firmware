@@ -15,7 +15,8 @@ extern "C" {
                            CO_CONFIG_SDO_CLI_BLOCK | \
                            CO_CONFIG_SDO_CLI_LOCAL | \
                            CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
-                           CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
+                           CO_CONFIG_GLOBAL_FLAG_TIMERNEXT | \
+                           CO_CONFIG_GLOBAL_FLAG_OD_DYNAMIC)
 
 #ifdef __cplusplus
 }
