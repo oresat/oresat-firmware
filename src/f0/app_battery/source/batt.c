@@ -6,8 +6,10 @@
 
 
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
+#define ENABLE_SERIAL_DEBUG_OUTPUT        1
 
-#if 0 || ENABLE_NV_MEMORY_UPDATE_CODE
+
+#if ENABLE_SERIAL_DEBUG_OUTPUT || ENABLE_NV_MEMORY_UPDATE_CODE
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 #include "chprintf.h"
 #define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
@@ -73,6 +75,9 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
 	{MAX17205_AD_NTCURVE, 0x0064 },
 	{MAX17205_AD_NTGAIN, 0xF49A },
 	{MAX17205_AD_NTOFF, 0x16A1 },
+
+	{MAX17205_AD_NFULLCAPREP, 0x1450 },
+	{MAX17205_AD_NFULLCAPNOM, 0x1450 },
     {0,0}
 };
 
@@ -365,7 +370,8 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 
 
 
-    dbgprintf("full_capacity_mAh = %u, available_capacity_mAh = %u, mix_capacity = %u\r\n", dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity_mAh);
+    dbgprintf("full_capacity_mAh = %u, available_capacity_mAh = %u, mix_capacity = %u, reported_capacity_mAh = %u\r\n",
+    		dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity_mAh, dest->reported_capacity_mAh);
 
 
 
