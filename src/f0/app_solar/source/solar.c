@@ -74,7 +74,9 @@ static const DACConfig dac1cfg = {
 };
 
 //Need some static variables to calculate the energy:
-static systime_t tLast = 0;
+systime_t tLast = 0;
+systime_t tDiff;
+uint32_t energyTrack;
 
 
 static INA226Driver ina226dev;
@@ -302,6 +304,13 @@ THD_FUNCTION(solar, arg)
 					pao_state.step_size,
 					((loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000))));
         }
+        //On first loop, reset all energy tracking variables:
+        if (loop_iteration == 0)
+        {
+            tLast = 0;
+            energyTrack = 0;
+            tDiff = 0;
+        }
 
     	itterate_mppt_perturb_and_observe(&pao_state);
 
@@ -316,13 +325,24 @@ THD_FUNCTION(solar, arg)
     	OD_RAM.x6000_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
     	OD_RAM.x6000_PV_Power.powerMax = pao_state.max_power_initial_mW;
 
+            /*
+            Energy Tracking:
+            - Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the most recently sampled power value in mw
+            - Tracking energy in a uint32_t to allow for millijoule precision
+            - Approximating the integral by dividing the power into tDiff chunks
+            - Converting to joules when we store it in the OD so we don't overflow the uint16_t in a 90 min interval
+            - Note that the persistent variables are declared outside the scope of the thread.
+            */
+            tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
 
+            //Storing energy in millijoules. Dividing by 1k because time is in ms
+            energyTrack = (uint32_t)((energyTrack + (uint32_t)(OD_RAM.x6000_PV_Power.power * tDiff)/1000));
 
+            //Dividing by 1k to convert to joules
+            uint32_t tempEnergy = energyTrack / 1000;
 
-            systime_t tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
-            OD_RAM.x6000_PV_Power.energy = (uint16_t)((OD_RAM.x6000_PV_Power.energy) + (uint16_t)(OD_RAM.x6000_PV_Power.power * tDiff))/1000;
-	    //TODO - divide by 1000 and make sure we still get useful values or energy - going to div by 10e3 bc the OD only allows 16 bit values, rollover fast at m scale
-            //Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the current pSample;
+            //Truncate to 16 bits for the OD.
+            OD_RAM.x6000_PV_Power.energy = (uint16_t) tempEnergy;
 
 
 
@@ -331,10 +351,11 @@ THD_FUNCTION(solar, arg)
 		//Only PAO implemented for the time being
 		OD_RAM.x6002_MPPT.algorithm = MPPT_ALGORITHM_PAO;
 
+        //Update tLast for the next loop's energy calculation
+        tLast = TIME_I2MS(chVTGetSystemTime());
+
     }
 
-    //Update tLast for the next loop's energy calculation
-    tLast = TIME_I2MS(chVTGetSystemTime());
 
     /* Stop drivers */
     dacStop(&DACD1);
