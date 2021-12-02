@@ -23,8 +23,8 @@
 /* Pre-compile time settings.                                                */
 /*===========================================================================*/
 
-#if !defined(RADIO_FB_COUNT) || defined(__DOXYGEN__)
-#define RADIO_FB_COUNT                      8U
+#if !defined(RADIO_FIFO_COUNT) || defined(__DOXYGEN__)
+#define RADIO_FIFO_COUNT                    8U
 #endif
 
 /*===========================================================================*/
@@ -68,10 +68,16 @@ extern "C" {
 extern synth_dev_t synth_devices[];
 extern radio_dev_t radio_devices[];
 extern radio_cfg_t radio_cfgs[];
+extern objects_fifo_t rx_fifo;
+extern objects_fifo_t tx_fifo;
 
 void radio_init(void);
 void radio_start(void);
 void radio_stop(void);
+
+void pdu_send(fb_t *fb, void *arg);
+void pdu_send_ahead(fb_t *fb, void *arg);
+fb_t *pdu_recv(void *arg);
 
 #ifdef __cplusplus
 }

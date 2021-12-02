@@ -61,7 +61,10 @@ extern "C" {
 
 #ifndef CO_CONFIG_EM
 #define CO_CONFIG_EM (CO_CONFIG_EM_PRODUCER | \
+                      CO_CONFIG_EM_PROD_CONFIGURABLE | \
+                      CO_CONFIG_EM_PROD_INHIBIT | \
                       CO_CONFIG_EM_HISTORY | \
+                      CO_CONFIG_EM_STATUS_BITS | \
                       CO_CONFIG_EM_CONSUMER | \
                       CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
@@ -76,7 +79,7 @@ extern "C" {
 #endif
 
 #ifndef CO_CONFIG_SDO_SRV_BUFFER_SIZE
-#define CO_CONFIG_SDO_SRV_BUFFER_SIZE (127*7)
+#define CO_CONFIG_SDO_SRV_BUFFER_SIZE 1024
 #endif
 
 #ifndef CO_CONFIG_SDO_CLI
@@ -98,11 +101,17 @@ extern "C" {
 #ifndef CO_CONFIG_PDO
 #define CO_CONFIG_PDO (CO_CONFIG_RPDO_ENABLE | \
                        CO_CONFIG_TPDO_ENABLE | \
+                       CO_CONFIG_RPDO_TIMERS_ENABLE | \
+                       CO_CONFIG_TPDO_TIMERS_ENABLE | \
                        CO_CONFIG_PDO_SYNC_ENABLE | \
-                       CO_CONFIG_RPDO_CALLS_EXTENSION | \
-                       CO_CONFIG_TPDO_CALLS_EXTENSION | \
+                       CO_CONFIG_PDO_OD_IO_ACCESS | \
                        CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE | \
-                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT)
+                       CO_CONFIG_GLOBAL_FLAG_TIMERNEXT | \
+                       CO_CONFIG_GLOBAL_FLAG_OD_DYNAMIC)
+#endif
+
+#ifndef CO_CONFIG_STORAGE
+#define CO_CONFIG_STORAGE (CO_CONFIG_STORAGE_ENABLE)
 #endif
 
 #ifndef CO_CONFIG_LEDS
@@ -141,6 +150,11 @@ extern "C" {
 
 #ifndef CO_CONFIG_TRACE
 #define CO_CONFIG_TRACE 0
+#endif
+
+/* TODO: Maybe we can make use of this? */
+#ifndef CO_CONFIG_DEBUG
+#define CO_CONFIG_DEBUG 0
 #endif
 
 
@@ -264,19 +278,20 @@ typedef struct {
 } CO_CANmodule_t;
 
 
+/* TODO: Make use of CAN_MODULE parameter by moving mutexes to modules */
 /* (un)lock critical section in CO_CANsend() */
-#define CO_LOCK_CAN_SEND()      chSysLock()             /* Lock critical section in CO_CANsend() */
-#define CO_UNLOCK_CAN_SEND()    chSysUnlock()           /* Unlock critical section in CO_CANsend() */
+#define CO_LOCK_CAN_SEND(CAN_MODULE)      chSysLock()               /* Lock critical section in CO_CANsend() */
+#define CO_UNLOCK_CAN_SEND(CAN_MODULE)    chSysUnlock()             /* Unlock critical section in CO_CANsend() */
 
 /* (un)lock critical section in CO_errorReport() or CO_errorReset() */
 extern mutex_t emcy_mutex;
-#define CO_LOCK_EMCY()          chMtxLock(&emcy_mutex)  /* Lock critical section in CO_errorReport() or CO_errorReset() */
-#define CO_UNLOCK_EMCY()        chMtxUnlock(&emcy_mutex)/* Unlock critical section in CO_errorReport() or CO_errorReset() */
+#define CO_LOCK_EMCY(CAN_MODULE)          chMtxLock(&emcy_mutex)    /* Lock critical section in CO_errorReport() or CO_errorReset() */
+#define CO_UNLOCK_EMCY(CAN_MODULE)        chMtxUnlock(&emcy_mutex)  /* Unlock critical section in CO_errorReport() or CO_errorReset() */
 
 /* (un)lock critical section when accessing Object Dictionary */
 extern mutex_t od_mutex;
-#define CO_LOCK_OD()            chMtxLock(&od_mutex)    /* Lock critical section when accessing Object Dictionary */
-#define CO_UNLOCK_OD()          chMtxUnlock(&od_mutex)  /* Unock critical section when accessing Object Dictionary */
+#define CO_LOCK_OD(CAN_MODULE)            chMtxLock(&od_mutex)      /* Lock critical section when accessing Object Dictionary */
+#define CO_UNLOCK_OD(CAN_MODULE)          chMtxUnlock(&od_mutex)    /* Unock critical section when accessing Object Dictionary */
 
 /* Synchronization between CAN receive and message processing threads. */
 #define CO_MemoryBarrier()

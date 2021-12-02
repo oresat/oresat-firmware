@@ -9,7 +9,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "ax5043.h"
-#include "frame_buf.h"
+#include "radio.h"
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -184,6 +184,7 @@ eventmask_t ax5043WaitIRQ(AX5043Driver *devp, uint16_t irq, sysinterval_t timeou
 THD_FUNCTION(rx_worker, arg) {
     AX5043Driver *devp = arg;
     ax5043_chunk_t *chunkp = NULL;
+    objects_fifo_t *fifo = devp->config->fifo;
     fb_t *fb = NULL;
     uint8_t buf[AX5043_FIFO_SIZE];
     uint8_t *pos;
@@ -224,7 +225,7 @@ THD_FUNCTION(rx_worker, arg) {
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTSTART) {
                     /* Acquire frame buffer object if needed */
                     while (fb == NULL) {
-                        fb = fb_alloc(FB_MAX_LEN);
+                        fb = fb_alloc(FB_MAX_LEN, fifo);
                     }
                     fb->phy_rx = devp;
                     fb->phy_arg = (void*)devp->config->phy_arg;
@@ -240,14 +241,14 @@ THD_FUNCTION(rx_worker, arg) {
                     uint8_t reg = ax5043ReadU8(devp, AX5043_REG_FRAMING);
                     reg |= AX5043_FRAMING_FABORT;
                     ax5043WriteU8(devp, AX5043_REG_FRAMING, reg);
-                    fb_free(fb);
+                    fb_free(fb, fifo);
                     fb = NULL;
                 }
 
                 /* End of packet */
                 if (chunkp->data.flags & AX5043_CHUNK_DATARX_PKTEND) {
                     if (fb != NULL) {
-                        fb_post(fb);
+                        pdu_send(fb, fifo);
                         fb = NULL;
                     }
                 }
@@ -284,7 +285,7 @@ THD_FUNCTION(rx_worker, arg) {
     }
 
     if (fb != NULL) {
-        fb_free(fb);
+        fb_free(fb, fifo);
         fb = NULL;
     }
     chThdExit(MSG_OK);

@@ -5,6 +5,7 @@
  * @addtogroup RADIO
  * @{
  */
+#include <string.h>
 #include "ch.h"
 #include "hal.h"
 #include "radio.h"
@@ -22,9 +23,12 @@
 /*===========================================================================*/
 
 /* Frame buffer allocation pool */
-static objects_fifo_t fb_fifo;
-static msg_t fb_fifo_msgs[RADIO_FB_COUNT];
-static fb_t fb_fifo_buf[RADIO_FB_COUNT];
+objects_fifo_t rx_fifo;
+static msg_t rx_fifo_msgs[RADIO_FIFO_COUNT];
+static fb_t rx_fifo_buf[RADIO_FIFO_COUNT];
+objects_fifo_t tx_fifo;
+static msg_t tx_fifo_msgs[RADIO_FIFO_COUNT];
+static fb_t tx_fifo_buf[RADIO_FIFO_COUNT];
 
 /*===========================================================================*/
 /* Local functions.                                                          */
@@ -34,28 +38,19 @@ static fb_t fb_fifo_buf[RADIO_FB_COUNT];
 /* Interface implementation.                                                 */
 /*===========================================================================*/
 
-fb_t *__fb_alloc(void) {
-    return chFifoTakeObjectTimeout(&fb_fifo, TIME_INFINITE);
-}
-
-void __fb_free(fb_t *fb) {
-    chFifoReturnObject(&fb_fifo, fb);
-}
-
-void __fb_post(fb_t *fb) {
-    chFifoSendObject(&fb_fifo, fb);
-}
-
-void __fb_post_first(fb_t *fb) {
-    chFifoSendObjectAhead(&fb_fifo, fb);
-}
-
-fb_t *__fb_get(void) {
-    fb_t *fb;
-    if (chFifoReceiveObjectTimeout(&fb_fifo, (void**)&fb, TIME_MS2I(1000)) != MSG_OK) {
-        fb = NULL;
-    }
+fb_t *__fb_alloc(size_t len, void *arg) {
+    (void)len;
+    osalDbgCheck(arg != NULL);
+    objects_fifo_t *fifo = arg;
+    fb_t *fb = chFifoTakeObjectTimeout(fifo, TIME_INFINITE);
+    memset(fb, 0, sizeof(fb_t));
     return fb;
+}
+
+void __fb_free(fb_t *fb, void *arg) {
+    osalDbgCheck(fb != NULL && arg != NULL);
+    objects_fifo_t *fifo = arg;
+    chFifoReturnObject(fifo, fb);
 }
 
 /*===========================================================================*/
@@ -65,7 +60,8 @@ fb_t *__fb_get(void) {
 void radio_init(void)
 {
     /* Initialize frame buffer FIFO */
-    chFifoObjectInit(&fb_fifo, sizeof(fb_t), RADIO_FB_COUNT, fb_fifo_buf, fb_fifo_msgs);
+    chFifoObjectInit(&rx_fifo, sizeof(fb_t), RADIO_FIFO_COUNT, rx_fifo_buf, rx_fifo_msgs);
+    chFifoObjectInit(&tx_fifo, sizeof(fb_t), RADIO_FIFO_COUNT, tx_fifo_buf, tx_fifo_msgs);
 
     /* Initialize radio systems */
     for (int i = 0; radio_devices[i].devp != NULL; i++) {
@@ -95,6 +91,31 @@ void radio_stop(void)
     for (int i = 0; synth_devices[i].devp != NULL; i++) {
         si41xxStop(synth_devices[i].devp);
     }
+}
+
+void pdu_send(fb_t *fb, void *arg)
+{
+    osalDbgCheck(fb != NULL && arg != NULL);
+    objects_fifo_t *fifo = arg;
+    chFifoSendObject(fifo, fb);
+}
+
+void pdu_send_ahead(fb_t *fb, void *arg)
+{
+    osalDbgCheck(fb != NULL && arg != NULL);
+    objects_fifo_t *fifo = arg;
+    chFifoSendObjectAhead(fifo, fb);
+}
+
+fb_t *pdu_recv(void *arg)
+{
+    osalDbgCheck(arg != NULL);
+    fb_t *fb;
+    objects_fifo_t *fifo = arg;
+    if (chFifoReceiveObjectTimeout(fifo, (void**)&fb, TIME_MS2I(1000)) != MSG_OK) {
+        fb = NULL;
+    }
+    return fb;
 }
 
 /** @} */

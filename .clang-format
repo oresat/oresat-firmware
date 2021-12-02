@@ -1,0 +1,11 @@
+﻿---
+BasedOnStyle: LLVM
+AccessModifierOffset: '-4'
+BreakBeforeBraces: Linux
+ColumnLimit: '120'
+IndentCaseLabels: 'false'
+IndentWidth: '4'
+TabWidth: '4'
+UseTab: Never
+
+...

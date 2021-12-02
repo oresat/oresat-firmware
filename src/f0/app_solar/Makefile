@@ -113,6 +113,7 @@ endif
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/ina226.mk
+include $(PROJ_SRC)/tmp101.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -175,7 +176,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -DCO_VERSION_MAJOR=2
+UDEFS = 
 
 # Define ASM defines here
 UADEFS =
@@ -209,6 +210,9 @@ include $(TOOLCHAIN)/toolchain.mk
 ##############################################################################
 # Custom rules
 #
+
+xxd:
+	xxd -i build/$(PROJECT).crc32.bin > build/$(PROJECT).crc32.bin.h
 
 #
 # Custom rules
