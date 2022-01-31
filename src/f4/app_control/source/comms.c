@@ -675,7 +675,8 @@ void comms_file(fb_t *fb, void *arg)
     fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
     int *ret = fb_put(resp_fb, sizeof(int));
-    *ret = file_recv((file_xfr_t*)fb->data);
+    uint32_t *crc = fb_put(resp_fb, sizeof(uint32_t));
+    *ret = file_recv((file_xfr_t*)fb->data, crc);
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 
