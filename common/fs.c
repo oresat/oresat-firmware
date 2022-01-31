@@ -141,7 +141,20 @@ int mmc_prog(const struct lfs_config *cfg, lfs_block_t block, lfs_off_t off, con
     chDbgCheck(block < cfg->block_count);
 
     /* Read the current data from the block */
-    mmc_read(cfg, block, 0, buf, cfg->block_size);
+    if (blkRead(sdcp, block, buf, 1) != HAL_SUCCESS) {
+        return LFS_ERR_IO;
+    }
+
+    /* Check if existing block already has the data */
+    size_t i;
+    for (i = 0; i < size; i++) {
+        if (buf[off + i] != ((uint8_t*)buffer)[i]) {
+            break;
+        }
+    }
+    if (i == size) {
+        return LFS_ERR_OK;
+    }
 
     /* Copy new data */
     memcpy(&buf[off], buffer, size);
