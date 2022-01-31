@@ -2,30 +2,46 @@
 #include "ina226.h"
 #include "CANopen.h"
 #include "chprintf.h"
+#include "OD.h"
+
+#define DEBUG_SD                (BaseSequentialStream *) &SD2
+
+#if 0
+#define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
+#else
+#define dbgprintf(str, ...)
+#endif
+
+
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+
 
 /* Defines for INA226 */
 #define CURR_LSB                20       /* 20uA/bit */
 #define RSENSE                  100      /* 0.1 ohm  */
-#define DAC_VDDA_UV             3333000  /* 3.333 V. Chgange to 3.0 v when powered from debug board */
+#define DAC_VDDA_UV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
 
-/* Defines for MPPT algorithm iteration speed */
-#define SLEEP_MS                2
-#define DEBUG_ITERATIONS        500
+//Assumes 3.3V Vcc
+#define DAC_MININUM_ADJUST_UV   805
 
-/* Defines for MPPT algorithm that changes with each solar cell variant
- * Things to note
- * Negative step size needs to be greater as the curve falls quickly.
- * Make sure to account for noise. Lower value will cause curve to crash. Higher value will not let the system reach its potential.
- */
-#define MIN_DP_DI               0        /* The most important piece. This keeps the point to the left of MPP. */
-#define NVE_STEP_SIZE           3500     /* Fixed -ve step size */
-#define CURR_THRES_SENS         0        /* Current Threshold Sensitivity. Reduces sensitivity to noise in current. */
-#define MAX_STEP_SIZE           10000    /* Maximum step size for variable step IC. */
-#define STEP_SIZE_FACTOR        2000     /* Posive step factor. */
-#define NVE_STEP_SIZE_FACTOR    4        /* Negative step factor. This is multipled with Positive step factor */
-#define MIN_PV_CURRENT          0        /* Minimum current drawn from PV cells */
-#define MAX_PV_CURRENT          500000   /* Maximum current drawn from PV cells */
-#define MIN_PV_POWER            50000    /* Minimum power drawn from PV cells */
+#define I_ADJ_FAILSAFE          1450000
+#define I_ADJ_INITIAL           1500000
+#define I_ADJ_MAX               1500000
+#define I_ADJ_MIN               0
+#define HISTERESIS_MW           3
+
+
+//1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
+#define VREF_STEP_IN_MICROVOLTS_NEGATIVE             1000
+#define VREF_STEP_IN_MICROVOLTS_POSITIVE             (VREF_STEP_IN_MICROVOLTS_NEGATIVE * 4)
+#define DIAG_REPORT_EVERY_N_LOOP_ITERATIONS          1
+
+
+#if VREF_STEP_IN_MICROVOLTS_NEGATIVE < DAC_MININUM_ADJUST_UV
+#error "VREF_STEP_IN_MICROVOLTS_NEGATIVE must be greater then DAC_MININUM_ADJUSG_UV"
+#endif
+
+extern const I2CConfig i2cconfig;
 
 /* Based on INA226 datasheet, page 15, Equation (2)
  * CURR_LSB = Max Current / 2^15
@@ -36,14 +52,17 @@
  * Since CURR_LSB is in uA and Rsense is in mOhm
  * CAL = 0.00512 / (CURR_LSB * Rsense * 10^-9)
  */
+#define NUM_INA226_AVG                                 16
+#define INA226_ADC_CONVERSION_TIME_MICROSECONDS        1100
+
 static const INA226Config ina226config = {
     &I2CD2,
     &i2cconfig,
     INA226_SADDR,
     INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
-    INA226_CONFIG_VSHCT_140US | INA226_CONFIG_VBUSCT_140US |
+    INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
     INA226_CONFIG_AVG_16,
-    (5120000/(RSENSE*CURR_LSB)),
+    (5120000/(RSENSE * CURR_LSB)),
     CURR_LSB
 };
 
@@ -54,7 +73,41 @@ static const DACConfig dac1cfg = {
     .cr           = 0                     /* No control reg options */
 };
 
+//Need some static variables to calculate the energy:
+systime_t tLast = 0;
+systime_t tDiff;
+uint32_t energyTrack;
+
+
 static INA226Driver ina226dev;
+
+typedef enum {
+	MPPT_ALGORITHM_PAO = 0
+} mppt_algorithm_t;
+
+
+typedef struct {
+	uint32_t iadj_uv;
+	bool direction_up_flag;
+	uint32_t step_size;
+
+	uint32_t avg_power_initial_mW;
+	uint32_t avg_voltage_initial_mV;
+	uint32_t avg_current_initial_uA;
+
+	uint32_t max_power_initial_mW;
+	uint32_t max_voltage_initial_mV;
+	uint32_t max_current_initial_uA;
+
+	uint32_t avg_power_perturbed_mW;
+	uint32_t avg_voltage_perturbed_mV;
+	uint32_t avg_current_perturbed_uA;
+
+	bool hit_step_size_threshold_flag;
+} mppt_pao_state;
+
+mppt_pao_state pao_state;
+
 
 /**
  * @brief control DAC output in microvolts.
@@ -63,7 +116,7 @@ static INA226Driver ina226dev;
  * @param[in] chan      DAC channel.
  * @param[in] uv        output volts in uv (microVolts).
  */
-void dacPutMicrovolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
+void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
     /* Per section 14.5.3 of the STM32F0x1 ref manual,
      * Vout(mV) = VDDA(mV) * (reg_val / 4096)
      * so, reg_val = (Vout * 4096) / VDDA
@@ -73,165 +126,236 @@ void dacPutMicrovolts(DACDriver *dacp, dacchannel_t chan, uint32_t uv) {
 }
 
 /**
- * @brief Calculates Iadj_v required for a particular max current for LT1618
+ * @brief Reads power flow characteristics from the INA226
  *
- * @param[in] i_out     Current in uA.
+ * @param[in|out] *dest_avg_power_mW     Output variable into which to store average power reading
+ * @param[in|out] *dest_avg_voltage_uV   Output variable into which to store average voltage reading
+ * @param[in|out] *dest_avg_current      Output variable into which to store average current reading
  *
- * @return              Iadj_v value in microvolts.
+ * @return true upon success, false otherwise
  */
-uint32_t calc_iadj(uint32_t i_out)
-{
-    /* Per page 7 of LT1618 datasheet
-     * V_Isense = (1.263 - 0.8* v_iadj)/25
-     * => 25 * i_out * Rsense  = 1.263 - 0.8 * V_iadj
-     * Multiplying 4000 on both sides
-     * 100000 * i_out * Rsense = 5052 - 3200 * V_iadj
-     * Now i_out is in uA, Rsense is in mOhm and V_iadj is in uV
-     * => 100000 * i_out/1000000 * Rsense/1000 = 5052 - 3200 * V_iadj/1000000
-     * => 100 * i_out * Rsense = 5052000000 - 3200 * V_iadj
-     * => i_out * Rsense = 50520000 - 32 * V_iadj
-     * => V_adj = (5052000 - i_out * Rsense * 100)/3200
-     */
-    return ((50520000 - i_out * RSENSE) / 32);
+bool read_avg_power_and_voltage(uint32_t *dest_avg_power_mW, uint32_t *dest_avg_voltage_mV, uint32_t *dest_avg_current_uA) {
+	chThdSleepMilliseconds((NUM_INA226_AVG * INA226_ADC_CONVERSION_TIME_MICROSECONDS) / 1000);//Compensate for the internal averaging done by the ina chip
+
+	bool ret = true;
+	if( ina226ReadPower(&ina226dev, dest_avg_power_mW) != MSG_OK ) {
+		ret = false;
+	}
+	if( ina226ReadVBUS(&ina226dev, dest_avg_voltage_mV) != MSG_OK ) {
+		ret = false;
+	}
+	if( ina226ReadCurrent(&ina226dev, dest_avg_current_uA) != MSG_OK ) {
+		ret = false;
+	}
+	if( ! ret ) {
+		//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
+	}
+
+	return(ret);
+}
+
+uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t max) {
+	if (v > max)
+		return (max);
+	else if (v < min)
+		return (min);
+
+	return (v);
 }
 
 /**
- * @brief Maximum power point tracking algorithm for Solar cells
- *
- * @param[in] volt      Solar cell bus voltage in uV.
- * @param[in] curr      Solar cell current in uA.
- * @param[in] pwr       Power output from solar cells in microWatts.
- *
- * @return              Maximum current to be drawn from solar cells in uA
- * TODO: Find min/max limits of step size. Also check the units that work the best
- *       Average a few samples to reduce noise
- *       reduce max current limit immediatly if current is lower that the allowed current.(brownout condition)
- *       increase max current limit immediatly if voltage is higher that expected.(shutdown condition)
+ * Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP.
  */
-int32_t calc_mppt(uint32_t volt, int32_t curr, uint32_t pwr)
-{
-    /* The values from the previous iteration of the loop */
-    static uint32_t prev_volt = 0;
-    static int32_t prev_curr = 0;
-    static uint32_t prev_pwr = 0;
+uint32_t get_iadj_step_size(mppt_pao_state *pao_state) {
+	if( (! pao_state->hit_step_size_threshold_flag) && pao_state->max_voltage_initial_mV != 0 ) {
+		const uint32_t threshold_low_mV = pao_state->max_voltage_initial_mV / 20; //0.95 threshold
+		const uint32_t threshold_mV = pao_state->max_voltage_initial_mV - threshold_low_mV;
 
-    /* Programmed max allowed current from current and previous iteration */
-    static int32_t i_in;
-    static int32_t prev_i_in;
+		if(  pao_state->avg_voltage_initial_mV > threshold_mV ) {
+			//Linear scale of step size based on delta from maximum voltage
+		    const int32_t v = (((pao_state->avg_voltage_initial_mV - threshold_mV) * 100) / threshold_low_mV);
+			const uint32_t step_size = (((5000 - VREF_STEP_IN_MICROVOLTS_NEGATIVE) * v) / 100) + VREF_STEP_IN_MICROVOLTS_NEGATIVE;
 
-    int32_t delta_v = volt - prev_volt;
-    int32_t delta_i = curr - prev_curr;
-    int32_t delta_p = pwr  - prev_pwr;
+			return(step_size);//up or down is fine
+		} else {
+			pao_state->hit_step_size_threshold_flag = true;
+		}
+	}
 
-    int32_t dp_di;
-    int32_t step_size;
-
-    /* Start VSIC MPPT Algorithm */
-    /* Handles sudden decrease in illumination */
-    if ((curr < (8 * i_in)/10) && (pwr < MIN_PV_POWER)) {
-        i_in = (8*curr)/10;
-        if (i_in < MIN_PV_CURRENT) {
-            i_in = MIN_PV_CURRENT;
-        }
-        return i_in;
-    }
-
-    /* Handles sudden decrease in load*/
-    if (curr > (12 * i_in)/10)  {
-        i_in = curr;
-        return i_in;
-    }
-
-    /* Variable Step IC MPPT Algorithm */
-    if ((prev_i_in-i_in) == 0 && (delta_p < 0 || delta_i <0 || delta_v<0)) {
-        /* Decrease current if power/current decreases without being specified.
-         * Closed loop control.
-         */
-        prev_i_in = i_in;
-        i_in -= NVE_STEP_SIZE;
-    } else {
-        prev_i_in = i_in;
-        if (delta_i > CURR_THRES_SENS || delta_i < -CURR_THRES_SENS) {
-            dp_di = (delta_p*1000)/delta_i;
-            step_size = (dp_di * STEP_SIZE_FACTOR)/(volt/1000);
-
-            if (dp_di > MIN_DP_DI) {
-                if(step_size > MAX_STEP_SIZE) {
-                    i_in += MAX_STEP_SIZE;
-                }else{
-                    i_in += step_size;
-                }
-            } else {
-                i_in -= NVE_STEP_SIZE;
-                if (dp_di < 0) {
-                    if(step_size < (-1)*MAX_STEP_SIZE) {
-                        i_in -= MAX_STEP_SIZE;
-                    }else{
-                        i_in += NVE_STEP_SIZE_FACTOR*step_size;
-                    }
-                }
-            }
-        }
-    }
-    /* End VSIC MPPT Algorithm */
-
-    prev_volt = volt;
-    prev_curr = curr;
-    prev_pwr  = pwr;
-
-    /* Bounds checks for current and power*/
-    if (i_in > MAX_PV_CURRENT) {
-        i_in = MAX_PV_CURRENT;
-    }
-    if (pwr < MIN_PV_POWER) {
-      i_in += MAX_STEP_SIZE;
-    }
-    return i_in;
+	if( pao_state->direction_up_flag ) {
+		return(VREF_STEP_IN_MICROVOLTS_POSITIVE);
+	}
+	return(VREF_STEP_IN_MICROVOLTS_NEGATIVE);
 }
+
+/**
+ * @param *pao_state The current state of the perturb and observe algorithm
+ *
+ * @return true on success, false otherwise
+ */
+bool itterate_mppt_perturb_and_observe(mppt_pao_state *pao_state) {
+
+	pao_state->step_size = get_iadj_step_size(pao_state);
+
+	uint32_t iadj_uv_perturbed = pao_state->iadj_uv;
+	if( pao_state->direction_up_flag ) {
+		iadj_uv_perturbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) + pao_state->step_size, I_ADJ_MIN, I_ADJ_MAX);
+	} else {
+		iadj_uv_perturbed = saturate_uint32_t(((int64_t) pao_state->iadj_uv) - pao_state->step_size, I_ADJ_MIN, I_ADJ_MAX);
+	}
+
+	if( pao_state->iadj_uv == iadj_uv_perturbed ) {
+		//It has saturated to an identical value, flip the search direction and process in the next iteration
+		pao_state->direction_up_flag = (! pao_state->direction_up_flag);
+	} else {
+		dac_put_microvolts(&DACD1, 0, iadj_uv_perturbed);
+
+		if( ! read_avg_power_and_voltage(&pao_state->avg_power_perturbed_mW, &pao_state->avg_voltage_perturbed_mV, &pao_state->avg_current_perturbed_uA) ) {
+			//I2C communications error, no data to make a decision on. Fail safe to moving left
+			pao_state->direction_up_flag = true;
+
+			pao_state->iadj_uv = iadj_uv_perturbed;
+			if( pao_state->iadj_uv > I_ADJ_FAILSAFE ) {
+				pao_state->iadj_uv = I_ADJ_FAILSAFE;
+			}
+
+			//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA);
+
+			return(false);
+
+		} else {
+			if( pao_state->avg_power_perturbed_mW >= (pao_state->avg_power_initial_mW - HISTERESIS_MW) ) {
+				//Always move the iadj_value, even if the output power is equal. This will cause it to hunt back and forth between two points that have a detectable difference in their power output.
+			} else {
+				pao_state->direction_up_flag = (! pao_state->direction_up_flag);
+			}
+
+			pao_state->iadj_uv = iadj_uv_perturbed;
+
+			pao_state->avg_current_initial_uA = pao_state->avg_current_perturbed_uA;
+			pao_state->avg_power_initial_mW = pao_state->avg_power_perturbed_mW;
+			pao_state->avg_voltage_initial_mV = pao_state->avg_voltage_perturbed_mV;
+		}
+	}
+
+	//These values are published to the CANOpen dictionary objects
+	pao_state->max_power_initial_mW = MAX(pao_state->max_power_initial_mW, pao_state->avg_power_initial_mW);
+	pao_state->max_voltage_initial_mV = MAX(pao_state->max_voltage_initial_mV, pao_state->avg_voltage_initial_mV);
+	pao_state->max_current_initial_uA = MAX(pao_state->max_current_initial_uA, pao_state->avg_current_initial_uA);
+
+	return(true);
+}
+
 
 /* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     (void)arg;
-    uint32_t voltage, power;
-    int32_t current;
-    uint32_t iadj_uv = 1500000;
-    uint32_t i_in=0;
-    int i = 0;
 
+    chprintf(DEBUG_SD, "\r\nRunning solar app...\r\n");
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
+    chprintf(DEBUG_SD, "Initializing DAC....\r\n");
     dacStart(&DACD1, &dac1cfg);
+
+    chprintf(DEBUG_SD, "Initializing INA226....\r\n");
     ina226Start(&ina226dev, &ina226config);
 
-    /* Start up LT1618 */
+    if( ina226dev.state != INA226_READY ) {
+    	chprintf(DEBUG_SD, "Failed to initialize INA226!!!\r\n");
+    	chThdSleepMilliseconds(100);
+    }
+
+    memset(&pao_state, 0, sizeof(pao_state));
+    pao_state.iadj_uv = I_ADJ_INITIAL;
+
     palSetLine(LINE_LT1618_EN);
 
-    while(!chThdShouldTerminateX()){
-        chThdSleepMilliseconds(SLEEP_MS);
+#if 0
+	//Generate CSV output to terminal for plotting in libreoffice
+	for(int iadj = 1500000; iadj >= 0; iadj -= 1000 ) {
+		dac_put_microvolts(&DACD1, 0, iadj);
 
-        /* Get present values */
-        voltage = ina226ReadVBUS(&ina226dev);    /* VBUS voltage in uV */
-        current = ina226ReadCurrent(&ina226dev); /* Current in uA */
-        power   = ina226ReadPower(&ina226dev);   /* Power in increments of uW */
+		if( ! read_avg_power_and_voltage(&pao_state.avg_power_initial_mW, &pao_state.avg_voltage_initial_mV, &pao_state.avg_current_initial_uA) ) {
+			//FIXME handle error
+		}
+		dbgprintf("iadj_uV,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d\r\n",
+				iadj, pao_state.avg_power_initial_mW, pao_state.avg_voltage_initial_mV, pao_state.avg_current_initial_uA);
+	}
+	for(;;) {
 
-        /* Set OD entries to raw values */
-        OD_PV_Power.voltage = ina226ReadRaw(&ina226dev, INA226_AD_VBUS);
-        OD_PV_Power.current = (int16_t)ina226ReadRaw(&ina226dev, INA226_AD_CURRENT);
-        OD_PV_Power.power   = ina226ReadRaw(&ina226dev, INA226_AD_POWER);
+	}
+#endif
 
-        /* Calculate max input current drawn from solar cells.
-         * This is used to calculate iadj.
-         */
-        i_in = calc_mppt(voltage, current, power);
-        iadj_uv = calc_iadj(i_in);
-        dacPutMicrovolts(&DACD1, 0, iadj_uv);
-        if ((++i % 500) == 0){
-          chprintf((BaseSequentialStream *) &SD2, "Iteration: %d, Volt: %d uv, Current: %d uA, Power: %d uW, \r\n", i, voltage, current, power);
-          chprintf((BaseSequentialStream *) &SD2, "Input curr: %d ua, Bias Volt: %d uv, \r\n", i_in, iadj_uv);
+	dac_put_microvolts(&DACD1, 0, pao_state.iadj_uv);
+
+	chprintf(DEBUG_SD, "Done with init INA226, running main loop....\r\n");
+    systime_t loop_start_time_ms = TIME_I2MS(chVTGetSystemTime());
+
+	for (uint32_t loop_iteration = 0; !chThdShouldTerminateX(); loop_iteration++) {
+        if ((loop_iteration % DIAG_REPORT_EVERY_N_LOOP_ITERATIONS) == 0) {
+			dbgprintf("loop,%u,iadj_uv,%u,direction_up_flag,%u,avg_power_initial_mW,%u,avg_voltage_initial_mV,%u,avg_current_initial_uA,%d,step_size,%u,avg_freq,%u\r\n",
+					loop_iteration, pao_state.iadj_uv,
+					pao_state.direction_up_flag,
+					pao_state.avg_power_initial_mW,
+					pao_state.avg_voltage_initial_mV,
+					pao_state.avg_current_initial_uA,
+					pao_state.step_size,
+					((loop_iteration / ((TIME_I2MS(chVTGetSystemTime()) - loop_start_time_ms) / 1000))));
         }
+        //On first loop, reset all energy tracking variables:
+        if (loop_iteration == 0)
+        {
+            tLast = 0;
+            energyTrack = 0;
+            tDiff = 0;
+        }
+
+    	itterate_mppt_perturb_and_observe(&pao_state);
+
+    	OD_RAM.x6000_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.current = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.currentAvg = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.power = pao_state.avg_power_initial_mW;
+    	OD_RAM.x6000_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
+
+    	OD_RAM.x6000_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
+    	OD_RAM.x6000_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
+    	OD_RAM.x6000_PV_Power.powerMax = pao_state.max_power_initial_mW;
+
+            /*
+            Energy Tracking:
+            - Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the most recently sampled power value in mw
+            - Tracking energy in a uint32_t to allow for millijoule precision
+            - Approximating the integral by dividing the power into tDiff chunks
+            - Converting to joules when we store it in the OD so we don't overflow the uint16_t in a 90 min interval
+            - Note that the persistent variables are declared outside the scope of the thread.
+            */
+            tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
+
+            //Storing energy in millijoules. Dividing by 1k because time is in ms
+            energyTrack = (uint32_t)((energyTrack + (uint32_t)(OD_RAM.x6000_PV_Power.power * tDiff)/1000));
+
+            //Dividing by 1k to convert to joules
+            uint32_t tempEnergy = energyTrack / 1000;
+
+            //Truncate to 16 bits for the OD.
+            OD_RAM.x6000_PV_Power.energy = (uint16_t) tempEnergy;
+
+
+
+    	OD_RAM.x6002_MPPT.LT1618_IADJ = pao_state.iadj_uv / 1000;
+
+		//Only PAO implemented for the time being
+		OD_RAM.x6002_MPPT.algorithm = MPPT_ALGORITHM_PAO;
+
+        //Update tLast for the next loop's energy calculation
+        tLast = TIME_I2MS(chVTGetSystemTime());
+
     }
+
 
     /* Stop drivers */
     dacStop(&DACD1);

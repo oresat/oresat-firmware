@@ -2,20 +2,20 @@
 FileName=app.eds
 FileVersion=0
 FileRevision=1
-LastEDS=/home/ryan/PSAS/repos/oresat-firmware/src/f0/app_solar/source/ObjDict/app.eds
+LastEDS=
 EDSVersion=4.0
-Description=OreSat Solar Board Object Dictionary
+Description=OreSat Battery Application Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=8:19PM
+ModificationTime=6:43PM
 ModificationDate=11-29-2021
 ModifiedBy=
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat Solar Board
+ProductName=OreSat Battery
 ProductNumber=0
 RevisionNumber=0
 BaudRate_10=1
@@ -3058,7 +3058,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1804sub2]
@@ -3094,7 +3094,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1804sub6]
@@ -3127,7 +3127,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1805sub2]
@@ -3163,7 +3163,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1805sub6]
@@ -3196,7 +3196,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000380+$NODEID
+DefaultValue=0x40000380+$NODEID
 PDOMapping=0
 
 [1806sub2]
@@ -3232,7 +3232,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1806sub6]
@@ -3265,7 +3265,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000480+$NODEID
+DefaultValue=0x40000480+$NODEID
 PDOMapping=0
 
 [1807sub2]
@@ -3301,7 +3301,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1807sub6]
@@ -3334,7 +3334,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 PDOMapping=0
 
 [1808sub2]
@@ -3370,7 +3370,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1808sub6]
@@ -3403,7 +3403,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000280+$NODEID
+DefaultValue=0x40000280+$NODEID
 PDOMapping=0
 
 [1809sub2]
@@ -3439,7 +3439,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=10000
 PDOMapping=0
 
 [1809sub6]
@@ -3964,7 +3964,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x04
+DefaultValue=0x03
 PDOMapping=0
 
 [1A01sub1]
@@ -3973,7 +3973,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000410
+DefaultValue=0x60000510
 PDOMapping=0
 
 [1A01sub2]
@@ -3982,7 +3982,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000510
+DefaultValue=0x60000610
 PDOMapping=0
 
 [1A01sub3]
@@ -3991,7 +3991,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000610
+DefaultValue=0x60000710
 PDOMapping=0
 
 [1A01sub4]
@@ -4000,7 +4000,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000710
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A01sub5]
@@ -4051,7 +4051,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x02
+DefaultValue=0x04
 PDOMapping=0
 
 [1A02sub1]
@@ -4060,7 +4060,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000910
+DefaultValue=0x60000810
 PDOMapping=0
 
 [1A02sub2]
@@ -4069,7 +4069,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000A10
+DefaultValue=0x60000910
 PDOMapping=0
 
 [1A02sub3]
@@ -4078,7 +4078,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000A10
 PDOMapping=0
 
 [1A02sub4]
@@ -4087,7 +4087,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000B10
 PDOMapping=0
 
 [1A02sub5]
@@ -4138,7 +4138,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x06
+DefaultValue=0x04
 PDOMapping=0
 
 [1A03sub1]
@@ -4147,7 +4147,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010108
+DefaultValue=0x60001210
 PDOMapping=0
 
 [1A03sub2]
@@ -4156,7 +4156,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010208
+DefaultValue=0x60001310
 PDOMapping=0
 
 [1A03sub3]
@@ -4165,7 +4165,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010308
+DefaultValue=0x60001410
 PDOMapping=0
 
 [1A03sub4]
@@ -4174,7 +4174,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010408
+DefaultValue=0x60001510
 PDOMapping=0
 
 [1A03sub5]
@@ -4183,7 +4183,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010508
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A03sub6]
@@ -4192,7 +4192,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010608
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A03sub7]
@@ -4225,7 +4225,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A04sub1]
@@ -4234,7 +4234,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000C10
 PDOMapping=0
 
 [1A04sub2]
@@ -4243,7 +4243,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60000D10
 PDOMapping=0
 
 [1A04sub3]
@@ -4252,7 +4252,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60001108
 PDOMapping=0
 
 [1A04sub4]
@@ -4261,7 +4261,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60001608
 PDOMapping=0
 
 [1A04sub5]
@@ -4312,7 +4312,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A05sub1]
@@ -4321,7 +4321,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010110
 PDOMapping=0
 
 [1A05sub2]
@@ -4330,7 +4330,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010210
 PDOMapping=0
 
 [1A05sub3]
@@ -4339,7 +4339,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010310
 PDOMapping=0
 
 [1A05sub4]
@@ -4348,7 +4348,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010410
 PDOMapping=0
 
 [1A05sub5]
@@ -4399,7 +4399,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x03
 PDOMapping=0
 
 [1A06sub1]
@@ -4408,7 +4408,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010510
 PDOMapping=0
 
 [1A06sub2]
@@ -4417,7 +4417,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010610
 PDOMapping=0
 
 [1A06sub3]
@@ -4426,7 +4426,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010710
 PDOMapping=0
 
 [1A06sub4]
@@ -4486,7 +4486,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A07sub1]
@@ -4495,7 +4495,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010810
 PDOMapping=0
 
 [1A07sub2]
@@ -4504,7 +4504,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010910
 PDOMapping=0
 
 [1A07sub3]
@@ -4513,7 +4513,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010A10
 PDOMapping=0
 
 [1A07sub4]
@@ -4522,7 +4522,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010B10
 PDOMapping=0
 
 [1A07sub5]
@@ -4573,7 +4573,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A08sub1]
@@ -4582,7 +4582,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011210
 PDOMapping=0
 
 [1A08sub2]
@@ -4591,7 +4591,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011310
 PDOMapping=0
 
 [1A08sub3]
@@ -4600,7 +4600,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011410
 PDOMapping=0
 
 [1A08sub4]
@@ -4609,7 +4609,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011510
 PDOMapping=0
 
 [1A08sub5]
@@ -4660,7 +4660,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0
+DefaultValue=0x04
 PDOMapping=0
 
 [1A09sub1]
@@ -4669,7 +4669,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010C10
 PDOMapping=0
 
 [1A09sub2]
@@ -4678,7 +4678,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60010D10
 PDOMapping=0
 
 [1A09sub3]
@@ -4687,7 +4687,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011108
 PDOMapping=0
 
 [1A09sub4]
@@ -4696,7 +4696,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x00000000
+DefaultValue=0x60011608
 PDOMapping=0
 
 [1A09sub5]
@@ -4834,7 +4834,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x04
+DefaultValue=0
 PDOMapping=0
 
 [1A0Bsub1]
@@ -4843,7 +4843,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000110
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Bsub2]
@@ -4852,7 +4852,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000210
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Bsub3]
@@ -4861,7 +4861,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000310
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Bsub4]
@@ -4870,7 +4870,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000410
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Bsub5]
@@ -4921,7 +4921,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x04
+DefaultValue=0
 PDOMapping=0
 
 [1A0Csub1]
@@ -4930,7 +4930,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000510
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Csub2]
@@ -4939,7 +4939,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000610
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Csub3]
@@ -4948,7 +4948,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000710
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Csub4]
@@ -4957,7 +4957,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000810
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Csub5]
@@ -5008,7 +5008,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x02
+DefaultValue=0
 PDOMapping=0
 
 [1A0Dsub1]
@@ -5017,7 +5017,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000910
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Dsub2]
@@ -5026,7 +5026,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000A10
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Dsub3]
@@ -5095,7 +5095,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=rw
-DefaultValue=0x06
+DefaultValue=0
 PDOMapping=0
 
 [1A0Esub1]
@@ -5104,7 +5104,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010108
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub2]
@@ -5113,7 +5113,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010208
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub3]
@@ -5122,7 +5122,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010308
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub4]
@@ -5131,7 +5131,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010408
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub5]
@@ -5140,7 +5140,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010508
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub6]
@@ -5149,7 +5149,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010608
+DefaultValue=0x00000000
 PDOMapping=0
 
 [1A0Esub7]
@@ -5267,10 +5267,10 @@ DefaultValue=0x00000008
 PDOMapping=0
 
 [6000]
-ParameterName=PV Power
+ParameterName=Pack1
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0xB
+SubNumber=0x17
 
 [6000sub0]
 ParameterName=max sub-index
@@ -5278,11 +5278,20 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x0A
+DefaultValue=0x16
 PDOMapping=0
 
 [6000sub1]
-ParameterName=Voltage
+ParameterName=Vbatt
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=8200
+PDOMapping=1
+
+[6000sub2]
+ParameterName=VCell max
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5290,17 +5299,8 @@ AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
-[6000sub2]
-ParameterName=Current
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
 [6000sub3]
-ParameterName=Power
+ParameterName=VCell min
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5309,7 +5309,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6000sub4]
-ParameterName=Voltage Avg
+ParameterName=VCell
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5318,16 +5318,16 @@ DefaultValue=0
 PDOMapping=1
 
 [6000sub5]
-ParameterName=Current Avg
+ParameterName=VCell1
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0003
+DataType=0x0006
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
 [6000sub6]
-ParameterName=Power Avg
+ParameterName=VCell2
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5336,7 +5336,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6000sub7]
-ParameterName=Voltage Max
+ParameterName=VCell avg
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
@@ -5345,7 +5345,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6000sub8]
-ParameterName=Current Max
+ParameterName=Current
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5354,124 +5354,352 @@ DefaultValue=0
 PDOMapping=1
 
 [6000sub9]
-ParameterName=Power Max
+ParameterName=Current avg
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0006
+DataType=0x0003
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
 [6000subA]
-ParameterName=Energy
+ParameterName=Current max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subB]
+ParameterName=Current min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subC]
+ParameterName=Full Capacity
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subD]
+ParameterName=Reported Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subE]
+ParameterName=Time To Empty
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subF]
+ParameterName=Time To Full
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub10]
+ParameterName=Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub11]
+ParameterName=Reported State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub12]
+ParameterName=Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub13]
+ParameterName=Temperature avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub14]
+ParameterName=Temperature max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub15]
+ParameterName=Temperature min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub16]
+ParameterName=State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
 [6001]
-ParameterName=PV Temp
+ParameterName=Pack2
 ObjectType=0x9
 ;StorageLocation=RAM
-SubNumber=0x7
+SubNumber=0x17
 
 [6001sub0]
-ParameterName=Highest sub-index supported
+ParameterName=max sub-index
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x06
+DefaultValue=0x16
 PDOMapping=0
 
 [6001sub1]
-ParameterName=Cell 1 Temp
+ParameterName=Vbatt
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0002
+DataType=0x0006
 AccessType=ro
-DefaultValue=0
+DefaultValue=8200
 PDOMapping=1
 
 [6001sub2]
-ParameterName=Cell 2 Temp
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub3]
-ParameterName=Cell 1 Temp Min
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=127
-PDOMapping=1
-
-[6001sub4]
-ParameterName=Cell 2 Temp Min
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=127
-PDOMapping=1
-
-[6001sub5]
-ParameterName=Cell 1 Temp Max
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=-128
-PDOMapping=1
-
-[6001sub6]
-ParameterName=Cell 2 Temp Max
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=-128
-PDOMapping=1
-
-[6002]
-ParameterName=MPPT
-ObjectType=0x9
-;StorageLocation=RAM
-SubNumber=0x3
-
-[6002sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0x02
-PDOMapping=0
-
-[6002sub1]
-ParameterName=Algorithm
-ObjectType=0x7
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=rww
-DefaultValue=0
-PDOMapping=1
-
-[6002sub2]
-ParameterName=LT1618 IADJ
+ParameterName=VCell max
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
+
+[6001sub3]
+ParameterName=VCell min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub4]
+ParameterName=VCell
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub5]
+ParameterName=VCell1
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub6]
+ParameterName=VCell2
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub7]
+ParameterName=VCell avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub8]
+ParameterName=Current
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub9]
+ParameterName=Current avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subA]
+ParameterName=Current max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subB]
+ParameterName=Current min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subC]
+ParameterName=Full Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subD]
+ParameterName=Reported Capacity
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subE]
+ParameterName=Time To Empty
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001subF]
+ParameterName=Time To Full
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub10]
+ParameterName=Cycles
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub11]
+ParameterName=Reported State of Charge
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub12]
+ParameterName=Temperature
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub13]
+ParameterName=Temperature avg
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub14]
+ParameterName=Temperature max
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub15]
+ParameterName=Temperature min
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub16]
+ParameterName=State
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6002]
+ParameterName=ModelGauge Alg Status
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
 
 [ManufacturerObjects]
 SupportedObjects=7

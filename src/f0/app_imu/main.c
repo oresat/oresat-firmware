@@ -20,8 +20,8 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "solar.h"
 #include "blink.h"
+#include "imu.h"
 
 static worker_t blink_worker;
 static thread_descriptor_t blink_desc = {
@@ -32,31 +32,14 @@ static thread_descriptor_t blink_desc = {
     .funcp = blink,
     .arg = NULL
 };
-static worker_t solar_worker;
-static thread_descriptor_t solar_desc = {
-    .name = "Solar MPPT",
-    .wbase = THD_WORKING_AREA_BASE(solar_wa),
-    .wend = THD_WORKING_AREA_END(solar_wa),
+static worker_t imu_worker;
+static thread_descriptor_t imu_desc = {
+    .name = "IMU",
+    .wbase = THD_WORKING_AREA_BASE(imu_wa),
+    .wend = THD_WORKING_AREA_END(imu_wa),
     .prio = NORMALPRIO,
-    .funcp = solar,
+    .funcp = imu,
     .arg = NULL
-};
-static worker_t sensor_mon_worker;
-static thread_descriptor_t sensor_mon_desc = {
-    .name = "Sensor Monitor",
-    .wbase = THD_WORKING_AREA_BASE(sensor_mon_wa),
-    .wend = THD_WORKING_AREA_END(sensor_mon_wa),
-    .prio = NORMALPRIO,
-    .funcp = sensor_mon,
-    .arg = NULL
-};
-
-const I2CConfig i2cconfig = {
-    STM32_TIMINGR_PRESC(0xBU) |
-    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
-    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
-    0,
-    0
 };
 
 static oresat_config_t oresat_conf = {
@@ -72,8 +55,7 @@ static void app_init(void)
 {
     /* App initialization */
     reg_worker(&blink_worker, &blink_desc, false, true);
-    reg_worker(&solar_worker, &solar_desc, true, true);
-    reg_worker(&sensor_mon_worker, &sensor_mon_desc, true, true);
+    reg_worker(&imu_worker, &imu_desc, false, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);

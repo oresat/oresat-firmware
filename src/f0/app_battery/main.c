@@ -17,46 +17,22 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"
-#include "solar.h"
-#include "blink.h"
+#include "batt.h"
 
-static worker_t blink_worker;
-static thread_descriptor_t blink_desc = {
-    .name = "Blink",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
-    .prio = NORMALPRIO,
-    .funcp = blink,
-    .arg = NULL
-};
-static worker_t solar_worker;
-static thread_descriptor_t solar_desc = {
-    .name = "Solar MPPT",
-    .wbase = THD_WORKING_AREA_BASE(solar_wa),
-    .wend = THD_WORKING_AREA_END(solar_wa),
-    .prio = NORMALPRIO,
-    .funcp = solar,
-    .arg = NULL
-};
-static worker_t sensor_mon_worker;
-static thread_descriptor_t sensor_mon_desc = {
-    .name = "Sensor Monitor",
-    .wbase = THD_WORKING_AREA_BASE(sensor_mon_wa),
-    .wend = THD_WORKING_AREA_END(sensor_mon_wa),
-    .prio = NORMALPRIO,
-    .funcp = sensor_mon,
-    .arg = NULL
-};
+#define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 
-const I2CConfig i2cconfig = {
-    STM32_TIMINGR_PRESC(0xBU) |
-    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
-    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
-    0,
-    0
+static worker_t battery_worker;
+static thread_descriptor_t battery_worker_desc = {
+    .name = "Battery management thread",
+    .wbase = THD_WORKING_AREA_BASE(batt_wa),
+    .wend = THD_WORKING_AREA_END(batt_wa),
+    .prio = NORMALPRIO,
+    .funcp = batt,
+    .arg = NULL
 };
 
 static oresat_config_t oresat_conf = {
@@ -71,9 +47,7 @@ static oresat_config_t oresat_conf = {
 static void app_init(void)
 {
     /* App initialization */
-    reg_worker(&blink_worker, &blink_desc, false, true);
-    reg_worker(&solar_worker, &solar_desc, true, true);
-    reg_worker(&sensor_mon_worker, &sensor_mon_desc, true, true);
+    reg_worker(&battery_worker, &battery_worker_desc, true, true);
 
     /* Start up debug output */
     sdStart(&SD2, NULL);
@@ -87,6 +61,9 @@ int main(void)
     // Initialize and start
     oresat_init(&oresat_conf);
     app_init();
+    chprintf(DEBUG_SERIAL, "\r\nStarting battery app...\r\n");
+
     oresat_start();
     return 0;
 }
+

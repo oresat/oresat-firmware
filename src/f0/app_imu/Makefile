@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x100
+  USE_PROCESS_STACKSIZE = 0x200
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x100
+  USE_EXCEPTIONS_STACKSIZE = 0x200
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_solar
+PROJECT   = app_imu
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = SOLAR_V4
+BOARD     = ORESAT_ACS_V4
 
 # Project sources.
 PROJ_ROOT = ../../..
@@ -112,8 +112,7 @@ endif
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
-include $(PROJ_SRC)/ina226.mk
-include $(PROJ_SRC)/tmp101.mk
+include $(PROJ_SRC)/bmi088.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -176,7 +175,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = 
+UDEFS =
 
 # Define ASM defines here
 UADEFS =
@@ -210,9 +209,6 @@ include $(TOOLCHAIN)/toolchain.mk
 ##############################################################################
 # Custom rules
 #
-
-xxd:
-	xxd -i build/$(PROJECT).crc32.bin > build/$(PROJECT).crc32.bin.h
 
 #
 # Custom rules

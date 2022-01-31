@@ -10,6 +10,8 @@
 #include "hal.h"
 #include "ina226.h"
 
+#define DEBUG_SD                  (BaseSequentialStream *) &SD2
+
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
@@ -52,7 +54,7 @@ typedef union {
 msg_t ina226I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
         uint8_t* rxbuf, size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+    		TIME_MS2I(50));
 }
 
 /**
@@ -70,7 +72,7 @@ msg_t ina226I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
 msg_t ina226I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
         size_t n) {
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-            TIME_INFINITE);
+    		TIME_MS2I(50));
 }
 #endif /* INA226_USE_I2C */
 
@@ -125,25 +127,53 @@ void ina226Start(INA226Driver *devp, const INA226Config *config) {
     i2cAcquireBus(config->i2cp);
 #endif /* INA226_SHARED_I2C */
 
+    //chprintf(DEBUG_SD, "Starting INA226 i2c....\r\n");
     i2cStart(config->i2cp, config->i2ccfg);
+    //chprintf(DEBUG_SD, "Done Starting INA226 i2c....\r\n");
+
     buf.reg = INA226_AD_CONFIG;
     buf.value = __REVSH(INA226_CONFIG_RST);
-    ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    do {
-        ina226I2CReadRegister(config->i2cp, config->saddr, INA226_AD_CONFIG,
-                                                buf.data, sizeof(buf.data));
-    } while (buf.data[0] & 0x80U); /* While still resetting */
+    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
+    	devp->state = INA226_UNINIT;
+    	return;
+    }
+
+    bool reset_success = false;
+    for(int loop_count = 0; loop_count < 10; loop_count++ ) {
+        ina226I2CReadRegister(config->i2cp, config->saddr, INA226_AD_CONFIG, buf.data, sizeof(buf.data));
+
+        if( (buf.data[0] & 0x80U) ) {
+        	/* While still resetting */
+        } else {
+        	reset_success = true;
+        	break;
+        }
+    }
+
+    if( ! reset_success ) {
+    	devp->state = INA226_UNINIT;
+    	return;
+    }
+
     buf.reg = INA226_AD_CONFIG;
     buf.value = __REVSH(config->cfg);
-    ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
+    	devp->state = INA226_UNINIT;
+    	return;
+    }
+
     buf.reg = INA226_AD_CAL;
     buf.value = __REVSH(config->cal);
-    ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
+    	devp->state = INA226_UNINIT;
+    	return;
+    }
 
 #if INA226_SHARED_I2C
     i2cReleaseBus(config->i2cp);
 #endif /* INA226_SHARED_I2C */
 #endif /* INA226_USE_I2C */
+
     devp->state = INA226_READY;
 }
 
@@ -171,7 +201,9 @@ void ina226Stop(INA226Driver *devp) {
         /* Reset to input.*/
         buf.reg = INA226_AD_CONFIG;
         buf.value = __REVSH(INA226_CONFIG_RST);
-        ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+        if( ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
+
+        }
 
         i2cStop(devp->config->i2cp);
 #if INA226_SHARED_I2C
@@ -225,7 +257,7 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
  *
  * @api
  */
-uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
+msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest) {
     i2cbuf_t buf;
 
     osalDbgCheck(devp != NULL);
@@ -239,13 +271,18 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
 #endif /* INA226_SHARED_I2C */
 
     buf.reg = reg;
-    ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
+    const msg_t ret = ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
 
 #if INA226_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
 #endif /* INA226_SHARED_I2C */
 #endif /* INA226_USE_I2C */
-    return __REVSH(buf.value);
+
+    if( ret == MSG_OK ) {
+    	*dest = __REVSH(buf.value);
+    }
+
+    return(ret);
 }
 
 /**
@@ -256,32 +293,38 @@ uint16_t ina226ReadRaw(INA226Driver *devp, uint8_t reg) {
  *
  * @api
  */
-int32_t ina226ReadShunt(INA226Driver *devp) {
-    int32_t voltage;
-
+msg_t ina226ReadShunt(INA226Driver *devp, int32_t *dest_voltage_uV) {
     osalDbgCheck(devp != NULL);
 
-    voltage = ((int16_t)ina226ReadRaw(devp, INA226_AD_SHUNT) * 25)/10;
+    //TODO validate the math on this. This function has not actually been tested
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_SHUNT, &reg_value);
 
-    return voltage;
+    if( ret == MSG_OK ) {
+    	*dest_voltage_uV = ((int32_t) ((int16_t) reg_value) * 25)/10;
+    }
+
+    return(ret);
 }
 
 /**
  * @brief   Reads INA226 VBUS voltage.
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               VBUS voltage in 1uV increments
+ * @return               VBUS voltage in 1 mV increments
  *
  * @api
  */
-uint32_t ina226ReadVBUS(INA226Driver *devp) {
-    uint32_t voltage;
-
+msg_t ina226ReadVBUS(INA226Driver *devp, uint32_t *dest_voltage_mV) {
     osalDbgCheck(devp != NULL);
 
-    voltage = ina226ReadRaw(devp, INA226_AD_VBUS) * 1250;
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_VBUS, &reg_value);
+    if( ret == MSG_OK ) {
+    	*dest_voltage_mV = (((uint32_t) reg_value) * 1250) / 1000;
+    }
 
-    return voltage;
+    return ret;
 }
 
 /**
@@ -289,20 +332,23 @@ uint32_t ina226ReadVBUS(INA226Driver *devp) {
  * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Current in increments of @p curr_lsb
+ * @return               Current in units of micro amps
  *
  * @api
  */
-int32_t ina226ReadCurrent(INA226Driver *devp) {
-    int32_t current;
-
+msg_t ina226ReadCurrent(INA226Driver *devp, uint32_t *dest_current_uA) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    current = (int16_t)ina226ReadRaw(devp, INA226_AD_CURRENT) * devp->config->curr_lsb;
+    uint16_t reg_value = 0;
+    const msg_t ret = ina226ReadRaw(devp, INA226_AD_CURRENT, &reg_value);
 
-    return current;
+    if( ret == MSG_OK ) {
+    	*dest_current_uA = (reg_value * devp->config->curr_lsb * 1000) / 2048;
+    }
+
+    return(ret);
 }
 
 /**
@@ -310,20 +356,23 @@ int32_t ina226ReadCurrent(INA226Driver *devp) {
  * @note    Requires curr_lsb to be set in config
  *
  * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Power in increments of @p curr_lsb * 25V
+ * @return               Power in increments of mW
  *
  * @api
  */
-uint32_t ina226ReadPower(INA226Driver *devp) {
-    uint32_t power;
-
+msg_t ina226ReadPower(INA226Driver *devp, uint32_t *dest_power_mW) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->config->curr_lsb,
             "ina226ReadCurrent(): invalid curr_lsb value");
 
-    power = ina226ReadRaw(devp, INA226_AD_POWER) * devp->config->curr_lsb * 25;
+    uint16_t reg_value = 0;
+	const msg_t ret = ina226ReadRaw(devp, INA226_AD_POWER, &reg_value);
 
-    return power;
+	if( ret == MSG_OK ) {
+		*dest_power_mW = reg_value / 2;
+	}
+
+	return ret;
 }
 
 /** @} */

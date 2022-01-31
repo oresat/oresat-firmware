@@ -15,14 +15,14 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-11-29" fileModificationTime="20:19:03.6312640-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModifiedBy="Ryan Meidick" fileModificationDate="2021-11-28" fileModificationTime="11:21:02.3619980-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
-        <q1:productName>OreSat Solar Board</q1:productName>
+        <q1:productName>OreSat IMU</q1:productName>
         <q1:productID>0</q1:productID>
         <q1:productText>
-          <description lang="en">OreSat Solar Board Object Dictionary</description>
+          <description lang="en">OreSat IMU Application Object Dictionary</description>
         </q1:productText>
         <q1:version versionType="SW">0</q1:version>
         <q1:version versionType="FW">0</q1:version>
@@ -1754,73 +1754,106 @@
               <UINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="PV Power" uniqueID="UID_REC_6000">
-            <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_600000">
+          <q1:struct name="Gyroscope" uniqueID="UID_REC_6000">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600000">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Voltage" uniqueID="UID_RECSUB_600001">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Current" uniqueID="UID_RECSUB_600002">
+            <q1:varDeclaration name="Pitch rate" uniqueID="UID_RECSUB_600001">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Power" uniqueID="UID_RECSUB_600003">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Voltage Avg" uniqueID="UID_RECSUB_600004">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Current Avg" uniqueID="UID_RECSUB_600005">
+            <q1:varDeclaration name="Yaw rate" uniqueID="UID_RECSUB_600002">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Power Avg" uniqueID="UID_RECSUB_600006">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Voltage Max" uniqueID="UID_RECSUB_600007">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Current Max" uniqueID="UID_RECSUB_600008">
+            <q1:varDeclaration name="Roll rate" uniqueID="UID_RECSUB_600003">
               <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Power Max" uniqueID="UID_RECSUB_600009">
+            <q1:varDeclaration name="Pitch rate raw" uniqueID="UID_RECSUB_600004">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Energy" uniqueID="UID_RECSUB_60000A">
+            <q1:varDeclaration name="Yaw rate raw" uniqueID="UID_RECSUB_600005">
+              <UINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Roll rate raw" uniqueID="UID_RECSUB_600006">
               <UINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="PV Temp" uniqueID="UID_REC_6001">
+          <q1:struct name="Acceleration" uniqueID="UID_REC_6001">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600100">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 1 Temp" uniqueID="UID_RECSUB_600101">
-              <SINT />
+            <q1:varDeclaration name="accX" uniqueID="UID_RECSUB_600101">
+              <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 2 Temp" uniqueID="UID_RECSUB_600102">
-              <SINT />
+            <q1:varDeclaration name="accY" uniqueID="UID_RECSUB_600102">
+              <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 1 Temp Min" uniqueID="UID_RECSUB_600103">
-              <SINT />
+            <q1:varDeclaration name="accZ" uniqueID="UID_RECSUB_600103">
+              <INT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 2 Temp Min" uniqueID="UID_RECSUB_600104">
-              <SINT />
+            <q1:varDeclaration name="acc X raw" uniqueID="UID_RECSUB_600104">
+              <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 1 Temp Max" uniqueID="UID_RECSUB_600105">
-              <SINT />
+            <q1:varDeclaration name="accY raw" uniqueID="UID_RECSUB_600105">
+              <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Cell 2 Temp Max" uniqueID="UID_RECSUB_600106">
-              <SINT />
+            <q1:varDeclaration name="accZ raw" uniqueID="UID_RECSUB_600106">
+              <UINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="MPPT" uniqueID="UID_REC_6002">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600200">
+          <q1:struct name="Magnetometer PZ1" uniqueID="UID_REC_6003">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600300">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Algorithm" uniqueID="UID_RECSUB_600201">
+            <q1:varDeclaration name="magX" uniqueID="UID_RECSUB_600301">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magY" uniqueID="UID_RECSUB_600302">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magZ" uniqueID="UID_RECSUB_600303">
+              <INT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Magnetometer PZ2" uniqueID="UID_REC_6004">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600400">
               <USINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="LT1618 IADJ" uniqueID="UID_RECSUB_600202">
-              <UINT />
+            <q1:varDeclaration name="magX" uniqueID="UID_RECSUB_600401">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magY" uniqueID="UID_RECSUB_600402">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magZ" uniqueID="UID_RECSUB_600403">
+              <INT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Magnetometer MZ1" uniqueID="UID_REC_6005">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600500">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magX" uniqueID="UID_RECSUB_600501">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magY" uniqueID="UID_RECSUB_600502">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magZ" uniqueID="UID_RECSUB_600503">
+              <INT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="Magnetometer MZ2" uniqueID="UID_REC_6006">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600600">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magX" uniqueID="UID_RECSUB_600601">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magY" uniqueID="UID_RECSUB_600602">
+              <INT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="magZ" uniqueID="UID_RECSUB_600603">
+              <INT />
             </q1:varDeclaration>
           </q1:struct>
         </q1:dataTypeList>
@@ -4142,7 +4175,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180305" access="readWrite">
             <label lang="en">Event timer</label>
             <UINT />
-            <q1:defaultValue value="10000" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180306" access="readWrite">
             <label lang="en">SYNC start value</label>
@@ -4178,7 +4211,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180401" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000180+$NODEID" />
+            <q1:defaultValue value="0x40000180+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180402" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4234,7 +4267,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_180501" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0xC0000280+$NODEID" />
+            <q1:defaultValue value="0x40000280+$NODEID" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180502" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -4836,7 +4869,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0000" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x04" />
+            <q1:defaultValue value="0x03" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0001" access="readWrite">
             <label lang="en">Application object 1</label>
@@ -4856,7 +4889,7 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0004" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000410" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0005" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -4893,27 +4926,27 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0100" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x04" />
+            <q1:defaultValue value="0x03" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000410" />
+            <q1:defaultValue value="0x60010110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000510" />
+            <q1:defaultValue value="0x60010210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0103" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60000610" />
+            <q1:defaultValue value="0x60010310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0104" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000710" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0105" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -4950,17 +4983,17 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0200" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x02" />
+            <q1:defaultValue value="0x01" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0201" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000910" />
+            <q1:defaultValue value="0x60020008" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0202" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000A10" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0203" access="readWrite">
             <label lang="en">Application object 3</label>
@@ -5007,37 +5040,37 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0300" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x06" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0301" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60010108" />
+            <q1:defaultValue value="0x60030110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0302" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60010208" />
+            <q1:defaultValue value="0x60030210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0303" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60010308" />
+            <q1:defaultValue value="0x60030310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0304" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60010408" />
+            <q1:defaultValue value="0x60040110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0305" access="readWrite">
             <label lang="en">Application object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x60010508" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0306" access="readWrite">
             <label lang="en">Application object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x60010608" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0307" access="readWrite">
             <label lang="en">Application object 7</label>
@@ -5064,27 +5097,27 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0400" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0401" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60040210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0402" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60040310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0403" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60050110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0404" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60050210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0405" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5121,27 +5154,27 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0500" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0501" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60050310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0502" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60060110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0503" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60060210" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0504" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x60060310" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0505" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5463,27 +5496,27 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0B00" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x04" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0B01" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000110" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0B02" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000210" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0B03" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60000310" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0B04" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000410" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0B05" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5520,27 +5553,27 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0C00" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x04" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0C01" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000510" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0C02" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000610" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0C03" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60000710" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0C04" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000810" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0C05" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -5577,17 +5610,17 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0D00" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x02" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0D01" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000910" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0D02" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000A10" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0D03" access="readWrite">
             <label lang="en">Application object 3</label>
@@ -5634,37 +5667,37 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0E00" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="0x06" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E01" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60010108" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E02" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60010208" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E03" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60010308" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E04" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60010408" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E05" access="readWrite">
             <label lang="en">Application object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x60010508" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E06" access="readWrite">
             <label lang="en">Application object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x60010608" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0E07" access="readWrite">
             <label lang="en">Application object 7</label>
@@ -5947,66 +5980,46 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="00 00 00 00 00 00 00 00 00 00" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6000">
-            <label lang="en">PV Power</label>
+            <label lang="en">Gyroscope</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_6000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600000">
-            <label lang="en">max sub-index</label>
+            <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x0A" />
+            <q1:defaultValue value="0x06" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600001">
-            <label lang="en">Voltage</label>
-            <UINT />
+            <description lang="en">Hundredths of degrees per second (DDD.DD format)</description>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600002">
-            <label lang="en">Current</label>
+            <description lang="en">Hundredths of degrees per second (DDD.DD format)</description>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600003">
-            <label lang="en">Power</label>
-            <UINT />
+            <description lang="en">Hundredths of degrees per second (DDD.DD format)</description>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600004">
-            <label lang="en">Voltage Avg</label>
+            <description lang="en">ADC units, for debugging</description>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600005">
-            <label lang="en">Current Avg</label>
-            <INT />
+            <description lang="en">ADC units, for debugging</description>
+            <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600006">
-            <label lang="en">Power Avg</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600007">
-            <label lang="en">Voltage Max</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600008">
-            <label lang="en">Current Max</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600009">
-            <label lang="en">Power Max</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_60000A">
-            <label lang="en">Energy</label>
+            <description lang="en">ADC units, for debugging</description>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6001">
-            <label lang="en">PV Temp</label>
+            <label lang="en">Acceleration</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_6001" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600100">
@@ -6015,52 +6028,134 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <q1:defaultValue value="0x06" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600101">
-            <label lang="en">Cell 1 Temp</label>
-            <SINT />
+            <description lang="en">Thousandths of meters per second squared (DD.DDD format)</description>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600102">
-            <label lang="en">Cell 2 Temp</label>
-            <SINT />
+            <description lang="en">Thousandths of meters per second squared (DD.DDD format)</description>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600103">
-            <label lang="en">Cell 1 Temp Min</label>
-            <SINT />
-            <q1:defaultValue value="127" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600104">
-            <label lang="en">Cell 2 Temp Min</label>
-            <SINT />
-            <q1:defaultValue value="127" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600105">
-            <label lang="en">Cell 1 Temp Max</label>
-            <SINT />
-            <q1:defaultValue value="-128" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600106">
-            <label lang="en">Cell 2 Temp Max</label>
-            <SINT />
-            <q1:defaultValue value="-128" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6002">
-            <label lang="en">MPPT</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6002" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600200">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="0x02" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600201" access="readWriteOutput">
-            <label lang="en">Algorithm</label>
-            <USINT />
+            <description lang="en">Thousandths of meters per second squared (DD.DDD format)</description>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600202">
-            <label lang="en">LT1618 IADJ</label>
+          <q1:parameter uniqueID="UID_SUB_600104">
+            <description lang="en">ADC units for debugging</description>
             <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600105">
+            <description lang="en">ADC units for debugging</description>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600106">
+            <description lang="en">ADC units for debugging</description>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6002">
+            <description lang="en">Degrees Celsius</description>
+            <SINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6003">
+            <label lang="en">Magnetometer PZ1</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6003" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600300">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600301">
+            <label lang="en">magX</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600302">
+            <label lang="en">magY</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600303">
+            <label lang="en">magZ</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6004">
+            <label lang="en">Magnetometer PZ2</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6004" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600400">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600401">
+            <label lang="en">magX</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600402">
+            <label lang="en">magY</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600403">
+            <label lang="en">magZ</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6005">
+            <label lang="en">Magnetometer MZ1</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6005" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600500">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600501">
+            <label lang="en">magX</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600502">
+            <label lang="en">magY</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600503">
+            <label lang="en">magZ</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6006">
+            <label lang="en">Magnetometer MZ2</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6006" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600600">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600601">
+            <label lang="en">magX</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600602">
+            <label lang="en">magY</label>
+            <INT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600603">
+            <label lang="en">magZ</label>
+            <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
         </q1:parameterList>
@@ -6080,7 +6175,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModificationDate="2021-11-29" fileModificationTime="20:19:03.6312640-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModificationDate="2021-11-28" fileModificationTime="11:21:02.3619980-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -6833,32 +6928,48 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
             <CANopenSubObject subIndex="08" name="VBUSP Current (Raw)" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_202208" />
           </CANopenObject>
           <CANopenObject index="2100" name="Error Status Bits" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2100" />
-          <CANopenObject index="6000" name="PV Power" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="11">
-            <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600000" />
-            <CANopenSubObject subIndex="01" name="Voltage" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600001" />
-            <CANopenSubObject subIndex="02" name="Current" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600002" />
-            <CANopenSubObject subIndex="03" name="Power" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600003" />
-            <CANopenSubObject subIndex="04" name="Voltage Avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600004" />
-            <CANopenSubObject subIndex="05" name="Current Avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600005" />
-            <CANopenSubObject subIndex="06" name="Power Avg" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600006" />
-            <CANopenSubObject subIndex="07" name="Voltage Max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600007" />
-            <CANopenSubObject subIndex="08" name="Current Max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600008" />
-            <CANopenSubObject subIndex="09" name="Power Max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600009" />
-            <CANopenSubObject subIndex="0A" name="Energy" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_60000A" />
+          <CANopenObject index="6000" name="Gyroscope" objectType="9" uniqueIDRef="UID_OBJ_6000" subNumber="7">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600000" />
+            <CANopenSubObject subIndex="01" name="Pitch rate" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600001" />
+            <CANopenSubObject subIndex="02" name="Yaw rate" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600002" />
+            <CANopenSubObject subIndex="03" name="Roll rate" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600003" />
+            <CANopenSubObject subIndex="04" name="Pitch rate raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600004" />
+            <CANopenSubObject subIndex="05" name="Yaw rate raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600005" />
+            <CANopenSubObject subIndex="06" name="Roll rate raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600006" />
           </CANopenObject>
-          <CANopenObject index="6001" name="PV Temp" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="7">
+          <CANopenObject index="6001" name="Acceleration" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600100" />
-            <CANopenSubObject subIndex="01" name="Cell 1 Temp" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600101" />
-            <CANopenSubObject subIndex="02" name="Cell 2 Temp" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600102" />
-            <CANopenSubObject subIndex="03" name="Cell 1 Temp Min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600103" />
-            <CANopenSubObject subIndex="04" name="Cell 2 Temp Min" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600104" />
-            <CANopenSubObject subIndex="05" name="Cell 1 Temp Max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600105" />
-            <CANopenSubObject subIndex="06" name="Cell 2 Temp Max" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600106" />
+            <CANopenSubObject subIndex="01" name="accX" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600101" />
+            <CANopenSubObject subIndex="02" name="accY" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600102" />
+            <CANopenSubObject subIndex="03" name="accZ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600103" />
+            <CANopenSubObject subIndex="04" name="acc X raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600104" />
+            <CANopenSubObject subIndex="05" name="accY raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600105" />
+            <CANopenSubObject subIndex="06" name="accZ raw" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600106" />
           </CANopenObject>
-          <CANopenObject index="6002" name="MPPT" objectType="9" uniqueIDRef="UID_OBJ_6002" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600200" />
-            <CANopenSubObject subIndex="01" name="Algorithm" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600201" />
-            <CANopenSubObject subIndex="02" name="LT1618 IADJ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600202" />
+          <CANopenObject index="6002" name="IMU Temperature" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6002" />
+          <CANopenObject index="6003" name="Magnetometer PZ1" objectType="9" uniqueIDRef="UID_OBJ_6003" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600300" />
+            <CANopenSubObject subIndex="01" name="magX" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600301" />
+            <CANopenSubObject subIndex="02" name="magY" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600302" />
+            <CANopenSubObject subIndex="03" name="magZ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600303" />
+          </CANopenObject>
+          <CANopenObject index="6004" name="Magnetometer PZ2" objectType="9" uniqueIDRef="UID_OBJ_6004" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600400" />
+            <CANopenSubObject subIndex="01" name="magX" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600401" />
+            <CANopenSubObject subIndex="02" name="magY" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600402" />
+            <CANopenSubObject subIndex="03" name="magZ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600403" />
+          </CANopenObject>
+          <CANopenObject index="6005" name="Magnetometer MZ1" objectType="9" uniqueIDRef="UID_OBJ_6005" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600500" />
+            <CANopenSubObject subIndex="01" name="magX" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600501" />
+            <CANopenSubObject subIndex="02" name="magY" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600502" />
+            <CANopenSubObject subIndex="03" name="magZ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600503" />
+          </CANopenObject>
+          <CANopenObject index="6006" name="Magnetometer MZ2" objectType="9" uniqueIDRef="UID_OBJ_6006" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600600" />
+            <CANopenSubObject subIndex="01" name="magX" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600601" />
+            <CANopenSubObject subIndex="02" name="magY" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600602" />
+            <CANopenSubObject subIndex="03" name="magZ" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600603" />
           </CANopenObject>
         </q2:CANopenObjectList>
         <dummyUsage>
