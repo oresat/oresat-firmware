@@ -1,6 +1,7 @@
 #include "file_xfr.h"
+#include "crc.h"
 
-int file_recv(file_xfr_t *xfr)
+int file_recv(file_xfr_t *xfr, uint32_t *crc)
 {
     lfs_file_t *file;
     int ret;
@@ -15,6 +16,10 @@ int file_recv(file_xfr_t *xfr)
         goto file_recv_fail;
 
     ret = file_write(&FSD1, file, xfr->data, xfr->len);
+    if (ret < 0)
+        goto file_recv_fail;
+
+    *crc = crc32(xfr->data, xfr->len, 0);
 
 file_recv_fail:
     file_close(&FSD1, file);

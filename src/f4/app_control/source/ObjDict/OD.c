@@ -1646,7 +1646,7 @@ OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
     },
     .x6002_deploymentControl = {
         .highestSub_indexSupported = 0x03,
-        .timeout = 0x0000012C,
+        .timeout = 0x00000A8C,
         .actuationTime = 0x00003A98,
         .attempts = 0x03
     },

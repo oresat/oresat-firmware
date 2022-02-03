@@ -5,11 +5,11 @@ FileRevision=1
 LastEDS=
 EDSVersion=4.0
 Description=OreSat C3 Node Object Dictionary
-CreationTime=12:18PM
+CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:57PM
-ModificationDate=08-31-2021
+ModificationTime=5:41PM
+ModificationDate=12-02-2021
 ModifiedBy=
 
 [DeviceInfo]
@@ -12489,7 +12489,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=300
+DefaultValue=2700
 PDOMapping=0
 
 [6002sub2]

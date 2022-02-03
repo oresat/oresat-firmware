@@ -14,7 +14,7 @@ typedef struct {
 extern "C" {
 #endif
 
-int file_recv(file_xfr_t *xfr);
+int file_recv(file_xfr_t *xfr, uint32_t *crc);
 
 #ifdef __cplusplus
 }
