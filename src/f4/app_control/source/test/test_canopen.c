@@ -92,7 +92,6 @@ nmt_usage:
 /*===========================================================================*/
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[])
 {
-    int err = 0;
     sdocli_op_t op;
     uint16_t index = 0;
     uint8_t node_id = 0, subindex = 0;

@@ -10,7 +10,7 @@ void sdo_init(void)
     chFifoObjectInit(&sdocli_fifo, sizeof(sdocli_job_t), OD_CNT_SDO_CLI, sdocli_fifo_buf, sdocli_fifo_msgs);
 }
 
-void sdo_transfer(sdocli_op_t op, uint8_t node_id, uint16_t index, uint8_t subindex, size_t total_size, size_t buf_size, uint8_t *buf)
+void sdo_transfer(sdocli_op_t op, uint8_t node_id, uint16_t index, uint8_t subindex, size_t total_size, size_t buf_size, void *buf)
 {
     sdocli_job_t *job = chFifoTakeObjectTimeout(&sdocli_fifo, TIME_INFINITE);
 
