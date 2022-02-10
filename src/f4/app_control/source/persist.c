@@ -17,6 +17,7 @@ typedef struct {
 } persist_group_t;
 
 persist_group_t storage[] = {
+    {&OD_PERSIST_KEYS, sizeof(OD_PERSIST_KEYS), FRAM_KEYS_ADDR},
     {&OD_PERSIST_STATE, sizeof(OD_PERSIST_STATE), FRAM_STATE_ADDR},
     {&OD_PERSIST_COMM, sizeof(OD_PERSIST_COMM), FRAM_COMM_ADDR},
     {&OD_PERSIST_MFR, sizeof(OD_PERSIST_MFR), FRAM_MFR_ADDR},

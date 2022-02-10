@@ -297,13 +297,10 @@ void edl_enable(bool state)
 
 void factory_reset(void)
 {
-    fw_info_t fw_info[2];
     chThdTerminate(c3_tp);
     chEvtSignal(c3_tp, C3_EVENT_TERMINATE);
     chThdWait(c3_tp);
-    framRead(&FRAMD1, FRAM_FWINFO_ADDR, &fw_info, sizeof(fw_info));
-    framEraseAll(&FRAMD1);
-    framWrite(&FRAMD1, FRAM_FWINFO_ADDR, &fw_info, sizeof(fw_info));
+    framErase(&FRAMD1, FRAM_STATE_ADDR, FRAM_SIZE - FRAM_STATE_ADDR);
     RCC->BDCR |= RCC_BDCR_BDRST;
     RCC->BDCR &= ~RCC_BDCR_BDRST;
     NVIC_SystemReset();
