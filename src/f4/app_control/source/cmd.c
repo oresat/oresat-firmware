@@ -35,17 +35,17 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         break;
     case CMD_C3_SOFTRESET:
         key = (uint32_t*)cmd->arg;
-        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+        if (key[0] == 0x67452301U && key[1] == 0xEFCDAB89U)
             NVIC_SystemReset();
         break;
     case CMD_C3_HARDRESET:
         key = (uint32_t*)cmd->arg;
-        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+        if (key[0] == 0x67452301U && key[1] == 0xEFCDAB89U)
             chSysHalt("HARD RESET");
         break;
     case CMD_C3_FACTORYRESET:
         key = (uint32_t*)cmd->arg;
-        if (key[0] == 0x01234567U && key[1] == 0x89ABCDEFU)
+        if (key[0] == 0x67452301U && key[1] == 0xEFCDAB89U)
             factory_reset();
         break;
     case CMD_I2C_RESET:
