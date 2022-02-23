@@ -16,7 +16,7 @@
 
         Created:      8/30/2019 11:18:00 AM
         Created By:   Miles Simpson
-        Modified:     2/9/2022 8:44:37 PM
+        Modified:     2/22/2022 10:27:30 PM
         Modified By:  
 
     Device Info:
@@ -1719,6 +1719,7 @@ typedef struct {
         uint32_t UHF_RX_Packets;
         uint64_t VC1_SequenceCount;
         uint64_t VC1_ExpediteCount;
+        uint32_t EDL_SequenceCount;
     } x6004_persistentState;
 } OD_PERSIST_STATE_t;
 
