@@ -79,7 +79,7 @@ static void c3StateSave(void)
         OD_PERSIST_STATE.x6004_persistentState.wakeup = 0;
     }
     /* Write state to FRAM */
-    storeGroup(&OD_PERSIST_STATE);
+    persistStoreGroup(&OD_PERSIST_STATE);
     /* TODO: Backup/sync with external RTC */
 }
 
@@ -88,7 +88,7 @@ static void c3StateRestore(void)
     time_t unix;
 
     /* Read the stored state from FRAM */
-    restoreGroup(&OD_PERSIST_STATE);
+    persistRestoreGroup(&OD_PERSIST_STATE);
     unix = rtcConvertDateTimeToUnix((RTCDateTime*)(&OD_PERSIST_STATE.x6004_persistentState.timestamp), NULL);
 
     /* TODO: Get RTC values from external RTC and reach quorum */

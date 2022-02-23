@@ -11,7 +11,11 @@
 #define FRAM_MFR_ADDR                       0x0300U
 #define FRAM_APP_ADDR                       0x0400U
 
-void storeGroup(void *group);
-void restoreGroup(void *group);
+void persistStoreGroup(void *group);
+void persistRestoreGroup(void *group);
+void persistResetGroup(void *group);
+void persistStoreAll(void);
+void persistRestoreAll(void);
+void persistResetAll(void);
 
 #endif

@@ -24,6 +24,7 @@
 #include "wdt.h"
 #include "c3.h"
 #include "fram.h"
+#include "persist.h"
 #include "fs.h"
 #include "node_mgr.h"
 #include "comms.h"
@@ -146,6 +147,9 @@ static void app_init(void)
     /* Initialize FRAM */
     framObjectInit(&FRAMD1);
     framStart(&FRAMD1, &framcfg);
+
+    /* Restore OD variables if available */
+    persistRestoreAll();
 
     /* Prepare filesystem */
     fs_init(&FSD1);

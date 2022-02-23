@@ -29,11 +29,11 @@ void cmd_persist(BaseSequentialStream *chp, int argc, char *argv[])
         goto persist_usage;
     }
     if (!strcmp(argv[0], "store")) {
-        storeGroup(group);
+        persistStoreGroup(group);
     } else if (!strcmp(argv[0], "restore")) {
-        restoreGroup(group);
+        persistRestoreGroup(group);
     } else if (!strcmp(argv[0], "reset")) {
-        resetGroup(group);
+        persistResetGroup(group);
     } else {
         goto persist_usage;
     }
