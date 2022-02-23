@@ -69,6 +69,8 @@ static const tlm_item_t tlm_aprs0[] = {
     /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* FW Bank TODO */
     { .type = TLM_PTR, .len = 1, .ptr = &bank_state },
+    /* EDL Sequence Count */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount },
     /* CAN1 Status TODO */
     /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* CAN2 Status TODO */
