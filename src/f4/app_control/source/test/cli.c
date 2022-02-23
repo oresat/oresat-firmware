@@ -10,6 +10,7 @@
 #include "test_opd.h"
 #include "test_time.h"
 #include "test_fram.h"
+#include "test_persist.h"
 #include "test_lfs.h"
 #include "test_mmc.h"
 #include "test_radio.h"
@@ -99,6 +100,7 @@ static const ShellCommand commands[] = {
     {"beacon", cmd_beacon},
     {"state", cmd_state},
     {"fram", cmd_fram},
+    {"persist", cmd_persist},
     {"crc", cmd_crc},
     {"deploy", cmd_deploy},
     {"edl", cmd_edl},

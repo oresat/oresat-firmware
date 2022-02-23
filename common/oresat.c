@@ -56,7 +56,7 @@ void oresat_start(void)
     chThdSetPriority(HIGHPRIO);
 
     /* Start the sensors */
-    /*sensors_start();*/
+    sensors_start();
 
     /* Start worker thread manager */
     thread_mgr_tp = chThdCreateStatic(thread_mgr_wa, sizeof(thread_mgr_wa), HIGHPRIO, thread_mgr, NULL);
