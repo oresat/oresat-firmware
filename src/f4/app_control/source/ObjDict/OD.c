@@ -1659,7 +1659,7 @@ OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
 
 OD_ATTR_PERSIST_STATE OD_PERSIST_STATE_t OD_PERSIST_STATE = {
     .x6004_persistentState = {
-        .highestSub_indexSupported = 0x0F,
+        .highestSub_indexSupported = 0x10,
         .timestamp = 0x0000000000000000,
         .alarmA = 0x00000000,
         .alarmB = 0x00000000,
@@ -1674,7 +1674,8 @@ OD_ATTR_PERSIST_STATE OD_PERSIST_STATE_t OD_PERSIST_STATE = {
         .UHF_RX_Packets = 0x00000000,
         .VC1_SequenceCount = 0x0000000000000000,
         .VC1_ExpediteCount = 0x0000000000000000,
-        .EDL_SequenceCount = 0x00000000
+        .EDL_SequenceCount = 0x00000000,
+        .EDL_RejectedCount = 0x00000000
     }
 };
 
@@ -1858,7 +1859,7 @@ typedef struct {
     OD_obj_record_t o_6001_stateControl[4];
     OD_obj_record_t o_6002_deploymentControl[4];
     OD_obj_record_t o_6003_TX_Control[3];
-    OD_obj_record_t o_6004_persistentState[16];
+    OD_obj_record_t o_6004_persistentState[17];
     OD_obj_array_t o_6005_cryptoKeys;
     OD_obj_record_t o_7000_C3_Telemetry[7];
     OD_obj_record_t o_7001_battery[45];
@@ -8114,6 +8115,12 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .subIndex = 15,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_PERSIST_STATE.x6004_persistentState.EDL_RejectedCount,
+            .subIndex = 16,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
         }
     },
     .o_6005_cryptoKeys = {
@@ -10268,7 +10275,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6001, 0x04, ODT_REC, &ODObjs.o_6001_stateControl, NULL},
     {0x6002, 0x04, ODT_REC, &ODObjs.o_6002_deploymentControl, NULL},
     {0x6003, 0x03, ODT_REC, &ODObjs.o_6003_TX_Control, NULL},
-    {0x6004, 0x10, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
+    {0x6004, 0x11, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
     {0x6005, 0x05, ODT_ARR, &ODObjs.o_6005_cryptoKeys, NULL},
     {0x7000, 0x07, ODT_REC, &ODObjs.o_7000_C3_Telemetry, NULL},
     {0x7001, 0x2D, ODT_REC, &ODObjs.o_7001_battery, NULL},

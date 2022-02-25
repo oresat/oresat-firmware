@@ -8,8 +8,8 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=10:27PM
-ModificationDate=02-22-2022
+ModificationTime=1:10AM
+ModificationDate=02-25-2022
 ModifiedBy=
 
 [DeviceInfo]
@@ -12548,7 +12548,7 @@ PDOMapping=0
 ParameterName=Persistent State
 ObjectType=0x9
 ;StorageLocation=PERSIST_STATE
-SubNumber=0x10
+SubNumber=0x11
 
 [6004sub0]
 ParameterName=Highest sub-index supported
@@ -12556,7 +12556,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x0F
+DefaultValue=0x10
 PDOMapping=0
 
 [6004sub1]
@@ -12687,6 +12687,15 @@ PDOMapping=0
 
 [6004subF]
 ParameterName=EDL Sequence Count
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+PDOMapping=0
+
+[6004sub10]
+ParameterName=EDL Rejected Count
 ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007

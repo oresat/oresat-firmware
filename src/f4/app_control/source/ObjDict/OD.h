@@ -16,7 +16,7 @@
 
         Created:      8/30/2019 11:18:00 AM
         Created By:   Miles Simpson
-        Modified:     2/22/2022 10:27:30 PM
+        Modified:     2/25/2022 1:10:19 AM
         Modified By:  
 
     Device Info:
@@ -1720,6 +1720,7 @@ typedef struct {
         uint64_t VC1_SequenceCount;
         uint64_t VC1_ExpediteCount;
         uint32_t EDL_SequenceCount;
+        uint32_t EDL_RejectedCount;
     } x6004_persistentState;
 } OD_PERSIST_STATE_t;
 
