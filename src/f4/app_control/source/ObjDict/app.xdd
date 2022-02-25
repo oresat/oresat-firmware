@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2022-02-25" fileModificationTime="11:53:34.0797840-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -3239,7 +3239,7 @@
               <UINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Reset Timeout" uniqueID="UID_RECSUB_600103">
-              <UINT />
+              <UDINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Factory Reset" uniqueID="UID_RECSUB_600104">
               <BOOL />
@@ -11985,8 +11985,8 @@ Determines how long the device stays in EDL mode after the last valid EDL comman
             <description lang="en">Hard Reset timeout in seconds
 
 Determines how long before attempting to trigger a WDT hard reset</description>
-            <UINT />
-            <q1:defaultValue value="60" />
+            <UDINT />
+            <q1:defaultValue value="86400" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600104" access="readWrite">
             <description lang="en">Initiate factory reset when set to true</description>
@@ -13868,7 +13868,7 @@ Also acts as Number of valid EDL frames</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2022-02-25" fileModificationTime="11:53:34.0797840-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

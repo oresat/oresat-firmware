@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:53AM
+ModificationTime=12:19PM
 ModificationDate=02-25-2022
 ModifiedBy=
 
@@ -12464,9 +12464,9 @@ PDOMapping=0
 ParameterName=Reset Timeout
 ObjectType=0x7
 ;StorageLocation=RAM
-DataType=0x0006
+DataType=0x0007
 AccessType=rw
-DefaultValue=60
+DefaultValue=86400
 PDOMapping=0
 
 [6001sub4]

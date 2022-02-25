@@ -1642,7 +1642,7 @@ OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
         .highestSub_indexSupported = 0x04,
         .saveInterval = 0x000A,
         .EDL_Timeout = 0x003C,
-        .resetTimeout = 0x003C,
+        .resetTimeout = 0x00015180,
         .factoryReset = false
     },
     .x6002_deploymentControl = {
@@ -7971,7 +7971,7 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataOrig = &OD_PERSIST_APP.x6001_stateControl.resetTimeout,
             .subIndex = 3,
             .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 2
+            .dataLength = 4
         },
         {
             .dataOrig = &OD_PERSIST_APP.x6001_stateControl.factoryReset,
