@@ -8,7 +8,7 @@ Description=OreSat C3 Node Object Dictionary
 CreationTime=11:18AM
 CreationDate=08-30-2019
 CreatedBy=Miles Simpson
-ModificationTime=1:10AM
+ModificationTime=11:53AM
 ModificationDate=02-25-2022
 ModifiedBy=
 
@@ -12431,7 +12431,7 @@ PDOMapping=0
 ParameterName=State Control
 ObjectType=0x9
 ;StorageLocation=PERSIST_APP
-SubNumber=0x4
+SubNumber=0x5
 
 [6001sub0]
 ParameterName=Highest sub-index supported
@@ -12439,7 +12439,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=ro
-DefaultValue=0x03
+DefaultValue=0x04
 PDOMapping=0
 
 [6001sub1]
@@ -12461,6 +12461,15 @@ DefaultValue=60
 PDOMapping=0
 
 [6001sub3]
+ParameterName=Reset Timeout
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=rw
+DefaultValue=60
+PDOMapping=0
+
+[6001sub4]
 ParameterName=Factory Reset
 ObjectType=0x7
 ;StorageLocation=RAM

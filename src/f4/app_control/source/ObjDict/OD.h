@@ -16,7 +16,7 @@
 
         Created:      8/30/2019 11:18:00 AM
         Created By:   Miles Simpson
-        Modified:     2/25/2022 1:10:19 AM
+        Modified:     2/25/2022 11:53:34 AM
         Modified By:  
 
     Device Info:
@@ -1687,6 +1687,7 @@ typedef struct {
         uint8_t highestSub_indexSupported;
         uint16_t saveInterval;
         uint16_t EDL_Timeout;
+        uint16_t resetTimeout;
         bool_t factoryReset;
     } x6001_stateControl;
     struct {

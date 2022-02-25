@@ -1639,9 +1639,10 @@ OD_ATTR_PERSIST_MFR OD_PERSIST_MFR_t OD_PERSIST_MFR = {
 
 OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
     .x6001_stateControl = {
-        .highestSub_indexSupported = 0x03,
+        .highestSub_indexSupported = 0x04,
         .saveInterval = 0x000A,
         .EDL_Timeout = 0x003C,
+        .resetTimeout = 0x003C,
         .factoryReset = false
     },
     .x6002_deploymentControl = {
@@ -1856,7 +1857,7 @@ typedef struct {
     OD_obj_record_t o_2022_MCU_Sensors[9];
     OD_obj_var_t o_2100_errorStatusBits;
     OD_obj_var_t o_6000_C3_State;
-    OD_obj_record_t o_6001_stateControl[4];
+    OD_obj_record_t o_6001_stateControl[5];
     OD_obj_record_t o_6002_deploymentControl[4];
     OD_obj_record_t o_6003_TX_Control[3];
     OD_obj_record_t o_6004_persistentState[17];
@@ -7967,8 +7968,14 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.factoryReset,
+            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.resetTimeout,
             .subIndex = 3,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.factoryReset,
+            .subIndex = 4,
             .attribute = ODA_SDO_RW,
             .dataLength = 1
         }
@@ -10272,7 +10279,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x2022, 0x09, ODT_REC, &ODObjs.o_2022_MCU_Sensors, NULL},
     {0x2100, 0x01, ODT_VAR, &ODObjs.o_2100_errorStatusBits, NULL},
     {0x6000, 0x01, ODT_VAR, &ODObjs.o_6000_C3_State, NULL},
-    {0x6001, 0x04, ODT_REC, &ODObjs.o_6001_stateControl, NULL},
+    {0x6001, 0x05, ODT_REC, &ODObjs.o_6001_stateControl, NULL},
     {0x6002, 0x04, ODT_REC, &ODObjs.o_6002_deploymentControl, NULL},
     {0x6003, 0x03, ODT_REC, &ODObjs.o_6003_TX_Control, NULL},
     {0x6004, 0x11, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
