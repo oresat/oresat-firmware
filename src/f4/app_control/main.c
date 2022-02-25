@@ -144,6 +144,9 @@ static void app_init(void)
     reg_worker(&c3_worker, &c3_desc, true, true);
     start_worker(&wdt_worker);
 
+    /* Start crypto driver */
+    cryStart(&CRYD1, NULL);
+
     /* Initialize FRAM */
     framObjectInit(&FRAMD1);
     framStart(&FRAMD1, &framcfg);

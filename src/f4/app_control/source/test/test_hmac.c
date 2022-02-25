@@ -72,7 +72,6 @@ void cmd_hmac(BaseSequentialStream *chp, int argc, char *argv[])
 {
     (void) argc;
     (void) argv;
-    cryStart(&CRYD1, NULL);
 
     /* Taken from RFC 4231: Test Vectors for HMAC-SHA-256 */
     // 4.2. Test Case 1

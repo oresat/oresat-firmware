@@ -12,7 +12,7 @@
 void cmd_persist(BaseSequentialStream *chp, int argc, char *argv[])
 {
     void *group = NULL;
-    if (argc < 3) {
+    if (argc < 2) {
         goto persist_usage;
     }
     if (!strcmp(argv[1], "keys")) {
@@ -47,7 +47,7 @@ persist_usage:
                    "        Store OD <group> to FRAM\r\n"
                    "    restore:\r\n"
                    "        Restore OD <group> from FRAM\r\n"
-                   "    reset\r\n"
+                   "    reset:\r\n"
                    "        Reset OD <group> in FRAM\r\n"
                    "  Groups:\r\n"
                    "    keys\r\n"
