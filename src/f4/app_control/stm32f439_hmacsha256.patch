@@ -1,0 +1,332 @@
+diff --git a/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.c b/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.c
+index 1d83e199b..322d172c1 100644
+--- a/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.c
++++ b/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.c
+@@ -361,6 +361,8 @@ void cry_lld_init(void) {
+ #endif
+ 
+ #if STM32_CRY_USE_HASH1
++  CRYD1.hmac_keyp    = NULL;
++  CRYD1.hmac_keylen  = 0;
+ #if STM32_CRY_HASH_SIZE_THRESHOLD != 0
+   CRYD1.hash_tr      = NULL;
+   CRYD1.hash_dma     = NULL;
+@@ -451,6 +453,7 @@ void cry_lld_start(CRYDriver *cryp) {
+ #endif
+   }
+ 
++#if STM32_CRY_USE_CRYP1
+   /* Resetting trasient key data.*/
+   cryp->cryp_ktype = cryp_key_none;
+   cryp->cryp_ksize = 0U;
+@@ -463,7 +466,6 @@ void cry_lld_start(CRYDriver *cryp) {
+   cryp->cryp_k[6]  = 0U;
+   cryp->cryp_k[7]  = 0U;
+ 
+-#if STM32_CRY_USE_CRYP1
+   /* CRYP setup.*/
+   CRYP->CR    = CRYP_CR_DATATYPE_1;
+   CRYP->DMACR = CRYP_DMACR_DIEN | CRYP_DMACR_DOEN;
+@@ -1711,7 +1713,8 @@ cryerror_t cry_lld_SHA512_final(CRYDriver *cryp, SHA512Context *sha512ctxp,
+ /**
+  * @brief   Initializes the HMAC transient key.
+  * @note    It is the underlying implementation to decide which key sizes are
+- *          allowable.
++ *          allowable. The key must not be moved, freed, or fall out of scope
++ *          until the relevent HMAC*_final() function has been called.
+  *
+  * @param[in] cryp              pointer to the @p CRYDriver object
+  * @param[in] size              key size in bytes
+@@ -1727,14 +1730,66 @@ cryerror_t cry_lld_SHA512_final(CRYDriver *cryp, SHA512Context *sha512ctxp,
+ cryerror_t cry_lld_hmac_loadkey(CRYDriver *cryp,
+                                 size_t size,
+                                 const uint8_t *keyp) {
+-
+-  (void)cryp;
+-  (void)size;
+-  (void)keyp;
++  /* The HASH peripheral doesn't really match up to this API so this gets a
++   * little awkward. The described use is loadkey() -> init() -> update() ->
++   * final() but the key can only be loaded after the configuration in init().
++   * At the same time init() needs to know the length of the key and so
++   * init() -> loadkey() does not work. Finally, the key needs to be loaded
++   * again, after update() and before final(), but final() feeds the last word
++   * of data into HASH so update() -> loadkey() -> final() is out as well.
++   *
++   * This is the least worst option that I could come up with, doing an
++   * allocation and copying the secret around seemed less desirable. The
++   * downside being users must ensure that the key has not been moved, freed,
++   * or fallen out of scope until final() is called.
++   */
++  cryp->hmac_keyp = keyp;
++  cryp->hmac_keylen = size;
+ 
+   return CRY_NOERROR;
+ }
+ 
++/**
++ * @brief   Actually loads a key into the HASH peripheral.
++ * @note    The hardware will pad to extend or hash to shorten to
++ *          ensure the actual key is the right size
++ *
++ * @param[in] cryp              pointer to the @p CRYDriver object
++ * @param[in] size              key size in bytes
++ * @param[in] keyp              pointer to the key data
++ *
++ * @notapi
++ */
++
++static void hmac_loadkey(CRYDriver *cryp, size_t size, const uint8_t *keyp) {
++  /* The API accepts bytes but HASH only takes words so special handling is
++   * needed for the end word */
++  uint32_t words = size / sizeof(uint32_t);
++  uint32_t bytes = size % sizeof(uint32_t);
++  uint32_t end = 0;
++  switch (bytes) {
++  case 3:
++    end = keyp[size-1] << 16 | keyp[size-2] << 8 | keyp[size-3];
++    break;
++  case 2:
++    end = keyp[size-1] << 8 | keyp[size-2];
++    break;
++  case 1:
++    end = keyp[size-1];
++    break;
++  default:
++    break;
++  }
++  cry_lld_hash_push(cryp, words, (const uint32_t *)keyp);
++  if (bytes) {
++    HASH->DIN = end;
++  }
++  /* It is not possible to configure NBLW and set DCAL at the same time.
++   * Additinally NBLW is not reset by HASH_CR_INIT and so must always be set */
++  HASH->STR = (8 * bytes) & HASH_STR_NBLW;
++  HASH->STR = HASH_STR_DCAL;
++}
++
+ /**
+  * @brief   Hash initialization using HMAC_SHA256.
+  *
+@@ -1752,11 +1807,25 @@ cryerror_t cry_lld_hmac_loadkey(CRYDriver *cryp,
+  */
+ cryerror_t cry_lld_HMACSHA256_init(CRYDriver *cryp,
+                                    HMACSHA256Context *hmacsha256ctxp) {
++  hmacsha256ctxp->last_data = 0;
++  hmacsha256ctxp->last_size = 0;
+ 
+-  (void)cryp;
+-  (void)hmacsha256ctxp;
++  if (!cryp->hmac_keyp || !cryp->hmac_keylen) {
++    return CRY_ERR_OP_FAILURE;
++  }
+ 
+-  return CRY_ERR_INV_ALGO;
++  //FIXME: DMA
++  /* SHA256 | HMAC | LE Byte data */
++  uint32_t cr = HASH_CR_ALGO_1 | HASH_CR_ALGO_0 | HASH_CR_MODE | HASH_CR_DATATYPE_1;
++  if (cryp->hmac_keylen > 64) {
++    /* Can only be set when the INIT bit is also set */
++    cr |= HASH_CR_LKEY;
++  }
++  HASH->CR = cr | HASH_CR_INIT;
++
++  /* Load the "inner" key */
++  hmac_loadkey(cryp, cryp->hmac_keylen, cryp->hmac_keyp);
++  return CRY_NOERROR;
+ }
+ 
+ /**
+@@ -1779,13 +1848,31 @@ cryerror_t cry_lld_HMACSHA256_update(CRYDriver *cryp,
+                                      HMACSHA256Context *hmacsha256ctxp,
+                                      size_t size,
+                                      const uint8_t *in) {
++  /* This HW is unable to hash blocks that are not a multiple of 4 bytes
++   except for the last block in the stream which is handled in the
++   "final" function. */
++  if (hmacsha256ctxp->last_size) {
++    return CRY_ERR_OP_FAILURE;
++  }
+ 
+-  (void)cryp;
+-  (void)hmacsha256ctxp;
+-  (void)size;
+-  (void)in;
++  /* Any unaligned data is deferred to the "final" function. */
++  hmacsha256ctxp->last_size = size % sizeof(uint32_t);
++  switch (hmacsha256ctxp->last_size) {
++  case 3:
++    hmacsha256ctxp->last_data = in[size-1] << 16 | in[size-2] << 8 | in[size-3];
++    break;
++  case 2:
++    hmacsha256ctxp->last_data = in[size-1] << 8 | in[size-2];
++    break;
++  case 1:
++    hmacsha256ctxp->last_data = in[size-1];
++    break;
++  default:
++    break;
++  }
+ 
+-  return CRY_ERR_INV_ALGO;
++  cry_lld_hash_push(cryp, size / sizeof(uint32_t), (const uint32_t *)in);
++  return CRY_NOERROR;
+ }
+ 
+ /**
+@@ -1806,12 +1893,34 @@ cryerror_t cry_lld_HMACSHA256_update(CRYDriver *cryp,
+ cryerror_t cry_lld_HMACSHA256_final(CRYDriver *cryp,
+                                     HMACSHA256Context *hmacsha256ctxp,
+                                     uint8_t *out) {
++  if (hmacsha256ctxp->last_size) {
++    HASH->DIN = hmacsha256ctxp->last_data;
++  }
++  /* It is not possible to configure NBLW and set DCAL at the same time.
++   * Additinally NBLW is not reset by HASH_CR_INIT and so must always be set */
++  HASH->STR = (8 * hmacsha256ctxp->last_size) & HASH_STR_NBLW;
++  HASH->STR = HASH_STR_DCAL;
++  /* Wait for calculation result */
++  while (HASH->SR & HASH_SR_BUSY) {}
+ 
+-  (void)cryp;
+-  (void)hmacsha256ctxp;
+-  (void)out;
++  /* Feed in the "outer" key (which should be the same as the inner key) */
++  hmac_loadkey(cryp, cryp->hmac_keylen, cryp->hmac_keyp);
+ 
+-  return CRY_ERR_INV_ALGO;
++  uint32_t digest[8];
++  /* Reading digest.*/
++  digest[0] = __REV(HASH_DIGEST->HR[0]);
++  digest[1] = __REV(HASH_DIGEST->HR[1]);
++  digest[2] = __REV(HASH_DIGEST->HR[2]);
++  digest[3] = __REV(HASH_DIGEST->HR[3]);
++  digest[4] = __REV(HASH_DIGEST->HR[4]);
++  digest[5] = __REV(HASH_DIGEST->HR[5]);
++  digest[6] = __REV(HASH_DIGEST->HR[6]);
++  digest[7] = __REV(HASH_DIGEST->HR[7]);
++  memcpy(out, digest, sizeof(digest));
++
++  cryp->hmac_keyp = NULL;
++  cryp->hmac_keylen = 0;
++  return CRY_NOERROR;
+ }
+ #endif
+ 
+diff --git a/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.h b/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.h
+index 257d39624..55f263df7 100644
+--- a/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.h
++++ b/os/hal/ports/STM32/LLD/CRYPv1/hal_crypto_lld.h
+@@ -195,17 +195,20 @@
+ #endif /* !STM32_DMA_SUPPORTS_DMAMUX */
+ 
+ /* DMA priority check.*/
+-#if !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_CRYP1_IN_DMA_PRIORITY)
++#if STM32_CRY_USE_CRYP1 &&                                                  \
++    !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_CRYP1_IN_DMA_PRIORITY)
+ #error "Invalid DMA priority assigned to CRYP1_IN"
+ #endif
+ 
+ /* DMA priority check.*/
+-#if !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_CRYP1_OUT_DMA_PRIORITY)
++#if STM32_CRY_USE_CRYP1 &&                                                  \
++    !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_CRYP1_OUT_DMA_PRIORITY)
+ #error "Invalid DMA priority assigned to CRYP1_OUT"
+ #endif
+ 
+ /* DMA priority check.*/
+-#if !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_HASH1_DMA_PRIORITY)
++#if STM32_CRY_USE_HASH1 &&                                                  \
++    !STM32_DMA_IS_VALID_PRIORITY(STM32_CRY_HASH1_DMA_PRIORITY)
+ #error "Invalid DMA priority assigned to HASH1"
+ #endif
+ 
+@@ -335,6 +338,14 @@ struct CRYDriver {
+ #endif /* STM32_CRY_CRYP_SIZE_THRESHOLD != 0 */
+ #endif /* STM32_CRY_USE_CRYP1 == TRUE */
+ #if (STM32_CRY_USE_HASH1 == TRUE) || defined (__DOXYGEN__)
++  /**
++   * @brief   Pointer to HMAC transient key
++   */
++  const uint8_t *hmac_keyp;
++  /**
++   * #brief   Length of the key pointed to by hmac_keyp
++   */
++  size_t hmac_keylen;
+ #if (STM32_CRY_HASH_SIZE_THRESHOLD != 0) || defined (__DOXYGEN__)
+   /**
+    * @brief   Thread reference for hash operations.
+@@ -387,7 +398,14 @@ typedef struct {
+  * @brief   Type of a HMAC_SHA256 context.
+  */
+ typedef struct {
+-  uint32_t dummy;
++  /**
++   * @brief   Last data to be hashed on finalization.
++   */
++  uint32_t      last_data;
++  /**
++   * @brief   Size, in bits, of the last data.
++   */
++  uint32_t      last_size;
+ } HMACSHA256Context;
+ #endif
+ 
+diff --git a/os/hal/ports/STM32/STM32F4xx/stm32_rcc.h b/os/hal/ports/STM32/STM32F4xx/stm32_rcc.h
+index cc401ce05..ec445db3e 100644
+--- a/os/hal/ports/STM32/STM32F4xx/stm32_rcc.h
++++ b/os/hal/ports/STM32/STM32F4xx/stm32_rcc.h
+@@ -1596,6 +1596,34 @@
+ #define rccResetCRC() rccResetAHB1(RCC_AHB1RSTR_CRCRST)
+ /** @} */
+ 
++/**
++ * @name    HASH peripheral specific RCC operations
++ * @{
++ */
++/**
++ * @brief   Enables the HASH peripheral clock.
++ *
++ * @param[in] lp        low power enable flag
++ *
++ * @api
++ */
++#define rccEnableHASH(lp) rccEnableAHB2(RCC_AHB2ENR_HASHEN, lp)
++
++/**
++ * @brief   Disables the HASH peripheral clock.
++ *
++ * @api
++ */
++#define rccDisableHASH() rccDisableAHB2(RCC_AHB2ENR_HASHEN)
++
++/**
++ * @brief   Resets the HASH peripheral.
++ *
++ * @api
++ */
++#define rccResetHASH() rccResetAHB2(RCC_AHB2RSTR_HASHRST)
++/** @} */
++
+ /**
+  * @name    FSMC peripherals specific RCC operations
+  * @{
+diff --git a/os/hal/ports/STM32/STM32F4xx/stm32_registry.h b/os/hal/ports/STM32/STM32F4xx/stm32_registry.h
+index 5072ce744..267b313b4 100644
+--- a/os/hal/ports/STM32/STM32F4xx/stm32_registry.h
++++ b/os/hal/ports/STM32/STM32F4xx/stm32_registry.h
+@@ -1219,6 +1219,14 @@
+ #define STM32_HAS_CRC                       TRUE
+ #define STM32_CRC_PROGRAMMABLE              FALSE
+ 
++/* CRY attributes.*/
++#if defined(STM32F437xx) || defined(STM32F439xx) || defined(__DOXYGEN__)
++#define STM32_HAS_HASH1                     TRUE
++#define STM32_HASH1_DMA_MSK                 STM32_DMA_STREAM_ID_MSK(2, 7)
++#define STM32_HASH1_DMA_CHN                 0x20000000
++
++#endif
++
+ #endif /* defined(STM32F429_439xx) || defined(STM32F427_437xx) */
+ 
+ /*===========================================================================*/
