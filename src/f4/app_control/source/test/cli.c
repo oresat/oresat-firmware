@@ -17,6 +17,7 @@
 #include "test_comms.h"
 #include "test_deploy.h"
 #include "test_crc.h"
+#include "test_hmac.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -102,6 +103,7 @@ static const ShellCommand commands[] = {
     {"fram", cmd_fram},
     {"persist", cmd_persist},
     {"crc", cmd_crc},
+    {"hmac", cmd_hmac},
     {"deploy", cmd_deploy},
     {"edl", cmd_edl},
     {NULL, NULL}

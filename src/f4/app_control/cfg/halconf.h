@@ -58,7 +58,7 @@
  * @brief   Enables the cryptographic subsystem.
  */
 #if !defined(HAL_USE_CRY) || defined(__DOXYGEN__)
-#define HAL_USE_CRY                         FALSE
+#define HAL_USE_CRY                         TRUE
 #endif
 
 /**
