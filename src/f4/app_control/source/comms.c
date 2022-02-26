@@ -625,6 +625,8 @@ THD_FUNCTION(edl_thd, arg)
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes += len;
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Packets += 1;
             }
+        } else {
+            OD_PERSIST_STATE.x6004_persistentState.EDL_RejectedCount += 1;
         }
         fb_free(fb, &rx_fifo);
     }
@@ -706,7 +708,7 @@ void comms_file(fb_t *fb, void *arg)
     int *ret = fb_put(resp_fb, sizeof(int));
     uint32_t *crc = fb_put(resp_fb, sizeof(uint32_t));
     *ret = file_recv((file_xfr_t*)fb->data, crc);
-    uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
+    uslp_map_send(fb->phy_arg, resp_fb, 1, 0, true);
 }
 
 void comms_beacon(bool enable)

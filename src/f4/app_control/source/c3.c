@@ -18,6 +18,7 @@
 #define PREDEPLOY_ALARM                     ALARM_A     /* Predeploy timeout alarm number */
 #define TX_ENABLE_ALARM                     ALARM_B     /* TX enable timeout alarm number */
 #define EDL_ALARM                           ALARM_A     /* EDL timeout alarm number */
+#define RESET_ALARM                         ALARM_A     /* Hard reset alarm number */
 
 #define BAT_LEVEL_LOW                       6500U
 #define BAT_LEVEL_HIGH                      7000U
@@ -25,6 +26,7 @@
 
 /* Global State Variables */
 thread_t *c3_tp;
+static time_t boot_time;
 
 /**
  * @brief   Alarm event callback
@@ -149,6 +151,11 @@ bool edl_enabled(void)
     return (difftime(rtcGetTimeUnix(NULL), OD_PERSIST_STATE.x6004_persistentState.lastEDL) < OD_PERSIST_APP.x6001_stateControl.EDL_Timeout);
 }
 
+bool trigger_reset(void)
+{
+    return (difftime(rtcGetTimeUnix(NULL), boot_time) >= OD_PERSIST_APP.x6001_stateControl.resetTimeout);
+}
+
 void set_alarm(rtcalarm_t alrm, time_t start, int days, int hours, int minutes, int seconds)
 {
     RTCDateTime ref_time;
@@ -174,6 +181,9 @@ THD_FUNCTION(c3, arg)
 
     /* Restore saved state */
     c3StateRestore();
+
+    /* Log boot time */
+    boot_time = rtcGetTimeUnix(NULL);
 
     /* Increment power cycles */
     OD_PERSIST_STATE.x6004_persistentState.powerCycles++;
@@ -222,6 +232,9 @@ THD_FUNCTION(c3, arg)
 
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
+            } else if (trigger_reset()) {
+                c3StateSave();
+                chSysHalt("HARD RESET");
             } else if (tx_enabled() && bat_good()) {
                 OD_RAM.x6000_C3_State[0] = BEACON;
             } else {
@@ -233,6 +246,9 @@ THD_FUNCTION(c3, arg)
 
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
+            } else if (trigger_reset()) {
+                c3StateSave();
+                chSysHalt("HARD RESET");
             } else if (!tx_enabled() || !bat_good()) {
                 OD_RAM.x6000_C3_State[0] = STANDBY;
             } else {
@@ -243,6 +259,7 @@ THD_FUNCTION(c3, arg)
             comms_beacon(false);
 
             if (!edl_enabled()) {
+                set_alarm(RESET_ALARM, rtcGetTimeUnix(NULL), 0, 0, 0, OD_PERSIST_APP.x6001_stateControl.resetTimeout);
                 if (tx_enabled() && bat_good()) {
                     OD_RAM.x6000_C3_State[0] = BEACON;
                 } else {
@@ -290,7 +307,7 @@ void edl_enable(bool state)
         set_alarm(EDL_ALARM, OD_PERSIST_STATE.x6004_persistentState.lastEDL, 0, 0, 0, OD_PERSIST_APP.x6001_stateControl.EDL_Timeout);
     } else {
         OD_PERSIST_STATE.x6004_persistentState.lastEDL = 0;
-        rtcSetAlarm(&RTCD1, EDL_ALARM, NULL);
+        rtcSetAlarm(&RTCD1, TX_ENABLE_ALARM, NULL);
     }
     chEvtSignal(c3_tp, C3_EVENT_EDL);
 }

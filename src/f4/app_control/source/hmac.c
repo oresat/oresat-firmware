@@ -41,30 +41,35 @@ int hmac_recv(void *data, size_t len, void *iv, void *seq_num, void *mac, void *
     uint8_t hmac[32] = {0};
     uint32_t recv_seq = __builtin_bswap32(*((uint32_t*)seq_num));
 
+    /* Check sequence number first */
+    if (recv_seq < OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount) {
+        return -1;
+    }
+
+    /* Calculate HMAC */
     err = cryLoadHMACTransientKey(&CRYD1, 32, arg);
     if (err != CRY_NOERROR) {
         return err;
     }
-
     err = cryHMACSHA256Init(&CRYD1, &ctx);
     if (err != CRY_NOERROR) {
         return err;
     }
-
     err = cryHMACSHA256Update(&CRYD1, &ctx, len, data);
     if (err != CRY_NOERROR) {
         return err;
     }
-
     err = cryHMACSHA256Final(&CRYD1, &ctx, hmac);
     if (err != CRY_NOERROR) {
         return err;
     }
 
-    if (memcmp(hmac, mac, 32) != 0 && recv_seq >= OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount) {
+    /* Compare HMAC */
+    if (memcmp(hmac, mac, 32) != 0) {
         return -1;
     }
 
+    /* Set new sequence number */
     OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount = recv_seq + 1;
 
     return 0;
