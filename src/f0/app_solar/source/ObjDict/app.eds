@@ -2,14 +2,14 @@
 FileName=app.eds
 FileVersion=0
 FileRevision=1
-LastEDS=/home/ryan/PSAS/repos/oresat-firmware/src/f0/app_solar/source/ObjDict/app.eds
+LastEDS=
 EDSVersion=4.0
 Description=OreSat Solar Board Object Dictionary
 CreationTime=2:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=8:19PM
-ModificationDate=11-29-2021
+ModificationTime=5:58PM
+ModificationDate=02-25-2022
 ModifiedBy=
 
 [DeviceInfo]
@@ -3973,7 +3973,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000410
+DefaultValue=0x60000510
 PDOMapping=0
 
 [1A01sub2]
@@ -3982,7 +3982,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000510
+DefaultValue=0x60000610
 PDOMapping=0
 
 [1A01sub3]
@@ -3991,7 +3991,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000610
+DefaultValue=0x60000710
 PDOMapping=0
 
 [1A01sub4]
@@ -4000,7 +4000,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000710
+DefaultValue=0x60000810
 PDOMapping=0
 
 [1A01sub5]
