@@ -517,9 +517,9 @@ int32_t bmi088RawGyroToDegPerSec(const uint8_t lsb, const uint8_t msb) {
     //TODO verify this calculation with real world known rotation rate data
     const int16_t gyroInt16   = (msb << 8) |  lsb;
 
-    const int32_t lsb_deg_per_sec = 16384; // for 2000 deg/sec range
+    const int32_t deg_per_sec_per_lsb = 16384; // for 2000 deg/sec range
 
-    const int32_t dps = (gyroInt16 * lsb_deg_per_sec) / 1000;
+    const int32_t dps = (gyroInt16 * 1000) /  deg_per_sec_per_lsb;
 
     return(dps);
 }
