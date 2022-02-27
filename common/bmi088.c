@@ -147,6 +147,13 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
         ret = false;
     }
 
+    if( bmi088SetGyroBandwidth(devp, BMI088_GYR_BANDWIDTH_100HZ_32HZ) != MSG_OK ) {
+        ret = false;
+    }
+
+    if( bmi088SetGyroRange(devp, BMI088_GYR_RANGE_1K) != MSG_OK ) {
+        ret = false;
+    }
 
 #if BMI088_SHARED_I2C
     i2cReleaseBus(config->i2cp);
@@ -517,9 +524,9 @@ int32_t bmi088RawGyroToDegPerSec(const uint8_t lsb, const uint8_t msb) {
     //TODO verify this calculation with real world known rotation rate data
     const int16_t gyroInt16   = (msb << 8) |  lsb;
 
-    const int32_t lsb_deg_per_sec = 16384; // for 2000 deg/sec range
+    const int32_t deg_per_sec_per_lsb = 32768; // for 1000 deg/sec range
 
-    const int32_t dps = (gyroInt16 * lsb_deg_per_sec) / 1000;
+    const int32_t dps = (gyroInt16 * 1000) /  deg_per_sec_per_lsb;
 
     return(dps);
 }
@@ -546,4 +553,10 @@ msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, bmi088_gyro_sample_t *dest) {
     return(r);
 }
 
+msg_t bmi088SetGyroBandwidth(BMI088Driver *devp, const uint8_t bandwidth) {
+    return bmi088I2CWriteRegisterU8(devp, devp->config->gyro_saddr, BMI088_AD_GYR_BANDWIDTH, bandwidth, 0);
+}
 
+msg_t bmi088SetGyroRange(BMI088Driver *devp, const uint8_t range) {
+    return bmi088I2CWriteRegisterU8(devp, devp->config->gyro_saddr, BMI088_AD_GYR_RANGE, range, 0);
+}

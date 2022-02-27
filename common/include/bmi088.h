@@ -575,11 +575,11 @@
 #define BMI088_GYR_RANGE_Pos                (0U)
 #define BMI088_GYR_RANGE_Msk                (0xFFU << BMI088_GYR_RANGE_Pos)
 #define BMI088_GYR_RANGE                    BMI088_GYR_RANGE_Msk
-#define BMI088_GYR_RANGE_2K                 (0x00U BMI088_GYR_RANGE_Pos)
-#define BMI088_GYR_RANGE_1K                 (0x01U BMI088_GYR_RANGE_Pos)
-#define BMI088_GYR_RANGE_500                (0x02U BMI088_GYR_RANGE_Pos)
-#define BMI088_GYR_RANGE_250                (0x03U BMI088_GYR_RANGE_Pos)
-#define BMI088_GYR_RANGE_125                (0x04U BMI088_GYR_RANGE_Pos)
+#define BMI088_GYR_RANGE_2K                 (0x00U << BMI088_GYR_RANGE_Pos)
+#define BMI088_GYR_RANGE_1K                 (0x01U << BMI088_GYR_RANGE_Pos)
+#define BMI088_GYR_RANGE_500                (0x02U << BMI088_GYR_RANGE_Pos)
+#define BMI088_GYR_RANGE_250                (0x03U << BMI088_GYR_RANGE_Pos)
+#define BMI088_GYR_RANGE_125                (0x04U << BMI088_GYR_RANGE_Pos)
 /**@} */
 
 /**
@@ -919,6 +919,8 @@ msg_t bmi088ReadTemp(BMI088Driver *devp, int16_t *dest_temp_c);
 
 msg_t bmi088ReadGyroChipId(BMI088Driver *devp, uint8_t *dest);
 msg_t bmi088ReadGyroXYZ(BMI088Driver *devp, bmi088_gyro_sample_t *dest);
+msg_t bmi088SetGyroBandwidth(BMI088Driver *devp, const uint8_t bandwidth);
+msg_t bmi088SetGyroRange(BMI088Driver *devp, const uint8_t range);
 
 
 #ifdef __cplusplus
