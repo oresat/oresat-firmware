@@ -16,7 +16,7 @@
 
         Created:      8/30/2019 11:18:00 AM
         Created By:   Miles Simpson
-        Modified:     12/2/2021 5:41:11 PM
+        Modified:     2/25/2022 12:19:50 PM
         Modified By:  
 
     Device Info:
@@ -59,6 +59,7 @@
 #define OD_CNT_ARR_1F81 127
 #define OD_CNT_ARR_1F82 127
 #define OD_CNT_ARR_2020 3
+#define OD_CNT_ARR_6005 4
 
 
 /*******************************************************************************
@@ -1686,6 +1687,7 @@ typedef struct {
         uint8_t highestSub_indexSupported;
         uint16_t saveInterval;
         uint16_t EDL_Timeout;
+        uint32_t resetTimeout;
         bool_t factoryReset;
     } x6001_stateControl;
     struct {
@@ -1718,8 +1720,15 @@ typedef struct {
         uint32_t UHF_RX_Packets;
         uint64_t VC1_SequenceCount;
         uint64_t VC1_ExpediteCount;
+        uint32_t EDL_SequenceCount;
+        uint32_t EDL_RejectedCount;
     } x6004_persistentState;
 } OD_PERSIST_STATE_t;
+
+typedef struct {
+    uint8_t x6005_cryptoKeys_sub0;
+    uint8_t x6005_cryptoKeys[OD_CNT_ARR_6005][32];
+} OD_PERSIST_KEYS_t;
 
 #ifndef OD_ATTR_ROM
 #define OD_ATTR_ROM
@@ -1750,6 +1759,11 @@ extern OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP;
 #define OD_ATTR_PERSIST_STATE
 #endif
 extern OD_ATTR_PERSIST_STATE OD_PERSIST_STATE_t OD_PERSIST_STATE;
+
+#ifndef OD_ATTR_PERSIST_KEYS
+#define OD_ATTR_PERSIST_KEYS
+#endif
+extern OD_ATTR_PERSIST_KEYS OD_PERSIST_KEYS_t OD_PERSIST_KEYS;
 
 #ifndef OD_ATTR_OD
 #define OD_ATTR_OD
@@ -1930,24 +1944,25 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6002 &OD->list[167]
 #define OD_ENTRY_H6003 &OD->list[168]
 #define OD_ENTRY_H6004 &OD->list[169]
-#define OD_ENTRY_H7000 &OD->list[170]
-#define OD_ENTRY_H7001 &OD->list[171]
-#define OD_ENTRY_H7002 &OD->list[172]
-#define OD_ENTRY_H7003 &OD->list[173]
-#define OD_ENTRY_H7004 &OD->list[174]
-#define OD_ENTRY_H7005 &OD->list[175]
-#define OD_ENTRY_H7006 &OD->list[176]
-#define OD_ENTRY_H7007 &OD->list[177]
-#define OD_ENTRY_H7008 &OD->list[178]
-#define OD_ENTRY_H7009 &OD->list[179]
-#define OD_ENTRY_H700A &OD->list[180]
-#define OD_ENTRY_H700B &OD->list[181]
-#define OD_ENTRY_H700C &OD->list[182]
-#define OD_ENTRY_H700D &OD->list[183]
-#define OD_ENTRY_H700E &OD->list[184]
-#define OD_ENTRY_H700F &OD->list[185]
-#define OD_ENTRY_H7013 &OD->list[186]
-#define OD_ENTRY_H7014 &OD->list[187]
+#define OD_ENTRY_H6005 &OD->list[170]
+#define OD_ENTRY_H7000 &OD->list[171]
+#define OD_ENTRY_H7001 &OD->list[172]
+#define OD_ENTRY_H7002 &OD->list[173]
+#define OD_ENTRY_H7003 &OD->list[174]
+#define OD_ENTRY_H7004 &OD->list[175]
+#define OD_ENTRY_H7005 &OD->list[176]
+#define OD_ENTRY_H7006 &OD->list[177]
+#define OD_ENTRY_H7007 &OD->list[178]
+#define OD_ENTRY_H7008 &OD->list[179]
+#define OD_ENTRY_H7009 &OD->list[180]
+#define OD_ENTRY_H700A &OD->list[181]
+#define OD_ENTRY_H700B &OD->list[182]
+#define OD_ENTRY_H700C &OD->list[183]
+#define OD_ENTRY_H700D &OD->list[184]
+#define OD_ENTRY_H700E &OD->list[185]
+#define OD_ENTRY_H700F &OD->list[186]
+#define OD_ENTRY_H7013 &OD->list[187]
+#define OD_ENTRY_H7014 &OD->list[188]
 
 
 /*******************************************************************************
@@ -2123,24 +2138,25 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6002_deploymentControl &OD->list[167]
 #define OD_ENTRY_H6003_TX_Control &OD->list[168]
 #define OD_ENTRY_H6004_persistentState &OD->list[169]
-#define OD_ENTRY_H7000_C3_Telemetry &OD->list[170]
-#define OD_ENTRY_H7001_battery &OD->list[171]
-#define OD_ENTRY_H7002_battery &OD->list[172]
-#define OD_ENTRY_H7003_solarPanel &OD->list[173]
-#define OD_ENTRY_H7004_solarPanel &OD->list[174]
-#define OD_ENTRY_H7005_solarPanel &OD->list[175]
-#define OD_ENTRY_H7006_solarPanel &OD->list[176]
-#define OD_ENTRY_H7007_solarPanel &OD->list[177]
-#define OD_ENTRY_H7008_solarPanel &OD->list[178]
-#define OD_ENTRY_H7009_solarPanel &OD->list[179]
-#define OD_ENTRY_H700A_solarPanel &OD->list[180]
-#define OD_ENTRY_H700B_starTracker &OD->list[181]
-#define OD_ENTRY_H700C_starTracker &OD->list[182]
-#define OD_ENTRY_H700D_GPS &OD->list[183]
-#define OD_ENTRY_H700E_ACS &OD->list[184]
-#define OD_ENTRY_H700F_RWB &OD->list[185]
-#define OD_ENTRY_H7013_dxWiFi &OD->list[186]
-#define OD_ENTRY_H7014_CFC &OD->list[187]
+#define OD_ENTRY_H6005_cryptoKeys &OD->list[170]
+#define OD_ENTRY_H7000_C3_Telemetry &OD->list[171]
+#define OD_ENTRY_H7001_battery &OD->list[172]
+#define OD_ENTRY_H7002_battery &OD->list[173]
+#define OD_ENTRY_H7003_solarPanel &OD->list[174]
+#define OD_ENTRY_H7004_solarPanel &OD->list[175]
+#define OD_ENTRY_H7005_solarPanel &OD->list[176]
+#define OD_ENTRY_H7006_solarPanel &OD->list[177]
+#define OD_ENTRY_H7007_solarPanel &OD->list[178]
+#define OD_ENTRY_H7008_solarPanel &OD->list[179]
+#define OD_ENTRY_H7009_solarPanel &OD->list[180]
+#define OD_ENTRY_H700A_solarPanel &OD->list[181]
+#define OD_ENTRY_H700B_starTracker &OD->list[182]
+#define OD_ENTRY_H700C_starTracker &OD->list[183]
+#define OD_ENTRY_H700D_GPS &OD->list[184]
+#define OD_ENTRY_H700E_ACS &OD->list[185]
+#define OD_ENTRY_H700F_RWB &OD->list[186]
+#define OD_ENTRY_H7013_dxWiFi &OD->list[187]
+#define OD_ENTRY_H7014_CFC &OD->list[188]
 
 
 /*******************************************************************************

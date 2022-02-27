@@ -29,7 +29,7 @@ typedef struct {
 extern objects_fifo_t sdocli_fifo;
 
 void sdo_init(void);
-void sdo_transfer(sdocli_op_t op, uint8_t node_id, uint16_t index, uint8_t subindex, size_t total_size, size_t buf_size, uint8_t *buf);
+void sdo_transfer(sdocli_op_t op, uint8_t node_id, uint16_t index, uint8_t subindex, size_t total_size, size_t buf_size, void *buf);
 
 #ifdef __cplusplus
 }

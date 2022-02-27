@@ -7,6 +7,7 @@
 #include "file_xfr.h"
 #include "rtc.h"
 #include "uslp.h"
+#include "hmac.h"
 #include "CANopen.h"
 #include "OD.h"
 
@@ -19,6 +20,20 @@ static inline void vc_unlock(void *arg) {
     mutex_t *mutex = arg;
     chMtxUnlock(mutex);
 }
+
+#if (USLP_USE_SDLS == TRUE)
+static const sdls_cfg_t sdls_cfg = {
+    .spi            = 1,
+    .iv_len         = 0,
+    .seq_num_len    = sizeof(OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount),
+    .pad_len        = 0,
+    .mac_len        = 32,
+    .send_func      = NULL,
+    .send_arg       = NULL,
+    .recv_func      = hmac_recv,
+    .recv_arg       = OD_PERSIST_KEYS.x6005_cryptoKeys[0],
+};
+#endif
 
 static const uslp_map_t map_cmd = {
     .sdu            = SDU_MAP_ACCESS,
@@ -43,40 +58,54 @@ static const uslp_vc_t vc0 = {
     .expedited_cnt  = NULL,
     .cop            = COP_NONE,
     .mapid[0]       = &map_cmd,
-    .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
-    .sdls_hdr_len   = 0,
-    .sdls_tlr_len   = 0,
+    .sdls_cfg       = &sdls_cfg,
 #endif
 };
 
-static MUTEX_DECL(vc1_lock);
 static const uslp_vc_t vc1 = {
-    .seq_ctrl_len   = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC1_SequenceCount),
-    .expedited_len  = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC1_ExpediteCount),
-    .seq_ctrl_cnt   = &OD_PERSIST_STATE.x6004_persistentState.VC1_SequenceCount,
-    .expedited_cnt  = &OD_PERSIST_STATE.x6004_persistentState.VC1_ExpediteCount,
+    .seq_ctrl_len   = 0,
+    .expedited_len  = 0,
+    .seq_ctrl_cnt   = NULL,
+    .expedited_cnt  = NULL,
+    .cop            = COP_NONE,
+    .mapid[0]       = &map_file,
+    .trunc_tf_len   = USLP_MAX_LEN,
+    .ocf            = false,
+#if (USLP_USE_SDLS == TRUE)
+    .sdls_cfg       = NULL,
+#endif
+};
+
+/*
+static MUTEX_DECL(vc2_lock);
+static const uslp_vc_t vc2 = {
+    .seq_ctrl_len   = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC2_SequenceCount),
+    .expedited_len  = sizeof(OD_PERSIST_STATE.x6004_persistentState.VC2_ExpediteCount),
+    .seq_ctrl_cnt   = &OD_PERSIST_STATE.x6004_persistentState.VC2_SequenceCount,
+    .expedited_cnt  = &OD_PERSIST_STATE.x6004_persistentState.VC2_ExpediteCount,
     .cop            = COP_1,
     .mapid[0]       = &map_cmd,
     .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = true,
-    .lock_arg       = &vc1_lock,
+    .lock_arg       = &vc2_lock,
     .lock           = vc_lock,
     .unlock         = vc_unlock,
 #if (USLP_USE_SDLS == TRUE)
-    .sdls_hdr_len   = 0,
-    .sdls_tlr_len   = 0,
+    .sdls_cfg       = &sdls_cfg,
 #endif
 };
+*/
 
 const uslp_mc_t mc = {
     .scid           = SCID,
     .owner          = true,
     .vcid[0]        = &vc0,
-    /*.vcid[1]        = &vc1,*/
+    .vcid[1]        = &vc1,
+    /*.vcid[2]        = &vc2,*/
 };
 
 static const uslp_pc_t lband_pc = {
@@ -132,8 +161,8 @@ static const ax5043_profile_t lband_high[] = {
     {AX5043_REG_MAXRFOFFSET, 0x0003BE | AX5043_MAXRFOFFSET_FREQOFFSCORR, 3},
 
     /* Receiver Parameter Set 0 */
-    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x04) |
-                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x00), 1},
+    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x08) |
+                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x03), 1},
     {AX5043_REG_AGCTARGET0, 0x89, 1},
     {AX5043_REG_TIMEGAIN0, _VAL2FLD(AX5043_TIMEGAIN_E, 0x09) |
                            _VAL2FLD(AX5043_TIMEGAIN_M, 0x08), 1},
@@ -214,8 +243,8 @@ static const ax5043_profile_t lband_low[] = {
     {AX5043_REG_MAXRFOFFSET, 0x0003BE | AX5043_MAXRFOFFSET_FREQOFFSCORR, 3},
 
     /* Receiver Parameter Set 0 */
-    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x05) |
-                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x01), 1},
+    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x09) |
+                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x03), 1},
     {AX5043_REG_AGCTARGET0, 0x89, 1},
     {AX5043_REG_TIMEGAIN0, _VAL2FLD(AX5043_TIMEGAIN_E, 0x09) |
                            _VAL2FLD(AX5043_TIMEGAIN_M, 0x08), 1},
@@ -296,8 +325,8 @@ static const ax5043_profile_t uhf_eng[] = {
     {AX5043_REG_MAXRFOFFSET, 0x000393 | AX5043_MAXRFOFFSET_FREQOFFSCORR, 3},
 
     /* Receiver Parameter Set 0 */
-    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x04) |
-                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x00), 1},
+    {AX5043_REG_AGCGAIN0, _VAL2FLD(AX5043_AGCGAIN_AGCDECAY, 0x08) |
+                          _VAL2FLD(AX5043_AGCGAIN_AGCATTACK, 0x03), 1},
     {AX5043_REG_AGCTARGET0, 0x89, 1},
     {AX5043_REG_TIMEGAIN0, _VAL2FLD(AX5043_TIMEGAIN_E, 0x09) |
                            _VAL2FLD(AX5043_TIMEGAIN_M, 0x0A), 1},
@@ -596,6 +625,8 @@ THD_FUNCTION(edl_thd, arg)
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes += len;
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Packets += 1;
             }
+        } else {
+            OD_PERSIST_STATE.x6004_persistentState.EDL_RejectedCount += 1;
         }
         fb_free(fb, &rx_fifo);
     }
@@ -663,7 +694,7 @@ void comms_cmd(fb_t *fb, void *arg)
     (void)arg;
     osalDbgCheck(fb != NULL);
     fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
-    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
+    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     cmd_process((cmd_t*)fb->data, resp_fb);
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
@@ -673,11 +704,11 @@ void comms_file(fb_t *fb, void *arg)
     (void)arg;
     osalDbgCheck(fb != NULL);
     fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
-    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN);
+    fb_reserve(resp_fb, USLP_MAX_HEADER_LEN + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     int *ret = fb_put(resp_fb, sizeof(int));
     uint32_t *crc = fb_put(resp_fb, sizeof(uint32_t));
     *ret = file_recv((file_xfr_t*)fb->data, crc);
-    uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
+    uslp_map_send(fb->phy_arg, resp_fb, 1, 0, true);
 }
 
 void comms_beacon(bool enable)

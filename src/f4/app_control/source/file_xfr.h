@@ -4,7 +4,7 @@
 #include "fs.h"
 
 typedef struct {
-    char filename[32];
+    char filename[8];
     uint32_t off;
     uint32_t len;
     uint8_t data[];

@@ -1639,9 +1639,10 @@ OD_ATTR_PERSIST_MFR OD_PERSIST_MFR_t OD_PERSIST_MFR = {
 
 OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
     .x6001_stateControl = {
-        .highestSub_indexSupported = 0x03,
+        .highestSub_indexSupported = 0x04,
         .saveInterval = 0x000A,
         .EDL_Timeout = 0x003C,
+        .resetTimeout = 0x00015180,
         .factoryReset = false
     },
     .x6002_deploymentControl = {
@@ -1653,13 +1654,13 @@ OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
     .x6003_TX_Control = {
         .highestSub_indexSupported = 0x02,
         .timeout = 0x00127500,
-        .beaconInterval = 0x00002710
+        .beaconInterval = 0x00007530
     }
 };
 
 OD_ATTR_PERSIST_STATE OD_PERSIST_STATE_t OD_PERSIST_STATE = {
     .x6004_persistentState = {
-        .highestSub_indexSupported = 0x0E,
+        .highestSub_indexSupported = 0x10,
         .timestamp = 0x0000000000000000,
         .alarmA = 0x00000000,
         .alarmB = 0x00000000,
@@ -1673,8 +1674,15 @@ OD_ATTR_PERSIST_STATE OD_PERSIST_STATE_t OD_PERSIST_STATE = {
         .UHF_RX_Bytes = 0x00000000,
         .UHF_RX_Packets = 0x00000000,
         .VC1_SequenceCount = 0x0000000000000000,
-        .VC1_ExpediteCount = 0x0000000000000000
+        .VC1_ExpediteCount = 0x0000000000000000,
+        .EDL_SequenceCount = 0x00000000,
+        .EDL_RejectedCount = 0x00000000
     }
+};
+
+OD_ATTR_PERSIST_KEYS OD_PERSIST_KEYS_t OD_PERSIST_KEYS = {
+    .x6005_cryptoKeys_sub0 = 0x04,
+    .x6005_cryptoKeys = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}
 };
 
 
@@ -1849,10 +1857,11 @@ typedef struct {
     OD_obj_record_t o_2022_MCU_Sensors[9];
     OD_obj_var_t o_2100_errorStatusBits;
     OD_obj_var_t o_6000_C3_State;
-    OD_obj_record_t o_6001_stateControl[4];
+    OD_obj_record_t o_6001_stateControl[5];
     OD_obj_record_t o_6002_deploymentControl[4];
     OD_obj_record_t o_6003_TX_Control[3];
-    OD_obj_record_t o_6004_persistentState[15];
+    OD_obj_record_t o_6004_persistentState[17];
+    OD_obj_array_t o_6005_cryptoKeys;
     OD_obj_record_t o_7000_C3_Telemetry[7];
     OD_obj_record_t o_7001_battery[45];
     OD_obj_record_t o_7002_battery[45];
@@ -7959,8 +7968,14 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.factoryReset,
+            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.resetTimeout,
             .subIndex = 3,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6001_stateControl.factoryReset,
+            .subIndex = 4,
             .attribute = ODA_SDO_RW,
             .dataLength = 1
         }
@@ -8101,7 +8116,27 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .subIndex = 14,
             .attribute = ODA_SDO_RW | ODA_MB,
             .dataLength = 8
+        },
+        {
+            .dataOrig = &OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount,
+            .subIndex = 15,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_PERSIST_STATE.x6004_persistentState.EDL_RejectedCount,
+            .subIndex = 16,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 4
         }
+    },
+    .o_6005_cryptoKeys = {
+        .dataOrig0 = &OD_PERSIST_KEYS.x6005_cryptoKeys_sub0,
+        .dataOrig = &OD_PERSIST_KEYS.x6005_cryptoKeys[0][0],
+        .attribute0 = ODA_SDO_R,
+        .attribute = ODA_SDO_W,
+        .dataElementLength = 32,
+        .dataElementSizeof = sizeof(uint8_t[32])
     },
     .o_7000_C3_Telemetry = {
         {
@@ -10244,10 +10279,11 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x2022, 0x09, ODT_REC, &ODObjs.o_2022_MCU_Sensors, NULL},
     {0x2100, 0x01, ODT_VAR, &ODObjs.o_2100_errorStatusBits, NULL},
     {0x6000, 0x01, ODT_VAR, &ODObjs.o_6000_C3_State, NULL},
-    {0x6001, 0x04, ODT_REC, &ODObjs.o_6001_stateControl, NULL},
+    {0x6001, 0x05, ODT_REC, &ODObjs.o_6001_stateControl, NULL},
     {0x6002, 0x04, ODT_REC, &ODObjs.o_6002_deploymentControl, NULL},
     {0x6003, 0x03, ODT_REC, &ODObjs.o_6003_TX_Control, NULL},
-    {0x6004, 0x0F, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
+    {0x6004, 0x11, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
+    {0x6005, 0x05, ODT_ARR, &ODObjs.o_6005_cryptoKeys, NULL},
     {0x7000, 0x07, ODT_REC, &ODObjs.o_7000_C3_Telemetry, NULL},
     {0x7001, 0x2D, ODT_REC, &ODObjs.o_7001_battery, NULL},
     {0x7002, 0x2D, ODT_REC, &ODObjs.o_7002_battery, NULL},

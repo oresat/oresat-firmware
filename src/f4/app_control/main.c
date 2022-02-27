@@ -24,6 +24,7 @@
 #include "wdt.h"
 #include "c3.h"
 #include "fram.h"
+#include "persist.h"
 #include "fs.h"
 #include "node_mgr.h"
 #include "comms.h"
@@ -143,9 +144,15 @@ static void app_init(void)
     reg_worker(&c3_worker, &c3_desc, true, true);
     start_worker(&wdt_worker);
 
+    /* Start crypto driver */
+    cryStart(&CRYD1, NULL);
+
     /* Initialize FRAM */
     framObjectInit(&FRAMD1);
     framStart(&FRAMD1, &framcfg);
+
+    /* Restore OD variables if available */
+    persistRestoreAll();
 
     /* Prepare filesystem */
     fs_init(&FSD1);

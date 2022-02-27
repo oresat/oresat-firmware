@@ -17,6 +17,7 @@ typedef struct {
 } persist_group_t;
 
 persist_group_t storage[] = {
+    {&OD_PERSIST_KEYS, sizeof(OD_PERSIST_KEYS), FRAM_KEYS_ADDR},
     {&OD_PERSIST_STATE, sizeof(OD_PERSIST_STATE), FRAM_STATE_ADDR},
     {&OD_PERSIST_COMM, sizeof(OD_PERSIST_COMM), FRAM_COMM_ADDR},
     {&OD_PERSIST_MFR, sizeof(OD_PERSIST_MFR), FRAM_MFR_ADDR},
@@ -24,7 +25,7 @@ persist_group_t storage[] = {
     {NULL, 0, 0}
 };
 
-void storeGroup(void *group)
+void persistStoreGroup(void *group)
 {
     persist_group_t *ptr = storage;
     while (ptr->data != NULL && ptr->data != group)
@@ -39,7 +40,7 @@ void storeGroup(void *group)
     free(buf);
 }
 
-void restoreGroup(void *group)
+void persistRestoreGroup(void *group)
 {
     persist_group_t *ptr = storage;
     while (ptr->data != NULL && ptr->data != group)
@@ -53,4 +54,41 @@ void restoreGroup(void *group)
         memcpy(ptr->data, buf->data, ptr->len);
     }
     free(buf);
+}
+
+void persistResetGroup(void *group)
+{
+    persist_group_t *ptr = storage;
+    while (ptr->data != NULL && ptr->data != group)
+        ptr++;
+    osalDbgCheck(ptr != NULL);
+
+    framErase(&FRAMD1, ptr->fram_addr, sizeof(buf_t) + ptr->len);
+}
+
+void persistStoreAll(void)
+{
+    persist_group_t *ptr = storage;
+    while (ptr->data != NULL) {
+        persistStoreGroup(ptr->data);
+        ptr++;
+    }
+}
+
+void persistRestoreAll(void)
+{
+    persist_group_t *ptr = storage;
+    while (ptr->data != NULL) {
+        persistRestoreGroup(ptr->data);
+        ptr++;
+    }
+}
+
+void persistResetAll(void)
+{
+    persist_group_t *ptr = storage;
+    while (ptr->data != NULL) {
+        persistRestoreGroup(ptr->data);
+        ptr++;
+    }
 }

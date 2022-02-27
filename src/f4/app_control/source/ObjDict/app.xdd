@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-12-02" fileModificationTime="17:41:11.4658330-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -94,6 +94,10 @@
           <q1:array name="MCU Unique Device ID" uniqueID="UID_ARR_2020">
             <q1:subrange lowerLimit="0" upperLimit="3" />
             <UDINT />
+          </q1:array>
+          <q1:array name="Crypto Keys" uniqueID="UID_ARR_6005">
+            <q1:subrange lowerLimit="0" upperLimit="4" />
+            <BITSTRING />
           </q1:array>
           <q1:struct name="Identity" uniqueID="UID_REC_1018">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_101800">
@@ -3234,7 +3238,10 @@
             <q1:varDeclaration name="EDL Timeout" uniqueID="UID_RECSUB_600102">
               <UINT />
             </q1:varDeclaration>
-            <q1:varDeclaration name="Factory Reset" uniqueID="UID_RECSUB_600103">
+            <q1:varDeclaration name="Reset Timeout" uniqueID="UID_RECSUB_600103">
+              <UDINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Factory Reset" uniqueID="UID_RECSUB_600104">
               <BOOL />
             </q1:varDeclaration>
           </q1:struct>
@@ -3308,6 +3315,12 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="VC1 Expedite Count" uniqueID="UID_RECSUB_60040E">
               <ULINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="EDL Sequence Count" uniqueID="UID_RECSUB_60040F">
+              <UDINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="EDL Rejected Count" uniqueID="UID_RECSUB_600410">
+              <UDINT />
             </q1:varDeclaration>
           </q1:struct>
           <q1:struct name="C3 Telemetry" uniqueID="UID_REC_7000">
@@ -11954,7 +11967,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
           <q1:parameter uniqueID="UID_SUB_600100">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x03" />
+            <q1:defaultValue value="0x04" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600101" access="readWrite">
             <description lang="en">State saving interval in seconds</description>
@@ -11969,6 +11982,13 @@ Determines how long the device stays in EDL mode after the last valid EDL comman
             <q1:defaultValue value="60" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600103" access="readWrite">
+            <description lang="en">Hard Reset timeout in seconds
+
+Determines how long before attempting to trigger a WDT hard reset</description>
+            <UDINT />
+            <q1:defaultValue value="86400" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600104" access="readWrite">
             <description lang="en">Initiate factory reset when set to true</description>
             <BOOL />
             <q1:defaultValue value="0" />
@@ -12020,7 +12040,7 @@ Determines how long the device will maintain TX enabled after receiving an enabl
           <q1:parameter uniqueID="UID_SUB_600302" access="readWrite">
             <description lang="en">Beacon interval in milliseconds.</description>
             <UDINT />
-            <q1:defaultValue value="10000" />
+            <q1:defaultValue value="30000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6004">
             <description lang="en">Persistent C3 State</description>
@@ -12030,7 +12050,7 @@ Determines how long the device will maintain TX enabled after receiving an enabl
           <q1:parameter uniqueID="UID_SUB_600400">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x0E" />
+            <q1:defaultValue value="0x10" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_600401" access="readWrite">
             <description lang="en">Last saved timestamp of device</description>
@@ -12100,9 +12120,54 @@ If true, skips antenna deployment attempt</description>
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_60040E" access="readWrite">
-            <description lang="en">Virtual Channel 0 Expedicted Frame Counter</description>
+            <description lang="en">Virtual Channel 1 Expedicted Frame Counter</description>
             <ULINT />
             <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_60040F" access="readWrite">
+            <description lang="en">EDL Sequence Count Number
+Also acts as Number of valid EDL frames</description>
+            <UDINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600410" access="readWrite">
+            <description lang="en">EDL Rejected Count Number</description>
+            <UDINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6005">
+            <label lang="en">Crypto Keys</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_6005" />
+            <q1:property name="CO_storageGroup" value="PERSIST_KEYS" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600500">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x04" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600501" access="write">
+            <label lang="en">Key 1</label>
+            <BITSTRING />
+            <q1:defaultValue value="0" />
+            <q1:property name="CO_stringLengthMin" value="32" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600502" access="write">
+            <label lang="en">Key 2</label>
+            <BITSTRING />
+            <q1:defaultValue value="0" />
+            <q1:property name="CO_stringLengthMin" value="32" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600503" access="write">
+            <label lang="en">Key 3</label>
+            <BITSTRING />
+            <q1:defaultValue value="0" />
+            <q1:property name="CO_stringLengthMin" value="32" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600504" access="write">
+            <label lang="en">Key 4</label>
+            <BITSTRING />
+            <q1:defaultValue value="0" />
+            <q1:property name="CO_stringLengthMin" value="32" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_7000">
             <label lang="en">C3 Telemetry</label>
@@ -13803,7 +13868,7 @@ If true, skips antenna deployment attempt</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2021-12-02" fileModificationTime="17:41:11.4658330-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -15420,11 +15485,12 @@ If true, skips antenna deployment attempt</description>
           </CANopenObject>
           <CANopenObject index="2100" name="Error Status Bits" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2100" />
           <CANopenObject index="6000" name="C3 State" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6000" />
-          <CANopenObject index="6001" name="State Control" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="4">
+          <CANopenObject index="6001" name="State Control" objectType="9" uniqueIDRef="UID_OBJ_6001" subNumber="5">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600100" />
             <CANopenSubObject subIndex="01" name="Save Interval" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600101" />
             <CANopenSubObject subIndex="02" name="EDL Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600102" />
-            <CANopenSubObject subIndex="03" name="Factory Reset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600103" />
+            <CANopenSubObject subIndex="03" name="Reset Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600103" />
+            <CANopenSubObject subIndex="04" name="Factory Reset" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600104" />
           </CANopenObject>
           <CANopenObject index="6002" name="Deployment Control" objectType="9" uniqueIDRef="UID_OBJ_6002" subNumber="4">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600200" />
@@ -15437,7 +15503,7 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="01" name="Timeout" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600301" />
             <CANopenSubObject subIndex="02" name="Beacon Interval" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600302" />
           </CANopenObject>
-          <CANopenObject index="6004" name="Persistent State" objectType="9" uniqueIDRef="UID_OBJ_6004" subNumber="15">
+          <CANopenObject index="6004" name="Persistent State" objectType="9" uniqueIDRef="UID_OBJ_6004" subNumber="17">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600400" />
             <CANopenSubObject subIndex="01" name="Timestamp" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600401" />
             <CANopenSubObject subIndex="02" name="Alarm A" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600402" />
@@ -15453,6 +15519,15 @@ If true, skips antenna deployment attempt</description>
             <CANopenSubObject subIndex="0C" name="UHF RX Packets" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040C" />
             <CANopenSubObject subIndex="0D" name="VC1 Sequence Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040D" />
             <CANopenSubObject subIndex="0E" name="VC1 Expedite Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040E" />
+            <CANopenSubObject subIndex="0F" name="EDL Sequence Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_60040F" />
+            <CANopenSubObject subIndex="10" name="EDL Rejected Count" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600410" />
+          </CANopenObject>
+          <CANopenObject index="6005" name="Crypto Keys" objectType="8" uniqueIDRef="UID_OBJ_6005" subNumber="5">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600500" />
+            <CANopenSubObject subIndex="01" name="Key 1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600501" />
+            <CANopenSubObject subIndex="02" name="Key 2" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600502" />
+            <CANopenSubObject subIndex="03" name="Key 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600503" />
+            <CANopenSubObject subIndex="04" name="Key 4" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600504" />
           </CANopenObject>
           <CANopenObject index="7000" name="C3 Telemetry" objectType="9" uniqueIDRef="UID_OBJ_7000" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700000" />

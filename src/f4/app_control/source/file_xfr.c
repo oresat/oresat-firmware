@@ -3,10 +3,12 @@
 
 int file_recv(file_xfr_t *xfr, uint32_t *crc)
 {
+    char filename[9] = {0};
     lfs_file_t *file;
     int ret;
 
-    file = file_open(&FSD1, xfr->filename, LFS_O_WRONLY | LFS_O_CREAT);
+    memcpy(filename, xfr->filename, 8);
+    file = file_open(&FSD1, filename, LFS_O_WRONLY | LFS_O_CREAT);
     if (file == NULL) {
         return FSD1.err;
     }

@@ -6,6 +6,9 @@
 #include "file_xfr.h"
 #include "comms.h"
 #include "uslp.h"
+#include "hmac.h"
+#include "CANopen.h"
+#include "OD.h"
 #include "chprintf.h"
 
 #define COMMS_EVENT_LOOPBACK_RX EVENT_MASK(0)
@@ -21,6 +24,20 @@ static size_t buf_len;
 
 static void pdu_loopback(fb_t *fb, void *arg);
 static void resp_recv(fb_t *fb, void *arg);
+
+#if (USLP_USE_SDLS == TRUE)
+static const sdls_cfg_t sdls_cfg = {
+    .spi            = 1,
+    .iv_len         = 0,
+    .seq_num_len    = sizeof(OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount),
+    .pad_len        = 0,
+    .mac_len        = 32,
+    .send_func      = hmac_send,
+    .send_arg       = OD_PERSIST_KEYS.x6005_cryptoKeys[0],
+    .recv_func      = NULL,
+    .recv_arg       = NULL,
+};
+#endif
 
 static const uslp_map_t map_cmd = {
     .sdu            = SDU_MAP_ACCESS,
@@ -45,12 +62,24 @@ static const uslp_vc_t vc0 = {
     .expedited_cnt  = NULL,
     .cop            = COP_NONE,
     .mapid[0]       = &map_cmd,
-    .mapid[1]       = &map_file,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
-    .sdls_hdr_len   = 0,
-    .sdls_tlr_len   = 0,
+    .sdls_cfg       = &sdls_cfg,
+#endif
+};
+
+static const uslp_vc_t vc1 = {
+    .seq_ctrl_len   = 0,
+    .expedited_len  = 0,
+    .seq_ctrl_cnt   = NULL,
+    .expedited_cnt  = NULL,
+    .cop            = COP_NONE,
+    .mapid[0]       = &map_file,
+    .trunc_tf_len   = USLP_MAX_LEN,
+    .ocf            = false,
+#if (USLP_USE_SDLS == TRUE)
+    .sdls_cfg       = NULL,
 #endif
 };
 
@@ -58,6 +87,7 @@ static const uslp_mc_t loopback_mc = {
     .scid           = SCID,
     .owner          = false,
     .vcid[0]        = &vc0,
+    .vcid[1]        = &vc1,
 };
 
 static const uslp_pc_t loopback_pc = {
@@ -120,7 +150,8 @@ static void send_cmd(cmd_code_t cmd_code, void *arg, size_t arg_len)
 {
     cmd_t *cmd;
     tx_fb = fb_alloc(CMD_RESP_ALLOC, &rx_fifo);
-    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + 2);
+    /* TODO: What's the 2 for? */
+    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + 2 + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     cmd = fb_put(tx_fb, sizeof(cmd_t) + arg_len);
     cmd->cmd = cmd_code;
     if (arg != NULL)
@@ -146,7 +177,8 @@ static int send_file_seg(BaseSequentialStream *chp, char *src, char *dest, lfs_s
     }
 
     tx_fb = fb_alloc(FB_MAX_LEN, &rx_fifo);
-    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t) + 2);
+    /* TODO: What's the 2 for? */
+    fb_reserve(tx_fb, USLP_MAX_HEADER_LEN + sizeof(file_xfr_t) + 2 + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     data = fb_put(tx_fb, len);
     ret = file_read(&FSD1, file, data, len);
     file_close(&FSD1, file);

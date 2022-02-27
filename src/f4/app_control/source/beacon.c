@@ -18,12 +18,15 @@ static const ax25_link_t ax25 = {
 };
 
 static time_t unix_time;
+static uint8_t bank_state;
 
 static const tlm_item_t tlm_aprs0[] = {
     /* User-Defined APRS Start */
     { .type = TLM_MSG, .msg = "{{z" },
-    /* Telemetry Version */
+    /* Satellite ID */
     { .type = TLM_VAL, .len = 1, .val = 0 },
+    /* Telemetry Version */
+    { .type = TLM_VAL, .len = 1, .val = 1 },
     /* C3 State */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x6000_C3_State },
     /* Uptime */
@@ -31,13 +34,13 @@ static const tlm_item_t tlm_aprs0[] = {
     /* RTC Time */
     { .type = TLM_PTR, .len = 4, .ptr = &unix_time },
     /* MCU Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.temperature },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.temperature },*/
     /* MCU VREFINT */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VREFINT },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VREFINT },*/
     /* VBUSP Voltage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBAT },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBAT },*/
     /* VBUSP Current */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBUSP_Current },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x2022_MCU_Sensors.VBUSP_Current },*/
     /* WDT Timeouts */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_PERSIST_STATE.x6004_persistentState.powerCycles },
     /* eMMC Usage */
@@ -49,13 +52,13 @@ static const tlm_item_t tlm_aprs0[] = {
     /* L-Band Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &lband.rssi },
     /* L-Band PLL Lock TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* UHF Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_Temperature },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_Temperature },*/
     /* UHF Forward Power */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_FWD_Pwr },
+    /*{ .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_FWD_Pwr },*/
     /* UHF Reverse Power */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_REV_Pwr },
+    /*{ .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7000_C3_Telemetry.UHF_REV_Pwr },*/
     /* UHF RX Bytes */
     { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes },
     /* UHF Valid Packets */
@@ -63,17 +66,21 @@ static const tlm_item_t tlm_aprs0[] = {
     /* UHF Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &uhf.rssi },
     /* UHF PLL Lock TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
-    /* Deployer TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
+    /* FW Bank TODO */
+    { .type = TLM_PTR, .len = 1, .ptr = &bank_state },
+    /* EDL Sequence Count */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount },
+    /* EDL Rejected Count */
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.EDL_RejectedCount },
     /* CAN1 Status TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* CAN2 Status TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* OPD Current */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.OPD_Current },
+    /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.OPD_Current },*/
     /* OPD State TODO */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
     /* Battery 0 Pack 1 VBatt */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VBattBP1 },
     /* Battery 0 Pack 1 VCell */
@@ -332,6 +339,7 @@ void beacon_send(const radio_cfg_t *cfg)
 
     OD_RAM.x7000_C3_Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
     unix_time = rtcGetTimeUnix(NULL);
+    bank_state = (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? 1 : 0) | ((FLASH->OPTCR & FLASH_OPTCR_BFB2 ? 1 : 0) << 1);
     OD_RAM.x7000_C3_Telemetry.eMMC_Usage = fs_usage(&FSD1);
 
     fb_reserve(fb, AX25_MAX_HDR_LEN);

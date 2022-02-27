@@ -57,6 +57,6 @@ void sensors_start(void)
 {
     adcAcquireBus(&ADCD1);
     adcStart(&ADCD1, NULL);
-    adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)sensors, sizeof(sensors)/sizeof(sensors_t));
+    /*adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)sensors, sizeof(sensors)/sizeof(sensors_t));*/
     adcReleaseBus(&ADCD1);
 }
