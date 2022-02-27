@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2021-11-29" fileModificationTime="20:19:03.6312640-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2022-02-25" fileModificationTime="17:58:12.4021630-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -4898,22 +4898,22 @@ Value definition for all subindexes:
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60000410" />
+            <q1:defaultValue value="0x60000510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60000510" />
+            <q1:defaultValue value="0x60000610" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0103" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x60000610" />
+            <q1:defaultValue value="0x60000710" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0104" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x60000710" />
+            <q1:defaultValue value="0x60000810" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0105" access="readWrite">
             <label lang="en">Application object 5</label>
@@ -6080,7 +6080,7 @@ Manufacturer may define its own constants up to index 0xFF. Of course, he must t
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModificationDate="2021-11-29" fileModificationTime="20:19:03.6312640-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-12" fileCreationTime="14:51:00.0000000-08:00" fileModificationDate="2022-02-25" fileModificationTime="17:58:12.4021630-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
