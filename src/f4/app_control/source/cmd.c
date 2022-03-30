@@ -18,9 +18,9 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     case CMD_TX_CTRL:
         ret = fb_put(resp_fb, 1);
         tx_enable(cmd->arg[0]);
-        
+
         //Shift the ret code up two bytes
-        *((uint32_t*)ret) = (tx_enabled() << 16) & (*cmd - 2);
+        *((uint32_t*)ret) = (tx_enabled() << 16) & (cmd - 2);
 
         break;
     case CMD_FW_FLASH:
