@@ -20,7 +20,9 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         tx_enable(cmd->arg[0]);
 
         //Shift the ret code up two bytes
-        *((uint32_t*)ret) = (tx_enabled() << 16) & (uint32_t)(&cmd-1);
+        //*((uint32_t*)ret) = (tx_enabled() << 16) & (uint32_t)(&cmd-1);
+
+        *((uint32_t*)ret) = 0xABCD8080;
 
         break;
     case CMD_FW_FLASH:
