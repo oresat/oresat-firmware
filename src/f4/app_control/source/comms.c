@@ -696,7 +696,8 @@ void comms_cmd(fb_t *fb, void *arg)
     fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     cmd_process((cmd_t*)fb->data, resp_fb);
-    fb_put((uint16_t)fb->data, resp_fb);
+    //fb_put((uint16_t)fb->data, resp_fb);
+    fb_put( (uint16_t) (fb->data - 1), resp_fb);
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 
