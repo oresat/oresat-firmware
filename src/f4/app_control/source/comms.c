@@ -101,7 +101,7 @@ static const uslp_vc_t vc2 = {
 */
 
 const uslp_mc_t mc = {
-    .scid           = SCID,
+    .scid           = &OD_PERSIST_APP.x6006_CCSDS.spacecraftID,
     .owner          = true,
     .vcid[0]        = &vc0,
     .vcid[1]        = &vc1,

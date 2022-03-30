@@ -14,9 +14,9 @@
         Project File: app.xdd
         File Version: 0
 
-        Created:      8/30/2019 11:18:00 AM
+        Created:      8/30/2019 12:18:00 PM
         Created By:   Miles Simpson
-        Modified:     2/25/2022 12:19:50 PM
+        Modified:     3/30/2022 1:57:40 PM
         Modified By:  
 
     Device Info:
@@ -1701,6 +1701,16 @@ typedef struct {
         uint32_t timeout;
         uint32_t beaconInterval;
     } x6003_TX_Control;
+    struct {
+        uint8_t highestSub_indexSupported;
+        uint16_t spacecraftID;
+    } x6006_CCSDS;
+    struct {
+        uint8_t highestSub_indexSupported;
+        char destCallsign[7];
+        char srcCallsign[7];
+        uint8_t satelliteID;
+    } x6007_APRS;
 } OD_PERSIST_APP_t;
 
 typedef struct {
@@ -1945,24 +1955,26 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6003 &OD->list[168]
 #define OD_ENTRY_H6004 &OD->list[169]
 #define OD_ENTRY_H6005 &OD->list[170]
-#define OD_ENTRY_H7000 &OD->list[171]
-#define OD_ENTRY_H7001 &OD->list[172]
-#define OD_ENTRY_H7002 &OD->list[173]
-#define OD_ENTRY_H7003 &OD->list[174]
-#define OD_ENTRY_H7004 &OD->list[175]
-#define OD_ENTRY_H7005 &OD->list[176]
-#define OD_ENTRY_H7006 &OD->list[177]
-#define OD_ENTRY_H7007 &OD->list[178]
-#define OD_ENTRY_H7008 &OD->list[179]
-#define OD_ENTRY_H7009 &OD->list[180]
-#define OD_ENTRY_H700A &OD->list[181]
-#define OD_ENTRY_H700B &OD->list[182]
-#define OD_ENTRY_H700C &OD->list[183]
-#define OD_ENTRY_H700D &OD->list[184]
-#define OD_ENTRY_H700E &OD->list[185]
-#define OD_ENTRY_H700F &OD->list[186]
-#define OD_ENTRY_H7013 &OD->list[187]
-#define OD_ENTRY_H7014 &OD->list[188]
+#define OD_ENTRY_H6006 &OD->list[171]
+#define OD_ENTRY_H6007 &OD->list[172]
+#define OD_ENTRY_H7000 &OD->list[173]
+#define OD_ENTRY_H7001 &OD->list[174]
+#define OD_ENTRY_H7002 &OD->list[175]
+#define OD_ENTRY_H7003 &OD->list[176]
+#define OD_ENTRY_H7004 &OD->list[177]
+#define OD_ENTRY_H7005 &OD->list[178]
+#define OD_ENTRY_H7006 &OD->list[179]
+#define OD_ENTRY_H7007 &OD->list[180]
+#define OD_ENTRY_H7008 &OD->list[181]
+#define OD_ENTRY_H7009 &OD->list[182]
+#define OD_ENTRY_H700A &OD->list[183]
+#define OD_ENTRY_H700B &OD->list[184]
+#define OD_ENTRY_H700C &OD->list[185]
+#define OD_ENTRY_H700D &OD->list[186]
+#define OD_ENTRY_H700E &OD->list[187]
+#define OD_ENTRY_H700F &OD->list[188]
+#define OD_ENTRY_H7013 &OD->list[189]
+#define OD_ENTRY_H7014 &OD->list[190]
 
 
 /*******************************************************************************
@@ -2139,24 +2151,26 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6003_TX_Control &OD->list[168]
 #define OD_ENTRY_H6004_persistentState &OD->list[169]
 #define OD_ENTRY_H6005_cryptoKeys &OD->list[170]
-#define OD_ENTRY_H7000_C3_Telemetry &OD->list[171]
-#define OD_ENTRY_H7001_battery &OD->list[172]
-#define OD_ENTRY_H7002_battery &OD->list[173]
-#define OD_ENTRY_H7003_solarPanel &OD->list[174]
-#define OD_ENTRY_H7004_solarPanel &OD->list[175]
-#define OD_ENTRY_H7005_solarPanel &OD->list[176]
-#define OD_ENTRY_H7006_solarPanel &OD->list[177]
-#define OD_ENTRY_H7007_solarPanel &OD->list[178]
-#define OD_ENTRY_H7008_solarPanel &OD->list[179]
-#define OD_ENTRY_H7009_solarPanel &OD->list[180]
-#define OD_ENTRY_H700A_solarPanel &OD->list[181]
-#define OD_ENTRY_H700B_starTracker &OD->list[182]
-#define OD_ENTRY_H700C_starTracker &OD->list[183]
-#define OD_ENTRY_H700D_GPS &OD->list[184]
-#define OD_ENTRY_H700E_ACS &OD->list[185]
-#define OD_ENTRY_H700F_RWB &OD->list[186]
-#define OD_ENTRY_H7013_dxWiFi &OD->list[187]
-#define OD_ENTRY_H7014_CFC &OD->list[188]
+#define OD_ENTRY_H6006_CCSDS &OD->list[171]
+#define OD_ENTRY_H6007_APRS &OD->list[172]
+#define OD_ENTRY_H7000_C3_Telemetry &OD->list[173]
+#define OD_ENTRY_H7001_battery &OD->list[174]
+#define OD_ENTRY_H7002_battery &OD->list[175]
+#define OD_ENTRY_H7003_solarPanel &OD->list[176]
+#define OD_ENTRY_H7004_solarPanel &OD->list[177]
+#define OD_ENTRY_H7005_solarPanel &OD->list[178]
+#define OD_ENTRY_H7006_solarPanel &OD->list[179]
+#define OD_ENTRY_H7007_solarPanel &OD->list[180]
+#define OD_ENTRY_H7008_solarPanel &OD->list[181]
+#define OD_ENTRY_H7009_solarPanel &OD->list[182]
+#define OD_ENTRY_H700A_solarPanel &OD->list[183]
+#define OD_ENTRY_H700B_starTracker &OD->list[184]
+#define OD_ENTRY_H700C_starTracker &OD->list[185]
+#define OD_ENTRY_H700D_GPS &OD->list[186]
+#define OD_ENTRY_H700E_ACS &OD->list[187]
+#define OD_ENTRY_H700F_RWB &OD->list[188]
+#define OD_ENTRY_H7013_dxWiFi &OD->list[189]
+#define OD_ENTRY_H7014_CFC &OD->list[190]
 
 
 /*******************************************************************************

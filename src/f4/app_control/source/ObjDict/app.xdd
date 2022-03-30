@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModifiedBy="" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModifiedBy="" fileModificationDate="2022-03-30" fileModificationTime="13:57:40.8229150-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Portland State Aerospace Society</q1:vendorName>
         <q1:vendorID>0</q1:vendorID>
@@ -3321,6 +3321,28 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="EDL Rejected Count" uniqueID="UID_RECSUB_600410">
               <UDINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="CCSDS" uniqueID="UID_REC_6006">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600600">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Spacecraft ID" uniqueID="UID_RECSUB_600601">
+              <UINT />
+            </q1:varDeclaration>
+          </q1:struct>
+          <q1:struct name="APRS" uniqueID="UID_REC_6007">
+            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_600700">
+              <USINT />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Dest Callsign" uniqueID="UID_RECSUB_600701">
+              <STRING />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Src Callsign" uniqueID="UID_RECSUB_600702">
+              <STRING />
+            </q1:varDeclaration>
+            <q1:varDeclaration name="Satellite ID" uniqueID="UID_RECSUB_600703">
+              <USINT />
             </q1:varDeclaration>
           </q1:struct>
           <q1:struct name="C3 Telemetry" uniqueID="UID_REC_7000">
@@ -12169,6 +12191,48 @@ Also acts as Number of valid EDL frames</description>
             <q1:defaultValue value="0" />
             <q1:property name="CO_stringLengthMin" value="32" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6006">
+            <label lang="en">CCSDS</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6006" />
+            <q1:property name="CO_storageGroup" value="PERSIST_APP" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600600">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x01" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600601" access="readWrite">
+            <label lang="en">Spacecraft ID</label>
+            <UINT />
+            <q1:defaultValue value="0x4F53" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_6007">
+            <label lang="en">APRS</label>
+            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6007" />
+            <q1:property name="CO_storageGroup" value="PERSIST_APP" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600700">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="0x03" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600701" access="readWrite">
+            <label lang="en">Dest Callsign</label>
+            <STRING />
+            <q1:defaultValue value="SPACE" />
+            <q1:property name="CO_stringLengthMin" value="6" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600702" access="readWrite">
+            <label lang="en">Src Callsign</label>
+            <STRING />
+            <q1:defaultValue value="KJ7SAT" />
+            <q1:property name="CO_stringLengthMin" value="6" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_600703" access="readWrite">
+            <label lang="en">Satellite ID</label>
+            <USINT />
+            <q1:defaultValue value="0x00" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_7000">
             <label lang="en">C3 Telemetry</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_7000" />
@@ -13868,7 +13932,7 @@ Also acts as Number of valid EDL frames</description>
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="11:18:00.0000000-08:00" fileModificationDate="2022-02-25" fileModificationTime="12:19:50.3243150-08:00" fileVersion="0" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="app.xdd" fileCreator="Miles Simpson" fileCreationDate="2019-08-30" fileCreationTime="12:18:00.0000000-07:00" fileModificationDate="2022-03-30" fileModificationTime="13:57:40.8229150-07:00" fileVersion="0" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -15528,6 +15592,16 @@ Also acts as Number of valid EDL frames</description>
             <CANopenSubObject subIndex="02" name="Key 2" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600502" />
             <CANopenSubObject subIndex="03" name="Key 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600503" />
             <CANopenSubObject subIndex="04" name="Key 4" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600504" />
+          </CANopenObject>
+          <CANopenObject index="6006" name="CCSDS" objectType="9" uniqueIDRef="UID_OBJ_6006" subNumber="2">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600600" />
+            <CANopenSubObject subIndex="01" name="Spacecraft ID" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600601" />
+          </CANopenObject>
+          <CANopenObject index="6007" name="APRS" objectType="9" uniqueIDRef="UID_OBJ_6007" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600700" />
+            <CANopenSubObject subIndex="01" name="Dest Callsign" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600701" />
+            <CANopenSubObject subIndex="02" name="Src Callsign" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600702" />
+            <CANopenSubObject subIndex="03" name="Satellite ID" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600703" />
           </CANopenObject>
           <CANopenObject index="7000" name="C3 Telemetry" objectType="9" uniqueIDRef="UID_OBJ_7000" subNumber="7">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_700000" />

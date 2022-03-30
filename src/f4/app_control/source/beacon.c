@@ -9,9 +9,9 @@
 
 /* TODO: Re-implement with OD interface */
 static const ax25_link_t ax25 = {
-    .dest = "SPACE ",
+    .dest = OD_PERSIST_APP.x6007_APRS.destCallsign,
     .dest_ssid = 0,
-    .src = "KJ7SAT",
+    .src = OD_PERSIST_APP.x6007_APRS.srcCallsign,
     .src_ssid = 0,
     .control = AX25_CTRL_UFRAME | _VAL2FLD(AX25_CTRL_U_FLD, AX25_UFRAME_UI),
     .sid = AX25_PID_NONE,
@@ -24,7 +24,7 @@ static const tlm_item_t tlm_aprs0[] = {
     /* User-Defined APRS Start */
     { .type = TLM_MSG, .msg = "{{z" },
     /* Satellite ID */
-    { .type = TLM_VAL, .len = 1, .val = 0 },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_PERSIST_APP.x6007_APRS.satelliteID },
     /* Telemetry Version */
     { .type = TLM_VAL, .len = 1, .val = 1 },
     /* C3 State */

@@ -1655,6 +1655,16 @@ OD_ATTR_PERSIST_APP OD_PERSIST_APP_t OD_PERSIST_APP = {
         .highestSub_indexSupported = 0x02,
         .timeout = 0x00127500,
         .beaconInterval = 0x00007530
+    },
+    .x6006_CCSDS = {
+        .highestSub_indexSupported = 0x01,
+        .spacecraftID = 0x4F53
+    },
+    .x6007_APRS = {
+        .highestSub_indexSupported = 0x03,
+        .destCallsign = {'S', 'P', 'A', 'C', 'E', 0, 0},
+        .srcCallsign = {'K', 'J', '7', 'S', 'A', 'T', 0},
+        .satelliteID = 0x00
     }
 };
 
@@ -1862,6 +1872,8 @@ typedef struct {
     OD_obj_record_t o_6003_TX_Control[3];
     OD_obj_record_t o_6004_persistentState[17];
     OD_obj_array_t o_6005_cryptoKeys;
+    OD_obj_record_t o_6006_CCSDS[2];
+    OD_obj_record_t o_6007_APRS[4];
     OD_obj_record_t o_7000_C3_Telemetry[7];
     OD_obj_record_t o_7001_battery[45];
     OD_obj_record_t o_7002_battery[45];
@@ -8138,6 +8150,46 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataElementLength = 32,
         .dataElementSizeof = sizeof(uint8_t[32])
     },
+    .o_6006_CCSDS = {
+        {
+            .dataOrig = &OD_PERSIST_APP.x6006_CCSDS.highestSub_indexSupported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6006_CCSDS.spacecraftID,
+            .subIndex = 1,
+            .attribute = ODA_SDO_RW | ODA_MB,
+            .dataLength = 2
+        }
+    },
+    .o_6007_APRS = {
+        {
+            .dataOrig = &OD_PERSIST_APP.x6007_APRS.highestSub_indexSupported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6007_APRS.destCallsign[0],
+            .subIndex = 1,
+            .attribute = ODA_SDO_RW | ODA_STR,
+            .dataLength = 6
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6007_APRS.srcCallsign[0],
+            .subIndex = 2,
+            .attribute = ODA_SDO_RW | ODA_STR,
+            .dataLength = 6
+        },
+        {
+            .dataOrig = &OD_PERSIST_APP.x6007_APRS.satelliteID,
+            .subIndex = 3,
+            .attribute = ODA_SDO_RW,
+            .dataLength = 1
+        }
+    },
     .o_7000_C3_Telemetry = {
         {
             .dataOrig = &OD_RAM.x7000_C3_Telemetry.highestSub_indexSupported,
@@ -10284,6 +10336,8 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6003, 0x03, ODT_REC, &ODObjs.o_6003_TX_Control, NULL},
     {0x6004, 0x11, ODT_REC, &ODObjs.o_6004_persistentState, NULL},
     {0x6005, 0x05, ODT_ARR, &ODObjs.o_6005_cryptoKeys, NULL},
+    {0x6006, 0x02, ODT_REC, &ODObjs.o_6006_CCSDS, NULL},
+    {0x6007, 0x04, ODT_REC, &ODObjs.o_6007_APRS, NULL},
     {0x7000, 0x07, ODT_REC, &ODObjs.o_7000_C3_Telemetry, NULL},
     {0x7001, 0x2D, ODT_REC, &ODObjs.o_7001_battery, NULL},
     {0x7002, 0x2D, ODT_REC, &ODObjs.o_7002_battery, NULL},
