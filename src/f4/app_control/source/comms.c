@@ -696,11 +696,6 @@ void comms_cmd(fb_t *fb, void *arg)
     fb_t *resp_fb = fb_alloc(CMD_RESP_ALLOC, &tx_fifo);
     fb_reserve(resp_fb, USLP_MAX_HEADER_LEN + 6); /* TODO: Replace 6 with some calculation of SDLS overhead */
     cmd_process((cmd_t*)fb->data, resp_fb);
-
-    /* */
-    //int *ret = fb_put((uint16_t)fb->data, sizeof(resp_fb));
-    fb_put((uint16_t)OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount, sizeof(uint16_t));
-
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 

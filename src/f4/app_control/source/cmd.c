@@ -19,12 +19,8 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         ret = fb_put(resp_fb, 1);
         tx_enable(cmd->arg[0]);
 
-        //Shift the ret code up two bytes
-        //*((uint32_t*)ret) = (tx_enabled() << 16) & (uint32_t)(&cmd-1);
-
-        //*((uint32_t*)ret) = 0xABCD8080;
-
-        *((uint32_t*)ret) = tx_enabled();
+        *((uint32_t*)ret) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
+        //*((uint32_t*)ret) = tx_enabled();
 
         break;
     case CMD_FW_FLASH:
