@@ -698,10 +698,9 @@ void comms_cmd(fb_t *fb, void *arg)
     cmd_process((cmd_t*)fb->data, resp_fb);
 
     /* */
-    int *ret = fb_put((uint16_t)fb->data, resp_fb);
-    *ret = 0xAB8080CD;
+    //int *ret = fb_put((uint16_t)fb->data, sizeof(resp_fb));
+    fb_put((uint16_t)OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount, sizeof(uint16_t));
 
-    
     uslp_map_send(fb->phy_arg, resp_fb, 0, 0, true);
 }
 
