@@ -20,8 +20,8 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         ret = fb_put(resp_fb, 8);
         tx_enable(cmd->arg[0]);
 
-        *((uint32_t*)ret[0]) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
-        *((uint32_t*)ret[1]) = tx_enabled();
+        *((uint32_t*[0])ret) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
+        *((uint32_t*[1])ret) = tx_enabled();
 
         break;
     case CMD_FW_FLASH:
