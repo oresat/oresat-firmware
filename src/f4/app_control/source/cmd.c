@@ -29,8 +29,8 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         *((uint32_t*)ret) = tx_enabled();
 =======
 
-        *((uint32_t*[0])ret) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
-        *((uint32_t*[1])ret) = tx_enabled();
+        *((uint32_t*)ret[0]) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
+        *((uint32_t*)ret[1]) = tx_enabled();
 
 >>>>>>> parent of 913621c... back to pointer math
         break;
