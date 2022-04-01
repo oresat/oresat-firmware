@@ -25,7 +25,14 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     switch (cmd->cmd) {
     case CMD_TX_CTRL:
         tx_enable(cmd->arg[0]);
+<<<<<<< HEAD
         *((uint32_t*)ret) = tx_enabled();
+=======
+
+        *((uint32_t*[0])ret) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
+        *((uint32_t*[1])ret) = tx_enabled();
+
+>>>>>>> parent of 913621c... back to pointer math
         break;
     case CMD_FW_FLASH:
         flash_arg = (cmd_flash_t*)cmd->arg;
