@@ -14,6 +14,11 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     uint32_t *key;
     void *ret;
 
+    //Add 32 bits for sequence number
+    ret = fb_put(resp_fb, sizeof(uint32_t));
+    //Put sequence number into the response buffer
+    *((uint32_t*)ret) = OD_PERSIST_STATE.x6004_persistentState.EDL_SequenceCount - 1;
+
     switch (cmd->cmd) {
     case CMD_TX_CTRL:
         ret = fb_put(resp_fb, 1);
