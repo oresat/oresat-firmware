@@ -84,7 +84,7 @@ static const uslp_vc_t vc1 = {
 };
 
 static const uslp_mc_t loopback_mc = {
-    .scid           = SCID,
+    .scid           = &OD_PERSIST_APP.x6006_CCSDS.spacecraftID,
     .owner          = false,
     .vcid[0]        = &vc0,
     .vcid[1]        = &vc1,
