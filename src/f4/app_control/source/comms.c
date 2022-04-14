@@ -51,6 +51,14 @@ static const uslp_map_t map_file = {
     .map_recv       = comms_file,
 };
 
+static const uslp_map_t map_beacon = {
+    .sdu            = SDU_MAP_ACCESS,
+    .upid           = UPID_MAPA_SDU,
+    .max_pkt_len    = 32,
+    .incomplete     = false,
+    .map_recv       = comms_beacon,
+};
+
 static const uslp_vc_t vc0 = {
     .seq_ctrl_len   = 0,
     .expedited_len  = 0,
@@ -72,6 +80,7 @@ static const uslp_vc_t vc1 = {
     .expedited_cnt  = NULL,
     .cop            = COP_NONE,
     .mapid[0]       = &map_file,
+    .mapid[1]       = &map_beacon,
     .trunc_tf_len   = USLP_MAX_LEN,
     .ocf            = false,
 #if (USLP_USE_SDLS == TRUE)
@@ -673,7 +682,7 @@ void comms_start(void)
 void comms_stop(void)
 {
     /* Stop transmissions */
-    comms_beacon(false);
+    beacon_enable(false);
     chThdTerminate(tx_tp);
     chThdWait(tx_tp);
     tx_tp = NULL;
@@ -711,7 +720,14 @@ void comms_file(fb_t *fb, void *arg)
     uslp_map_send(fb->phy_arg, resp_fb, 1, 0, true);
 }
 
-void comms_beacon(bool enable)
+void comms_beacon(fb_t *fb, void *arg)
+{
+    (void)fb;
+    (void)arg;
+    beacon_send(tx_ax25);
+}
+
+void beacon_enable(bool enable)
 {
     if (enable && beacon_tp == NULL) {
         beacon_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "Beacon", NORMALPRIO, beacon, (void*)tx_ax25);

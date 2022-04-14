@@ -228,7 +228,7 @@ THD_FUNCTION(c3, arg)
             }
             break;
         case STANDBY:
-            comms_beacon(false);
+            beacon_enable(false);
 
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
@@ -242,7 +242,7 @@ THD_FUNCTION(c3, arg)
             }
             break;
         case BEACON:
-            comms_beacon(true);
+            beacon_enable(true);
 
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
@@ -256,7 +256,7 @@ THD_FUNCTION(c3, arg)
             }
             break;
         case EDL:
-            comms_beacon(false);
+            beacon_enable(false);
 
             if (!edl_enabled()) {
                 set_alarm(RESET_ALARM, rtcGetTimeUnix(NULL), 0, 0, 0, OD_PERSIST_APP.x6001_stateControl.resetTimeout);

@@ -28,7 +28,8 @@ void comms_stop(void);
 
 void comms_cmd(fb_t *fb, void *arg);
 void comms_file(fb_t *fb, void *arg);
-void comms_beacon(bool enable);
+void comms_beacon(fb_t *fb, void *arg);
+void beacon_enable(bool enable);
 
 #ifdef __cplusplus
 }
