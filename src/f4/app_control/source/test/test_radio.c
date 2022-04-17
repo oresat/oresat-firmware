@@ -167,7 +167,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
     } else if (!strcmp(argv[0], "rssi")) {
-        chprintf(chp, "AGCCOUNTER: %u\r\nRSSI: %u\r\nBGNDRSSI: %u\r\n", ax5043ReadU8(devp, AX5043_REG_AGCCOUNTER), ax5043ReadU8(devp, AX5043_REG_RSSI), ax5043ReadU8(devp, AX5043_REG_BGNDRSSI));
+        chprintf(chp, "AGCCOUNTER: %u\r\nRSSI: %d\r\nBGNDRSSI: %d\r\n", ax5043ReadU8(devp, AX5043_REG_AGCCOUNTER), (int8_t)ax5043ReadU8(devp, AX5043_REG_RSSI), (int8_t)ax5043ReadU8(devp, AX5043_REG_BGNDRSSI));
     } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
