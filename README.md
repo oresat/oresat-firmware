@@ -93,7 +93,7 @@ for details on how to do this on a per-system basis.
 #### Test your toolchain
 To test that your build system works correctly, it's recommended that you build one of the `app_blinky` applications and write it to a dev board successfully. Here are the links for the various versions of the app with further documentation:
 * [NUCLEO64_STM32F091RC](src/f0/app_blinky)
-* [NUCLEO64 STM32F446RE](src/f4/app_blinky)
+* [NUCLEO144 STM32F439ZI](src/f4/app_blinky)
 * [NUCLEO64 STM32L452RE](src/l4/app_blinky)
 
 ### Creating an app
@@ -103,7 +103,7 @@ supported MCUs for OreSat are listed below, and link to the relevant folders and
 
 #### Supported MCUs
 * [STM32F091xC](src/f0)
-* [STM32F446RE](src/f4)
+* [STM32F439Zx](src/f4)
 * [STM32L452RE](src/l4)
 
 ## Subsystems
