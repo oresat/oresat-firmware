@@ -1,6 +1,6 @@
 # STM32F446RE
 
-This is the source directory for all STM32F446RE applications.
+This is the source directory for all STM32F439Zx applications.
 This device contains an ARM Cortex-M4, and is also known as an M4 or F4.
 
 This MCU implements the main Command, Communications, and Control system
