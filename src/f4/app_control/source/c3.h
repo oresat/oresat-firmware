@@ -37,6 +37,8 @@ extern THD_FUNCTION(c3, arg);
 /* Support function prototypes */
 void tx_enable(bool state);
 void edl_enable(bool state);
+void soft_reset(void);
+void hard_reset(void);
 void factory_reset(void);
 
 bool delay_deploy(void);

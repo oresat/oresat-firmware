@@ -5,6 +5,7 @@
 #include "comms.h"
 #include "deployer.h"
 #include "fw.h"
+#include "worker.h"
 #include "CANopen.h"
 #include "OD.h"
 
@@ -233,8 +234,7 @@ THD_FUNCTION(c3, arg)
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
             } else if (trigger_reset()) {
-                c3StateSave();
-                chSysHalt("HARD RESET");
+                hard_reset();
             } else if (tx_enabled() && bat_good()) {
                 OD_RAM.x6000_C3_State[0] = BEACON;
             } else {
@@ -247,8 +247,7 @@ THD_FUNCTION(c3, arg)
             if (edl_enabled()) {
                 OD_RAM.x6000_C3_State[0] = EDL;
             } else if (trigger_reset()) {
-                c3StateSave();
-                chSysHalt("HARD RESET");
+                hard_reset();
             } else if (!tx_enabled() || !bat_good()) {
                 OD_RAM.x6000_C3_State[0] = STANDBY;
             } else {
@@ -310,6 +309,20 @@ void edl_enable(bool state)
         rtcSetAlarm(&RTCD1, TX_ENABLE_ALARM, NULL);
     }
     chEvtSignal(c3_tp, C3_EVENT_EDL);
+}
+
+void soft_reset(void)
+{
+    c3StateSave();
+    NVIC_SystemReset();
+}
+
+void hard_reset(void)
+{
+    c3StateSave();
+    stop_workers(true);
+    chThdSleepSeconds(60);
+    NVIC_SystemReset();
 }
 
 void factory_reset(void)

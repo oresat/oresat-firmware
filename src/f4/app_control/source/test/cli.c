@@ -94,8 +94,10 @@ void cmd_state(BaseSequentialStream *chp, int argc, char *argv[])
         palSetLine(LINE_I2C_PWROFF);
         chThdSleepMilliseconds(10);
         palClearLine(LINE_I2C_PWROFF);
-    } else if (!strcmp(argv[0], "reset")) {
-        NVIC_SystemReset();
+    } else if (!strcmp(argv[0], "softreset")) {
+        soft_reset();
+    } else if (!strcmp(argv[0], "hardreset")) {
+        hard_reset();
     } else if (!strcmp(argv[0], "factoryreset")) {
         chprintf(chp, "Initiating factory reset...");
         factory_reset();
@@ -112,7 +114,8 @@ state_usage:
                    "    edl <t/f>:          Override EDL state\r\n"
                    "    keyload <index>:    Load key into <index>\r\n"
                    "    i2c_cycle:          Power cycle I2C peripheral bus\r\n"
-                   "    reset:              Soft reset C3\r\n"
+                   "    softreset:          Soft reset C3\r\n"
+                   "    hardreset:          Hard reset C3\r\n"
                    "    factoryreset:       Reset C3 to factory defaults\r\n"
                    "\r\n");
     return;
