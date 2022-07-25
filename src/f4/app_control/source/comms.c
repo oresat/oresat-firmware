@@ -10,6 +10,7 @@
 #include "hmac.h"
 #include "CANopen.h"
 #include "OD.h"
+#include "chprintf.h"
 
 static inline void vc_lock(void *arg) {
     mutex_t *mutex = arg;
@@ -724,7 +725,8 @@ void comms_beacon(fb_t *fb, void *arg)
 {
     (void)fb;
     (void)arg;
-    beacon_send(tx_ax25);
+    /*beacon_send(tx_ax25);*/
+    chprintf((BaseSequentialStream *)&SD3, "PING | UHF RSSI: %d | L-Band RSSI: %d", uhf.rssi, lband.rssi);
 }
 
 void beacon_enable(bool enable)
