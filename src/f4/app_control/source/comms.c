@@ -726,7 +726,7 @@ void comms_beacon(fb_t *fb, void *arg)
     (void)fb;
     (void)arg;
     /*beacon_send(tx_ax25);*/
-    chprintf((BaseSequentialStream *)&SD3, "PING | UHF RSSI: %d | L-Band RSSI: %d", uhf.rssi, lband.rssi);
+    chprintf((BaseSequentialStream *)&SD3, "PING | UHF RSSI: %d | L-Band RSSI: %d\r\n", uhf.rssi, lband.rssi);
 }
 
 void beacon_enable(bool enable)
