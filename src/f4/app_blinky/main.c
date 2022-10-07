@@ -31,12 +31,6 @@ int main(void)
     chSysInit();
 
     palSetLineMode(LINE_LED,PAL_MODE_OUTPUT_PUSHPULL);
-#if defined STM32F439xx
-    palSetLineMode(LINE_LD1,PAL_MODE_OUTPUT_PUSHPULL);
-    palSetLineMode(LINE_LD2,PAL_MODE_OUTPUT_PUSHPULL);
-    palClearLine(LINE_LD1);
-    palClearLine(LINE_LD2);
-#endif
 
     while (true)
     {
