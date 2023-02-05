@@ -9,6 +9,8 @@
 
 #include "hal.h"
 #include "bmi088.h"
+#include "chprintf.h"
+#define DEBUG_SD    (BaseSequentialStream*) &SD2
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -112,6 +114,28 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 
     devp->config = config;
 
+//    for(int i = 0; i < 100000; i++ ) {
+//    	devp->state = BMI088_READY;
+//    	chprintf(DEBUG_SD, "Stopping I2C bus...\r\n");
+//    	uint8_t chip_id = 0;
+//    	chprintf(DEBUG_SD, "Reading chip ID...\r\n");
+//    	chThdSleepMilliseconds(5);
+//    	int r = 0;
+//    	if( (r = bmi088ReadAccelerometerChipId(devp, &chip_id)) != MSG_OK ) {
+//    		chprintf(DEBUG_SD, "Failed to read chip ID, %d\r\n", r);
+//    	} else {
+//    		chprintf(DEBUG_SD, "Chip ID = 0x%X\r\n", chip_id);
+//    	}
+//
+////    	chprintf(DEBUG_SD, "Setting power...\r\n");
+////    	chThdSleepMilliseconds(5);
+////
+////    	if( bmi088AccelerometerPowerOnOrOff(devp, BMI088_ON) != MSG_OK ) {
+////			devp->error_flags |= (1<<0);
+////			ret = false;
+////		}
+//    	chThdSleepMilliseconds(250);
+//    }
 
     /* Configuring common registers.*/
 #if BMI088_USE_I2C
@@ -139,19 +163,25 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif
 
 
+
+
     if( bmi088AccelerometerPowerOnOrOff(devp, BMI088_ON) != MSG_OK ) {
+    	devp->error_flags |= (1<<0);
         ret = false;
     }
 
     if( bmi088AccelerometerEnableOrSuspend(devp, BMI088_MODE_ACTIVE) != MSG_OK ) {
+    	devp->error_flags |= (1<<1);
         ret = false;
     }
 
     if( bmi088SetGyroBandwidth(devp, BMI088_GYR_BANDWIDTH_100HZ_32HZ) != MSG_OK ) {
+    	devp->error_flags |= (1<<2);
         ret = false;
     }
 
     if( bmi088SetGyroRange(devp, BMI088_GYR_RANGE_1K) != MSG_OK ) {
+    	devp->error_flags |= (1<<3);
         ret = false;
     }
 

@@ -876,6 +876,7 @@ typedef struct {
 struct BMI088Driver {
     /* Driver state.*/
     bmi088_state_t              state;
+    uint32_t                    error_flags;
     /* Current configuration data.*/
     const BMI088Config          *config;
 };
