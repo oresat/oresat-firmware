@@ -17,6 +17,8 @@ Session.vim
 *~
 # auto-generated tag files
 tags
+# COC
+.cache/
 
 ## C-specific files
 # Prerequisites
@@ -75,3 +77,5 @@ dkms.conf
 ## Custom definitions
 # build dirs
 build*/
+**/OD.*
+*.tmp
