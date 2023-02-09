@@ -94,31 +94,31 @@ bool update_imu_data(void) {
     OD_RAM.x6000_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
     OD_RAM.x6000_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
 
-    OD_RAM.x6001_acceleration.accX = accl_data.accl_x;
-    OD_RAM.x6001_acceleration.accY = accl_data.accl_y;
-    OD_RAM.x6001_acceleration.accZ = accl_data.accl_z;
+    OD_RAM.x6001_acceleration.accx = accl_data.accl_x;
+    OD_RAM.x6001_acceleration.accy = accl_data.accl_y;
+    OD_RAM.x6001_acceleration.accz = accl_data.accl_z;
     OD_RAM.x6001_acceleration.accXRaw = accl_data.accl_x_raw;
-    OD_RAM.x6001_acceleration.accYRaw = accl_data.accl_y_raw;
-    OD_RAM.x6001_acceleration.accZRaw = accl_data.accl_z_raw;
+    OD_RAM.x6001_acceleration.accyRaw = accl_data.accl_y_raw;
+    OD_RAM.x6001_acceleration.acczRaw = accl_data.accl_z_raw;
 
     OD_RAM.x6002_IMU_Temperature = temp_c;
 
     //TODO Implement magnetometer driver and populate this info
-    OD_RAM.x6003_magnetometerPZ1.magX = 0;
-    OD_RAM.x6003_magnetometerPZ1.magY = 0;
-    OD_RAM.x6003_magnetometerPZ1.magZ = 0;
+    OD_RAM.x6003_magnetometerPZ1.magx = 0;
+    OD_RAM.x6003_magnetometerPZ1.magy = 0;
+    OD_RAM.x6003_magnetometerPZ1.magz = 0;
 
-    OD_RAM.x6004_magnetometerPZ2.magX = 0;
-    OD_RAM.x6004_magnetometerPZ2.magY = 0;
-    OD_RAM.x6004_magnetometerPZ2.magZ = 0;
+    OD_RAM.x6004_magnetometerPZ2.magx = 0;
+    OD_RAM.x6004_magnetometerPZ2.magy = 0;
+    OD_RAM.x6004_magnetometerPZ2.magz = 0;
 
-    OD_RAM.x6005_magnetometerMZ1.magX = 0;
-    OD_RAM.x6005_magnetometerMZ1.magY = 0;
-    OD_RAM.x6005_magnetometerMZ1.magZ = 0;
+    OD_RAM.x6005_magnetometerMZ1.magx = 0;
+    OD_RAM.x6005_magnetometerMZ1.magy = 0;
+    OD_RAM.x6005_magnetometerMZ1.magz = 0;
 
-    OD_RAM.x6006_magnetometerMZ2.magX = 0;
-    OD_RAM.x6006_magnetometerMZ2.magY = 0;
-    OD_RAM.x6006_magnetometerMZ2.magZ = 0;
+    OD_RAM.x6006_magnetometerMZ2.magx = 0;
+    OD_RAM.x6006_magnetometerMZ2.magy = 0;
+    OD_RAM.x6006_magnetometerMZ2.magz = 0;
 
     return ret;
 }

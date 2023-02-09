@@ -81,6 +81,7 @@ Tools required:
 * openocd             (Required, this is how we program and debug things)
 * stlink              (Gets udev rules up and running, may be helpful)
 * srecord
+* eds-utils
 
 PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
 package managers is several years old. You MUST build it from source for it

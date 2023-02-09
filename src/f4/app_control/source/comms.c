@@ -628,8 +628,8 @@ THD_FUNCTION(edl_thd, arg)
             edl_enable(true);
             len = fb->len;
             if (fb->phy_arg == &edl_lband_link) {
-                OD_PERSIST_STATE.x6004_persistentState.LBandRX_Bytes += len;
-                OD_PERSIST_STATE.x6004_persistentState.LBandRX_Packets += 1;
+                OD_PERSIST_STATE.x6004_persistentState.lbandRX_Bytes += len;
+                OD_PERSIST_STATE.x6004_persistentState.lbandRX_Packets += 1;
             } else if (fb->phy_arg == &edl_uhf_link) {
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Bytes += len;
                 OD_PERSIST_STATE.x6004_persistentState.UHF_RX_Packets += 1;

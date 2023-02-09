@@ -44,11 +44,11 @@ static const tlm_item_t tlm_aprs0[] = {
     /* WDT Timeouts */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_PERSIST_STATE.x6004_persistentState.powerCycles },
     /* eMMC Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.eMMC_Usage },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.emmcUsage },
     /* L-Band RX Bytes */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.LBandRX_Bytes },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.lbandRX_Bytes },
     /* L-Band Valid Packets */
-    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.LBandRX_Packets },
+    { .type = TLM_PTR, .len = 4, .ptr = &OD_PERSIST_STATE.x6004_persistentState.lbandRX_Packets },
     /* L-Band Last RSSI */
     { .type = TLM_PTR, .len = 1, .ptr = &lband.rssi },
     /* L-Band PLL Lock TODO */
@@ -81,20 +81,20 @@ static const tlm_item_t tlm_aprs0[] = {
     /*{ .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7000_C3_Telemetry.OPD_Current },*/
     /* OPD State TODO */
     /*{ .type = TLM_VAL, .len = 1, .val = 0 },*/
-    /* Battery 0 Pack 1 VBatt */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VBattBP1 },
-    /* Battery 0 Pack 1 VCell */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellBP1 },
-    /* Battery 0 Pack 1 VCell Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMaxBP1 },
-    /* Battery 0 Pack 1 VCell Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMinBP1 },
-    /* Battery 0 Pack 1 VCell 1 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell1_BP1 },
-    /* Battery 0 Pack 1 VCell 2 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell2_BP1 },
-    /* Battery 0 Pack 1 VCell Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellAvgBP1 },
+    /* Battery 0 Pack 1 vbatt */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vbattBP1 },
+    /* Battery 0 Pack 1 vcell */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellBP1 },
+    /* Battery 0 Pack 1 vcell Max */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellMaxBP1 },
+    /* Battery 0 Pack 1 vcell Min */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellMinBP1 },
+    /* Battery 0 Pack 1 vcell 1 */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcell1BP1 },
+    /* Battery 0 Pack 1 vcell 2 */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcell2BP1 },
+    /* Battery 0 Pack 1 vcell Avg */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellAvgBP1 },
     /* Battery 0 Pack 1 Temperature */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureBP1 },
     /* Battery 0 Pack 1 Temperature Avg */
@@ -119,20 +119,20 @@ static const tlm_item_t tlm_aprs0[] = {
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.fullCapacityBP1 },
     /* Battery 0 Pack 1 Reported Capacity */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.reportedCapacityBP1 },
-    /* Battery 0 Pack 2 VBatt */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VBattBP2 },
-    /* Battery 0 Pack 2 VCell */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellBP2 },
-    /* Battery 0 Pack 2 VCell Max */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMaxBP2 },
-    /* Battery 0 Pack 2 VCell Min */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellMinBP2 },
-    /* Battery 0 Pack 2 VCell 1 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell1_BP2 },
-    /* Battery 0 Pack 2 VCell 2 */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCell2_BP2 },
-    /* Battery 0 Pack 2 VCell Avg */
-    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.VCellAvgBP2 },
+    /* Battery 0 Pack 2 vbatt */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vbattBP2 },
+    /* Battery 0 Pack 2 vcell */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellBP2 },
+    /* Battery 0 Pack 2 vcell Max */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellMaxBP2 },
+    /* Battery 0 Pack 2 vcell Min */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellMinBP2 },
+    /* Battery 0 Pack 2 vcell 1 */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcell1BP2 },
+    /* Battery 0 Pack 2 vcell 2 */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcell2BP2 },
+    /* Battery 0 Pack 2 vcell Avg */
+    { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.vcellAvgBP2 },
     /* Battery 0 Pack 2 Temperature */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x7001_battery.temperatureBP2 },
     /* Battery 0 Pack 2 Temperature Avg */
@@ -262,17 +262,17 @@ static const tlm_item_t tlm_aprs0[] = {
     /* ACS Yaw */
     { .type = TLM_PTR, .len = 2, .ptr = &OD_RAM.x700E_ACS.gyroYaw },
     /* ACS IMU Temperature */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700E_ACS.IMUTemp },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x700E_ACS.IMU_Temp },
     /* DxWiFi FS Usage */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.rootPartitionPercent },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxwifi.rootPartitionPercent },
     /* DxWiFi Readable Files */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.freadCacheLength },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxwifi.freadCacheLength },
     /* DxWiFi Updater Status */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updaterStatus },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxwifi.updaterStatus },
     /* DxWiFi Updates Cached */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.updatesAvailable },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxwifi.updatesAvailable },
     /* DxWiFi Transmitting */
-    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxWiFi.transmitting },
+    { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7013_dxwifi.transmitting },
 #ifdef ORESAT1
     /* CFC FS Usage */
     { .type = TLM_PTR, .len = 1, .ptr = &OD_RAM.x7014_CFC.rootPartitionPercent },
@@ -340,7 +340,7 @@ void beacon_send(const radio_cfg_t *cfg)
     OD_RAM.x7000_C3_Telemetry.uptime = TIME_I2S(chVTGetSystemTime());
     unix_time = rtcGetTimeUnix(NULL);
     bank_state = (SYSCFG->MEMRMP & SYSCFG_MEMRMP_UFB_MODE ? 1 : 0) | ((FLASH->OPTCR & FLASH_OPTCR_BFB2 ? 1 : 0) << 1);
-    OD_RAM.x7000_C3_Telemetry.eMMC_Usage = fs_usage(&FSD1);
+    OD_RAM.x7000_C3_Telemetry.emmcUsage = fs_usage(&FSD1);
 
     fb_reserve(fb, AX25_MAX_HDR_LEN);
     fb->data_ptr = tlm_payload(fb, &aprs0);
