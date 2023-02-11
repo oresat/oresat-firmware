@@ -121,9 +121,9 @@
  * @{
  */
 typedef struct {
-    char            dest[6];
+    const char      *dest;
     uint8_t         dest_ssid;
-    char            src[6];
+    const char      *src;
     uint8_t         src_ssid;
     uint8_t         control;
     uint8_t         sid;

@@ -25,6 +25,8 @@ void reg_worker(worker_t *wp, thread_descriptor_t *desc, bool critical, bool aut
 void unreg_worker(worker_t *wp);
 thread_t *start_worker(worker_t *wp);
 msg_t stop_worker(worker_t *wp);
+void start_workers(void);
+void stop_workers(bool stop_crit);
 
 #ifdef __cplusplus
 }

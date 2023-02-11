@@ -41,12 +41,12 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
     case CMD_C3_SOFTRESET:
         key = (uint32_t*)cmd->arg;
         if (key[0] == 0x67452301U && key[1] == 0xEFCDAB89U)
-            NVIC_SystemReset();
+            soft_reset();
         break;
     case CMD_C3_HARDRESET:
         key = (uint32_t*)cmd->arg;
         if (key[0] == 0x67452301U && key[1] == 0xEFCDAB89U)
-            chSysHalt("HARD RESET");
+            hard_reset();
         break;
     case CMD_C3_FACTORYRESET:
         key = (uint32_t*)cmd->arg;

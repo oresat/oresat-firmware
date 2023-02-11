@@ -5,6 +5,13 @@ OOCD_CFG = oocd.cfg
 GDB_OOCD_CFG = gdboocd.cmd
 GDB_STL_CFG = gdbstl.cmd
 SERIAL_RAW != echo -e "$(SERIAL)"
+ifneq ($(SERIAL),)
+	SERIAL_ARG = adapter serial $(SERIAL);
+endif
+
+
+PRE_MAKE_ALL_RULE_HOOK:
+	eds2c $(APP_ROOT)/source/ObjDict/app.eds
 
 ifeq ($(USE_BOOTLOADER),yes)
 POST_MAKE_ALL_RULE_HOOK:
@@ -19,7 +26,7 @@ endif
 write: $(OUTFILES) POST_MAKE_ALL_RULE_HOOK write_ocd
 
 write_ocd:
-	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "hla_serial $(SERIAL); program $(APP_HEXFILE) verify reset exit"
+	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "$(SERIAL_ARG) program $(APP_HEXFILE) verify reset exit"
 
 write_stl:
 	st-flash --serial=$(SERIAL_RAW) --reset --format ihex write $(APP_HEXFILE)
@@ -27,7 +34,7 @@ write_stl:
 gdb: $(GDB_ELF) gdb_ocd
 
 gdb_ocd:
-	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -ex "target remote | openocd -f oocd.cfg -c 'hla_serial $(SERIAL); gdb_port pipe'" -x $(GDB_OOCD_CFG)
+	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -ex "target remote | openocd -f oocd.cfg -c '$(SERIAL_ARG) gdb_port pipe'" -x $(GDB_OOCD_CFG)
 
 gdb_stl:
 	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(TOOLCHAIN) -x ./$(GDB_STL_CFG)

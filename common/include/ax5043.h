@@ -2608,7 +2608,7 @@ typedef size_t (*ax5043_tx_cb_t)(void *arg);
  * @brief   RSSI
  */
 typedef struct __attribute__((packed)) {
-    uint8_t                     rssi;
+    int8_t                      rssi;
 } ax5043_chunk_rssi_t;
 
 /**
@@ -2631,8 +2631,8 @@ typedef struct __attribute__((packed)) {
  * @brief   ANTRSSI2
  */
 typedef struct __attribute__((packed)) {
-    uint8_t                     rssi;
-    uint8_t                     bgndnoise;
+    int8_t                      rssi;
+    int8_t                      bgndnoise;
 } ax5043_chunk_antrssi2_t;
 
 /**
@@ -2671,9 +2671,9 @@ typedef struct __attribute__((packed)) {
  * @brief   ANTRSSI3
  */
 typedef struct __attribute__((packed)) {
-    uint8_t                     ant0rssi;
-    uint8_t                     ant1rssi;
-    uint8_t                     bgndnoise;
+    int8_t                      ant0rssi;
+    int8_t                      ant1rssi;
+    int8_t                      bgndnoise;
 } ax5043_chunk_antrssi3_t;
 
 /**
@@ -2864,10 +2864,10 @@ struct AX5043Driver {
     uint32_t                    datarate;
     uint32_t                    freq_off;
     uint32_t                    rf_freq_off;
-    uint8_t                     rssi;
-    uint8_t                     ant0rssi;
-    uint8_t                     ant1rssi;
-    uint8_t                     bgndnoise;
+    int8_t                      rssi;
+    int8_t                      ant0rssi;
+    int8_t                      ant1rssi;
+    int8_t                      bgndnoise;
 };
 /** @} */
 

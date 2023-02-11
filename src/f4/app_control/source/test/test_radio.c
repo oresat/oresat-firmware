@@ -167,7 +167,7 @@ void cmd_radio(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
     } else if (!strcmp(argv[0], "rssi")) {
-        chprintf(chp, "AGCCOUNTER: %u\r\nRSSI: %u\r\nBGNDRSSI: %u\r\n", ax5043ReadU8(devp, AX5043_REG_AGCCOUNTER), ax5043ReadU8(devp, AX5043_REG_RSSI), ax5043ReadU8(devp, AX5043_REG_BGNDRSSI));
+        chprintf(chp, "AGCCOUNTER: %u\r\nRSSI: %d\r\nBGNDRSSI: %d\r\n", ax5043ReadU8(devp, AX5043_REG_AGCCOUNTER), (int8_t)ax5043ReadU8(devp, AX5043_REG_RSSI), (int8_t)ax5043ReadU8(devp, AX5043_REG_BGNDRSSI));
     } else if (!strcmp(argv[0], "read") && argc > 2) {
         uint16_t reg = strtoul(argv[1], NULL, 0);
 
@@ -339,9 +339,9 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
         }
     } else if (!strcmp(argv[0], "lna") && argc > 1) {
         if (!strcmp(argv[1], "enable")) {
-            palSetLine(LINE_LNA_ENABLE);
-        } else if (!strcmp(argv[1], "disable")) {
             palClearLine(LINE_LNA_ENABLE);
+        } else if (!strcmp(argv[1], "disable")) {
+            palSetLine(LINE_LNA_ENABLE);
         }
     } else if (!strcmp(argv[0], "totclear")) {
         palSetLine(LINE_TOT_RESET);
@@ -355,7 +355,7 @@ void cmd_rf(BaseSequentialStream *chp, int argc, char *argv[])
         chprintf(chp, "PA State: %s\r\nLNA State: %s\r\nTOT State: %s\r\n"
                       "PA THERM AVG: %u\r\nPA FWD AVG: %u\r\nPA REV AVG: %u\r\n\r\n",
                 (palReadLine(LINE_PA_ENABLE) ? "ENABLED" : "DISABLED"),
-                (palReadLine(LINE_LNA_ENABLE) ? "ENABLED" : "DISABLED"),
+                (palReadLine(LINE_LNA_ENABLE) ? "DISABLED" : "ENABLED"),
                 (palReadLine(LINE_TOT_STATE) ? "NOT TRIPPED" : "TRIPPED"),
                 pa_avg.therm, pa_avg.fwd, pa_avg.rev);
     } else {
@@ -404,7 +404,7 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
         goto rftest_usage;
     }
 
-    palClearLine(LINE_LNA_ENABLE);
+    palSetLine(LINE_LNA_ENABLE);
     palSetLine(LINE_PA_ENABLE);
     ax5043WriteU16(tx_eng->devp, AX5043_REG_TXPWRCOEFFB, 0);
     ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 1);
@@ -420,13 +420,13 @@ void cmd_rftest(BaseSequentialStream *chp, int argc, char *argv[])
     } else {
         ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
         palClearLine(LINE_PA_ENABLE);
-        palSetLine(LINE_LNA_ENABLE);
+        palClearLine(LINE_LNA_ENABLE);
         goto rftest_usage;
     }
 
     ax5043WriteU8(tx_eng->devp, AX5043_REG_PWRAMP, 0);
     palClearLine(LINE_PA_ENABLE);
-    palSetLine(LINE_LNA_ENABLE);
+    palClearLine(LINE_LNA_ENABLE);
     return;
 rftest_usage:
     chprintf(chp, "\r\n"
