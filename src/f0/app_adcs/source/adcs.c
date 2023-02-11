@@ -83,7 +83,7 @@ static PWMConfig pwmcfg_1 = {
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
-   {PWM_OUTPUT_ACTIVE_HIGH,NULL}
+   {PWM_OUTPUT_ACTIVE_HIGH, NULL}
   },
   0,//CR2
  #if STM32_PWM_USE_ADVANCED
@@ -141,7 +141,7 @@ typedef struct  {
 } magnetorquer_data_t;
 
 
-magnetorquer_data_t g_magnetoqruer_data;
+magnetorquer_data_t g_magnetorquer_data;
 
 
 static const I2CConfig i2ccfg = {
@@ -233,6 +233,11 @@ bool update_imu_data(void) {
     OD_RAM.x6002_IMU_Temperature = temp_c;
 
     //TODO Implement magnetometer driver and populate this info
+
+    //FIXME publish g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA
+    //FIXME publish g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA
+    //FIXME publish g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA
+
     OD_RAM.x6003_magnetometerPZ1.magX = 0;
     OD_RAM.x6003_magnetometerPZ1.magY = 0;
     OD_RAM.x6003_magnetometerPZ1.magZ = 0;
@@ -338,7 +343,7 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	if( ecm >= EC_MAG_NONE ) {
 		return(false);
 	}
-	if( ! g_magnetoqruer_data.mag_data[ecm].is_initialized) {
+	if( ! g_magnetorquer_data.mag_data[ecm].is_initialized) {
 		return(false);
 	}
 
@@ -346,7 +351,7 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 		return(false);
 	}
 
-	r = mmc5883maReadData(&g_magnetoqruer_data.mag_data[ecm].driver, &g_magnetoqruer_data.mag_data[ecm].data);
+	r = mmc5883maReadData(&g_magnetorquer_data.mag_data[ecm].driver, &g_magnetorquer_data.mag_data[ecm].data);
 
 	select_magnetometer(EC_MAG_NONE);
 
@@ -357,7 +362,7 @@ bool update_endcard_magnetometer_readings(void) {
 	bool ret = true;
 
 	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
-		if( g_magnetoqruer_data.mag_data[ecm].is_initialized) {
+		if( g_magnetorquer_data.mag_data[ecm].is_initialized) {
 			select_magnetometer(ecm);
 			//TODO read the mag readings
 
@@ -377,15 +382,15 @@ bool init_end_cap_magnetometers(void) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
 		chThdSleepMilliseconds(20);
 
-		mmc5883maObjectInit(&g_magnetoqruer_data.mag_data[ecm].driver);
+		mmc5883maObjectInit(&g_magnetorquer_data.mag_data[ecm].driver);
 
 		if( ! select_magnetometer(ecm) ) {
 			ret = false;
 			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u due to selection error\r\n");
 		} else {
-			if( mmc5883maStart(&g_magnetoqruer_data.mag_data[ecm].driver, &mmc4883ma_generic_config) ) {
+			if( mmc5883maStart(&g_magnetorquer_data.mag_data[ecm].driver, &mmc4883ma_generic_config) ) {
 				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u\r\n");
-				g_magnetoqruer_data.mag_data[ecm].is_initialized = true;
+				g_magnetorquer_data.mag_data[ecm].is_initialized = true;
 			} else {
 				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u\r\n");
 			}
@@ -416,21 +421,21 @@ void set_pwm_output(void) {
 		const systime_t now_time = chVTGetSystemTime();
 
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
-		if( g_magnetoqruer_data.pwm_data[i].last_update_time == 0 || chTimeDiffX(g_magnetoqruer_data.pwm_data[i].last_update_time, now_time) > 5 ) {
-			if( g_magnetoqruer_data.pwm_data[i].current_pwm_percent != g_magnetoqruer_data.pwm_data[i].target_pwm_percent || g_magnetoqruer_data.pwm_data[i].current_pwm_phase != g_magnetoqruer_data.pwm_data[i].target_pwm_phase ) {
-				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_magnetoqruer_data.pwm_data[i].target_pwm_percent);
+		if( g_magnetorquer_data.pwm_data[i].last_update_time == 0 || chTimeDiffX(g_magnetorquer_data.pwm_data[i].last_update_time, now_time) > 5 ) {
+			if( g_magnetorquer_data.pwm_data[i].current_pwm_percent != g_magnetorquer_data.pwm_data[i].target_pwm_percent || g_magnetorquer_data.pwm_data[i].current_pwm_phase != g_magnetorquer_data.pwm_data[i].target_pwm_phase ) {
+				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_magnetorquer_data.pwm_data[i].target_pwm_percent);
 
-				pwmEnableChannel(&PWMD1, g_magnetoqruer_data.pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, g_magnetoqruer_data.pwm_data[i].target_pwm_percent));
+				pwmEnableChannel(&PWMD1, g_magnetorquer_data.pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, g_magnetorquer_data.pwm_data[i].target_pwm_percent));
 
-				if( g_magnetoqruer_data.pwm_data[i].target_pwm_phase ) {
-					palSetPad(GPIOB, g_magnetoqruer_data.pwm_data[i].phase_gpio_pin_number);
+				if( g_magnetorquer_data.pwm_data[i].target_pwm_phase ) {
+					palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 				} else {
-					palClearPad(GPIOB, g_magnetoqruer_data.pwm_data[i].phase_gpio_pin_number);
+					palClearPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 				}
 
-				g_magnetoqruer_data.pwm_data[i].current_pwm_percent = g_magnetoqruer_data.pwm_data[i].target_pwm_percent;
-				g_magnetoqruer_data.pwm_data[i].current_pwm_phase = g_magnetoqruer_data.pwm_data[i].target_pwm_phase;
-				g_magnetoqruer_data.pwm_data[i].last_update_time = now_time;
+				g_magnetorquer_data.pwm_data[i].current_pwm_percent = g_magnetorquer_data.pwm_data[i].target_pwm_percent;
+				g_magnetorquer_data.pwm_data[i].current_pwm_phase = g_magnetorquer_data.pwm_data[i].target_pwm_phase;
+				g_magnetorquer_data.pwm_data[i].last_update_time = now_time;
 			}
 		}
 	}
@@ -445,13 +450,13 @@ void magnetorquer_handle_canopen(void) {
 	//-- phase
 
 	for(int i = 0; i < 3; i++ ) {
-//		g_magnetoqruer_data.pwm_data[i].target_pwm_percent = chVTGetSystemTime() % 10000;//FIXME DELETE THIS
-//		g_magnetoqruer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() % 10000) / 20;//FIXME DELETE THIS
-//		g_magnetoqruer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() / 25) % 1500;//FIXME DELETE THIS
-//		g_magnetoqruer_data.pwm_data[i].target_pwm_percent = 500 + ((chVTGetSystemTime() / 25) % 1000);//FIXME DELETE THIS
-		g_magnetoqruer_data.pwm_data[i].target_pwm_percent = 1700;//FIXME DELETE THIS
-		g_magnetoqruer_data.pwm_data[i].target_pwm_phase = 1;
-//		g_magnetoqruer_data.pwm_data[i].target_pwm_phase = (chVTGetSystemTime() / 10000) % 2;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = chVTGetSystemTime() % 10000;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() % 10000) / 20;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() / 25) % 1500;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 500 + ((chVTGetSystemTime() / 25) % 1000);//FIXME DELETE THIS
+		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 1700;//FIXME DELETE THIS
+		g_magnetorquer_data.pwm_data[i].target_pwm_phase = 1;
+//		g_magnetorquer_data.pwm_data[i].target_pwm_phase = (chVTGetSystemTime() / 10000) % 2;//FIXME DELETE THIS
 	}
 }
 
@@ -533,10 +538,10 @@ void read_adc_current(void) {
 //		}
 
 		if( adc_chan_idx >= 1 && adc_chan_idx <= 3 ) {
-			g_magnetoqruer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
-			g_magnetoqruer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
-			g_magnetoqruer_data.pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
-			g_magnetoqruer_data.pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
+			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
+			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
+			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
+			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
 		}
 	}
 
@@ -548,7 +553,7 @@ void read_adc_current(void) {
 
 		chprintf(DEBUG_SD, "================\r\n");
 		for(int i = 0; i < 3; i++ ) {
-			pwm_phase_data_t *data = &g_magnetoqruer_data.pwm_data[i];
+			pwm_phase_data_t *data = &g_magnetorquer_data.pwm_data[i];
 			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
 							i,
 							data->current_feedback_measurement_uA,
@@ -570,20 +575,20 @@ void process_magnetorquer(void) {
 void init_magnetorquer(void) {
 	init_end_cap_magnetometers();
 
-	memset(&g_magnetoqruer_data, 0, sizeof(g_magnetoqruer_data));
+	memset(&g_magnetorquer_data, 0, sizeof(g_magnetorquer_data));
 
-	g_magnetoqruer_data.pwm_data[0].phase_gpio_pin_number = GPIOB_MT_X_PHASE;
-	g_magnetoqruer_data.pwm_data[0].pwm_channel_number = MT_X_PWM_PWM_CHANNEL;
+	g_magnetorquer_data.pwm_data[0].phase_gpio_pin_number = GPIOB_MT_X_PHASE;
+	g_magnetorquer_data.pwm_data[0].pwm_channel_number = MT_X_PWM_PWM_CHANNEL;
 
-	g_magnetoqruer_data.pwm_data[1].phase_gpio_pin_number = GPIOB_MT_Y_PHASE;
-	g_magnetoqruer_data.pwm_data[1].pwm_channel_number = MT_Y_PWM_PWM_CHANNEL;
+	g_magnetorquer_data.pwm_data[1].phase_gpio_pin_number = GPIOB_MT_Y_PHASE;
+	g_magnetorquer_data.pwm_data[1].pwm_channel_number = MT_Y_PWM_PWM_CHANNEL;
 
-	g_magnetoqruer_data.pwm_data[2].phase_gpio_pin_number = GPIOB_MT_Z_PHASE;
-	g_magnetoqruer_data.pwm_data[2].pwm_channel_number = MT_Z_PWM_PWM_CHANNEL;
+	g_magnetorquer_data.pwm_data[2].phase_gpio_pin_number = GPIOB_MT_Z_PHASE;
+	g_magnetorquer_data.pwm_data[2].pwm_channel_number = MT_Z_PWM_PWM_CHANNEL;
 
 	for(int i = 0; i < 3; i++ ) {
-		palSetPad(GPIOB, g_magnetoqruer_data.pwm_data[i].phase_gpio_pin_number);
-//		palClearPad(GPIOB, g_magnetoqruer_data.pwm_data[i].phase_gpio_pin_number);
+		palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
+//		palClearPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 	}
 
 
