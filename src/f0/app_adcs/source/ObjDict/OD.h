@@ -10,7 +10,6 @@
 #define OD_CNT_HB_CONS 1
 #define OD_CNT_HB_PROD 1
 #define OD_CNT_SDO_SRV 1
-#define OD_CNT_SDO_CLI 1
 #define OD_CNT_RPDO 16
 #define OD_CNT_TPDO 16
 
