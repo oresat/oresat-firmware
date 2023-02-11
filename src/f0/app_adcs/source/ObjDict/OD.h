@@ -115,9 +115,9 @@ typedef struct {
         int16_t magnetorquerXPWM_DutyCycle;
         int16_t magnetorquerYPWM_DutyCycle;
         int16_t magnetorquerZPWM_DutyCycle;
-        int16_t magnetorquerXCurrentUA;
-        int16_t magnetorquerYCurrentUA;
-        int16_t magnetorquerZCurrentUA;
+        int16_t magnetorquerXCurrent;
+        int16_t magnetorquerYCurrent;
+        int16_t magnetorquerZCurrent;
     } x6007_magnetorquer;
 } OD_RAM_t;
 

@@ -101,9 +101,9 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .magnetorquerXPWM_DutyCycle = 0,
         .magnetorquerYPWM_DutyCycle = 0,
         .magnetorquerZPWM_DutyCycle = 0,
-        .magnetorquerXCurrentUA = 0,
-        .magnetorquerYCurrentUA = 0,
-        .magnetorquerZCurrentUA = 0,
+        .magnetorquerXCurrent = 0,
+        .magnetorquerYCurrent = 0,
+        .magnetorquerZCurrent = 0,
     },
 };
 
@@ -4272,19 +4272,19 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXCurrentUA,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXCurrent,
             .subIndex = 4,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerYCurrentUA,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerYCurrent,
             .subIndex = 5,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerZCurrentUA,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerZCurrent,
             .subIndex = 6,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2

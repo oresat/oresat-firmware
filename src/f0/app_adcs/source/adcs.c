@@ -223,36 +223,36 @@ bool update_imu_data(void) {
     OD_RAM.x6000_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
     OD_RAM.x6000_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
 
-    OD_RAM.x6001_acceleration.accX = accl_data.accl_x;
-    OD_RAM.x6001_acceleration.accY = accl_data.accl_y;
-    OD_RAM.x6001_acceleration.accZ = accl_data.accl_z;
+    OD_RAM.x6001_acceleration.accx = accl_data.accl_x;
+    OD_RAM.x6001_acceleration.accy = accl_data.accl_y;
+    OD_RAM.x6001_acceleration.accz = accl_data.accl_z;
     OD_RAM.x6001_acceleration.accXRaw = accl_data.accl_x_raw;
-    OD_RAM.x6001_acceleration.accYRaw = accl_data.accl_y_raw;
-    OD_RAM.x6001_acceleration.accZRaw = accl_data.accl_z_raw;
+    OD_RAM.x6001_acceleration.accyRaw = accl_data.accl_y_raw;
+    OD_RAM.x6001_acceleration.acczRaw = accl_data.accl_z_raw;
 
     OD_RAM.x6002_IMU_Temperature = temp_c;
 
-    //TODO Implement magnetometer driver and populate this info
 
-    //FIXME publish g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA
-    //FIXME publish g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA
-    //FIXME publish g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA
+    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
+    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
+    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
 
-    OD_RAM.x6003_magnetometerPZ1.magX = 0;
-    OD_RAM.x6003_magnetometerPZ1.magY = 0;
-    OD_RAM.x6003_magnetometerPZ1.magZ = 0;
 
-    OD_RAM.x6004_magnetometerPZ2.magX = 0;
-    OD_RAM.x6004_magnetometerPZ2.magY = 0;
-    OD_RAM.x6004_magnetometerPZ2.magZ = 0;
+    OD_RAM.x6003_magnetometerPZ1.magx = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.mx;
+    OD_RAM.x6003_magnetometerPZ1.magy = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.my;
+    OD_RAM.x6003_magnetometerPZ1.magz = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.mz;
 
-    OD_RAM.x6005_magnetometerMZ1.magX = 0;
-    OD_RAM.x6005_magnetometerMZ1.magY = 0;
-    OD_RAM.x6005_magnetometerMZ1.magZ = 0;
+    OD_RAM.x6004_magnetometerPZ2.magx = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.mx;
+    OD_RAM.x6004_magnetometerPZ2.magy = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.my;
+    OD_RAM.x6004_magnetometerPZ2.magz = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.mz;
 
-    OD_RAM.x6006_magnetometerMZ2.magX = 0;
-    OD_RAM.x6006_magnetometerMZ2.magY = 0;
-    OD_RAM.x6006_magnetometerMZ2.magZ = 0;
+    OD_RAM.x6005_magnetometerMZ1.magx = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.mx;
+    OD_RAM.x6005_magnetometerMZ1.magy = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.my;
+    OD_RAM.x6005_magnetometerMZ1.magz = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.mz;
+
+    OD_RAM.x6006_magnetometerMZ2.magx = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.mx;
+    OD_RAM.x6006_magnetometerMZ2.magy = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.my;
+    OD_RAM.x6006_magnetometerMZ2.magz = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.mz;
 
     return ret;
 }
