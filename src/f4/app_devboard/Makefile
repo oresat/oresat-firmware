@@ -101,9 +101,16 @@ CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
+ODDIR    := $(APP_ROOT)/od
 
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+# generate OD.c/OD.h from app.eds
+$(shell eds2c $(ODDIR)/app.eds)
+# add them
+ALLCSRC += $(ODDIR)/OD.c
+ALLINC += $(ODDIR)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk

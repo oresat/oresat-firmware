@@ -10,9 +10,6 @@ ifneq ($(SERIAL),)
 endif
 
 
-PRE_MAKE_ALL_RULE_HOOK:
-	eds2c $(APP_ROOT)/source/ObjDict/app.eds
-
 ifeq ($(USE_BOOTLOADER),yes)
 POST_MAKE_ALL_RULE_HOOK:
 	python3 $(TOOLCHAIN)/f0_pack_image.py $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT).crc32.bin $(DATE)
