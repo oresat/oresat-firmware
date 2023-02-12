@@ -5069,7 +5069,7 @@ PDOMapping=1
 ParameterName=Magnetorquer
 ObjectType=0x09
 ;StorageLocation=RAM
-SubNumber=7
+SubNumber=10
 
 [6007sub0]
 ParameterName=Highest sub-index supported
@@ -5080,7 +5080,7 @@ AccessType=const
 DefaultValue=0x03
 
 [6007sub1]
-ParameterName=magnetorquer X PWM Duty Cycle
+ParameterName=set magnetorquer X Current
 ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5089,7 +5089,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6007sub2]
-ParameterName=magnetorquer Y PWM duty Cycle
+ParameterName=set magnetorquer Y Current
 ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5098,7 +5098,7 @@ DefaultValue=0
 PDOMapping=1
 
 [6007sub3]
-ParameterName=magnetorquer Z PWM duty Cycle
+ParameterName=set magnetorquer Z Current
 ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0003
@@ -5107,6 +5107,33 @@ DefaultValue=0
 PDOMapping=1
 
 [6007sub4]
+ParameterName=magnetorquer X PWM Duty Cycle
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=r
+DefaultValue=0
+PDOMapping=1
+
+[6007sub5]
+ParameterName=magnetorquer Y PWM duty Cycle
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=r
+DefaultValue=0
+PDOMapping=1
+
+[6007sub6]
+ParameterName=magnetorquer Z PWM duty Cycle
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=r
+DefaultValue=0
+PDOMapping=1
+
+[6007sub7]
 ParameterName=magnetorquer X Current
 ObjectType=0x07
 ;StorageLocation=RAM
@@ -5115,7 +5142,7 @@ AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
-[6007sub5]
+[6007sub8]
 ParameterName=magnetorquer Y Current
 ObjectType=0x07
 ;StorageLocation=RAM
@@ -5124,7 +5151,7 @@ AccessType=ro
 DefaultValue=0
 PDOMapping=1
 
-[6007sub6]
+[6007sub9]
 ParameterName=magnetorquer Z Current
 ObjectType=0x07
 ;StorageLocation=RAM
@@ -5132,6 +5159,10 @@ DataType=0x0003
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
+
+
+
+
 
 
 

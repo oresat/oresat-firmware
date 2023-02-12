@@ -10,6 +10,10 @@
 #include "hal.h"
 #include "hal_pal.h"
 
+#include "stdint.h"
+#include "inttypes.h"
+
+
 
 #define BMI088_GYRO_SADDR     0x68U
 #define BMI088_ACC_SADDR      0x18U
@@ -26,6 +30,11 @@
 //FIXME I believe MAX() is defined in some common C library???
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(a,b) (((a)<(b))?(a):(b))
+
+#ifndef ABS
+/// Returns the absolute value of <b>a</b>.
+#define ABS(a) ((a) < 0 ? -(a) : (a))
+#endif
 
 
 #define ADC_NUM_CHANNELS           4
@@ -112,10 +121,11 @@ typedef enum {
 
 
 typedef struct {
-	uint32_t current_pwm_percent; //0-10000
-	bool current_pwm_phase;
-	uint32_t target_pwm_percent;
-	bool target_pwm_phase;
+	int32_t current_pwm_percent; //0-10000
+//	bool current_pwm_phase;
+	int32_t target_pwm_percent; //Negative values indicate the phase should be inverted
+//	int32_t target_pwm_current_uA;  //Negative values indicate the phase should be inverted
+//	bool target_pwm_phase;
 
 	float current_feedback_min_V;
 	float current_feedback_max_V;
@@ -160,6 +170,27 @@ static const BMI088Config imucfg = {
 };
 
 static BMI088Driver imudev;
+
+
+int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) {
+	if (v >= max)
+		return (max);
+
+	else if (v <= min)
+		return (min);
+
+	return (v);
+}
+
+int16_t saturate_int16_t(const int32_t v) {
+	if (v >= INT16_MAX)
+		return (INT16_MAX);
+
+	else if (v <= INT16_MIN)
+		return (INT16_MIN);
+
+	return (v);
+}
 
 /**
  * TODO more documentation
@@ -233,9 +264,15 @@ bool update_imu_data(void) {
     OD_RAM.x6002_IMU_Temperature = temp_c;
 
 
-    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
-    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
-    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA;//FIXME scale this to output units, uA is too small of a unit
+    //FIXME confirm these units are usable and reasonable for higher level applications
+    //Output current units are 100uA per LSB. int16 is +/- 32768. Yields a min/max representation of 3.2 amps
+    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA / 100);
+    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA / 100);
+    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA / 100);
+
+    OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = g_magnetorquer_data.pwm_data[0].current_pwm_percent;
+    OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = g_magnetorquer_data.pwm_data[1].current_pwm_percent;
+    OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = g_magnetorquer_data.pwm_data[2].current_pwm_percent;
 
 
     OD_RAM.x6003_magnetometerPZ1.magx = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.mx;
@@ -421,20 +458,20 @@ void set_pwm_output(void) {
 		const systime_t now_time = chVTGetSystemTime();
 
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
-		if( g_magnetorquer_data.pwm_data[i].last_update_time == 0 || chTimeDiffX(g_magnetorquer_data.pwm_data[i].last_update_time, now_time) > 5 ) {
-			if( g_magnetorquer_data.pwm_data[i].current_pwm_percent != g_magnetorquer_data.pwm_data[i].target_pwm_percent || g_magnetorquer_data.pwm_data[i].current_pwm_phase != g_magnetorquer_data.pwm_data[i].target_pwm_phase ) {
+		if( g_magnetorquer_data.pwm_data[i].last_update_time == 0 || chTimeDiffX(g_magnetorquer_data.pwm_data[i].last_update_time, now_time) > 10 ) {
+			if( g_magnetorquer_data.pwm_data[i].current_pwm_percent != g_magnetorquer_data.pwm_data[i].target_pwm_percent ) {
 				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_magnetorquer_data.pwm_data[i].target_pwm_percent);
 
-				pwmEnableChannel(&PWMD1, g_magnetorquer_data.pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, g_magnetorquer_data.pwm_data[i].target_pwm_percent));
+				const int32_t pwm_val = ABS(g_magnetorquer_data.pwm_data[i].target_pwm_percent);
+				pwmEnableChannel(&PWMD1, g_magnetorquer_data.pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, pwm_val));
 
-				if( g_magnetorquer_data.pwm_data[i].target_pwm_phase ) {
+				if( g_magnetorquer_data.pwm_data[i].target_pwm_percent < 0 ) {
 					palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 				} else {
 					palClearPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 				}
 
 				g_magnetorquer_data.pwm_data[i].current_pwm_percent = g_magnetorquer_data.pwm_data[i].target_pwm_percent;
-				g_magnetorquer_data.pwm_data[i].current_pwm_phase = g_magnetorquer_data.pwm_data[i].target_pwm_phase;
 				g_magnetorquer_data.pwm_data[i].last_update_time = now_time;
 			}
 		}
@@ -442,21 +479,52 @@ void set_pwm_output(void) {
 #endif
 }
 
+int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t axis) {
+	int32_t ret = 0;
+	if( axis <= 1 ) {
+		//X and Y axes
+		//1700 => 1000000 uA
+		//500 => 295000 uA (this is hard/impossible to measure using the ADC
+		//0 => 0 uA
+		ret = current_uA / (988000.0 / 1700.0);
+		const int32_t pwm_duty_max_value = 1700;
+		ret = saturate_int32_t(ret, -pwm_duty_max_value, pwm_duty_max_value);
+	} else {
+		//Z axis
+		//1700 => 344000 uA
+		//500 => 102000 uA  (this is hard/impossible to measure using the ADC
+		ret = current_uA / (344000.0 / 1700.0);
+		const int32_t pwm_duty_max_value = 4940;
+		ret = saturate_int32_t(ret, -pwm_duty_max_value, pwm_duty_max_value);
+	}
+
+
+	return(ret);
+}
+
 void magnetorquer_handle_canopen(void) {
-	//TODO
-	//Publish output data
-	//Read/update target PWM outputs
-	//-- PWM duty cycle
-	//-- phase
+	//FIXME what is the maximum duty cycle / current draw that the power bus will support
+//	const int32_t pwm_duty_max_value = 3000; //Don't allow 100% duty cycle as we will short out the power bus
+//	g_magnetorquer_data.pwm_data[0].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerXPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
+//	g_magnetorquer_data.pwm_data[1].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerYPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
+//	g_magnetorquer_data.pwm_data[2].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerYPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
+
+
+	OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 5000;//FIXME remove this, this is just for testing
+	OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 5000;
+	OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = 5000;
+	g_magnetorquer_data.pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent * 100, 0);
+	g_magnetorquer_data.pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent * 100, 1);
+	g_magnetorquer_data.pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent * 100, 2);
+
 
 	for(int i = 0; i < 3; i++ ) {
 //		g_magnetorquer_data.pwm_data[i].target_pwm_percent = chVTGetSystemTime() % 10000;//FIXME DELETE THIS
 //		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() % 10000) / 20;//FIXME DELETE THIS
 //		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() / 25) % 1500;//FIXME DELETE THIS
 //		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 500 + ((chVTGetSystemTime() / 25) % 1000);//FIXME DELETE THIS
-		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 1700;//FIXME DELETE THIS
-		g_magnetorquer_data.pwm_data[i].target_pwm_phase = 1;
-//		g_magnetorquer_data.pwm_data[i].target_pwm_phase = (chVTGetSystemTime() / 10000) % 2;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 1700;//FIXME DELETE THIS
+//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(500000, i);
 	}
 }
 
@@ -467,6 +535,73 @@ int32_t current_feedback_convert_volts_to_microamps(const float volts) {
 	float microamps = (volts / 3.0) * 1000000.0;
 
 	return(microamps);
+}
+
+void print_debug_output(void) {
+	static systime_t last_print_time = 0;
+	systime_t now_time = TIME_I2MS(chVTGetSystemTime());
+	if (chTimeDiffX(last_print_time, now_time) > 750) {
+		last_print_time = now_time;
+
+		chprintf(DEBUG_SD, "================\r\n");
+		chprintf(DEBUG_SD, "CANOpen Data:\r\n");
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.pitchRate = %d\r\n", OD_RAM.x6000_gyroscope.pitchRate);
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.yawRate = %d\r\n", OD_RAM.x6000_gyroscope.yawRate);
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.rollRate = %d\r\n", OD_RAM.x6000_gyroscope.rollRate);
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.pitchRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.pitchRateRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.yawRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.yawRateRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.rollRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.rollRateRaw);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accx = %d\r\n", OD_RAM.x6001_acceleration.accx);
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accy = %d\r\n", OD_RAM.x6001_acceleration.accy);
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accz = %d\r\n", OD_RAM.x6001_acceleration.accz);
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accXRaw = %d\r\n", OD_RAM.x6001_acceleration.accXRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accyRaw = %d\r\n", OD_RAM.x6001_acceleration.accyRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.acczRaw = %d\r\n", OD_RAM.x6001_acceleration.acczRaw);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6002_IMU_Temperature = %d\r\n", OD_RAM.x6002_IMU_Temperature);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerXCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerYCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerZCurrent);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magx = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magx);
+		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magy = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magy);
+		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magz = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magz);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magx = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magx);
+		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magy = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magy);
+		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magz = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magz);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magx = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magx);
+		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magy = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magy);
+		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magz = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magz);
+
+		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magx = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magx);
+		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magy = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magy);
+		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magz = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magz);
+
+
+
+		for(int i = 0; i < 3; i++ ) {
+			pwm_phase_data_t *data = &g_magnetorquer_data.pwm_data[i];
+			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
+							i,
+							data->current_feedback_measurement_uA,
+							(uint32_t) (data->current_feedback_measurement_V * 1000),
+							(uint32_t) (data->current_feedback_min_V * 1000),
+							(uint32_t) (data->current_feedback_max_V * 1000));
+		}
+
+	}
 }
 
 void read_adc_current(void) {
@@ -545,24 +680,10 @@ void read_adc_current(void) {
 		}
 	}
 
+
 	//Compute current sense data
-	static systime_t last_print_time = 0;
-	systime_t now_time = TIME_I2MS(chVTGetSystemTime());
-	if (chTimeDiffX(last_print_time, now_time) > 500) {
-		last_print_time = now_time;
+	print_debug_output();
 
-		chprintf(DEBUG_SD, "================\r\n");
-		for(int i = 0; i < 3; i++ ) {
-			pwm_phase_data_t *data = &g_magnetorquer_data.pwm_data[i];
-			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
-							i,
-							data->current_feedback_measurement_uA,
-							(uint32_t) (data->current_feedback_measurement_V * 1000),
-							(uint32_t) (data->current_feedback_min_V * 1000),
-							(uint32_t) (data->current_feedback_max_V * 1000));
-		}
-
-	}
 }
 
 void process_magnetorquer(void) {
@@ -588,7 +709,6 @@ void init_magnetorquer(void) {
 
 	for(int i = 0; i < 3; i++ ) {
 		palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
-//		palClearPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
 	}
 
 

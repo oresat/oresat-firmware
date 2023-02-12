@@ -97,7 +97,10 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .magz = 0,
     },
     .x6007_magnetorquer = {
-        .highestSubIndexSupported = 0x06,
+        .highestSubIndexSupported = 0x09,
+        .setMagnetorquerXCurrent = 0,
+        .setMagnetorquerYCurrent = 0,
+        .setMagnetorquerZCurrent = 0,
         .magnetorquerXPWM_DutyCycle = 0,
         .magnetorquerYPWM_DutyCycle = 0,
         .magnetorquerZPWM_DutyCycle = 0,
@@ -828,7 +831,7 @@ typedef struct {
     OD_obj_record_t o_6004_magnetometerPZ2[4];
     OD_obj_record_t o_6005_magnetometerMZ1[4];
     OD_obj_record_t o_6006_magnetometerMZ2[4];
-    OD_obj_record_t o_6007_magnetorquer[7];
+    OD_obj_record_t o_6007_magnetorquer[10];
 } ODObjs_t;
 
 static CO_PROGMEM ODObjs_t ODObjs = {
@@ -4254,38 +4257,56 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent,
             .subIndex = 1,
             .attribute = ODA_SDO_RW | ODA_TRPDO,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent,
             .subIndex = 2,
             .attribute = ODA_SDO_RW | ODA_TRPDO,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent,
             .subIndex = 3,
             .attribute = ODA_SDO_RW | ODA_TRPDO,
             .dataLength = 2
         },
         {
-            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXCurrent,
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle,
             .subIndex = 4,
+            .attribute = ODA_SDO_RW | ODA_TRPDO,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle,
+            .subIndex = 5,
+            .attribute = ODA_SDO_RW | ODA_TRPDO,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle,
+            .subIndex = 6,
+            .attribute = ODA_SDO_RW | ODA_TRPDO,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerXCurrent,
+            .subIndex = 7,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerYCurrent,
-            .subIndex = 5,
+            .subIndex = 8,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2
         },
         {
             .dataOrig = &OD_RAM.x6007_magnetorquer.magnetorquerZCurrent,
-            .subIndex = 6,
+            .subIndex = 9,
             .attribute = ODA_SDO_R | ODA_TPDO,
             .dataLength = 2
         },
@@ -4392,7 +4413,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6004, 0x04, ODT_REC, &ODObjs.o_6004_magnetometerPZ2, NULL},
     {0x6005, 0x04, ODT_REC, &ODObjs.o_6005_magnetometerMZ1, NULL},
     {0x6006, 0x04, ODT_REC, &ODObjs.o_6006_magnetometerMZ2, NULL},
-    {0x6007, 0x07, ODT_REC, &ODObjs.o_6007_magnetorquer, NULL},
+    {0x6007, 0x0A, ODT_REC, &ODObjs.o_6007_magnetorquer, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };
 
