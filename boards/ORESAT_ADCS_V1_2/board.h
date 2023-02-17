@@ -207,7 +207,7 @@
 #define LINE_CAN_SILENT             PAL_LINE(GPIOA, 9U)
 #define LINE_CAN_SHDN               PAL_LINE(GPIOA, 10U)
 #define LINE_MAG_FAULT              PAL_LINE(GPIOB, 3U)
-#define LINE_MAG_EN                 PAL_LINE(GPIOB, 4U)
+#define LINE_MAG_N_EN                 PAL_LINE(GPIOB, 4U)
 #define LINE_MAG_READY              PAL_LINE(GPIOB, 5U)
 #define LINE_IMU_INT1               PAL_LINE(GPIOB, 12U)
 #define LINE_IMU_INT2               PAL_LINE(GPIOB, 13U)
@@ -376,7 +376,7 @@
  * PB1  - PIN1                      (analog).
  * PB2  - PIN2                      (analog).
  * PB3  - MAG_FAULT                 (input).
- * PB4  - MAG_EN                    (output).
+ * PB4  - MAG_N_EN                  (output).
  * PB5  - MAG_READY                 (input).
  * PB6  - I2C1_SCL                  (alternate 1).
  * PB7  - I2C1_SDA                  (alternate 1).

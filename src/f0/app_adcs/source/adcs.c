@@ -14,7 +14,6 @@
 #include "inttypes.h"
 
 
-
 #define BMI088_GYRO_SADDR     0x68U
 #define BMI088_ACC_SADDR      0x18U
 
@@ -63,7 +62,6 @@ static const ADCConversionGroup adcgrpcfg = {
 };
 
 
-
 static const DACConfig dac_config = {
   .init         = 2047u,
   .datamode     = DAC_DHRM_12BIT_RIGHT,
@@ -76,6 +74,8 @@ static const DACConfig dac_config = {
 #define PWM_FREQ		2500// periods per sec
 #define PWM_PERIOD		PWM_TIMER_FREQ/PWM_FREQ
 
+
+//FIXME these PWM channel mappings may be wrong? or the mod-wires on the dev board may be wrong. Either way, Z-axis in the firmware is controling X-axis magnetorquer in the hardware on the dev ADCS board
 //PB13
 #define MT_X_PWM_PWM_CHANNEL     (1 - 1)
 //PB14
@@ -120,12 +120,27 @@ typedef enum {
 } end_card_magnetometoer_t;
 
 
+
+static const I2CConfig mmc5883ma_i2ccfg = {
+    STM32_TIMINGR_PRESC(0xBU) |
+    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
+    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
+    0,
+    0
+};
+
+static const MMC5883MAConfig mmc4883ma_generic_config = {
+	.i2cp = &I2CD1,
+	.i2ccfg = &mmc5883ma_i2ccfg,
+//	.saddr = MMC5883MA_I2C_ADDRESS
+};
+
+
+
 typedef struct {
 	int32_t current_pwm_percent; //0-10000
-//	bool current_pwm_phase;
 	int32_t target_pwm_percent; //Negative values indicate the phase should be inverted
 //	int32_t target_pwm_current_uA;  //Negative values indicate the phase should be inverted
-//	bool target_pwm_phase;
 
 	float current_feedback_min_V;
 	float current_feedback_max_V;
@@ -136,22 +151,22 @@ typedef struct {
 	uint8_t pwm_channel_number;
 
 	systime_t last_update_time;
-} pwm_phase_data_t;
+} mt_pwm_phase_data_t;
 
 typedef struct {
 	MMC5883MADriver driver;
 	mmc5883ma_data_t data;
-	bool is_initialized;
-} mag_data_struct_t;
+	volatile bool is_initialized;
+} magnetometer_data_struct_t;
 
 typedef struct  {
-	pwm_phase_data_t pwm_data[3];
+	mt_pwm_phase_data_t mt_pwm_data[3];
 
-	mag_data_struct_t mag_data[4];
-} magnetorquer_data_t;
+	magnetometer_data_struct_t magetometer_data[4];
+} adcs_data_t;
 
 
-magnetorquer_data_t g_magnetorquer_data;
+adcs_data_t g_adcs_data;
 
 
 static const I2CConfig i2ccfg = {
@@ -265,35 +280,36 @@ bool update_imu_data(void) {
 
 
     //FIXME confirm these units are usable and reasonable for higher level applications
-    //Output current units are 100uA per LSB. int16 is +/- 32768. Yields a min/max representation of 3.2 amps
-    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[0].current_feedback_measurement_uA / 100);
-    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[1].current_feedback_measurement_uA / 100);
-    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = saturate_int16_t(g_magnetorquer_data.pwm_data[2].current_feedback_measurement_uA / 100);
+    //Output current units are 100uA per LSB. int16 is +/- 32768. Yields a min/max representation of +/- 3.2 amps
+    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = saturate_int16_t(g_adcs_data.mt_pwm_data[0].current_feedback_measurement_uA / 100);
+    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = saturate_int16_t(g_adcs_data.mt_pwm_data[1].current_feedback_measurement_uA / 100);
+    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = saturate_int16_t(g_adcs_data.mt_pwm_data[2].current_feedback_measurement_uA / 100);
 
-    OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = g_magnetorquer_data.pwm_data[0].current_pwm_percent;
-    OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = g_magnetorquer_data.pwm_data[1].current_pwm_percent;
-    OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = g_magnetorquer_data.pwm_data[2].current_pwm_percent;
+    OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = g_adcs_data.mt_pwm_data[0].current_pwm_percent;
+    OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = g_adcs_data.mt_pwm_data[1].current_pwm_percent;
+    OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = g_adcs_data.mt_pwm_data[2].current_pwm_percent;
 
 
-    OD_RAM.x6003_magnetometerPZ1.magx = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.mx;
-    OD_RAM.x6003_magnetometerPZ1.magy = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.my;
-    OD_RAM.x6003_magnetometerPZ1.magz = g_magnetorquer_data.mag_data[EC_MAG_2_PZ_1].data.mz;
+    OD_RAM.x6003_magnetometerPZ1.magx = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx;
+    OD_RAM.x6003_magnetometerPZ1.magy = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my;
+    OD_RAM.x6003_magnetometerPZ1.magz = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz;
 
-    OD_RAM.x6004_magnetometerPZ2.magx = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.mx;
-    OD_RAM.x6004_magnetometerPZ2.magy = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.my;
-    OD_RAM.x6004_magnetometerPZ2.magz = g_magnetorquer_data.mag_data[EC_MAG_3_PZ_2].data.mz;
+    OD_RAM.x6004_magnetometerPZ2.magx = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx;
+    OD_RAM.x6004_magnetometerPZ2.magy = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my;
+    OD_RAM.x6004_magnetometerPZ2.magz = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz;
 
-    OD_RAM.x6005_magnetometerMZ1.magx = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.mx;
-    OD_RAM.x6005_magnetometerMZ1.magy = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.my;
-    OD_RAM.x6005_magnetometerMZ1.magz = g_magnetorquer_data.mag_data[EC_MAG_0_MZ_1].data.mz;
+    OD_RAM.x6005_magnetometerMZ1.magx = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx;
+    OD_RAM.x6005_magnetometerMZ1.magy = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my;
+    OD_RAM.x6005_magnetometerMZ1.magz = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz;
 
-    OD_RAM.x6006_magnetometerMZ2.magx = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.mx;
-    OD_RAM.x6006_magnetometerMZ2.magy = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.my;
-    OD_RAM.x6006_magnetometerMZ2.magz = g_magnetorquer_data.mag_data[EC_MAG_1_MZ_2].data.mz;
+    OD_RAM.x6006_magnetometerMZ2.magx = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx;
+    OD_RAM.x6006_magnetometerMZ2.magy = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my;
+    OD_RAM.x6006_magnetometerMZ2.magz = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz;
+
+    //FIXME add some kind of publication of eroror codes/states etc
 
     return ret;
 }
-
 
 bool connect_endcard_mmc4883ma(const uint8_t ltc4304_i2c_address, const bool conn_1_enable, const bool conn_2_enable) {
 	bool ret = true;
@@ -313,62 +329,64 @@ bool connect_endcard_mmc4883ma(const uint8_t ltc4304_i2c_address, const bool con
 	i2cStop(i2cp);
 
 	if( ! ret ) {
-		chprintf(DEBUG_SD, "ERROR: Failed to set LTC4305 connections!\r\n");
+		//chprintf(DEBUG_SD, "ERROR: Failed to set LTC4305 connections!\r\n");
+	} else {
+		//chprintf(DEBUG_SD, "SUCCESS: set LTC4305 connections!\r\n");
 	}
 
 	return(ret);
 }
 
 
-static const I2CConfig mmc5883ma_i2ccfg = {
-    STM32_TIMINGR_PRESC(0xBU) |
-    STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
-    STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
-    0,
-    0
-};
-
-static const MMC5883MAConfig mmc4883ma_generic_config = {
-	.i2cp = &I2CD1,
-	.i2ccfg = &mmc5883ma_i2ccfg,
-	.saddr = MMC5883MA_I2C_ADDRESS
-};
-
 
 bool select_magnetometer(const end_card_magnetometoer_t ecm) {
 	chprintf(DEBUG_SD, "Selecting magnetometer %u\r\n", ecm);
 	chThdSleepMilliseconds(10);
 
+
 	bool ret1 = false;
 	bool ret2 = false;
 
+	//EC_MAG_2_PZ_1
+//	ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+//	ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
+//	chprintf(DEBUG_SD, "select_magnetometer(%d), %d, %d\r\n", ecm, ret1, ret2);
+//	return(true);
+
+
 	switch(ecm) {
 	case EC_MAG_0_MZ_1:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS, true, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, false, false);
+		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
+		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	case EC_MAG_1_MZ_2:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS, false, true);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, false, false);
+		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
+		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	case EC_MAG_2_PZ_1:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, true, false);
+		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
 		break;
 	case EC_MAG_3_PZ_2:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, false, true);
+		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
 		break;
 	case EC_MAG_NONE:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS, false, false);
+		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	}
 
 
+#if 0
+	//FIXME re-enable this code
 	if( ! (ret1 && ret2) ) {
-		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers\r\n");
+		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers ret1=%d, ret2=%d\r\n", ret1, ret2);
 	}
+#else
+	chprintf(DEBUG_SD, "select_magnetometer(%d): %s\r\n", ecm, (ret2 ? "Success" : "Fail"));
+	return(ret2);//FIXME remove this line of code, this is for bench debuging
+#endif
 
 	return(ret1 && ret2);
 }
@@ -380,7 +398,9 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	if( ecm >= EC_MAG_NONE ) {
 		return(false);
 	}
-	if( ! g_magnetorquer_data.mag_data[ecm].is_initialized) {
+
+	if( ! (g_adcs_data.magetometer_data[ecm].is_initialized) ) {
+		chprintf(DEBUG_SD, "Magnetometer %d not initialized.\r\n", ecm);
 		return(false);
 	}
 
@@ -388,7 +408,17 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 		return(false);
 	}
 
-	r = mmc5883maReadData(&g_magnetorquer_data.mag_data[ecm].driver, &g_magnetorquer_data.mag_data[ecm].data);
+
+
+	chprintf(DEBUG_SD, "Reading from magnetometer...\r\n");chThdSleepMilliseconds(5);
+
+	r = mmc5883maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data);
+
+	chprintf(DEBUG_SD, "MAG: mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
+			g_adcs_data.magetometer_data[ecm].data.my,
+			g_adcs_data.magetometer_data[ecm].data.mz);
+
+
 
 	select_magnetometer(EC_MAG_NONE);
 
@@ -396,14 +426,20 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 }
 
 bool update_endcard_magnetometer_readings(void) {
+	static systime_t last_mag_update_time = 0;
+
+	systime_t now_time = chVTGetSystemTime();
+	if( chTimeDiffX(last_mag_update_time, now_time) < 1000 ) {
+		return(true);
+	}
+	last_mag_update_time = now_time;
+
+
 	bool ret = true;
 
 	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
-		if( g_magnetorquer_data.mag_data[ecm].is_initialized) {
-			select_magnetometer(ecm);
-			//TODO read the mag readings
-
-		}
+		chprintf(DEBUG_SD, "Reading EMC %u\r\n", ecm);
+		select_and_read_magnetometer(ecm);
 	}
 
 	select_magnetometer(EC_MAG_NONE);
@@ -413,27 +449,39 @@ bool update_endcard_magnetometer_readings(void) {
 
 
 bool init_end_cap_magnetometers(void) {
+	palClearLine(LINE_MAG_N_EN);
+	chThdSleepMilliseconds(5);
+
 	bool ret = true;
 
 	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
 		chThdSleepMilliseconds(20);
 
-		mmc5883maObjectInit(&g_magnetorquer_data.mag_data[ecm].driver);
+		mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 
 		if( ! select_magnetometer(ecm) ) {
 			ret = false;
 			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u due to selection error\r\n");
 		} else {
-			if( mmc5883maStart(&g_magnetorquer_data.mag_data[ecm].driver, &mmc4883ma_generic_config) ) {
-				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u\r\n");
-				g_magnetorquer_data.mag_data[ecm].is_initialized = true;
+			if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc4883ma_generic_config) ) {
+				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u\r\n", ecm);
+				g_adcs_data.magetometer_data[ecm].is_initialized = true;
 			} else {
-				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u\r\n");
+				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u\r\n", ecm);
 			}
+			extern uint8_t mmc_product_id_readback;
+			chprintf(DEBUG_SD, "MMC Product Id readback = 0x%X\r\n", mmc_product_id_readback);
 		}
 	}
 
+
+	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
+		chprintf(DEBUG_SD, "ecm init %d = %d\r\n", ecm, g_adcs_data.magetometer_data[ecm].is_initialized);
+	}
+//	for(;;) {
+//
+//	}
 
 	select_magnetometer(EC_MAG_NONE);
 
@@ -458,21 +506,21 @@ void set_pwm_output(void) {
 		const systime_t now_time = chVTGetSystemTime();
 
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
-		if( g_magnetorquer_data.pwm_data[i].last_update_time == 0 || chTimeDiffX(g_magnetorquer_data.pwm_data[i].last_update_time, now_time) > 10 ) {
-			if( g_magnetorquer_data.pwm_data[i].current_pwm_percent != g_magnetorquer_data.pwm_data[i].target_pwm_percent ) {
-				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_magnetorquer_data.pwm_data[i].target_pwm_percent);
+		if( g_adcs_data.mt_pwm_data[i].last_update_time == 0 || chTimeDiffX(g_adcs_data.mt_pwm_data[i].last_update_time, now_time) > 10 ) {
+			if( g_adcs_data.mt_pwm_data[i].current_pwm_percent != g_adcs_data.mt_pwm_data[i].target_pwm_percent ) {
+				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
 
-				const int32_t pwm_val = ABS(g_magnetorquer_data.pwm_data[i].target_pwm_percent);
-				pwmEnableChannel(&PWMD1, g_magnetorquer_data.pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, pwm_val));
+				const int32_t pwm_val = ABS(g_adcs_data.mt_pwm_data[i].target_pwm_percent);
+				pwmEnableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, pwm_val));
 
-				if( g_magnetorquer_data.pwm_data[i].target_pwm_percent < 0 ) {
-					palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
+				if( g_adcs_data.mt_pwm_data[i].target_pwm_percent < 0 ) {
+					palSetPad(GPIOB, g_adcs_data.mt_pwm_data[i].phase_gpio_pin_number);
 				} else {
-					palClearPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
+					palClearPad(GPIOB, g_adcs_data.mt_pwm_data[i].phase_gpio_pin_number);
 				}
 
-				g_magnetorquer_data.pwm_data[i].current_pwm_percent = g_magnetorquer_data.pwm_data[i].target_pwm_percent;
-				g_magnetorquer_data.pwm_data[i].last_update_time = now_time;
+				g_adcs_data.mt_pwm_data[i].current_pwm_percent = g_adcs_data.mt_pwm_data[i].target_pwm_percent;
+				g_adcs_data.mt_pwm_data[i].last_update_time = now_time;
 			}
 		}
 	}
@@ -485,7 +533,6 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 		//X and Y axes
 		//1700 => 1000000 uA
 		//500 => 295000 uA (this is hard/impossible to measure using the ADC
-		//0 => 0 uA
 		ret = current_uA / (988000.0 / 1700.0);
 		const int32_t pwm_duty_max_value = 1700;
 		ret = saturate_int32_t(ret, -pwm_duty_max_value, pwm_duty_max_value);
@@ -498,34 +545,13 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 		ret = saturate_int32_t(ret, -pwm_duty_max_value, pwm_duty_max_value);
 	}
 
-
 	return(ret);
 }
 
 void magnetorquer_handle_canopen(void) {
-	//FIXME what is the maximum duty cycle / current draw that the power bus will support
-//	const int32_t pwm_duty_max_value = 3000; //Don't allow 100% duty cycle as we will short out the power bus
-//	g_magnetorquer_data.pwm_data[0].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerXPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
-//	g_magnetorquer_data.pwm_data[1].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerYPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
-//	g_magnetorquer_data.pwm_data[2].target_pwm_percent = saturate_int32_t(OD_RAM.x6007_magnetorquer.setMagnetorquerYPWM_DutyCycle, -pwm_duty_max_value, pwm_duty_max_value);
-
-
-	OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 5000;//FIXME remove this, this is just for testing
-	OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 5000;
-	OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = 5000;
-	g_magnetorquer_data.pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent * 100, 0);
-	g_magnetorquer_data.pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent * 100, 1);
-	g_magnetorquer_data.pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent * 100, 2);
-
-
-	for(int i = 0; i < 3; i++ ) {
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = chVTGetSystemTime() % 10000;//FIXME DELETE THIS
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() % 10000) / 20;//FIXME DELETE THIS
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = (chVTGetSystemTime() / 25) % 1500;//FIXME DELETE THIS
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 500 + ((chVTGetSystemTime() / 25) % 1000);//FIXME DELETE THIS
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = 1700;//FIXME DELETE THIS
-//		g_magnetorquer_data.pwm_data[i].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(500000, i);
-	}
+	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent * 100, 0);
+	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent * 100, 1);
+	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent * 100, 2);
 }
 
 
@@ -592,7 +618,7 @@ void print_debug_output(void) {
 
 
 		for(int i = 0; i < 3; i++ ) {
-			pwm_phase_data_t *data = &g_magnetorquer_data.pwm_data[i];
+			mt_pwm_phase_data_t *data = &g_adcs_data.mt_pwm_data[i];
 			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
 							i,
 							data->current_feedback_measurement_uA,
@@ -673,10 +699,10 @@ void read_adc_current(void) {
 //		}
 
 		if( adc_chan_idx >= 1 && adc_chan_idx <= 3 ) {
-			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
-			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
-			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
-			g_magnetorquer_data.pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
 		}
 	}
 
@@ -694,21 +720,24 @@ void process_magnetorquer(void) {
 
 
 void init_magnetorquer(void) {
-	init_end_cap_magnetometers();
 
-	memset(&g_magnetorquer_data, 0, sizeof(g_magnetorquer_data));
+//	for(;;) {
+//		chThdSleepMilliseconds(1200);
+//	}
 
-	g_magnetorquer_data.pwm_data[0].phase_gpio_pin_number = GPIOB_MT_X_PHASE;
-	g_magnetorquer_data.pwm_data[0].pwm_channel_number = MT_X_PWM_PWM_CHANNEL;
+	memset(&g_adcs_data.mt_pwm_data, 0, sizeof(g_adcs_data.mt_pwm_data));
 
-	g_magnetorquer_data.pwm_data[1].phase_gpio_pin_number = GPIOB_MT_Y_PHASE;
-	g_magnetorquer_data.pwm_data[1].pwm_channel_number = MT_Y_PWM_PWM_CHANNEL;
+	g_adcs_data.mt_pwm_data[0].phase_gpio_pin_number = GPIOB_MT_X_PHASE;
+	g_adcs_data.mt_pwm_data[0].pwm_channel_number = MT_X_PWM_PWM_CHANNEL;
 
-	g_magnetorquer_data.pwm_data[2].phase_gpio_pin_number = GPIOB_MT_Z_PHASE;
-	g_magnetorquer_data.pwm_data[2].pwm_channel_number = MT_Z_PWM_PWM_CHANNEL;
+	g_adcs_data.mt_pwm_data[1].phase_gpio_pin_number = GPIOB_MT_Y_PHASE;
+	g_adcs_data.mt_pwm_data[1].pwm_channel_number = MT_Y_PWM_PWM_CHANNEL;
+
+	g_adcs_data.mt_pwm_data[2].phase_gpio_pin_number = GPIOB_MT_Z_PHASE;
+	g_adcs_data.mt_pwm_data[2].pwm_channel_number = MT_Z_PWM_PWM_CHANNEL;
 
 	for(int i = 0; i < 3; i++ ) {
-		palSetPad(GPIOB, g_magnetorquer_data.pwm_data[i].phase_gpio_pin_number);
+		palSetPad(GPIOB, g_adcs_data.mt_pwm_data[i].phase_gpio_pin_number);
 	}
 
 
@@ -752,6 +781,49 @@ THD_FUNCTION(adcs, arg)
 
     chprintf(DEBUG_SD, "Starting ADCS thread...\r\n");
     chThdSleepMilliseconds(50);
+
+
+#if 0
+//	select_magnetometer(EC_MAG_0_MZ_1);
+
+	end_card_magnetometoer_t ecm = EC_MAG_2_PZ_1;
+
+
+	chprintf(DEBUG_SD, "Setting ECM %u\r\n", ecm);
+	select_magnetometer(ecm);
+//	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
+//		select_magnetometer(ecm);
+//	}
+	for(;;) {
+			i2cStart(&I2CD1, &mmc5883ma_i2ccfg);
+
+			uint8_t dest = 0;
+			mmc5883maI2CReadRegister3(&I2CD1, ((0x30 >> 0) | (1<<7)), MMC5883MA_AD_PRDCT_ID_1, &dest);
+
+			uint16_t mag = 0;
+			mmc5883maI2CReadRegister4(&I2CD1, ((0x30 >> 0) | (1<<7)), MMC5883MA_AD_XOUT_LOW, &mag);
+			chprintf(DEBUG_SD, "MMC Chip ID: 0x%X, X=0x%X\r\n", dest, mag);
+
+//
+
+			i2cStop(&I2CD1);
+			chThdSleepMilliseconds(500);
+	}
+
+	for(;;) {
+		chThdSleepMilliseconds(100);
+	}
+#endif
+
+
+
+
+	init_end_cap_magnetometers();
+	for(;;) {
+		update_endcard_magnetometer_readings();
+		chThdSleepMilliseconds(1200);
+	}
+
     init_magnetorquer();
 
     /* Activates the ADC1 driver. */
@@ -760,11 +832,18 @@ THD_FUNCTION(adcs, arg)
     chprintf(DEBUG_SD, "done with adcStartConversion()...\r\n");
 
 
+    OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 3000;//FIXME remove this, this is just for testing
+    OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 4000;
+    OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = 5000;
+
+
     bmi088ObjectInit(&imudev);
 
     chprintf(DEBUG_SD, "Starting BMI088...\r\n");
     chThdSleepMilliseconds(50);
     bmi088Start(&imudev, &imucfg);
+
+
 
     chprintf(DEBUG_SD, "BMI088 state = %u, error_flags=0x%X\r\n", imudev.state, imudev.error_flags);
     if( imudev.state != BMI088_READY ) {
@@ -774,12 +853,22 @@ THD_FUNCTION(adcs, arg)
         if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
             chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be 0x%X\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED);
         } else {
-            chprintf(DEBUG_SD, "Failed to read accl chip ID from BMI088, r = %d\r\n", r);
+            chprintf(DEBUG_SD, "Failed to read accl chip ID from BMI088 ACCEL, r = %d\r\n", r);
         }
 
         if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
+        	chprintf(DEBUG_SD, "BMI088 ACCEL FAIL: didnt find BMI088!\r\n");
             //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
+        } else {
+        	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!\r\n");
         }
+
+
+        int16_t temp_c = 0;
+        bmi088ReadTemp(&imudev, &temp_c);
+        chprintf(DEBUG_SD, "Read temperature as %u\r\n", temp_c);
+
+
 
 
         uint8_t bmi088_gyro_chip_id = 0;
@@ -787,12 +876,16 @@ THD_FUNCTION(adcs, arg)
         if( r == MSG_OK ) {
             chprintf(DEBUG_SD, "BMI088 gyroscope ID is 0x%X, expected to be 0x%X\r\n", bmi088_gyro_chip_id, BMI088_GYR_CHIP_ID_EXPECTED);
         } else {
-            chprintf(DEBUG_SD, "Failed to read gyro chip ID from BMI088, r = %d\r\n", r);
+            chprintf(DEBUG_SD, "Failed to read gyro chip ID from BMI088 GYRO, r = %d\r\n", r);
         }
 
         if( bmi088_gyro_chip_id != BMI088_GYR_CHIP_ID_EXPECTED ) {
+        	chprintf(DEBUG_SD, "BMI088 GYRO FAIL: didnt find BMI088!\r\n");
             //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, IMU_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
+        } else {
+        	chprintf(DEBUG_SD, "BMI088 GYRO SUCCESS: found BMI088!\r\n");
         }
+
     }
     chprintf(DEBUG_SD, "Done initializing, starting loop...\r\n");
 
@@ -800,6 +893,7 @@ THD_FUNCTION(adcs, arg)
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
         update_imu_data();
+        update_endcard_magnetometer_readings();
         process_magnetorquer();
 
 /*

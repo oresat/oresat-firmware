@@ -163,6 +163,11 @@ bool bmi088Start(BMI088Driver *devp, const BMI088Config *config) {
 #endif
 
 
+    if( bmi088SoftReset(devp) != MSG_OK ) {
+       devp->error_flags |= (1<<0);
+	   ret = false;
+    }
+    chThdSleepMilliseconds(5);
 
 
     if( bmi088AccelerometerPowerOnOrOff(devp, BMI088_ON) != MSG_OK ) {

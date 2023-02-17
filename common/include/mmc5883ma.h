@@ -18,27 +18,28 @@
  * @{
  */
 
-#define MMC5883MA_I2C_ADDRESS                  0x30
+#define MMC5883MA_I2C_ADDRESS_READ                  ((0x30 >> 0) | (1<<7))
+#define MMC5883MA_I2C_ADDRESS_WRITE                 (0x30 >> 0)
 
 /**
  * @brief   MMC5883MA Driver version string.
  */
-#define MMC5883MA_VERSION                      "1.0.0"
+//#define MMC5883MA_VERSION                      "1.0.0"
 
 /**
  * @brief   MMC5883MA Driver version major number.
  */
-#define MMC5883MA_MAJOR                        1
+//#define MMC5883MA_MAJOR                        1
 
 /**
  * @brief   MMC5883MA Driver version minor number.
  */
-#define MMC5883MA_MINOR                        0
+//#define MMC5883MA_MINOR                        0
 
 /**
  * @brief   MMC5883MA Driver version patch number.
  */
-#define MMC5883MA_PATCH                        0
+//#define MMC5883MA_PATCH                        0
 /** @} */
 
 /**
@@ -354,7 +355,7 @@ typedef struct {
     /**
      * @brief MMC5883MA Slave Address
      */
-    i2caddr_t                   saddr;
+    //i2caddr_t                   saddr;
 #endif /* MMC5883MA_USE_I2C */
 } MMC5883MAConfig;
 
@@ -420,6 +421,8 @@ void mmc5883maObjectInit(MMC5883MADriver *devp);
 bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config);
 void mmc5883maStop(MMC5883MADriver *devp);
 bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest);
+bool mmc5883maI2CReadRegister3(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint8_t *dest_value);
+bool mmc5883maI2CReadRegister4(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint16_t *dest_value);
 #ifdef __cplusplus
 }
 #endif
