@@ -7,9 +7,13 @@
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 #include "mmc5883ma.h"
 #include "string.h"
+#include "chprintf.h"
+
+#define DEBUG_SD    (BaseSequentialStream*) &SD2
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -117,6 +121,10 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 //	osalDbgAssert((devp->state != MMC5883MA_READY),
 //	            "mmc5883maStart(), invalid state");
 
+	if( devp->state != MMC5883MA_READY ) {
+		return(false);
+	}
+
 	bool ret = false;
 
     /* Configuring common registers.*/
@@ -167,7 +175,10 @@ void mmc5883maObjectInit(MMC5883MADriver *devp) {
 }
 
 bool mmc5883maSoftReset(MMC5883MADriver *devp) {
-	return(mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_RST_CMD));
+	chprintf(DEBUG_SD, "Resetting MMC4883...\r\n");
+	bool r = mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL1, MMC5883MA_INTRNLCTRL1_SW_RST_CMD);
+	chThdSleepMilliseconds(5);
+	return(r);
 }
 
 /**
@@ -200,20 +211,41 @@ bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
 
     devp->state = MMC5883MA_READY;
 
-    mmc5883maSoftReset(devp);
-    chThdSleepMilliseconds(5);
 
-    if( ! mmc5883maI2CReadRegister2(devp->config->i2cp, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
-    	devp->state = MMC5883MA_STOP;
+    bool found_mmc5883ma_flag = false;
+
+    //Probe I2C bus to see what's attached
+    if( ! mmc5883maI2CReadRegister3(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+    	chprintf(DEBUG_SD, "Failed to read product code from MMC5883MA chip\r\n");
     } else {
-    	if( mmc_product_id_readback != 0x30 ) {
-    		//devp->state = MMC5883MA_STOP;
+    	if( mmc_product_id_readback == MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+			chprintf(DEBUG_SD, "Successfully read product code from MMC5883MA (good), 0x%X\r\n", mmc_product_id_readback);
+			found_mmc5883ma_flag = true;
+    	} else {
+    		chprintf(DEBUG_SD, "ERROR: unexpected product ID code from MMC5883MA, read 0x%X, expectex 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
     	}
     }
 
-    //Control 1 reg can be left default of all zeros, 100hz
-    uint8_t ctrl2 = (1<<2) | (1<<3); //50hz continuous mode
-    if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL2, ctrl2)) {
+
+    if( found_mmc5883ma_flag ) {
+		mmc5883maSoftReset(devp);
+
+		if( ! mmc5883maI2CReadRegister2(devp->config->i2cp, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+			devp->state = MMC5883MA_STOP;
+		} else {
+			chprintf(DEBUG_SD, "Read MMC5883MA product code as 0x%X, expected 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
+			if( mmc_product_id_readback != MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+				chprintf(DEBUG_SD, "ERROR: Read incorrect MMC5883MA product code!!!\r\n");
+				devp->state = MMC5883MA_STOP;
+			}
+		}
+
+		if( devp->state == MMC5883MA_READY ) {
+			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL2, MMC5883MA_INTRNLCTRL2_CM_FREQ_1_Hz)) {
+				devp->state = MMC5883MA_STOP;
+			}
+		}
+    } else {
     	devp->state = MMC5883MA_STOP;
     }
 

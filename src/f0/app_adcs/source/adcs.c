@@ -129,10 +129,9 @@ static const I2CConfig mmc5883ma_i2ccfg = {
     0
 };
 
-static const MMC5883MAConfig mmc4883ma_generic_config = {
+static const MMC5883MAConfig mmc5883ma_generic_config = {
 	.i2cp = &I2CD1,
-	.i2ccfg = &mmc5883ma_i2ccfg,
-//	.saddr = MMC5883MA_I2C_ADDRESS
+	.i2ccfg = &mmc5883ma_i2ccfg
 };
 
 
@@ -311,13 +310,12 @@ bool update_imu_data(void) {
     return ret;
 }
 
-bool connect_endcard_mmc4883ma(const uint8_t ltc4304_i2c_address, const bool conn_1_enable, const bool conn_2_enable) {
+bool connect_endcard_mmc5883ma(const uint8_t ltc4304_i2c_address, const bool conn_1_enable, const bool conn_2_enable) {
 	bool ret = true;
 
 	I2CDriver *i2cp = &I2CD1;
 
 	i2cStart(i2cp, &i2ccfg);
-
 	if( conn_1_enable ) {
 		ret = ltc4305_set_connections(i2cp, ltc4304_i2c_address, true, false);
 	} else if( conn_2_enable ) {
@@ -329,9 +327,9 @@ bool connect_endcard_mmc4883ma(const uint8_t ltc4304_i2c_address, const bool con
 	i2cStop(i2cp);
 
 	if( ! ret ) {
-		//chprintf(DEBUG_SD, "ERROR: Failed to set LTC4305 connections!\r\n");
+		chprintf(DEBUG_SD, "ERROR: Failed to set LTC4305 connections!\r\n");
 	} else {
-		//chprintf(DEBUG_SD, "SUCCESS: set LTC4305 connections!\r\n");
+//		chprintf(DEBUG_SD, "SUCCESS: set LTC4305 connections!\r\n");
 	}
 
 	return(ret);
@@ -340,53 +338,45 @@ bool connect_endcard_mmc4883ma(const uint8_t ltc4304_i2c_address, const bool con
 
 
 bool select_magnetometer(const end_card_magnetometoer_t ecm) {
-	chprintf(DEBUG_SD, "Selecting magnetometer %u\r\n", ecm);
+//	chprintf(DEBUG_SD, "Selecting magnetometer %u\r\n", ecm);
 	chThdSleepMilliseconds(10);
-
 
 	bool ret1 = false;
 	bool ret2 = false;
 
-	//EC_MAG_2_PZ_1
-//	ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
-//	ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
-//	chprintf(DEBUG_SD, "select_magnetometer(%d), %d, %d\r\n", ecm, ret1, ret2);
-//	return(true);
-
+	if( ecm != EC_MAG_NONE ) {
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
+		return(ret2);
+	}
 
 	switch(ecm) {
 	case EC_MAG_0_MZ_1:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret1 = connect_endcard_mmc5883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	case EC_MAG_1_MZ_2:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret1 = connect_endcard_mmc5883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	case EC_MAG_2_PZ_1:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
+		ret1 = connect_endcard_mmc5883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, true, false);
 		break;
 	case EC_MAG_3_PZ_2:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
+		ret1 = connect_endcard_mmc5883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, true);
 		break;
 	case EC_MAG_NONE:
-		ret1 = connect_endcard_mmc4883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
-		ret2 = connect_endcard_mmc4883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
+		ret1 = true;
+		//ret1 = connect_endcard_mmc5883ma(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, false, false); FIXME uncomment this
+		ret2 = connect_endcard_mmc5883ma(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, false, false);
 		break;
 	}
 
 
-#if 0
-	//FIXME re-enable this code
 	if( ! (ret1 && ret2) ) {
 		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers ret1=%d, ret2=%d\r\n", ret1, ret2);
 	}
-#else
-	chprintf(DEBUG_SD, "select_magnetometer(%d): %s\r\n", ecm, (ret2 ? "Success" : "Fail"));
-	return(ret2);//FIXME remove this line of code, this is for bench debuging
-#endif
 
 	return(ret1 && ret2);
 }
@@ -409,16 +399,13 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	}
 
 
-
-	chprintf(DEBUG_SD, "Reading from magnetometer...\r\n");chThdSleepMilliseconds(5);
+	chprintf(DEBUG_SD, "Reading from magnetometer %d: ", ecm);chThdSleepMilliseconds(5);
 
 	r = mmc5883maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data);
 
-	chprintf(DEBUG_SD, "MAG: mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
+	chprintf(DEBUG_SD, " mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
 			g_adcs_data.magetometer_data[ecm].data.my,
 			g_adcs_data.magetometer_data[ecm].data.mz);
-
-
 
 	select_magnetometer(EC_MAG_NONE);
 
@@ -429,7 +416,7 @@ bool update_endcard_magnetometer_readings(void) {
 	static systime_t last_mag_update_time = 0;
 
 	systime_t now_time = chVTGetSystemTime();
-	if( chTimeDiffX(last_mag_update_time, now_time) < 1000 ) {
+	if( chTimeDiffX(last_mag_update_time, now_time) < 500 ) { //Note: Default output rate for the MMC driver is 1hz, sample at 2X that
 		return(true);
 	}
 	last_mag_update_time = now_time;
@@ -438,7 +425,7 @@ bool update_endcard_magnetometer_readings(void) {
 	bool ret = true;
 
 	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
-		chprintf(DEBUG_SD, "Reading EMC %u\r\n", ecm);
+//		chprintf(DEBUG_SD, "Reading EMC %u\r\n", ecm);
 		select_and_read_magnetometer(ecm);
 	}
 
@@ -450,38 +437,30 @@ bool update_endcard_magnetometer_readings(void) {
 
 bool init_end_cap_magnetometers(void) {
 	palClearLine(LINE_MAG_N_EN);
+
 	chThdSleepMilliseconds(5);
 
 	bool ret = true;
 
-	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
+	for(end_card_magnetometoer_t ecm = EC_MAG_0_MZ_1; ecm < EC_MAG_NONE; ecm++ ) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
-		chThdSleepMilliseconds(20);
+		chThdSleepMilliseconds(5);
 
 		mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 
 		if( ! select_magnetometer(ecm) ) {
 			ret = false;
-			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u due to selection error\r\n");
+			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u due to LTC selection error\r\n");
 		} else {
-			if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc4883ma_generic_config) ) {
+			if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5883ma_generic_config) ) {
 				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u\r\n", ecm);
 				g_adcs_data.magetometer_data[ecm].is_initialized = true;
 			} else {
 				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u\r\n", ecm);
+				ret = false;
 			}
-			extern uint8_t mmc_product_id_readback;
-			chprintf(DEBUG_SD, "MMC Product Id readback = 0x%X\r\n", mmc_product_id_readback);
 		}
 	}
-
-
-	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
-		chprintf(DEBUG_SD, "ecm init %d = %d\r\n", ecm, g_adcs_data.magetometer_data[ecm].is_initialized);
-	}
-//	for(;;) {
-//
-//	}
 
 	select_magnetometer(EC_MAG_NONE);
 
@@ -720,11 +699,6 @@ void process_magnetorquer(void) {
 
 
 void init_magnetorquer(void) {
-
-//	for(;;) {
-//		chThdSleepMilliseconds(1200);
-//	}
-
 	memset(&g_adcs_data.mt_pwm_data, 0, sizeof(g_adcs_data.mt_pwm_data));
 
 	g_adcs_data.mt_pwm_data[0].phase_gpio_pin_number = GPIOB_MT_X_PHASE;
@@ -783,47 +757,7 @@ THD_FUNCTION(adcs, arg)
     chThdSleepMilliseconds(50);
 
 
-#if 0
-//	select_magnetometer(EC_MAG_0_MZ_1);
-
-	end_card_magnetometoer_t ecm = EC_MAG_2_PZ_1;
-
-
-	chprintf(DEBUG_SD, "Setting ECM %u\r\n", ecm);
-	select_magnetometer(ecm);
-//	for(end_card_magnetometoer_t ecm = 0; ecm < EC_MAG_NONE; ecm++ ) {
-//		select_magnetometer(ecm);
-//	}
-	for(;;) {
-			i2cStart(&I2CD1, &mmc5883ma_i2ccfg);
-
-			uint8_t dest = 0;
-			mmc5883maI2CReadRegister3(&I2CD1, ((0x30 >> 0) | (1<<7)), MMC5883MA_AD_PRDCT_ID_1, &dest);
-
-			uint16_t mag = 0;
-			mmc5883maI2CReadRegister4(&I2CD1, ((0x30 >> 0) | (1<<7)), MMC5883MA_AD_XOUT_LOW, &mag);
-			chprintf(DEBUG_SD, "MMC Chip ID: 0x%X, X=0x%X\r\n", dest, mag);
-
-//
-
-			i2cStop(&I2CD1);
-			chThdSleepMilliseconds(500);
-	}
-
-	for(;;) {
-		chThdSleepMilliseconds(100);
-	}
-#endif
-
-
-
-
 	init_end_cap_magnetometers();
-	for(;;) {
-		update_endcard_magnetometer_readings();
-		chThdSleepMilliseconds(1200);
-	}
-
     init_magnetorquer();
 
     /* Activates the ADC1 driver. */
@@ -870,7 +804,6 @@ THD_FUNCTION(adcs, arg)
 
 
 
-
         uint8_t bmi088_gyro_chip_id = 0;
         msg_t r = bmi088ReadGyroChipId(&imudev, &bmi088_gyro_chip_id);
         if( r == MSG_OK ) {
@@ -892,9 +825,9 @@ THD_FUNCTION(adcs, arg)
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
-        update_imu_data();
-        update_endcard_magnetometer_readings();
-        process_magnetorquer();
+        update_imu_data();//FIXME add error handling
+        update_endcard_magnetometer_readings();//FIXME add error handling
+        process_magnetorquer();//FIXME add error handling
 
 /*
         if( update_imu_data() ) {
