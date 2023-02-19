@@ -1,9 +1,12 @@
 #include <stdlib.h>
+#include "301/CO_ODinterface.h"
 #include "persist.h"
 #include "fram.h"
 #include "crc.h"
 #include "CANopen.h"
 #include "OD.h"
+
+extern CO_t *CO;
 
 typedef struct {
     uint32_t crc;
@@ -91,4 +94,75 @@ void persistResetAll(void)
         persistRestoreGroup(ptr->data);
         ptr++;
     }
+}
+
+ODR_t OD_write_1010(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten)
+{
+    (void)buf;
+    (void)count;
+    (void)countWritten;
+
+    switch(stream->subIndex){
+    case 1: // save all para
+        persistStoreAll();
+        break;
+    case 2: // save comm para
+        persistStoreGroup(&storage[2]);
+        break;
+    case 3: // save app para
+        persistStoreGroup(&storage[4]);
+        break;
+    case 4: // save man para
+        persistStoreGroup(&storage[3]);
+        break;
+    }
+
+    return ODR_OK;
+}
+
+ODR_t OD_write_1011(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten)
+{
+    (void)buf;
+    (void)count;
+    (void)countWritten;
+
+    switch(stream->subIndex){
+    case 1: // restore all para
+        persistRestoreAll();
+        break;
+    case 2: // restore comm para
+        persistRestoreGroup(&storage[2]);
+        break;
+    case 3: // restore app para
+        persistRestoreGroup(&storage[4]);
+        break;
+    case 4: // restore man para
+        persistRestoreGroup(&storage[3]);
+        break;
+    }
+
+    return ODR_OK;
+}
+
+OD_extension_t store_extension = {
+    .object = NULL,
+    .read = OD_readOriginal,
+    .write = OD_write_1010,
+};
+
+OD_extension_t restore_extension = {
+    .object = NULL,
+    .read = OD_readOriginal,
+    .write = OD_write_1011,
+};
+
+void persist_storage_init(void)
+{
+    persistRestoreAll();
+
+    OD_entry_t *store_entry = OD_find(OD, 0x1010);
+    OD_entry_t *restore_entry = OD_find(OD, 0x1011);
+
+    OD_extension_init(store_entry, &store_extension);
+    OD_extension_init(restore_entry, &restore_extension);
 }

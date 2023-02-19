@@ -17,5 +17,6 @@ void persistResetGroup(void *group);
 void persistStoreAll(void);
 void persistRestoreAll(void);
 void persistResetAll(void);
+void persist_storage_init(void);
 
 #endif

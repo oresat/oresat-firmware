@@ -164,7 +164,7 @@ static void app_init(void)
     framStart(&FRAMD1, &framcfg);
 
     /* Restore OD variables if available */
-    persistRestoreAll();
+    persist_storage_init();
 
     /* Prepare filesystem */
     fs_init(&FSD1);
