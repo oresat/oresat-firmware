@@ -10,6 +10,7 @@ extern "C" {
 
 void cmd_nmt(BaseSequentialStream *chp, int argc, char *argv[]);
 void cmd_sdo(BaseSequentialStream *chp, int argc, char *argv[]);
+void cmd_sync(BaseSequentialStream *chp, int argc, char *argv[]);
 
 #ifdef __cplusplus
 }

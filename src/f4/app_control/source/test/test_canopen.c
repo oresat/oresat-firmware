@@ -126,3 +126,23 @@ sdo_usage:
     chprintf(chp, "Usage: sdo (r)ead|(w)rite <node_id> <index> <subindex> <size> [value]\r\n");
     return;
 }
+
+/*===========================================================================*/
+/* OreSat CAN Bus SYNC message                                               */
+/*===========================================================================*/
+void cmd_sync(BaseSequentialStream *chp, int argc, char *argv[])
+{
+    (void)argv;
+
+    if (argc != 0) {
+        goto sdo_usage;
+    }
+
+    CO_SYNCsend(CO->SYNC);
+    chprintf(chp, "Sent!\r\n");
+    return;
+
+sdo_usage:
+    chprintf(chp, "Usage: sync\r\n");
+    return;
+}

@@ -11758,7 +11758,7 @@ HighLimit=F
 ParameterName=State Control
 ObjectType=0x09
 ;StorageLocation=PERSIST_APP
-SubNumber=5
+SubNumber=6
 
 [6001sub0]
 ParameterName=Highest sub-index supported
@@ -11766,7 +11766,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_APP
 DataType=0x0005
 AccessType=const
-DefaultValue=0x04
+DefaultValue=0x05
 
 ;State saving interval in seconds
 [6001sub1]
@@ -11807,6 +11807,15 @@ ObjectType=0x07
 DataType=0x0001
 AccessType=rw
 DefaultValue=0
+
+;Time sync tImeout in seconds
+[6001sub5]
+ParameterName=Time Sync Timeout
+ObjectType=0x07
+;StorageLocation=PERSIST_APP
+DataType=0x0007
+AccessType=rw
+DefaultValue=14400
 
 ;Antenna deployment control
 [6002]

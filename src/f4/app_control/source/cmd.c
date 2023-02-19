@@ -1,4 +1,5 @@
 #include "cmd.h"
+#include "301/CO_PDO.h"
 #include "c3.h"
 #include "fw.h"
 #include "fs.h"
@@ -6,6 +7,8 @@
 #include "rtc.h"
 #include "node_mgr.h"
 #include "CO_master.h"
+
+extern CO_t *CO;
 
 void cmd_process(cmd_t *cmd, fb_t *resp_fb)
 {
@@ -131,6 +134,15 @@ void cmd_process(cmd_t *cmd, fb_t *resp_fb)
         } *sdo_arg = (void*)cmd->arg;
         sdo_transfer(SDO_CLI_WRITE, sdo_arg->node_id, sdo_arg->index, sdo_arg->subindex, sdo_arg->size, sdo_arg->size, sdo_arg->data);
         *((uint8_t*)ret) = 0;
+        break;
+    case CMD_SYNC:
+        ret = fb_put(resp_fb, 1);
+        CO_SYNCsend(CO->SYNC);
+        break;
+    case CMD_TIME_SYNC:
+        ret = fb_put(resp_fb, 1);
+        CO_TPDOsendRequest(&CO->TPDO[0]);
+        break;
     default:
         break;
     }

@@ -21,6 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "gps_time_sync.h"
 #include "wdt.h"
 #include "c3.h"
 #include "fram.h"
@@ -96,6 +97,16 @@ static thread_descriptor_t node_mgr_desc = {
     .funcp = node_mgr,
     .arg = (void*)&nodes
 };
+static worker_t gps_time_sync_worker;
+static thread_descriptor_t gps_time_sync_desc = {
+    .name = "GPS Time Sync",
+    .wbase = THD_WORKING_AREA_BASE(gps_time_sync_wa),
+    .wend = THD_WORKING_AREA_END(gps_time_sync_wa),
+    .prio = NORMALPRIO,
+    .funcp = gps_time_sync,
+    .arg = (void*)&nodes
+};
+
 
 static I2CConfig i2ccfg = {
     OPMODE_I2C,
@@ -142,6 +153,7 @@ static void app_init(void)
     reg_worker(&wdt_worker, &wdt_desc, true, true);
     reg_worker(&node_mgr_worker, &node_mgr_desc, true, true);
     reg_worker(&c3_worker, &c3_desc, true, true);
+    reg_worker(&gps_time_sync_worker, &gps_time_sync_desc, true, true);
     start_worker(&wdt_worker);
 
     /* Start crypto driver */

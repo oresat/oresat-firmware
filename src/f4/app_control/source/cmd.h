@@ -26,6 +26,8 @@ typedef enum {
     CMD_OPD_STATUS,
     CMD_RTC_SETTIME,
     CMD_SDO_WRITE,
+    CMD_SYNC,
+    CMD_TIME_SYNC,
 } cmd_code_t;
 
 typedef struct {

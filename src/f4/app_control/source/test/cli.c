@@ -20,6 +20,7 @@
 #include "test_deploy.h"
 #include "test_crc.h"
 #include "test_hmac.h"
+#include "test_time_sync.h"
 #include "chprintf.h"
 #include "shell.h"
 
@@ -128,6 +129,7 @@ static const ShellCommand commands[] = {
     {"fw", cmd_fw},
     {"nmt", cmd_nmt},
     {"sdo", cmd_sdo},
+    {"sync", cmd_sync},
     {"opd", cmd_opd},
     {"node", cmd_node},
     {"mmc", cmd_mmc},
@@ -145,6 +147,7 @@ static const ShellCommand commands[] = {
     {"hmac", cmd_hmac},
     {"deploy", cmd_deploy},
     {"edl", cmd_edl},
+    {"timesync", cmd_time_sync},
     {NULL, NULL}
 };
 
