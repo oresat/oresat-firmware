@@ -21,6 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "ecss.h"
 #include "gps_time_sync.h"
 #include "wdt.h"
 #include "c3.h"
@@ -158,6 +159,9 @@ static void app_init(void)
 
     /* Start crypto driver */
     cryStart(&CRYD1, NULL);
+
+    /* Initialize common extensions */
+    ecss_extension_init();
 
     /* Initialize FRAM */
     framObjectInit(&FRAMD1);

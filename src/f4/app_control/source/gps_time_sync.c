@@ -1,11 +1,9 @@
 #include "gps_time_sync.h"
 #include "301/CO_NMT_Heartbeat.h"
 #include "301/CO_SYNC.h"
-#include "301/CO_ODinterface.h"
 #include "CANopen.h"
 #include "node_mgr.h"
 #include "opd.h"
-#include "rtc.h"
 
 #define GPS_OPD_ID 0x19
 
@@ -81,56 +79,4 @@ THD_FUNCTION(gps_time_sync, arg)
     }
 
     chThdExit(MSG_OK);
-}
-
-ODR_t OD_read_2010(OD_stream_t *stream, void *buf, OD_size_t count, OD_size_t *countRead)
-{
-    time_scet_t scet;
-
-    if (buf == NULL || stream == NULL || countRead == NULL) {
-        return ODR_DEV_INCOMPAT;
-    }
-
-    if (count > stream->dataLength) {
-        count = stream->dataLength;
-    }
-
-    if (stream->subIndex == 1) {
-        rtcGetTimeSCET(&scet);
-    }
-
-    *countRead = count;
-    return ODR_OK;
-}
-
-
-ODR_t OD_write_2010(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten)
-{
-    time_scet_t scet;
-
-    if (buf == NULL || stream == NULL || countWritten == NULL) {
-        return ODR_DEV_INCOMPAT;
-    }
-
-    if (stream->subIndex == 1) {
-        scet.raw = *(uint64_t *)stream->object;
-        rtcSetTimeSCET(&scet);
-        memcpy(&scet, buf, stream->dataLength);
-    }
-
-    *countWritten = count;
-    return ODR_OK;
-}
-
-static OD_extension_t store_extension = {
-    .object = NULL,
-    .read = OD_read_2010,
-    .write = OD_write_2010,
-};
-
-
-void gps_time_sync_extension_init(void)
-{
-    OD_entry_t *gps_entry = OD_find(OD, 0x2010);
-    OD_extension_init(gps_entry, &store_extension);
 }

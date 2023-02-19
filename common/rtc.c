@@ -263,29 +263,3 @@ uint32_t rtcEncodeRelAlarm(const RTCDateTime *timespec, int days, int hours, int
     /* Return the encoded alarm value */
     return rtcEncodeAlarm(&alarm_timespec, 0);
 }
-
-/* TODO: Move these out of RTC probably */
-/* TODO: Re-implement these using new OD interface */
-/*
-CO_SDO_abortCode_t OD_SCET_Func(CO_ODF_arg_t *ODF_arg)
-{
-    if (ODF_arg->reading) {
-        rtcGetTimeSCET((time_scet_t*)ODF_arg->data);
-    } else {
-        rtcSetTimeSCET((time_scet_t*)ODF_arg->data);
-    }
-
-    return CO_SDO_AB_NONE;
-}
-
-CO_SDO_abortCode_t OD_UTC_Func(CO_ODF_arg_t *ODF_arg)
-{
-    if (ODF_arg->reading) {
-        rtcGetTimeUTC((time_utc_t*)ODF_arg->data);
-    } else {
-        rtcSetTimeUTC((time_utc_t*)ODF_arg->data);
-    }
-
-    return CO_SDO_AB_NONE;
-}
-*/

@@ -8,6 +8,4 @@
 extern THD_WORKING_AREA(gps_time_sync_wa, 0x40);
 extern THD_FUNCTION(gps_time_sync, arg);
 
-void gps_time_sync_extension_init(void);
-
 #endif /* _GPS_TIME_SYNC_H_ */
