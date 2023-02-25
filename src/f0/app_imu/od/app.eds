@@ -5303,5 +5303,5 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x000A
 AccessType=ro
-DefaultValue=00000000000000000000
+DefaultValue=00 00 00 00 00 00 00 00 00 00
 

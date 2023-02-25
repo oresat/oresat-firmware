@@ -9680,6 +9680,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2]
 ParameterName=
@@ -9687,6 +9688,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3]
 ParameterName=
@@ -9694,6 +9696,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4]
 ParameterName=
@@ -9701,6 +9704,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5]
 ParameterName=
@@ -9708,6 +9712,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6]
 ParameterName=
@@ -9715,6 +9720,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7]
 ParameterName=
@@ -9722,6 +9728,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub8]
 ParameterName=
@@ -9729,6 +9736,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub9]
 ParameterName=
@@ -9736,6 +9744,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subA]
 ParameterName=
@@ -9743,6 +9752,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subB]
 ParameterName=
@@ -9750,6 +9760,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subC]
 ParameterName=
@@ -9757,6 +9768,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subD]
 ParameterName=
@@ -9764,6 +9776,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subE]
 ParameterName=
@@ -9771,6 +9784,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81subF]
 ParameterName=
@@ -9778,6 +9792,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub10]
 ParameterName=
@@ -9785,6 +9800,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub11]
 ParameterName=
@@ -9792,6 +9808,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub12]
 ParameterName=
@@ -9799,6 +9816,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub13]
 ParameterName=
@@ -9806,6 +9824,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub14]
 ParameterName=
@@ -9813,6 +9832,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub15]
 ParameterName=
@@ -9820,6 +9840,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub16]
 ParameterName=
@@ -9827,6 +9848,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub17]
 ParameterName=
@@ -9834,6 +9856,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub18]
 ParameterName=
@@ -9841,6 +9864,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub19]
 ParameterName=
@@ -9848,6 +9872,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1A]
 ParameterName=
@@ -9855,6 +9880,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1B]
 ParameterName=
@@ -9862,6 +9888,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1C]
 ParameterName=
@@ -9869,6 +9896,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1D]
 ParameterName=
@@ -9876,6 +9904,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1E]
 ParameterName=
@@ -9883,6 +9912,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub1F]
 ParameterName=
@@ -9890,6 +9920,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub20]
 ParameterName=
@@ -9897,6 +9928,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub21]
 ParameterName=
@@ -9904,6 +9936,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub22]
 ParameterName=
@@ -9911,6 +9944,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub23]
 ParameterName=
@@ -9918,6 +9952,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub24]
 ParameterName=
@@ -9925,6 +9960,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub25]
 ParameterName=
@@ -9932,6 +9968,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub26]
 ParameterName=
@@ -9939,6 +9976,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub27]
 ParameterName=
@@ -9946,6 +9984,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub28]
 ParameterName=
@@ -9953,6 +9992,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub29]
 ParameterName=
@@ -9960,6 +10000,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2A]
 ParameterName=
@@ -9967,6 +10008,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2B]
 ParameterName=
@@ -9974,6 +10016,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2C]
 ParameterName=
@@ -9981,6 +10024,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2D]
 ParameterName=
@@ -9988,6 +10032,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2E]
 ParameterName=
@@ -9995,6 +10040,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub2F]
 ParameterName=
@@ -10002,6 +10048,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub30]
 ParameterName=
@@ -10009,6 +10056,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub31]
 ParameterName=
@@ -10016,6 +10064,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub32]
 ParameterName=
@@ -10023,6 +10072,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub33]
 ParameterName=
@@ -10030,6 +10080,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub34]
 ParameterName=
@@ -10037,6 +10088,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub35]
 ParameterName=
@@ -10044,6 +10096,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub36]
 ParameterName=
@@ -10051,6 +10104,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub37]
 ParameterName=
@@ -10058,6 +10112,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub38]
 ParameterName=
@@ -10065,6 +10120,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub39]
 ParameterName=
@@ -10072,6 +10128,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3A]
 ParameterName=
@@ -10079,6 +10136,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3B]
 ParameterName=
@@ -10086,6 +10144,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3C]
 ParameterName=
@@ -10093,6 +10152,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3D]
 ParameterName=
@@ -10100,6 +10160,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3E]
 ParameterName=
@@ -10107,6 +10168,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub3F]
 ParameterName=
@@ -10114,6 +10176,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub40]
 ParameterName=
@@ -10121,6 +10184,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub41]
 ParameterName=
@@ -10128,6 +10192,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub42]
 ParameterName=
@@ -10135,6 +10200,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub43]
 ParameterName=
@@ -10142,6 +10208,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub44]
 ParameterName=
@@ -10149,6 +10216,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub45]
 ParameterName=
@@ -10156,6 +10224,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub46]
 ParameterName=
@@ -10163,6 +10232,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub47]
 ParameterName=
@@ -10170,6 +10240,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub48]
 ParameterName=
@@ -10177,6 +10248,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub49]
 ParameterName=
@@ -10184,6 +10256,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4A]
 ParameterName=
@@ -10191,6 +10264,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4B]
 ParameterName=
@@ -10198,6 +10272,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4C]
 ParameterName=
@@ -10205,6 +10280,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4D]
 ParameterName=
@@ -10212,6 +10288,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4E]
 ParameterName=
@@ -10219,6 +10296,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub4F]
 ParameterName=
@@ -10226,6 +10304,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub50]
 ParameterName=
@@ -10233,6 +10312,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub51]
 ParameterName=
@@ -10240,6 +10320,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub52]
 ParameterName=
@@ -10247,6 +10328,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub53]
 ParameterName=
@@ -10254,6 +10336,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub54]
 ParameterName=
@@ -10261,6 +10344,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub55]
 ParameterName=
@@ -10268,6 +10352,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub56]
 ParameterName=
@@ -10275,6 +10360,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub57]
 ParameterName=
@@ -10282,6 +10368,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub58]
 ParameterName=
@@ -10289,6 +10376,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub59]
 ParameterName=
@@ -10296,6 +10384,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5A]
 ParameterName=
@@ -10303,6 +10392,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5B]
 ParameterName=
@@ -10310,6 +10400,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5C]
 ParameterName=
@@ -10317,6 +10408,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5D]
 ParameterName=
@@ -10324,6 +10416,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5E]
 ParameterName=
@@ -10331,6 +10424,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub5F]
 ParameterName=
@@ -10338,6 +10432,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub60]
 ParameterName=
@@ -10345,6 +10440,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub61]
 ParameterName=
@@ -10352,6 +10448,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub62]
 ParameterName=
@@ -10359,6 +10456,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub63]
 ParameterName=
@@ -10366,6 +10464,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub64]
 ParameterName=
@@ -10373,6 +10472,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub65]
 ParameterName=
@@ -10380,6 +10480,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub66]
 ParameterName=
@@ -10387,6 +10488,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub67]
 ParameterName=
@@ -10394,6 +10496,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub68]
 ParameterName=
@@ -10401,6 +10504,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub69]
 ParameterName=
@@ -10408,6 +10512,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6A]
 ParameterName=
@@ -10415,6 +10520,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6B]
 ParameterName=
@@ -10422,6 +10528,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6C]
 ParameterName=
@@ -10429,6 +10536,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6D]
 ParameterName=
@@ -10436,6 +10544,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6E]
 ParameterName=
@@ -10443,6 +10552,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub6F]
 ParameterName=
@@ -10450,6 +10560,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub70]
 ParameterName=
@@ -10457,6 +10568,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub71]
 ParameterName=
@@ -10464,6 +10576,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub72]
 ParameterName=
@@ -10471,6 +10584,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub73]
 ParameterName=
@@ -10478,6 +10592,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub74]
 ParameterName=
@@ -10485,6 +10600,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub75]
 ParameterName=
@@ -10492,6 +10608,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub76]
 ParameterName=
@@ -10499,6 +10616,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub77]
 ParameterName=
@@ -10506,6 +10624,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub78]
 ParameterName=
@@ -10513,6 +10632,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub79]
 ParameterName=
@@ -10520,6 +10640,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7A]
 ParameterName=
@@ -10527,6 +10648,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7B]
 ParameterName=
@@ -10534,6 +10656,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7C]
 ParameterName=
@@ -10541,6 +10664,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7D]
 ParameterName=
@@ -10548,6 +10672,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7E]
 ParameterName=
@@ -10555,6 +10680,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F81sub7F]
 ParameterName=
@@ -10562,6 +10688,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 [1F82]
 ParameterName=RequestNMT
@@ -10583,6 +10710,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2]
 ParameterName=
@@ -10590,6 +10718,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3]
 ParameterName=
@@ -10597,6 +10726,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4]
 ParameterName=
@@ -10604,6 +10734,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5]
 ParameterName=
@@ -10611,6 +10742,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6]
 ParameterName=
@@ -10618,6 +10750,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7]
 ParameterName=
@@ -10625,6 +10758,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub8]
 ParameterName=
@@ -10632,6 +10766,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub9]
 ParameterName=
@@ -10639,6 +10774,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subA]
 ParameterName=
@@ -10646,6 +10782,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subB]
 ParameterName=
@@ -10653,6 +10790,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subC]
 ParameterName=
@@ -10660,6 +10798,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subD]
 ParameterName=
@@ -10667,6 +10806,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subE]
 ParameterName=
@@ -10674,6 +10814,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82subF]
 ParameterName=
@@ -10681,6 +10822,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub10]
 ParameterName=
@@ -10688,6 +10830,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub11]
 ParameterName=
@@ -10695,6 +10838,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub12]
 ParameterName=
@@ -10702,6 +10846,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub13]
 ParameterName=
@@ -10709,6 +10854,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub14]
 ParameterName=
@@ -10716,6 +10862,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub15]
 ParameterName=
@@ -10723,6 +10870,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub16]
 ParameterName=
@@ -10730,6 +10878,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub17]
 ParameterName=
@@ -10737,6 +10886,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub18]
 ParameterName=
@@ -10744,6 +10894,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub19]
 ParameterName=
@@ -10751,6 +10902,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1A]
 ParameterName=
@@ -10758,6 +10910,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1B]
 ParameterName=
@@ -10765,6 +10918,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1C]
 ParameterName=
@@ -10772,6 +10926,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1D]
 ParameterName=
@@ -10779,6 +10934,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1E]
 ParameterName=
@@ -10786,6 +10942,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub1F]
 ParameterName=
@@ -10793,6 +10950,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub20]
 ParameterName=
@@ -10800,6 +10958,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub21]
 ParameterName=
@@ -10807,6 +10966,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub22]
 ParameterName=
@@ -10814,6 +10974,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub23]
 ParameterName=
@@ -10821,6 +10982,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub24]
 ParameterName=
@@ -10828,6 +10990,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub25]
 ParameterName=
@@ -10835,6 +10998,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub26]
 ParameterName=
@@ -10842,6 +11006,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub27]
 ParameterName=
@@ -10849,6 +11014,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub28]
 ParameterName=
@@ -10856,6 +11022,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub29]
 ParameterName=
@@ -10863,6 +11030,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2A]
 ParameterName=
@@ -10870,6 +11038,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2B]
 ParameterName=
@@ -10877,6 +11046,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2C]
 ParameterName=
@@ -10884,6 +11054,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2D]
 ParameterName=
@@ -10891,6 +11062,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2E]
 ParameterName=
@@ -10898,6 +11070,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub2F]
 ParameterName=
@@ -10905,6 +11078,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub30]
 ParameterName=
@@ -10912,6 +11086,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub31]
 ParameterName=
@@ -10919,6 +11094,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub32]
 ParameterName=
@@ -10926,6 +11102,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub33]
 ParameterName=
@@ -10933,6 +11110,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub34]
 ParameterName=
@@ -10940,6 +11118,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub35]
 ParameterName=
@@ -10947,6 +11126,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub36]
 ParameterName=
@@ -10954,6 +11134,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub37]
 ParameterName=
@@ -10961,6 +11142,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub38]
 ParameterName=
@@ -10968,6 +11150,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub39]
 ParameterName=
@@ -10975,6 +11158,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3A]
 ParameterName=
@@ -10982,6 +11166,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3B]
 ParameterName=
@@ -10989,6 +11174,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3C]
 ParameterName=
@@ -10996,6 +11182,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3D]
 ParameterName=
@@ -11003,6 +11190,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3E]
 ParameterName=
@@ -11010,6 +11198,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub3F]
 ParameterName=
@@ -11017,6 +11206,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub40]
 ParameterName=
@@ -11024,6 +11214,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub41]
 ParameterName=
@@ -11031,6 +11222,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub42]
 ParameterName=
@@ -11038,6 +11230,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub43]
 ParameterName=
@@ -11045,6 +11238,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub44]
 ParameterName=
@@ -11052,6 +11246,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub45]
 ParameterName=
@@ -11059,6 +11254,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub46]
 ParameterName=
@@ -11066,6 +11262,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub47]
 ParameterName=
@@ -11073,6 +11270,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub48]
 ParameterName=
@@ -11080,6 +11278,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub49]
 ParameterName=
@@ -11087,6 +11286,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4A]
 ParameterName=
@@ -11094,6 +11294,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4B]
 ParameterName=
@@ -11101,6 +11302,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4C]
 ParameterName=
@@ -11108,6 +11310,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4D]
 ParameterName=
@@ -11115,6 +11318,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4E]
 ParameterName=
@@ -11122,6 +11326,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub4F]
 ParameterName=
@@ -11129,6 +11334,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub50]
 ParameterName=
@@ -11136,6 +11342,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub51]
 ParameterName=
@@ -11143,6 +11350,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub52]
 ParameterName=
@@ -11150,6 +11358,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub53]
 ParameterName=
@@ -11157,6 +11366,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub54]
 ParameterName=
@@ -11164,6 +11374,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub55]
 ParameterName=
@@ -11171,6 +11382,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub56]
 ParameterName=
@@ -11178,6 +11390,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub57]
 ParameterName=
@@ -11185,6 +11398,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub58]
 ParameterName=
@@ -11192,6 +11406,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub59]
 ParameterName=
@@ -11199,6 +11414,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5A]
 ParameterName=
@@ -11206,6 +11422,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5B]
 ParameterName=
@@ -11213,6 +11430,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5C]
 ParameterName=
@@ -11220,6 +11438,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5D]
 ParameterName=
@@ -11227,6 +11446,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5E]
 ParameterName=
@@ -11234,6 +11454,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub5F]
 ParameterName=
@@ -11241,6 +11462,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub60]
 ParameterName=
@@ -11248,6 +11470,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub61]
 ParameterName=
@@ -11255,6 +11478,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub62]
 ParameterName=
@@ -11262,6 +11486,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub63]
 ParameterName=
@@ -11269,6 +11494,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub64]
 ParameterName=
@@ -11276,6 +11502,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub65]
 ParameterName=
@@ -11283,6 +11510,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub66]
 ParameterName=
@@ -11290,6 +11518,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub67]
 ParameterName=
@@ -11297,6 +11526,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub68]
 ParameterName=
@@ -11304,6 +11534,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub69]
 ParameterName=
@@ -11311,6 +11542,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6A]
 ParameterName=
@@ -11318,6 +11550,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6B]
 ParameterName=
@@ -11325,6 +11558,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6C]
 ParameterName=
@@ -11332,6 +11566,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6D]
 ParameterName=
@@ -11339,6 +11574,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6E]
 ParameterName=
@@ -11346,6 +11582,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub6F]
 ParameterName=
@@ -11353,6 +11590,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub70]
 ParameterName=
@@ -11360,6 +11598,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub71]
 ParameterName=
@@ -11367,6 +11606,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub72]
 ParameterName=
@@ -11374,6 +11614,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub73]
 ParameterName=
@@ -11381,6 +11622,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub74]
 ParameterName=
@@ -11388,6 +11630,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub75]
 ParameterName=
@@ -11395,6 +11638,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub76]
 ParameterName=
@@ -11402,6 +11646,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub77]
 ParameterName=
@@ -11409,6 +11654,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub78]
 ParameterName=
@@ -11416,6 +11662,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub79]
 ParameterName=
@@ -11423,6 +11670,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7A]
 ParameterName=
@@ -11430,6 +11678,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7B]
 ParameterName=
@@ -11437,6 +11686,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7C]
 ParameterName=
@@ -11444,6 +11694,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7D]
 ParameterName=
@@ -11451,6 +11702,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7E]
 ParameterName=
@@ -11458,6 +11710,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F82sub7F]
 ParameterName=
@@ -11465,6 +11718,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=rw
+DefaultValue=0
 
 [1F89]
 ParameterName=BootTime
@@ -11472,6 +11726,7 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
+DefaultValue=0
 
 ;C3 State
 ;'A': Offline
@@ -11814,7 +12069,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_KEYS
 DataType=0x000A
 AccessType=wo
-DefaultValue=0
+DefaultValue=00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 [6005sub2]
 ParameterName=Key 2
@@ -11822,7 +12077,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_KEYS
 DataType=0x000A
 AccessType=wo
-DefaultValue=0
+DefaultValue=00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 [6005sub3]
 ParameterName=Key 3
@@ -11830,7 +12085,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_KEYS
 DataType=0x000A
 AccessType=wo
-DefaultValue=0
+DefaultValue=00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 [6005sub4]
 ParameterName=Key 4
@@ -11838,7 +12093,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_KEYS
 DataType=0x000A
 AccessType=wo
-DefaultValue=0
+DefaultValue=00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
 [6006]
 ParameterName=CCSDS
@@ -15217,5 +15472,5 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x000A
 AccessType=ro
-DefaultValue=00000000000000000000
+DefaultValue=00 00 00 00 00 00 00 00 00 00
 
