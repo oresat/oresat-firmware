@@ -7095,7 +7095,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0xC0000180+$NODEID
+DefaultValue=0x40000180+$NODEID
 
 [1800sub2]
 ParameterName=Transmission type
