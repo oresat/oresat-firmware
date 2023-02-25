@@ -471,7 +471,7 @@ DefaultValue=0.0.0
 ParameterName=Store parameters
 ObjectType=0x08
 ;StorageLocation=RAM
-SubNumber=5
+SubNumber=7
 
 [1010sub0]
 ParameterName=Highest sub-index supported
@@ -479,7 +479,7 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x04
+DefaultValue=0x06
 
 [1010sub1]
 ParameterName=Save all parameters
@@ -513,6 +513,22 @@ DataType=0x0007
 AccessType=rw
 DefaultValue=0x00000001
 
+[1010sub5]
+ParameterName=Save state defined parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1010sub6]
+ParameterName=Save key defined parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
 ;Sub-indexes 1 and above:
 ;* Reading provides information about its restoring capability:
 ;  * bit 0: If set, CANopen device restores parameters
@@ -521,7 +537,7 @@ DefaultValue=0x00000001
 ParameterName=Restore default parameters
 ObjectType=0x08
 ;StorageLocation=RAM
-SubNumber=5
+SubNumber=7
 
 [1011sub0]
 ParameterName=Highest sub-index supported
@@ -529,7 +545,7 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x04
+DefaultValue=0x06
 
 [1011sub1]
 ParameterName=Restore all default parameters
@@ -557,6 +573,22 @@ DefaultValue=0x00000001
 
 [1011sub4]
 ParameterName=Restore manufacturer defined default parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011sub5]
+ParameterName=Restore state defined parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011sub6]
+ParameterName=Restore key defined parameters
 ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x0007

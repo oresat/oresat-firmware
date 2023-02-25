@@ -112,8 +112,14 @@ ODR_t OD_write_1010(OD_stream_t *stream, const void *buf, OD_size_t count, OD_si
     case 3: // save app para
         persistStoreGroup(&storage[4]);
         break;
-    case 4: // save man para
+    case 4: // save mfr para
         persistStoreGroup(&storage[3]);
+        break;
+    case 5: // store state para
+        persistStoreGroup(&storage[1]);
+        break;
+    case 6: // store keys para
+        persistStoreGroup(&storage[0]);
         break;
     }
 
@@ -136,8 +142,14 @@ ODR_t OD_write_1011(OD_stream_t *stream, const void *buf, OD_size_t count, OD_si
     case 3: // restore app para
         persistRestoreGroup(&storage[4]);
         break;
-    case 4: // restore man para
+    case 4: // restore mfr para
         persistRestoreGroup(&storage[3]);
+        break;
+    case 5: // restore state para
+        persistRestoreGroup(&storage[1]);
+        break;
+    case 6: // restore keys para
+        persistRestoreGroup(&storage[0]);
         break;
     }
 
