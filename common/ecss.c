@@ -5,77 +5,65 @@
 
 ODR_t OD_read_2010(OD_stream_t *stream, void *buf, OD_size_t count, OD_size_t *countRead)
 {
+    (void)count;
     time_scet_t scet;
 
-    if (buf == NULL || stream == NULL || countRead == NULL) {
+    if (buf == NULL || stream == NULL || stream->subIndex != 0 || countRead == NULL) {
         return ODR_DEV_INCOMPAT;
     }
 
-    if (count > stream->dataLength) {
-        count = stream->dataLength;
-    }
+    rtcGetTimeSCET(&scet);
+    memcpy(buf, &scet.raw, sizeof(uint64_t));
 
-    if (stream->subIndex == 0) {
-        rtcGetTimeSCET(&scet);
-        memcpy(buf, &scet, stream->dataLength);
-    }
-
-    *countRead = count;
+    *countRead = sizeof(uint64_t);
     return ODR_OK;
 }
 
 ODR_t OD_write_2010(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten)
 {
+    (void)count;
     time_scet_t scet;
 
-    if (buf == NULL || stream == NULL || countWritten == NULL) {
+    if (buf == NULL || stream == NULL || stream->subIndex != 0 || countWritten == NULL) {
         return ODR_DEV_INCOMPAT;
     }
 
-    if (stream->subIndex == 0) {
-        scet.raw = *(uint64_t *)stream->object;
-        rtcSetTimeSCET(&scet);
-    }
+    scet.raw = *(uint64_t *)buf;
+    rtcSetTimeSCET(&scet);
 
-    *countWritten = count;
+    *countWritten = sizeof(uint64_t);
     return ODR_OK;
 }
 
 ODR_t OD_read_2011(OD_stream_t *stream, void *buf, OD_size_t count, OD_size_t *countRead)
 {
+    (void)count;
     time_utc_t utc;
 
-    if (buf == NULL || stream == NULL || countRead == NULL) {
+    if (buf == NULL || stream == NULL || stream->subIndex != 0 || countRead == NULL) {
         return ODR_DEV_INCOMPAT;
     }
 
-    if (count > stream->dataLength) {
-        count = stream->dataLength;
-    }
+    rtcGetTimeUTC(&utc);
+    memcpy(buf, &utc.raw, sizeof(uint64_t));
 
-    if (stream->subIndex == 0) {
-        rtcGetTimeUTC(&utc);
-        memcpy(buf, &utc, stream->dataLength);
-    }
-
-    *countRead = count;
+    *countRead = sizeof(uint64_t);
     return ODR_OK;
 }
 
 ODR_t OD_write_2011(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten)
 {
+    (void)count;
     time_utc_t utc;
 
-    if (buf == NULL || stream == NULL || countWritten == NULL) {
+    if (buf == NULL || stream == NULL || stream->subIndex != 0 || countWritten == NULL) {
         return ODR_DEV_INCOMPAT;
     }
     
-    if (stream->subIndex == 0) {
-        utc.raw = *(uint64_t *)stream->object;
-        rtcSetTimeUTC(&utc);
-    }
+    utc.raw = *(uint64_t *)buf;
+    rtcSetTimeUTC(&utc);
 
-    *countWritten = count;
+    *countWritten = sizeof(uint64_t);
     return ODR_OK;
 }
 
