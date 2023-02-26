@@ -18,7 +18,7 @@ typedef struct oresat_node_state {
 /* TODO: Don't use extern, switch to some system config/object struct */
 extern CO_t *CO;
 
-node_state_t node_state[OD_CNT_HB_CONS];
+node_state_t node_state[OD_CNT_ARR_1016];
 EVENTSOURCE_DECL(mgr_change_event);
 
 void node_change_cb(uint8_t nodeId, uint8_t idx, CO_NMT_internalState_t state, void *object)
