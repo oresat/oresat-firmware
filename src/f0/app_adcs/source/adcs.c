@@ -36,10 +36,11 @@
 
 
 #define ADC_NUM_CHANNELS           4
-#define MY_SAMPLING_NUMBER         100
+#define MY_SAMPLING_NUMBER         32
 #define ADC_BUFF_SIZE              (ADC_NUM_CHANNELS * MY_SAMPLING_NUMBER)
 static adcsample_t                 adc_sample_buff[ADC_BUFF_SIZE];
-static adcsample_t                 adc_temp_sample_buff[ADC_BUFF_SIZE];
+//static adcsample_t                 adc_temp_sample_buff[ADC_BUFF_SIZE];
+
 
 static float measured_i_sense_voltage[ADC_NUM_CHANNELS];;
 
@@ -49,15 +50,36 @@ static float measured_i_sense_voltage[ADC_NUM_CHANNELS];;
 //ADC_SMPR_SMP_71P5
 //ADC_SMPR_SMP_239P5
 
-static const ADCConversionGroup adcgrpcfg = {
-  TRUE,                                             /* Enables the circular buffer mode for the group.  */
-  ADC_NUM_CHANNELS,
-  NULL,
-  NULL,
-  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGR1 */
-  ADC_TR(0, 0),                                     /* TR */
-  ADC_SMPR_SMP_71P5,                                /* SMPR */
-  ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL5 | ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7     /* CHSELR, note, for continuous conversion mode you must configure 1 or an even number of channels */
+//static const ADCConversionGroup adcgrpcfg = {
+//  .circular = TRUE,                                             /* Enables the circular buffer mode for the group.  */
+//  num_channels = ADC_NUM_CHANNELS,
+//  .end_cb = NULL,
+//  .error_cb = NULL,
+//  .cfgr1 = ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGR1 */
+//  .tr = ADC_TR(0, 0),                                     /* TR */
+//  .smpr = ADC_SMPR_SMP_71P5,                                /* SMPR */
+//  .chselr = ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL5 | ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7     /* CHSELR, note, for continuous conversion mode you must configure 1 or an even number of channels */
+//};
+
+volatile uint32_t adc_conversion_complete_callback_count = 0;
+void adc_conversion_complete_callback(ADCDriver *adcp) {
+	adc_conversion_complete_callback_count++;
+}
+
+volatile uint32_t adc_conversion_error_callback_count = 0;
+void adc_conversion_error_callback(ADCDriver *adcp, adcerror_t err) {
+	adc_conversion_error_callback_count++;
+}
+
+static const ADCConversionGroup adcgrpcfg_tim1_trigo = {
+  .circular = FALSE,                                             /* Enables the circular buffer mode for the group.  */
+  .num_channels = ADC_NUM_CHANNELS,
+  .end_cb = adc_conversion_complete_callback,
+  .error_cb = adc_conversion_error_callback,
+  .cfgr1 = ADC_CFGR1_RES_12BIT | ADC_CFGR1_EXTEN_RISING, /* CFGR1 */
+  .tr = ADC_TR(0, 0),                                    /* TR */
+  .smpr = ADC_SMPR_SMP_1P5,                             /* SMPR */
+  .chselr = ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL5 | ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7     /* CHSELR, note, for continuous conversion mode you must configure 1 or an even number of channels */
 };
 
 
@@ -81,23 +103,39 @@ static const DACConfig dac_config = {
 //PB15
 #define MT_Z_PWM_PWM_CHANNEL     (3 - 1)
 
-
-static PWMConfig pwmcfg_1 = {
-  PWM_TIMER_FREQ,
-  PWM_PERIOD,
-  NULL,
-  {
+static PWMConfig pwmcfg_1_trigo = {
+  .frequency = PWM_TIMER_FREQ,
+  .period = PWM_PERIOD,
+  .callback = NULL,
+  .channels = {
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
    {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
   },
-  0,//CR2
+  .cr2 = TIM_CR2_MMS_1,//CR2
  #if STM32_PWM_USE_ADVANCED
-   0, //BDTR
+   .bdtr = 0, //BDTR
  #endif
-   0,//DIER
+   .dier = 0,//DIER
 };
+
+//static PWMConfig pwmcfg_1 = {
+//  .frequency = PWM_TIMER_FREQ,
+//  .period = PWM_PERIOD,
+//  .callback = NULL,
+//  .channels = {
+//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
+//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
+//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
+//   {PWM_OUTPUT_ACTIVE_HIGH, NULL}
+//  },
+//  .cr2 = 0,//CR2
+// #if STM32_PWM_USE_ADVANCED
+//   .bdtr = 0, //BDTR
+// #endif
+//   .dier = 0,//DIER
+//};
 
 
 
@@ -148,8 +186,8 @@ typedef struct {
 	int32_t current_pwm_percent; //0-10000
 	int32_t target_pwm_percent; //Negative values indicate the phase should be inverted
 
-	float current_feedback_min_V;
-	float current_feedback_max_V;
+//	float current_feedback_min_V;
+//	float current_feedback_max_V;
 	float current_feedback_measurement_V; //Volts, Note: this is the average voltage while the PWM output is high.
 	int32_t current_feedback_measurement_uA; //uA. Note: this is the average current flowing while the PWM output is high. It does not represent overall average current.
 
@@ -265,6 +303,7 @@ void handle_can_open_data(void) {
 	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent * 100, 0);
 	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent * 100, 1);
 	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent * 100, 2);
+
 
 
     OD_RAM.x6000_gyroscope.pitchRate = g_adcs_data.gyro_sample.gyro_x;
@@ -592,7 +631,7 @@ bool init_end_cap_magnetometers(void) {
 
 void set_pwm_output(void) {
 	if( PWMD1.state == PWM_STOP ) {
-		pwmStart(&PWMD1, &pwmcfg_1);
+		pwmStart(&PWMD1, &pwmcfg_1_trigo);
 #if 0
 		chprintf(DEBUG_SD, "Turning on PWM output...\r\n");
 		pwmEnableChannel(&PWMD1, MT_X_PWM_PWM_CHANNEL, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, 1000));
@@ -695,12 +734,16 @@ void print_debug_output(void) {
 
 		for(int i = 0; i < 3; i++ ) {
 			mt_pwm_phase_data_t *data = &g_adcs_data.mt_pwm_data[i];
-			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
+//			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
+//							i,
+//							data->current_feedback_measurement_uA,
+//							(uint32_t) (data->current_feedback_measurement_V * 1000),
+//							(uint32_t) (data->current_feedback_min_V * 1000),
+//							(uint32_t) (data->current_feedback_max_V * 1000));
+			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV\r\n",
 							i,
 							data->current_feedback_measurement_uA,
-							(uint32_t) (data->current_feedback_measurement_V * 1000),
-							(uint32_t) (data->current_feedback_min_V * 1000),
-							(uint32_t) (data->current_feedback_max_V * 1000));
+							(uint32_t) (data->current_feedback_measurement_V * 1000));
 		}
 
 
@@ -709,6 +752,7 @@ void print_debug_output(void) {
 	}
 }
 
+#if 0
 void read_adc_current(void) {
 	/**
 	 * 12 bit ADC readings from 0-4096
@@ -790,10 +834,55 @@ void read_adc_current(void) {
 	print_debug_output();
 
 }
+#endif
 
 void process_magnetorquer(void) {
+//	chprintf(DEBUG_SD, "ADCD1.state = %u\r\n", ADCD1.state);
+
+	if( ADCD1.state == ADC_STOP || ADCD1.state == ADC_UNINIT ) {
+		adcStart(&ADCD1, NULL);
+	}
+
+	if( ADCD1.state == ADC_COMPLETE ) {
+		adcStopConversion(&ADCD1);
+	}
+
+	if( ADCD1.state == ADC_READY ) {
+		uint32_t channel_sums[MY_SAMPLING_NUMBER];
+		memset(channel_sums, 0, sizeof(channel_sums));
+
+		for(int s = 0; s < MY_SAMPLING_NUMBER; s++) {
+//			chprintf(DEBUG_SD, "  adc_sample_buff[%d] = [", s);
+
+			for (int adc_chan_idx = 1; adc_chan_idx < ADC_NUM_CHANNELS; adc_chan_idx++) {
+				const int idx = (s * ADC_NUM_CHANNELS) + adc_chan_idx;
+				channel_sums[adc_chan_idx] += adc_sample_buff[idx];
+//				chprintf(DEBUG_SD, "%d, ", adc_sample_buff[idx]);
+			}
+//			chprintf(DEBUG_SD, "]\r\n");
+		}
+
+		for (int adc_chan_idx = 1; adc_chan_idx < ADC_NUM_CHANNELS; adc_chan_idx++) {
+			const uint32_t channel_avg = channel_sums[adc_chan_idx] / MY_SAMPLING_NUMBER;
+			measured_i_sense_voltage[adc_chan_idx] = (((float) channel_avg) / 4096.0) * 3.3;
+//			chprintf(DEBUG_SD, "avg = %u, voltage[%d] = %u mV\r\n", channel_avg, adc_chan_idx, ((uint32_t) (measured_i_sense_voltage[adc_chan_idx] * 1000.0)));
+
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
+			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
+//				g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
+//				g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
+		}
+
+//		chprintf(DEBUG_SD, "Staring conversion...\r\n"); chThdSleepMilliseconds(10);
+		adcStartConversion(&ADCD1, &adcgrpcfg_tim1_trigo, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC conversion.
+	}
+
+//	chprintf(DEBUG_SD, "adc_conv_cb#=%u, ", adc_conversion_complete_callback_count);
+//	chprintf(DEBUG_SD, "adc_error_cb#=%u\r\n", adc_conversion_error_callback_count);
+
 	set_pwm_output();
-	read_adc_current();
+	print_debug_output();
+//	read_adc_current();
 }
 
 
@@ -880,9 +969,9 @@ THD_FUNCTION(adcs, arg)
     init_magnetorquer();
 
     /* Activates the ADC1 driver. */
-    adcStart(&ADCD1, NULL);
-    adcStartConversion(&ADCD1, &adcgrpcfg, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC continuous conversion.
-    chprintf(DEBUG_SD, "done with adcStartConversion()...\r\n");
+//    adcStart(&ADCD1, NULL);
+//    adcStartConversion(&ADCD1, &adcgrpcfg, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC continuous conversion.
+//    chprintf(DEBUG_SD, "done with adcStartConversion()...\r\n");
 
 
     OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 3000;//FIXME remove this, this is just for testing
@@ -945,12 +1034,12 @@ THD_FUNCTION(adcs, arg)
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
-        if( update_imu_data() ) {
-			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
-        } else {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
-        }
-        update_endcard_magnetometer_readings();
+//        if( update_imu_data() ) {
+//			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+//        } else {
+//        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+//        }
+//        update_endcard_magnetometer_readings();
         process_magnetorquer();
         handle_can_open_data();
 
