@@ -39,8 +39,6 @@
 #define MY_SAMPLING_NUMBER         32
 #define ADC_BUFF_SIZE              (ADC_NUM_CHANNELS * MY_SAMPLING_NUMBER)
 static adcsample_t                 adc_sample_buff[ADC_BUFF_SIZE];
-//static adcsample_t                 adc_temp_sample_buff[ADC_BUFF_SIZE];
-
 
 static float measured_i_sense_voltage[ADC_NUM_CHANNELS];;
 
@@ -58,32 +56,21 @@ static float measured_i_sense_voltage[ADC_NUM_CHANNELS];;
 //ADC_SMPR_SMP_71P5
 //ADC_SMPR_SMP_239P5
 
-//static const ADCConversionGroup adcgrpcfg = {
-//  .circular = TRUE,                                             /* Enables the circular buffer mode for the group.  */
-//  num_channels = ADC_NUM_CHANNELS,
-//  .end_cb = NULL,
-//  .error_cb = NULL,
-//  .cfgr1 = ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGR1 */
-//  .tr = ADC_TR(0, 0),                                     /* TR */
-//  .smpr = ADC_SMPR_SMP_71P5,                                /* SMPR */
-//  .chselr = ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL5 | ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7     /* CHSELR, note, for continuous conversion mode you must configure 1 or an even number of channels */
-//};
 
-volatile uint32_t adc_conversion_complete_callback_count = 0;
-void adc_conversion_complete_callback(ADCDriver *adcp) {
-	adc_conversion_complete_callback_count++;
-}
+//volatile uint32_t adc_conversion_complete_callback_count = 0;
+//void adc_conversion_complete_callback(ADCDriver *adcp) {
+//	adc_conversion_complete_callback_count++;
+//}
 
-volatile uint32_t adc_conversion_error_callback_count = 0;
-void adc_conversion_error_callback(ADCDriver *adcp, adcerror_t err) {
-	adc_conversion_error_callback_count++;
-}
 
+/**
+ * This ADC is configured to trigger a single batch of ADC conversions based on the risigion edge of TRIGO from TIM1
+ */
 static const ADCConversionGroup adcgrpcfg_tim1_trigo = {
   .circular = FALSE,                                             /* Enables the circular buffer mode for the group.  */
   .num_channels = ADC_NUM_CHANNELS,
-  .end_cb = adc_conversion_complete_callback,
-  .error_cb = adc_conversion_error_callback,
+  .end_cb = NULL,
+  .error_cb = NULL,
   .cfgr1 = ADC_CFGR1_RES_12BIT | ADC_CFGR1_EXTEN_RISING, /* CFGR1 */
   .tr = ADC_TR(0, 0),                                    /* TR */
   .smpr = ADC_SMPR_SMP_1P5,                             /* SMPR */
@@ -111,6 +98,9 @@ static const DACConfig dac_config = {
 //PB15
 #define MT_Z_PWM_PWM_CHANNEL     (3 - 1)
 
+/**
+ * This PWM block is configured to enable the TRIGO output to start an ADC conversion batch when the PWM edge goes high.
+ */
 static PWMConfig pwmcfg_1_trigo = {
   .frequency = PWM_TIMER_FREQ,
   .period = PWM_PERIOD,
@@ -127,23 +117,6 @@ static PWMConfig pwmcfg_1_trigo = {
  #endif
    .dier = 0,//DIER
 };
-
-//static PWMConfig pwmcfg_1 = {
-//  .frequency = PWM_TIMER_FREQ,
-//  .period = PWM_PERIOD,
-//  .callback = NULL,
-//  .channels = {
-//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
-//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
-//   {PWM_OUTPUT_ACTIVE_LOW | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, NULL},
-//   {PWM_OUTPUT_ACTIVE_HIGH, NULL}
-//  },
-//  .cr2 = 0,//CR2
-// #if STM32_PWM_USE_ADVANCED
-//   .bdtr = 0, //BDTR
-// #endif
-//   .dier = 0,//DIER
-//};
 
 
 
@@ -194,8 +167,6 @@ typedef struct {
 	int32_t current_pwm_percent; //0-10000
 	int32_t target_pwm_percent; //Negative values indicate the phase should be inverted
 
-//	float current_feedback_min_V;
-//	float current_feedback_max_V;
 	float current_feedback_measurement_V; //Volts, Note: this is the average voltage while the PWM output is high.
 	int32_t current_feedback_measurement_uA; //uA. Note: this is the average current flowing while the PWM output is high. It does not represent overall average current.
 
@@ -261,9 +232,6 @@ const char* end_card_magnetometoer_t_to_str(const end_card_magnetometoer_t ecm) 
 	return ("???");
 
 }
-
-
-
 
 int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) {
 	if (v >= max)
@@ -524,7 +492,7 @@ bool select_magnetometer(const end_card_magnetometoer_t ecm) {
 	}
 
 //	return(ret1); //fixme remove this
-//	return(ret2); //FIXME remove this
+	return(ret2); //FIXME remove this
 
 	if( ! (ret1 && ret2) ) {
 		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers ret1=%d, ret2=%d\r\n", ret1, ret2);
@@ -675,9 +643,6 @@ void set_pwm_output(void) {
 }
 
 
-
-
-
 int32_t current_feedback_convert_volts_to_microamps(const float volts) {
 	//Based on the circuit design, this should nominally be 3V/amp.
 	//This calculation seems to be within 5%-10% accurate when compared to in line bench DMM readings.
@@ -742,12 +707,6 @@ void print_debug_output(void) {
 
 		for(int i = 0; i < 3; i++ ) {
 			mt_pwm_phase_data_t *data = &g_adcs_data.mt_pwm_data[i];
-//			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV, [%u - %u mV]\r\n",
-//							i,
-//							data->current_feedback_measurement_uA,
-//							(uint32_t) (data->current_feedback_measurement_V * 1000),
-//							(uint32_t) (data->current_feedback_min_V * 1000),
-//							(uint32_t) (data->current_feedback_max_V * 1000));
 			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %d uA, %u mV\r\n",
 							i,
 							data->current_feedback_measurement_uA,
@@ -760,89 +719,6 @@ void print_debug_output(void) {
 	}
 }
 
-#if 0
-void read_adc_current(void) {
-	/**
-	 * 12 bit ADC readings from 0-4096
-	 * Input voltage calculated as (<adc reading>/4096)*3.3
-	 */
-
-	/* Making mean of sampled values.*/
-	memcpy(adc_temp_sample_buff, adc_sample_buff, sizeof(adc_sample_buff));
-
-//	for(int s = 0; s < MY_SAMPLING_NUMBER; s++) {
-//		chprintf(DEBUG_SD, "  adc_sample_buff[%d] = [", s);
-//		for (int i = 0; i < ADC_NUM_CHANNELS; i++) {
-//			chprintf(DEBUG_SD, "%d, ", adc_temp_sample_buff[i]);
-//		}
-//		chprintf(DEBUG_SD, "]\r\n");
-//	}
-
-
-
-
-#if ADC_NUM_CHANNELS == 4
-	//Skip the first channel cuz we don't care about the data, just need 4 channels so the underlying ADC driver would actually work.
-	int start_chan_idx = 1;
-#else
-#error "Handle this"
-#endif
-
-	for (int adc_chan_idx = start_chan_idx; adc_chan_idx < ADC_NUM_CHANNELS; adc_chan_idx++) {
-		const float low_threshold_volts = 0.08;
-		const uint32_t low_threshold_adc_reading = (4096.0 * low_threshold_volts);
-
-		uint32_t number_samples_over_threshold = 0;
-		uint32_t adc_reading_sum = 0;
-		uint32_t min_adc_value = 4096;
-		uint32_t max_adc_value = 0;
-		for(int sample_num = 0; sample_num < MY_SAMPLING_NUMBER; sample_num++) {
-			const uint32_t array_index = (sample_num * ADC_NUM_CHANNELS) + adc_chan_idx;
-			const uint16_t adc_reading_value = adc_temp_sample_buff[array_index];
-
-			if( adc_reading_value > low_threshold_adc_reading ) {
-				number_samples_over_threshold++;
-				adc_reading_sum += adc_reading_value;
-
-				min_adc_value = MIN(min_adc_value, adc_reading_value);
-				max_adc_value = MAX(max_adc_value, adc_reading_value);
-			}
-		}
-
-		if( number_samples_over_threshold == 0 ) {
-			min_adc_value = 0;
-		}
-
-		float adc_reading_mean_voltage = 0;
-		if( number_samples_over_threshold > 5 ) {
-			adc_reading_mean_voltage = 3.3 * ((float) adc_reading_sum / ((float) number_samples_over_threshold)) / 4096.0;
-		}
-
-		const uint32_t min_mV = (1000.0 * 3.3 * ((float) min_adc_value) / 4096.0);
-		const uint32_t max_mV = (1000.0 * 3.3 * ((float) max_adc_value) / 4096.0);
-
-		measured_i_sense_voltage[adc_chan_idx] = adc_reading_mean_voltage;
-//		const uint32_t millivolts = adc_reading_mean_voltage * 1000.0;
-
-//		if( do_print ) {
-//			chprintf(DEBUG_SD, "  measured_i_sense_voltage[%d] = %u mV, %u, [%u - %u mV]\r\n",
-//				adc_chan_idx, millivolts, number_samples_over_threshold, min_mV, max_mV);
-//		}
-
-		if( adc_chan_idx >= 1 && adc_chan_idx <= 3 ) {
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
-		}
-	}
-
-
-	//Compute current sense data
-	print_debug_output();
-
-}
-#endif
 
 void process_magnetorquer(void) {
 //	chprintf(DEBUG_SD, "ADCD1.state = %u\r\n", ADCD1.state);
@@ -890,7 +766,6 @@ void process_magnetorquer(void) {
 
 	set_pwm_output();
 	print_debug_output();
-//	read_adc_current();
 }
 
 
@@ -976,11 +851,6 @@ THD_FUNCTION(adcs, arg)
 	init_end_cap_magnetometers();
     init_magnetorquer();
 
-    /* Activates the ADC1 driver. */
-//    adcStart(&ADCD1, NULL);
-//    adcStartConversion(&ADCD1, &adcgrpcfg, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC continuous conversion.
-//    chprintf(DEBUG_SD, "done with adcStartConversion()...\r\n");
-
 
     OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 3000;//FIXME remove this, this is just for testing
     OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 4000;
@@ -1042,12 +912,12 @@ THD_FUNCTION(adcs, arg)
     for (uint32_t iterations = 0; !chThdShouldTerminateX(); iterations++) {
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
-//        if( update_imu_data() ) {
-//			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
-//        } else {
-//        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
-//        }
-//        update_endcard_magnetometer_readings();
+        if( update_imu_data() ) {
+			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+        } else {
+        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+        }
+        update_endcard_magnetometer_readings();
         process_magnetorquer();
         handle_can_open_data();
 
