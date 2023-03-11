@@ -216,7 +216,7 @@ bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
 
     //Probe I2C bus to see what's attached
     if( ! mmc5883maI2CReadRegister3(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
-    	chprintf(DEBUG_SD, "Failed to read product code from MMC5883MA chip\r\n");
+    	chprintf(DEBUG_SD, "Failed to read product code from MMC5883MA chip, i2c comm failure\r\n");
     } else {
     	if( mmc_product_id_readback == MMC5883MA_EXPECTED_PRODUCT_CODE ) {
 			chprintf(DEBUG_SD, "Successfully read product code from MMC5883MA (good), 0x%X\r\n", mmc_product_id_readback);
@@ -225,7 +225,6 @@ bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
     		chprintf(DEBUG_SD, "ERROR: unexpected product ID code from MMC5883MA, read 0x%X, expectex 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
     	}
     }
-
 
     if( found_mmc5883ma_flag ) {
 		mmc5883maSoftReset(devp);
@@ -278,6 +277,9 @@ void mmc5883maStop(MMC5883MADriver *devp) {
         i2cAcquireBus(devp->config->i2cp);
         i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MMC5883MA_SHARED_I2C */
+
+        //The MMC will be in low power mode after being reset
+        mmc5883maSoftReset(devp);
 
         i2cStop(devp->config->i2cp);
 #if MMC5883MA_SHARED_I2C

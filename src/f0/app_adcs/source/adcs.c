@@ -44,6 +44,14 @@ static adcsample_t                 adc_sample_buff[ADC_BUFF_SIZE];
 
 static float measured_i_sense_voltage[ADC_NUM_CHANNELS];;
 
+/*
+ * Context references for ADC conversion triggered by TIM1
+ * http://forum.chibios.org/viewtopic.php?t=2254
+ * https://forum.chibios.org/viewtopic.php?t=6036
+ * https://forum.chibios.org/viewtopic.php?t=2093
+ */
+
+
 //ADC_SMPR_SMP_1P5
 //ADC_SMPR_SMP_7P5
 //ADC_SMPR_SMP_13P5
