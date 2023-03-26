@@ -216,6 +216,18 @@ static const BMI088Config imucfg = {
 static BMI088Driver imudev;
 
 
+void CO_errorReportRateLimited(CO_EM_t *em, const uint8_t errorBit, uint16_t errorCode, uint32_t infoCode, systime_t *last_error_time) {
+
+	const systime_t now_time = chVTGetSystemTime();
+	if( chTimeDiffX(*last_error_time, now_time) < 10000 ) {
+		return;
+	}
+	*last_error_time = now_time;
+
+	CO_errorReport(em, errorBit, errorCode, infoCode);
+}
+
+
 const char* end_card_magnetometoer_t_to_str(const end_card_magnetometoer_t ecm) {
 	switch (ecm) {
 	case EC_MAG_0_MZ_1:
@@ -433,7 +445,8 @@ bool connect_endcard_ltc4305_geneic(const uint8_t ltc4304_i2c_address, const boo
 bool connect_endcard_ltc4305_plus_z(const bool conn_1_enable, const bool conn_2_enable) {
 	bool ret = connect_endcard_ltc4305_geneic(LTC_4035_PLUSZ_CARD_I2C_ADDRESS_WRITE, conn_1_enable, conn_2_enable);
 	if( ! ret ) {
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_LTZ_PLUS_Z_ENDCAP_FAILURE);
+		static systime_t last_report_time = 0;
+		CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_LTZ_PLUS_Z_ENDCAP_FAILURE, &last_report_time);
 	} //FIXME should this error be cleard if/when comms works again on a subsequent call?
 
 	return(ret);
@@ -442,7 +455,8 @@ bool connect_endcard_ltc4305_plus_z(const bool conn_1_enable, const bool conn_2_
 bool connect_endcard_ltc4305_minus_z(const bool conn_1_enable, const bool conn_2_enable) {
 	bool ret = connect_endcard_ltc4305_geneic(LTC_4035_MINUSZ_CARD_I2C_ADDRESS_WRITE, conn_1_enable, conn_2_enable);
 	if( ! ret ) {
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_LTZ_MINUS_Z_ENDCAP_FAILURE);
+		static systime_t last_report_time = 0;
+		CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_LTZ_MINUS_Z_ENDCAP_FAILURE, &last_report_time);
 	} //FIXME should this error be cleard if/when comms works again on a subsequent call?
 
 	return(ret);
@@ -529,7 +543,8 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 		r = true;
 	} else {
 		//FIXME should this error be cleard if/when comms works again on a subsequent call?
-		CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_COMM_FAILURE + ecm);
+		static systime_t last_report_time = 0;
+		CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_COMM_FAILURE + ecm, &last_report_time);
 	}
 
 
@@ -593,7 +608,8 @@ bool init_end_cap_magnetometers(void) {
 				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 				ret = false;
 				//FIXME should this error be cleard if/when comms works again on a subsequent call?
-				CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_INIT_FAILURE + ecm);
+				static systime_t last_report_time = 0;
+				CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_INIT_FAILURE + ecm, &last_report_time);
 			}
 		}
 	}
@@ -625,14 +641,16 @@ void set_pwm_output(void) {
 			if( g_adcs_data.mt_pwm_data[i].current_pwm_percent != g_adcs_data.mt_pwm_data[i].target_pwm_percent ) {
 				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
 
-				const int32_t pwm_val = ABS(g_adcs_data.mt_pwm_data[i].target_pwm_percent);
-				pwmEnableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, pwm_val));
+				pwmDisableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number);
 
 				if( g_adcs_data.mt_pwm_data[i].target_pwm_percent < 0 ) {
 					palSetPad(GPIOB, g_adcs_data.mt_pwm_data[i].phase_gpio_pin_number);
 				} else {
 					palClearPad(GPIOB, g_adcs_data.mt_pwm_data[i].phase_gpio_pin_number);
 				}
+
+				const int32_t pwm_val = ABS(g_adcs_data.mt_pwm_data[i].target_pwm_percent);
+				pwmEnableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number, PWM_PERCENTAGE_TO_WIDTH(&PWMD1, pwm_val));
 
 				g_adcs_data.mt_pwm_data[i].current_pwm_percent = g_adcs_data.mt_pwm_data[i].target_pwm_percent;
 				g_adcs_data.mt_pwm_data[i].last_update_time = now_time;
@@ -751,10 +769,21 @@ void process_magnetorquer(void) {
 			measured_i_sense_voltage[adc_chan_idx] = (((float) channel_avg) / 4096.0) * 3.3;
 //			chprintf(DEBUG_SD, "avg = %u, voltage[%d] = %u mV\r\n", channel_avg, adc_chan_idx, ((uint32_t) (measured_i_sense_voltage[adc_chan_idx] * 1000.0)));
 
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
-			g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
-//				g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_min_V = min_mV / 1000.0;
-//				g_adcs_data.mt_pwm_data[adc_chan_idx - 1].current_feedback_max_V = max_mV / 1000.0;
+			uint8_t dest_mt_idx = 0;
+			if( adc_chan_idx == 1 ) {
+				dest_mt_idx = 2;
+			} else if( adc_chan_idx == 2 ) {
+				dest_mt_idx = 1;
+			} else if( adc_chan_idx == 3 ) {
+				dest_mt_idx = 0;
+			}
+
+			g_adcs_data.mt_pwm_data[dest_mt_idx].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
+			g_adcs_data.mt_pwm_data[dest_mt_idx].current_feedback_measurement_uA = current_feedback_convert_volts_to_microamps(measured_i_sense_voltage[adc_chan_idx]);
+			if( g_adcs_data.mt_pwm_data[dest_mt_idx].current_pwm_percent < 0 ) {
+				g_adcs_data.mt_pwm_data[dest_mt_idx].current_feedback_measurement_uA *= -1;
+			}
+
 		}
 
 //		chprintf(DEBUG_SD, "Staring conversion...\r\n"); chThdSleepMilliseconds(10);
@@ -852,9 +881,9 @@ THD_FUNCTION(adcs, arg)
     init_magnetorquer();
 
 
-    OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 3000;//FIXME remove this, this is just for testing
-    OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 4000;
-    OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = 5000;
+//    OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = 300;//FIXME remove this, this is just for testing
+//    OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = 400;
+//    OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = 500;
 
 
     bmi088ObjectInit(&imudev);
@@ -868,7 +897,8 @@ THD_FUNCTION(adcs, arg)
     chprintf(DEBUG_SD, "BMI088 state = %u, error_flags=0x%X\r\n", imudev.state, imudev.error_flags);
     if( imudev.state != BMI088_READY ) {
         chprintf(DEBUG_SD, "Failed to start IMU driver...\r\n");
-        CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_IMU_INIT_FAILURE);
+        static systime_t last_report_time = 0;
+        CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_IMU_INIT_FAILURE, &last_report_time);
     } else {
         uint8_t bmi088_chip_id = 0;
         if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
@@ -879,7 +909,8 @@ THD_FUNCTION(adcs, arg)
 
         if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
         	chprintf(DEBUG_SD, "BMI088 ACCEL FAIL: didnt find BMI088!\r\n");
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH);
+        	static systime_t last_report_time = 0;
+            CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH, &last_report_time);
         } else {
         	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!\r\n");
         }
@@ -901,7 +932,8 @@ THD_FUNCTION(adcs, arg)
 
         if( bmi088_gyro_chip_id != BMI088_GYR_CHIP_ID_EXPECTED ) {
         	chprintf(DEBUG_SD, "BMI088 GYRO FAIL: didnt find BMI088!\r\n");
-            CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH);
+        	static systime_t last_report_time = 0;
+            CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_GYRO_CHIP_ID_MISMATCH, &last_report_time);
         } else {
         	chprintf(DEBUG_SD, "BMI088 GYRO SUCCESS: found BMI088!\r\n");
         }
@@ -913,9 +945,11 @@ THD_FUNCTION(adcs, arg)
         dbgprintf("IMU loop iteration %u system time %u\r\n", iterations, (uint32_t)chVTGetSystemTime());
 
         if( update_imu_data() ) {
-			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+        	//FIXME re-enable this??? with rate limits???
+//			CO_errorReset(CO->em, CO_EM_GENERIC_ERROR, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
         } else {
-        	CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE);
+        	static systime_t last_report_time = 0;
+        	CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_IMU_DATA_UPDATE_FAILURE, &last_report_time);
         }
         update_endcard_magnetometer_readings();
         process_magnetorquer();

@@ -112,15 +112,15 @@ typedef struct {
     } x6006_magnetometerMZ2;
     struct {
         uint8_t highestSubIndexSupported;
-        int16_t setMagnetorquerXCurrent;
-        int16_t setMagnetorquerYCurrent;
-        int16_t setMagnetorquerZCurrent;
+        int32_t setMagnetorquerXCurrent;
+        int32_t setMagnetorquerYCurrent;
+        int32_t setMagnetorquerZCurrent;
         int16_t magnetorquerXPWM_DutyCycle;
         int16_t magnetorquerYPWM_DutyCycle;
         int16_t magnetorquerZPWM_DutyCycle;
-        int16_t magnetorquerXCurrent;
-        int16_t magnetorquerYCurrent;
-        int16_t magnetorquerZCurrent;
+        int32_t magnetorquerXCurrent;
+        int32_t magnetorquerYCurrent;
+        int32_t magnetorquerZCurrent;
     } x6007_magnetorquer;
 } OD_RAM_t;
 
