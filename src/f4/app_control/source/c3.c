@@ -23,7 +23,7 @@
 
 #define BAT_LEVEL_LOW                       6500U
 #define BAT_LEVEL_HIGH                      7000U
-#define BAT_LOW                             (OD_RAM.x7001_battery.VBattBP1 < BAT_LEVEL_LOW && OD_RAM.x7001_battery.VBattBP2 < BAT_LEVEL_LOW)
+#define BAT_LOW                             (OD_RAM.x7001_battery.vbattBP1 < BAT_LEVEL_LOW && OD_RAM.x7001_battery.vbattBP2 < BAT_LEVEL_LOW)
 
 /* Global State Variables */
 thread_t *c3_tp;

@@ -319,7 +319,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     	dest->v_cell_2_mV = dest->batt_mV - dest->v_cell_1_mV;
     }
 
-    dbgprintf("cell1_mV = %u, cell2_mV = %u, VCell_mV = %u, batt_mV = %u\r\n", dest->v_cell_1_mV, dest->v_cell_2_mV, dest->v_cell_mV, dest->batt_mV);
+    dbgprintf("cell1_mV = %u, cell2_mV = %u, vcell_mV = %u, batt_mV = %u\r\n", dest->v_cell_1_mV, dest->v_cell_2_mV, dest->v_cell_mV, dest->batt_mV);
 
     uint16_t max_min_volt_raw = 0;
     if( (r = max17205ReadRaw(driver, MAX17205_AD_MAXMINVOLT, &max_min_volt_raw)) != MSG_OK ) {
@@ -327,7 +327,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 	} else {
 		dest->v_cell_max_volt_mV = (max_min_volt_raw >> 8) * 20;
 		dest->v_cell_min_volt_mV = (max_min_volt_raw & 0xFF) * 20;
-		dbgprintf("VCell_max_volt_mV = %u, VCell_min_volt_mV = %u\r\n", dest->v_cell_max_volt_mV, dest->v_cell_min_volt_mV);
+		dbgprintf("vcell_max_volt_mV = %u, vcell_min_volt_mV = %u\r\n", dest->v_cell_max_volt_mV, dest->v_cell_min_volt_mV);
 	}
 
 
@@ -498,12 +498,12 @@ void populate_od_pack_data(OD_RAM_t *battery_data_ptr, batt_pack_data_t *pack_da
 
 	if (isPack == 1) {
 	battery_data_ptr->x6000_pack1.vbatt = pack_data->batt_mV;
-	battery_data_ptr->x6000_pack1.VCellMax = pack_data->v_cell_max_volt_mV;
-	battery_data_ptr->x6000_pack1.VCellMin = pack_data->v_cell_min_volt_mV;
-	battery_data_ptr->x6000_pack1.VCell = pack_data->v_cell_mV;
-	battery_data_ptr->x6000_pack1.VCell1 = pack_data->v_cell_1_mV;
-	battery_data_ptr->x6000_pack1.VCell2 = pack_data->v_cell_2_mV;
-	battery_data_ptr->x6000_pack1.VCellAvg = pack_data->v_cell_avg_mV;
+	battery_data_ptr->x6000_pack1.vcellMax = pack_data->v_cell_max_volt_mV;
+	battery_data_ptr->x6000_pack1.vcellMin = pack_data->v_cell_min_volt_mV;
+	battery_data_ptr->x6000_pack1.vcell = pack_data->v_cell_mV;
+	battery_data_ptr->x6000_pack1.vcell1 = pack_data->v_cell_1_mV;
+	battery_data_ptr->x6000_pack1.vcell2 = pack_data->v_cell_2_mV;
+	battery_data_ptr->x6000_pack1.vcellAvg = pack_data->v_cell_avg_mV;
 
 	battery_data_ptr->x6000_pack1.current = pack_data->current_mA;
 	battery_data_ptr->x6000_pack1.currentAvg = pack_data->avg_current_mA;
@@ -549,12 +549,12 @@ void populate_od_pack_data(OD_RAM_t *battery_data_ptr, batt_pack_data_t *pack_da
 	else if (isPack == 2) {
 
 		battery_data_ptr->x6001_pack2.vbatt = pack_data->batt_mV;
-		battery_data_ptr->x6001_pack2.VCellMax = pack_data->v_cell_max_volt_mV;
-		battery_data_ptr->x6001_pack2.VCellMin = pack_data->v_cell_min_volt_mV;
-		battery_data_ptr->x6001_pack2.VCell = pack_data->v_cell_mV;
-		battery_data_ptr->x6001_pack2.VCell1 = pack_data->v_cell_1_mV;
-		battery_data_ptr->x6001_pack2.VCell2 = pack_data->v_cell_2_mV;
-		battery_data_ptr->x6001_pack2.VCellAvg = pack_data->v_cell_avg_mV;
+		battery_data_ptr->x6001_pack2.vcellMax = pack_data->v_cell_max_volt_mV;
+		battery_data_ptr->x6001_pack2.vcellMin = pack_data->v_cell_min_volt_mV;
+		battery_data_ptr->x6001_pack2.vcell = pack_data->v_cell_mV;
+		battery_data_ptr->x6001_pack2.vcell1 = pack_data->v_cell_1_mV;
+		battery_data_ptr->x6001_pack2.vcell2 = pack_data->v_cell_2_mV;
+		battery_data_ptr->x6001_pack2.vcellAvg = pack_data->v_cell_avg_mV;
 
 		battery_data_ptr->x6001_pack2.current = pack_data->current_mA;
 		battery_data_ptr->x6001_pack2.currentAvg = pack_data->avg_current_mA;

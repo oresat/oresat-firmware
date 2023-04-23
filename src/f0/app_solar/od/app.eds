@@ -1,0 +1,5198 @@
+[FileInfo]
+FileName=app.eds
+FileVersion=0
+FileRevision=1
+EDSVersion=4.0
+Description=OreSat Solar Board Object Dictionary
+CreationTime=02:51PM
+CreationDate=08-12-2019
+CreatedBy=Miles Simpson
+ModificationTime=05:58PM
+ModificationDate=02-25-2022
+ModifiedBy=
+
+[DeviceInfo]
+VendorName=Portland State Aerospace Society
+VendorNumber=0
+ProductName=OreSat Solar Board
+ProductNumber=0
+RevisionNumber=0
+OrderCode=
+BaudRate_10=1
+BaudRate_20=1
+BaudRate_50=1
+BaudRate_125=1
+BaudRate_250=1
+BaudRate_500=1
+BaudRate_800=1
+BaudRate_1000=1
+SimpleBootUpMaster=0
+SimpleBootUpSlave=0
+Granularity=0
+DynamicChannelsSupported=0
+GroupMessaging=0
+NrOfRXPDO=16
+NrOfTXPDO=16
+LSS_Supported=0
+
+[DummyUsage]
+Dummy0000=1
+Dummy0001=1
+Dummy0002=1
+Dummy0003=1
+Dummy0004=1
+Dummy0005=1
+Dummy0006=1
+Dummy0007=1
+
+[Comments]
+Lines=0
+
+[MandatoryObjects]
+SupportedObjects=3
+1=0x1000
+2=0x1001
+3=0x1018
+
+[1000]
+ParameterName=Device type
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1001]
+ParameterName=Error register
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0x00
+PDOMapping=1
+
+[1018]
+ParameterName=Identity
+ObjectType=0x09
+;StorageLocation=ROM
+SubNumber=5
+
+[1018sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x04
+
+[1018sub1]
+ParameterName=Vendor-ID
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1018sub2]
+ParameterName=Product code
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1018sub3]
+ParameterName=Revision number
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1018sub4]
+ParameterName=Serial number
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[OptionalObjects]
+SupportedObjects=85
+1=0x1002
+2=0x1003
+3=0x1005
+4=0x1006
+5=0x1007
+6=0x1008
+7=0x1009
+8=0x100A
+9=0x1010
+10=0x1011
+11=0x1014
+12=0x1015
+13=0x1016
+14=0x1017
+15=0x1019
+16=0x1029
+17=0x1200
+18=0x1400
+19=0x1401
+20=0x1402
+21=0x1403
+22=0x1404
+23=0x1405
+24=0x1406
+25=0x1407
+26=0x1408
+27=0x1409
+28=0x140A
+29=0x140B
+30=0x140C
+31=0x140D
+32=0x140E
+33=0x140F
+34=0x1600
+35=0x1601
+36=0x1602
+37=0x1603
+38=0x1604
+39=0x1605
+40=0x1606
+41=0x1607
+42=0x1608
+43=0x1609
+44=0x160A
+45=0x160B
+46=0x160C
+47=0x160D
+48=0x160E
+49=0x160F
+50=0x1800
+51=0x1801
+52=0x1802
+53=0x1803
+54=0x1804
+55=0x1805
+56=0x1806
+57=0x1807
+58=0x1808
+59=0x1809
+60=0x180A
+61=0x180B
+62=0x180C
+63=0x180D
+64=0x180E
+65=0x180F
+66=0x1A00
+67=0x1A01
+68=0x1A02
+69=0x1A03
+70=0x1A04
+71=0x1A05
+72=0x1A06
+73=0x1A07
+74=0x1A08
+75=0x1A09
+76=0x1A0A
+77=0x1A0B
+78=0x1A0C
+79=0x1A0D
+80=0x1A0E
+81=0x1A0F
+82=0x1F80
+83=0x6000
+84=0x6001
+85=0x6002
+
+[1002]
+ParameterName=Manufacturer status register
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[1003]
+ParameterName=Pre-defined error field
+ObjectType=0x08
+;StorageLocation=RAM
+SubNumber=9
+
+[1003sub0]
+ParameterName=Number of errors
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1003sub1]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub2]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub3]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub4]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub5]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub6]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub7]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1003sub8]
+ParameterName=Standard error field
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0x00000000
+
+[1005]
+ParameterName=COB-ID SYNC message
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000080
+
+[1006]
+ParameterName=Communication cycle period
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+
+[1007]
+ParameterName=Synchronous window length
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0
+
+[1008]
+ParameterName=Manufacturer device name
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0009
+AccessType=ro
+DefaultValue=OreSat Node
+
+[1009]
+ParameterName=Manufacturer hardware version
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0009
+AccessType=ro
+DefaultValue=0.0
+
+[100A]
+ParameterName=Manufacturer software version
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0009
+AccessType=ro
+DefaultValue=0.0.0
+
+[1010]
+ParameterName=Store parameters
+ObjectType=0x08
+;StorageLocation=RAM
+SubNumber=5
+
+[1010sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x04
+
+[1010sub1]
+ParameterName=Save all parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1010sub2]
+ParameterName=Save communication parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1010sub3]
+ParameterName=Save application parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1010sub4]
+ParameterName=Save manufacturer defined parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011]
+ParameterName=Restore default parameters
+ObjectType=0x08
+;StorageLocation=RAM
+SubNumber=5
+
+[1011sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x04
+
+[1011sub1]
+ParameterName=Restore all default parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011sub2]
+ParameterName=Restore communication default parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011sub3]
+ParameterName=Restore application default parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1011sub4]
+ParameterName=Restore manufacturer defined default parameters
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000001
+
+[1014]
+ParameterName=COB-ID EMCY
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80+$NODEID
+
+[1015]
+ParameterName=Inhibit time EMCY
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1016]
+ParameterName=Consumer heartbeat time
+ObjectType=0x08
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1016sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1016sub1]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub2]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub3]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub4]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub5]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub6]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub7]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1016sub8]
+ParameterName=Consumer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1017]
+ParameterName=Producer heartbeat time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=1000
+
+[1019]
+ParameterName=Synchronous counter overflow value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1029]
+ParameterName=Error behavior
+ObjectType=0x08
+;StorageLocation=ROM
+SubNumber=7
+
+[1029sub0]
+ParameterName=max sub-index
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1029sub1]
+ParameterName=Communication
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1029sub2]
+ParameterName=Communication other
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1029sub3]
+ParameterName=Communication passive
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1029sub4]
+ParameterName=Generic
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1029sub5]
+ParameterName=Device profile
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1029sub6]
+ParameterName=Manufacturer specific
+ObjectType=0x07
+;StorageLocation=ROM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1200]
+ParameterName=SDO server parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1200sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1200sub1]
+ParameterName=COB-ID client to server
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000000
+PDOMapping=1
+
+[1200sub2]
+ParameterName=COB-ID server to client
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000000
+PDOMapping=1
+
+[1200sub3]
+ParameterName=Node-ID of the SDO client
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0x01
+
+[1400]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1400sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1400sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000200+$NODEID
+
+[1400sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1400sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1401]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1401sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1401sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000300+$NODEID
+
+[1401sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1401sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1402]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1402sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1402sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000400+$NODEID
+
+[1402sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1402sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1403]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1403sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1403sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000500+$NODEID
+
+[1403sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1403sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1404]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1404sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1404sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000200+$NODEID
+
+[1404sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1404sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1405]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1405sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1405sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000300+$NODEID
+
+[1405sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1405sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1406]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1406sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1406sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000400+$NODEID
+
+[1406sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1406sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1407]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1407sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1407sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000500+$NODEID
+
+[1407sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1407sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1408]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1408sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1408sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000200+$NODEID
+
+[1408sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1408sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1409]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[1409sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[1409sub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000300+$NODEID
+
+[1409sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1409sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140A]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Asub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Asub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000400+$NODEID
+
+[140Asub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Asub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140B]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Bsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Bsub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000500+$NODEID
+
+[140Bsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Bsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140C]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Csub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Csub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000200+$NODEID
+
+[140Csub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Csub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140D]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Dsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Dsub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000300+$NODEID
+
+[140Dsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Dsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140E]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Esub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Esub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000400+$NODEID
+
+[140Esub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Esub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[140F]
+ParameterName=RPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=4
+
+[140Fsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[140Fsub1]
+ParameterName=COB-ID used by RPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x80000500+$NODEID
+
+[140Fsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[140Fsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1600]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1600sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1600sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1600sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1601sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1601sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1601sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1602sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1602sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1602sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1603sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1603sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1603sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1604sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1604sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1604sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1605sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1605sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1605sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1606sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1606sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1606sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1607sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1607sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1607sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1608sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1608sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1608sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1609sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1609sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1609sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160A]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Asub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Asub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Asub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160B]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Bsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Bsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Bsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160C]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Csub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Csub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Csub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160D]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Dsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Dsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Dsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160E]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Esub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Esub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Esub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160F]
+ParameterName=RPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[160Fsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[160Fsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[160Fsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1800]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1800sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1800sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x40000180+$NODEID
+
+[1800sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1800sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1800sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1800sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10000
+
+[1800sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1801]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1801sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1801sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x40000280+$NODEID
+
+[1801sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1801sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1801sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1801sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10000
+
+[1801sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1802]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1802sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1802sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x40000380+$NODEID
+
+[1802sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1802sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1802sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1802sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10000
+
+[1802sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1803]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1803sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1803sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x40000480+$NODEID
+
+[1803sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1803sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1803sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1803sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=10000
+
+[1803sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1804]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1804sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1804sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000180+$NODEID
+
+[1804sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1804sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1804sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1804sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1804sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1805]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1805sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1805sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000280+$NODEID
+
+[1805sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1805sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1805sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1805sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1805sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1806]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1806sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1806sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000380+$NODEID
+
+[1806sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1806sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1806sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1806sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1806sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1807]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1807sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1807sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000480+$NODEID
+
+[1807sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1807sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1807sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1807sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1807sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1808]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1808sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1808sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000180+$NODEID
+
+[1808sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1808sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1808sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1808sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1808sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1809]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[1809sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[1809sub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000280+$NODEID
+
+[1809sub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[1809sub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1809sub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[1809sub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[1809sub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180A]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Asub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Asub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000380+$NODEID
+
+[180Asub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Asub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Asub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Asub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Asub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180B]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Bsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Bsub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000480+$NODEID
+
+[180Bsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Bsub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Bsub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Bsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Bsub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180C]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Csub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Csub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000180+$NODEID
+
+[180Csub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Csub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Csub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Csub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Csub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180D]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Dsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Dsub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000280+$NODEID
+
+[180Dsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Dsub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Dsub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Dsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Dsub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180E]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Esub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Esub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000380+$NODEID
+
+[180Esub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Esub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Esub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Esub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Esub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[180F]
+ParameterName=TPDO communication parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=7
+
+[180Fsub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[180Fsub1]
+ParameterName=COB-ID used by TPDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0xC0000480+$NODEID
+
+[180Fsub2]
+ParameterName=Transmission type
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=254
+
+[180Fsub3]
+ParameterName=Inhibit time
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Fsub4]
+ParameterName=compatibility entry
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+
+[180Fsub5]
+ParameterName=Event timer
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+
+[180Fsub6]
+ParameterName=SYNC start value
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[1A00]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A00sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A00sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000110
+
+[1A00sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000210
+
+[1A00sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000310
+
+[1A00sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000410
+
+[1A00sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A00sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A00sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A00sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A01]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A01sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A01sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000510
+
+[1A01sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000610
+
+[1A01sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000710
+
+[1A01sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000810
+
+[1A01sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A01sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A01sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A01sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A02sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A02sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000910
+
+[1A02sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000A10
+
+[1A02sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A02sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A03]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A03sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A03sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010108
+
+[1A03sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010208
+
+[1A03sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010308
+
+[1A03sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010408
+
+[1A03sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010508
+
+[1A03sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010608
+
+[1A03sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A03sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A04sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A04sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A04sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A05sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A05sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A05sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A06sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A06sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A06sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A07sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A07sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A07sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A08sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A08sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A08sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A09sub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A09sub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A09sub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0A]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Asub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Asub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Asub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0B]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Bsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Bsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000110
+
+[1A0Bsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000210
+
+[1A0Bsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000310
+
+[1A0Bsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000410
+
+[1A0Bsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Bsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Bsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Bsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0C]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Csub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Csub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000510
+
+[1A0Csub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000610
+
+[1A0Csub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000710
+
+[1A0Csub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000810
+
+[1A0Csub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Csub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Csub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Csub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0D]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Dsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Dsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000910
+
+[1A0Dsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60000A10
+
+[1A0Dsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Dsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Dsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Dsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Dsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Dsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0E]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Esub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Esub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010108
+
+[1A0Esub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010208
+
+[1A0Esub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010308
+
+[1A0Esub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010408
+
+[1A0Esub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010508
+
+[1A0Esub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x60010608
+
+[1A0Esub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Esub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0F]
+ParameterName=TPDO mapping parameter
+ObjectType=0x09
+;StorageLocation=PERSIST_COMM
+SubNumber=9
+
+[1A0Fsub0]
+ParameterName=Number of mapped application objects in PDO
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[1A0Fsub1]
+ParameterName=Application object 1
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub2]
+ParameterName=Application object 2
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub3]
+ParameterName=Application object 3
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub4]
+ParameterName=Application object 4
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub5]
+ParameterName=Application object 5
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub6]
+ParameterName=Application object 6
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub7]
+ParameterName=Application object 7
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1A0Fsub8]
+ParameterName=Application object 8
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000000
+
+[1F80]
+ParameterName=NMTStartup
+ObjectType=0x07
+;StorageLocation=PERSIST_COMM
+DataType=0x0007
+AccessType=rw
+DefaultValue=0x00000008
+
+[6000]
+ParameterName=PV Power
+ObjectType=0x09
+;StorageLocation=RAM
+SubNumber=11
+
+[6000sub0]
+ParameterName=max sub-index
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x0A
+
+[6000sub1]
+ParameterName=Voltage
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub2]
+ParameterName=Current
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub3]
+ParameterName=Power
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub4]
+ParameterName=Voltage Avg
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub5]
+ParameterName=Current Avg
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub6]
+ParameterName=Power Avg
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub7]
+ParameterName=Voltage Max
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub8]
+ParameterName=Current Max
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0003
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000sub9]
+ParameterName=Power Max
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6000subA]
+ParameterName=Energy
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001]
+ParameterName=PV Temp
+ObjectType=0x09
+;StorageLocation=RAM
+SubNumber=7
+
+[6001sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x06
+
+[6001sub1]
+ParameterName=Cell 1 Temp
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub2]
+ParameterName=Cell 2 Temp
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6001sub3]
+ParameterName=Cell 1 Temp Min
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=127
+PDOMapping=1
+
+[6001sub4]
+ParameterName=Cell 2 Temp Min
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=127
+PDOMapping=1
+
+[6001sub5]
+ParameterName=Cell 1 Temp Max
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=-128
+PDOMapping=1
+
+[6001sub6]
+ParameterName=Cell 2 Temp Max
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=-128
+PDOMapping=1
+
+[6002]
+ParameterName=MPPT
+ObjectType=0x09
+;StorageLocation=RAM
+SubNumber=3
+
+[6002sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x02
+
+[6002sub1]
+ParameterName=Algorithm
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=rww
+DefaultValue=0
+PDOMapping=1
+
+[6002sub2]
+ParameterName=LT1618 IADJ
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[ManufacturerObjects]
+SupportedObjects=7
+1=0x2000
+2=0x2010
+3=0x2011
+4=0x2020
+5=0x2021
+6=0x2022
+7=0x2100
+
+[2000]
+ParameterName=BUS Management
+ObjectType=0x09
+;StorageLocation=PERSIST_MFR
+SubNumber=5
+
+[2000sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=PERSIST_MFR
+DataType=0x0005
+AccessType=const
+DefaultValue=0x04
+
+[2000sub1]
+ParameterName=Bdefault
+ObjectType=0x07
+;StorageLocation=PERSIST_MFR
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[2000sub2]
+ParameterName=Ttoggle
+ObjectType=0x07
+;StorageLocation=PERSIST_MFR
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[2000sub3]
+ParameterName=Ntoggle
+ObjectType=0x07
+;StorageLocation=PERSIST_MFR
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[2000sub4]
+ParameterName=Ctoggle
+ObjectType=0x07
+;StorageLocation=PERSIST_MFR
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+
+[2010]
+ParameterName=SCET
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2011]
+ParameterName=UTC
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x001B
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2020]
+ParameterName=MCU Unique Device ID
+ObjectType=0x08
+;StorageLocation=RAM
+SubNumber=4
+
+[2020sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[2020sub1]
+ParameterName=UID
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0
+
+[2020sub2]
+ParameterName=UID
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0
+
+[2020sub3]
+ParameterName=UID
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0007
+AccessType=ro
+DefaultValue=0
+
+[2021]
+ParameterName=MCU Calibration
+ObjectType=0x09
+;StorageLocation=RAM
+SubNumber=4
+
+[2021sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x03
+
+[2021sub1]
+ParameterName=TS_CAL1
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+
+[2021sub2]
+ParameterName=TS_CAL2
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+
+[2021sub3]
+ParameterName=VREFINT_CAL
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+
+[2022]
+ParameterName=MCU Sensors
+ObjectType=0x09
+;StorageLocation=RAM
+SubNumber=9
+
+[2022sub0]
+ParameterName=Highest sub-index supported
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=const
+DefaultValue=0x08
+
+[2022sub1]
+ParameterName=Temperature
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0002
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub2]
+ParameterName=VREFINT
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub3]
+ParameterName=VBAT
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub4]
+ParameterName=VBUSP Current
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0005
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub5]
+ParameterName=Temperature (Raw)
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub6]
+ParameterName=VREFINT (Raw)
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub7]
+ParameterName=VBAT (Raw)
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2022sub8]
+ParameterName=VBUSP Current (Raw)
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[2100]
+ParameterName=Error Status Bits
+ObjectType=0x07
+;StorageLocation=RAM
+DataType=0x000A
+AccessType=ro
+DefaultValue=00 00 00 00 00 00 00 00 00 00
+
