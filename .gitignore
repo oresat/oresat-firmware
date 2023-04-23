@@ -79,3 +79,6 @@ dkms.conf
 build*/
 **/OD.*
 *.tmp
+
+# Vagrant
+/.vagrant/
