@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
     apt-get install -y \
       autoconf \
       automake \
+      bear \
       can-utils \
       curl \
       gdb-multiarch \
