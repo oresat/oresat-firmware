@@ -47,6 +47,18 @@ int main(void)
         
     }
 
+//CONFIGURING USART ON STM32F0XX vis REFERENCE MANUAL CODE
+
+/* (1) Oversampling by 16, 9600 baud*/
+/* (2) 8 data bit, 1 start bit, 1 stop bit, no parity*/
+USART1 ->BRR = 480000 / 96; /* (1)*/
+USART1 ->CR1 = USART_CR1_TE | USART_CR1_UE; /* (2)*/
+
+//USART TRANSMIT BYTE CODE EXAMPLE (REFERENCE MANUAL CODE)
+
+/*start USART transmission*/
+USART1 ->TDR = printf("hello\n"); /*Will initiate TC if TXE is set*/ //{FIXME}
+
 //TEST RUNNING ACTIVATING IWDG (according to reference manual)
 
 /* (1) Activate IWDG (not needed if done in option bytes) */
