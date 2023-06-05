@@ -4,36 +4,22 @@
 */
 
 /* ChibiOS header files */
-#include "ch.h"
 #include "hal.h"
 #include "math.h"
-#include <stdlib.h>
+#include "stdarg.h"
+#include "stdlib.h"
+#include "stdio.h"
 #include "halconf.h"
+#include "stm32f0xx_tim.h"
+#include "mcuconf.h"
+#include "stm32f0xx.h"
 #include "stm32f0xx_iwdg.h" //needed to activate library for internal watchdog timer
 
-//Enabling internal Watchdog Timer
-void IWDG_Enable(void){
-    IWDG -> KR = 0x0000; //Activate IWDG
-    IWDG -> KR = IWDG_WriteAccess_Enable;
-    IWDG_SetPrescaler(8); //set prescaler to 8
-    IWDG_SetReload(40000);
-    while (IWDG -> SR) {}
-    div_t result = div((int)IWDG_ReloadCounter, 2);
-    IWDG -> WINR = result.quot; //IWDG_ReloadCounter / 2
-}
 
-//Setting SysTick Timer to show IWDG is working
-void SysTick_Init(void) {
-    //set SysTick to generate an interrupt every 1 ms
-    div_t result = div(SystemCoreClock, 1000);
-    SysTick_Config(result.quot);
-}
 
-volatile uint32_t tick_counter = 0;
 
-void SysTick_Handler(void){
-    tick_counter++;
-}
+
+
 
 
 int main(void)
@@ -47,8 +33,9 @@ int main(void)
      */
     halInit();
     chSysInit();
-    SysTick_Init();
-    IWDG_Enable();
+   
+    
+   
 
     while (true)
     {
@@ -56,24 +43,35 @@ int main(void)
         chThdSleepMilliseconds(500);
         palSetLine(LINE_LED);
         chThdSleepMilliseconds(500);
+        
+        
     }
 
-    while (1) {
-        //check if IWDG has reset MCU
-        if (RCC -> CSR & RCC_CSR_IWDGRSTF) {
-            //clear reset flag
-            RCC -> CSR |= RCC_CSR_RMVF;
-            //blink the LED to indicate a reset occurred
-        }
+//TEST RUNNING ACTIVATING IWDG (according to reference manual)
 
-        //check if it's time to refresh the IWDG
-        if (tick_counter >= 1000) { //refresh every second
-            //reload the IWDG
-            IWDG_ReloadCounter();
-            //reset the tick counter
-            tick_counter = 0;
-        }
-    }
+/* (1) Activate IWDG (not needed if done in option bytes) */
+/* (2) Enable write access to IWDG registers */
+/* (3) Set prescaler by 8 */
+/* (4) Set reload value to have a rollover each 100ms */
+/* (5) Check if flags are reset */
+/* (6) Refresh counter */
+IWDG->KR = 0xCCCC; /* (1) */
+IWDG->KR = 0x5555; /* (2) */
+IWDG->PR = IWDG_Prescaler_8; /* (3) */
+IWDG->RLR = 0x0FFF; /* (4) */
+printf("Hello\n");
+while (IWDG->SR) /* (5) */
+{
+/* add time out here for a robust application */
+
+}
+IWDG->KR = 0x0000; /* (6) */
+
+
+ 
+
+
+
 
     return 0;
 }
