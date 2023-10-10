@@ -26,7 +26,7 @@ extern EXIT_STATUS acs_init(ACS *acs)
 inline static EXIT_STATUS entry_helper(ACS *acs, ACS_VALID_STATE next_state)
 {
 /// ******critical section***********
-/*
+//*
 	chSysLock();
 	acs->can_buf.status[CAN_SM_STATE] = next_state;
 	chSysUnlock();
@@ -48,7 +48,7 @@ inline static EXIT_STATUS exit_helper(ACS *acs)
   dbgSerialOut("exit_helper: %u \n\r", acs->can_buf.status[CAN_SM_STATE], 500);
 
 /// ******critical section***********
-/*
+//*
 	chSysLock();
 	acs->can_buf.status[CAN_SM_PREV_STATE] = acs->can_buf.status[CAN_SM_STATE];
 	chSysUnlock();
@@ -177,7 +177,7 @@ static EXIT_STATUS fn_rw_start(ACS *acs)
 	(void)acs;
   chprintf(DEBUG_CHP, "start bldc\n\r");
 
-/* 
+//* 
   chSysLock(); 
   acs->can_buf.status[CAN_SEMAPHORE_STATE] = chBSemGetStateI(acs->motor.pBldc_bsem)+1;
   chSysUnlock(); 
@@ -197,7 +197,7 @@ static EXIT_STATUS fn_rw_stop(ACS *acs)
   chprintf(DEBUG_CHP, "stop bldc\n\r");
   bldcStop(&acs->motor);
 
-/* 
+//* 
   chSysLock(); 
   acs->can_buf.status[CAN_SEMAPHORE_STATE] = chBSemGetStateI(acs->motor.pBldc_bsem)+1;
   chSysUnlock(); 
@@ -386,7 +386,7 @@ static EXIT_STATUS transitionState(ACS *acs)
 static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status)
 {
   /// ******critical section********
-/*
+//*
     chSysLock();
     acs->can_buf.status[can_status] = status;
     chSysUnlock();
@@ -399,7 +399,7 @@ static EXIT_STATUS changeStatus(ACS *acs, uint8_t can_status, EXIT_STATUS status
 static EXIT_STATUS receiveCommand(ACS *acs)
 {
   /// ******critical section*******
-/*
+//*
 	chSysLock();
 	for(int i = 0;i < CAN_BUF_SIZE; ++i){
 		acs->cmd[i] = acs->can_buf.cmd[i];
@@ -470,7 +470,7 @@ THD_FUNCTION(ACS_Thread,acs)
 {
   chRegSetThreadName("acs_thread");
   
-  chEvtRegister(&rpdo_event,&el,0);
+  //chEvtRegister(&rpdo_event,&el,0);
 
 	acs_statemachine(acs);
 }

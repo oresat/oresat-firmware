@@ -127,7 +127,9 @@
 #define GPIOC_PIN4                  4U
 #define GPIOC_PIN5                  5U
 #define GPIOC_PIN6                  6U
+#define GPIOC_EN_MAG                6U // warning. probably incorrect
 #define GPIOC_PIN7                  7U
+#define GPIOC_MAG_PH                7U // warning. probably incorrect
 #define GPIOC_PIN8                  8U
 #define GPIOC_PIN9                  9U
 #define GPIOC_PIN10                 10U

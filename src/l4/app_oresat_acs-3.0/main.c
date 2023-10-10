@@ -31,40 +31,73 @@
 
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {
-    .name = "Example blinky thread",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
-    .prio = NORMALPRIO,
-    .funcp = blink,
-    .arg = NULL
+  .name = "Example blinky thread",
+  .wbase = THD_WORKING_AREA_BASE(blink_wa),
+  .wend = THD_WORKING_AREA_END(blink_wa),
+  .prio = NORMALPRIO,
+  .funcp = blink,
+  .arg = NULL
 };
 
 static oresat_config_t oresat_conf = {
-    .cand = &CAND1,
-    .node_id = ORESAT_DEFAULT_ID,
-    .bitrate = ORESAT_DEFAULT_BITRATE,
+  .cand = &CAND1,
+  .node_id = ORESAT_DEFAULT_ID,
+  .bitrate = ORESAT_DEFAULT_BITRATE,
 };
+
+ACS acs = { }; /// Global ACS struct
 
 /**
  * @brief App Initialization
  */
 static void app_init(void)
 {
-    /* App initialization */
-    reg_worker(&worker1, &worker1_desc, false, true);
+  
+  acs_init(&acs);
 
-    /* Start up debug output */
-    sdStart(&LPSD1, NULL);
+  /* App initialization */
+  reg_worker(&worker1, &worker1_desc, false, true);
+
+  /* Start up debug output */
+  sdStart(&LPSD1, NULL);
 }
 
+/**
+ * App main function
+ */
+static void app_main(void)
+{
+//*
+	chThdCreateStatic( /// Create ACS thread
+		waACS_Thread,
+		sizeof(waACS_Thread),
+		NORMALPRIO + 1,
+		ACS_Thread,
+		&acs	
+	);
+//*/
+
+  while(true)
+  { /// main loop
+		chThdSleepMilliseconds(1000);
+	}
+}
 /**
  * @brief Main Application
  */
 int main(void)
 {
-    // Initialize and start
-    oresat_init(&oresat_conf);
-    app_init();
-    oresat_start();
-    return 0;
+	/**
+	 * ChibiOS and OreSat init
+	 */
+	halInit();
+	chSysInit();
+  
+// Initialize and start
+//  oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
+  oresat_init(&oresat_conf);
+  app_init();
+  //oresat_start();
+	app_main();
+  return 0;
 }
