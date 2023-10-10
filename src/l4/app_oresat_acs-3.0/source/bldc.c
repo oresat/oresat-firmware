@@ -210,7 +210,6 @@ static PWMConfig pwmRwConfig =
    {PWM_OUTPUT_DISABLED, NULL}
   },
   0,
-	0,
   0
 };
 

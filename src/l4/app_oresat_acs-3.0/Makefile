@@ -83,11 +83,12 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_devboard
+PROJECT   = app_oresat_acs
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ST_NUCLEO64_L452RE_P
+BOARD     = ORESAT_ACS_V4
+#BOARD     = ST_NUCLEO64_L452RE_P
 
 #Project sources.
 PROJ_ROOT = ../../..

@@ -20,7 +20,14 @@
 
 /* Project header files */
 #include "oresat.h"
+#include "acs_common.h"
+#include "acs.h"
 #include "blink.h"
+//#include "shell.h"
+//#include "acs_command.h"
+
+
+#include "acs.h"
 
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {

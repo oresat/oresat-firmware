@@ -259,6 +259,8 @@ THD_FUNCTION(nmt, arg)
     for (int i = 0; i < OD_CNT_SDO_CLI; i++) {
         sdo_cli_tp[i] = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x800), "SDO Client", HIGHPRIO-1, sdo_client, &co->SDOclient[i]);
     }
+#else
+    (void)sdo_cli_tp;
 #endif
     em_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "Emergency", HIGHPRIO-2, em, co->em);
     pdo_sync_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "PDO SYNC", HIGHPRIO-2, pdo_sync, co);

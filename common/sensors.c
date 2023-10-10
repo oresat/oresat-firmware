@@ -55,6 +55,7 @@ void sensors_init(void)
 
 void sensors_start(void)
 {
+    (void)adcgrpcfg;
     adcAcquireBus(&ADCD1);
     adcStart(&ADCD1, NULL);
     /*adcStartConversion(&ADCD1, &adcgrpcfg, (adcsample_t*)sensors, sizeof(sensors)/sizeof(sensors_t));*/
