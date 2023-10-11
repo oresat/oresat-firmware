@@ -87,7 +87,8 @@ PROJECT   = app_oresat_acs
 
 # Target settings.
 MCU       = cortex-m4
-BOARD     = ORESAT_ACS_V4
+BOARD     = ORESAT_ACS_L4_DEV
+#BOARD     = ORESAT_ACS_V4
 #BOARD     = ST_NUCLEO64_L452RE_P
 
 #Project sources.
