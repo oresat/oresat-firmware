@@ -334,7 +334,7 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
         uint32_t COB_IDUsedByRPDO;
         uint8_t transmissionType;
         uint16_t eventTimer;
-    } *RPDOCommParam = (void*)&OD_PERSIST_COMM.x1400_RPDO_CommunicationParameter;
+    } *RPDOCommParam = (void*)&OD_RAM.x1400_rpdo_1_communication_parameters;
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDUsedByTPDO;
@@ -343,7 +343,7 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
         uint8_t compatibilityEntry;
         uint16_t eventTimer;
         uint8_t SYNCStartValue;
-    } *TPDOCommParam = (void*)&OD_PERSIST_COMM.x1800_TPDO_CommunicationParameter;
+    } *TPDOCommParam = (void*)&OD_RAM.x1800_tpdo_1_communication_parameters;
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         uint16_t cob_id = RPDOCommParam[i].COB_IDUsedByRPDO & 0x7FF;
         uint16_t cob_id_default = 0x200U + (0x100U * (i % 4));

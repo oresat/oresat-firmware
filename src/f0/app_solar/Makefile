@@ -82,6 +82,10 @@ endif
 # Project, target, sources and paths
 #
 
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+
 # Define project name here
 PROJECT   = app_solar
 
@@ -111,8 +115,12 @@ ifeq ($(USE_BOOTLOADER),)
   USE_BOOTLOADER = yes
 endif
 
-# generate OD.c/OD.h from app.eds
-$(shell eds2c $(ODDIR)/app.eds)
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+
+# generate OD.c/OD.h from oresat-configs
+$(shell oresat-gen-fw-files $(ORESAT) solar -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)

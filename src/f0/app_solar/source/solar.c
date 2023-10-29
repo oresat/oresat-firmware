@@ -314,16 +314,16 @@ THD_FUNCTION(solar, arg)
 
     	itterate_mppt_perturb_and_observe(&pao_state);
 
-    	OD_RAM.x6000_PV_Power.voltage = pao_state.avg_voltage_initial_mV;
-    	OD_RAM.x6000_PV_Power.voltageAvg = pao_state.avg_voltage_initial_mV;
-    	OD_RAM.x6000_PV_Power.current = pao_state.avg_current_initial_uA / 1000;
-    	OD_RAM.x6000_PV_Power.currentAvg = pao_state.avg_current_initial_uA / 1000;
-    	OD_RAM.x6000_PV_Power.power = pao_state.avg_power_initial_mW;
-    	OD_RAM.x6000_PV_Power.powerAvg = pao_state.avg_power_initial_mW;
+    	OD_RAM.x4000_output.voltage = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x4000_output.voltage_avg = pao_state.avg_voltage_initial_mV;
+    	OD_RAM.x4000_output.current = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x4000_output.current_avg = pao_state.avg_current_initial_uA / 1000;
+    	OD_RAM.x4000_output.power = pao_state.avg_power_initial_mW;
+    	OD_RAM.x4000_output.power_avg = pao_state.avg_power_initial_mW;
 
-    	OD_RAM.x6000_PV_Power.voltageMax = pao_state.max_voltage_initial_mV;
-    	OD_RAM.x6000_PV_Power.currentMax = pao_state.max_current_initial_uA / 1000;
-    	OD_RAM.x6000_PV_Power.powerMax = pao_state.max_power_initial_mW;
+    	OD_RAM.x4000_output.voltage_max = pao_state.max_voltage_initial_mV;
+    	OD_RAM.x4000_output.current_max = pao_state.max_current_initial_uA / 1000;
+    	OD_RAM.x4000_output.power_max = pao_state.max_power_initial_mW;
 
             /*
             Energy Tracking:
@@ -336,26 +336,22 @@ THD_FUNCTION(solar, arg)
             tDiff = TIME_I2MS(chVTGetSystemTime()) - tLast;
 
             //Storing energy in millijoules. Dividing by 1k because time is in ms
-            energyTrack = (uint32_t)((energyTrack + (uint32_t)(OD_RAM.x6000_PV_Power.power * tDiff)/1000));
+            energyTrack = (uint32_t)((energyTrack + (uint32_t)(OD_RAM.x4000_output.power * tDiff)/1000));
 
             //Dividing by 1k to convert to joules
             uint32_t tempEnergy = energyTrack / 1000;
 
             //Truncate to 16 bits for the OD.
-            OD_RAM.x6000_PV_Power.energy = (uint16_t) tempEnergy;
+            OD_RAM.x4000_output.energy = (uint16_t) tempEnergy;
 
+    	OD_RAM.x4004_lt1618_iadj = pao_state.iadj_uv / 1000;
 
+			//Only PAO implemented for the time being
+			OD_RAM.x4003_mppt_alg = MPPT_ALGORITHM_PAO;
 
-    	OD_RAM.x6002_MPPT.LT1618_IADJ = pao_state.iadj_uv / 1000;
-
-		//Only PAO implemented for the time being
-		OD_RAM.x6002_MPPT.algorithm = MPPT_ALGORITHM_PAO;
-
-        //Update tLast for the next loop's energy calculation
-        tLast = TIME_I2MS(chVTGetSystemTime());
-
+			//Update tLast for the next loop's energy calculation
+			tLast = TIME_I2MS(chVTGetSystemTime());
     }
-
 
     /* Stop drivers */
     dacStop(&DACD1);
