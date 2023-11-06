@@ -106,8 +106,12 @@ ODDIR    := $(APP_ROOT)/od
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
-# generate OD.c/OD.h from app.eds
-$(shell eds2c $(ODDIR)/app.eds)
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+
+# generate OD.c/OD.h from oresat-configs
+$(shell oresat-gen-fw-files $(ORESAT) base -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)

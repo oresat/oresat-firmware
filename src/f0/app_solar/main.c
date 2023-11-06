@@ -19,6 +19,8 @@
 #include "hal.h"
 
 /* Project header files */
+#include "CANopen.h"
+#include "OD.h"
 #include "oresat.h"
 #include "solar.h"
 #include "blink.h"
