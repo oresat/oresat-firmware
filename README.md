@@ -82,7 +82,13 @@ Tools required:
 * stlink              (Gets udev rules up and running, may be helpful)
 * srecord
 * eds-utils
-* oresat-od-db
+* oresat-configs
+
+To install oresat-configs: 
+* `$ git clone https://github.com/oresat/oresat-configs`
+* `$ cd oresat-configs`
+* `$ pip install -r requirements.txt`
+* `$ ./build_and_install.sh`
 
 PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
 package managers is several years old. You MUST build it from source for it
