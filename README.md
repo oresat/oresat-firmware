@@ -81,7 +81,6 @@ Tools required:
 * openocd             (Required, this is how we program and debug things)
 * stlink              (Gets udev rules up and running, may be helpful)
 * srecord
-* eds-utils
 * oresat-configs
 
 To install oresat-configs: 
