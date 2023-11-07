@@ -188,9 +188,11 @@ THD_FUNCTION(pdo_sync, arg)
 
     /* Register the callback function to wake up thread when message received */
     CO_SYNC_initCallbackPre(co->SYNC, chThdGetSelfX(), process_cb);
+#ifdef OD_CNT_RPDO
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         CO_RPDO_initCallbackPre(&co->RPDO[i], chThdGetSelfX(), process_cb);
     }
+#endif
 
     prev_time = chVTGetSystemTime();
     while (!chThdShouldTerminateX()) {
@@ -208,9 +210,11 @@ THD_FUNCTION(pdo_sync, arg)
         chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_SYNC_initCallbackPre(co->SYNC, NULL, NULL);
+#ifdef OD_CNT_RPDO
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         CO_RPDO_initCallbackPre(&co->RPDO[i], NULL, NULL);
     }
+#endif
     chThdExit(MSG_OK);
 }
 
@@ -329,33 +333,36 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
     CO_t *CO = NULL;
     CO_ReturnError_t err;
     /* TODO: Use proper OD interface */
+#ifdef OD_CNT_RPDO
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDUsedByRPDO;
         uint8_t transmissionType;
         uint16_t eventTimer;
     } *RPDOCommParam = (void*)&OD_RAM.x1400_rpdo_1_communication_parameters;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t COB_IDUsedByTPDO;
-        uint8_t transmissionType;
-        uint16_t inhibitTime;
-        uint8_t compatibilityEntry;
-        uint16_t eventTimer;
-        uint8_t SYNCStartValue;
-    } *TPDOCommParam = (void*)&OD_RAM.x1800_tpdo_1_communication_parameters;
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         uint16_t cob_id = RPDOCommParam[i].COB_IDUsedByRPDO & 0x7FF;
         uint16_t cob_id_default = 0x200U + (0x100U * (i % 4));
         if (cob_id == cob_id_default)
             RPDOCommParam[i].COB_IDUsedByRPDO += node_id + i / 4;
     }
+#endif
+#ifdef OD_CNT_TPDO
+    struct {
+        uint8_t highestSub_indexSupported;
+        uint32_t COB_IDUsedByTPDO;
+        uint8_t transmissionType;
+        uint16_t inhibitTime;
+        uint16_t eventTimer;
+        uint8_t SYNCStartValue;
+    } *TPDOCommParam = (void*)&OD_RAM.x1800_tpdo_1_communication_parameters;
     for (int i = 0; i < OD_CNT_TPDO; i++) {
         uint16_t cob_id = TPDOCommParam[i].COB_IDUsedByTPDO & 0x7FF;
         uint16_t cob_id_default = 0x180U + (0x100U * (i % 4));
         if (cob_id == cob_id_default)
             TPDOCommParam[i].COB_IDUsedByTPDO += node_id + i / 4;
     }
+#endif
     CO = CO_new(NULL, NULL);
     *pCO = CO;
     chDbgAssert(CO != NULL, "CO_new failed");
