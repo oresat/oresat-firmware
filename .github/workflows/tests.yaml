@@ -15,24 +15,41 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Clone this repository
+      uses: actions/checkout@v3
       with:
         submodules: 'true'
+
+    - name: Clone oresat-configs repository
+      uses: actions/checkout@v3
+      with:
+        repository: oresat/oresat-configs
+        path: resources/oresat-configs
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
 
+    - name: Build and install oresat-configs
+      working-directory: resources/oresat-configs
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python -m build
+        pip install dist/*.whl
+
+    - name: Clean up oresat-configs
+      run: rm -rf resources/oresat-configs
+
     - name: Install Ubuntu dependencies
       run: |
         sudo apt install autoconf automake gcc-arm-none-eabi libcapstone4 libftdi1-2 libgpiod2 libhidapi-hidraw0 libtool libusb-1.0-0 libusb-1.0-0-dev pkg-config srecord stlink-tools tcl xxd patch
 
-    - name: Install Python dependencies
+    - name: Install eds-utils
       run: |
         python -m pip install --upgrade pip
         pip install --no-deps eds-utils
-        pip install oresat-configs
 
     - name: Apply C3 patches
       working-directory:
