@@ -36,11 +36,11 @@ void oresat_init(oresat_config_t *config)
     if (config->node_id == ORESAT_DEFAULT_ID) {
 #if defined(STM32F0XX)
         uint8_t node_id = ((FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos);
-        if (node_id <= 0x7F) {
+        if (node_id <= 0x7C) {
             config->node_id = node_id;
         } else
 #endif
-            config->node_id = 0x7F;
+            config->node_id = 0x7C;
     }
 
     /* Initialize CANopen Subsystem */
