@@ -3,18 +3,18 @@ FileName=app.eds
 FileVersion=0
 FileRevision=1
 EDSVersion=4.0
-Description=OreSat IMU Application Object Dictionary
+Description=OreSat Template Application Object Dictionary
 CreationTime=02:51PM
 CreationDate=08-12-2019
 CreatedBy=Miles Simpson
-ModificationTime=11:21AM
-ModificationDate=11-28-2021
-ModifiedBy=Ryan Meidick
+ModificationTime=11:45AM
+ModificationDate=04-25-2021
+ModifiedBy=
 
 [DeviceInfo]
 VendorName=Portland State Aerospace Society
 VendorNumber=0
-ProductName=OreSat IMU
+ProductName=OreSat Template
 ProductNumber=0
 RevisionNumber=0
 OrderCode=
@@ -118,7 +118,7 @@ AccessType=ro
 DefaultValue=0x00000000
 
 [OptionalObjects]
-SupportedObjects=89
+SupportedObjects=82
 1=0x1002
 2=0x1003
 3=0x1005
@@ -201,13 +201,6 @@ SupportedObjects=89
 80=0x1A0E
 81=0x1A0F
 82=0x1F80
-83=0x6000
-84=0x6001
-85=0x6002
-86=0x6003
-87=0x6004
-88=0x6005
-89=0x6006
 
 [1002]
 ParameterName=Manufacturer status register
@@ -2508,7 +2501,7 @@ DefaultValue=0x00000000
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1800sub0]
 ParameterName=Highest sub-index supported
@@ -2516,7 +2509,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1800sub1]
 ParameterName=COB-ID used by TPDO
@@ -2524,7 +2517,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000180+$NODEID
+DefaultValue=0xC0000180+$NODEID
 
 [1800sub2]
 ParameterName=Transmission type
@@ -2542,21 +2535,13 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1800sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1800sub5]
 ParameterName=Event timer
 ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=0
 
 [1800sub6]
 ParameterName=SYNC start value
@@ -2570,7 +2555,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1801sub0]
 ParameterName=Highest sub-index supported
@@ -2578,7 +2563,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1801sub1]
 ParameterName=COB-ID used by TPDO
@@ -2586,7 +2571,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000280+$NODEID
+DefaultValue=0xC0000280+$NODEID
 
 [1801sub2]
 ParameterName=Transmission type
@@ -2604,21 +2589,13 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1801sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1801sub5]
 ParameterName=Event timer
 ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=0
 
 [1801sub6]
 ParameterName=SYNC start value
@@ -2632,7 +2609,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1802sub0]
 ParameterName=Highest sub-index supported
@@ -2640,7 +2617,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1802sub1]
 ParameterName=COB-ID used by TPDO
@@ -2648,7 +2625,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000380+$NODEID
+DefaultValue=0xC0000380+$NODEID
 
 [1802sub2]
 ParameterName=Transmission type
@@ -2666,21 +2643,13 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1802sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1802sub5]
 ParameterName=Event timer
 ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=0
 
 [1802sub6]
 ParameterName=SYNC start value
@@ -2694,7 +2663,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1803sub0]
 ParameterName=Highest sub-index supported
@@ -2702,7 +2671,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1803sub1]
 ParameterName=COB-ID used by TPDO
@@ -2710,7 +2679,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000480+$NODEID
+DefaultValue=0xC0000480+$NODEID
 
 [1803sub2]
 ParameterName=Transmission type
@@ -2726,14 +2695,6 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
-
-[1803sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
 DefaultValue=0
 
 [1803sub5]
@@ -2756,7 +2717,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1804sub0]
 ParameterName=Highest sub-index supported
@@ -2764,7 +2725,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1804sub1]
 ParameterName=COB-ID used by TPDO
@@ -2772,7 +2733,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000180+$NODEID
+DefaultValue=0xC0000180+$NODEID
 
 [1804sub2]
 ParameterName=Transmission type
@@ -2788,14 +2749,6 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
-
-[1804sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
 DefaultValue=0
 
 [1804sub5]
@@ -2818,7 +2771,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1805sub0]
 ParameterName=Highest sub-index supported
@@ -2826,7 +2779,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1805sub1]
 ParameterName=COB-ID used by TPDO
@@ -2834,7 +2787,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000280+$NODEID
+DefaultValue=0xC0000280+$NODEID
 
 [1805sub2]
 ParameterName=Transmission type
@@ -2850,14 +2803,6 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
-
-[1805sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
 DefaultValue=0
 
 [1805sub5]
@@ -2880,7 +2825,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1806sub0]
 ParameterName=Highest sub-index supported
@@ -2888,7 +2833,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1806sub1]
 ParameterName=COB-ID used by TPDO
@@ -2914,14 +2859,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1806sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1806sub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -2942,7 +2879,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1807sub0]
 ParameterName=Highest sub-index supported
@@ -2950,7 +2887,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1807sub1]
 ParameterName=COB-ID used by TPDO
@@ -2976,14 +2913,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1807sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1807sub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3004,7 +2933,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1808sub0]
 ParameterName=Highest sub-index supported
@@ -3012,7 +2941,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1808sub1]
 ParameterName=COB-ID used by TPDO
@@ -3038,14 +2967,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1808sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1808sub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3066,7 +2987,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [1809sub0]
 ParameterName=Highest sub-index supported
@@ -3074,7 +2995,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [1809sub1]
 ParameterName=COB-ID used by TPDO
@@ -3100,14 +3021,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[1809sub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [1809sub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3128,7 +3041,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Asub0]
 ParameterName=Highest sub-index supported
@@ -3136,7 +3049,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Asub1]
 ParameterName=COB-ID used by TPDO
@@ -3162,14 +3075,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[180Asub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [180Asub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3190,7 +3095,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Bsub0]
 ParameterName=Highest sub-index supported
@@ -3198,7 +3103,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Bsub1]
 ParameterName=COB-ID used by TPDO
@@ -3224,14 +3129,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[180Bsub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [180Bsub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3252,7 +3149,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Csub0]
 ParameterName=Highest sub-index supported
@@ -3260,7 +3157,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Csub1]
 ParameterName=COB-ID used by TPDO
@@ -3286,14 +3183,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[180Csub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [180Csub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3314,7 +3203,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Dsub0]
 ParameterName=Highest sub-index supported
@@ -3322,7 +3211,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Dsub1]
 ParameterName=COB-ID used by TPDO
@@ -3348,14 +3237,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[180Dsub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [180Dsub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3376,7 +3257,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Esub0]
 ParameterName=Highest sub-index supported
@@ -3384,7 +3265,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Esub1]
 ParameterName=COB-ID used by TPDO
@@ -3410,14 +3291,6 @@ DataType=0x0006
 AccessType=rw
 DefaultValue=0
 
-[180Esub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
-DefaultValue=0
-
 [180Esub5]
 ParameterName=Event timer
 ObjectType=0x07
@@ -3438,7 +3311,7 @@ DefaultValue=0
 ParameterName=TPDO communication parameter
 ObjectType=0x09
 ;StorageLocation=PERSIST_COMM
-SubNumber=7
+SubNumber=6
 
 [180Fsub0]
 ParameterName=Highest sub-index supported
@@ -3446,7 +3319,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0005
 AccessType=const
-DefaultValue=0x06
+DefaultValue=0x05
 
 [180Fsub1]
 ParameterName=COB-ID used by TPDO
@@ -3470,14 +3343,6 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
-
-[180Fsub4]
-ParameterName=compatibility entry
-ObjectType=0x07
-;StorageLocation=PERSIST_COMM
-DataType=0x0005
-AccessType=ro
 DefaultValue=0
 
 [180Fsub5]
@@ -3516,7 +3381,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000110
+DefaultValue=0x00000000
 
 [1A00sub2]
 ParameterName=Application object 2
@@ -3524,7 +3389,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000210
+DefaultValue=0x00000000
 
 [1A00sub3]
 ParameterName=Application object 3
@@ -3532,7 +3397,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60000310
+DefaultValue=0x00000000
 
 [1A00sub4]
 ParameterName=Application object 4
@@ -3594,7 +3459,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010110
+DefaultValue=0x00000000
 
 [1A01sub2]
 ParameterName=Application object 2
@@ -3602,7 +3467,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010210
+DefaultValue=0x00000000
 
 [1A01sub3]
 ParameterName=Application object 3
@@ -3610,7 +3475,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60010310
+DefaultValue=0x00000000
 
 [1A01sub4]
 ParameterName=Application object 4
@@ -3672,7 +3537,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60020008
+DefaultValue=0x00000000
 
 [1A02sub2]
 ParameterName=Application object 2
@@ -3750,7 +3615,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60030110
+DefaultValue=0x00000000
 
 [1A03sub2]
 ParameterName=Application object 2
@@ -3758,7 +3623,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60030210
+DefaultValue=0x00000000
 
 [1A03sub3]
 ParameterName=Application object 3
@@ -3766,7 +3631,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60030310
+DefaultValue=0x00000000
 
 [1A03sub4]
 ParameterName=Application object 4
@@ -3774,7 +3639,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60040110
+DefaultValue=0x00000000
 
 [1A03sub5]
 ParameterName=Application object 5
@@ -3828,7 +3693,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60040210
+DefaultValue=0x00000000
 
 [1A04sub2]
 ParameterName=Application object 2
@@ -3836,7 +3701,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60040310
+DefaultValue=0x00000000
 
 [1A04sub3]
 ParameterName=Application object 3
@@ -3844,7 +3709,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60050110
+DefaultValue=0x00000000
 
 [1A04sub4]
 ParameterName=Application object 4
@@ -3852,7 +3717,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60050210
+DefaultValue=0x00000000
 
 [1A04sub5]
 ParameterName=Application object 5
@@ -3906,7 +3771,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60050310
+DefaultValue=0x00000000
 
 [1A05sub2]
 ParameterName=Application object 2
@@ -3914,7 +3779,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60060110
+DefaultValue=0x00000000
 
 [1A05sub3]
 ParameterName=Application object 3
@@ -3922,7 +3787,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60060210
+DefaultValue=0x00000000
 
 [1A05sub4]
 ParameterName=Application object 4
@@ -3930,7 +3795,7 @@ ObjectType=0x07
 ;StorageLocation=PERSIST_COMM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60060310
+DefaultValue=0x00000000
 
 [1A05sub5]
 ParameterName=Application object 5
@@ -4752,315 +4617,6 @@ DataType=0x0007
 AccessType=rw
 DefaultValue=0x00000008
 
-[6000]
-ParameterName=Gyroscope
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=7
-
-[6000sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x06
-
-[6000sub1]
-ParameterName=Pitch rate
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6000sub2]
-ParameterName=Yaw rate
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6000sub3]
-ParameterName=Roll rate
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6000sub4]
-ParameterName=Pitch rate raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6000sub5]
-ParameterName=Yaw rate raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6000sub6]
-ParameterName=Roll rate raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001]
-ParameterName=Acceleration
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=7
-
-[6001sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x06
-
-[6001sub1]
-ParameterName=accX
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub2]
-ParameterName=accY
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub3]
-ParameterName=accZ
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub4]
-ParameterName=acc X raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub5]
-ParameterName=accY raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6001sub6]
-ParameterName=accZ raw
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0006
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6002]
-ParameterName=IMU Temperature
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0002
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6003]
-ParameterName=Magnetometer PZ1
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=4
-
-[6003sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x03
-
-[6003sub1]
-ParameterName=magX
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6003sub2]
-ParameterName=magY
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6003sub3]
-ParameterName=magZ
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6004]
-ParameterName=Magnetometer PZ2
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=4
-
-[6004sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x03
-
-[6004sub1]
-ParameterName=magX
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6004sub2]
-ParameterName=magY
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6004sub3]
-ParameterName=magZ
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6005]
-ParameterName=Magnetometer MZ1
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=4
-
-[6005sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x03
-
-[6005sub1]
-ParameterName=magX
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6005sub2]
-ParameterName=magY
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6005sub3]
-ParameterName=magZ
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6006]
-ParameterName=Magnetometer MZ2
-ObjectType=0x09
-;StorageLocation=RAM
-SubNumber=4
-
-[6006sub0]
-ParameterName=Highest sub-index supported
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0005
-AccessType=const
-DefaultValue=0x03
-
-[6006sub1]
-ParameterName=magX
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6006sub2]
-ParameterName=magY
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
-[6006sub3]
-ParameterName=magZ
-ObjectType=0x07
-;StorageLocation=RAM
-DataType=0x0003
-AccessType=ro
-DefaultValue=0
-PDOMapping=1
-
 [ManufacturerObjects]
 SupportedObjects=7
 1=0x2000
@@ -5303,5 +4859,5 @@ ObjectType=0x07
 ;StorageLocation=RAM
 DataType=0x000A
 AccessType=ro
-DefaultValue=00000000000000000000
+DefaultValue=00 00 00 00 00 00 00 00 00 00
 

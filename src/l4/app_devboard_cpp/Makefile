@@ -95,6 +95,7 @@ APP_ROOT  = .
 PROJ_SRC  = $(PROJ_ROOT)/common
 PROJ_INC  = $(PROJ_SRC)/include
 TOOLCHAIN = $(PROJ_ROOT)/toolchain
+ODDIR    := $(APP_ROOT)/od
 
 # Imported source files and paths.
 CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
@@ -104,6 +105,16 @@ DEPDIR   := $(APP_ROOT)/.dep
 
 #Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+
+# generate OD.c/OD.h from oresat-configs
+$(shell oresat-gen-fw-files $(ORESAT) base -d $(ODDIR))
+# add them
+ALLCSRC += $(ODDIR)/OD.c
+ALLINC += $(ODDIR)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk

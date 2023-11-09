@@ -101,6 +101,7 @@ CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
+ODDIR    := $(APP_ROOT)/od
 
 # Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
@@ -109,6 +110,16 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 ifeq ($(USE_BOOTLOADER),)
   USE_BOOTLOADER = yes
 endif
+
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+
+# generate OD.c/OD.h from oresat-configs
+$(shell oresat-gen-fw-files $(ORESAT) battery -d $(ODDIR))
+# add them
+ALLCSRC += $(ODDIR)/OD.c
+ALLINC += $(ODDIR)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk

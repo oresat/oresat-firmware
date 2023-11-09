@@ -86,39 +86,38 @@ bool update_imu_data(void) {
     //TODO re-suspend to save power
     //BMI088AccelerometerEnableOrSuspend(&imudev, BMI088_MODE_SUSPEND);
 
+    OD_RAM.x4000_gyroscope.pitch_rate = gyro_sample.gyro_x;
+    OD_RAM.x4000_gyroscope.yaw_rate = gyro_sample.gyro_y;
+    OD_RAM.x4000_gyroscope.roll_rate = gyro_sample.gyro_z;
+    OD_RAM.x4000_gyroscope.pitch_rate_raw = gyro_sample.gyro_x_raw;
+    OD_RAM.x4000_gyroscope.yaw_rate_raw = gyro_sample.gyro_y_raw;
+    OD_RAM.x4000_gyroscope.roll_rate_raw = gyro_sample.gyro_z_raw;
 
-    OD_RAM.x6000_gyroscope.pitchRate = gyro_sample.gyro_x;
-    OD_RAM.x6000_gyroscope.yawRate = gyro_sample.gyro_y;
-    OD_RAM.x6000_gyroscope.rollRate = gyro_sample.gyro_z;
-    OD_RAM.x6000_gyroscope.pitchRateRaw = gyro_sample.gyro_x_raw;
-    OD_RAM.x6000_gyroscope.yawRateRaw = gyro_sample.gyro_y_raw;
-    OD_RAM.x6000_gyroscope.rollRateRaw = gyro_sample.gyro_z_raw;
+    OD_RAM.x4001_accelerometer.x = accl_data.accl_x;
+    OD_RAM.x4001_accelerometer.y = accl_data.accl_y;
+    OD_RAM.x4001_accelerometer.z = accl_data.accl_z;
+    OD_RAM.x4001_accelerometer.x_raw = accl_data.accl_x_raw;
+    OD_RAM.x4001_accelerometer.y_raw = accl_data.accl_y_raw;
+    OD_RAM.x4001_accelerometer.z_raw = accl_data.accl_z_raw;
 
-    OD_RAM.x6001_acceleration.accx = accl_data.accl_x;
-    OD_RAM.x6001_acceleration.accy = accl_data.accl_y;
-    OD_RAM.x6001_acceleration.accz = accl_data.accl_z;
-    OD_RAM.x6001_acceleration.accXRaw = accl_data.accl_x_raw;
-    OD_RAM.x6001_acceleration.accyRaw = accl_data.accl_y_raw;
-    OD_RAM.x6001_acceleration.acczRaw = accl_data.accl_z_raw;
-
-    OD_RAM.x6002_IMU_Temperature = temp_c;
+    OD_RAM.x4002_temperature = temp_c;
 
     //TODO Implement magnetometer driver and populate this info
-    OD_RAM.x6003_magnetometerPZ1.magx = 0;
-    OD_RAM.x6003_magnetometerPZ1.magy = 0;
-    OD_RAM.x6003_magnetometerPZ1.magz = 0;
+    OD_RAM.x4003_pos_z_magnetometer_1.x = 0;
+    OD_RAM.x4003_pos_z_magnetometer_1.y = 0;
+    OD_RAM.x4003_pos_z_magnetometer_1.z = 0;
 
-    OD_RAM.x6004_magnetometerPZ2.magx = 0;
-    OD_RAM.x6004_magnetometerPZ2.magy = 0;
-    OD_RAM.x6004_magnetometerPZ2.magz = 0;
+    OD_RAM.x4004_pos_z_magnetometer_2.x = 0;
+    OD_RAM.x4004_pos_z_magnetometer_2.y = 0;
+    OD_RAM.x4004_pos_z_magnetometer_2.z = 0;
 
-    OD_RAM.x6005_magnetometerMZ1.magx = 0;
-    OD_RAM.x6005_magnetometerMZ1.magy = 0;
-    OD_RAM.x6005_magnetometerMZ1.magz = 0;
+    OD_RAM.x4005_min_z_magnetometer_1.x = 0;
+    OD_RAM.x4005_min_z_magnetometer_1.y = 0;
+    OD_RAM.x4005_min_z_magnetometer_1.z = 0;
 
-    OD_RAM.x6006_magnetometerMZ2.magx = 0;
-    OD_RAM.x6006_magnetometerMZ2.magy = 0;
-    OD_RAM.x6006_magnetometerMZ2.magz = 0;
+    OD_RAM.x4006_min_z_magnetometer_2.x = 0;
+    OD_RAM.x4006_min_z_magnetometer_2.y = 0;
+    OD_RAM.x4006_min_z_magnetometer_2.z = 0;
 
     return ret;
 }

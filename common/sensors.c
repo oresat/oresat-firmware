@@ -24,10 +24,10 @@ static void sensors_cb(ADCDriver *adcp)
     temperature = temperature * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2_VAL - TS_CAL1_VAL) + TS_CAL1_TEMP * 10;
 
     /* TODO: Use proper OD interface */
-    OD_RAM.x2022_MCU_Sensors.temperatureRaw = sensors[i].ts;
-    OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = sensors[i].vrefint;
-    OD_RAM.x2022_MCU_Sensors.temperature= temperature;
-    OD_RAM.x2022_MCU_Sensors.VREFINT= vdda;
+    //OD_RAM.x2022_MCU_Sensors.temperatureRaw = sensors[i].ts;
+    //OD_RAM.x2022_MCU_Sensors.VREFINT_Raw = sensors[i].vrefint;
+    OD_RAM.x3003_system.temperature = temperature;
+    OD_RAM.x3003_system.vrefint = vdda;
 }
 
 static void sensors_err_cb(ADCDriver *adcp, adcerror_t err)
@@ -48,9 +48,11 @@ void sensors_init(void)
 {
     ADC_ENABLE_SENSORS(&ADCD1);
     /* TODO: Use proper OD interface */
+    /*
     OD_RAM.x2021_MCU_Calibration.TS_CAL1 = TS_CAL1_VAL;
     OD_RAM.x2021_MCU_Calibration.TS_CAL2 = TS_CAL2_VAL;
     OD_RAM.x2021_MCU_Calibration.VREFINT_CAL = VREFINT_CAL_VAL;
+    */
 }
 
 void sensors_start(void)
