@@ -288,78 +288,78 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 }
 
 void handle_can_open_data(void) {
-	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent * 100, 0);
-	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent * 100, 1);
-	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent * 100, 2);
+	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4008_magnetorquer_current_set.x * 100, 0);
+	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4008_magnetorquer_current_set.y * 100, 1);
+	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4008_magnetorquer_current_set.z * 100, 2);
 
 
 
-    OD_RAM.x6000_gyroscope.pitchRate = g_adcs_data.gyro_sample.gyro_x;
-    OD_RAM.x6000_gyroscope.yawRate = g_adcs_data.gyro_sample.gyro_y;
-    OD_RAM.x6000_gyroscope.rollRate = g_adcs_data.gyro_sample.gyro_z;
-    OD_RAM.x6000_gyroscope.pitchRateRaw = g_adcs_data.gyro_sample.gyro_x_raw;
-    OD_RAM.x6000_gyroscope.yawRateRaw = g_adcs_data.gyro_sample.gyro_y_raw;
-    OD_RAM.x6000_gyroscope.rollRateRaw = g_adcs_data.gyro_sample.gyro_z_raw;
+    OD_RAM.x4000_gyroscope.pitch_rate = g_adcs_data.gyro_sample.gyro_x;
+    OD_RAM.x4000_gyroscope.yaw_rate = g_adcs_data.gyro_sample.gyro_y;
+    OD_RAM.x4000_gyroscope.roll_rate = g_adcs_data.gyro_sample.gyro_z;
+    OD_RAM.x4000_gyroscope.pitch_rate_raw = g_adcs_data.gyro_sample.gyro_x_raw;
+    OD_RAM.x4000_gyroscope.yaw_rate_raw = g_adcs_data.gyro_sample.gyro_y_raw;
+    OD_RAM.x4000_gyroscope.roll_rate_raw = g_adcs_data.gyro_sample.gyro_z_raw;
 
-    OD_RAM.x6001_acceleration.accx = g_adcs_data.accl_data.accl_x;
-    OD_RAM.x6001_acceleration.accy = g_adcs_data.accl_data.accl_y;
-    OD_RAM.x6001_acceleration.accz = g_adcs_data.accl_data.accl_z;
-    OD_RAM.x6001_acceleration.accXRaw = g_adcs_data.accl_data.accl_x_raw;
-    OD_RAM.x6001_acceleration.accyRaw = g_adcs_data.accl_data.accl_y_raw;
-    OD_RAM.x6001_acceleration.acczRaw = g_adcs_data.accl_data.accl_z_raw;
+    OD_RAM.x4001_accelerometer.x = g_adcs_data.accl_data.accl_x;
+    OD_RAM.x4001_accelerometer.y = g_adcs_data.accl_data.accl_y;
+    OD_RAM.x4001_accelerometer.z = g_adcs_data.accl_data.accl_z;
+    OD_RAM.x4001_accelerometer.x_raw = g_adcs_data.accl_data.accl_x_raw;
+    OD_RAM.x4001_accelerometer.y_raw = g_adcs_data.accl_data.accl_y_raw;
+    OD_RAM.x4001_accelerometer.z_raw = g_adcs_data.accl_data.accl_z_raw;
 
-    OD_RAM.x6002_IMU_Temperature = g_adcs_data.temp_c;
+    OD_RAM.x4002_temperature = g_adcs_data.temp_c;
 
 
-    OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = g_adcs_data.mt_pwm_data[0].current_feedback_measurement_uA;
-    OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = g_adcs_data.mt_pwm_data[1].current_feedback_measurement_uA;
-    OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = g_adcs_data.mt_pwm_data[2].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer_current.x = g_adcs_data.mt_pwm_data[0].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer_current.y = g_adcs_data.mt_pwm_data[1].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer_current.z = g_adcs_data.mt_pwm_data[2].current_feedback_measurement_uA;
 
-    OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = g_adcs_data.mt_pwm_data[0].current_pwm_percent;
-    OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = g_adcs_data.mt_pwm_data[1].current_pwm_percent;
-    OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = g_adcs_data.mt_pwm_data[2].current_pwm_percent;
+    OD_RAM.x4009_magnetorquer_pwm_percent.x = g_adcs_data.mt_pwm_data[0].current_pwm_percent;
+    OD_RAM.x4009_magnetorquer_pwm_percent.y = g_adcs_data.mt_pwm_data[1].current_pwm_percent;
+    OD_RAM.x4009_magnetorquer_pwm_percent.z = g_adcs_data.mt_pwm_data[2].current_pwm_percent;
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].is_working) {
-		OD_RAM.x6003_magnetometerPZ1.magx = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx;
-		OD_RAM.x6003_magnetometerPZ1.magy = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my;
-		OD_RAM.x6003_magnetometerPZ1.magz = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz;
+		OD_RAM.x4003_pos_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx;
+		OD_RAM.x4003_pos_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my;
+		OD_RAM.x4003_pos_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz;
     } else {
-    	OD_RAM.x6003_magnetometerPZ1.magx = INT16_MAX;
-    	OD_RAM.x6003_magnetometerPZ1.magy = INT16_MAX;
-    	OD_RAM.x6003_magnetometerPZ1.magz = INT16_MAX;
+    	OD_RAM.x4003_pos_z_magnetometer_1.x = INT16_MAX;
+    	OD_RAM.x4003_pos_z_magnetometer_1.y = INT16_MAX;
+    	OD_RAM.x4003_pos_z_magnetometer_1.z = INT16_MAX;
     }
 
     if (g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].is_working) {
-		OD_RAM.x6004_magnetometerPZ2.magx = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx;
-		OD_RAM.x6004_magnetometerPZ2.magy = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my;
-		OD_RAM.x6004_magnetometerPZ2.magz = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz;
+		OD_RAM.x4004_pos_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx;
+		OD_RAM.x4004_pos_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my;
+		OD_RAM.x4004_pos_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz;
 	} else {
-    	OD_RAM.x6004_magnetometerPZ2.magx = INT16_MAX;
-    	OD_RAM.x6004_magnetometerPZ2.magy = INT16_MAX;
-    	OD_RAM.x6004_magnetometerPZ2.magz = INT16_MAX;
+    	OD_RAM.x4004_pos_z_magnetometer_2.x = INT16_MAX;
+    	OD_RAM.x4004_pos_z_magnetometer_2.y = INT16_MAX;
+    	OD_RAM.x4004_pos_z_magnetometer_2.z = INT16_MAX;
     }
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].is_working) {
-		OD_RAM.x6005_magnetometerMZ1.magx = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx;
-		OD_RAM.x6005_magnetometerMZ1.magy = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my;
-		OD_RAM.x6005_magnetometerMZ1.magz = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz;
+		OD_RAM.x4005_min_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx;
+		OD_RAM.x4005_min_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my;
+		OD_RAM.x4005_min_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz;
     } else {
-    	OD_RAM.x6005_magnetometerMZ1.magx = INT16_MAX;
-    	OD_RAM.x6005_magnetometerMZ1.magy = INT16_MAX;
-    	OD_RAM.x6005_magnetometerMZ1.magz = INT16_MAX;
+    	OD_RAM.x4005_min_z_magnetometer_1.x = INT16_MAX;
+    	OD_RAM.x4005_min_z_magnetometer_1.y = INT16_MAX;
+    	OD_RAM.x4005_min_z_magnetometer_1.z = INT16_MAX;
     }
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].is_working) {
-		OD_RAM.x6006_magnetometerMZ2.magx = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx;
-		OD_RAM.x6006_magnetometerMZ2.magy = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my;
-		OD_RAM.x6006_magnetometerMZ2.magz = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz;
+		OD_RAM.x4006_min_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx;
+		OD_RAM.x4006_min_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my;
+		OD_RAM.x4006_min_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz;
     } else {
-    	OD_RAM.x6006_magnetometerMZ2.magx = INT16_MAX;
-    	OD_RAM.x6006_magnetometerMZ2.magy = INT16_MAX;
-    	OD_RAM.x6006_magnetometerMZ2.magz = INT16_MAX;
+    	OD_RAM.x4006_min_z_magnetometer_2.x = INT16_MAX;
+    	OD_RAM.x4006_min_z_magnetometer_2.y = INT16_MAX;
+    	OD_RAM.x4006_min_z_magnetometer_2.z = INT16_MAX;
     }
 
 }
@@ -677,49 +677,49 @@ void print_debug_output(void) {
 
 		chprintf(DEBUG_SD, "================\r\n");
 		chprintf(DEBUG_SD, "CANOpen Data:\r\n");
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.pitchRate = %d\r\n", OD_RAM.x6000_gyroscope.pitchRate);
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.yawRate = %d\r\n", OD_RAM.x6000_gyroscope.yawRate);
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.rollRate = %d\r\n", OD_RAM.x6000_gyroscope.rollRate);
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.pitchRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.pitchRateRaw);
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.yawRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.yawRateRaw);
-		chprintf(DEBUG_SD, "  OD_RAM.x6000_gyroscope.rollRateRaw = %d\r\n", OD_RAM.x6000_gyroscope.rollRateRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.pitch_rate = %d\r\n", OD_RAM.x4000_gyroscope.pitch_rate);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.yaw_rate = %d\r\n", OD_RAM.x4000_gyroscope.yaw_rate);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.roll_rate = %d\r\n", OD_RAM.x4000_gyroscope.roll_rate);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.pitch_rate_raw = %d\r\n", OD_RAM.x4000_gyroscope.pitch_rate_raw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.yaw_rate_raw = %d\r\n", OD_RAM.x4000_gyroscope.yaw_rate_raw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4000_gyroscope.roll_rate_raw = %d\r\n", OD_RAM.x4000_gyroscope.roll_rate_raw);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accx = %d\r\n", OD_RAM.x6001_acceleration.accx);
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accy = %d\r\n", OD_RAM.x6001_acceleration.accy);
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accz = %d\r\n", OD_RAM.x6001_acceleration.accz);
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accXRaw = %d\r\n", OD_RAM.x6001_acceleration.accXRaw);
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.accyRaw = %d\r\n", OD_RAM.x6001_acceleration.accyRaw);
-		chprintf(DEBUG_SD, "  OD_RAM.x6001_acceleration.acczRaw = %d\r\n", OD_RAM.x6001_acceleration.acczRaw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.x = %d\r\n", OD_RAM.x4001_accelerometer.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.y = %d\r\n", OD_RAM.x4001_accelerometer.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.z = %d\r\n", OD_RAM.x4001_accelerometer.z);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.x_raw = %d\r\n", OD_RAM.x4001_accelerometer.x_raw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.y_raw = %d\r\n", OD_RAM.x4001_accelerometer.y_raw);
+		chprintf(DEBUG_SD, "  OD_RAM.x4001_accelerometer.z_raw = %d\r\n", OD_RAM.x4001_accelerometer.z_raw);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6002_IMU_Temperature = %d\r\n", OD_RAM.x6002_IMU_Temperature);
+		chprintf(DEBUG_SD, "  OD_RAM.x4002_temperature = %d\r\n", OD_RAM.x4002_temperature);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerXCurrent);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerYCurrent);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.setMagnetorquerZCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x4008_magnetorquer_current_set.x = %d\r\n", OD_RAM.x4008_magnetorquer_current_set.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4008_magnetorquer_current_set.y = %d\r\n", OD_RAM.x4008_magnetorquer_current_set.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4008_magnetorquer_current_set.z = %d\r\n", OD_RAM.x4008_magnetorquer_current_set.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerXPWM_DutyCycle);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerYPWM_DutyCycle);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerZPWM_DutyCycle);
+		chprintf(DEBUG_SD, "  OD_RAM.x4009_magnetorquer_pwm_percent.x = %d\r\n", OD_RAM.x4009_magnetorquer_pwm_percent.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4009_magnetorquer_pwm_percent.y = %d\r\n", OD_RAM.x4009_magnetorquer_pwm_percent.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4009_magnetorquer_pwm_percent.z = %d\r\n", OD_RAM.x4009_magnetorquer_pwm_percent.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerXCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerXCurrent);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerYCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerYCurrent);
-		chprintf(DEBUG_SD, "  OD_RAM.x6007_magnetorquer.magnetorquerZCurrent = %d\r\n", OD_RAM.x6007_magnetorquer.magnetorquerZCurrent);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.x = %d\r\n", OD_RAM.x4007_magnetorquer_current.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.y = %d\r\n", OD_RAM.x4007_magnetorquer_current.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.z = %d\r\n", OD_RAM.x4007_magnetorquer_current.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magx = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magx);
-		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magy = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magy);
-		chprintf(DEBUG_SD, "  OD_RAM.x6003_magnetometerPZ1.magz = %d\r\n", OD_RAM.x6003_magnetometerPZ1.magz);
+		chprintf(DEBUG_SD, "  OD_RAM.x4003_pos_z_magnetometer_1.x = %d\r\n", OD_RAM.x4003_pos_z_magnetometer_1.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4003_pos_z_magnetometer_1.y = %d\r\n", OD_RAM.x4003_pos_z_magnetometer_1.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4003_pos_z_magnetometer_1.z = %d\r\n", OD_RAM.x4003_pos_z_magnetometer_1.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magx = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magx);
-		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magy = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magy);
-		chprintf(DEBUG_SD, "  OD_RAM.x6004_magnetometerPZ2.magz = %d\r\n", OD_RAM.x6004_magnetometerPZ2.magz);
+		chprintf(DEBUG_SD, "  OD_RAM.x4004_pos_z_magnetometer_2.x = %d\r\n", OD_RAM.x4004_pos_z_magnetometer_2.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4004_pos_z_magnetometer_2.y = %d\r\n", OD_RAM.x4004_pos_z_magnetometer_2.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4004_pos_z_magnetometer_2.z = %d\r\n", OD_RAM.x4004_pos_z_magnetometer_2.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magx = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magx);
-		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magy = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magy);
-		chprintf(DEBUG_SD, "  OD_RAM.x6005_magnetometerMZ1.magz = %d\r\n", OD_RAM.x6005_magnetometerMZ1.magz);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.x = %d\r\n", OD_RAM.x4005_min_z_magnetometer_1.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.y = %d\r\n", OD_RAM.x4005_min_z_magnetometer_1.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.z = %d\r\n", OD_RAM.x4005_min_z_magnetometer_1.z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magx = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magx);
-		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magy = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magy);
-		chprintf(DEBUG_SD, "  OD_RAM.x6006_magnetometerMZ2.magz = %d\r\n", OD_RAM.x6006_magnetometerMZ2.magz);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.x = %d\r\n", OD_RAM.x4006_min_z_magnetometer_2.x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.y = %d\r\n", OD_RAM.x4006_min_z_magnetometer_2.y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4005_min_z_magnetometer_1.z = %d\r\n", OD_RAM.x4006_min_z_magnetometer_2.z);
 
 
 

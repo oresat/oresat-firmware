@@ -82,6 +82,7 @@ endif
 # Project, target, sources and paths
 #
 
+
 # Define project name here
 PROJECT   = app_adcs
 
@@ -104,6 +105,17 @@ DEPDIR   := $(APP_ROOT)/.dep
 
 # Board specific directories.
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
+
+ODDIR    := $(APP_ROOT)/od
+ifeq ($(ORESAT),)
+  ORESAT = oresat0.5
+endif
+# generate OD.c/OD.h from oresat-configs
+$(shell oresat-gen-fw-files $(ORESAT) imu -d $(ODDIR))
+# add them
+ALLCSRC += $(ODDIR)/OD.c
+ALLINC += $(ODDIR)
+
 
 # Enable bootloader
 ifeq ($(USE_BOOTLOADER),)
