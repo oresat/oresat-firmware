@@ -100,12 +100,20 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .cob_id = 0x180,
         .transmission_type = 0xFE,
         .inhibit_time = 0x0,
-        .event_timer = 0x0,
+        .event_timer = 0x3E8,
         .sync_start_value = 0x0,
     },
     .x1809_tpdo_10_communication_parameters = {
         .highest_index_supported = 0x6,
         .cob_id = 0x280,
+        .transmission_type = 0xFE,
+        .inhibit_time = 0x0,
+        .event_timer = 0x3E8,
+        .sync_start_value = 0x0,
+    },
+    .x180A_tpdo_11_communication_parameters = {
+        .highest_index_supported = 0x6,
+        .cob_id = 0x380,
         .transmission_type = 0xFE,
         .inhibit_time = 0x0,
         .event_timer = 0x3E8,
@@ -152,22 +160,25 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .mapping_object_3 = 0x40060310,
     },
     .x1A07_tpdo_8_mapping_parameters = {
-        .highest_index_supported = 0x3,
+        .highest_index_supported = 0x2,
         .mapping_object_1 = 0x40070120,
         .mapping_object_2 = 0x40070220,
-        .mapping_object_3 = 0x40070310,
     },
     .x1A08_tpdo_9_mapping_parameters = {
-        .highest_index_supported = 0x3,
+        .highest_index_supported = 0x2,
         .mapping_object_1 = 0x40080120,
         .mapping_object_2 = 0x40080220,
-        .mapping_object_3 = 0x40080310,
     },
     .x1A09_tpdo_10_mapping_parameters = {
-        .highest_index_supported = 0x3,
+        .highest_index_supported = 0x2,
         .mapping_object_1 = 0x40090120,
         .mapping_object_2 = 0x40090220,
-        .mapping_object_3 = 0x40090310,
+    },
+    .x1A0A_tpdo_11_mapping_parameters = {
+        .highest_index_supported = 0x3,
+        .mapping_object_1 = 0x40100110,
+        .mapping_object_2 = 0x40100210,
+        .mapping_object_3 = 0x40100310,
     },
     .x2010_scet = 0x0,
     .x2011_utc = 0x0,
@@ -227,19 +238,22 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .y = 0x0,
         .z = 0x0,
     },
-    .x4007_magnetorquer_current = {
-        .highest_index_supported = 0x3,
-        .x = 0x0,
-        .y = 0x0,
-        .z = 0x0,
+    .x4007_magnetorquer_current_x = {
+        .highest_index_supported = 0x2,
+        .current_feedback = 0x0,
+        .current_set = 0x0,
     },
-    .x4008_magnetorquer_current_set = {
-        .highest_index_supported = 0x3,
-        .x = 0x0,
-        .y = 0x0,
-        .z = 0x0,
+    .x4008_magnetorquer_current_y = {
+        .highest_index_supported = 0x2,
+        .current_feedback = 0x0,
+        .current_set = 0x0,
     },
-    .x4009_magnetorquer_pwm_percent = {
+    .x4009_magnetorquer_current_z = {
+        .highest_index_supported = 0x2,
+        .current_feedback = 0x0,
+        .current_set = 0x0,
+    },
+    .x4010_magnetorquer_pwm_percent = {
         .highest_index_supported = 0x3,
         .x = 0x0,
         .y = 0x0,
@@ -269,6 +283,7 @@ typedef struct {
     OD_obj_record_t o_1807_tpdo_8_communication_parameters[6];
     OD_obj_record_t o_1808_tpdo_9_communication_parameters[6];
     OD_obj_record_t o_1809_tpdo_10_communication_parameters[6];
+    OD_obj_record_t o_180A_tpdo_11_communication_parameters[6];
     OD_obj_record_t o_1A00_tpdo_1_mapping_parameters[4];
     OD_obj_record_t o_1A01_tpdo_2_mapping_parameters[4];
     OD_obj_record_t o_1A02_tpdo_3_mapping_parameters[2];
@@ -276,9 +291,10 @@ typedef struct {
     OD_obj_record_t o_1A04_tpdo_5_mapping_parameters[4];
     OD_obj_record_t o_1A05_tpdo_6_mapping_parameters[4];
     OD_obj_record_t o_1A06_tpdo_7_mapping_parameters[4];
-    OD_obj_record_t o_1A07_tpdo_8_mapping_parameters[4];
-    OD_obj_record_t o_1A08_tpdo_9_mapping_parameters[4];
-    OD_obj_record_t o_1A09_tpdo_10_mapping_parameters[4];
+    OD_obj_record_t o_1A07_tpdo_8_mapping_parameters[3];
+    OD_obj_record_t o_1A08_tpdo_9_mapping_parameters[3];
+    OD_obj_record_t o_1A09_tpdo_10_mapping_parameters[3];
+    OD_obj_record_t o_1A0A_tpdo_11_mapping_parameters[4];
     OD_obj_var_t o_2010_scet;
     OD_obj_var_t o_2011_utc;
     OD_obj_var_t o_3000_satellite_id;
@@ -292,9 +308,10 @@ typedef struct {
     OD_obj_record_t o_4004_pos_z_magnetometer_2[4];
     OD_obj_record_t o_4005_min_z_magnetometer_1[4];
     OD_obj_record_t o_4006_min_z_magnetometer_2[4];
-    OD_obj_record_t o_4007_magnetorquer_current[4];
-    OD_obj_record_t o_4008_magnetorquer_current_set[4];
-    OD_obj_record_t o_4009_magnetorquer_pwm_percent[4];
+    OD_obj_record_t o_4007_magnetorquer_current_x[3];
+    OD_obj_record_t o_4008_magnetorquer_current_y[3];
+    OD_obj_record_t o_4009_magnetorquer_current_z[3];
+    OD_obj_record_t o_4010_magnetorquer_pwm_percent[4];
 } ODObjs_t;
 
 static CO_PROGMEM ODObjs_t ODObjs = {
@@ -787,6 +804,44 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 1
         },
     },
+    .o_180A_tpdo_11_communication_parameters = {
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.highest_index_supported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.cob_id,
+            .subIndex = 1,
+            .attribute = ODA_SDO_R | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.transmission_type,
+            .subIndex = 2,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.inhibit_time,
+            .subIndex = 3,
+            .attribute = ODA_SDO_R | ODA_MB,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.event_timer,
+            .subIndex = 5,
+            .attribute = ODA_SDO_R | ODA_MB,
+            .dataLength = 2
+        },
+        {
+            .dataOrig = &OD_RAM.x180A_tpdo_11_communication_parameters.sync_start_value,
+            .subIndex = 6,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+    },
     .o_1A00_tpdo_1_mapping_parameters = {
         {
             .dataOrig = &OD_RAM.x1A00_tpdo_1_mapping_parameters.highest_index_supported,
@@ -976,12 +1031,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .attribute = ODA_SDO_R | ODA_MB,
             .dataLength = 4
         },
-        {
-            .dataOrig = &OD_RAM.x1A07_tpdo_8_mapping_parameters.mapping_object_3,
-            .subIndex = 3,
-            .attribute = ODA_SDO_R | ODA_MB,
-            .dataLength = 4
-        },
     },
     .o_1A08_tpdo_9_mapping_parameters = {
         {
@@ -999,12 +1048,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         {
             .dataOrig = &OD_RAM.x1A08_tpdo_9_mapping_parameters.mapping_object_2,
             .subIndex = 2,
-            .attribute = ODA_SDO_R | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x1A08_tpdo_9_mapping_parameters.mapping_object_3,
-            .subIndex = 3,
             .attribute = ODA_SDO_R | ODA_MB,
             .dataLength = 4
         },
@@ -1028,8 +1071,28 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .attribute = ODA_SDO_R | ODA_MB,
             .dataLength = 4
         },
+    },
+    .o_1A0A_tpdo_11_mapping_parameters = {
         {
-            .dataOrig = &OD_RAM.x1A09_tpdo_10_mapping_parameters.mapping_object_3,
+            .dataOrig = &OD_RAM.x1A0A_tpdo_11_mapping_parameters.highest_index_supported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x1A0A_tpdo_11_mapping_parameters.mapping_object_1,
+            .subIndex = 1,
+            .attribute = ODA_SDO_R | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x1A0A_tpdo_11_mapping_parameters.mapping_object_2,
+            .subIndex = 2,
+            .attribute = ODA_SDO_R | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x1A0A_tpdo_11_mapping_parameters.mapping_object_3,
             .subIndex = 3,
             .attribute = ODA_SDO_R | ODA_MB,
             .dataLength = 4
@@ -1298,79 +1361,87 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 2
         },
     },
-    .o_4007_magnetorquer_current = {
+    .o_4007_magnetorquer_current_x = {
         {
-            .dataOrig = &OD_RAM.x4007_magnetorquer_current.highest_index_supported,
+            .dataOrig = &OD_RAM.x4007_magnetorquer_current_x.highest_index_supported,
             .subIndex = 0,
             .attribute = ODA_SDO_R,
             .dataLength = 1
         },
         {
-            .dataOrig = &OD_RAM.x4007_magnetorquer_current.x,
+            .dataOrig = &OD_RAM.x4007_magnetorquer_current_x.current_feedback,
             .subIndex = 1,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x4007_magnetorquer_current.y,
+            .dataOrig = &OD_RAM.x4007_magnetorquer_current_x.current_set,
             .subIndex = 2,
+            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
+            .dataLength = 4
+        },
+    },
+    .o_4008_magnetorquer_current_y = {
+        {
+            .dataOrig = &OD_RAM.x4008_magnetorquer_current_y.highest_index_supported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x4008_magnetorquer_current_y.current_feedback,
+            .subIndex = 1,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 4
         },
         {
-            .dataOrig = &OD_RAM.x4007_magnetorquer_current.z,
-            .subIndex = 3,
+            .dataOrig = &OD_RAM.x4008_magnetorquer_current_y.current_set,
+            .subIndex = 2,
+            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
+            .dataLength = 4
+        },
+    },
+    .o_4009_magnetorquer_current_z = {
+        {
+            .dataOrig = &OD_RAM.x4009_magnetorquer_current_z.highest_index_supported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x4009_magnetorquer_current_z.current_feedback,
+            .subIndex = 1,
+            .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+            .dataLength = 4
+        },
+        {
+            .dataOrig = &OD_RAM.x4009_magnetorquer_current_z.current_set,
+            .subIndex = 2,
+            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
+            .dataLength = 4
+        },
+    },
+    .o_4010_magnetorquer_pwm_percent = {
+        {
+            .dataOrig = &OD_RAM.x4010_magnetorquer_pwm_percent.highest_index_supported,
+            .subIndex = 0,
+            .attribute = ODA_SDO_R,
+            .dataLength = 1
+        },
+        {
+            .dataOrig = &OD_RAM.x4010_magnetorquer_pwm_percent.x,
+            .subIndex = 1,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
-    },
-    .o_4008_magnetorquer_current_set = {
         {
-            .dataOrig = &OD_RAM.x4008_magnetorquer_current_set.highest_index_supported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x4008_magnetorquer_current_set.x,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x4008_magnetorquer_current_set.y,
+            .dataOrig = &OD_RAM.x4010_magnetorquer_pwm_percent.y,
             .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x4008_magnetorquer_current_set.z,
-            .subIndex = 3,
-            .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
+            .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
         },
-    },
-    .o_4009_magnetorquer_pwm_percent = {
         {
-            .dataOrig = &OD_RAM.x4009_magnetorquer_pwm_percent.highest_index_supported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x4009_magnetorquer_pwm_percent.x,
-            .subIndex = 1,
-            .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x4009_magnetorquer_pwm_percent.y,
-            .subIndex = 2,
-            .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x4009_magnetorquer_pwm_percent.z,
+            .dataOrig = &OD_RAM.x4010_magnetorquer_pwm_percent.z,
             .subIndex = 3,
             .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
             .dataLength = 2
@@ -1400,6 +1471,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1807, 0x06, ODT_REC, &ODObjs.o_1807_tpdo_8_communication_parameters, NULL},
     {0x1808, 0x06, ODT_REC, &ODObjs.o_1808_tpdo_9_communication_parameters, NULL},
     {0x1809, 0x06, ODT_REC, &ODObjs.o_1809_tpdo_10_communication_parameters, NULL},
+    {0x180A, 0x06, ODT_REC, &ODObjs.o_180A_tpdo_11_communication_parameters, NULL},
     {0x1A00, 0x04, ODT_REC, &ODObjs.o_1A00_tpdo_1_mapping_parameters, NULL},
     {0x1A01, 0x04, ODT_REC, &ODObjs.o_1A01_tpdo_2_mapping_parameters, NULL},
     {0x1A02, 0x02, ODT_REC, &ODObjs.o_1A02_tpdo_3_mapping_parameters, NULL},
@@ -1407,9 +1479,10 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A04, 0x04, ODT_REC, &ODObjs.o_1A04_tpdo_5_mapping_parameters, NULL},
     {0x1A05, 0x04, ODT_REC, &ODObjs.o_1A05_tpdo_6_mapping_parameters, NULL},
     {0x1A06, 0x04, ODT_REC, &ODObjs.o_1A06_tpdo_7_mapping_parameters, NULL},
-    {0x1A07, 0x04, ODT_REC, &ODObjs.o_1A07_tpdo_8_mapping_parameters, NULL},
-    {0x1A08, 0x04, ODT_REC, &ODObjs.o_1A08_tpdo_9_mapping_parameters, NULL},
-    {0x1A09, 0x04, ODT_REC, &ODObjs.o_1A09_tpdo_10_mapping_parameters, NULL},
+    {0x1A07, 0x03, ODT_REC, &ODObjs.o_1A07_tpdo_8_mapping_parameters, NULL},
+    {0x1A08, 0x03, ODT_REC, &ODObjs.o_1A08_tpdo_9_mapping_parameters, NULL},
+    {0x1A09, 0x03, ODT_REC, &ODObjs.o_1A09_tpdo_10_mapping_parameters, NULL},
+    {0x1A0A, 0x04, ODT_REC, &ODObjs.o_1A0A_tpdo_11_mapping_parameters, NULL},
     {0x2010, 0x01, ODT_VAR, &ODObjs.o_2010_scet, NULL},
     {0x2011, 0x01, ODT_VAR, &ODObjs.o_2011_utc, NULL},
     {0x3000, 0x01, ODT_VAR, &ODObjs.o_3000_satellite_id, NULL},
@@ -1423,9 +1496,10 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x4004, 0x04, ODT_REC, &ODObjs.o_4004_pos_z_magnetometer_2, NULL},
     {0x4005, 0x04, ODT_REC, &ODObjs.o_4005_min_z_magnetometer_1, NULL},
     {0x4006, 0x04, ODT_REC, &ODObjs.o_4006_min_z_magnetometer_2, NULL},
-    {0x4007, 0x04, ODT_REC, &ODObjs.o_4007_magnetorquer_current, NULL},
-    {0x4008, 0x04, ODT_REC, &ODObjs.o_4008_magnetorquer_current_set, NULL},
-    {0x4009, 0x04, ODT_REC, &ODObjs.o_4009_magnetorquer_pwm_percent, NULL},
+    {0x4007, 0x03, ODT_REC, &ODObjs.o_4007_magnetorquer_current_x, NULL},
+    {0x4008, 0x03, ODT_REC, &ODObjs.o_4008_magnetorquer_current_y, NULL},
+    {0x4009, 0x03, ODT_REC, &ODObjs.o_4009_magnetorquer_current_z, NULL},
+    {0x4010, 0x04, ODT_REC, &ODObjs.o_4010_magnetorquer_pwm_percent, NULL},
     {0x0000, 0x00, 0, NULL, NULL}
 };
 

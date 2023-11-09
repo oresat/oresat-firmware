@@ -10,7 +10,7 @@
 #define OD_CNT_HB_CONS 1
 #define OD_CNT_HB_PROD 1
 #define OD_CNT_SDO_SRV 1
-#define OD_CNT_TPDO 10
+#define OD_CNT_TPDO 11
 
 #define OD_CNT_ARR_1003 8
 #define OD_CNT_ARR_1016 1
@@ -122,6 +122,14 @@ typedef struct {
     } x1809_tpdo_10_communication_parameters;
     struct {
         uint8_t highest_index_supported;
+        uint32_t cob_id;
+        uint8_t transmission_type;
+        uint16_t inhibit_time;
+        uint16_t event_timer;
+        uint8_t sync_start_value;
+    } x180A_tpdo_11_communication_parameters;
+    struct {
+        uint8_t highest_index_supported;
         uint32_t mapping_object_1;
         uint32_t mapping_object_2;
         uint32_t mapping_object_3;
@@ -164,20 +172,23 @@ typedef struct {
         uint8_t highest_index_supported;
         uint32_t mapping_object_1;
         uint32_t mapping_object_2;
-        uint32_t mapping_object_3;
     } x1A07_tpdo_8_mapping_parameters;
     struct {
         uint8_t highest_index_supported;
         uint32_t mapping_object_1;
         uint32_t mapping_object_2;
-        uint32_t mapping_object_3;
     } x1A08_tpdo_9_mapping_parameters;
     struct {
         uint8_t highest_index_supported;
         uint32_t mapping_object_1;
         uint32_t mapping_object_2;
-        uint32_t mapping_object_3;
     } x1A09_tpdo_10_mapping_parameters;
+    struct {
+        uint8_t highest_index_supported;
+        uint32_t mapping_object_1;
+        uint32_t mapping_object_2;
+        uint32_t mapping_object_3;
+    } x1A0A_tpdo_11_mapping_parameters;
     uint64_t x2010_scet;
     uint64_t x2011_utc;
     uint8_t x3000_satellite_id;
@@ -238,22 +249,25 @@ typedef struct {
     } x4006_min_z_magnetometer_2;
     struct {
         uint8_t highest_index_supported;
-        int32_t x;
-        int32_t y;
-        int16_t z;
-    } x4007_magnetorquer_current;
+        int32_t current_feedback;
+        int32_t current_set;
+    } x4007_magnetorquer_current_x;
     struct {
         uint8_t highest_index_supported;
-        int32_t x;
-        int32_t y;
-        int16_t z;
-    } x4008_magnetorquer_current_set;
+        int32_t current_feedback;
+        int32_t current_set;
+    } x4008_magnetorquer_current_y;
     struct {
         uint8_t highest_index_supported;
-        int32_t x;
-        int32_t y;
+        int32_t current_feedback;
+        int32_t current_set;
+    } x4009_magnetorquer_current_z;
+    struct {
+        uint8_t highest_index_supported;
+        int16_t x;
+        int16_t y;
         int16_t z;
-    } x4009_magnetorquer_pwm_percent;
+    } x4010_magnetorquer_pwm_percent;
 } OD_RAM_t;
 
 #ifndef OD_ATTR_RAM
@@ -287,32 +301,35 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1807 &OD->list[18]
 #define OD_ENTRY_H1808 &OD->list[19]
 #define OD_ENTRY_H1809 &OD->list[20]
-#define OD_ENTRY_H1A00 &OD->list[21]
-#define OD_ENTRY_H1A01 &OD->list[22]
-#define OD_ENTRY_H1A02 &OD->list[23]
-#define OD_ENTRY_H1A03 &OD->list[24]
-#define OD_ENTRY_H1A04 &OD->list[25]
-#define OD_ENTRY_H1A05 &OD->list[26]
-#define OD_ENTRY_H1A06 &OD->list[27]
-#define OD_ENTRY_H1A07 &OD->list[28]
-#define OD_ENTRY_H1A08 &OD->list[29]
-#define OD_ENTRY_H1A09 &OD->list[30]
-#define OD_ENTRY_H2010 &OD->list[31]
-#define OD_ENTRY_H2011 &OD->list[32]
-#define OD_ENTRY_H3000 &OD->list[33]
-#define OD_ENTRY_H3001 &OD->list[34]
-#define OD_ENTRY_H3002 &OD->list[35]
-#define OD_ENTRY_H3003 &OD->list[36]
-#define OD_ENTRY_H4000 &OD->list[37]
-#define OD_ENTRY_H4001 &OD->list[38]
-#define OD_ENTRY_H4002 &OD->list[39]
-#define OD_ENTRY_H4003 &OD->list[40]
-#define OD_ENTRY_H4004 &OD->list[41]
-#define OD_ENTRY_H4005 &OD->list[42]
-#define OD_ENTRY_H4006 &OD->list[43]
-#define OD_ENTRY_H4007 &OD->list[44]
-#define OD_ENTRY_H4008 &OD->list[45]
-#define OD_ENTRY_H4009 &OD->list[46]
+#define OD_ENTRY_H180A &OD->list[21]
+#define OD_ENTRY_H1A00 &OD->list[22]
+#define OD_ENTRY_H1A01 &OD->list[23]
+#define OD_ENTRY_H1A02 &OD->list[24]
+#define OD_ENTRY_H1A03 &OD->list[25]
+#define OD_ENTRY_H1A04 &OD->list[26]
+#define OD_ENTRY_H1A05 &OD->list[27]
+#define OD_ENTRY_H1A06 &OD->list[28]
+#define OD_ENTRY_H1A07 &OD->list[29]
+#define OD_ENTRY_H1A08 &OD->list[30]
+#define OD_ENTRY_H1A09 &OD->list[31]
+#define OD_ENTRY_H1A0A &OD->list[32]
+#define OD_ENTRY_H2010 &OD->list[33]
+#define OD_ENTRY_H2011 &OD->list[34]
+#define OD_ENTRY_H3000 &OD->list[35]
+#define OD_ENTRY_H3001 &OD->list[36]
+#define OD_ENTRY_H3002 &OD->list[37]
+#define OD_ENTRY_H3003 &OD->list[38]
+#define OD_ENTRY_H4000 &OD->list[39]
+#define OD_ENTRY_H4001 &OD->list[40]
+#define OD_ENTRY_H4002 &OD->list[41]
+#define OD_ENTRY_H4003 &OD->list[42]
+#define OD_ENTRY_H4004 &OD->list[43]
+#define OD_ENTRY_H4005 &OD->list[44]
+#define OD_ENTRY_H4006 &OD->list[45]
+#define OD_ENTRY_H4007 &OD->list[46]
+#define OD_ENTRY_H4008 &OD->list[47]
+#define OD_ENTRY_H4009 &OD->list[48]
+#define OD_ENTRY_H4010 &OD->list[49]
 
 #define OD_ENTRY_H1000_DEVICE_TYPE &OD->list[0]
 #define OD_ENTRY_H1001_ERROR_REGISTER &OD->list[1]
@@ -335,32 +352,35 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1807_TPDO_8_COMMUNICATION_PARAMETERS &OD->list[18]
 #define OD_ENTRY_H1808_TPDO_9_COMMUNICATION_PARAMETERS &OD->list[19]
 #define OD_ENTRY_H1809_TPDO_10_COMMUNICATION_PARAMETERS &OD->list[20]
-#define OD_ENTRY_H1A00_TPDO_1_MAPPING_PARAMETERS &OD->list[21]
-#define OD_ENTRY_H1A01_TPDO_2_MAPPING_PARAMETERS &OD->list[22]
-#define OD_ENTRY_H1A02_TPDO_3_MAPPING_PARAMETERS &OD->list[23]
-#define OD_ENTRY_H1A03_TPDO_4_MAPPING_PARAMETERS &OD->list[24]
-#define OD_ENTRY_H1A04_TPDO_5_MAPPING_PARAMETERS &OD->list[25]
-#define OD_ENTRY_H1A05_TPDO_6_MAPPING_PARAMETERS &OD->list[26]
-#define OD_ENTRY_H1A06_TPDO_7_MAPPING_PARAMETERS &OD->list[27]
-#define OD_ENTRY_H1A07_TPDO_8_MAPPING_PARAMETERS &OD->list[28]
-#define OD_ENTRY_H1A08_TPDO_9_MAPPING_PARAMETERS &OD->list[29]
-#define OD_ENTRY_H1A09_TPDO_10_MAPPING_PARAMETERS &OD->list[30]
-#define OD_ENTRY_H2010_SCET &OD->list[31]
-#define OD_ENTRY_H2011_UTC &OD->list[32]
-#define OD_ENTRY_H3000_SATELLITE_ID &OD->list[33]
-#define OD_ENTRY_H3001_FLIGHT_MODE &OD->list[34]
-#define OD_ENTRY_H3002_VERSIONS &OD->list[35]
-#define OD_ENTRY_H3003_SYSTEM &OD->list[36]
-#define OD_ENTRY_H4000_GYROSCOPE &OD->list[37]
-#define OD_ENTRY_H4001_ACCELEROMETER &OD->list[38]
-#define OD_ENTRY_H4002_TEMPERATURE &OD->list[39]
-#define OD_ENTRY_H4003_POS_Z_MAGNETOMETER_1 &OD->list[40]
-#define OD_ENTRY_H4004_POS_Z_MAGNETOMETER_2 &OD->list[41]
-#define OD_ENTRY_H4005_MIN_Z_MAGNETOMETER_1 &OD->list[42]
-#define OD_ENTRY_H4006_MIN_Z_MAGNETOMETER_2 &OD->list[43]
-#define OD_ENTRY_H4007_MAGNETORQUER_CURRENT &OD->list[44]
-#define OD_ENTRY_H4008_MAGNETORQUER_CURRENT_SET &OD->list[45]
-#define OD_ENTRY_H4009_MAGNETORQUER_PWM_PERCENT &OD->list[46]
+#define OD_ENTRY_H180A_TPDO_11_COMMUNICATION_PARAMETERS &OD->list[21]
+#define OD_ENTRY_H1A00_TPDO_1_MAPPING_PARAMETERS &OD->list[22]
+#define OD_ENTRY_H1A01_TPDO_2_MAPPING_PARAMETERS &OD->list[23]
+#define OD_ENTRY_H1A02_TPDO_3_MAPPING_PARAMETERS &OD->list[24]
+#define OD_ENTRY_H1A03_TPDO_4_MAPPING_PARAMETERS &OD->list[25]
+#define OD_ENTRY_H1A04_TPDO_5_MAPPING_PARAMETERS &OD->list[26]
+#define OD_ENTRY_H1A05_TPDO_6_MAPPING_PARAMETERS &OD->list[27]
+#define OD_ENTRY_H1A06_TPDO_7_MAPPING_PARAMETERS &OD->list[28]
+#define OD_ENTRY_H1A07_TPDO_8_MAPPING_PARAMETERS &OD->list[29]
+#define OD_ENTRY_H1A08_TPDO_9_MAPPING_PARAMETERS &OD->list[30]
+#define OD_ENTRY_H1A09_TPDO_10_MAPPING_PARAMETERS &OD->list[31]
+#define OD_ENTRY_H1A0A_TPDO_11_MAPPING_PARAMETERS &OD->list[32]
+#define OD_ENTRY_H2010_SCET &OD->list[33]
+#define OD_ENTRY_H2011_UTC &OD->list[34]
+#define OD_ENTRY_H3000_SATELLITE_ID &OD->list[35]
+#define OD_ENTRY_H3001_FLIGHT_MODE &OD->list[36]
+#define OD_ENTRY_H3002_VERSIONS &OD->list[37]
+#define OD_ENTRY_H3003_SYSTEM &OD->list[38]
+#define OD_ENTRY_H4000_GYROSCOPE &OD->list[39]
+#define OD_ENTRY_H4001_ACCELEROMETER &OD->list[40]
+#define OD_ENTRY_H4002_TEMPERATURE &OD->list[41]
+#define OD_ENTRY_H4003_POS_Z_MAGNETOMETER_1 &OD->list[42]
+#define OD_ENTRY_H4004_POS_Z_MAGNETOMETER_2 &OD->list[43]
+#define OD_ENTRY_H4005_MIN_Z_MAGNETOMETER_1 &OD->list[44]
+#define OD_ENTRY_H4006_MIN_Z_MAGNETOMETER_2 &OD->list[45]
+#define OD_ENTRY_H4007_MAGNETORQUER_CURRENT_X &OD->list[46]
+#define OD_ENTRY_H4008_MAGNETORQUER_CURRENT_Y &OD->list[47]
+#define OD_ENTRY_H4009_MAGNETORQUER_CURRENT_Z &OD->list[48]
+#define OD_ENTRY_H4010_MAGNETORQUER_PWM_PERCENT &OD->list[49]
 
 #define OD_INDEX_SCET 0x2010
 
@@ -417,17 +437,19 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_SUBINDEX_MIN_Z_MAGNETOMETER_2_Y 0x2
 #define OD_SUBINDEX_MIN_Z_MAGNETOMETER_2_Z 0x3
 
-#define OD_INDEX_MAGNETORQUER_CURRENT 0x4007
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_X 0x1
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Y 0x2
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Z 0x3
+#define OD_INDEX_MAGNETORQUER_CURRENT_X 0x4007
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_X_CURRENT_FEEDBACK 0x1
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_X_CURRENT_SET 0x2
 
-#define OD_INDEX_MAGNETORQUER_CURRENT_SET 0x4008
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_SET_X 0x1
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_SET_Y 0x2
-#define OD_SUBINDEX_MAGNETORQUER_CURRENT_SET_Z 0x3
+#define OD_INDEX_MAGNETORQUER_CURRENT_Y 0x4008
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Y_CURRENT_FEEDBACK 0x1
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Y_CURRENT_SET 0x2
 
-#define OD_INDEX_MAGNETORQUER_PWM_PERCENT 0x4009
+#define OD_INDEX_MAGNETORQUER_CURRENT_Z 0x4009
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Z_CURRENT_FEEDBACK 0x1
+#define OD_SUBINDEX_MAGNETORQUER_CURRENT_Z_CURRENT_SET 0x2
+
+#define OD_INDEX_MAGNETORQUER_PWM_PERCENT 0x4010
 #define OD_SUBINDEX_MAGNETORQUER_PWM_PERCENT_X 0x1
 #define OD_SUBINDEX_MAGNETORQUER_PWM_PERCENT_Y 0x2
 #define OD_SUBINDEX_MAGNETORQUER_PWM_PERCENT_Z 0x3
