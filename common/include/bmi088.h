@@ -445,6 +445,7 @@
 #define BMI088_ACC_CHIP_ID_Msk              (0xFFU << BMI088_ACC_CHIP_ID_Pos)
 #define BMI088_ACC_CHIP_ID                  BMI088_ACC_CHIP_ID_Msk
 #define BMI088_ACC_CHIP_ID_EXPECTED         (0x1E)
+#define BMI090L_ACC_CHIP_ID_EXPECTED        (0x1A)
 /** @} */
 
 /**

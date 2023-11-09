@@ -42,9 +42,10 @@ static thread_descriptor_t adcs_desc = {
     .arg = NULL
 };
 
+#define ORESAT_ACS_NODE_ID 0x38
 static oresat_config_t oresat_conf = {
     .cand = &CAND1,
-    .node_id = ORESAT_DEFAULT_ID,
+    .node_id = ORESAT_ACS_NODE_ID, //ORESAT_DEFAULT_ID,
     .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 

@@ -902,13 +902,13 @@ THD_FUNCTION(adcs, arg)
     } else {
         uint8_t bmi088_chip_id = 0;
         if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
-            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be 0x%X\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED);
+            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be (0x%X or 0x%X)\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED, BMI090L_ACC_CHIP_ID_EXPECTED);
         } else {
-            chprintf(DEBUG_SD, "Failed to read accl chip ID from BMI088 ACCEL, r = %d\r\n", r);
+            chprintf(DEBUG_SD, "Failed to read accel chip ID from BMI088 ACCEL, r = %d\r\n", r);
         }
 
-        if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED ) {
-        	chprintf(DEBUG_SD, "BMI088 ACCEL FAIL: didnt find BMI088!\r\n");
+        if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED && bmi088_chip_id != BMI090L_ACC_CHIP_ID_EXPECTED ) {
+        	chprintf(DEBUG_SD, "ERROR: BMI088 ACCEL FAIL: didn't find BMI088!\r\n");
         	static systime_t last_report_time = 0;
             CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH, &last_report_time);
         } else {
