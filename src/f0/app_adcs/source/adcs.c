@@ -288,9 +288,9 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 }
 
 void handle_can_open_data(void) {
-	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer_current_x.current_set * 100, 0);
-	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4008_magnetorquer_current_y.current_set * 100, 1);
-	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4009_magnetorquer_current_z.current_set * 100, 2);
+	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_x_setpoint * 100, 0);
+	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_y_setpoint * 100, 1);
+	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_z_setpoint * 100, 2);
 
 
 
@@ -311,13 +311,13 @@ void handle_can_open_data(void) {
     OD_RAM.x4002_temperature = g_adcs_data.temp_c;
 
 
-    OD_RAM.x4007_magnetorquer_current_x.current_feedback = g_adcs_data.mt_pwm_data[0].current_feedback_measurement_uA;
-    OD_RAM.x4008_magnetorquer_current_y.current_feedback = g_adcs_data.mt_pwm_data[1].current_feedback_measurement_uA;
-    OD_RAM.x4009_magnetorquer_current_z.current_feedback = g_adcs_data.mt_pwm_data[2].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer.current_x = g_adcs_data.mt_pwm_data[0].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer.current_y = g_adcs_data.mt_pwm_data[1].current_feedback_measurement_uA;
+    OD_RAM.x4007_magnetorquer.current_z = g_adcs_data.mt_pwm_data[2].current_feedback_measurement_uA;
 
-    OD_RAM.x4010_magnetorquer_pwm_percent.x = g_adcs_data.mt_pwm_data[0].current_pwm_percent;
-    OD_RAM.x4010_magnetorquer_pwm_percent.y = g_adcs_data.mt_pwm_data[1].current_pwm_percent;
-    OD_RAM.x4010_magnetorquer_pwm_percent.z = g_adcs_data.mt_pwm_data[2].current_pwm_percent;
+    OD_RAM.x4007_magnetorquer.pwm_x = g_adcs_data.mt_pwm_data[0].current_pwm_percent;
+    OD_RAM.x4007_magnetorquer.pwm_y = g_adcs_data.mt_pwm_data[1].current_pwm_percent;
+    OD_RAM.x4007_magnetorquer.pwm_z = g_adcs_data.mt_pwm_data[2].current_pwm_percent;
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].is_working) {
@@ -693,17 +693,17 @@ void print_debug_output(void) {
 
 		chprintf(DEBUG_SD, "  OD_RAM.x4002_temperature = %d\r\n", OD_RAM.x4002_temperature);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current_x.current_set = %d\r\n", OD_RAM.x4007_magnetorquer_current_x.current_set);
-		chprintf(DEBUG_SD, "  OD_RAM.x4008_magnetorquer_current_y.current_set = %d\r\n", OD_RAM.x4008_magnetorquer_current_y.current_set);
-		chprintf(DEBUG_SD, "  OD_RAM.x4009_magnetorquer_current_z.current_set = %d\r\n", OD_RAM.x4009_magnetorquer_current_z.current_set);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current_x.current_set = %d\r\n", OD_RAM.x4007_magnetorquer.current_x_setpoint);
+		chprintf(DEBUG_SD, "  OD_RAM.x4008_magnetorquer_current_y.current_set = %d\r\n", OD_RAM.x4007_magnetorquer.current_y_setpoint);
+		chprintf(DEBUG_SD, "  OD_RAM.x4009_magnetorquer_current_z.current_set = %d\r\n", OD_RAM.x4007_magnetorquer.current_z_setpoint);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.x = %d\r\n", OD_RAM.x4010_magnetorquer_pwm_percent.x);
-		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.y = %d\r\n", OD_RAM.x4010_magnetorquer_pwm_percent.y);
-		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.z = %d\r\n", OD_RAM.x4010_magnetorquer_pwm_percent.z);
+		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.x = %d\r\n", OD_RAM.x4007_magnetorquer.pwm_x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.y = %d\r\n", OD_RAM.x4007_magnetorquer.pwm_y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4010_magnetorquer_pwm_percent.z = %d\r\n", OD_RAM.x4007_magnetorquer.pwm_z);
 
-		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.x = %d\r\n", OD_RAM.x4007_magnetorquer_current_x.current_feedback);
-		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.y = %d\r\n", OD_RAM.x4008_magnetorquer_current_y.current_feedback);
-		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.z = %d\r\n", OD_RAM.x4009_magnetorquer_current_z.current_feedback);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.x = %d\r\n", OD_RAM.x4007_magnetorquer.current_x);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.y = %d\r\n", OD_RAM.x4007_magnetorquer.current_y);
+		chprintf(DEBUG_SD, "  OD_RAM.x4007_magnetorquer_current.z = %d\r\n", OD_RAM.x4007_magnetorquer.current_z);
 
 		chprintf(DEBUG_SD, "  OD_RAM.x4003_pos_z_magnetometer_1.x = %d\r\n", OD_RAM.x4003_pos_z_magnetometer_1.x);
 		chprintf(DEBUG_SD, "  OD_RAM.x4003_pos_z_magnetometer_1.y = %d\r\n", OD_RAM.x4003_pos_z_magnetometer_1.y);
