@@ -65,6 +65,7 @@ jobs:
         make -C src/f0/app_bootloader
         make -C src/f0/app_devboard
         make -C src/f0/app_imu
+        make -C src/f0/app_adcs
         make -C src/f0/app_solar
 
     - name: Compile f4 apps
