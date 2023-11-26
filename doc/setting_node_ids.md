@@ -44,14 +44,36 @@ F804 = nData1:Data1:nData0:Data0
 In the directory `oresat-firmware/toolchain`, you can run:
 
 ```bash
-openocd -f ../boards/PROTOCARD_V4/oocd.cfg
+$ openocd -f ../boards/PROTOCARD_V4/oocd.cfg
+Open On-Chip Debugger 0.12.0+dev-00308-g18281b0c4-dirty (2023-09-03-13:32)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : clock speed 1000 kHz
+Info : STLINK V3J8M3B5S1 (API v3) VID:PID 0483:374F
+Info : Target voltage: 3.338645
+Info : [stm32f0x.cpu] Cortex-M0 r0p0 processor detected
+Info : [stm32f0x.cpu] target has 4 breakpoints, 2 watchpoints
+Info : starting gdb server for stm32f0x.cpu on 3333
+Info : Listening on port 3333 for gdb connections
+```
+
+## Telnet
+
+In another terminal connect with telnet
+
+```bash
+$ telnet 4444
 ```
 
 Run `halt`. This seems to be important, we don’t want the processor doing weird things.
 
 Read all 32 bit option bytes registers:
 
-```bash
+```
 mdw 0x1ffff800 4
 0x1ffff800: 00ff55aa 00ff00ff 00ff00ff 00ff00ff 
 ```
@@ -60,7 +82,7 @@ We can see 0x1ffff804 is 00ff, which is our nData0:Data0.
 
 Check that the flash is locked:
 
-```bash
+```
 mdw 0x40022010
 0x40022010: 00000080 
 ```
@@ -68,14 +90,14 @@ mdw 0x40022010
 Unlock the flash directly performing the unlocking sequence on the FLASH_KEYR
 (0x40022004) register.
 
-```bash
+```
 mww 0x40022004 0x45670123
 mww 0x40022004 0xCDEF89AB
 ```
 
 Reassure that the flash is unlocked. Read the FLASH_CR:
 
-```bash
+```
 mdw 0x40022010
 0x40022010: 00000000 
 ```
@@ -83,7 +105,7 @@ mdw 0x40022010
 Unlock option bytes for writing (which is described in the reference manual as
 setting the OPTWRE bit in the FLASH_CR).
 
-```bash
+```
 mww 0x40022008 0x45670123
 mww 0x40022008 0xCDEF89AB
 mdw 0x40022010           
@@ -92,14 +114,14 @@ mdw 0x40022010
 
 Clear option bytes (they are stored in the FLASH after all).
 
-```bash
+```
 mww 0x40022010 0x00000220
 mww 0x40022010 0x00000260
 ```
 
 Enable programming by setting FLASH_CR.OPTPG:
 
-```bash
+```
 mww 0x40022010 0x00000210
 mdw 0x40022010
 0x40022010: 00000210
@@ -111,13 +133,13 @@ Here’s the example, for Battery 0, which is Node ID 4. You have to put in a
 half word with the ID in the low byte (e.g.0x04), and the complement of the
 ID in the high byte (e.g., 0xfb).
 
-ACS board Node ID 0x38: 0xc738
-Battery board Node ID 0x04: 0xfb04
-Solar Module 3 Node ID 0x18: 0xe718
-Solar Module 1 Node ID 0x10: 0xef10
-Solar Module 2 Node ID 0x14: 0xe
+- ACS board Node ID 0x38: 0xc738
+- Battery board Node ID 0x04: 0xfb04
+- Solar Module 3 Node ID 0x18: 0xe718
+- Solar Module 1 Node ID 0x10: 0xef10
+- Solar Module 2 Node ID 0x14: 0xe
 
-```bash
+```
 mwh 0x1ffff800 0x55AA
 mwh 0x1ffff802 0x00ff
 mwh 0x1ffff804 0xfb04
@@ -130,7 +152,7 @@ mwh 0x1ffff80e 0x00ff
 
 Now we can check this worked:
 
-```bash
+```
 mdw 0x1ffff800 4
 0x1ffff800: 00ff55aa 00fffb04 00ff00ff 00ff00ff 
 ```
