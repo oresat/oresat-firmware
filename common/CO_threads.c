@@ -8,10 +8,14 @@
 
 static thread_t *nmt_tp;
 static thread_t *sdo_srv_tp[OD_CNT_SDO_SRV];
+#if OD_CNT_SDO_CLI > 0
 static thread_t *sdo_cli_tp[OD_CNT_SDO_CLI];
+#endif
 static thread_t *em_tp;
 static thread_t *pdo_sync_tp;
+#if OD_CNT_HB_CONS == 1
 static thread_t *hbcons_tp;
+#endif
 
 static CO_NMT_internalState_t NMTstate;
 
@@ -218,6 +222,7 @@ THD_FUNCTION(pdo_sync, arg)
     chThdExit(MSG_OK);
 }
 
+#if OD_CNT_HB_CONS == 1
 /* CANopen Heartbeat Consumer thread */
 THD_FUNCTION(hb_cons, arg)
 {
@@ -239,6 +244,7 @@ THD_FUNCTION(hb_cons, arg)
     CO_HBconsumer_initCallbackPre(HBcons, NULL, NULL);
     chThdExit(MSG_OK);
 }
+#endif
 
 /* CANopen NMT and Heartbeat thread */
 THD_FUNCTION(nmt, arg)
@@ -266,7 +272,9 @@ THD_FUNCTION(nmt, arg)
 #endif
     em_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "Emergency", HIGHPRIO-2, em, co->em);
     pdo_sync_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "PDO SYNC", HIGHPRIO-2, pdo_sync, co);
+#if OD_CNT_HB_CONS == 1
     hbcons_tp = chThdCreateFromHeap(NULL, THD_WORKING_AREA_SIZE(0x200), "HB Consumer", HIGHPRIO-3, hb_cons, co->HBcons);
+#endif
 
     /* Enter normal operating mode */
     CO_CANsetNormalMode(co->CANmodule);
@@ -308,8 +316,10 @@ THD_FUNCTION(nmt, arg)
     chEvtSignal(em_tp, CO_EVT_TERMINATE);
     chThdTerminate(pdo_sync_tp);
     chEvtSignal(pdo_sync_tp, CO_EVT_TERMINATE);
+#if OD_CNT_HB_CONS == 1
     chThdTerminate(hbcons_tp);
     chEvtSignal(hbcons_tp, CO_EVT_TERMINATE);
+#endif
 
     /* Wait for CANopen threads to end */
 #if OD_CNT_SDO_CLI > 0
@@ -322,7 +332,9 @@ THD_FUNCTION(nmt, arg)
     }
     chThdWait(em_tp);
     chThdWait(pdo_sync_tp);
+#if OD_CNT_HB_CONS == 1
     chThdWait(hbcons_tp);
+#endif
 
     /* Terminate and return reset value */
     chThdExit(reset);
