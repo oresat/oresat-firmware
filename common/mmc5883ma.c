@@ -1,14 +1,19 @@
 /**
  * @file    mmc5883ma.c
- * @brief   MMC5883MA Digital to Analog Converter.
+ * @brief   MMC5883MA Magnetometer
  *
  * @addtogroup MMC5883MA
  * @ingrup ORESAT
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 #include "mmc5883ma.h"
+#include "string.h"
+#include "chprintf.h"
+
+#define DEBUG_SD    (BaseSequentialStream*) &SD2
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -21,57 +26,81 @@
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
-typedef union {
-    struct __attribute__((packed)) {
-        uint8_t reg;
-        union {
-            uint8_t data[2];
-            uint16_t value;
-        };
-    };
-    uint8_t buf[3];
-} i2cbuf_t;
+//typedef union {
+//    struct __attribute__((packed)) {
+//        uint8_t reg;
+//        union {
+//            uint8_t data[2];
+//            uint16_t value;
+//        };
+//    };
+//    uint8_t buf[3];
+//} i2cbuf_t;
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
 /*===========================================================================*/
+#define MMC5883MA_DEFAULT_I2C_TIMEOUT      50
 
 #if (MMC5883MA_USE_I2C) || defined(__DOXYGEN__)
-/**
- * @brief   Reads registers value using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in]  i2cp      pointer to the I2C interface
- * @param[in]  sad       slave address without R bit
- * @param[in]  reg       first sub-register address
- * @param[out] rxbuf     pointer to an output buffer
- * @param[in]  n         number of consecutive register to read
- * @return               the operation status.
- * @notapi
- */
-msg_t mmc5883maI2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
-        uint8_t* rxbuf, size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-            TIME_INFINITE);
+
+bool mmc5883maI2CWriteRegister2(I2CDriver *i2cp, const uint8_t reg_number, const uint8_t value) {
+	uint8_t tx[2];
+	tx[0] = reg_number;
+	tx[1] = value;
+
+    if( i2cMasterTransmitTimeout(i2cp, MMC5883MA_I2C_ADDRESS_WRITE, tx, 2, NULL, 0, MMC5883MA_DEFAULT_I2C_TIMEOUT) == MSG_OK ) {
+    	return(true);
+    }
+    return(false);
 }
 
-/**
- * @brief   Writes a value into a register using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in] i2cp       pointer to the I2C interface
- * @param[in] sad        slave address without R bit
- * @param[in] txbuf      buffer containing reg in first byte and high
- *                       and low data bytes
- * @param[in] n          size of txbuf
- * @return               the operation status.
- * @notapi
- */
-msg_t mmc5883maI2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
-        size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-            TIME_INFINITE);
+bool mmc5883maI2CReadRegister2(I2CDriver *i2cp, const uint8_t reg_number, uint8_t *dest_value) {
+	uint8_t tx[2];
+	tx[0] = reg_number;
+	tx[1] = 0;
+	uint8_t rx[2];
+	rx[0] = 0;
+	rx[1] = 0;
+
+    if( i2cMasterTransmitTimeout(i2cp, (i2caddr_t) MMC5883MA_I2C_ADDRESS_READ, tx, 1, rx, 1, MMC5883MA_DEFAULT_I2C_TIMEOUT) == MSG_OK ) {
+    	*dest_value = rx[0];
+    	return(true);
+    }
+    return(false);
 }
+
+
+bool mmc5883maI2CReadRegister3(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint8_t *dest_value) {
+	uint8_t tx[2];
+	tx[0] = reg_number;
+	tx[1] = 0;
+	uint8_t rx[2];
+	rx[0] = 0;
+	rx[1] = 0;
+
+    if( i2cMasterTransmitTimeout(i2cp, (i2caddr_t) i2c_address, tx, 1, rx, 1, MMC5883MA_DEFAULT_I2C_TIMEOUT) == MSG_OK ) {
+    	*dest_value = rx[0];
+    	return(true);
+    }
+    return(false);
+}
+
+bool mmc5883maI2CReadRegister4(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint16_t *dest_value) {
+	uint8_t tx[2];
+	tx[0] = reg_number;
+	tx[1] = 0;
+	uint8_t rx[2];
+	rx[0] = 0;
+	rx[1] = 0;
+
+    if( i2cMasterTransmitTimeout(i2cp, (i2caddr_t) i2c_address, tx, 1, rx, 2, MMC5883MA_DEFAULT_I2C_TIMEOUT) == MSG_OK ) {
+    	*dest_value = rx[0] | rx[1];
+    	return(true);
+    }
+    return(false);
+}
+
 #endif /* MMC5883MA_USE_I2C */
 
 /*==========================================================================*/
@@ -85,6 +114,50 @@ static const struct MMC5883MAVMT vmt_device = {
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
+
+
+bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
+	osalDbgCheck((devp != NULL));
+//	osalDbgAssert((devp->state != MMC5883MA_READY),
+//	            "mmc5883maStart(), invalid state");
+
+	if( devp->state != MMC5883MA_READY ) {
+		return(false);
+	}
+
+	bool ret = false;
+
+    /* Configuring common registers.*/
+#if MMC5883MA_USE_I2C
+#if MMC5883MA_SHARED_I2C
+    i2cAcquireBus(config->i2cp);
+#endif /* MMC5883MA_SHARED_I2C */
+
+
+    uint8_t rx[10];
+    memset(rx, 0, sizeof(rx));
+
+    uint8_t reg = MMC5883MA_AD_XOUT_LOW;
+
+    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+    msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, &reg, 1, rx, 6, MMC5883MA_DEFAULT_I2C_TIMEOUT);
+    i2cStop(devp->config->i2cp);
+
+	dest->mx = (rx[0] << 8) | rx[1];
+	dest->my = (rx[2] << 8) | rx[3];
+	dest->mz = (rx[4] << 8) | rx[5];
+
+    if( r == MSG_OK ) {
+    	ret = true;
+    }
+
+#if MMC5883MA_SHARED_I2C
+    i2cReleaseBus(config->i2cp);
+#endif /* MMC5883MA_SHARED_I2C */
+#endif /* MMC5883MA_USE_I2C */
+
+    return(ret);
+}
 
 /**
  * @brief   Initializes an instance.
@@ -101,6 +174,13 @@ void mmc5883maObjectInit(MMC5883MADriver *devp) {
     devp->state = MMC5883MA_STOP;
 }
 
+bool mmc5883maSoftReset(MMC5883MADriver *devp) {
+	chprintf(DEBUG_SD, "Resetting MMC4883...\r\n");
+	bool r = mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL1, MMC5883MA_INTRNLCTRL1_SW_RST_CMD);
+	chThdSleepMilliseconds(5);
+	return(r);
+}
+
 /**
  * @brief   Configures and activates MMC5883MA Complex Driver peripheral.
  *
@@ -109,8 +189,10 @@ void mmc5883maObjectInit(MMC5883MADriver *devp) {
  *
  * @api
  */
-void mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
-    i2cbuf_t buf;
+uint8_t mmc_product_id_readback;
+
+bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
+//    i2cbuf_t buf;
 
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == MMC5883MA_STOP) ||
@@ -126,25 +208,55 @@ void mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
 #endif /* MMC5883MA_SHARED_I2C */
 
     i2cStart(config->i2cp, config->i2ccfg);
-    buf.reg = MMC5883MA_AD_CONFIG;
-    buf.value = __REVSH(MMC5883MA_CONFIG_RST);
-    mmc5883maI2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    do {
-        mmc5883maI2CReadRegister(config->i2cp, config->saddr, MMC5883MA_AD_CONFIG,
-                                                buf.data, sizeof(buf.data));
-    } while (buf.data[0] & 0x80U); /* While still resetting */
-    buf.reg = MMC5883MA_AD_CONFIG;
-    buf.value = __REVSH(config->cfg);
-    mmc5883maI2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
-    buf.reg = MMC5883MA_AD_CAL;
-    buf.value = __REVSH(config->cal);
-    mmc5883maI2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf));
+
+    devp->state = MMC5883MA_READY;
+
+
+    bool found_mmc5883ma_flag = false;
+
+    //Probe I2C bus to see what's attached
+    if( ! mmc5883maI2CReadRegister3(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+    	chprintf(DEBUG_SD, "Failed to read product code from MMC5883MA chip, i2c comm failure\r\n");
+    } else {
+    	if( mmc_product_id_readback == MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+			chprintf(DEBUG_SD, "Successfully read product code from MMC5883MA (good), 0x%X\r\n", mmc_product_id_readback);
+			found_mmc5883ma_flag = true;
+    	} else {
+    		chprintf(DEBUG_SD, "ERROR: unexpected product ID code from MMC5883MA, read 0x%X, expectex 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
+    	}
+    }
+
+    if( found_mmc5883ma_flag ) {
+		mmc5883maSoftReset(devp);
+
+		if( ! mmc5883maI2CReadRegister2(devp->config->i2cp, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+			devp->state = MMC5883MA_STOP;
+		} else {
+			chprintf(DEBUG_SD, "Read MMC5883MA product code as 0x%X, expected 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
+			if( mmc_product_id_readback != MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+				chprintf(DEBUG_SD, "ERROR: Read incorrect MMC5883MA product code!!!\r\n");
+				devp->state = MMC5883MA_STOP;
+			}
+		}
+
+		if( devp->state == MMC5883MA_READY ) {
+			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL2, MMC5883MA_INTRNLCTRL2_CM_FREQ_1_Hz)) {
+				devp->state = MMC5883MA_STOP;
+			}
+		}
+    } else {
+    	devp->state = MMC5883MA_STOP;
+    }
+
+    i2cStop(devp->config->i2cp);
 
 #if MMC5883MA_SHARED_I2C
     i2cReleaseBus(config->i2cp);
 #endif /* MMC5883MA_SHARED_I2C */
 #endif /* MMC5883MA_USE_I2C */
-    devp->state = MMC5883MA_READY;
+
+
+    return(devp->state == MMC5883MA_READY);
 }
 
 /**
@@ -155,8 +267,6 @@ void mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
  * @api
  */
 void mmc5883maStop(MMC5883MADriver *devp) {
-    i2cbuf_t buf;
-
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == MMC5883MA_STOP) || (devp->state == MMC5883MA_READY),
             "mmc5883maStop(), invalid state");
@@ -168,10 +278,8 @@ void mmc5883maStop(MMC5883MADriver *devp) {
         i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 #endif /* MMC5883MA_SHARED_I2C */
 
-        /* Reset to input.*/
-        buf.reg = MMC5883MA_AD_CONFIG;
-        buf.value = __REVSH(MMC5883MA_CONFIG_RST);
-        mmc5883maI2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
+        //The MMC will be in low power mode after being reset
+        mmc5883maSoftReset(devp);
 
         i2cStop(devp->config->i2cp);
 #if MMC5883MA_SHARED_I2C
@@ -182,148 +290,6 @@ void mmc5883maStop(MMC5883MADriver *devp) {
     devp->state = MMC5883MA_STOP;
 }
 
-/**
- * @brief   Sets MMC5883MA Alert type and value
- *
- * @param[in] devp       pointer to the @p MMC5883MADriver object
- * @param[in] alert_me   the value to write to Mask/Enable register (0 to disable)
- * @param[in] alert_lim  the value to write to Alert Limit register
- *
- * @api
- */
-void mmc5883maSetAlert(MMC5883MADriver *devp, uint16_t alert_me, uint16_t alert_lim) {
-    i2cbuf_t buf;
 
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MMC5883MA_READY,
-            "mmc5883maSetAlert(), invalid state");
-
-#if MMC5883MA_USE_I2C
-#if MMC5883MA_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* MMC5883MA_SHARED_I2C */
-
-    buf.reg = MMC5883MA_AD_LIM;
-    buf.value = __REVSH(alert_lim);
-    mmc5883maI2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-    buf.reg = MMC5883MA_AD_ME;
-    buf.value = __REVSH(alert_me);
-    mmc5883maI2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-
-#if MMC5883MA_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* MMC5883MA_SHARED_I2C */
-#endif /* MMC5883MA_USE_I2C */
-}
-
-/**
- * @brief   Reads MMC5883MA Register as raw value.
- *
- * @param[in] devp       pointer to the @p MMC5883MADriver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-uint16_t mmc5883maReadRaw(MMC5883MADriver *devp, uint8_t reg) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MMC5883MA_READY,
-            "mmc5883maReadRaw(), invalid state");
-
-#if MMC5883MA_USE_I2C
-#if MMC5883MA_SHARED_I2C
-    i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* MMC5883MA_SHARED_I2C */
-
-    buf.reg = reg;
-    mmc5883maI2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
-
-#if MMC5883MA_SHARED_I2C
-    i2cReleaseBus(devp->config->i2cp);
-#endif /* MMC5883MA_SHARED_I2C */
-#endif /* MMC5883MA_USE_I2C */
-    return __REVSH(buf.value);
-}
-
-/**
- * @brief   Reads MMC5883MA Shunt voltage.
- *
- * @param[in] devp       Pointer to the @p MMC5883MADriver object
- * @return               Shunt voltage in 0.1uV increments
- *
- * @api
- */
-int16_t mmc5883maReadShunt(MMC5883MADriver *devp) {
-    int16_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = mmc5883maReadRaw(devp, MMC5883MA_AD_SHUNT) * 25;
-
-    return voltage;
-}
-
-/**
- * @brief   Reads MMC5883MA VBUS voltage.
- *
- * @param[in] devp       pointer to the @p MMC5883MADriver object
- * @return               VBUS voltage in 0.01mV increments
- *
- * @api
- */
-uint16_t mmc5883maReadVBUS(MMC5883MADriver *devp) {
-    uint16_t voltage;
-
-    osalDbgCheck(devp != NULL);
-
-    voltage = mmc5883maReadRaw(devp, MMC5883MA_AD_VBUS) * 125;
-
-    return voltage;
-}
-
-/**
- * @brief   Reads MMC5883MA Current.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p MMC5883MADriver object
- * @return               Current in increments of @p curr_lsb
- *
- * @api
- */
-int16_t mmc5883maReadCurrent(MMC5883MADriver *devp) {
-    int16_t current;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "mmc5883maReadCurrent(): invalid curr_lsb value");
-
-    current = mmc5883maReadRaw(devp, MMC5883MA_AD_CURRENT) * devp->config->curr_lsb;
-
-    return current;
-}
-
-/**
- * @brief   Reads MMC5883MA Power.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p MMC5883MADriver object
- * @return               Power in increments of @p curr_lsb * 25V
- *
- * @api
- */
-uint16_t mmc5883maReadPower(MMC5883MADriver *devp) {
-    uint16_t power;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "mmc5883maReadCurrent(): invalid curr_lsb value");
-
-    power = mmc5883maReadRaw(devp, MMC5883MA_AD_POWER) * devp->config->curr_lsb * 25;
-
-    return power;
-}
 
 /** @} */

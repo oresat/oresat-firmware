@@ -1,0 +1,18 @@
+#!/bin/bash
+
+SDO_SCRIPT=../../../../oresat-olaf/olaf/scripts/sdo_transfer.py
+
+echo "Set Magnetorquer Current (uA * 10)"
+$SDO_SCRIPT can0 0x7C r 0x6007 0x1 i32
+$SDO_SCRIPT can0 0x7C r 0x6007 0x2 i32
+$SDO_SCRIPT can0 0x7C r 0x6007 0x3 i32
+echo "PWM Duty Cycles"
+$SDO_SCRIPT can0 0x7C r 0x6007 0x4 i16
+$SDO_SCRIPT can0 0x7C r 0x6007 0x5 i16
+$SDO_SCRIPT can0 0x7C r 0x6007 0x6 i16
+echo "Read Magnetorquer Current (uA)"
+$SDO_SCRIPT can0 0x7C r 0x6007 0x7 i32
+$SDO_SCRIPT can0 0x7C r 0x6007 0x8 i32
+$SDO_SCRIPT can0 0x7C r 0x6007 0x9 i32
+
+

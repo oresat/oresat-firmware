@@ -17,25 +17,37 @@
  * @name    Version Identification
  * @{
  */
+
+
+#define MMC5883MA_I2C_ADDRESS_READ                  (0x30)
+#define MMC5883MA_I2C_ADDRESS_WRITE                 (0x30)
+
+#define MMC5883MA_EXPECTED_PRODUCT_CODE              0x0C
+
+//#define HMC5883L_I2C_ADDRESS_READ                   0x3D
+//#define HMC5883L_I2C_ADDRESSW_WRITE                 0x3C
+//#define HMC5883L_ID_REGISTER_A                      0x0A
+
+
 /**
  * @brief   MMC5883MA Driver version string.
  */
-#define MMC5883MA_VERSION                      "1.0.0"
+//#define MMC5883MA_VERSION                      "1.0.0"
 
 /**
  * @brief   MMC5883MA Driver version major number.
  */
-#define MMC5883MA_MAJOR                        1
+//#define MMC5883MA_MAJOR                        1
 
 /**
  * @brief   MMC5883MA Driver version minor number.
  */
-#define MMC5883MA_MINOR                        0
+//#define MMC5883MA_MINOR                        0
 
 /**
  * @brief   MMC5883MA Driver version patch number.
  */
-#define MMC5883MA_PATCH                        0
+//#define MMC5883MA_PATCH                        0
 /** @} */
 
 /**
@@ -93,7 +105,7 @@
  * @name    MMC5883MA X Threshold register fields
  * @{
  */
-#define MMC5883MA_X_THRSHLD_X_MAG_TH_Pos       (0U)
+//#define MMC5883MA_X_THRSHLD_X_MAG_TH_Pos       (0U)
 #define MMC5883MA_X_THRSHLD_X_MAG_TH_Msk       (0xFFU << MMC5883MA_X_THRSHLD_X_MAG_TH_Pos)
 #define MMC5883MA_X_THRSHLD_X_MAG_TH           MMC5883MA_X_THRSHLD_X_MAG_TH_Msk
 #define MMC5883MA_X_THRSHLD_X_MAG_TH_Pos       (0x00U << MMC5883MA_X_THRSHLD_X_MAG_TH_Pos)
@@ -103,19 +115,9 @@
  * @name    MMC5883MA Internal Control_2 register fields
  * @{
  */
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_Pos      (0U)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_Msk      (0xFU << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ          MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Msk
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_14Hz     (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_5Hz      (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_2200mHz  (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1Hz      (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/2Hz    (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/4Hz    (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/8Hz    (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/16Hz   (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/32Hz   (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
-#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1/64Hz   (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
+#define MMC5883MA_INTRNLCTRL2_CM_FREQ_2200_mHz (0x03)
+#define MMC5883MA_INTRNLCTRL2_CM_FREQ_1_Hz     (0x04)
+
 #define MMC5883MA_INTRNLCTRL2_CM_FREQ_RST      (0x1U << MMC5883MA_INTRNL_CTRL_2_CM_FREQ_Pos)
 #define MMC5883MA_INTRNLCTRL2_MDT_Pos          (5U)
 #define MMC5883MA_INTRNLCTRL2_MDT_Msk          (0x1U << MMC5883MA_INTRNLCTRL2_MDT_Pos)
@@ -140,16 +142,8 @@
 #define MMC5883MA_INTRNLCTRL1_BW_ODR_200Hz     (0x1U << MMC5883MA_INTRNLCTRL1_BW_Pos)
 #define MMC5883MA_INTRNLCTRL1_BW_ODR_400Hz     (0x2U << MMC5883MA_INTRNLCTRL1_BW_Pos)
 #define MMC5883MA_INTRNLCTRL1_BW_ODR_600Hz     (0x3U << MMC5883MA_INTRNLCTRL1_BW_Pos)
-#define MMC5883MA_INTRNLCTRL1_INH_Pos          (2U)
-#define MMC5883MA_INTRNLCTRL1_INH_Msk          (0x7U <<  MMC5883MA_INTRNLCTRL_INH_Pos)
-#define MMC5883MA_INTRNLCTRL1_INH              MMC5883MA_INTRNLCTRZ_INH_Msk
-#define MMC5883MA_INTRNLCTRL1_INH_X            (0x1U << MMC5883MA_INTRNLCTRL_INH_Pos)
-#define MMC5883MA_INTRNLCTRL1_INH_Y            (0x2U << MMC5883MA_INTRNLCTRL_INH_Pos)
-#define MMC5883MA_INTRNLCTRL1_INH_Z            (0x4U << MMC5883MA_INTRNLCTRL_INH_Pos)
 #define MMC5883MA_INTRNLCTRL1_SW_RST_Pos       (7U)  
-#define MMC5883MA_INTRNLCTRL1_SW_RST_Msk       (0x1U << MMC5883MA_INTRNLCTRL_SW_RST_Pos) 
-#define MMC5883MA_INTRNLCTRL1_SW_RST           MMC5883MA_INTRNLCTRL_SW_RST_Msk
-#define MMC5883MA_INTRNLCTRL1_SW_RST_CMD       (0x1U << MMC5883MA_INTRNLCTRL_SW_RST_Pos)
+#define MMC5883MA_INTRNLCTRL1_SW_RST_CMD       (0x1U << MMC5883MA_INTRNLCTRL1_SW_RST_Pos)
 /** @} */
 
 /**
@@ -243,7 +237,7 @@
  */
 #define MMC5883MA_YOUT_H_Pos                   (0U)              
 #define MMC5883MA_YOUT_H_Msk                   (0xFFU << MMC5883MA_YOUT_H_Pos)
-#define MMC5883MA_YOUT_H_Msk                   MMC5883MA_YOUT_H_Msk
+//#define MMC5883MA_YOUT_H_Msk                   MMC5883MA_YOUT_H_Msk
 /** @} */
 
 /**
@@ -351,7 +345,7 @@ typedef struct {
     /**
      * @brief MMC5883MA Slave Address
      */
-    i2caddr_t                   saddr;
+    //i2caddr_t                   saddr;
 #endif /* MMC5883MA_USE_I2C */
 } MMC5883MAConfig;
 
@@ -396,6 +390,12 @@ struct MMC5883MADriver {
 
 /** @} */
 
+typedef struct {
+	int16_t mx;
+	int16_t my;
+	int16_t mz;
+} mmc5883ma_data_t;
+
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
@@ -408,8 +408,11 @@ struct MMC5883MADriver {
 extern "C" {
 #endif
 void mmc5883maObjectInit(MMC5883MADriver *devp);
-void mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config);
+bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config);
 void mmc5883maStop(MMC5883MADriver *devp);
+bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest);
+bool mmc5883maI2CReadRegister3(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint8_t *dest_value);
+bool mmc5883maI2CReadRegister4(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint16_t *dest_value);
 #ifdef __cplusplus
 }
 #endif

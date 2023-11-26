@@ -444,7 +444,8 @@
 #define BMI088_ACC_CHIP_ID_Pos              (0U)
 #define BMI088_ACC_CHIP_ID_Msk              (0xFFU << BMI088_ACC_CHIP_ID_Pos)
 #define BMI088_ACC_CHIP_ID                  BMI088_ACC_CHIP_ID_Msk
-#define BMI088_ACC_CHIP_ID_EXPECTED         (0x1EU)
+#define BMI088_ACC_CHIP_ID_EXPECTED         (0x1E)
+#define BMI090L_ACC_CHIP_ID_EXPECTED        (0x1A)
 /** @} */
 
 /**
@@ -876,6 +877,7 @@ typedef struct {
 struct BMI088Driver {
     /* Driver state.*/
     bmi088_state_t              state;
+    uint32_t                    error_flags;
     /* Current configuration data.*/
     const BMI088Config          *config;
 };
