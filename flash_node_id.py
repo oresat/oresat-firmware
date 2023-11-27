@@ -22,24 +22,24 @@ NODE_IDS = {
     ("solar_module", 7): 0x24,
     ("solar_module", 8): 0x28,
     ("adcs", 1): 0x38,
-    ("reactiom_wheel", 1): 0x3C,
-    ("reactiom_wheel", 2): 0x40,
-    ("reactiom_wheel", 3): 0x44,
-    ("reactiom_wheel", 4): 0x48,
+    ("reaction_wheel", 1): 0x3C,
+    ("reaction_wheel", 2): 0x40,
+    ("reaction_wheel", 3): 0x44,
+    ("reaction_wheel", 4): 0x48,
 }
 
 CONFIG_PATH = {
     "battery": "boards/BATTERY_V3/oocd.cfg",
     "solar_module": "boards/SOLAR_V4/oocd.cfg",
     "adcs": "boards/ORESAT_ADCS_V1_2/oocd.cfg",
-    "reactiom_wheel": "boards/ORESAT_RWB_V4/oocd.cfg",
+    "reaction_wheel": "boards/ORESAT_RWB_V4/oocd.cfg",
 }
 
 CARD_ALIASES = {
     "battery": ["bat", "batt"],
     "solar_module": ["solar", "sol"],
     "adcs": ["imu"],
-    "reactiom_wheel": ["rw"],
+    "reaction_wheel": ["rw"],
 }
 
 parser = ArgumentParser(description="Flash the node id to a OreSat firmware card")
