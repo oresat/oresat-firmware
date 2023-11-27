@@ -36,8 +36,8 @@ CONFIG_PATH = {
 }
 
 CARD_ALIASES = {
-    "battery": ["bat"],
-    "solar_module": ["solar"],
+    "battery": ["bat", "batt"],
+    "solar_module": ["solar", "sol"],
     "adcs": ["imu"],
     "reactiom_wheel": ["rw"],
 }
@@ -69,8 +69,6 @@ except KeyError:
     sys.exit(1)
 
 proc = None
-failed = False
-
 inv_node_id = 255 - node_id
 value = hex(inv_node_id << 8 | node_id)
 
@@ -99,48 +97,41 @@ def telnet_write(tn: Telnet, msg: str):
 
 try:
     with Telnet(args.host, args.port) as tn:
-        print("connect with telnet")
+        print("connecting with telnet")
         sleep(2)
-        # stop the firmware
-        print("halting firmware")
-        tn.write(b"halt\r\n")
 
-        # unlock flash
-        print("unlock flash")
+        print("halting firmware")
+        telnet_write(tn, "halt")
+
+        print("unlocking flash")
         telnet_write(tn, "mww 0x40022004 0x45670123")
         telnet_write(tn, "mww 0x40022004 0xCDEF89AB")
 
-        # unlock option bytes for writing
-        print("unlock option bytes")
+        print("unlocking option bytes for writing")
         telnet_write(tn, "mww 0x40022008 0x45670123")
         telnet_write(tn, "mww 0x40022008 0xCDEF89AB")
 
-        # clear option bytes
-        print("clear option bytes")
+        print("clearing option bytes")
         telnet_write(tn, "mww 0x40022010 0x00000220")
         telnet_write(tn, "mww 0x40022010 0x00000260")
 
-        # enable programing
-        print("enable programing")
+        print("enabling programing")
         telnet_write(tn, "mww 0x40022010 0x00000210")
 
-        # write node_id
-        print("write node_id")
+        print("writing node id")
         telnet_write(tn, "mwh 0x1ffff800 0x55AA")
         telnet_write(tn, "mwh 0x1ffff802 0x00ff")
-        telnet_write(tn, f"mwh 0x1ffff804 {value}")  # node id set here
+        telnet_write(tn, f"mwh 0x1ffff804 {value}")
         telnet_write(tn, "mwh 0x1ffff806 0x00ff")
         telnet_write(tn, "mwh 0x1ffff808 0x00ff")
         telnet_write(tn, "mwh 0x1ffff80a 0x00ff")
         telnet_write(tn, "mwh 0x1ffff80c 0x00ff")
         telnet_write(tn, "mwh 0x1ffff80e 0x00ff")
+
+        print(f"node id 0x{node_id:X} was flashed")
 except OSError:
-    print("Failed to write node id due to a telnet connection error")
-    failed = True
+    print("failed to write node id due to a telnet connection error")
 
 sleep(0.5)
 proc.terminate()
 thread.join()
-
-if not failed:
-    print("node id was flashed")
