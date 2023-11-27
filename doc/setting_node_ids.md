@@ -74,7 +74,7 @@ Run `halt`. This seems to be important, we don’t want the processor doing weir
 Read all 32 bit option bytes registers:
 
 ```
-mdw 0x1ffff800 4
+> mdw 0x1ffff800 4
 0x1ffff800: 00ff55aa 00ff00ff 00ff00ff 00ff00ff 
 ```
 
@@ -83,7 +83,7 @@ We can see 0x1ffff804 is 00ff, which is our nData0:Data0.
 Check that the flash is locked:
 
 ```
-mdw 0x40022010
+> mdw 0x40022010
 0x40022010: 00000080 
 ```
 
@@ -91,14 +91,14 @@ Unlock the flash directly performing the unlocking sequence on the FLASH_KEYR
 (0x40022004) register.
 
 ```
-mww 0x40022004 0x45670123
-mww 0x40022004 0xCDEF89AB
+> mww 0x40022004 0x45670123
+> mww 0x40022004 0xCDEF89AB
 ```
 
 Reassure that the flash is unlocked. Read the FLASH_CR:
 
 ```
-mdw 0x40022010
+> mdw 0x40022010
 0x40022010: 00000000 
 ```
 
@@ -106,24 +106,24 @@ Unlock option bytes for writing (which is described in the reference manual as
 setting the OPTWRE bit in the FLASH_CR).
 
 ```
-mww 0x40022008 0x45670123
-mww 0x40022008 0xCDEF89AB
-mdw 0x40022010           
+> mww 0x40022008 0x45670123
+> mww 0x40022008 0xCDEF89AB
+> mdw 0x40022010
 0x40022010: 00000200
 ```
 
 Clear option bytes (they are stored in the FLASH after all).
 
 ```
-mww 0x40022010 0x00000220
-mww 0x40022010 0x00000260
+> mww 0x40022010 0x00000220
+> mww 0x40022010 0x00000260
 ```
 
 Enable programming by setting FLASH_CR.OPTPG:
 
 ```
-mww 0x40022010 0x00000210
-mdw 0x40022010
+> mww 0x40022010 0x00000210
+> mdw 0x40022010
 0x40022010: 00000210
 ```
 
@@ -140,20 +140,20 @@ ID in the high byte (e.g., 0xfb).
 - Solar Module 2 Node ID 0x14: 0xe
 
 ```
-mwh 0x1ffff800 0x55AA
-mwh 0x1ffff802 0x00ff
-mwh 0x1ffff804 0xfb04       // set node id here
-mwh 0x1ffff806 0x00ff
-mwh 0x1ffff808 0x00ff
-mwh 0x1ffff80a 0x00ff
-mwh 0x1ffff80c 0x00ff
-mwh 0x1ffff80e 0x00ff 
+> mwh 0x1ffff800 0x55AA
+> mwh 0x1ffff802 0x00ff
+> mwh 0x1ffff804 0xfb04       // set node id here
+> mwh 0x1ffff806 0x00ff
+> mwh 0x1ffff808 0x00ff
+> mwh 0x1ffff80a 0x00ff
+> mwh 0x1ffff80c 0x00ff
+> mwh 0x1ffff80e 0x00ff
 ```
 
 Now we can check this worked:
 
 ```
-mdw 0x1ffff800 4
+> mdw 0x1ffff800 4
 0x1ffff800: 00ff55aa 00fffb04 00ff00ff 00ff00ff 
 ```
 
