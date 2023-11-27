@@ -66,7 +66,7 @@ Info : Listening on port 3333 for gdb connections
 In another terminal connect with telnet
 
 ```bash
-$ telnet 4444
+$ telnet localhost 4444
 ```
 
 Run `halt`. This seems to be important, we don’t want the processor doing weird things.
@@ -142,7 +142,7 @@ ID in the high byte (e.g., 0xfb).
 ```
 mwh 0x1ffff800 0x55AA
 mwh 0x1ffff802 0x00ff
-mwh 0x1ffff804 0xfb04
+mwh 0x1ffff804 0xfb04       // set node id here
 mwh 0x1ffff806 0x00ff
 mwh 0x1ffff808 0x00ff
 mwh 0x1ffff80a 0x00ff
