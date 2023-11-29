@@ -14,20 +14,17 @@
     limitations under the License.
 */
 
-/* ChibiOS header files */
+/// ChibiOS header files 
 #include "ch.h"
 #include "hal.h"
 
-/* Project header files */
+/// Project header files 
 #include "oresat.h"
 #include "acs_common.h"
 #include "acs.h"
 #include "blink.h"
 //#include "shell.h"
 //#include "acs_command.h"
-
-
-#include "acs.h"
 
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {
@@ -55,10 +52,10 @@ static void app_init(void)
   
   acs_init(&acs);
 
-  /* App initialization */
+  /// App initialization 
   reg_worker(&worker1, &worker1_desc, false, true);
 
-  /* Start up debug output */
+  /// Start up debug output 
   sdStart(&LPSD1, NULL);
 }
 
@@ -67,6 +64,7 @@ static void app_init(void)
  */
 static void app_main(void)
 {
+
 //*
 	chThdCreateStatic( /// Create ACS thread
 		waACS_Thread,
@@ -78,26 +76,27 @@ static void app_main(void)
 //*/
 
   while(true)
-  { /// main loop
+  { 
+    /// main loop
 		chThdSleepMilliseconds(1000);
 	}
 }
+
 /**
  * @brief Main Application
  */
 int main(void)
 {
-	/**
+  /**
 	 * ChibiOS and OreSat init
 	 */
 	halInit();
 	chSysInit();
-  
-// Initialize and start
-//  oresat_init(ORESAT_DEFAULT_ID, ORESAT_DEFAULT_BITRATE);
+
+  /// Initialize and start
   oresat_init(&oresat_conf);
   app_init();
-  //oresat_start();
-	app_main();
+  oresat_start();
+  app_main();
   return 0;
 }

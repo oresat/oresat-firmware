@@ -79,8 +79,11 @@
 #define GPIOA_PIN6                  6U
 #define GPIOA_PIN7                  7U
 #define GPIOA_PIN8                  8U
+#define GPIOA_U_HIGH                8U
 #define GPIOA_PIN9                  9U
+#define GPIOA_V_HIGH                9U
 #define GPIOA_PIN10                 10U
+#define GPIOA_W_HIGH                10U
 #define GPIOA_PIN11                 11U
 #define GPIOA_PIN12                 12U
 #define GPIOA_PIN13                 13U
@@ -89,21 +92,24 @@
 
 #define GPIOB_PIN0                  0U
 #define GPIOB_PIN1                  1U
+#define GPIOB_W_LOW                 1U
 #define GPIOB_PIN2                  2U
 #define GPIOB_PIN3                  3U
 #define GPIOB_PIN4                  4U
 #define GPIOB_PIN5                  5U
 #define GPIOB_PIN6                  6U
+#define GPIOB_CAN_TX                6U
 #define GPIOB_PIN7                  7U
+#define GPIOB_CAN_RX                7U
 #define GPIOB_PIN8                  8U
-#define GPIOB_CAN_RX                8U
 #define GPIOB_PIN9                  9U
-#define GPIOB_CAN_TX                9U
 #define GPIOB_PIN10                 10U
 #define GPIOB_PIN11                 11U
 #define GPIOB_PIN12                 12U
 #define GPIOB_PIN13                 13U
+#define GPIOB_U_LOW                 13U
 #define GPIOB_PIN14                 14U
+#define GPIOB_V_LOW                 14U
 #define GPIOB_PIN15                 15U
 
 #define GPIOC_PIN0                  0U
@@ -113,7 +119,9 @@
 #define GPIOC_PIN4                  4U
 #define GPIOC_PIN5                  5U
 #define GPIOC_PIN6                  6U
+#define GPIOC_EN_MAG                6U // warning. probably incorrect
 #define GPIOC_PIN7                  7U
+#define GPIOC_MAG_PH                7U // warning. probably incorrect
 #define GPIOC_PIN8                  8U
 #define GPIOC_PIN9                  9U
 #define GPIOC_PIN10                 10U
