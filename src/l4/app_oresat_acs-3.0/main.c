@@ -19,13 +19,14 @@
 #include "hal.h"
 
 /// Project header files 
-#include "oresat.h"
+//#include "oresat.h"
 #include "acs_common.h"
 #include "acs.h"
-#include "blink.h"
+//#include "blink.h"
 //#include "shell.h"
 //#include "acs_command.h"
 
+/*
 static worker_t worker1;
 static thread_descriptor_t worker1_desc = {
   .name = "Example blinky thread",
@@ -35,6 +36,7 @@ static thread_descriptor_t worker1_desc = {
   .funcp = blink,
   .arg = NULL
 };
+*/
 
 static oresat_config_t oresat_conf = {
   .cand = &CAND1,
@@ -51,9 +53,8 @@ static void app_init(void)
 {
   
   acs_init(&acs);
-
   /// App initialization 
-  reg_worker(&worker1, &worker1_desc, false, true);
+ // reg_worker(&worker1, &worker1_desc, false, true);
 
   /// Start up debug output 
   sdStart(&LPSD1, NULL);
@@ -65,7 +66,7 @@ static void app_init(void)
 static void app_main(void)
 {
 
-//*
+/*
 	chThdCreateStatic( /// Create ACS thread
 		waACS_Thread,
 		sizeof(waACS_Thread),
@@ -75,10 +76,14 @@ static void app_main(void)
 	);
 //*/
 
+  int i = 0;
+
   while(true)
   { 
     /// main loop
-		chThdSleepMilliseconds(1000);
+    dbgSerialOut("Serial Test!: %u \n\r", ++i, 300);
+   // chprintf((BaseSequentialStream*)&LPSD1, "Hello World %dst test!\r\n", 1); 
+    chThdSleepMilliseconds(1000);
 	}
 }
 
@@ -94,9 +99,9 @@ int main(void)
 	chSysInit();
 
   /// Initialize and start
-  oresat_init(&oresat_conf);
+//  oresat_init(&oresat_conf);
   app_init();
-  oresat_start();
+ // oresat_start();
   app_main();
   return 0;
 }
