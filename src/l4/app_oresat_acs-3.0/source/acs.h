@@ -13,7 +13,7 @@
 #define CAN_BUF_SIZE		8			/// bytes in buffer
 #define CAN_NODE_ID			0x3F	/// max 0x7F
 
-//#define DEBUG_OUT
+#define DEBUG_OUT
 //#define DEBUG_LOOP
 
 /**

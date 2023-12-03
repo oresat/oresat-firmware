@@ -453,6 +453,8 @@ static EXIT_STATUS acs_statemachine(ACS *acs)
   
   dbgSerialOut("Entering acs_statemachine...\n\r", 0, 500);
 
+  //chEvtRegister(&rpdo_event,&el,0);
+  
   while(!chThdShouldTerminateX())
   {
 		handleEvent(acs); // TODO: add error checking
@@ -469,9 +471,6 @@ THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 THD_FUNCTION(ACS_Thread,acs)
 {
   chRegSetThreadName("acs_thread");
-  
-  //chEvtRegister(&rpdo_event,&el,0);
-
 	acs_statemachine(acs);
 }
 

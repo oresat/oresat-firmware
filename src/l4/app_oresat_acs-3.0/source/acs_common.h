@@ -10,7 +10,6 @@
 /**
  *	Serial debugging
  */
-#define DEBUG_OUT
 #define CH_DBG_SYSTEM_STATE_CHECK TRUE
 #define DEBUG_SERIAL LPSD1
 #define DEBUG_CHP ((BaseSequentialStream *) &DEBUG_SERIAL)

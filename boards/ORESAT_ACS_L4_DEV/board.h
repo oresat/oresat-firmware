@@ -98,14 +98,14 @@
 #define GPIOB_PIN4                  4U
 #define GPIOB_PIN5                  5U
 #define GPIOB_PIN6                  6U
-#define GPIOB_CAN_TX                6U
+#define GPIOB_CAN1_TX               6U
 #define GPIOB_PIN7                  7U
-#define GPIOB_CAN_RX                7U
 #define GPIOB_PIN8                  8U
 #define GPIOB_PIN9                  9U
 #define GPIOB_PIN10                 10U
 #define GPIOB_PIN11                 11U
 #define GPIOB_PIN12                 12U
+#define GPIOB_CAN1_RX               12U
 #define GPIOB_PIN13                 13U
 #define GPIOB_U_LOW                 13U
 #define GPIOB_PIN14                 14U
@@ -423,13 +423,13 @@
  * PB3  - PIN3                      (analog).
  * PB4  - PIN4                      (analog).
  * PB5  - PIN5                      (analog).
- * PB6  - PIN6                      (analog).
+ * PB6  - CAN1_TX                   (alternate 8).
  * PB7  - PIN7                      (analog).
  * PB8  - PIN8                      (analog).
  * PB9  - PIN9                      (analog).
  * PB10 - PIN10                     (analog).
  * PB11 - PIN11                     (analog).
- * PB12 - PIN12                     (analog).
+ * PB12 - CAN1_RX                   (alternate 10).
  * PB13 - PIN13 LED                 (output pushpull maximum).
  * PB14 - PIN14                     (analog).
  * PB15 - PIN15                     (analog).
@@ -440,13 +440,13 @@
                                      PIN_MODE_ANALOG(GPIOB_PIN3) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN4) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN5) |          \
-                                     PIN_MODE_ANALOG(GPIOB_PIN6) |          \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN6) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN7) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN8) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN9) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN10) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN11) |         \
-                                     PIN_MODE_ANALOG(GPIOB_PIN12) |         \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN12) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN13) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN14) |         \
                                      PIN_MODE_ANALOG(GPIOB_PIN15))
@@ -520,13 +520,13 @@
                                      PIN_AFIO_AF(GPIOB_PIN3, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN4, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN5, 0U) |          \
-                                     PIN_AFIO_AF(GPIOB_PIN6, 0U) |          \
+                                     PIN_AFIO_AF(GPIOB_PIN6, 8U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN7, 0U))
 #define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_PIN8, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN9, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_PIN10, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN11, 0U) |         \
-                                     PIN_AFIO_AF(GPIOB_PIN12, 0U) |         \
+                                     PIN_AFIO_AF(GPIOB_PIN12, 10U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN13, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN14, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_PIN15, 0U))
