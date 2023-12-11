@@ -125,6 +125,25 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 		return(false);
 	}
 
+
+	static uint32_t read_call_count = 0;
+	read_call_count++;
+	if( read_call_count > 20 ) {
+		//This will periodically clear any bias on the magnetometer
+		read_call_count = 0;
+
+		if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_SET)) {
+
+		}
+		chThdSleepMilliseconds(1);
+
+		if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_RST)) {
+
+		}
+		chThdSleepMilliseconds(1);
+	}
+
+
 	bool ret = false;
 
     /* Configuring common registers.*/
