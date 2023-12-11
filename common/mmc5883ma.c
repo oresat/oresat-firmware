@@ -13,6 +13,7 @@
 #include "string.h"
 #include "chprintf.h"
 
+
 #define DEBUG_SD    (BaseSequentialStream*) &SD2
 
 /*===========================================================================*/
@@ -126,22 +127,13 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 	}
 
 
+	static float bridge_offset_estimate_x = 0.0;
+	static float bridge_offset_estimate_y = 0.0;
+	static float bridge_offset_estimate_z = 0.0;
+
 	static uint32_t read_call_count = 0;
 	read_call_count++;
-	if( read_call_count > 20 ) {
-		//This will periodically clear any bias on the magnetometer
-		read_call_count = 0;
 
-		if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_SET)) {
-
-		}
-		chThdSleepMilliseconds(1);
-
-		if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_RST)) {
-
-		}
-		chThdSleepMilliseconds(1);
-	}
 
 
 	bool ret = false;
@@ -168,6 +160,52 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 
     if( r == MSG_OK ) {
     	ret = true;
+
+    	if( read_call_count > 20 ) {
+			//This will periodically clear any bias on the magnetometer
+			read_call_count = 0;
+
+			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_SET)) {
+
+			}
+			chThdSleepMilliseconds(1);
+
+
+			memset(rx, 0, sizeof(rx));
+			i2cStart(devp->config->i2cp, devp->config->i2ccfg);
+			msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, &reg, 1, rx, 6, MMC5883MA_DEFAULT_I2C_TIMEOUT);
+			i2cStop(devp->config->i2cp);
+
+			mmc5883ma_data_t dest_temp;
+			dest_temp.mx = (rx[0] << 8) | rx[1];
+			dest_temp.my = (rx[2] << 8) | rx[3];
+			dest_temp.mz = (rx[4] << 8) | rx[5];
+
+
+			const int32_t delta_set_reset_x = dest_temp.mx - dest->mx;
+			const int32_t delta_set_reset_y = dest_temp.my - dest->my;
+			const int32_t delta_set_reset_z = dest_temp.mz - dest->mz;
+
+			const float bridge_offset_midpoint_x = ((float) delta_set_reset_x) / 2.0;
+			const float bridge_offset_midpoint_y = ((float) delta_set_reset_y) / 2.0;
+			const float bridge_offset_midpoint_z = ((float) delta_set_reset_z) / 2.0;
+
+			//Modify tracked bridge offset estimate, but filter the data slightly.
+			const float filter_coefficient = 4.0;
+			bridge_offset_estimate_x = bridge_offset_estimate_x + ((bridge_offset_midpoint_x - bridge_offset_estimate_x) / filter_coefficient);
+			bridge_offset_estimate_y = bridge_offset_estimate_y + ((bridge_offset_midpoint_y - bridge_offset_estimate_y) / filter_coefficient);
+			bridge_offset_estimate_z = bridge_offset_estimate_z + ((bridge_offset_midpoint_z - bridge_offset_estimate_z) / filter_coefficient);
+
+
+			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_RST)) {
+
+			}
+			chThdSleepMilliseconds(1);
+		}
+
+    	dest->mx += bridge_offset_estimate_x;
+    	dest->my += bridge_offset_estimate_y;
+    	dest->mz += bridge_offset_estimate_z;
     }
 
 #if MMC5883MA_SHARED_I2C
