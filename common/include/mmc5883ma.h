@@ -372,12 +372,16 @@ struct MMC5883MAVMT {
 /**
  * @brief   @p MMC5883MADriver specific data.
  */
-#define _mmc5883ma_data                                                        \
-    _base_object_data                                                       \
-    /* Driver state.*/                                                      \
-    mmc5883ma_state_t              state;                                      \
-    /* Current configuration data.*/                                        \
-    const MMC5883MAConfig          *config;
+#define _mmc5883ma_data                       \
+    _base_object_data                         \
+    /* Driver state.*/                        \
+    mmc5883ma_state_t              state;     \
+    /* Current configuration data.*/          \
+    const MMC5883MAConfig          *config;   \
+	float bridge_offset_estimate_x;           \
+	float bridge_offset_estimate_y;           \
+	float bridge_offset_estimate_z;           \
+	uint32_t read_call_count;
 
 /**
  * @brief MMC5883MA Power Monitor class.
