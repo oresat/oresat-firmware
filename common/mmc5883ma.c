@@ -160,9 +160,11 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 			//This will periodically clear any bias on the magnetometer
     		devp->read_call_count = 0;
 
+    		i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_SET)) {
 
 			}
+			i2cStop(devp->config->i2cp);
 			chThdSleepMilliseconds(1);
 
 
@@ -191,10 +193,11 @@ bool mmc5883maReadData(MMC5883MADriver *devp, mmc5883ma_data_t *dest) {
 			devp->bridge_offset_estimate_y = devp->bridge_offset_estimate_y + ((bridge_offset_midpoint_y - devp->bridge_offset_estimate_y) / filter_coefficient);
 			devp->bridge_offset_estimate_z = devp->bridge_offset_estimate_z + ((bridge_offset_midpoint_z - devp->bridge_offset_estimate_z) / filter_coefficient);
 
-
+			i2cStart(devp->config->i2cp, devp->config->i2ccfg);
 			if( ! mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL0, MMC5883MA_INTRNLCTRL0_RST)) {
 
 			}
+			i2cStop(devp->config->i2cp);
 			chThdSleepMilliseconds(1);
 		}
 
