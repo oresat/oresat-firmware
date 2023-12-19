@@ -27,12 +27,14 @@
 
 static oresat_config_t oresat_conf = {
   .cand = &CAND1,
-  .node_id = CAN_NOD_ID,
+  .node_id = CAN_NODE_ID,
   .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
-ACS acs = { }; /// Global ACS struct
-
+/// Global ACS struct
+ACS acs = { 
+  .cand = &CAND1,
+}; 
 /**
  * @brief App Initialization
  */
@@ -59,6 +61,18 @@ static void app_main(void)
 		&acs	
 	);
 //*/
+
+#ifdef DEBUG_LOOP
+/*
+	chThdCreateStatic( /// Create ACS thread
+		waCANDBG_Thread,
+		sizeof(waCANDBG_Thread),
+		NORMALPRIO + 1,
+		CANDBG_Thread,
+		&acs	
+	);
+//*/
+#endif
 }
 
 /**

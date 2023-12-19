@@ -14,7 +14,7 @@
 #define CAN_NODE_ID			0x3F	/// max 0x7F
 
 #define DEBUG_OUT
-//#define DEBUG_LOOP
+#define DEBUG_LOOP
 
 /**
  *	Valid ACS states
@@ -95,6 +95,7 @@ typedef struct ACS ACS;
 struct ACS
 {
 	ACS_STATE state;
+  CANDriver *cand;
 	CAN_BUFFER can_buf;
 	uint8_t cmd[CAN_BUF_SIZE];
 	ACS_VALID_FUNCTION function;
@@ -163,12 +164,14 @@ typedef enum
   CAN_STATUS_END
 } CAN_STATUS_BUF;
 
+//void cana_rx_ISR(CANDriver *canp, uint32_t flags);
+
 extern THD_WORKING_AREA(waACS_Thread,ACS_THREAD_SIZE);
 extern THD_FUNCTION(ACS_Thread, arg);
 
 #ifdef DEBUG_LOOP
-THD_WORKING_AREA(waCANDBG_Thread,ACS_THREAD_SIZE);
-THD_FUNCTION(CANDBG_Thread, arg);
+extern THD_WORKING_AREA(waCANDBG_Thread,ACS_THREAD_SIZE);
+extern THD_FUNCTION(CANDBG_Thread, arg);
 #endif
 
 EXIT_STATUS acs_init(ACS *acs);

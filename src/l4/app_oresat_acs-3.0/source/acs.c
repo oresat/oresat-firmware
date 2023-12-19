@@ -8,16 +8,25 @@
  */
 static event_listener_t el;
 
+static void cana_rx_ISR(CANDriver *canp, uint32_t flags)
+{
+   (void)canp;
+   (void)flags;
+   // do sth usefull
+}
+
 /**
  *	@brief ACS initialization function
  */
 extern EXIT_STATUS acs_init(ACS *acs)
 {
 	(void)acs;
-	// need to initialize things
+
+  acs->cand->rxfull_cb = cana_rx_ISR;
   bldcInit(&acs->motor);
-//  mtqrInit(&acs->mtqr);
-	return STATUS_SUCCESS;
+  //mtqrInit(&acs->mtqr);
+	
+  return STATUS_SUCCESS;
 }	
 
 /**
@@ -418,12 +427,15 @@ static EXIT_STATUS receiveCommand(ACS *acs)
 static EXIT_STATUS handleEvent(ACS *acs)
 {
 	EXIT_STATUS status = STATUS_SUCCESS;
+  CANRxFrame rxmsg;
 
   /// block until there is an event from CAN
-  chEvtWaitAny(ALL_EVENTS);	
-  receiveCommand(acs); // should probably rename to be more descriptive
+  chEvtWaitAny(ALL_EVENTS);
+  //canReceiveTimeout(acs->cand, CAN_ANY_MAILBOX, &rxmsg,1000);
+  //receiveCommand(acs); // should probably rename to be more descriptive
 
   dbgSerialOut("CommandReceived: %u \n\r", acs->cmd[CAN_CMD_0], 1000);
+  //dbgSerialOut("CommandReceived: %u \n\r", rxmsg.data32[0], 1000);
 	
   switch(acs->cmd[CAN_CMD_0])
   {
@@ -454,7 +466,10 @@ static EXIT_STATUS acs_statemachine(ACS *acs)
   dbgSerialOut("Entering acs_statemachine...\n\r", 0, 500);
 
   //chEvtRegister(&rpdo_event,&el,0);
-  
+  //chEvtRegister(acs->cand->rxfull_cb,&el,0);
+  //chEvtRegister(acs->cand->rxfull_event,&el,0);
+  //chEvtRegister(&CAND1.rxfull_event,&el,0);
+ 
   while(!chThdShouldTerminateX())
   {
 		handleEvent(acs); // TODO: add error checking
@@ -479,16 +494,16 @@ THD_FUNCTION(ACS_Thread,acs)
  */
 #ifdef DEBUG_LOOP
 THD_WORKING_AREA(waCANDBG_Thread,ACS_THREAD_SIZE);
-THD_FUNCTION(CANDBG_Thread,acs)
+THD_FUNCTION(CANDBG_Thread,arg)
 {
   chRegSetThreadName("can_dbg_thread");
   
-  uint8_t ping = 0u;
+	uint8_t ping = 0;
   
   while(1)
   {
     chSysLock();
-    ((ACS *)acs)->can_buf.status[CAN_STATUS_PING] = ++ping;
+    ((ACS *)arg)->can_buf.status[CAN_STATUS_PING] = ++ping;
     chSysUnlock();
 
     chThdSleepMilliseconds(5*1000);
@@ -496,4 +511,20 @@ THD_FUNCTION(CANDBG_Thread,acs)
 }
 #endif
 
-
+static THD_WORKING_AREA(can_tx_wa, 256);
+static THD_FUNCTION(can_tx, p) {
+  CANTxFrame txmsg; 
+  (void)p;
+  chRegSetThreadName("transmitter");
+  txmsg.IDE = CAN_IDE_EXT;
+  txmsg.EID = 0x01234567;
+  txmsg.RTR = CAN_RTR_DATA;
+  txmsg.DLC = 8;
+  txmsg.data32[0] = 0x55AA55AA;
+  txmsg.data32[1] = 0x00FF00FF;
+  
+  while (!chThdShouldTerminateX()) {
+    canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
+    chThdSleepMilliseconds(500);
+  }
+}
