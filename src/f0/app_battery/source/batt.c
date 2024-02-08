@@ -511,10 +511,10 @@ void populate_od_pack_data(batt_pack_data_t *pack_data) {
         OD_RAM.x4000_pack_1.time_to_full = pack_data->time_to_full_seconds;
         OD_RAM.x4000_pack_1.cycles = pack_data->cycles;
         OD_RAM.x4000_pack_1.reported_state_of_charge = pack_data->reported_state_of_charge;
-        OD_RAM.x4000_pack_1.temperature = pack_data->temp_1_C;
-        OD_RAM.x4000_pack_1.temperature_avg = pack_data->avg_temp_1_C;
-        OD_RAM.x4000_pack_1.temperature_min = pack_data->temp_min_C;
-        OD_RAM.x4000_pack_1.temperature_max = pack_data->temp_max_C;
+        OD_RAM.x4000_pack_1.temperature = (int8_t)(pack_data->temp_1_C);
+        OD_RAM.x4000_pack_1.temperature_avg = (int8_t)(pack_data->avg_temp_1_C);
+        OD_RAM.x4000_pack_1.temperature_min = (int8_t)(pack_data->temp_min_C);
+        OD_RAM.x4000_pack_1.temperature_max = (int8_t)(pack_data->temp_max_C);
 
         if (palReadLine(LINE_HEATER_ON_1)) {
             state_bitmask |= (1 << STATUS_BIT_HEATER);
@@ -552,10 +552,10 @@ void populate_od_pack_data(batt_pack_data_t *pack_data) {
         OD_RAM.x4001_pack_2.time_to_full = pack_data->time_to_full_seconds;
         OD_RAM.x4001_pack_2.cycles = pack_data->cycles;
         OD_RAM.x4001_pack_2.reported_state_of_charge = pack_data->reported_state_of_charge;
-        OD_RAM.x4001_pack_2.temperature = pack_data->temp_1_C;
-        OD_RAM.x4001_pack_2.temperature_avg = pack_data->avg_temp_1_C;
-        OD_RAM.x4001_pack_2.temperature_min = pack_data->temp_min_C;
-        OD_RAM.x4001_pack_2.temperature_max = pack_data->temp_max_C;
+        OD_RAM.x4001_pack_2.temperature = (int8_t)(pack_data->temp_1_C);
+        OD_RAM.x4001_pack_2.temperature_avg = (int8_t)(pack_data->avg_temp_1_C);
+        OD_RAM.x4001_pack_2.temperature_min = (int8_t)(pack_data->temp_min_C);
+        OD_RAM.x4001_pack_2.temperature_max = (int8_t)(pack_data->temp_max_C);
 
         if (palReadLine(LINE_HEATER_ON_2)) {
             state_bitmask |= (1 << STATUS_BIT_HEATER);
