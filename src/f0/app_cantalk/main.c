@@ -21,24 +21,24 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "heartbeat.h"
+#include "heartmon.h"
 
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 
-static worker_t heartbeat_worker;
-static thread_descriptor_t heartbeat_worker_desc = {
-    .name = "heartbeat thread",
-    .wbase = THD_WORKING_AREA_BASE(heartbeat_wa),
-    .wend = THD_WORKING_AREA_END(heartbeat_wa),
-    .prio = NORMALPRIO,
-    .funcp = heartbeat,
-    .arg = NULL
+static worker_t heartmon_worker;
+static thread_descriptor_t heartmon_worker_desc = {
+  .name = "heartmon thread",
+  .wbase = THD_WORKING_AREA_BASE(heartmon_wa),
+  .wend = THD_WORKING_AREA_END(heartmon_wa),
+  .prio = NORMALPRIO,
+  .funcp = heartmon,
+  .arg = NULL
 };
 
 static oresat_config_t oresat_conf = {
-    .cand = &CAND1,
-    .node_id = ORESAT_DEFAULT_ID,
-    .bitrate = ORESAT_DEFAULT_BITRATE,
+  .cand = &CAND1,
+  .node_id = ORESAT_DEFAULT_ID,
+  .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
 /**
@@ -46,11 +46,11 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* App initialization */
-    reg_worker(&heartbeat_worker, &heartbeat_worker_desc, true, true);
-
-    /* Start up debug output */
-    sdStart(&SD2, NULL);
+  /* App initialization */
+  reg_worker(&heartmon_worker, &heartmon_worker_desc, true, true);
+  
+  /* Start up debug output */
+  sdStart(&SD2, NULL);
 }
 
 /**
@@ -58,12 +58,11 @@ static void app_init(void)
  */
 int main(void)
 {
-    // Initialize and start
-    oresat_init(&oresat_conf);
-    app_init();
-    chprintf(DEBUG_SERIAL, "\r\nStarting cantalk app...\r\n");
-
-    oresat_start();
-    return 0;
+  // Initialize and start
+  oresat_init(&oresat_conf);
+  app_init();
+  chprintf(DEBUG_SERIAL, "\r\nStarting cantalk app...\r\n");
+  oresat_start();
+  return 0;
 }
 

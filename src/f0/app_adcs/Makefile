@@ -108,7 +108,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 ODDIR    := $(APP_ROOT)/od
 ifeq ($(ORESAT),)
-  ORESAT = oresat0.5
+  ORESAT = --oresat 0.5
 endif
 # generate OD.c/OD.h from oresat-configs
 $(shell oresat-gen-fw-files $(ORESAT) imu -d $(ODDIR))

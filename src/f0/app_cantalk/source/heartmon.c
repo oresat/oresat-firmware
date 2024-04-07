@@ -1,5 +1,5 @@
 #include "ch.h"
-#include "heartbeat.h"
+#include "heartmon.h"
 #include "CANopen.h"
 #include "chprintf.h"
 #include "OD.h"
@@ -15,11 +15,13 @@
 #define dbgprintf(str, ...)
 #endif
 
-/* heartbeat monitoring thread */
-THD_WORKING_AREA(heartbeat_wa, 0x400);
-THD_FUNCTION(heartbeat, arg)
+/* heartmon monitoring thread */
+THD_WORKING_AREA(heartmon_wa, 0x400);
+THD_FUNCTION(heartmon, arg)
 {
   (void)arg;
+
+  //TODO: Coordinate the blink with the CAN heartbeat
   
   while (!chThdShouldTerminateX()) 
   {
@@ -29,7 +31,7 @@ THD_FUNCTION(heartbeat, arg)
      chThdSleepMilliseconds(500);
   }
 
-  dbgprintf("Terminating heartbeat thread...\r\n");
+  dbgprintf("Terminating heartmon thread...\r\n");
 
   palClearLine(LINE_LED);
   chThdExit(MSG_OK);

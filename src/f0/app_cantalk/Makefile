@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_battery
+PROJECT   = app_cantalk
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = BATTERY_V3
+BOARD     = CANTALK_V0
 
 # Project sources.
 PROJ_ROOT = ../../..
