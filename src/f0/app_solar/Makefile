@@ -82,10 +82,6 @@ endif
 # Project, target, sources and paths
 #
 
-#ifeq ($(ORESAT),)
-#  ORESAT = oresat0.5
-#endif
-
 # Define project name here
 PROJECT   = app_solar
 
