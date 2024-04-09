@@ -112,11 +112,11 @@ ifeq ($(USE_BOOTLOADER),)
 endif
 
 ifeq ($(ORESAT),)
-  ORESAT = oresat0.5
+  ORESAT = 0.5
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) battery -d $(ODDIR))
+$(shell oresat-gen-fw-files --oresat $(ORESAT) battery -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)

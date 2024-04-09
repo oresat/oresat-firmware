@@ -83,11 +83,8 @@ Tools required:
 * srecord
 * oresat-configs
 
-To install oresat-configs: 
-* `$ git clone https://github.com/oresat/oresat-configs`
-* `$ cd oresat-configs`
-* `$ pip install -r requirements.txt`
-* `$ ./build_and_install.sh`
+To install oresat-configs:
+* `$ pip install oresat-configs`
 
 PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
 package managers is several years old. You MUST build it from source for it

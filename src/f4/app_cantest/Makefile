@@ -107,11 +107,11 @@ ODDIR    := $(APP_ROOT)/od
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 ifeq ($(ORESAT),)
-  ORESAT = oresat0.5
+  ORESAT = 0.5
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) base -d $(ODDIR))
+$(shell oresat-gen-fw-files --oresat $(ORESAT) base -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
