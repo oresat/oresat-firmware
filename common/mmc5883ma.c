@@ -235,7 +235,7 @@ void mmc5883maObjectInit(MMC5883MADriver *devp) {
 }
 
 bool mmc5883maSoftReset(MMC5883MADriver *devp) {
-	chprintf(DEBUG_SD, "Resetting MMC4883...\r\n");
+	chprintf(DEBUG_SD, "Resetting MMC5883...\r\n");
 	bool r = mmc5883maI2CWriteRegister2(devp->config->i2cp, MMC5883MA_AD_INTRNLCTRL1, MMC5883MA_INTRNLCTRL1_SW_RST_CMD);
 	chThdSleepMilliseconds(5);
 	return(r);
@@ -249,7 +249,7 @@ bool mmc5883maSoftReset(MMC5883MADriver *devp) {
  *
  * @api
  */
-uint8_t mmc_product_id_readback;
+uint8_t mmc5883ma_product_id_readback;
 
 bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
     osalDbgCheck((devp != NULL) && (config != NULL));
@@ -273,25 +273,25 @@ bool mmc5883maStart(MMC5883MADriver *devp, const MMC5883MAConfig *config) {
     bool found_mmc5883ma_flag = false;
 
     //Probe I2C bus to see what's attached
-    if( ! mmc5883maI2CReadRegister3(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+    if( ! mmc5883maI2CReadRegister3(devp->config->i2cp, MMC5883MA_I2C_ADDRESS_READ, MMC5883MA_AD_PRDCT_ID_1, &mmc5883ma_product_id_readback) ) {
     	chprintf(DEBUG_SD, "Failed to read product code from MMC5883MA chip, i2c comm failure\r\n");
     } else {
-    	if( mmc_product_id_readback == MMC5883MA_EXPECTED_PRODUCT_CODE ) {
-			chprintf(DEBUG_SD, "Successfully read product code from MMC5883MA (good), 0x%X\r\n", mmc_product_id_readback);
+    	if( mmc5883ma_product_id_readback == MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+			chprintf(DEBUG_SD, "Successfully read product code from MMC5883MA (good), 0x%X\r\n", mmc5883ma_product_id_readback);
 			found_mmc5883ma_flag = true;
     	} else {
-    		chprintf(DEBUG_SD, "ERROR: unexpected product ID code from MMC5883MA, read 0x%X, expectex 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
+    		chprintf(DEBUG_SD, "ERROR: unexpected product ID code from MMC5883MA, read 0x%X, expected 0x%X\r\n", mmc5883ma_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
     	}
     }
 
     if( found_mmc5883ma_flag ) {
 		mmc5883maSoftReset(devp);
 
-		if( ! mmc5883maI2CReadRegister2(devp->config->i2cp, MMC5883MA_AD_PRDCT_ID_1, &mmc_product_id_readback) ) {
+		if( ! mmc5883maI2CReadRegister2(devp->config->i2cp, MMC5883MA_AD_PRDCT_ID_1, &mmc5883ma_product_id_readback) ) {
 			devp->state = MMC5883MA_STOP;
 		} else {
-			chprintf(DEBUG_SD, "Read MMC5883MA product code as 0x%X, expected 0x%X\r\n", mmc_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
-			if( mmc_product_id_readback != MMC5883MA_EXPECTED_PRODUCT_CODE ) {
+			chprintf(DEBUG_SD, "Read MMC5883MA product code as 0x%X, expected 0x%X\r\n", mmc5883ma_product_id_readback, MMC5883MA_EXPECTED_PRODUCT_CODE);
+			if( mmc5883ma_product_id_readback != MMC5883MA_EXPECTED_PRODUCT_CODE ) {
 				chprintf(DEBUG_SD, "ERROR: Read incorrect MMC5883MA product code!!!\r\n");
 				devp->state = MMC5883MA_STOP;
 			}

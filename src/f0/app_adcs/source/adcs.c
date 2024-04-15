@@ -1,7 +1,7 @@
 #include "adcs.h"
 
 #include "bmi088.h"
-#include "mmc5883ma.h"
+#include "mmc5983ma.h"
 #include "ltc4305.h"
 #include "chprintf.h"
 #include "CANopen.h"
@@ -149,7 +149,7 @@ typedef enum {
 } end_card_magnetometoer_t;
 
 
-static const I2CConfig mmc5883ma_i2ccfg = {
+static const I2CConfig mmc5983ma_i2ccfg = {
     STM32_TIMINGR_PRESC(0xBU) |
     STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
     STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
@@ -157,9 +157,9 @@ static const I2CConfig mmc5883ma_i2ccfg = {
     0
 };
 
-static const MMC5883MAConfig mmc5883ma_generic_config = {
+static const MMC5983MAConfig mmc5983ma_generic_config = {
 	.i2cp = &I2CD1,
-	.i2ccfg = &mmc5883ma_i2ccfg
+	.i2ccfg = &mmc5983ma_i2ccfg
 };
 
 
@@ -177,8 +177,8 @@ typedef struct {
 } mt_pwm_phase_data_t;
 
 typedef struct {
-	MMC5883MADriver driver;
-	mmc5883ma_data_t data;
+	MMC5983MADriver driver;
+	mmc5983ma_data_t data;
 	volatile bool is_initialized;
 	volatile bool is_working;
 } magnetometer_data_struct_t;
@@ -288,6 +288,7 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 }
 
 void handle_can_open_data(void) {
+	chprintf(DEBUG_SD, "Entering handle_can_open_data()\r\n");
 	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_x_setpoint * 100, 0);
 	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_y_setpoint * 100, 1);
 	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_z_setpoint * 100, 2);
@@ -499,14 +500,14 @@ bool select_magnetometer(const end_card_magnetometoer_t ecm) {
 		ret2 = connect_endcard_ltc4305_plus_z(false, true);
 		break;
 	case EC_MAG_NONE:
-		ret1 = true;
-		ret1 = connect_endcard_ltc4305_minus_z(false, false); //FIXME uncomment this
+		ret1 = connect_endcard_ltc4305_minus_z(false, false);
 		ret2 = connect_endcard_ltc4305_plus_z(false, false);
 		break;
 	}
 
+//	return(true);//fixme remove this
 //	return(ret1); //fixme remove this
-	return(ret2); //FIXME remove this
+//	return(ret2); //FIXME remove this
 
 	if( ! (ret1 && ret2) ) {
 		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers ret1=%d, ret2=%d\r\n", ret1, ret2);
@@ -536,7 +537,7 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	chprintf(DEBUG_SD, "Reading from magnetometer %d %s: ", ecm, end_card_magnetometoer_t_to_str(ecm));
 	chThdSleepMilliseconds(5);
 
-	if( mmc5883maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
+	if( mmc5983maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
 		chprintf(DEBUG_SD, " mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
 				g_adcs_data.magetometer_data[ecm].data.my,
 				g_adcs_data.magetometer_data[ecm].data.mz);
@@ -595,17 +596,17 @@ bool init_end_cap_magnetometers(void) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
 		chThdSleepMilliseconds(5);
 
-		mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
+		mmc5983maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 
 		if( ! select_magnetometer(ecm) ) {
 			ret = false;
-			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s due to LTC selection error\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+			chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s due to LTC selection error\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 		} else {
-			if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5883ma_generic_config) ) {
-				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+			if( mmc5983maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5983ma_generic_config) ) {
+				chprintf(DEBUG_SD, "Successfully started MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 				g_adcs_data.magetometer_data[ecm].is_initialized = true;
 			} else {
-				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+				chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 				ret = false;
 				//FIXME should this error be cleard if/when comms works again on a subsequent call?
 				static systime_t last_report_time = 0;
@@ -739,6 +740,7 @@ void print_debug_output(void) {
 
 
 void process_magnetorquer(void) {
+	chprintf(DEBUG_SD, "Entering process_magnetorquer()\r\n");
 //	chprintf(DEBUG_SD, "ADCD1.state = %u\r\n", ADCD1.state);
 
 	if( ADCD1.state == ADC_STOP || ADCD1.state == ADC_UNINIT ) {
@@ -750,6 +752,8 @@ void process_magnetorquer(void) {
 	}
 
 	if( ADCD1.state == ADC_READY ) {
+		chprintf(DEBUG_SD, "ADC ready, reading ADC values...\r\n");
+
 		uint32_t channel_sums[MY_SAMPLING_NUMBER];
 		memset(channel_sums, 0, sizeof(channel_sums));
 
@@ -786,15 +790,17 @@ void process_magnetorquer(void) {
 
 		}
 
-//		chprintf(DEBUG_SD, "Staring conversion...\r\n"); chThdSleepMilliseconds(10);
+		chprintf(DEBUG_SD, "Staring conversion...\r\n");// chThdSleepMilliseconds(10);
 		adcStartConversion(&ADCD1, &adcgrpcfg_tim1_trigo, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC conversion.
 	}
 
 //	chprintf(DEBUG_SD, "adc_conv_cb#=%u, ", adc_conversion_complete_callback_count);
 //	chprintf(DEBUG_SD, "adc_error_cb#=%u\r\n", adc_conversion_error_callback_count);
 
+	chprintf(DEBUG_SD, "Setting magnetorquer PWM outputs...\r\n");
 	set_pwm_output();
 	print_debug_output();
+	chprintf(DEBUG_SD, "Exiting process_magnetorquer()\r\n");
 }
 
 
@@ -860,14 +866,14 @@ THD_FUNCTION(adcs, arg)
 //    palClearLine(LINE_MAG_N_EN);
 //    end_card_magnetometoer_t ecm = EC_MAG_2_PZ_1;
 ////    ecm = EC_MAG_3_PZ_2;
-//    mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
+//    mmc5983maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 //    select_magnetometer(ecm);
 //    while(1) {
-//		if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5883ma_generic_config) ) {
-//			chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+//		if( mmc5983maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5983ma_generic_config) ) {
+//			chprintf(DEBUG_SD, "Successfully started MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 //			g_adcs_data.magetometer_data[ecm].is_initialized = true;
 //		} else {
-//			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+//			chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 ////			ret = false;
 //			//FIXME should this error be cleard if/when comms works again on a subsequent call?
 //			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_INIT_FAILURE + ecm);
