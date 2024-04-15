@@ -126,6 +126,7 @@ endif
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/bmi088.mk
 include $(PROJ_SRC)/mmc5883ma.mk
+include $(PROJ_SRC)/mmc5983ma.mk
 include $(PROJ_SRC)/ltc4305.mk
 
 # Licensing files.
