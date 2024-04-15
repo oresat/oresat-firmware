@@ -116,7 +116,7 @@ ifeq ($(ORESAT),)
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) battery -d $(ODDIR))
+$(shell oresat-gen-fw-files $(ORESAT) cantalk -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)

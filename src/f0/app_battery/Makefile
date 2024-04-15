@@ -112,7 +112,7 @@ ifeq ($(USE_BOOTLOADER),)
 endif
 
 ifeq ($(ORESAT),)
-  ORESAT = oresat0.5
+  ORESAT = --oresat 0.5
 endif
 
 # generate OD.c/OD.h from oresat-configs

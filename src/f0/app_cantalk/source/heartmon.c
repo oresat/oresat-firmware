@@ -19,16 +19,19 @@
 THD_WORKING_AREA(heartmon_wa, 0x400);
 THD_FUNCTION(heartmon, arg)
 {
+  
   (void)arg;
+  uint16_t blinkcount = 0;
 
   //TODO: Coordinate the blink with the CAN heartbeat
   
   while (!chThdShouldTerminateX()) 
   {
-     palClearLine(LINE_LED);
-     chThdSleepMilliseconds(500);
-     palSetLine(LINE_LED);
-     chThdSleepMilliseconds(500);
+    palClearLine(LINE_LED);
+    chThdSleepMilliseconds(500);
+    palSetLine(LINE_LED);
+    chThdSleepMilliseconds(500);
+    OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
   dbgprintf("Terminating heartmon thread...\r\n");
