@@ -587,11 +587,10 @@ void stop_end_cap_magnetometers(void) {
 
 bool init_end_cap_magnetometers(void) {
 	palClearLine(LINE_MAG_N_EN);
-	chThdSleepMilliseconds(5);
+	chThdSleepMilliseconds(10);
 
 	bool ret = true;
 
-	//FIXME ecm start
 	for(end_card_magnetometoer_t ecm = EC_MAG_0_MZ_1; ecm < EC_MAG_NONE; ecm++ ) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
 		chThdSleepMilliseconds(5);
@@ -897,6 +896,8 @@ THD_FUNCTION(adcs, arg)
     chprintf(DEBUG_SD, "Starting BMI088...\r\n");
     chThdSleepMilliseconds(50);
     bmi088Start(&imudev, &imucfg);
+
+
 
 
 
