@@ -23,7 +23,7 @@ THD_FUNCTION(heartmon, arg)
   (void)arg;
   uint16_t blinkcount = 0;
 
-  //TODO: Coordinate the blink with the CAN heartbeat
+  //TODO: Count heartbeats instead of blinks:
   
   while (!chThdShouldTerminateX()) 
   {
