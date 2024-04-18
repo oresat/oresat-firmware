@@ -16,7 +16,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
     struct lfs_info info;
     char buf[BUF_SIZE];
 
-    if (!strcmp(argv[0], "ls") && argc > 1) {
+    if (argv[0] != NULL && !strcmp(argv[0], "ls") && argc > 1) {
         dir = dir_open(&FSD1, argv[1]);
         if (dir == NULL) {
             chprintf(chp, "Error in dir_open: %d\r\n", FSD1.err);
@@ -45,19 +45,19 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "\r\n");
-    } else if (!strcmp(argv[0], "mkdir") && argc > 1) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "mkdir") && argc > 1) {
         ret = fs_mkdir(&FSD1, argv[1]);
         if (ret < 0) {
             chprintf(chp, "Error in fs_mkdir: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "rm") && argc > 1) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "rm") && argc > 1) {
         ret = fs_remove(&FSD1, argv[1]);
         if (ret < 0) {
             chprintf(chp, "Error in fs_remove: %d\r\n");
             return;
         }
-    } else if (!strcmp(argv[0], "cat") && argc > 1) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "cat") && argc > 1) {
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
             chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
@@ -78,7 +78,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
-    } else if (!strcmp(argv[0], "hexdump") && argc > 1) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "hexdump") && argc > 1) {
         file = file_open(&FSD1, argv[1], LFS_O_RDONLY);
         if (file == NULL) {
             chprintf(chp, "Error in file_open: %d\r\n", FSD1.err);
@@ -102,7 +102,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
-    } else if (!strcmp(argv[0], "load") && argc > 1) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "load") && argc > 1) {
         uint8_t buf[BUF_SIZE] = {0};
         char line[BUF_SIZE * 2] = {0};
         char c, *p = line;
@@ -159,7 +159,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             chprintf(chp, "Error in file_close: %d\r\n", ret);
             return;
         }
-    } else if (!strcmp(argv[0], "mount")) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "mount")) {
         chprintf(chp, "Attempting to mount LFS...\r\n");
         ret = fs_mount(&FSD1, false);
         if (ret < 0) {
@@ -167,7 +167,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "unmount")) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "unmount")) {
         chprintf(chp, "Attempting to unmount LFS...\r\n");
         ret = fs_unmount(&FSD1);
         if (ret < 0) {
@@ -175,7 +175,7 @@ void cmd_lfs(BaseSequentialStream *chp, int argc, char *argv[])
             return;
         }
         chprintf(chp, "OK\r\n");
-    } else if (!strcmp(argv[0], "format")) {
+    } else if (argv[0] != NULL && !strcmp(argv[0], "format")) {
         chprintf(chp, "Attempting to format LFS...\r\n");
         ret = fs_format(&FSD1);
         if (ret < 0) {
