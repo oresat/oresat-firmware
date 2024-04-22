@@ -71,6 +71,7 @@ jobs:
       run: |
         make -C src/f4/app_blinky
         make -C src/f4/app_cantest
+        make -C src/f4/app_control
 
     - name: Compile l4 apps
       run: |
