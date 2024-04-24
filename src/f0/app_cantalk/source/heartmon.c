@@ -28,9 +28,9 @@ THD_FUNCTION(heartmon, arg)
   while (!chThdShouldTerminateX()) 
   {
     palClearLine(LINE_LED);
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(1500);
     palSetLine(LINE_LED);
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(1500);
     OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
