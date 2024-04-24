@@ -4,6 +4,8 @@
 #include "ch.h"
 #include "hal.h"
 
+#define PROTOCARD_NODE_ID 0x54
+
 /**
  * blinking example thread declaration 
 */

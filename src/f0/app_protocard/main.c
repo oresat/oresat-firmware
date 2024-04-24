@@ -37,7 +37,8 @@ static thread_descriptor_t blink_worker_desc = {
 
 static oresat_config_t oresat_conf = {
   .cand = &CAND1,
-  .node_id = ORESAT_DEFAULT_ID,
+  //.node_id = ORESAT_DEFAULT_ID,PROTOCARD_NODE_ID
+  .node_id = PROTOCARD_NODE_ID,
   .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
@@ -61,7 +62,7 @@ int main(void)
   // Initialize and start
   oresat_init(&oresat_conf);
   app_init();
-  chprintf(DEBUG_SERIAL, "\r\nStarting prototemplate app...\r\n");
+  chprintf(DEBUG_SERIAL, "\r\nStarting protocard app...\r\n");
   oresat_start();
   return 0;
 }
