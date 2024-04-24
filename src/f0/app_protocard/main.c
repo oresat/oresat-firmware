@@ -17,25 +17,28 @@
 /* ChibiOS header files */
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
 /* Project header files */
 #include "oresat.h"
 #include "blink.h"
 
-static worker_t worker1;
-static thread_descriptor_t worker1_desc = {
-    .name = "Example blinky thread",
-    .wbase = THD_WORKING_AREA_BASE(blink_wa),
-    .wend = THD_WORKING_AREA_END(blink_wa),
-    .prio = NORMALPRIO,
-    .funcp = blink,
-    .arg = NULL
+#define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
+
+static worker_t heartmon_worker;
+static thread_descriptor_t blink_worker_desc = {
+  .name = "blink count tpdo thread",
+  .wbase = THD_WORKING_AREA_BASE(blink_wa),
+  .wend = THD_WORKING_AREA_END(blink_wa),
+  .prio = NORMALPRIO,
+  .funcp = blink,
+  .arg = NULL
 };
 
 static oresat_config_t oresat_conf = {
-    .cand = &CAND1,
-    .node_id = ORESAT_DEFAULT_ID,
-    .bitrate = ORESAT_DEFAULT_BITRATE,
+  .cand = &CAND1,
+  .node_id = ORESAT_DEFAULT_ID,
+  .bitrate = ORESAT_DEFAULT_BITRATE,
 };
 
 /**
@@ -43,11 +46,11 @@ static oresat_config_t oresat_conf = {
  */
 static void app_init(void)
 {
-    /* App initialization */
-    reg_worker(&worker1, &worker1_desc, false, true);
-
-    /* Start up debug output */
-    sdStart(&SD2, NULL);
+  /* App initialization */
+  reg_worker(&blink_worker, &blink_worker_desc, true, true);
+  
+  /* Start up debug output */
+  sdStart(&SD2, NULL);
 }
 
 /**
@@ -55,9 +58,11 @@ static void app_init(void)
  */
 int main(void)
 {
-    // Initialize and start
-    oresat_init(&oresat_conf);
-    app_init();
-    oresat_start();
-    return 0;
+  // Initialize and start
+  oresat_init(&oresat_conf);
+  app_init();
+  chprintf(DEBUG_SERIAL, "\r\nStarting prototemplate app...\r\n");
+  oresat_start();
+  return 0;
 }
+

@@ -55,13 +55,13 @@ endif
 # Stack size to be allocated to the Cortex-M process stack. This stack is
 # the stack used by the main() thread.
 ifeq ($(USE_PROCESS_STACKSIZE),)
-  USE_PROCESS_STACKSIZE = 0x200
+  USE_PROCESS_STACKSIZE = 0x400
 endif
 
 # Stack size to the allocated to the Cortex-M main/exceptions stack. This
 # stack is used for processing interrupts and exceptions.
 ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
-  USE_EXCEPTIONS_STACKSIZE = 0x200
+  USE_EXCEPTIONS_STACKSIZE = 0x400
 endif
 
 # Enables the use of FPU (no, softfp, hard).
@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_protocard
+PROJECT   = app_prototemplate
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = PROTOCARD_V4
+BOARD     = PROTOTEMPLATE_0
 
 # Project sources.
 PROJ_ROOT = ../../..
@@ -112,17 +112,18 @@ ifeq ($(USE_BOOTLOADER),)
 endif
 
 ifeq ($(ORESAT),)
-  ORESAT = oresat0.5
+  ORESAT = --oresat 0.5
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) base -d $(ODDIR))
+$(shell oresat-gen-fw-files $(ORESAT) cantalk -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
 
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
+include $(PROJ_SRC)/max17205.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -185,7 +186,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = 
+UDEFS = -DCO_VERSION_MAJOR=4
 
 # Define ASM defines here
 UADEFS =
