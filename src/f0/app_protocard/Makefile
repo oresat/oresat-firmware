@@ -83,11 +83,11 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_prototemplate
+PROJECT   = app_protocard
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = PROTOTEMPLATE_0
+BOARD     = PROTOCARD_V4
 
 # Project sources.
 PROJ_ROOT = ../../..
@@ -116,7 +116,7 @@ ifeq ($(ORESAT),)
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) cantalk -d $(ODDIR))
+$(shell oresat-gen-fw-files $(ORESAT) protocard -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)

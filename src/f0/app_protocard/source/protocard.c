@@ -1,11 +1,11 @@
 #include "ch.h"
-#include "blink.h"
+#include "protocard.h"
 #include "CANopen.h"
 #include "chprintf.h"
 #include "OD.h"
 
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
-#define ENABLE_SERIAL_DEBUG_OUTPUT        0
+#define ENABLE_SERIAL_DEBUG_OUTPUT        1
 
 #if ENABLE_SERIAL_DEBUG_OUTPUT || ENABLE_NV_MEMORY_UPDATE_CODE
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
@@ -20,8 +20,8 @@
  * blinking example thread definition 
  * counts blinks and saves to tpdo
 */
-THD_WORKING_AREA(thread0_wa, 0x400);
-THD_FUNCTION(thread0, arg)
+THD_WORKING_AREA(blink_wa, 0x400);
+THD_FUNCTION(blink, arg)
 {
   
   (void)arg;
@@ -36,7 +36,7 @@ THD_FUNCTION(thread0, arg)
     OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
-  dbgprintf("Terminating thread0...\r\n");
+  dbgprintf("Terminating blink thread...\r\n");
 
   palClearLine(LINE_LED);
   chThdExit(MSG_OK);

@@ -21,11 +21,11 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "blink.h"
+#include "protocard.h"
 
 #define DEBUG_SERIAL    (BaseSequentialStream*) &SD2
 
-static worker_t heartmon_worker;
+static worker_t blink_worker;
 static thread_descriptor_t blink_worker_desc = {
   .name = "blink count tpdo thread",
   .wbase = THD_WORKING_AREA_BASE(blink_wa),
