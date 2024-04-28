@@ -183,9 +183,11 @@ extern "C" {
 void mmc5983maObjectInit(MMC5983MADriver *devp);
 bool mmc5983maStart(MMC5983MADriver *devp, const MMC5983MAConfig *config);
 void mmc5983maStop(MMC5983MADriver *devp);
+int32_t mmc5983maRawToMilliGauss(const int16_t raw);
 bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest);
 bool mmc5983maI2CReadRegister3(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint8_t *dest_value);
 bool mmc5983maI2CReadRegister4(I2CDriver *i2cp, const uint8_t i2c_address, const uint8_t reg_number, uint16_t *dest_value);
+float mmc5983maRawToGauss(const int16_t raw);
 #ifdef __cplusplus
 }
 #endif

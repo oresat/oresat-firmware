@@ -245,6 +245,7 @@ const char* end_card_magnetometoer_t_to_str(const end_card_magnetometoer_t ecm) 
 
 }
 
+
 int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) {
 	if (v >= max)
 		return (max);
@@ -322,9 +323,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].is_working) {
-		OD_RAM.x4003_pos_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx;
-		OD_RAM.x4003_pos_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my;
-		OD_RAM.x4003_pos_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz;
+		OD_RAM.x4003_pos_z_magnetometer_1.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx);
+		OD_RAM.x4003_pos_z_magnetometer_1.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my);
+		OD_RAM.x4003_pos_z_magnetometer_1.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz);
     } else {
     	OD_RAM.x4003_pos_z_magnetometer_1.x = INT16_MAX;
     	OD_RAM.x4003_pos_z_magnetometer_1.y = INT16_MAX;
@@ -332,9 +333,9 @@ void handle_can_open_data(void) {
     }
 
     if (g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].is_working) {
-		OD_RAM.x4004_pos_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx;
-		OD_RAM.x4004_pos_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my;
-		OD_RAM.x4004_pos_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz;
+		OD_RAM.x4004_pos_z_magnetometer_2.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx);
+		OD_RAM.x4004_pos_z_magnetometer_2.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my);
+		OD_RAM.x4004_pos_z_magnetometer_2.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz);
 	} else {
     	OD_RAM.x4004_pos_z_magnetometer_2.x = INT16_MAX;
     	OD_RAM.x4004_pos_z_magnetometer_2.y = INT16_MAX;
@@ -343,9 +344,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].is_working) {
-		OD_RAM.x4005_min_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx;
-		OD_RAM.x4005_min_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my;
-		OD_RAM.x4005_min_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz;
+		OD_RAM.x4005_min_z_magnetometer_1.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx);
+		OD_RAM.x4005_min_z_magnetometer_1.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my);
+		OD_RAM.x4005_min_z_magnetometer_1.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz);
     } else {
     	OD_RAM.x4005_min_z_magnetometer_1.x = INT16_MAX;
     	OD_RAM.x4005_min_z_magnetometer_1.y = INT16_MAX;
@@ -354,9 +355,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].is_working) {
-		OD_RAM.x4006_min_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx;
-		OD_RAM.x4006_min_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my;
-		OD_RAM.x4006_min_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz;
+		OD_RAM.x4006_min_z_magnetometer_2.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx);
+		OD_RAM.x4006_min_z_magnetometer_2.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my);
+		OD_RAM.x4006_min_z_magnetometer_2.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz);
     } else {
     	OD_RAM.x4006_min_z_magnetometer_2.x = INT16_MAX;
     	OD_RAM.x4006_min_z_magnetometer_2.y = INT16_MAX;
@@ -538,11 +539,13 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	chThdSleepMilliseconds(5);
 
 	if( mmc5983maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
-		chprintf(DEBUG_SD, " mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
-				g_adcs_data.magetometer_data[ecm].data.my,
-				g_adcs_data.magetometer_data[ecm].data.mz);
+		chprintf(DEBUG_SD, " mx=%d (%d mG), my=%d (%d mG), mz=%d (%d mG)\r\n",
+				g_adcs_data.magetometer_data[ecm].data.mx, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mx),
+				g_adcs_data.magetometer_data[ecm].data.my, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.my),
+				g_adcs_data.magetometer_data[ecm].data.mz, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mz));
 		r = true;
 	} else {
+		chprintf(DEBUG_SD, "\r\nERROR Failed to read from %s\r\n", end_card_magnetometoer_t_to_str(ecm));
 		//FIXME should this error be cleard if/when comms works again on a subsequent call?
 		static systime_t last_report_time = 0;
 		CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_COMM_FAILURE + ecm, &last_report_time);
@@ -639,7 +642,7 @@ void set_pwm_output(void) {
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
 		if( g_adcs_data.mt_pwm_data[i].last_update_time == 0 || chTimeDiffX(g_adcs_data.mt_pwm_data[i].last_update_time, now_time) > 10 ) {
 			if( g_adcs_data.mt_pwm_data[i].current_pwm_percent != g_adcs_data.mt_pwm_data[i].target_pwm_percent ) {
-				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
+				chprintf(DEBUG_SD, "target_pwm_percent = %d\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
 
 				pwmDisableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number);
 
@@ -892,13 +895,9 @@ THD_FUNCTION(adcs, arg)
 
 
     bmi088ObjectInit(&imudev);
-
-    chprintf(DEBUG_SD, "Starting BMI088...\r\n");
-    chThdSleepMilliseconds(50);
+    chprintf(DEBUG_SD, "Starting BMI088...\r\n");chThdSleepMilliseconds(50);
     bmi088Start(&imudev, &imucfg);
-
-
-
+    chprintf(DEBUG_SD, "BMI088 started...\r\n");
 
 
     chprintf(DEBUG_SD, "BMI088 state = %u, error_flags=0x%X\r\n", imudev.state, imudev.error_flags);
@@ -907,19 +906,21 @@ THD_FUNCTION(adcs, arg)
         static systime_t last_report_time = 0;
         CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_IMU_INIT_FAILURE, &last_report_time);
     } else {
-        uint8_t bmi088_chip_id = 0;
-        if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
-            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be (0x%X or 0x%X)\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED, BMI090L_ACC_CHIP_ID_EXPECTED);
+        uint8_t bmi_chip_id = 0;
+        if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi_chip_id)) == MSG_OK ) {
+            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be (0x%X or 0x%X)\r\n", bmi_chip_id, BMI088_ACC_CHIP_ID_EXPECTED, BMI090L_ACC_CHIP_ID_EXPECTED);
         } else {
             chprintf(DEBUG_SD, "Failed to read accel chip ID from BMI088 ACCEL, r = %d\r\n", r);
         }
 
-        if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED && bmi088_chip_id != BMI090L_ACC_CHIP_ID_EXPECTED ) {
+        if( bmi_chip_id != BMI088_ACC_CHIP_ID_EXPECTED && bmi_chip_id != BMI090L_ACC_CHIP_ID_EXPECTED ) {
         	chprintf(DEBUG_SD, "ERROR: BMI088 ACCEL FAIL: didn't find BMI088!\r\n");
         	static systime_t last_report_time = 0;
             CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH, &last_report_time);
-        } else {
-        	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!\r\n");
+        } else if (bmi_chip_id == BMI088_ACC_CHIP_ID_EXPECTED ){
+        	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!, chip_id = 0x%X\r\n", bmi_chip_id);
+        } else if (bmi_chip_id == BMI090L_ACC_CHIP_ID_EXPECTED ){
+            chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI090L!, chip_id = 0x%X\r\n", bmi_chip_id);
         }
 
 

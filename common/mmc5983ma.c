@@ -21,6 +21,7 @@
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 #define MMC5983MA_DEFAULT_I2C_TIMEOUT      50
+#define MMC5983MA_DATA_READ_I2C_TIMEOUT    250
 
 #if (MMC5983MA_USE_I2C) || defined(__DOXYGEN__)
 
@@ -247,7 +248,23 @@ void mmc5983maStop(MMC5983MADriver *devp) {
 
 
 
+const char* msg_t_to_str(const msg_t v) {
+    switch (v) {
+    case MSG_OK:
+        return ("MSG_OK");
+    case MSG_TIMEOUT:
+        return ("MSG_TIMEOUT");
+    case MSG_RESET:
+        return ("MSG_RESET");
+    default:
+        return ("MSG_???");
+    }
+}
 
+int32_t mmc5983maRawToMilliGauss(const int16_t raw) {
+	float gauss = 1000.0 * ((float) raw) / 4096.0;
+	return(gauss);
+}
 
 bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 	osalDbgCheck((devp != NULL));
@@ -286,22 +303,24 @@ bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 //    	chprintf(DEBUG_SD, "MMC5983MA status register = 0x%X\r\n", rx[0]);chThdSleepMilliseconds(10);
 
 		memset(rx, 0, sizeof(rx));
-		uint8_t reg = MMC5983MA_XOUT_0;
+//		uint8_t reg = MMC5983MA_XOUT_0;
+		uint8_t tx[2];
+		tx[0] = MMC5983MA_XOUT_0;
+		tx[1] = 0;
 
 //		chprintf(DEBUG_SD, "MMC5983MA reading data registers\r\n");chThdSleepMilliseconds(10);
 
 		i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-		msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5983MA_I2C_ADDRESS_READ, &reg, 1, rx, 6, MMC5983MA_DEFAULT_I2C_TIMEOUT);
+		msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5983MA_I2C_ADDRESS_READ, tx, 1, rx, 7, MMC5983MA_DATA_READ_I2C_TIMEOUT);
 		i2cStop(devp->config->i2cp);
 
-
-		dest->mx = (rx[0] << 8) | rx[1];
-		dest->my = (rx[2] << 8) | rx[3];
-		dest->mz = (rx[4] << 8) | rx[5];
-
-//		chprintf(DEBUG_SD, "MMC5983MA done reading data registers: (%d, %d, %d)\r\n", dest->mx, dest->my, dest->mz);chThdSleepMilliseconds(10);
+		chprintf(DEBUG_SD, "MMC5983MA done reading data registers: (%d, %d, %d), r=%d (%s), state=%d\r\n", dest->mx, dest->my, dest->mz, r, msg_t_to_str(r), devp->state);chThdSleepMilliseconds(10);
 
 		if( r == MSG_OK ) {
+			//Note The data sheet says this is 4096 counts/gauss
+			dest->mx = saturate_int32_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768, INT16_MIN, INT16_MAX);
+			dest->my = saturate_int32_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768, INT16_MIN, INT16_MAX);
+			dest->mz = saturate_int32_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768, INT16_MIN, INT16_MAX);
 			ret = true;
 
 			if( devp->read_call_count > 20 ) {
@@ -315,16 +334,17 @@ bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 				i2cStop(devp->config->i2cp);
 				chThdSleepMilliseconds(1);
 
-
+				tx[0] = MMC5983MA_XOUT_0;
+				tx[1] = 0;
 				memset(rx, 0, sizeof(rx));
 				i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-				msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5983MA_I2C_ADDRESS_READ, &reg, 1, rx, 6, MMC5983MA_DEFAULT_I2C_TIMEOUT);
+				msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, MMC5983MA_I2C_ADDRESS_READ, tx, 1, rx, 7, MMC5983MA_DATA_READ_I2C_TIMEOUT);
 				i2cStop(devp->config->i2cp);
 
 				mmc5983ma_data_t dest_temp;
-				dest_temp.mx = (rx[0] << 8) | rx[1];
-				dest_temp.my = (rx[2] << 8) | rx[3];
-				dest_temp.mz = (rx[4] << 8) | rx[5];
+				dest_temp.mx = saturate_int32_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768, INT16_MIN, INT16_MAX);
+				dest_temp.my = saturate_int32_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768, INT16_MIN, INT16_MAX);
+				dest_temp.mz = saturate_int32_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768, INT16_MIN, INT16_MAX);
 
 
 				const int32_t delta_set_reset_x = dest_temp.mx - dest->mx;
@@ -352,6 +372,12 @@ bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 			dest->mx += devp->bridge_offset_estimate_x;
 			dest->my += devp->bridge_offset_estimate_y;
 			dest->mz += devp->bridge_offset_estimate_z;
+		} else {
+			dest->mx = 0;
+			dest->my = 0;
+			dest->mz = 0;
+
+			ret = false;
 		}
 
 
