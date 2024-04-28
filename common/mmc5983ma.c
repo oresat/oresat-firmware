@@ -246,6 +246,15 @@ void mmc5983maStop(MMC5983MADriver *devp) {
 }
 
 
+int16_t saturate_int16_t(const int32_t v) {
+	if (v >= INT16_MAX)
+		return (INT16_MAX);
+
+	else if (v <= INT16_MIN)
+		return (INT16_MIN);
+
+	return (v);
+}
 
 
 const char* msg_t_to_str(const msg_t v) {
@@ -318,9 +327,9 @@ bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 
 		if( r == MSG_OK ) {
 			//Note The data sheet says this is 4096 counts/gauss
-			dest->mx = saturate_int32_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768, INT16_MIN, INT16_MAX);
-			dest->my = saturate_int32_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768, INT16_MIN, INT16_MAX);
-			dest->mz = saturate_int32_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768, INT16_MIN, INT16_MAX);
+			dest->mx = saturate_int16_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768);
+			dest->my = saturate_int16_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768);
+			dest->mz = saturate_int16_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768);
 			ret = true;
 
 			if( devp->read_call_count > 20 ) {
@@ -342,9 +351,9 @@ bool mmc5983maReadData(MMC5983MADriver *devp, mmc5983ma_data_t *dest) {
 				i2cStop(devp->config->i2cp);
 
 				mmc5983ma_data_t dest_temp;
-				dest_temp.mx = saturate_int32_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768, INT16_MIN, INT16_MAX);
-				dest_temp.my = saturate_int32_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768, INT16_MIN, INT16_MAX);
-				dest_temp.mz = saturate_int32_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768, INT16_MIN, INT16_MAX);
+				dest_temp.mx = saturate_int16_t(((uint32_t) (rx[0] << 8) | rx[1]) - 32768);
+				dest_temp.my = saturate_int16_t(((uint32_t) (rx[2] << 8) | rx[3]) - 32768);
+				dest_temp.mz = saturate_int16_t(((uint32_t) (rx[4] << 8) | rx[5]) - 32768);
 
 
 				const int32_t delta_set_reset_x = dest_temp.mx - dest->mx;

@@ -92,11 +92,11 @@ static const DACConfig dac_config = {
 
 //FIXME these PWM channel mappings may be wrong? or the mod-wires on the dev board may be wrong. Either way, Z-axis in the firmware is controling X-axis magnetorquer in the hardware on the dev ADCS board
 //PB13
-#define MT_X_PWM_PWM_CHANNEL     (1 - 1)
+#define MT_Z_PWM_PWM_CHANNEL     (1 - 1)
 //PB14
 #define MT_Y_PWM_PWM_CHANNEL     (2 - 1)
 //PB15
-#define MT_Z_PWM_PWM_CHANNEL     (3 - 1)
+#define MT_X_PWM_PWM_CHANNEL     (3 - 1)
 
 /**
  * This PWM block is configured to enable the TRIGO output to start an ADC conversion batch when the PWM edge goes high.
@@ -255,18 +255,11 @@ int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) 
 
 	return (v);
 }
-//
-//int16_t saturate_int16_t(const int32_t v) {
-//	if (v >= INT16_MAX)
-//		return (INT16_MAX);
-//
-//	else if (v <= INT16_MIN)
-//		return (INT16_MIN);
-//
-//	return (v);
-//}
 
 
+/**
+ * return value is in the range of 0 to 10000
+ */
 int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t axis) {
 	int32_t ret = 0;
 	if( axis <= 1 ) {
@@ -539,10 +532,10 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	chThdSleepMilliseconds(5);
 
 	if( mmc5983maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
-		chprintf(DEBUG_SD, " mx=%d (%d mG), my=%d (%d mG), mz=%d (%d mG)\r\n",
-				g_adcs_data.magetometer_data[ecm].data.mx, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mx),
-				g_adcs_data.magetometer_data[ecm].data.my, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.my),
-				g_adcs_data.magetometer_data[ecm].data.mz, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mz));
+//		chprintf(DEBUG_SD, " mx=%d (%d mG), my=%d (%d mG), mz=%d (%d mG)\r\n",
+//				g_adcs_data.magetometer_data[ecm].data.mx, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mx),
+//				g_adcs_data.magetometer_data[ecm].data.my, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.my),
+//				g_adcs_data.magetometer_data[ecm].data.mz, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mz));
 		r = true;
 	} else {
 		chprintf(DEBUG_SD, "\r\nERROR Failed to read from %s\r\n", end_card_magnetometoer_t_to_str(ecm));
@@ -638,6 +631,24 @@ void set_pwm_output(void) {
 #if 1
 	for(int i = 0; i < 3; i++ ) {
 		const systime_t now_time = chVTGetSystemTime();
+
+//		if( i == 1 ) {
+//			int mod = (now_time / 40000) % 4;
+//			switch (mod) {
+//				case 0:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent =	map_current_uA_to_pwm_duty_cycle(500000, i);
+//					break;
+//				case 1:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent = 0;
+//					break;
+//				case 2:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent =	map_current_uA_to_pwm_duty_cycle(-500000, i);
+//					break;
+//				case 3:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent = 0;
+//					break;
+//			}
+//		}
 
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
 		if( g_adcs_data.mt_pwm_data[i].last_update_time == 0 || chTimeDiffX(g_adcs_data.mt_pwm_data[i].last_update_time, now_time) > 10 ) {
