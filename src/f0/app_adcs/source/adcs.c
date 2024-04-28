@@ -788,11 +788,11 @@ void process_magnetorquer(void) {
 
 			uint8_t dest_mt_idx = 0;
 			if( adc_chan_idx == 1 ) {
-				dest_mt_idx = 2;
+				dest_mt_idx = 0;
 			} else if( adc_chan_idx == 2 ) {
 				dest_mt_idx = 1;
 			} else if( adc_chan_idx == 3 ) {
-				dest_mt_idx = 0;
+				dest_mt_idx = 2;
 			}
 
 			g_adcs_data.mt_pwm_data[dest_mt_idx].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
