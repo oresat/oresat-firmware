@@ -116,7 +116,8 @@ ifeq ($(ORESAT),)
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files --oresat $(ORESAT) solar -d $(ODDIR))
+FW_VERSION = $(shell git describe)
+$(shell oresat-gen-fw-files --oresat $(ORESAT) solar -d $(ODDIR) -fw $(FW_VERSION) -hw $(BOARD))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
