@@ -87,7 +87,7 @@ PROJECT   = app_solar
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = SOLAR_V4
+BOARD     = SOLAR_V5
 
 # Project sources.
 PROJ_ROOT = ../../..
