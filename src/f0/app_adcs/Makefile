@@ -111,7 +111,7 @@ ifeq ($(ORESAT),)
   ORESAT = 0.5
 endif
 # generate OD.c/OD.h from oresat-configs
-FW_VERSION = $(shell git describe)
+FW_VERSION = $(shell git describe --always)
 $(shell oresat-gen-fw-files --oresat $(ORESAT) imu -d $(ODDIR) -fw $(FW_VERSION) -hw $(BOARD))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
