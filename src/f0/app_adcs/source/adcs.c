@@ -1,7 +1,7 @@
 #include "adcs.h"
 
 #include "bmi088.h"
-#include "mmc5883ma.h"
+#include "mmc5983ma.h"
 #include "ltc4305.h"
 #include "chprintf.h"
 #include "CANopen.h"
@@ -92,11 +92,11 @@ static const DACConfig dac_config = {
 
 //FIXME these PWM channel mappings may be wrong? or the mod-wires on the dev board may be wrong. Either way, Z-axis in the firmware is controling X-axis magnetorquer in the hardware on the dev ADCS board
 //PB13
-#define MT_X_PWM_PWM_CHANNEL     (1 - 1)
+#define MT_Z_PWM_PWM_CHANNEL     (1 - 1)
 //PB14
 #define MT_Y_PWM_PWM_CHANNEL     (2 - 1)
 //PB15
-#define MT_Z_PWM_PWM_CHANNEL     (3 - 1)
+#define MT_X_PWM_PWM_CHANNEL     (3 - 1)
 
 /**
  * This PWM block is configured to enable the TRIGO output to start an ADC conversion batch when the PWM edge goes high.
@@ -149,7 +149,7 @@ typedef enum {
 } end_card_magnetometoer_t;
 
 
-static const I2CConfig mmc5883ma_i2ccfg = {
+static const I2CConfig mmc5983ma_i2ccfg = {
     STM32_TIMINGR_PRESC(0xBU) |
     STM32_TIMINGR_SCLDEL(0x4U) | STM32_TIMINGR_SDADEL(0x2U) |
     STM32_TIMINGR_SCLH(0xFU)  | STM32_TIMINGR_SCLL(0x13U),
@@ -157,9 +157,9 @@ static const I2CConfig mmc5883ma_i2ccfg = {
     0
 };
 
-static const MMC5883MAConfig mmc5883ma_generic_config = {
+static const MMC5983MAConfig mmc5983ma_generic_config = {
 	.i2cp = &I2CD1,
-	.i2ccfg = &mmc5883ma_i2ccfg
+	.i2ccfg = &mmc5983ma_i2ccfg
 };
 
 
@@ -177,8 +177,8 @@ typedef struct {
 } mt_pwm_phase_data_t;
 
 typedef struct {
-	MMC5883MADriver driver;
-	mmc5883ma_data_t data;
+	MMC5983MADriver driver;
+	mmc5983ma_data_t data;
 	volatile bool is_initialized;
 	volatile bool is_working;
 } magnetometer_data_struct_t;
@@ -245,6 +245,7 @@ const char* end_card_magnetometoer_t_to_str(const end_card_magnetometoer_t ecm) 
 
 }
 
+
 int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) {
 	if (v >= max)
 		return (max);
@@ -254,18 +255,11 @@ int32_t saturate_int32_t(const int32_t v, const int32_t min, const int32_t max) 
 
 	return (v);
 }
-//
-//int16_t saturate_int16_t(const int32_t v) {
-//	if (v >= INT16_MAX)
-//		return (INT16_MAX);
-//
-//	else if (v <= INT16_MIN)
-//		return (INT16_MIN);
-//
-//	return (v);
-//}
 
 
+/**
+ * return value is in the range of 0 to 10000
+ */
 int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t axis) {
 	int32_t ret = 0;
 	if( axis <= 1 ) {
@@ -288,6 +282,7 @@ int32_t map_current_uA_to_pwm_duty_cycle(const int32_t current_uA, const uint8_t
 }
 
 void handle_can_open_data(void) {
+	chprintf(DEBUG_SD, "Entering handle_can_open_data()\r\n");
 	g_adcs_data.mt_pwm_data[0].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_x_setpoint * 100, 0);
 	g_adcs_data.mt_pwm_data[1].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_y_setpoint * 100, 1);
 	g_adcs_data.mt_pwm_data[2].target_pwm_percent = map_current_uA_to_pwm_duty_cycle(OD_RAM.x4007_magnetorquer.current_z_setpoint * 100, 2);
@@ -321,9 +316,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].is_working) {
-		OD_RAM.x4003_pos_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx;
-		OD_RAM.x4003_pos_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my;
-		OD_RAM.x4003_pos_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz;
+		OD_RAM.x4003_pos_z_magnetometer_1.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mx);
+		OD_RAM.x4003_pos_z_magnetometer_1.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.my);
+		OD_RAM.x4003_pos_z_magnetometer_1.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_2_PZ_1].data.mz);
     } else {
     	OD_RAM.x4003_pos_z_magnetometer_1.x = INT16_MAX;
     	OD_RAM.x4003_pos_z_magnetometer_1.y = INT16_MAX;
@@ -331,9 +326,9 @@ void handle_can_open_data(void) {
     }
 
     if (g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].is_working) {
-		OD_RAM.x4004_pos_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx;
-		OD_RAM.x4004_pos_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my;
-		OD_RAM.x4004_pos_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz;
+		OD_RAM.x4004_pos_z_magnetometer_2.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mx);
+		OD_RAM.x4004_pos_z_magnetometer_2.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.my);
+		OD_RAM.x4004_pos_z_magnetometer_2.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_3_PZ_2].data.mz);
 	} else {
     	OD_RAM.x4004_pos_z_magnetometer_2.x = INT16_MAX;
     	OD_RAM.x4004_pos_z_magnetometer_2.y = INT16_MAX;
@@ -342,9 +337,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].is_working) {
-		OD_RAM.x4005_min_z_magnetometer_1.x = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx;
-		OD_RAM.x4005_min_z_magnetometer_1.y = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my;
-		OD_RAM.x4005_min_z_magnetometer_1.z = g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz;
+		OD_RAM.x4005_min_z_magnetometer_1.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mx);
+		OD_RAM.x4005_min_z_magnetometer_1.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.my);
+		OD_RAM.x4005_min_z_magnetometer_1.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_0_MZ_1].data.mz);
     } else {
     	OD_RAM.x4005_min_z_magnetometer_1.x = INT16_MAX;
     	OD_RAM.x4005_min_z_magnetometer_1.y = INT16_MAX;
@@ -353,9 +348,9 @@ void handle_can_open_data(void) {
 
 
     if (g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].is_working) {
-		OD_RAM.x4006_min_z_magnetometer_2.x = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx;
-		OD_RAM.x4006_min_z_magnetometer_2.y = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my;
-		OD_RAM.x4006_min_z_magnetometer_2.z = g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz;
+		OD_RAM.x4006_min_z_magnetometer_2.x = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mx);
+		OD_RAM.x4006_min_z_magnetometer_2.y = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.my);
+		OD_RAM.x4006_min_z_magnetometer_2.z = mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[EC_MAG_1_MZ_2].data.mz);
     } else {
     	OD_RAM.x4006_min_z_magnetometer_2.x = INT16_MAX;
     	OD_RAM.x4006_min_z_magnetometer_2.y = INT16_MAX;
@@ -499,14 +494,14 @@ bool select_magnetometer(const end_card_magnetometoer_t ecm) {
 		ret2 = connect_endcard_ltc4305_plus_z(false, true);
 		break;
 	case EC_MAG_NONE:
-		ret1 = true;
-		ret1 = connect_endcard_ltc4305_minus_z(false, false); //FIXME uncomment this
+		ret1 = connect_endcard_ltc4305_minus_z(false, false);
 		ret2 = connect_endcard_ltc4305_plus_z(false, false);
 		break;
 	}
 
+//	return(true);//fixme remove this
 //	return(ret1); //fixme remove this
-	return(ret2); //FIXME remove this
+//	return(ret2); //FIXME remove this
 
 	if( ! (ret1 && ret2) ) {
 		chprintf(DEBUG_SD, "ERROR: Failed to select magnetometers ret1=%d, ret2=%d\r\n", ret1, ret2);
@@ -536,12 +531,14 @@ bool select_and_read_magnetometer(const end_card_magnetometoer_t ecm) {
 	chprintf(DEBUG_SD, "Reading from magnetometer %d %s: ", ecm, end_card_magnetometoer_t_to_str(ecm));
 	chThdSleepMilliseconds(5);
 
-	if( mmc5883maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
-		chprintf(DEBUG_SD, " mx=%d, my=%d, mz=%d\r\n", g_adcs_data.magetometer_data[ecm].data.mx,
-				g_adcs_data.magetometer_data[ecm].data.my,
-				g_adcs_data.magetometer_data[ecm].data.mz);
+	if( mmc5983maReadData(&g_adcs_data.magetometer_data[ecm].driver, &g_adcs_data.magetometer_data[ecm].data) ) {
+//		chprintf(DEBUG_SD, " mx=%d (%d mG), my=%d (%d mG), mz=%d (%d mG)\r\n",
+//				g_adcs_data.magetometer_data[ecm].data.mx, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mx),
+//				g_adcs_data.magetometer_data[ecm].data.my, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.my),
+//				g_adcs_data.magetometer_data[ecm].data.mz, mmc5983maRawToMilliGauss(g_adcs_data.magetometer_data[ecm].data.mz));
 		r = true;
 	} else {
+		chprintf(DEBUG_SD, "\r\nERROR Failed to read from %s\r\n", end_card_magnetometoer_t_to_str(ecm));
 		//FIXME should this error be cleard if/when comms works again on a subsequent call?
 		static systime_t last_report_time = 0;
 		CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_COMM_FAILURE + ecm, &last_report_time);
@@ -586,26 +583,25 @@ void stop_end_cap_magnetometers(void) {
 
 bool init_end_cap_magnetometers(void) {
 	palClearLine(LINE_MAG_N_EN);
-	chThdSleepMilliseconds(5);
+	chThdSleepMilliseconds(10);
 
 	bool ret = true;
 
-	//FIXME ecm start
 	for(end_card_magnetometoer_t ecm = EC_MAG_0_MZ_1; ecm < EC_MAG_NONE; ecm++ ) {
 		chprintf(DEBUG_SD, "Initing MMC %u\r\n", ecm);
 		chThdSleepMilliseconds(5);
 
-		mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
+		mmc5983maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 
 		if( ! select_magnetometer(ecm) ) {
 			ret = false;
-			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s due to LTC selection error\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+			chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s due to LTC selection error\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 		} else {
-			if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5883ma_generic_config) ) {
-				chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+			if( mmc5983maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5983ma_generic_config) ) {
+				chprintf(DEBUG_SD, "Successfully started MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 				g_adcs_data.magetometer_data[ecm].is_initialized = true;
 			} else {
-				chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+				chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 				ret = false;
 				//FIXME should this error be cleard if/when comms works again on a subsequent call?
 				static systime_t last_report_time = 0;
@@ -636,10 +632,28 @@ void set_pwm_output(void) {
 	for(int i = 0; i < 3; i++ ) {
 		const systime_t now_time = chVTGetSystemTime();
 
+//		if( i == 1 ) {
+//			int mod = (now_time / 40000) % 4;
+//			switch (mod) {
+//				case 0:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent =	map_current_uA_to_pwm_duty_cycle(500000, i);
+//					break;
+//				case 1:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent = 0;
+//					break;
+//				case 2:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent =	map_current_uA_to_pwm_duty_cycle(-500000, i);
+//					break;
+//				case 3:
+//					g_adcs_data.mt_pwm_data[i].target_pwm_percent = 0;
+//					break;
+//			}
+//		}
+
 		//Updates will come in periodically via CANOpen, this will apply those updates to the PWM outputs.
 		if( g_adcs_data.mt_pwm_data[i].last_update_time == 0 || chTimeDiffX(g_adcs_data.mt_pwm_data[i].last_update_time, now_time) > 10 ) {
 			if( g_adcs_data.mt_pwm_data[i].current_pwm_percent != g_adcs_data.mt_pwm_data[i].target_pwm_percent ) {
-				chprintf(DEBUG_SD, "target_pwm_percent = %u\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
+				chprintf(DEBUG_SD, "target_pwm_percent = %d\r\n", g_adcs_data.mt_pwm_data[i].target_pwm_percent);
 
 				pwmDisableChannel(&PWMD1, g_adcs_data.mt_pwm_data[i].pwm_channel_number);
 
@@ -739,6 +753,7 @@ void print_debug_output(void) {
 
 
 void process_magnetorquer(void) {
+	chprintf(DEBUG_SD, "Entering process_magnetorquer()\r\n");
 //	chprintf(DEBUG_SD, "ADCD1.state = %u\r\n", ADCD1.state);
 
 	if( ADCD1.state == ADC_STOP || ADCD1.state == ADC_UNINIT ) {
@@ -750,6 +765,8 @@ void process_magnetorquer(void) {
 	}
 
 	if( ADCD1.state == ADC_READY ) {
+		chprintf(DEBUG_SD, "ADC ready, reading ADC values...\r\n");
+
 		uint32_t channel_sums[MY_SAMPLING_NUMBER];
 		memset(channel_sums, 0, sizeof(channel_sums));
 
@@ -771,11 +788,11 @@ void process_magnetorquer(void) {
 
 			uint8_t dest_mt_idx = 0;
 			if( adc_chan_idx == 1 ) {
-				dest_mt_idx = 2;
+				dest_mt_idx = 0;
 			} else if( adc_chan_idx == 2 ) {
 				dest_mt_idx = 1;
 			} else if( adc_chan_idx == 3 ) {
-				dest_mt_idx = 0;
+				dest_mt_idx = 2;
 			}
 
 			g_adcs_data.mt_pwm_data[dest_mt_idx].current_feedback_measurement_V = measured_i_sense_voltage[adc_chan_idx];
@@ -786,15 +803,17 @@ void process_magnetorquer(void) {
 
 		}
 
-//		chprintf(DEBUG_SD, "Staring conversion...\r\n"); chThdSleepMilliseconds(10);
+		chprintf(DEBUG_SD, "Staring conversion...\r\n");// chThdSleepMilliseconds(10);
 		adcStartConversion(&ADCD1, &adcgrpcfg_tim1_trigo, adc_sample_buff, ADC_BUFF_SIZE);//Starts an ADC conversion.
 	}
 
 //	chprintf(DEBUG_SD, "adc_conv_cb#=%u, ", adc_conversion_complete_callback_count);
 //	chprintf(DEBUG_SD, "adc_error_cb#=%u\r\n", adc_conversion_error_callback_count);
 
+	chprintf(DEBUG_SD, "Setting magnetorquer PWM outputs...\r\n");
 	set_pwm_output();
 	print_debug_output();
+	chprintf(DEBUG_SD, "Exiting process_magnetorquer()\r\n");
 }
 
 
@@ -860,14 +879,14 @@ THD_FUNCTION(adcs, arg)
 //    palClearLine(LINE_MAG_N_EN);
 //    end_card_magnetometoer_t ecm = EC_MAG_2_PZ_1;
 ////    ecm = EC_MAG_3_PZ_2;
-//    mmc5883maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
+//    mmc5983maObjectInit(&g_adcs_data.magetometer_data[ecm].driver);
 //    select_magnetometer(ecm);
 //    while(1) {
-//		if( mmc5883maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5883ma_generic_config) ) {
-//			chprintf(DEBUG_SD, "Successfully started MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+//		if( mmc5983maStart(&g_adcs_data.magetometer_data[ecm].driver, &mmc5983ma_generic_config) ) {
+//			chprintf(DEBUG_SD, "Successfully started MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 //			g_adcs_data.magetometer_data[ecm].is_initialized = true;
 //		} else {
-//			chprintf(DEBUG_SD, "Failed to start MMC4883MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
+//			chprintf(DEBUG_SD, "Failed to start MMC5983MA number %u %s\r\n", ecm, end_card_magnetometoer_t_to_str(ecm));
 ////			ret = false;
 //			//FIXME should this error be cleard if/when comms works again on a subsequent call?
 //			CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_MAGNETOMETER_0_INIT_FAILURE + ecm);
@@ -887,11 +906,9 @@ THD_FUNCTION(adcs, arg)
 
 
     bmi088ObjectInit(&imudev);
-
-    chprintf(DEBUG_SD, "Starting BMI088...\r\n");
-    chThdSleepMilliseconds(50);
+    chprintf(DEBUG_SD, "Starting BMI088...\r\n");chThdSleepMilliseconds(50);
     bmi088Start(&imudev, &imucfg);
-
+    chprintf(DEBUG_SD, "BMI088 started...\r\n");
 
 
     chprintf(DEBUG_SD, "BMI088 state = %u, error_flags=0x%X\r\n", imudev.state, imudev.error_flags);
@@ -900,19 +917,21 @@ THD_FUNCTION(adcs, arg)
         static systime_t last_report_time = 0;
         CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_IMU_INIT_FAILURE, &last_report_time);
     } else {
-        uint8_t bmi088_chip_id = 0;
-        if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi088_chip_id)) == MSG_OK ) {
-            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be (0x%X or 0x%X)\r\n", bmi088_chip_id, BMI088_ACC_CHIP_ID_EXPECTED, BMI090L_ACC_CHIP_ID_EXPECTED);
+        uint8_t bmi_chip_id = 0;
+        if( (r = bmi088ReadAccelerometerChipId(&imudev, &bmi_chip_id)) == MSG_OK ) {
+            chprintf(DEBUG_SD, "BMI088 accelerometer chip ID is 0x%X, expected to be (0x%X or 0x%X)\r\n", bmi_chip_id, BMI088_ACC_CHIP_ID_EXPECTED, BMI090L_ACC_CHIP_ID_EXPECTED);
         } else {
             chprintf(DEBUG_SD, "Failed to read accel chip ID from BMI088 ACCEL, r = %d\r\n", r);
         }
 
-        if( bmi088_chip_id != BMI088_ACC_CHIP_ID_EXPECTED && bmi088_chip_id != BMI090L_ACC_CHIP_ID_EXPECTED ) {
+        if( bmi_chip_id != BMI088_ACC_CHIP_ID_EXPECTED && bmi_chip_id != BMI090L_ACC_CHIP_ID_EXPECTED ) {
         	chprintf(DEBUG_SD, "ERROR: BMI088 ACCEL FAIL: didn't find BMI088!\r\n");
         	static systime_t last_report_time = 0;
             CO_errorReportRateLimited(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, ADCS_OD_ERROR_INFO_CODE_ACCL_CHIP_ID_MISMATCH, &last_report_time);
-        } else {
-        	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!\r\n");
+        } else if (bmi_chip_id == BMI088_ACC_CHIP_ID_EXPECTED ){
+        	chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI088!, chip_id = 0x%X\r\n", bmi_chip_id);
+        } else if (bmi_chip_id == BMI090L_ACC_CHIP_ID_EXPECTED ){
+            chprintf(DEBUG_SD, "BMI088 ACCEL SUCCESS: found BMI090L!, chip_id = 0x%X\r\n", bmi_chip_id);
         }
 
 

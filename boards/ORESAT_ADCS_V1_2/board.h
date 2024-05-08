@@ -90,9 +90,9 @@
 #define GPIOB_IMU_INT3              10U
 #define GPIOB_MT_X_PHASE            11U
 #define GPIOB_IMU_INT1              12U
-#define GPIOB_MT_X_PWM              13U
+#define GPIOB_MT_Z_PWM              13U
 #define GPIOB_MT_Y_PWM              14U
-#define GPIOB_MT_Z_PWM              15U
+#define GPIOB_MT_X_PWM              15U
 
 //#define GPIOB_IMU_INT2              13U
 //#define GPIOB_IMU_INT4              14U
@@ -402,9 +402,9 @@
                                      PIN_MODE_INPUT(GPIOB_IMU_INT3) | \
                                      PIN_MODE_OUTPUT(GPIOB_MT_X_PHASE) |         \
                                      PIN_MODE_INPUT(GPIOB_IMU_INT1) |       \
-                                     PIN_MODE_ALTERNATE(GPIOB_MT_X_PWM) |         \
+                                     PIN_MODE_ALTERNATE(GPIOB_MT_Z_PWM) |         \
                                      PIN_MODE_ALTERNATE(GPIOB_MT_Y_PWM) |          \
-                                     PIN_MODE_ALTERNATE(GPIOB_MT_Z_PWM))
+                                     PIN_MODE_ALTERNATE(GPIOB_MT_X_PWM))
 
 #define VAL_GPIOB_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOB_MT_Z_PHASE) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOB_IMU_INT2) |   \
@@ -419,9 +419,9 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_IMU_INT3) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MT_X_PHASE) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOB_IMU_INT1) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_MT_X_PWM) |      \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_MT_Z_PWM) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOB_MT_Y_PWM) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_MT_Z_PWM))
+                                     PIN_OTYPE_PUSHPULL(GPIOB_MT_X_PWM))
 
 #define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_MT_Z_PHASE) |          \
                                      PIN_OSPEED_HIGH(GPIOB_IMU_INT2) |      \
@@ -436,9 +436,9 @@
                                      PIN_OSPEED_HIGH(GPIOB_IMU_INT3) | \
                                      PIN_OSPEED_HIGH(GPIOB_MT_X_PHASE) |         \
                                      PIN_OSPEED_HIGH(GPIOB_IMU_INT1) |      \
-                                     PIN_OSPEED_HIGH(GPIOB_MT_X_PWM) |         \
+                                     PIN_OSPEED_HIGH(GPIOB_MT_Z_PWM) |         \
                                      PIN_OSPEED_HIGH(GPIOB_MT_Y_PWM) |          \
-                                     PIN_OSPEED_HIGH(GPIOB_MT_Z_PWM))
+                                     PIN_OSPEED_HIGH(GPIOB_MT_X_PWM))
 #define VAL_GPIOB_PUPDR             (PIN_PUPDR_FLOATING(GPIOB_MT_Z_PHASE) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_IMU_INT2) |   \
                                      PIN_PUPDR_FLOATING(GPIOB_MT_Y_PHASE) |       \
@@ -452,9 +452,9 @@
                                      PIN_PUPDR_FLOATING(GPIOB_IMU_INT3) | \
                                      PIN_PUPDR_FLOATING(GPIOB_MT_X_PHASE) |      \
                                      PIN_PUPDR_FLOATING(GPIOB_IMU_INT1) |   \
-                                     PIN_PUPDR_FLOATING(GPIOB_MT_X_PWM) |      \
+                                     PIN_PUPDR_FLOATING(GPIOB_MT_Z_PWM) |      \
                                      PIN_PUPDR_FLOATING(GPIOB_MT_Y_PWM) |       \
-                                     PIN_PUPDR_FLOATING(GPIOB_MT_Z_PWM))
+                                     PIN_PUPDR_FLOATING(GPIOB_MT_X_PWM))
 #define VAL_GPIOB_ODR               (PIN_ODR_LOW(GPIOB_MT_Z_PHASE) |             \
                                      PIN_ODR_HIGH(GPIOB_IMU_INT2) |         \
                                      PIN_ODR_LOW(GPIOB_MT_Y_PHASE) |             \
@@ -468,9 +468,9 @@
                                      PIN_ODR_HIGH(GPIOB_IMU_INT3) | \
                                      PIN_ODR_LOW(GPIOB_MT_X_PHASE) |            \
                                      PIN_ODR_HIGH(GPIOB_IMU_INT1) |         \
-                                     PIN_ODR_LOW(GPIOB_MT_X_PWM) |            \
+                                     PIN_ODR_LOW(GPIOB_MT_Z_PWM) |            \
                                      PIN_ODR_LOW(GPIOB_MT_Y_PWM) |             \
-                                     PIN_ODR_LOW(GPIOB_MT_Z_PWM))
+                                     PIN_ODR_LOW(GPIOB_MT_X_PWM))
 #define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_MT_Z_PHASE, 0U) |          \
                                      PIN_AFIO_AF(GPIOB_IMU_INT2, 0U) |      \
                                      PIN_AFIO_AF(GPIOB_MT_Y_PHASE, 0U) |          \
@@ -484,9 +484,9 @@
                                      PIN_AFIO_AF(GPIOB_IMU_INT3, 0U) | \
                                      PIN_AFIO_AF(GPIOB_MT_X_PHASE, 0U) |         \
                                      PIN_AFIO_AF(GPIOB_IMU_INT1, 0U) |      \
-                                     PIN_AFIO_AF(GPIOB_MT_X_PWM, 2U) |         \
+                                     PIN_AFIO_AF(GPIOB_MT_Z_PWM, 2U) |         \
                                      PIN_AFIO_AF(GPIOB_MT_Y_PWM, 2U) |          \
-                                     PIN_AFIO_AF(GPIOB_MT_Z_PWM, 2U))
+                                     PIN_AFIO_AF(GPIOB_MT_X_PWM, 2U))
 
 /*
  * GPIOC setup:
