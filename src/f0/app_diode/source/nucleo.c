@@ -7,9 +7,12 @@
 /*
  * DAC streaming callback.
  */
-size_t nx = 0, ny = 0, nz = 0;
-static void end_cb1(DACDriver *dacp) {
 
+//*
+//size_t nx = 0, ny = 0, nz = 0;
+static void end_cb1(DACDriver *dacp) {
+  (void)dacp;
+/*
   nz++;
   if (dacIsBufferComplete(dacp)) {
     nx += DAC_BUFFER_SIZE / 2;
@@ -17,11 +20,12 @@ static void end_cb1(DACDriver *dacp) {
   else {
     ny += DAC_BUFFER_SIZE / 2;
   }
-
-  if ((nz % 1000) == 0) {
-    palTogglePad(GPIOA, GPIOA_DAC_OUT1);
-  }
+*/
+//  if ((nz % 1000) == 0) {
+//    palTogglePad(GPIOA, GPIOA_DAC_OUT1);
+//  }
 }
+//*/
 
 /*
  * DAC error callback.
@@ -52,14 +56,22 @@ static const DACConversionGroup dacgrpcfg1 = {
  * GPT6 configuration.
  */
 static const GPTConfig gpt6cfg1 = {
-  //.frequency    = 10U,
   .frequency    = 1000000U,
+  //.frequency    = 1000U,
   .callback     = NULL,
   .cr2          = TIM_CR2_MMS_1,    /* MMS = 010 = TRGO on Update Event.    */
   .dier         = 0U
 };
 
-void dac_start(void)
+void test_dac_start(void)
+{
+  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
+  dacStart(&DACD1, &dac1cfg1);
+  gptStart(&GPTD6, &gpt6cfg1);
+
+}
+
+void example_dac_start(void)
 {
   palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
   dacStart(&DACD1, &dac1cfg1);
@@ -73,7 +85,7 @@ void dac_start(void)
    */
   dacStartConversion(&DACD1, &dacgrpcfg1,
                      (dacsample_t *)dac_buffer, DAC_BUFFER_SIZE);               
-  gptStartContinuous(&GPTD6, 2U);
+  gptStartContinuous(&GPTD6, 10000U);
 
 }
 
@@ -99,11 +111,41 @@ THD_FUNCTION(blink, arg)
     chThdSleepMilliseconds(500);
     palSetLine(LINE_LED);
     chThdSleepMilliseconds(500);
-    OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
+    ++blinkcount;
+    //OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
   dbgprintf("Terminating blink thread...\r\n");
 
   palClearLine(LINE_LED);
+  chThdExit(MSG_OK);
+}
+
+/**
+ * adc watch 
+*/
+THD_WORKING_AREA(adc_watch_wa, 0x400);
+THD_FUNCTION(adc_watch, psample)
+{
+  
+  adcsample_t *p = (adcsample_t *)psample;
+
+  while (!chThdShouldTerminateX()) 
+  {
+    memcpy(&OD_RAM.x4000_adcsample, p, 8*sizeof(adcsample_t));
+    
+    chprintf(DEBUG_SERIAL, "\r\n%04X ", OD_RAM.x4000_adcsample.buf0);
+    chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf1);
+    chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf2);
+    chprintf(DEBUG_SERIAL,     "%04X\r\n", OD_RAM.x4000_adcsample.buf3);
+    chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf4);
+    chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf5);
+    chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf6);
+    chprintf(DEBUG_SERIAL,     "%04X\r\n", OD_RAM.x4000_adcsample.buf7);
+    chThdSleepMilliseconds(10*1000);
+  }
+
+  dbgprintf("Terminating adc_watch thread...\r\n");
+
   chThdExit(MSG_OK);
 }

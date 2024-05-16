@@ -15,16 +15,16 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define PROTOCARD_NODE_ID 0x54
+#define DTC_NODE_ID 0x64
 
 #define DAC_BUFFER_SIZE 360
-//#define DAC_BUFFER_SIZE 12
+//#define DAC_BUFFER_SIZE 2
 /*
  * DAC test buffer (sine wave).
  */
 /*
 static const dacsample_t dac_buffer[DAC_BUFFER_SIZE] = {
-  0, 0, 0, 0, 5000, 5000, 5000, 5000, 9999, 9999, 9999, 9999 
+  0, 3200 
 };
 //*/
 //*
@@ -60,12 +60,21 @@ static const dacsample_t dac_buffer[DAC_BUFFER_SIZE] = {
   1215, 1248, 1281, 1314, 1347, 1381, 1415, 1449, 1483, 1518, 1552, 1587,
   1622, 1657, 1692, 1727, 1763, 1798, 1834, 1869, 1905, 1940, 1976, 2012
 };
+
+#define DAC_BLINK_BUFFER_SIZE 2 
+static const dacsample_t dac_blink_buffer[DAC_BLINK_BUFFER_SIZE] = {
+  0, 9999 
+};
+
 //*/
 /**
  * blinking example thread declaration 
 */
 extern THD_WORKING_AREA(blink_wa, 0x400);
 extern THD_FUNCTION(blink, arg);
-void dac_start(void);
+extern THD_WORKING_AREA(adc_watch_wa, 0x400);
+extern THD_FUNCTION(adc_watch, arg);
+void test_dac_start(void);
+void example_dac_start(void);
 
 #endif

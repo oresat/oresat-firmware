@@ -110,7 +110,7 @@ ifeq ($(ORESAT),)
 endif
 
 # generate OD.c/OD.h from oresat-configs
-$(shell oresat-gen-fw-files $(ORESAT) protocard -d $(ODDIR))
+$(shell oresat-gen-fw-files $(ORESAT) diode -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
