@@ -7,25 +7,16 @@
 /*
  * DAC streaming callback.
  */
-
-//*
-//size_t nx = 0, ny = 0, nz = 0;
 static void end_cb1(DACDriver *dacp) {
   (void)dacp;
-/*
-  nz++;
+  
   if (dacIsBufferComplete(dacp)) {
-    nx += DAC_BUFFER_SIZE / 2;
+  
   }
   else {
-    ny += DAC_BUFFER_SIZE / 2;
+  
   }
-*/
-//  if ((nz % 1000) == 0) {
-//    palTogglePad(GPIOA, GPIOA_DAC_OUT1);
-//  }
 }
-//*/
 
 /*
  * DAC error callback.
@@ -63,30 +54,75 @@ static const GPTConfig gpt6cfg1 = {
   .dier         = 0U
 };
 
-void test_dac_start(void)
-{
-  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
-  dacStart(&DACD1, &dac1cfg1);
-  gptStart(&GPTD6, &gpt6cfg1);
-
-}
-
 void example_dac_start(void)
 {
   palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
   dacStart(&DACD1, &dac1cfg1);
-  /*                                                                            
-   * Starting GPT6 driver, it is used for triggering the DAC.
-   */                       
+  
+  // Starting GPT6 driver, it is used for triggering the DAC.
   gptStart(&GPTD6, &gpt6cfg1);
 
-  /*
-   * Starting a continuous conversion.
-   */
-  dacStartConversion(&DACD1, &dacgrpcfg1,
-                     (dacsample_t *)dac_buffer, DAC_BUFFER_SIZE);               
+  // Starting a continuous conversion.
+  dacStartConversion(&DACD1, &dacgrpcfg1,(dacsample_t *)dac_buffer, DAC_BUFFER_SIZE);            
   gptStartContinuous(&GPTD6, 10000U);
 
+}
+
+static adcsample_t samples1[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
+
+/*
+ * ADC streaming callback.
+ */
+//uint16_t nx = 0;//, ny = 0;
+static void adccallback(ADCDriver *adcp) {
+  if(adcIsBufferComplete(adcp)) 
+  {
+    memcpy(&OD_RAM.x4000_adcsample, samples1, sizeof(adcsample_t) * ADC_SAMPLES);
+  }
+}
+
+uint16_t errors = 0;
+static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+  (void)adcp;
+  (void)err;
+
+  ++errors;
+  OD_RAM.x4001_diode.select = errors;
+  
+}
+
+/*
+ * ADC conversion group.
+ * Mode:        Continuous buffer, 8 samples of 1 channel, SW triggered.
+ * Channels:    IN10.
+ */
+static const ADCConversionGroup adcgrpcfg1 = {
+  TRUE,
+  ADC_GRP1_NUM_CHANNELS,
+  adccallback,
+  adcerrorcallback,
+  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGR1 */
+  ADC_TR(0, 0),                                     /* TR */
+  ADC_SMPR_SMP_28P5,                                /* SMPR */
+  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL11 |
+  ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17           /* CHSELR */
+};
+
+void example_adc_start(void)
+{
+  //TODO: add pin setup to board file
+  palSetGroupMode(GPIOA, PAL_PORT_BIT(0) | PAL_PORT_BIT(1), 0, PAL_MODE_INPUT_ANALOG);
+
+  adcStart(&ADCD1, NULL);
+
+  chThdSleepMilliseconds(1000);
+
+  adcStartConversion(&ADCD1, &adcgrpcfg1, samples1, ADC_GRP1_BUF_DEPTH);
+}
+
+void dtc_init(void)
+{
+  OD_RAM.x4001_diode.select = 7;
 }
 
 /**
@@ -112,7 +148,6 @@ THD_FUNCTION(blink, arg)
     palSetLine(LINE_LED);
     chThdSleepMilliseconds(500);
     ++blinkcount;
-    //OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
   dbgprintf("Terminating blink thread...\r\n");
@@ -125,15 +160,12 @@ THD_FUNCTION(blink, arg)
  * adc watch 
 */
 THD_WORKING_AREA(adc_watch_wa, 0x400);
-THD_FUNCTION(adc_watch, psample)
+THD_FUNCTION(adc_watch, arg)
 {
-  
-  adcsample_t *p = (adcsample_t *)psample;
+  (void)arg; 
 
   while (!chThdShouldTerminateX()) 
   {
-    memcpy(&OD_RAM.x4000_adcsample, p, 8*sizeof(adcsample_t));
-    
     chprintf(DEBUG_SERIAL, "\r\n%04X ", OD_RAM.x4000_adcsample.buf0);
     chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf1);
     chprintf(DEBUG_SERIAL,     "%04X ", OD_RAM.x4000_adcsample.buf2);
@@ -146,6 +178,61 @@ THD_FUNCTION(adc_watch, psample)
   }
 
   dbgprintf("Terminating adc_watch thread...\r\n");
+
+  chThdExit(MSG_OK);
+}
+
+/**
+ *  diode select
+*/
+THD_WORKING_AREA(diode_select_wa, 0x400);
+THD_FUNCTION(diode_select, arg)
+{
+  (void)arg; 
+
+  palSetGroupMode(
+    GPIOB, 
+    PAL_PORT_BIT(13) | PAL_PORT_BIT(14) | PAL_PORT_BIT(15), 
+    0, 
+    PAL_MODE_OUTPUT_PUSHPULL
+  ); 
+
+  palWriteGroup(
+    GPIOB, 
+    PAL_PORT_BIT(13) | PAL_PORT_BIT(14) | PAL_PORT_BIT(15), 
+    0, 
+    //diode_select
+    0x7
+  )
+
+  uint16_t diode_select = 0;
+  while (!chThdShouldTerminateX()) 
+  {
+    //uint16_t diode_select = OD_RAM.x4001_diode.select;
+    //if(diode_select < 8)
+   // {
+      /* Setting PC0 to logic high, PC1 to logic low, and PC2 to logic high,
+      while leaving PC3 to PC15 unchanged. */
+      palWriteGroup(
+        GPIOB, 
+        PAL_PORT_BIT(13) | PAL_PORT_BIT(14) | PAL_PORT_BIT(15), 
+        0, 
+        diode_select
+        //0x7
+      );
+    //}
+    if(diode_select > 7)
+    {
+      diode_select = 0;
+    }
+    else 
+    {
+      ++diode_select; 
+    }
+    chThdSleepMilliseconds(500);
+  }
+
+  dbgprintf("Terminating diode select thread...\r\n");
 
   chThdExit(MSG_OK);
 }

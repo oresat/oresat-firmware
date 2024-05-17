@@ -19,6 +19,17 @@
 
 #define DAC_BUFFER_SIZE 360
 //#define DAC_BUFFER_SIZE 2
+
+#define ADC_GRP1_NUM_CHANNELS   1
+#define ADC_GRP1_BUF_DEPTH      8
+#define ADC_SAMPLES             ADC_GRP1_BUF_DEPTH
+
+typedef struct DTC 
+{
+  uint16_t diode_select;
+
+} DTC; 
+
 /*
  * DAC test buffer (sine wave).
  */
@@ -74,7 +85,10 @@ extern THD_WORKING_AREA(blink_wa, 0x400);
 extern THD_FUNCTION(blink, arg);
 extern THD_WORKING_AREA(adc_watch_wa, 0x400);
 extern THD_FUNCTION(adc_watch, arg);
-void test_dac_start(void);
+extern THD_WORKING_AREA(diode_select_wa, 0x400);
+extern THD_FUNCTION(diode_select, arg);
+void dtc_init(void);
 void example_dac_start(void);
+void example_adc_start(void);
 
 #endif
