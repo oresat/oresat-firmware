@@ -23,8 +23,6 @@
 #include "oresat.h"
 #include "nucleo.h"
 
-//DTC dtc;
-
 static oresat_config_t oresat_conf = {
   .cand = &CAND1,
   .node_id = DTC_NODE_ID,
@@ -49,7 +47,6 @@ static thread_descriptor_t adc_watch_worker_desc = {
   .prio = NORMALPRIO,
   .funcp = adc_watch,
   .arg = NULL
-  //.arg = NULL 
 };
 
 static worker_t diode_select_worker;
@@ -60,7 +57,6 @@ static thread_descriptor_t diode_select_worker_desc = {
   .prio = NORMALPRIO,
   .funcp = diode_select,
   .arg = NULL
-  //.arg = NULL 
 };
 
 /**
@@ -68,14 +64,13 @@ static thread_descriptor_t diode_select_worker_desc = {
  */
 static void app_init(void)
 {
-  dtc_init();  
-  
   /* App initialization */
+  dtc_init();  
   reg_worker(&blink_worker, &blink_worker_desc, true, true);
   reg_worker(&adc_watch_worker, &adc_watch_worker_desc, true, true);
   reg_worker(&diode_select_worker, &diode_select_worker_desc, true, true);
   
-  /* Start up debug output */
+  /* Start up serial for debug output */
   sdStart(&SD2, NULL);
 }
 
@@ -88,10 +83,6 @@ int main(void)
   oresat_init(&oresat_conf);
   app_init();
   chprintf(DEBUG_SERIAL, "\r\nStarting app_diode...\r\n");
-  
-  example_dac_start();
-  example_adc_start();
-
   oresat_start();
 
   return 0;

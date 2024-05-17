@@ -15,20 +15,28 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define DTC_NODE_ID 0x64
+#define DTC_NODE_ID             0x64
 
-#define DAC_BUFFER_SIZE 360
+#define DAC_BUFFER_SIZE         360
 //#define DAC_BUFFER_SIZE 2
 
-#define ADC_GRP1_NUM_CHANNELS   1
-#define ADC_GRP1_BUF_DEPTH      8
-#define ADC_SAMPLES             ADC_GRP1_BUF_DEPTH
+#define ADC_NUM_CHANNELS        1
+#define ADC_BUF_DEPTH           8
+
+#define DIODE_MUX_EN            GPIOB_LED_MUX_EN
+#define DIODE_MUX_A0            GPIOB_LED_MUX_A0
+#define DIODE_MUX_A1            GPIOB_LED_MUX_A1
+#define DIODE_MUX_A2            GPIOB_LED_MUX_A2
+
+#define NUM_DIODES              8
 
 typedef struct DTC 
 {
-  uint16_t diode_select;
-
+  uint16_t *pdiode_select;
+  uint16_t *padcsample;
+  uint16_t errors;
 } DTC; 
+
 
 /*
  * DAC test buffer (sine wave).
@@ -88,7 +96,7 @@ extern THD_FUNCTION(adc_watch, arg);
 extern THD_WORKING_AREA(diode_select_wa, 0x400);
 extern THD_FUNCTION(diode_select, arg);
 void dtc_init(void);
-void example_dac_start(void);
-void example_adc_start(void);
+void dac_start(void);
+void adc_start(void);
 
 #endif
