@@ -4,6 +4,8 @@
 #include "ch.h"
 #include "hal.h"
 
+//#define STM32F0xx_MCUCONF
+
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
 #define ENABLE_SERIAL_DEBUG_OUTPUT        1
 
@@ -15,26 +17,34 @@
 #define dbgprintf(str, ...)
 #endif
 
+#define SAMPLES                 1
+
 #define DTC_NODE_ID             0x64
 
 #define DAC_BUFFER_SIZE         360
 //#define DAC_BUFFER_SIZE 2
 
-#define ADC_NUM_CHANNELS        1
-#define ADC_BUF_DEPTH           8
+#define DTC_MUX_EN              GPIOB_LED_MUX_EN
+#define DTC_MUX_A0              GPIOB_LED_MUX_A0
+#define DTC_MUX_A1              GPIOB_LED_MUX_A1
+#define DTC_MUX_A2              GPIOB_LED_MUX_A2
 
-#define DIODE_MUX_EN            GPIOB_LED_MUX_EN
-#define DIODE_MUX_A0            GPIOB_LED_MUX_A0
-#define DIODE_MUX_A1            GPIOB_LED_MUX_A1
-#define DIODE_MUX_A2            GPIOB_LED_MUX_A2
+#define DTC_NUM_DIODES          8
 
-#define NUM_DIODES              8
+typedef struct 
+{
+  adcsample_t channel1;
+  adcsample_t channel2;
+  adcsample_t channel3;
+  adcsample_t channel4;
+} sample_t;
 
-typedef struct DTC 
+typedef struct 
 {
   uint16_t *pdiode_select;
   uint16_t *padcsample;
-  uint16_t errors;
+  uint16_t *perrors;
+  uint16_t adc_callback_count;
 } DTC; 
 
 /*

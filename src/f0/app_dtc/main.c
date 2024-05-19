@@ -82,7 +82,7 @@ int main(void)
   // Initialize and start
   oresat_init(&oresat_conf);
   app_init();
-  chprintf(DEBUG_SERIAL, "\r\nStarting app_diode...\r\n");
+  chprintf(DEBUG_SERIAL, "\r\nStarting app_dtc...\r\n");
   oresat_start();
 
   return 0;

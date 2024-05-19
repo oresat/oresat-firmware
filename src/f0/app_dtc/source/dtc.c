@@ -2,33 +2,48 @@
 #include "dtc.h"
 #include "CANopen.h"
 #include "chprintf.h"
+#include "sensors.h"
 #include "OD.h"
 
 DTC dtc = { 0 };
 
+void dtc_init(void)
+{
+  dtc.padcsample = &OD_RAM.x4000_adcsample.buf0;
+  dtc.pdiode_select = &OD_RAM.x4001_dtc.select;
+  dtc.perrors = &OD_RAM.x4001_dtc.errors;
+  dac_start();
+  adc_start();
+}
+
 /*
  * DAC streaming callback.
  */
-static void end_cb1(DACDriver *dacp) {
+static void dac_end_callback(DACDriver *dacp) 
+{
   (void)dacp;
-  
+/* 
   if (dacIsBufferComplete(dacp)) {
   
   }
   else {
   
   }
+//*/
 }
 
 /*
  * DAC error callback.
  */
-static void error_cb1(DACDriver *dacp, dacerror_t err) {
-
+static void dac_error_callback(DACDriver *dacp, dacerror_t err) 
+{
   (void)dacp;
   (void)err;
 
-  chSysHalt("DAC failure");
+  osalSysLock();
+  ++(*dtc.perrors);
+  osalSysUnlock();
+
 }
 
 static const DACConfig dac1cfg1 = {
@@ -40,8 +55,8 @@ static const DACConfig dac1cfg1 = {
 
 static const DACConversionGroup dacgrpcfg1 = {
   .num_channels = 1U,
-  .end_cb       = end_cb1,
-  .error_cb     = error_cb1,
+  .end_cb       = dac_end_callback,
+  .error_cb     = dac_error_callback,
   .trigger      = DAC_TRG(0)
 };
 
@@ -52,7 +67,7 @@ static const GPTConfig gpt6cfg1 = {
   .frequency    = 1000000U,
   //.frequency    = 1000U,
   .callback     = NULL,
-  .cr2          = TIM_CR2_MMS_1,    /* MMS = 010 = TRGO on Update Event.    */
+  .cr2          = TIM_CR2_MMS_1,  // MMS = 010 = TRGO on Update Event.    
   .dier         = 0U
 };
 
@@ -70,26 +85,49 @@ void dac_start(void)
 
 }
 
-static adcsample_t samples1[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
+//sample_t sample[SAMPLES];
+adcsample_t sample2[2];
 
 /*
  * ADC streaming callback.
  */
-static void adccallback(ADCDriver *adcp) {
+//static int cb = 0;
+static void adc_callback(ADCDriver *adcp) {
+  adcsample_t *padcsample = (adcsample_t *)adcp->samples;
+  //sample_t *psample = (sample_t*)adcp->samples;
   if(adcIsBufferComplete(adcp)) 
   {
+/*
+    if(cb == 0)
+    {
+      cb = 1;
+    }
+    else
+    {
+      osalSysLock();
+      dtc.padcsample[0] = padcsample[0];
+      dtc.padcsample[1] = padcsample[1];
+      osalSysUnlock();
+      cb = 0;
+      ++dtc.adc_callback_count;
+    }
+//*/
+//*
     osalSysLock();
-    memcpy(&OD_RAM.x4000_adcsample, samples1, sizeof(adcsample_t) * ADC_BUF_DEPTH);
+    dtc.padcsample[0] = padcsample[0];
+    dtc.padcsample[1] = padcsample[1];
     osalSysUnlock();
+    ++dtc.adc_callback_count;
+//*/
   }
 }
 
-static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
+static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
   (void)adcp;
   (void)err;
 
   osalSysLock();
-  ++dtc.errors;
+  ++(*dtc.perrors);
   osalSysUnlock();
 }
 
@@ -100,34 +138,30 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
  */
 static const ADCConversionGroup adcgrpcfg1 = {
   TRUE,
-  ADC_NUM_CHANNELS,
-  adccallback,
-  adcerrorcallback,
-  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,             /* CFGR1 */
-  ADC_TR(0, 0),                                     /* TR */
-  ADC_SMPR_SMP_28P5,                                /* SMPR */
-  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL11 |
-  ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17           /* CHSELR */
+  2,
+  //sizeof(sample_t)/sizeof(adcsample_t),
+  adc_callback,
+  adc_error_callback,
+  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,            /* CFGR1 */
+  ADC_TR(0, 0),                                    /* TR */
+  ADC_SMPR_SMP_239P5,                              /* SMPR */
+  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL10 //|      /* CHSELR */
+  //ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          /* CHSELR */
 };
 
 void adc_start(void)
 {
   //TODO: add pin setup to board file
-  palSetGroupMode(GPIOA, PAL_PORT_BIT(0) | PAL_PORT_BIT(1), 0, PAL_MODE_INPUT_ANALOG);
-
+  palSetGroupMode(
+    GPIOA, 
+    PAL_PORT_BIT(0) | PAL_PORT_BIT(1) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7) , 
+    0, 
+    PAL_MODE_INPUT_ANALOG
+  );
+  //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
-
-  chThdSleepMilliseconds(1000);
-
-  adcStartConversion(&ADCD1, &adcgrpcfg1, samples1, ADC_BUF_DEPTH);
-}
-
-void dtc_init(void)
-{
-  dtc.pdiode_select = &OD_RAM.x4001_diode.select;
-  dtc.padcsample = &OD_RAM.x4000_adcsample.buf0;
-  dac_start();
-  adc_start();
+  adcStartConversion(&ADCD1, &adcgrpcfg1, sample2, 2 );
+  //adcReleaseBus(&ADCD1);
 }
 
 /**
@@ -144,10 +178,12 @@ THD_FUNCTION(blink, arg)
 
   while (!chThdShouldTerminateX()) 
   {
+/*
     if(blinkcount % 10 == 0)
     {
       chprintf(DEBUG_SERIAL, "%u\r\n",blinkcount);
     }
+//*/
     palClearLine(LINE_LED);
     chThdSleepMilliseconds(500);
     palSetLine(LINE_LED);
@@ -171,7 +207,19 @@ THD_FUNCTION(adc_watch, arg)
 
   while (!chThdShouldTerminateX()) 
   {
+//    adcConvert(&ADCD1, &adcgrpcfg1, samples1, ADC_BUF_DEPTH);
 //*   
+    chprintf(DEBUG_SERIAL,   "\r\n%04u ",    dtc.padcsample[0]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[1]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[2]);
+    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[3]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[4]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[5]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[6]);
+    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[7]);
+    chprintf(DEBUG_SERIAL,  "cb : %04u\r\n", dtc.adc_callback_count);
+//*/
+/*   
     chprintf(DEBUG_SERIAL, "\r\n%04X ",    dtc.padcsample[0]);
     chprintf(DEBUG_SERIAL,     "%04X ",    dtc.padcsample[1]);
     chprintf(DEBUG_SERIAL,     "%04X ",    dtc.padcsample[2]);
@@ -181,7 +229,8 @@ THD_FUNCTION(adc_watch, arg)
     chprintf(DEBUG_SERIAL,     "%04X ",    dtc.padcsample[6]);
     chprintf(DEBUG_SERIAL,     "%04X\r\n", dtc.padcsample[7]);
 //*/
-    chThdSleepMilliseconds(10*1000);
+
+    chThdSleepMilliseconds(1000);
   }
 
   dbgprintf("Terminating adc_watch thread...\r\n");
@@ -199,18 +248,19 @@ THD_FUNCTION(diode_select, arg)
 
   while (!chThdShouldTerminateX()) 
   {
-    //if(diode_select < NUM_DIODES)
-   // {
+   if(*dtc.pdiode_select < DTC_NUM_DIODES)
+    {
       osalSysLock();
       palWriteGroup(
         GPIOB, 
-        PAL_PORT_BIT(DIODE_MUX_A0) | PAL_PORT_BIT(DIODE_MUX_A1) | PAL_PORT_BIT(DIODE_MUX_A2), 
+        PAL_PORT_BIT(DTC_MUX_A0) | PAL_PORT_BIT(DTC_MUX_A1) | PAL_PORT_BIT(DTC_MUX_A2), 
         0, 
-        (*dtc.pdiode_select << DIODE_MUX_A0)
+        (*dtc.pdiode_select << DTC_MUX_A0)
       );
       osalSysUnlock();
-    //}
-    if(*dtc.pdiode_select < NUM_DIODES)
+    }
+/*
+    if(*dtc.pdiode_select < DTC_NUM_DIODES)
     {
       ++(*dtc.pdiode_select); 
     }
@@ -218,6 +268,7 @@ THD_FUNCTION(diode_select, arg)
     {
       *dtc.pdiode_select = 0;
     }
+//*/
     chThdSleepMilliseconds(1000);
   }
 
@@ -225,3 +276,4 @@ THD_FUNCTION(diode_select, arg)
 
   chThdExit(MSG_OK);
 }
+
