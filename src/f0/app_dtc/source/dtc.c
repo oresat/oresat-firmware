@@ -86,17 +86,34 @@ void dac_start(void)
 }
 
 //sample_t sample[SAMPLES];
-adcsample_t sample2[2];
+sample_t sample[2];
+//dtc.psample = sample;
+//adcsample_t sample2[2];
 
 /*
  * ADC streaming callback.
  */
-//static int cb = 0;
+static int cb = 0;
 static void adc_callback(ADCDriver *adcp) {
-  adcsample_t *padcsample = (adcsample_t *)adcp->samples;
-  //sample_t *psample = (sample_t*)adcp->samples;
+  //adcsample_t *padcsample = (adcsample_t *)adcp->samples;
+  sample_t *psample = (sample_t*)adcp->samples;
+//*  
+  int i = adcIsBufferComplete(adcp); 
+  OD_RAM.x4000_adcsample.buf0 = psample[i].ch1;
+  OD_RAM.x4000_adcsample.buf1 = psample[i].ch2;
+  OD_RAM.x4000_adcsample.buf2 = psample[i].ts;
+  OD_RAM.x4000_adcsample.buf3 = psample[i].vrefint;
+  ++dtc.adc_callback_count;
+//*/
+/*
   if(adcIsBufferComplete(adcp)) 
   {
+    OD_RAM.x4000_adcsample.buf0 = psample[0].ch1;
+    OD_RAM.x4000_adcsample.buf1 = psample[1].ch2;
+    OD_RAM.x4000_adcsample.buf2 = psample[2].ts;
+    OD_RAM.x4000_adcsample.buf3 = psample[3].vrefint;
+  }
+//*/
 /*
     if(cb == 0)
     {
@@ -112,14 +129,41 @@ static void adc_callback(ADCDriver *adcp) {
       ++dtc.adc_callback_count;
     }
 //*/
-//*
+/*
+    if(cb == 0)
+    {
+      cb = 1;
+    }
+    else
+    {
+      osalSysLock();
+      dtc.padcsample[0] = psample[1].ch1;
+      dtc.padcsample[1] = psample[2].ch2;
+      dtc.padcsample[2] = psample[3].ts;
+      dtc.padcsample[3] = psample[4].vrefint;
+      osalSysUnlock();
+      cb = 0;
+      ++dtc.adc_callback_count;
+    }
+//*/
+/*
     osalSysLock();
     dtc.padcsample[0] = padcsample[0];
     dtc.padcsample[1] = padcsample[1];
     osalSysUnlock();
     ++dtc.adc_callback_count;
 //*/
-  }
+/*
+    osalSysLock();
+    dtc.psample->ch1 = psample[1].ch1;
+    dtc.psample->ch2 = psample[2].ch2;
+    dtc.psample->ts = psample[3].ts;
+    dtc.psample->vrefint = psample[4].vrefint;
+    osalSysUnlock();
+    ++dtc.adc_callback_count;
+//*/
+
+ // }
 }
 
 static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
@@ -138,15 +182,14 @@ static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
  */
 static const ADCConversionGroup adcgrpcfg1 = {
   TRUE,
-  2,
-  //sizeof(sample_t)/sizeof(adcsample_t),
+  4,
   adc_callback,
   adc_error_callback,
   ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,            /* CFGR1 */
   ADC_TR(0, 0),                                    /* TR */
   ADC_SMPR_SMP_239P5,                              /* SMPR */
-  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL10 //|      /* CHSELR */
-  //ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          /* CHSELR */
+  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL11 |        /* CHSELR */
+  ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          /* CHSELR */
 };
 
 void adc_start(void)
@@ -160,7 +203,10 @@ void adc_start(void)
   );
   //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, sample2, 2 );
+  adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
+  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, 4);
+  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, sizeof(sample)/sizeof(sample_t));
+  //adcStartConversion(&ADCD1, &adcgrpcfg1, sample2, 2 );
   //adcReleaseBus(&ADCD1);
 }
 
@@ -217,6 +263,17 @@ THD_FUNCTION(adc_watch, arg)
     chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[5]);
     chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[6]);
     chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[7]);
+    chprintf(DEBUG_SERIAL,  "cb : %04u\r\n", dtc.adc_callback_count);
+//*/
+/*   
+    chprintf(DEBUG_SERIAL,   "\r\n%04u ",    dtc.psample[0]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.psample[1]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.psample[2]);
+    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.psample[3]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.psample[4]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.psample[5]);
+    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.psample[6]);
+    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.psample[7]);
     chprintf(DEBUG_SERIAL,  "cb : %04u\r\n", dtc.adc_callback_count);
 //*/
 /*   

@@ -17,7 +17,7 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define SAMPLES                 1
+#define SAMPLES                 2
 
 #define DTC_NODE_ID             0x64
 
@@ -33,10 +33,10 @@
 
 typedef struct 
 {
-  adcsample_t channel1;
-  adcsample_t channel2;
-  adcsample_t channel3;
-  adcsample_t channel4;
+  adcsample_t ch1;
+  adcsample_t ch2;
+  adcsample_t ts;
+  adcsample_t vrefint;
 } sample_t;
 
 typedef struct 
@@ -45,6 +45,7 @@ typedef struct
   uint16_t *padcsample;
   uint16_t *perrors;
   uint16_t adc_callback_count;
+  sample_t *psample;
 } DTC; 
 
 /*
