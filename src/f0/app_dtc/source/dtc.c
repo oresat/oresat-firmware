@@ -85,24 +85,26 @@ void dac_start(void)
 
 }
 
-//sample_t sample[SAMPLES];
-sample_t sample[2];
-//dtc.psample = sample;
-//adcsample_t sample2[2];
+sample_t sample[SAMPLES];
+
+#define BUFFER_DEPTH            sizeof(sample)/sizeof(sample_t)
 
 /*
  * ADC streaming callback.
  */
 static int cb = 0;
 static void adc_callback(ADCDriver *adcp) {
-  //adcsample_t *padcsample = (adcsample_t *)adcp->samples;
   sample_t *psample = (sample_t*)adcp->samples;
 //*  
   int i = adcIsBufferComplete(adcp); 
+  
+  osalSysLock();
   OD_RAM.x4000_adcsample.buf0 = psample[i].ch1;
   OD_RAM.x4000_adcsample.buf1 = psample[i].ch2;
   OD_RAM.x4000_adcsample.buf2 = psample[i].ts;
   OD_RAM.x4000_adcsample.buf3 = psample[i].vrefint;
+  osalSysUnlock();
+
   ++dtc.adc_callback_count;
 //*/
 /*
@@ -182,7 +184,7 @@ static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
  */
 static const ADCConversionGroup adcgrpcfg1 = {
   TRUE,
-  4,
+  NUM_CHANNELS,
   adc_callback,
   adc_error_callback,
   ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,            /* CFGR1 */
@@ -204,9 +206,7 @@ void adc_start(void)
   //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
   adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
-  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, 4);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, sizeof(sample)/sizeof(sample_t));
-  //adcStartConversion(&ADCD1, &adcgrpcfg1, sample2, 2 );
+  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
   //adcReleaseBus(&ADCD1);
 }
 

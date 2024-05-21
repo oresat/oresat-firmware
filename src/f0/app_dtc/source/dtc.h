@@ -18,7 +18,6 @@
 #endif
 
 #define SAMPLES                 2
-
 #define DTC_NODE_ID             0x64
 
 #define DAC_BUFFER_SIZE         360
@@ -38,6 +37,8 @@ typedef struct
   adcsample_t ts;
   adcsample_t vrefint;
 } sample_t;
+
+#define NUM_CHANNELS            sizeof(sample_t)/sizeof(adcsample_t)
 
 typedef struct 
 {
