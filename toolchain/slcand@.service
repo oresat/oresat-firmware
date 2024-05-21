@@ -1,0 +1,9 @@
+[Unit]
+Description=Manages slcand for %I
+BindsTo=dev-%i.device
+After=dev-%i.device
+
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/slcand -F -o -c -s8 -t hw -S 3000000 /dev/%i %i
