@@ -24,6 +24,10 @@ uint8_t m0_firmware_temp_buffer[M0_FIRMWARE_UPDATE_WRITE_CHUNK_SIZE];
 #endif
 
 
+#define ORESAT_F0_FLASH_START_ADDRESS 0x08000000
+#define ORESAT_F0_FIRMWARE_CRC_ADDRESS 0x0800A7F4
+#define ORESAT_F0_FIRMWARE_CODE_ADDRESS 0x0800A804
+
 /**
  * Used to fully initialize a can_bootloader_config_t structure.
  *
