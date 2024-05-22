@@ -13,7 +13,7 @@ void dtc_init(void)
   dtc.pdiode_select = &OD_RAM.x4001_dtc.select;
   dtc.perrors = &OD_RAM.x4001_dtc.errors;
   dac_start();
-  adc_start();
+//  adc_start();
 }
 
 /*
@@ -190,7 +190,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
   ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,            /* CFGR1 */
   ADC_TR(0, 0),                                    /* TR */
   ADC_SMPR_SMP_239P5,                              /* SMPR */
-  ADC_CHSELR_CHSEL10 | ADC_CHSELR_CHSEL11 |        /* CHSELR */
+  ADC_CHSELR_CHSEL11 | ADC_CHSELR_CHSEL15  |        /* CHSELR */
   ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          /* CHSELR */
 };
 
@@ -199,13 +199,15 @@ void adc_start(void)
   //TODO: add pin setup to board file
   palSetGroupMode(
     GPIOA, 
-    PAL_PORT_BIT(0) | PAL_PORT_BIT(1) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7) , 
+    PAL_PORT_BIT(1) | PAL_PORT_BIT(5) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7) , 
+   // PAL_PORT_BIT(0) | PAL_PORT_BIT(1) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7) , 
     0, 
     PAL_MODE_INPUT_ANALOG
   );
-  //adcAcquireBus(&ADCD1);
+  adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
   adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
+  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, 4);
   adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
   //adcReleaseBus(&ADCD1);
 }
@@ -234,7 +236,8 @@ THD_FUNCTION(blink, arg)
     chThdSleepMilliseconds(500);
     palSetLine(LINE_LED);
     chThdSleepMilliseconds(500);
-    OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
+    ++blinkcount;
+   // OD_RAM.x4000_blinks.blinkcount = ++blinkcount;
   }
 
   dbgprintf("Terminating blink thread...\r\n");
