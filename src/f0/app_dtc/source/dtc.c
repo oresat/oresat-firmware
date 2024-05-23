@@ -13,7 +13,7 @@ void dtc_init(void)
   dtc.pdiode_select = &OD_RAM.x4001_dtc.select;
   dtc.perrors = &OD_RAM.x4001_dtc.errors;
   dac_start();
-//  adc_start();
+  adc_start();
 }
 
 /*
@@ -106,66 +106,6 @@ static void adc_callback(ADCDriver *adcp) {
   osalSysUnlock();
 
   ++dtc.adc_callback_count;
-//*/
-/*
-  if(adcIsBufferComplete(adcp)) 
-  {
-    OD_RAM.x4000_adcsample.buf0 = psample[0].ch1;
-    OD_RAM.x4000_adcsample.buf1 = psample[1].ch2;
-    OD_RAM.x4000_adcsample.buf2 = psample[2].ts;
-    OD_RAM.x4000_adcsample.buf3 = psample[3].vrefint;
-  }
-//*/
-/*
-    if(cb == 0)
-    {
-      cb = 1;
-    }
-    else
-    {
-      osalSysLock();
-      dtc.padcsample[0] = padcsample[0];
-      dtc.padcsample[1] = padcsample[1];
-      osalSysUnlock();
-      cb = 0;
-      ++dtc.adc_callback_count;
-    }
-//*/
-/*
-    if(cb == 0)
-    {
-      cb = 1;
-    }
-    else
-    {
-      osalSysLock();
-      dtc.padcsample[0] = psample[1].ch1;
-      dtc.padcsample[1] = psample[2].ch2;
-      dtc.padcsample[2] = psample[3].ts;
-      dtc.padcsample[3] = psample[4].vrefint;
-      osalSysUnlock();
-      cb = 0;
-      ++dtc.adc_callback_count;
-    }
-//*/
-/*
-    osalSysLock();
-    dtc.padcsample[0] = padcsample[0];
-    dtc.padcsample[1] = padcsample[1];
-    osalSysUnlock();
-    ++dtc.adc_callback_count;
-//*/
-/*
-    osalSysLock();
-    dtc.psample->ch1 = psample[1].ch1;
-    dtc.psample->ch2 = psample[2].ch2;
-    dtc.psample->ts = psample[3].ts;
-    dtc.psample->vrefint = psample[4].vrefint;
-    osalSysUnlock();
-    ++dtc.adc_callback_count;
-//*/
-
- // }
 }
 
 static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
@@ -197,6 +137,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
 void adc_start(void)
 {
   //TODO: add pin setup to board file
+/*
   palSetGroupMode(
     GPIOA, 
     PAL_PORT_BIT(1) | PAL_PORT_BIT(5) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7) , 
@@ -204,11 +145,12 @@ void adc_start(void)
     0, 
     PAL_MODE_INPUT_ANALOG
   );
-  adcAcquireBus(&ADCD1);
+//*/
+  //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
   adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
   //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, 4);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
   //adcReleaseBus(&ADCD1);
 }
 
