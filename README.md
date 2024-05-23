@@ -77,7 +77,7 @@ how to install these tools, as it varies between systems.
 Tools required:
 * make
 * arm-none-eabi-gcc
-* arm-none-eabi-gdb   (may require a symlink to gdb-multiarch on Debian systems)
+* gdb-multiarch
 * openocd             (Required, this is how we program and debug things)
 * stlink              (Gets udev rules up and running, may be helpful)
 * srecord

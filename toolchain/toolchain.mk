@@ -31,10 +31,10 @@ write_stl:
 gdb: $(GDB_ELF) gdb_ocd
 
 gdb_ocd:
-	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -ex "target remote | openocd -f oocd.cfg -c '$(SERIAL_ARG) gdb_port pipe'" -x $(GDB_OOCD_CFG)
+	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -ex "target extended-remote | openocd -f oocd.cfg -c '$(SERIAL_ARG) gdb_port pipe'" -x $(GDB_OOCD_CFG)
 
 gdb_stl:
-	$(TRGT)gdb -q $(shell pwd)/$(GDB_ELF) -cd $(TOOLCHAIN) -x ./$(GDB_STL_CFG)
+	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -cd $(TOOLCHAIN) -x ./$(GDB_STL_CFG)
 
 serial:
 	picocom -b 115200 /dev/serial/by-id/usb-STMicroelectronics_STLINK-V3_$(SERIAL_RAW)-if02

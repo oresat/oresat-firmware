@@ -37,10 +37,6 @@ The packages needed for Debian are as follow:
  libusb-1.0-0 libusb-1.0-0-dev make pkg-config python3 srecord
  stlink-tools tcl xxd`
 
-Make a symbollic link to `arm-none-eabi-gdb`:
-
-`$ sudo ln -s /usr/bin/gdb-multiarch /usr/bin/arm-none-eabi-gdb`
-
 OpenOCD can be built as follow:
 
 - `$ git clone https://git.code.sf.net/p/openocd/code openocd`
