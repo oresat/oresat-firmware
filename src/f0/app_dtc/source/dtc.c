@@ -87,6 +87,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
   ADC_CHSELR_CHSEL11 | ADC_CHSELR_CHSEL15  |       /* CHSELR */
   ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          
 };
+
 void adc_start(void)
 {
   //adcAcquireBus(&ADCD1);

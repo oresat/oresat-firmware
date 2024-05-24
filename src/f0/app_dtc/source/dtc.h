@@ -4,8 +4,6 @@
 #include "ch.h"
 #include "hal.h"
 
-//#define STM32F0xx_MCUCONF
-
 #define ENABLE_NV_MEMORY_UPDATE_CODE      0
 #define ENABLE_SERIAL_DEBUG_OUTPUT        1
 
@@ -17,10 +15,7 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define SAMPLES                 2
 #define DTC_NODE_ID             0x54
-
-#define DAC_BUFFER_SIZE         360
 
 #define DTC_MUX_EN              GPIOB_LED_MUX_EN
 #define DTC_MUX_A0              GPIOB_LED_MUX_A0
@@ -28,6 +23,8 @@
 #define DTC_MUX_A2              GPIOB_LED_MUX_A2
 
 #define DTC_NUM_DIODES          8
+
+#define SAMPLES                 2
 
 typedef struct 
 {
