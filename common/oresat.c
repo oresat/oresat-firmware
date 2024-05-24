@@ -1,5 +1,5 @@
 #include "oresat.h"
-#include "sensors.h"
+//#include "sensors.h"
 #include "CO_threads.h"
 #include "CANopen.h"
 
@@ -26,7 +26,7 @@ void oresat_init(oresat_config_t *config)
     */
 
     /* Init sensors */
-    sensors_init();
+//    sensors_init();
 
     /* Record the config being used */
     cand = config->cand;
@@ -58,7 +58,7 @@ void oresat_start(void)
     chThdSetPriority(HIGHPRIO);
 
     /* Start the sensors */
-    sensors_start();
+//    sensors_start();
 
     /* Start worker thread manager */
     thread_mgr_tp = chThdCreateStatic(thread_mgr_wa, sizeof(thread_mgr_wa), HIGHPRIO, thread_mgr, NULL);
