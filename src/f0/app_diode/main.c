@@ -21,7 +21,7 @@
 
 /* Project header files */
 #include "oresat.h"
-#include "dtc.h"
+#include "diode_test.h"
 
 static oresat_config_t oresat_conf = {
   .cand = &CAND1,

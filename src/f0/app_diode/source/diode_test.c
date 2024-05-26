@@ -1,5 +1,5 @@
 #include "ch.h"
-#include "dtc.h"
+#include "diode_test.h"
 #include "CANopen.h"
 #include "chprintf.h"
 #include "OD.h"

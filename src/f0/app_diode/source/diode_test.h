@@ -1,5 +1,5 @@
-#ifndef _DTC_H_
-#define _DTC_H_
+#ifndef _DIODE_TEST_H_
+#define _DIODE_TEST_H_
 
 #include "ch.h"
 #include "hal.h"

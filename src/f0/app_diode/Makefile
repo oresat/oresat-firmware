@@ -87,7 +87,7 @@ PROJECT   = app_diode
 
 # Target settings.
 MCU       = cortex-m0
-BOARD     = DTC_V0
+BOARD     = DIODE_TEST_V0
 
 # Project sources.
 PROJ_ROOT = ../../..
