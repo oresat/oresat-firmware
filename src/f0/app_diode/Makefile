@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT   = app_dtc
+PROJECT   = app_diode
 
 # Target settings.
 MCU       = cortex-m0
