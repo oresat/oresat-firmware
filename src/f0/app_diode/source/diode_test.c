@@ -26,9 +26,7 @@ static void dac_error_callback(DACDriver *dacp, dacerror_t err)
   (void)dacp;
   (void)err;
 
-  osalSysLock();
   ++(*dtc.perrors);
-  osalSysUnlock();
 }
 
 static const DACConfig dac1cfg1 = {
@@ -57,7 +55,7 @@ static int cb = 0;
 static void adc_callback(ADCDriver *adcp) {
   sample_t *psample = (sample_t*)adcp->samples;
   int i = adcIsBufferComplete(adcp); 
-  
+  //adcStopConversionI(&ADCD1);
   OD_RAM.x4000_adcsample.ch1 = psample[i].ch1;
   OD_RAM.x4000_adcsample.ch2 = psample[i].ch2;
   OD_RAM.x4000_adcsample.ts = psample[i].ts;
@@ -68,32 +66,50 @@ static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
   (void)adcp;
   (void)err;
 
-  osalSysLock();
   ++(*dtc.perrors);
-  osalSysUnlock();
 }
 
 /*
  * ADC conversion group.
  */
 static const ADCConversionGroup adcgrpcfg1 = {
-  TRUE,
+  //TRUE,
+  FALSE,
   NUM_CHANNELS,
   adc_callback,
   adc_error_callback,
-  ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,            /* CFGR1 */
+  ADC_CFGR1_RES_12BIT,            /* CFGR1 */
   ADC_TR(0, 0),                                    /* TR */
-  ADC_SMPR_SMP_239P5,                              /* SMPR */
+  ADC_SMPR_SMP_28P5,                              /* SMPR */
   ADC_CHSELR_CHSEL11 | ADC_CHSELR_CHSEL15  |       /* CHSELR */
   ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          
 };
 
+static void gpt_adc_trigger_cb(GPTDriver *gptp)
+{
+  (void)gptp;
+  adcStartConversionI(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  OD_RAM.x4001_diode.errors = ++(*dtc.perrors);
+}
+
+/*
+  * GPT6 configuration.
+  */
+ static const GPTConfig gpt6cfg1 = {
+   .frequency    = 1000000U,
+   .callback     = gpt_adc_trigger_cb,
+   .cr2          = TIM_CR2_MMS_1,    /* MMS = 010 = TRGO on Update Event.    */
+   .dier         = 0U
+ };
+
 void adc_start(void)
 {
+  gptStart(&GPTD6, &gpt6cfg1);
   //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
   adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  gptStartContinuous(&GPTD6, 1000U);
+  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
   //adcReleaseBus(&ADCD1);
 }
 
