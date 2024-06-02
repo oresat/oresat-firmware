@@ -19,27 +19,12 @@ void dtc_init(void)
 }
 
 /*
- * DAC error callback.
+ * DAC
  */
-static void dac_error_callback(DACDriver *dacp, dacerror_t err) 
-{
-  (void)dacp;
-  (void)err;
-
-  ++(*dtc.perrors);
-}
-
 static const DACConfig dac1cfg1 = {
   .init         = 0U,
   .datamode     = DAC_DHRM_12BIT_RIGHT,
   .cr           = 0
-};
-
-static const DACConversionGroup dacgrpcfg1 = {
-  .num_channels = 1U,
-  .end_cb       = NULL,
-  .error_cb     = dac_error_callback,
-  .trigger      = DAC_TRG(0)
 };
 
 void dac_start(void)
@@ -51,11 +36,10 @@ void dac_start(void)
 /*
  * ADC streaming callback.
  */
-static int cb = 0;
 static void adc_callback(ADCDriver *adcp) {
   sample_t *psample = (sample_t*)adcp->samples;
   int i = adcIsBufferComplete(adcp); 
-  //adcStopConversionI(&ADCD1);
+  
   OD_RAM.x4000_adcsample.ch1 = psample[i].ch1;
   OD_RAM.x4000_adcsample.ch2 = psample[i].ch2;
   OD_RAM.x4000_adcsample.ts = psample[i].ts;
@@ -73,14 +57,13 @@ static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
  * ADC conversion group.
  */
 static const ADCConversionGroup adcgrpcfg1 = {
-  //TRUE,
-  FALSE,
+  TRUE,
   NUM_CHANNELS,
   adc_callback,
   adc_error_callback,
-  ADC_CFGR1_RES_12BIT,            /* CFGR1 */
+  ADC_CFGR1_EXTEN_RISING | ADC_CFGR1_RES_12BIT,    /* CFGR1 */
   ADC_TR(0, 0),                                    /* TR */
-  ADC_SMPR_SMP_28P5,                              /* SMPR */
+  ADC_SMPR_SMP_28P5,                               /* SMPR */
   ADC_CHSELR_CHSEL11 | ADC_CHSELR_CHSEL15  |       /* CHSELR */
   ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          
 };
@@ -88,14 +71,14 @@ static const ADCConversionGroup adcgrpcfg1 = {
 static void gpt_adc_trigger_cb(GPTDriver *gptp)
 {
   (void)gptp;
-  adcStartConversionI(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
-  OD_RAM.x4001_diode.errors = ++(*dtc.perrors);
+  //adcStartConversionI(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  //OD_RAM.x4001_diode.errors = ++(*dtc.perrors);
 }
 
 /*
   * GPT6 configuration.
   */
- static const GPTConfig gpt6cfg1 = {
+ static const GPTConfig gpt1cfg1 = {
    .frequency    = 1000000U,
    .callback     = gpt_adc_trigger_cb,
    .cr2          = TIM_CR2_MMS_1,    /* MMS = 010 = TRGO on Update Event.    */
@@ -104,12 +87,21 @@ static void gpt_adc_trigger_cb(GPTDriver *gptp)
 
 void adc_start(void)
 {
-  gptStart(&GPTD6, &gpt6cfg1);
+/*
+  palSetGroupMode(
+    GPIOA, 
+    PAL_PORT_BIT(1) | PAL_PORT_BIT(5) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7),
+    0, 
+    PAL_MODE_INPUT_ANALOG
+  );
+//*/
+
+  gptStart(&GPTD1, &gpt1cfg1);
   //adcAcquireBus(&ADCD1);
   adcStart(&ADCD1, NULL);
   adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
-  gptStartContinuous(&GPTD6, 1000U);
-  //adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  gptStartContinuous(&GPTD1, 1000U);
+  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
   //adcReleaseBus(&ADCD1);
 }
 
