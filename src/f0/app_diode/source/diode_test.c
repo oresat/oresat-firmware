@@ -10,12 +10,11 @@ sample_t sample[SAMPLES];
 
 void dtc_init(void)
 {
-  dtc.padcsample = &OD_RAM.x4000_adcsample.ch1;
+  dtc.padcsample = &OD_RAM.x4000_adcsample.led_current;
   dtc.pdiode_select = &OD_RAM.x4001_diode.select;
   dtc.pdac = &OD_RAM.x4001_diode.dac;
-  dtc.perrors = &OD_RAM.x4001_diode.errors;
+  dtc.perror = &OD_RAM.x4001_diode.error;
   dac_start();
-  adc_start();
 }
 
 /*
@@ -39,18 +38,18 @@ void dac_start(void)
 static void adc_callback(ADCDriver *adcp) {
   sample_t *psample = (sample_t*)adcp->samples;
   int i = adcIsBufferComplete(adcp); 
-  
-  OD_RAM.x4000_adcsample.ch1 = psample[i].ch1;
-  OD_RAM.x4000_adcsample.ch2 = psample[i].ch2;
-  OD_RAM.x4000_adcsample.ts = psample[i].ts;
-  OD_RAM.x4000_adcsample.vrefint = psample[i].vrefint;
+ 
+  OD_RAM.x4000_adcsample.led_current = psample[i].led_current;
+  OD_RAM.x4000_adcsample.led_swir_pd_current = psample[i].led_swir_pd_current;
+  OD_RAM.x4000_adcsample.uv_pd_current = psample[i].uv_pd_current;
+  OD_RAM.x4000_adcsample.tsen = psample[i].tsen;
 }
 
 static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
   (void)adcp;
   (void)err;
 
-  ++(*dtc.perrors);
+  (*dtc.perror) = (*dtc.perror) | ERROR_ADC_CB;
 }
 
 /*
@@ -61,48 +60,29 @@ static const ADCConversionGroup adcgrpcfg1 = {
   NUM_CHANNELS,
   adc_callback,
   adc_error_callback,
-  ADC_CFGR1_EXTEN_RISING | ADC_CFGR1_RES_12BIT,    /* CFGR1 */
-  ADC_TR(0, 0),                                    /* TR */
-  ADC_SMPR_SMP_28P5,                               /* SMPR */
-  ADC_CHSELR_CHSEL11 | ADC_CHSELR_CHSEL15  |       /* CHSELR */
-  ADC_CHSELR_CHSEL16 | ADC_CHSELR_CHSEL17          
+  ADC_CFGR1_EXTEN_RISING | ADC_CFGR1_RES_12BIT,   /* CFGR1 */
+  ADC_TR(0, 0),                                   /* TR */
+  ADC_SMPR_SMP_1P5,                               /* SMPR */
+  ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL5  |        /* CHSELR */
+  ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7          
 };
 
-static void gpt_adc_trigger_cb(GPTDriver *gptp)
-{
-  (void)gptp;
-  //adcStartConversionI(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
-  //OD_RAM.x4001_diode.errors = ++(*dtc.perrors);
-}
-
 /*
-  * GPT6 configuration.
-  */
- static const GPTConfig gpt1cfg1 = {
-   .frequency    = 1000000U,
-   .callback     = gpt_adc_trigger_cb,
-   .cr2          = TIM_CR2_MMS_1,    /* MMS = 010 = TRGO on Update Event.    */
-   .dier         = 0U
- };
+ * GPT6 configuration.
+ */
+static const GPTConfig gpt1cfg1 = {
+  .frequency    = 1000000U,
+  .callback     = NULL,
+  .cr2          = TIM_CR2_MMS_1,    // MMS = 010 = TRGO on Update Event.    
+  .dier         = 0U
+};
 
 void adc_start(void)
 {
-/*
-  palSetGroupMode(
-    GPIOA, 
-    PAL_PORT_BIT(1) | PAL_PORT_BIT(5) | PAL_PORT_BIT(6) | PAL_PORT_BIT(7),
-    0, 
-    PAL_MODE_INPUT_ANALOG
-  );
-//*/
-
   gptStart(&GPTD1, &gpt1cfg1);
-  //adcAcquireBus(&ADCD1);
-  adcStart(&ADCD1, NULL);
-  adcSTM32SetCCR(ADC_CCR_TSEN | ADC_CCR_VREFEN);
-  gptStartContinuous(&GPTD1, 1000U);
+  gptStartContinuous(&GPTD1, 100U);
+  adcSTM32SetCCR(ADC_CCR_TSEN);
   adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
-  //adcReleaseBus(&ADCD1);
 }
 
 /**
@@ -135,7 +115,15 @@ THD_FUNCTION(adc_watch, arg)
 {
   (void)arg; 
 
-  while (!chThdShouldTerminateX()) 
+  // give oresat_start time to release the adc bus
+  while(ADCD1.state != ADC_READY)
+  {
+    chThdSleepMilliseconds(200);
+  }
+
+  adc_start();
+
+  while(!chThdShouldTerminateX()) 
   {
 //*   
     chprintf(DEBUG_SERIAL,   "\r\n%04u ",    dtc.padcsample[0]);
@@ -144,10 +132,10 @@ THD_FUNCTION(adc_watch, arg)
     chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[3]);
     chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdiode_select);
     chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdac);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.perrors);
+    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.perror);
 //*/
 
-    chThdSleepMilliseconds(1000);
+    chThdSleepMilliseconds(500);
   }
 
   dbgprintf("Terminating adc_watch thread...\r\n");
@@ -178,7 +166,7 @@ THD_FUNCTION(diode_select, arg)
     }
 
     osalSysLock();
-    dacPutChannelX(&DACD1, 0, OD_RAM.x4001_diode.dac);
+    dacPutChannelX(&DACD1, 0, *dtc.pdac);
     osalSysUnlock();
 
     chThdSleepMilliseconds(200);

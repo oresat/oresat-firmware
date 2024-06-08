@@ -26,12 +26,19 @@
 
 #define SAMPLES                 2
 
+#define ERROR_ADC_CB            (1 << 0)
+#define ERROR_1                 (1 << 1)
+#define ERROR_2                 (1 << 2)
+#define ERROR_3                 (1 << 3)
+#define ERROR_4                 (1 << 4)
+#define ERROR_5                 (1 << 5)
+
 typedef struct 
 {
-  adcsample_t ch1;
-  adcsample_t ch2;
-  adcsample_t ts;
-  adcsample_t vrefint;
+  adcsample_t led_current;          // PA1
+  adcsample_t led_swir_pd_current;  // PA5
+  adcsample_t uv_pd_current;        // PA6
+  adcsample_t tsen;                 // PA7
 } sample_t;
 
 #define NUM_CHANNELS            sizeof(sample_t)/sizeof(adcsample_t)
@@ -41,7 +48,7 @@ typedef struct
   uint16_t *padcsample;
   uint16_t *pdiode_select;
   uint16_t *pdac;
-  uint16_t *perrors;
+  uint16_t *perror;
   uint16_t adc_callback_count;
   sample_t *psample;
 } DTC; 

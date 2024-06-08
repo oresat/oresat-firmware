@@ -57,6 +57,7 @@
 #define STM32_CECSW                         STM32_CECSW_HSI
 #define STM32_I2C1SW                        STM32_I2C1SW_HSI
 #define STM32_USART1SW                      STM32_USART1SW_HSI
+//#define STM32_USART1SW                      STM32_USART1SW_PCLK
 #define STM32_RTCSEL                        STM32_RTCSEL_LSI
 
 /*
@@ -105,7 +106,7 @@
 #define STM32_GPT_USE_TIM1                  TRUE
 #define STM32_GPT_USE_TIM2                  FALSE
 #define STM32_GPT_USE_TIM3                  FALSE
-#define STM32_GPT_USE_TIM6                  TRUE
+#define STM32_GPT_USE_TIM6                  FALSE
 #define STM32_GPT_USE_TIM7                  FALSE
 #define STM32_GPT_USE_TIM14                 FALSE
 #define STM32_GPT_TIM1_IRQ_PRIORITY         2

@@ -61,13 +61,13 @@
  * IO pins assignments.
  */
 #define GPIOA_LED                   0U
-#define GPIOA_ADC1_IN1              1U
+#define GPIOA_LED_CURRENT           1U
 #define GPIOA_USART2_TX             2U
 #define GPIOA_USART2_RX             3U
 #define GPIOA_DAC_OUT1              4U
-#define GPIOA_ADC1_IN5              5U
-#define GPIOA_ADC1_IN6              6U
-#define GPIOA_ADC1_IN7              7U
+#define GPIOA_LED_SWIR_PD_CURRENT   5U
+#define GPIOA_UV_PD_CURRENT         6U
+#define GPIOA_TSEN                 7U
 #define GPIOA_PIN8                  8U
 #define GPIOA_CAN_SILENT            9U
 #define GPIOA_CAN_SHDN              10U
@@ -262,13 +262,13 @@
  * PA15 - PIN15                     (analog).
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_OUTPUT(GPIOA_LED) |           \
-                                     PIN_MODE_ANALOG(GPIOA_ADC1_IN1) |      \
+                                     PIN_MODE_ANALOG(GPIOA_LED_CURRENT) |      \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_ANALOG(GPIOA_DAC_OUT1) |      \
-                                     PIN_MODE_ANALOG(GPIOA_ADC1_IN5) |       \
-                                     PIN_MODE_ANALOG(GPIOA_ADC1_IN6) |       \
-                                     PIN_MODE_ANALOG(GPIOA_ADC1_IN7) |       \
+                                     PIN_MODE_ANALOG(GPIOA_LED_SWIR_PD_CURRENT) |       \
+                                     PIN_MODE_ANALOG(GPIOA_UV_PD_CURRENT) |       \
+                                     PIN_MODE_ANALOG(GPIOA_TSEN) |       \
                                      PIN_MODE_ANALOG(GPIOA_PIN8) |          \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SILENT) |    \
                                      PIN_MODE_OUTPUT(GPIOA_CAN_SHDN) |      \
@@ -278,13 +278,13 @@
                                      PIN_MODE_ALTERNATE(GPIOA_SWCLK) |      \
                                      PIN_MODE_ANALOG(GPIOA_PIN15))
 #define VAL_GPIOA_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOA_LED) |        \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_ADC1_IN1) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_LED_CURRENT) |    \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_USART2_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOA_DAC_OUT1) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_ADC1_IN5) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_ADC1_IN6) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOA_ADC1_IN7) |   \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_LED_SWIR_PD_CURRENT) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_UV_PD_CURRENT) |   \
+                                     PIN_OTYPE_PUSHPULL(GPIOA_TSEN) |   \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN8) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_SILENT) | \
                                      PIN_OTYPE_PUSHPULL(GPIOA_CAN_SHDN) |   \
@@ -294,13 +294,13 @@
                                      PIN_OTYPE_PUSHPULL(GPIOA_SWCLK) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN15))
 #define VAL_GPIOA_OSPEEDR           (PIN_OSPEED_HIGH(GPIOA_LED) |           \
-                                     PIN_OSPEED_LOW(GPIOA_ADC1_IN1) |       \
+                                     PIN_OSPEED_HIGH(GPIOA_LED_CURRENT) |      \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_TX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_USART2_RX) |     \
                                      PIN_OSPEED_HIGH(GPIOA_DAC_OUT1) |      \
-                                     PIN_OSPEED_LOW(GPIOA_ADC1_IN5) |       \
-                                     PIN_OSPEED_LOW(GPIOA_ADC1_IN6) |       \
-                                     PIN_OSPEED_LOW(GPIOA_ADC1_IN7) |       \
+                                     PIN_OSPEED_HIGH(GPIOA_LED_SWIR_PD_CURRENT) |       \
+                                     PIN_OSPEED_HIGH(GPIOA_UV_PD_CURRENT) |       \
+                                     PIN_OSPEED_HIGH(GPIOA_TSEN) |       \
                                      PIN_OSPEED_HIGH(GPIOA_PIN8) |          \
                                      PIN_OSPEED_HIGH(GPIOA_CAN_SILENT) |    \
                                      PIN_OSPEED_HIGH(GPIOA_CAN_SHDN) |      \
@@ -310,13 +310,13 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
-                                     PIN_PUPDR_FLOATING(GPIOA_ADC1_IN1) |   \
+                                     PIN_PUPDR_FLOATING(GPIOA_LED_CURRENT) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_USART2_TX) |  \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
                                      PIN_PUPDR_FLOATING(GPIOA_DAC_OUT1) |   \
-                                     PIN_PUPDR_FLOATING(GPIOA_ADC1_IN5) |   \
-                                     PIN_PUPDR_FLOATING(GPIOA_ADC1_IN6) |   \
-                                     PIN_PUPDR_FLOATING(GPIOA_ADC1_IN7) |   \
+                                     PIN_PUPDR_FLOATING(GPIOA_LED_SWIR_PD_CURRENT) |   \
+                                     PIN_PUPDR_FLOATING(GPIOA_UV_PD_CURRENT) |   \
+                                     PIN_PUPDR_FLOATING(GPIOA_TSEN) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN8) |       \
                                      PIN_PUPDR_PULLDOWN(GPIOA_CAN_SILENT) | \
                                      PIN_PUPDR_PULLDOWN(GPIOA_CAN_SHDN) |   \
@@ -326,13 +326,13 @@
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
                                      PIN_PUPDR_FLOATING(GPIOA_PIN15))
 #define VAL_GPIOA_ODR               (PIN_ODR_LOW(GPIOA_LED) |               \
-                                     PIN_ODR_HIGH(GPIOA_ADC1_IN1) |         \
+                                     PIN_ODR_LOW(GPIOA_LED_CURRENT) |         \
                                      PIN_ODR_HIGH(GPIOA_USART2_TX) |        \
                                      PIN_ODR_HIGH(GPIOA_USART2_RX) |        \
                                      PIN_ODR_HIGH(GPIOA_DAC_OUT1) |          \
-                                     PIN_ODR_HIGH(GPIOA_ADC1_IN5) |         \
-                                     PIN_ODR_HIGH(GPIOA_ADC1_IN6) |         \
-                                     PIN_ODR_HIGH(GPIOA_ADC1_IN7) |         \
+                                     PIN_ODR_HIGH(GPIOA_LED_SWIR_PD_CURRENT) |         \
+                                     PIN_ODR_HIGH(GPIOA_UV_PD_CURRENT) |         \
+                                     PIN_ODR_HIGH(GPIOA_TSEN) |         \
                                      PIN_ODR_HIGH(GPIOA_PIN8) |             \
                                      PIN_ODR_LOW(GPIOA_CAN_SILENT) |        \
                                      PIN_ODR_LOW(GPIOA_CAN_SHDN) |          \
@@ -342,13 +342,13 @@
                                      PIN_ODR_HIGH(GPIOA_SWCLK) |            \
                                      PIN_ODR_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_LED, 0U) |           \
-                                     PIN_AFIO_AF(GPIOA_ADC1_IN1, 0U) |      \
+                                     PIN_AFIO_AF(GPIOA_LED_CURRENT, 0U) |      \
                                      PIN_AFIO_AF(GPIOA_USART2_TX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_USART2_RX, 1U) |     \
                                      PIN_AFIO_AF(GPIOA_DAC_OUT1, 0U) |      \
-                                     PIN_AFIO_AF(GPIOA_ADC1_IN5, 0U) |      \
-                                     PIN_AFIO_AF(GPIOA_ADC1_IN6, 0U) |      \
-                                     PIN_AFIO_AF(GPIOA_ADC1_IN7, 0U))
+                                     PIN_AFIO_AF(GPIOA_LED_SWIR_PD_CURRENT, 0U) |      \
+                                     PIN_AFIO_AF(GPIOA_UV_PD_CURRENT, 0U) |      \
+                                     PIN_AFIO_AF(GPIOA_TSEN, 0U))
 #define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_PIN8, 0U) |          \
                                      PIN_AFIO_AF(GPIOA_CAN_SILENT, 0U) |    \
                                      PIN_AFIO_AF(GPIOA_CAN_SHDN, 0U) |      \
