@@ -67,7 +67,7 @@
 #define GPIOA_DAC_OUT1              4U
 #define GPIOA_LED_SWIR_PD_CURRENT   5U
 #define GPIOA_UV_PD_CURRENT         6U
-#define GPIOA_TSEN                 7U
+#define GPIOA_TSEN                  7U
 #define GPIOA_PIN8                  8U
 #define GPIOA_CAN_SILENT            9U
 #define GPIOA_CAN_SHDN              10U
