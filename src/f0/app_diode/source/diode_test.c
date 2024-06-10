@@ -28,7 +28,7 @@ static const DACConfig dac1cfg1 = {
 
 void dac_start(void)
 {
-  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
+//  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
   dacStart(&DACD1, &dac1cfg1);
 }
 
@@ -62,9 +62,9 @@ static const ADCConversionGroup adcgrpcfg1 = {
   adc_error_callback,
   ADC_CFGR1_EXTEN_RISING | ADC_CFGR1_RES_12BIT,   /* CFGR1 */
   ADC_TR(0, 0),                                   /* TR */
-  ADC_SMPR_SMP_1P5,                               /* SMPR */
+  ADC_SMPR_SMP_239P5,                               /* SMPR */
   ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL5  |        /* CHSELR */
-  ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL7          
+  ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL17          
 };
 
 /*
