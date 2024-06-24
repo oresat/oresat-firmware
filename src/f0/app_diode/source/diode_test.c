@@ -15,6 +15,7 @@ void dtc_init(void)
   dtc.pdac = &OD_RAM.x4001_diode.dac;
   dtc.perror = &OD_RAM.x4001_diode.error;
   dac_start();
+  gpt_start();
 }
 
 /*
@@ -28,8 +29,12 @@ static const DACConfig dac1cfg1 = {
 
 void dac_start(void)
 {
-//  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
   dacStart(&DACD1, &dac1cfg1);
+}
+
+void dac_stop(void)
+{
+  dacStop(&DACD1);
 }
 
 /*
@@ -67,7 +72,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
   ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL17          
 };
 
-/*
+/**
  * GPT6 configuration.
  */
 static const GPTConfig gpt1cfg1 = {
@@ -77,17 +82,31 @@ static const GPTConfig gpt1cfg1 = {
   .dier         = 0U
 };
 
-void adc_start(void)
+void gpt_start(void)
 {
   gptStart(&GPTD1, &gpt1cfg1);
   gptStartContinuous(&GPTD1, 100U);
+}
+
+void gpt_stop(void)
+{
+  gptStop(&GPTD1);
+}
+
+void adc_start(void)
+{
   adcSTM32SetCCR(ADC_CCR_TSEN);
   adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
 }
 
+void adc_stop(void)
+{
+  adcStop(&ADCD1);
+}
+
 /**
- * blinking example thread definition 
-*/
+ * blink thread 
+ */
 THD_WORKING_AREA(blink_wa, 0x400);
 THD_FUNCTION(blink, arg)
 {
@@ -115,7 +134,7 @@ THD_FUNCTION(adc_watch, arg)
 {
   (void)arg; 
 
-  // give oresat_start time to release the adc bus
+  /// give oresat_start time to release the adc bus
   while(ADCD1.state != ADC_READY)
   {
     chThdSleepMilliseconds(200);
