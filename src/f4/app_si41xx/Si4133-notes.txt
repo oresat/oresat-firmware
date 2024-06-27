@@ -83,3 +83,7 @@ REQUESTED FUNCTIONALITY:
   - RF1 output = 1265 MHz
   - RF2 output = disabled
   - IF output  = 436.5 MHz
+
+
+NB: More recent version is Si5351A - 26-Jun-2024 - GNL
+
