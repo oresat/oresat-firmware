@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="ad50", ATTRS{idProduct}=="60c4", SYMLINK+="vulcan%n", TAG+="systemd", ENV{SYSTEMD_WANTS}="slcand@vulcan%n.service"

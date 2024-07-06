@@ -526,6 +526,18 @@
 #define WSPI_USE_MUTUAL_EXCLUSION           TRUE
 #endif
 
+/*===========================================================================*/
+/* Oresat custom CRC driver related settings.                                */
+/*===========================================================================*/
+
+/**
+ * @brief   Enables the CRC driver to use the hardware CRC peripheral.
+ * @note    The driver falls back to a software implementation if FALSE
+ */
+#if !defined(USE_CRC_HW) || defined(__DOXYGEN__)
+#define USE_CRC_HW                         TRUE
+#endif
+
 #endif /* HALCONF_H */
 
 /** @} */
