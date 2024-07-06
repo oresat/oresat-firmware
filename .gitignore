@@ -82,3 +82,7 @@ build*/
 
 # Vagrant
 /.vagrant/
+
+# Python
+__pycache__
+.direnv

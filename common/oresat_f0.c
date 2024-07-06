@@ -4,14 +4,19 @@
 
 
 /**
- * This function should be called on applications using the STM32F091xC-app.ld linker script and using the bootloader to run them.
+ * This function is called by applications using the STM32F091xC-app.ld
+ * linker script and using the bootloader to run them. It overwrites a weak
+ * symbol from ChibiOS's CRT0 and so will be called late in the init sequence.
  */
 void __late_init(void) {
-    /* Relocate by software the vector table to the internal SRAM at 0x20000000 ***/
-    /* Copy the vector table from the Flash (mapped at the base of the application
-    load address 0x08003000) to the base address of the SRAM at 0x20000000. */
+    // Relocate by software the vector table to the internal SRAM at 0x20000000.
+    // The vector table comes from flash, mapped at the base of the application
+    // region, load address __flash2_base__ (0x0800A800).
+    //
+    // The SRAM then gets remapped to 0x00000000 to function as the real vector
+    // table
 
-    memcpy((void *)0x20000000, (void *)ORESAT_F0_FIRMWARE_CODE_ADDRESS, 0xC0);
+    memcpy(__ram0_base__, __flash2_base__, 0xC0);
     __DSB();
     /* Remap SRAM at 0x00000000 */
     SYSCFG->CFGR1 |= SYSCFG_CFGR1_MEM_MODE;

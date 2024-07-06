@@ -1,28 +1,35 @@
 #ifndef COMMON_INCLUDE_ORESAT_F0_H_
 #define COMMON_INCLUDE_ORESAT_F0_H_
 
-/* TODO: It'd be nice to derive these values from the linker script as the authoratative source */
-#define ORESAT_F0_FLASH_START_ADDRESS                 0x08000000
-
-#define ORESAT_F0_FIRMWARE_CRC_ADDRESS                0x0800A000
-#define ORESAT_F0_FIRMWARE_LENGTH_ADDRESS             (ORESAT_F0_FIRMWARE_CRC_ADDRESS + 0x4)
-#define ORESAT_F0_FIRMWARE_VERSION_ADDRESS            (ORESAT_F0_FIRMWARE_CRC_ADDRESS + 0x8)
-#define ORESAT_F0_FIRMWARE_CODE_ADDRESS               (ORESAT_F0_FIRMWARE_CRC_ADDRESS + 0x400)
-#define ORESAT_F0_FIRMWARE_CODE_END_ADDRESS           0x0803C000
-
-#define ORESAT_F0_FIRMWARE_MAXIMUM_LENGTH             (ORESAT_F0_FIRMWARE_CODE_END_ADDRESS - ORESAT_F0_FIRMWARE_CRC_ADDRESS)
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern int __flash0_base__;
-extern size_t __flash0_size__;
-extern int __flash0_end__;
-extern int __flash1_base__;
-extern size_t __flash1_size__;
-extern int __flash1_end__;
+// See STM32F091xC-bootloader.ld/STM32F4091xC-app.ld for definitions and
+// rules_memory.ld for declarations.
+extern uint8_t __flash0_base__[];
+extern uint8_t __flash0_end__[];
+extern uint8_t __flash1_base__[];
+extern uint8_t __flash1_end__[];
+extern uint8_t __flash2_base__[];
+extern uint8_t __flash2_end__[];
+extern uint8_t __ram0_base__[];
+extern uint8_t __ram0_end__[];
+extern uint8_t __ram1_base__[];
+extern uint8_t __ram1_end__[];
+
+// The __*_size__ symbols are weird. The contents aren't relevent, it's the
+// address, converted to a number, which is the represented region size.
+extern const void __flash0_size__;
+extern const void __flash1_size__;
+extern const void __flash2_size__;
+extern const void __ram0_size__;
+extern const void __ram1_size__;
+#define FLASH0_SIZE ((const uint32_t)(&__flash0_size__))
+#define FLASH1_SIZE ((const uint32_t)(&__flash1_size__))
+#define FLASH2_SIZE ((const uint32_t)(&__flash2_size__))
+#define RAM0_SIZE ((const uint32_t)(&__ram0_size__))
+#define RAM1_SIZE ((const uint32_t)(&__ram1_size__))
 
 #ifdef __cplusplus
 }
