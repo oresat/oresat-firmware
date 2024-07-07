@@ -13,7 +13,14 @@ void dtc_init(void)
   dtc.padcsample = &OD_RAM.x4000_adcsample.led_current;
   dtc.pdiode_select = &OD_RAM.x4001_diode.select;
   dtc.pdac = &OD_RAM.x4001_diode.dac;
+  dtc.pctrl = &OD_RAM.x4001_diode.ctrl;
   dtc.perror = &OD_RAM.x4001_diode.error;
+
+  dtc.pled_current = &OD_RAM.x4000_adcsample.led_current;
+  dtc.pled_swir_pd_current = &OD_RAM.x4000_adcsample.led_swir_pd_current;
+  dtc.puv_pd_current = &OD_RAM.x4000_adcsample.uv_pd_current;
+  dtc.ptsen = &OD_RAM.x4000_adcsample.tsen;
+  
   dac_start();
   gpt_start();
 }
@@ -145,13 +152,14 @@ THD_FUNCTION(adc_watch, arg)
   while(!chThdShouldTerminateX()) 
   {
 //*   
-    chprintf(DEBUG_SERIAL,   "\r\n%04u ",    dtc.padcsample[0]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[1]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[2]);
-    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[3]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdiode_select);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdac);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.perror);
+    chprintf(DEBUG_SERIAL, "\r\nled_current:           %04u \r\n", *dtc.pled_current);
+    chprintf(DEBUG_SERIAL,     "led_swir_pd_current:   %04u \r\n", *dtc.pled_swir_pd_current);
+    chprintf(DEBUG_SERIAL,     "uv_pd_current:         %04u \r\n", *dtc.puv_pd_current);
+    chprintf(DEBUG_SERIAL,     "tsen:                  %04u \r\n", *dtc.ptsen);
+    chprintf(DEBUG_SERIAL,     "diode_select:          %04u \r\n", *dtc.pdiode_select);
+    chprintf(DEBUG_SERIAL,     "dac:                   %04u \r\n", *dtc.pdac);
+    chprintf(DEBUG_SERIAL,     "ctrl:                0x%04X \r\n", *dtc.pctrl);
+    chprintf(DEBUG_SERIAL,     "error:               0x%04X \r\n", *dtc.perror);
 //*/
 
     chThdSleepMilliseconds(500);
@@ -162,13 +170,27 @@ THD_FUNCTION(adc_watch, arg)
   chThdExit(MSG_OK);
 }
 
+void enableDiodeMux(void)
+{
+  palSetPad(GPIOB, DTC_MUX_EN);
+  (*dtc.pctrl) |= (1 << CTRL_MUX_EN);
+}
+
+void disableDiodeMux(void)
+{
+  palClearPad(GPIOB, DTC_MUX_EN);
+  (*dtc.pctrl) &= ~(1 << CTRL_MUX_EN);
+}
+
 /**
  *  diode select
 */
 THD_WORKING_AREA(diode_select_wa, 0x400);
 THD_FUNCTION(diode_select, arg)
 {
-  (void)arg; 
+  (void)arg;
+
+  enableDiodeMux(); //PB12 
 
   while (!chThdShouldTerminateX()) 
   {
@@ -181,6 +203,7 @@ THD_FUNCTION(diode_select, arg)
         0, 
         (*dtc.pdiode_select << DTC_MUX_A0)
       );
+      *dtc.pctrl = (*dtc.pctrl & (~CTRL_MUX_MASK)) | (*dtc.pdiode_select << CTRL_MUX_A0);
       osalSysUnlock();
     }
 

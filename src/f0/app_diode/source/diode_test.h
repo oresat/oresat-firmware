@@ -22,7 +22,7 @@
 #define DTC_MUX_A0              GPIOB_LED_MUX_A0
 #define DTC_MUX_A1              GPIOB_LED_MUX_A1
 #define DTC_MUX_A2              GPIOB_LED_MUX_A2
-#define DTC_POUT                GPIOB_POUTPROT
+#define DTC_POUT                GPIOB_POUTPROT  //PB0
 
 #define DTC_NUM_DIODES          8
 
@@ -51,6 +51,7 @@
 #define CTRL_D                  0xD
 #define CTRL_E                  0xE
 #define CTRL_F                  0xF
+#define CTRL_MUX_MASK           (0x7 << CTRL_MUX_A0)
 
 typedef struct 
 {
@@ -64,11 +65,15 @@ typedef struct
 
 typedef struct 
 {
-  uint16_t *padcsample;
+  adcsample_t *padcsample;
   uint16_t *pdiode_select;
   uint16_t *pdac;
+  uint16_t *pctrl;
   uint16_t *perror;
-  sample_t *psample;
+  adcsample_t *pled_current;
+  adcsample_t *pled_swir_pd_current;
+  adcsample_t *puv_pd_current;
+  adcsample_t *ptsen;
 } DTC; 
 
 /**
@@ -90,5 +95,7 @@ void gpt_start(void);
 void gpt_stop(void);
 void adc_start(void);
 void adc_stop(void);
+void enableDiodeMux(void);
+void disableDiodeMux(void);
 
 #endif

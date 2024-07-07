@@ -309,7 +309,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_SWDIO) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
                                      PIN_OSPEED_HIGH(GPIOA_PIN15))
-#define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOA_LED) |        \
+#define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_LED) |        \
                                      PIN_PUPDR_FLOATING(GPIOA_LED_CURRENT) |   \
                                      PIN_PUPDR_FLOATING(GPIOA_USART2_TX) |  \
                                      PIN_PUPDR_PULLUP(GPIOA_USART2_RX) |    \
@@ -378,7 +378,7 @@
  * PB14 - PIN14                     (analog).
  * PB15 - PIN15                     (analog).
  */
-#define VAL_GPIOB_MODER             (PIN_MODE_OUTPUT(GPIOB_POUTPROT) |          \
+#define VAL_GPIOB_MODER             (PIN_MODE_ANALOG(GPIOB_POUTPROT) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN1) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN2) |          \
                                      PIN_MODE_ANALOG(GPIOB_PIN3) |          \
@@ -410,7 +410,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_LED_MUX_A0) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_LED_MUX_A1) | \
                                      PIN_OTYPE_PUSHPULL(GPIOB_LED_MUX_A2))
-#define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_LOW(GPIOB_POUTPROT) |           \
+#define VAL_GPIOB_OSPEEDR           (PIN_OSPEED_HIGH(GPIOB_POUTPROT) |           \
                                      PIN_OSPEED_HIGH(GPIOB_PIN1) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN2) |          \
                                      PIN_OSPEED_HIGH(GPIOB_PIN3) |          \
@@ -442,7 +442,7 @@
                                      PIN_PUPDR_FLOATING(GPIOB_LED_MUX_A0) | \
                                      PIN_PUPDR_FLOATING(GPIOB_LED_MUX_A1) | \
                                      PIN_PUPDR_FLOATING(GPIOB_LED_MUX_A2))
-#define VAL_GPIOB_ODR               (PIN_ODR_LOW(GPIOB_POUTPROT)  |             \
+#define VAL_GPIOB_ODR               (PIN_ODR_HIGH(GPIOB_POUTPROT)  |        \
                                      PIN_ODR_HIGH(GPIOB_PIN1) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN2) |             \
                                      PIN_ODR_HIGH(GPIOB_PIN3) |             \
