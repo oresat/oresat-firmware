@@ -35,13 +35,15 @@
 #define ERROR_4                 (1 << 4)
 #define ERROR_5                 (1 << 5)
 
+
+/// status OD definitions
 #define CTRL_DAC_EN             0x0
-#define CTRL_ADC_EN             0x1
-#define CTRL_MUX_EN             0x2
-#define CTRL_MUX_A0             0x3
-#define CTRL_MUX_A1             0x4
-#define CTRL_MUX_A2             0x5
-#define CTRL_6                  0x6
+#define CTRL_GPT_EN             0x1
+#define CTRL_ADC_EN             0x2
+#define CTRL_MUX_EN             0x3
+#define CTRL_MUX_A0             0x4
+#define CTRL_MUX_A1             0x5
+#define CTRL_MUX_A2             0x6
 #define CTRL_7                  0x7
 #define CTRL_8                  0x8
 #define CTRL_9                  0x9
@@ -50,7 +52,9 @@
 #define CTRL_C                  0xC
 #define CTRL_D                  0xD
 #define CTRL_E                  0xE
-#define CTRL_F                  0xF
+#define CTRL_F                  0xFa
+
+// bit masks
 #define CTRL_MUX_MASK           (0x7 << CTRL_MUX_A0)
 
 typedef struct 
@@ -58,22 +62,24 @@ typedef struct
   adcsample_t led_current;          // PA1
   adcsample_t led_swir_pd_current;  // PA5
   adcsample_t uv_pd_current;        // PA6
-  adcsample_t tsen;                 // PA7
+  adcsample_t tsen;                 // PA17
 } sample_t;
 
 #define NUM_CHANNELS            sizeof(sample_t)/sizeof(adcsample_t)
 
 typedef struct 
 {
-  adcsample_t *padcsample;
-  uint16_t *pdiode_select;
+  uint8_t *pctrl;
+  uint8_t *pmux_select;
   uint16_t *pdac;
-  uint16_t *pctrl;
+  uint16_t *pstatus;
   uint16_t *perror;
+  void (*pfunc[64])(void);
   adcsample_t *pled_current;
   adcsample_t *pled_swir_pd_current;
   adcsample_t *puv_pd_current;
   adcsample_t *ptsen;
+  adcsample_t *padcsample;
 } DTC; 
 
 /**
@@ -89,13 +95,15 @@ extern THD_FUNCTION(diode_select, arg);
  * function declaration 
 */
 void dtc_init(void);
-void dac_start(void);
-void dac_stop(void);
-void gpt_start(void);
-void gpt_stop(void);
-void adc_start(void);
-void adc_stop(void);
-void enableDiodeMux(void);
-void disableDiodeMux(void);
+void dtc_dacStart(void);
+void dtc_dacStop(void);
+void dtc_dacSet(void);
+void dtc_gptStart(void);
+void dtc_gptStop(void);
+void dtc_adcStart(void);
+void dtc_adcStop(void);
+void dtc_muxEnable(void);
+void dtc_muxDisable(void);
+void dtc_muxSelect(void);
 
 #endif
