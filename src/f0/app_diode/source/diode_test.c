@@ -10,15 +10,21 @@ sample_t sample[SAMPLES];
 
 void dtc_init(void)
 {
-  dtc.pfunc[0] = &dtc_dacStart;
-  dtc.pfunc[1] = &dtc_dacStop;
-  dtc.pfunc[2] = &dtc_dacSet;
-  dtc.pfunc[3] = &dtc_gptStart;
-  dtc.pfunc[4] = &dtc_gptStop;
-  dtc.pfunc[5] = &dtc_adcStart;
-  dtc.pfunc[6] = &dtc_adcStop;
-  dtc.pfunc[7] = &dtc_muxEnable;
-  dtc.pfunc[8] = &dtc_muxDisable;
+  dtc.pfunc[0] = NULL; // NOP
+  dtc.pfunc[1] = &dtc_dacStart;
+  dtc.pfunc[2] = &dtc_dacStop;
+  dtc.pfunc[3] = &dtc_dacSet;
+  dtc.pfunc[4] = &dtc_gptStart;
+  dtc.pfunc[5] = &dtc_gptStop;
+  dtc.pfunc[6] = &dtc_adcStart;
+  dtc.pfunc[7] = &dtc_adcStop;
+  dtc.pfunc[8] = &dtc_muxEnable;
+  dtc.pfunc[9] = &dtc_muxDisable;
+
+  int i;
+  for(i = 0; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
+
+  dtc.functionCount = i;
 
   dtc.pctrl = &OD_RAM.x4000_dtc.ctrl;
   dtc.pmux_select = &OD_RAM.x4000_dtc.mux_select;
@@ -112,22 +118,41 @@ void dtc_gptStart(void)
 {
   gptStart(&GPTD1, &gpt1cfg1);
   gptStartContinuous(&GPTD1, 100U);
+  (*dtc.pstatus) |= (1 << CTRL_GPT_EN);
 }
 
 void dtc_gptStop(void)
 {
   gptStop(&GPTD1);
+  (*dtc.pstatus) &= ~(1 << CTRL_GPT_EN);
 }
 
 void dtc_adcStart(void)
 {
-  adcSTM32SetCCR(ADC_CCR_TSEN);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  adcStart(&ADCD1, NULL);
+  if(ADCD1.state == ADC_READY)
+  {
+    (*dtc.pstatus) |= (1 << CTRL_ADC_EN);
+    adcSTM32SetCCR(ADC_CCR_TSEN);
+    adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  }
+  else
+  {
+    (*dtc.perror) = (*dtc.perror) | ERROR_ADC_START;
+  }
 }
 
 void dtc_adcStop(void)
 {
   adcStop(&ADCD1);
+  if(ADCD1.state == ADC_STOP)
+  {
+    (*dtc.pstatus) &= ~(1 << CTRL_ADC_EN);
+  }
+  else
+  {
+    (*dtc.perror) = (*dtc.perror) | ERROR_ADC_STOP;
+  }
 }
 
 /**
@@ -193,13 +218,13 @@ THD_FUNCTION(adc_watch, arg)
 void dtc_muxEnable(void)
 {
   palSetPad(GPIOB, DTC_MUX_EN);
-  (*dtc.pctrl) |= (1 << CTRL_MUX_EN);
+  (*dtc.pstatus) |= (1 << CTRL_MUX_EN);
 }
 
 void dtc_muxDisable(void)
 {
   palClearPad(GPIOB, DTC_MUX_EN);
-  (*dtc.pctrl) &= ~(1 << CTRL_MUX_EN);
+  (*dtc.pstatus) &= ~(1 << CTRL_MUX_EN);
 }
 
 void dtc_muxSelect(void)
@@ -231,7 +256,7 @@ THD_FUNCTION(diode_select, arg)
   while (!chThdShouldTerminateX()) 
   {
     
-    if(*dtc.pctrl > 0)
+    if(*dtc.pctrl > 0 && *dtc.pctrl <= dtc.functionCount)
     {
       dtc.pfunc[*dtc.pctrl]();
       *dtc.pctrl = 0;

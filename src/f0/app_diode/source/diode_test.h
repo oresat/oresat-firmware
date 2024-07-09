@@ -30,8 +30,8 @@
 
 #define ERROR_DAC               (1 << 0)
 #define ERROR_ADC_CB            (1 << 1)
-#define ERROR_2                 (1 << 2)
-#define ERROR_3                 (1 << 3)
+#define ERROR_ADC_START         (1 << 2)
+#define ERROR_ADC_STOP          (1 << 3)
 #define ERROR_4                 (1 << 4)
 #define ERROR_5                 (1 << 5)
 
@@ -67,6 +67,8 @@ typedef struct
 
 #define NUM_CHANNELS            sizeof(sample_t)/sizeof(adcsample_t)
 
+#define MAX_FUNCTIONS           64
+
 typedef struct 
 {
   uint8_t *pctrl;
@@ -74,12 +76,16 @@ typedef struct
   uint16_t *pdac;
   uint16_t *pstatus;
   uint16_t *perror;
-  void (*pfunc[64])(void);
+  void (*pfunc[MAX_FUNCTIONS])(void);
   adcsample_t *pled_current;
   adcsample_t *pled_swir_pd_current;
   adcsample_t *puv_pd_current;
   adcsample_t *ptsen;
   adcsample_t *padcsample;
+  int functionCount;
+  ADCDriver *padc;
+  GPTDriver *pgpt;
+  
 } DTC; 
 
 /**
