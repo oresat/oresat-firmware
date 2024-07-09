@@ -10,11 +10,37 @@ sample_t sample[SAMPLES];
 
 void dtc_init(void)
 {
-  dtc.padcsample = &OD_RAM.x4000_adcsample.led_current;
-  dtc.pdiode_select = &OD_RAM.x4001_diode.select;
-  dtc.pdac = &OD_RAM.x4001_diode.dac;
-  dtc.perror = &OD_RAM.x4001_diode.error;
-  dac_start();
+  dtc.pfunc[0] = NULL; // NOP
+  dtc.pfunc[1] = &dtc_dacStart;
+  dtc.pfunc[2] = &dtc_dacStop;
+  dtc.pfunc[3] = &dtc_dacSet;
+  dtc.pfunc[4] = &dtc_gptStart;
+  dtc.pfunc[5] = &dtc_gptStop;
+  dtc.pfunc[6] = &dtc_adcStart;
+  dtc.pfunc[7] = &dtc_adcStop;
+  dtc.pfunc[8] = &dtc_muxEnable;
+  dtc.pfunc[9] = &dtc_muxDisable;
+
+  int i;
+  for(i = 0; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
+
+  dtc.functionCount = i;
+
+  dtc.pctrl = &OD_RAM.x4000_dtc.ctrl;
+  dtc.pmux_select = &OD_RAM.x4000_dtc.mux_select;
+  dtc.pdac = &OD_RAM.x4000_dtc.dac;
+  dtc.pstatus = &OD_RAM.x4000_dtc.status;
+  dtc.perror = &OD_RAM.x4000_dtc.error;
+
+  dtc.pled_current = &OD_RAM.x4001_adcsample.led_current;
+  dtc.pled_swir_pd_current = &OD_RAM.x4001_adcsample.led_swir_pd_current;
+  dtc.puv_pd_current = &OD_RAM.x4001_adcsample.uv_pd_current;
+  dtc.ptsen = &OD_RAM.x4001_adcsample.tsen;
+  
+  dtc.padcsample = &OD_RAM.x4001_adcsample.led_current;
+
+  dtc_dacStart();
+  dtc_gptStart();
 }
 
 /*
@@ -26,10 +52,21 @@ static const DACConfig dac1cfg1 = {
   .cr           = 0
 };
 
-void dac_start(void)
+void dtc_dacStart(void)
 {
-//  palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_ANALOG);
   dacStart(&DACD1, &dac1cfg1);
+}
+
+void dtc_dacStop(void)
+{
+  dacStop(&DACD1);
+}
+
+void dtc_dacSet(void)
+{
+  osalSysLock();
+  dacPutChannelX(&DACD1, 0, *dtc.pdac);
+  osalSysUnlock();
 }
 
 /*
@@ -39,10 +76,10 @@ static void adc_callback(ADCDriver *adcp) {
   sample_t *psample = (sample_t*)adcp->samples;
   int i = adcIsBufferComplete(adcp); 
  
-  OD_RAM.x4000_adcsample.led_current = psample[i].led_current;
-  OD_RAM.x4000_adcsample.led_swir_pd_current = psample[i].led_swir_pd_current;
-  OD_RAM.x4000_adcsample.uv_pd_current = psample[i].uv_pd_current;
-  OD_RAM.x4000_adcsample.tsen = psample[i].tsen;
+  OD_RAM.x4001_adcsample.led_current = psample[i].led_current;
+  OD_RAM.x4001_adcsample.led_swir_pd_current = psample[i].led_swir_pd_current;
+  OD_RAM.x4001_adcsample.uv_pd_current = psample[i].uv_pd_current;
+  OD_RAM.x4001_adcsample.tsen = psample[i].tsen;
 }
 
 static void adc_error_callback(ADCDriver *adcp, adcerror_t err) {
@@ -67,7 +104,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
   ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL17          
 };
 
-/*
+/**
  * GPT6 configuration.
  */
 static const GPTConfig gpt1cfg1 = {
@@ -77,17 +114,50 @@ static const GPTConfig gpt1cfg1 = {
   .dier         = 0U
 };
 
-void adc_start(void)
+void dtc_gptStart(void)
 {
   gptStart(&GPTD1, &gpt1cfg1);
   gptStartContinuous(&GPTD1, 100U);
-  adcSTM32SetCCR(ADC_CCR_TSEN);
-  adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  (*dtc.pstatus) |= (1 << CTRL_GPT_EN);
+}
+
+void dtc_gptStop(void)
+{
+  gptStop(&GPTD1);
+  (*dtc.pstatus) &= ~(1 << CTRL_GPT_EN);
+}
+
+void dtc_adcStart(void)
+{
+  adcStart(&ADCD1, NULL);
+  if(ADCD1.state == ADC_READY)
+  {
+    (*dtc.pstatus) |= (1 << CTRL_ADC_EN);
+    adcSTM32SetCCR(ADC_CCR_TSEN);
+    adcStartConversion(&ADCD1, &adcgrpcfg1, (adcsample_t *)sample, BUFFER_DEPTH);
+  }
+  else
+  {
+    (*dtc.perror) = (*dtc.perror) | ERROR_ADC_START;
+  }
+}
+
+void dtc_adcStop(void)
+{
+  adcStop(&ADCD1);
+  if(ADCD1.state == ADC_STOP)
+  {
+    (*dtc.pstatus) &= ~(1 << CTRL_ADC_EN);
+  }
+  else
+  {
+    (*dtc.perror) = (*dtc.perror) | ERROR_ADC_STOP;
+  }
 }
 
 /**
- * blinking example thread definition 
-*/
+ * blink thread 
+ */
 THD_WORKING_AREA(blink_wa, 0x400);
 THD_FUNCTION(blink, arg)
 {
@@ -115,24 +185,26 @@ THD_FUNCTION(adc_watch, arg)
 {
   (void)arg; 
 
-  // give oresat_start time to release the adc bus
+  /// give oresat_start time to release the adc bus
   while(ADCD1.state != ADC_READY)
   {
     chThdSleepMilliseconds(200);
   }
 
-  adc_start();
+  dtc_adcStart();
 
   while(!chThdShouldTerminateX()) 
   {
 //*   
-    chprintf(DEBUG_SERIAL,   "\r\n%04u ",    dtc.padcsample[0]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[1]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    dtc.padcsample[2]);
-    chprintf(DEBUG_SERIAL,       "%04u\r\n", dtc.padcsample[3]);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdiode_select);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.pdac);
-    chprintf(DEBUG_SERIAL,       "%04u ",    *dtc.perror);
+    chprintf(DEBUG_SERIAL, "\r\nctrl:                  %04u \r\n", *dtc.pctrl);
+    chprintf(DEBUG_SERIAL,     "mux_select:            %04u \r\n", *dtc.pmux_select);
+    chprintf(DEBUG_SERIAL,     "dac:                   %04u \r\n", *dtc.pdac);
+    chprintf(DEBUG_SERIAL,     "status:              0x%04X \r\n", *dtc.pstatus);
+    chprintf(DEBUG_SERIAL,     "error:               0x%04X \r\n", *dtc.perror);
+    chprintf(DEBUG_SERIAL,     "led_current:           %04u \r\n", *dtc.pled_current);
+    chprintf(DEBUG_SERIAL,     "led_swir_pd_current:   %04u \r\n", *dtc.pled_swir_pd_current);
+    chprintf(DEBUG_SERIAL,     "uv_pd_current:         %04u \r\n", *dtc.puv_pd_current);
+    chprintf(DEBUG_SERIAL,     "tsen:                  %04u \r\n", *dtc.ptsen);
 //*/
 
     chThdSleepMilliseconds(500);
@@ -143,31 +215,55 @@ THD_FUNCTION(adc_watch, arg)
   chThdExit(MSG_OK);
 }
 
+void dtc_muxEnable(void)
+{
+  palSetPad(GPIOB, DTC_MUX_EN);
+  (*dtc.pstatus) |= (1 << CTRL_MUX_EN);
+}
+
+void dtc_muxDisable(void)
+{
+  palClearPad(GPIOB, DTC_MUX_EN);
+  (*dtc.pstatus) &= ~(1 << CTRL_MUX_EN);
+}
+
+void dtc_muxSelect(void)
+{
+ if(*dtc.pmux_select < DTC_NUM_DIODES)
+  {
+    osalSysLock();
+    palWriteGroup(
+      GPIOB, 
+      PAL_PORT_BIT(DTC_MUX_A0) | PAL_PORT_BIT(DTC_MUX_A1) | PAL_PORT_BIT(DTC_MUX_A2), 
+      0, 
+      (*dtc.pmux_select << DTC_MUX_A0)
+    );
+    *dtc.pctrl = (*dtc.pstatus & (~CTRL_MUX_MASK)) | (*dtc.pmux_select << CTRL_MUX_A0);
+    osalSysUnlock();
+  }
+}
+
 /**
  *  diode select
 */
 THD_WORKING_AREA(diode_select_wa, 0x400);
 THD_FUNCTION(diode_select, arg)
 {
-  (void)arg; 
+  (void)arg;
+
+  //dtc_muxEnable(); //PB12 
 
   while (!chThdShouldTerminateX()) 
   {
-   if(*dtc.pdiode_select < DTC_NUM_DIODES)
+    
+    if(*dtc.pctrl > 0 && *dtc.pctrl <= dtc.functionCount)
     {
-      osalSysLock();
-      palWriteGroup(
-        GPIOB, 
-        PAL_PORT_BIT(DTC_MUX_A0) | PAL_PORT_BIT(DTC_MUX_A1) | PAL_PORT_BIT(DTC_MUX_A2), 
-        0, 
-        (*dtc.pdiode_select << DTC_MUX_A0)
-      );
-      osalSysUnlock();
+      dtc.pfunc[*dtc.pctrl]();
+      *dtc.pctrl = 0;
     }
-
-    osalSysLock();
-    dacPutChannelX(&DACD1, 0, *dtc.pdac);
-    osalSysUnlock();
+  
+    dtc_muxSelect();
+    dtc_dacSet();
 
     chThdSleepMilliseconds(200);
   }
