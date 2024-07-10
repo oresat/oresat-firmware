@@ -101,6 +101,7 @@ extern THD_FUNCTION(diode_select, arg);
  * function declaration 
 */
 void dtc_init(void);
+void dtc_doNothing(void);
 void dtc_dacStart(void);
 void dtc_dacStop(void);
 void dtc_dacSet(void);

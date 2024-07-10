@@ -8,9 +8,15 @@ DTC dtc = { 0 };
 sample_t sample[SAMPLES];
 #define BUFFER_DEPTH            sizeof(sample)/sizeof(sample_t)
 
+void dtc_doNothing(void)
+{
+  // blank stub placeholder
+  // TODO: fix this temp workaround
+}
+
 void dtc_init(void)
 {
-  dtc.pfunc[0] = NULL; // NOP
+  dtc.pfunc[0] = &dtc_doNothing; // NOP TODO: do something better
   dtc.pfunc[1] = &dtc_dacStart;
   dtc.pfunc[2] = &dtc_dacStop;
   dtc.pfunc[3] = &dtc_dacSet;
@@ -21,9 +27,8 @@ void dtc_init(void)
   dtc.pfunc[8] = &dtc_muxEnable;
   dtc.pfunc[9] = &dtc_muxDisable;
 
-  int i;
-  for(i = 0; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
-
+  int i = 0; // count the number of functions
+  for(; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
   dtc.functionCount = i;
 
   dtc.pctrl = &OD_RAM.x4000_dtc.ctrl;
