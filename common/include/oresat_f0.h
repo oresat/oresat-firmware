@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-// See STM32F091xC-bootloader.ld/STM32F4091xC-app.ld for definitions and
+// See STM32F091xC-bootloader.ld/STM32F091xC-app.ld for definitions and
 // rules_memory.ld for declarations.
 extern uint8_t __flash0_base__[];
 extern uint8_t __flash0_end__[];

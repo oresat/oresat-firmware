@@ -30,9 +30,6 @@ Join one of our meetings. Meetings can be found in [Our Calendar](https://calend
   Here are links to some of our supported development boards.
 
   * [NUCLEO-F091RC](https://www.mouser.com/ProductDetail/STMicroelectronics/NUCLEO-F091RC?qs=CE9ecZDhCK0jcTHFYd%2Fi5g%3D%3D#.YoAe6h4MCag.link)
-  * [NUCLEO-F446RE](https://www.mouser.com/ProductDetail/STMicroelectronics/NUCLEO-F446RE?qs=PRtH0mD6DWYnuBoPSlbRCA%3D%3D)
-  * [NUCLEO-L452RE](https://www.mouser.com/ProductDetail/STMicroelectronics/NUCLEO-L452RE?qs=zwwtnr6GuIyXyX5dw%2FgKaw%3D%3D)
-  * [NUCLEO-F439ZI](https://www.mouser.com/ProductDetail/STMicroelectronics/NUCLEO-F439ZI?qs=w%2Fv1CP2dgqohyY3gLxBfCw%3D%3D)
 
   Be sure to test with [app_blinky](https://github.com/oresat/oresat-firmware#test-your-toolchain)!
 
