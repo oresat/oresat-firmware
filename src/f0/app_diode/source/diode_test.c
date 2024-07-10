@@ -238,7 +238,7 @@ void dtc_muxSelect(void)
       0, 
       (*dtc.pmux_select << DTC_MUX_A0)
     );
-    *dtc.pctrl = (*dtc.pstatus & (~CTRL_MUX_MASK)) | (*dtc.pmux_select << CTRL_MUX_A0);
+    *dtc.pstatus = (*dtc.pstatus & (~CTRL_MUX_MASK)) | (*dtc.pmux_select << CTRL_MUX_A0);
     osalSysUnlock();
   }
 }
