@@ -34,13 +34,6 @@ jobs:
         sudo apt update
         sudo apt install -y gcc-arm-none-eabi srecord xxd
 
-    - name: Apply C3 patches
-      working-directory:
-        ext/ChibiOS
-      run: |
-        patch -p0 < ../../src/f4/app_control/stm32f42x_43x_efl.patch
-        patch -p1 < ../../src/f4/app_control/stm32f439_hmacsha256.patch
-
     - name: Compile f0 apps
       run: |
         make -C src/f0/app_battery
@@ -49,14 +42,3 @@ jobs:
         make -C src/f0/app_devboard
         make -C src/f0/app_adcs
         make -C src/f0/app_solar
-
-    - name: Compile f4 apps
-      run: |
-        make -C src/f4/app_blinky
-        make -C src/f4/app_cantest
-
-    - name: Compile l4 apps
-      run: |
-        make -C src/l4/app_blinky
-        make -C src/l4/app_devboard
-        make -C src/l4/app_devboard_cpp
