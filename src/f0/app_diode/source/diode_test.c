@@ -221,14 +221,15 @@ THD_FUNCTION(adc_watch, arg)
 }
 
 void dtc_muxEnable(void)
-{
-  palSetPad(GPIOB, DTC_MUX_EN);
+{	
+	//PB12
+  palClearPad(GPIOB, DTC_MUX_EN); // logic low enable
   (*dtc.pstatus) |= (1 << CTRL_MUX_EN);
 }
 
 void dtc_muxDisable(void)
 {
-  palClearPad(GPIOB, DTC_MUX_EN);
+  palSetPad(GPIOB, DTC_MUX_EN); // logic high disable
   (*dtc.pstatus) &= ~(1 << CTRL_MUX_EN);
 }
 
@@ -256,7 +257,7 @@ THD_FUNCTION(diode_select, arg)
 {
   (void)arg;
 
-  //dtc_muxEnable(); //PB12 
+  dtc_muxEnable();  
 
   while (!chThdShouldTerminateX()) 
   {
