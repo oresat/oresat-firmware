@@ -17,6 +17,7 @@
 
 #define DTC_NODE_ID             0x54
 
+// definitions from the board file
 #define DTC_LED                 GPIOA_LED
 #define DTC_MUX_EN              GPIOB_LED_MUX_EN
 #define DTC_MUX_A0              GPIOB_LED_MUX_A0
@@ -26,8 +27,9 @@
 
 #define DTC_NUM_DIODES          8
 
-#define SAMPLES                 2
+#define SAMPLES                 2  // number of samples in sample buffer
 
+// bits for OD error object
 #define ERROR_DAC               (1 << 0)
 #define ERROR_ADC_CB            (1 << 1)
 #define ERROR_ADC_START         (1 << 2)
@@ -35,8 +37,7 @@
 #define ERROR_4                 (1 << 4)
 #define ERROR_5                 (1 << 5)
 
-
-/// status OD definitions
+// bits for OD status object
 #define CTRL_DAC_EN             0x0
 #define CTRL_GPT_EN             0x1
 #define CTRL_ADC_EN             0x2
@@ -57,6 +58,9 @@
 // bit masks
 #define CTRL_MUX_MASK           (0x7 << CTRL_MUX_A0)
 
+/*
+ * sample_t struct for buffering samples
+ */
 typedef struct 
 {
   adcsample_t led_current;          // PA1
@@ -69,8 +73,12 @@ typedef struct
 
 #define MAX_FUNCTIONS           64
 
+/*
+ * DTC struct
+ */
 typedef struct 
 {
+	// pointers to OD objects
   uint8_t *pctrl;
   uint8_t *pmux_select;
   uint16_t *pdac;
@@ -82,24 +90,21 @@ typedef struct
   adcsample_t *puv_pd_current;
   adcsample_t *ptsen;
   adcsample_t *padcsample;
-  int functionCount;
-  ADCDriver *padc;
-  GPTDriver *pgpt;
-  
+  int lastFunctionIndex; // last index of functions set in *pfunc[]
 } DTC; 
 
-/**
+/*
  * thread declaration 
-*/
+ */
 extern THD_WORKING_AREA(blink_wa, 0x400);
 extern THD_FUNCTION(blink, arg);
-extern THD_WORKING_AREA(adc_watch_wa, 0x400);
-extern THD_FUNCTION(adc_watch, arg);
+extern THD_WORKING_AREA(dtc_watch_wa, 0x400);
+extern THD_FUNCTION(dtc_watch, arg);
 extern THD_WORKING_AREA(ctrl_thread_wa, 0x400);
 extern THD_FUNCTION(ctrl_thread, arg);
-/**
+/*
  * function declaration 
-*/
+ */
 void dtc_init(void);
 void dtc_callCtrlThreadFunctions(void);
 void dtc_dacStart(void);
@@ -112,5 +117,6 @@ void dtc_adcStop(void);
 void dtc_muxEnable(void);
 void dtc_muxDisable(void);
 void dtc_muxSelect(void);
+void dtc_clearErrors(void);
 
 #endif

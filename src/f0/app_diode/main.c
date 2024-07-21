@@ -39,19 +39,19 @@ static thread_descriptor_t blink_worker_desc = {
   .arg = NULL
 };
 
-static worker_t adc_watch_worker;
-static thread_descriptor_t adc_watch_worker_desc = {
-  .name = "adc watcher thread",
-  .wbase = THD_WORKING_AREA_BASE(adc_watch_wa),
-  .wend = THD_WORKING_AREA_END(adc_watch_wa),
+static worker_t dtc_watch_worker;
+static thread_descriptor_t dtc_watch_worker_desc = {
+  .name = "stc watcher thread",
+  .wbase = THD_WORKING_AREA_BASE(dtc_watch_wa),
+  .wend = THD_WORKING_AREA_END(dtc_watch_wa),
   .prio = NORMALPRIO,
-  .funcp = adc_watch,
+  .funcp = dtc_watch,
   .arg = NULL
 };
 
 static worker_t ctrl_thread_worker;
 static thread_descriptor_t ctrl_thread_worker_desc = {
-  .name = "diode select thread",
+  .name = "control thread",
   .wbase = THD_WORKING_AREA_BASE(ctrl_thread_wa),
   .wend = THD_WORKING_AREA_END(ctrl_thread_wa),
   .prio = NORMALPRIO,
@@ -67,7 +67,7 @@ static void app_init(void)
   /* App initialization */
   dtc_init();  
   reg_worker(&blink_worker, &blink_worker_desc, true, true);
-  reg_worker(&adc_watch_worker, &adc_watch_worker_desc, true, true);
+  reg_worker(&dtc_watch_worker, &dtc_watch_worker_desc, true, true);
   reg_worker(&ctrl_thread_worker, &ctrl_thread_worker_desc, true, true);
   
   /* Start up serial for debug output */
@@ -82,7 +82,7 @@ int main(void)
   // Initialize and start
   oresat_init(&oresat_conf);
   app_init();
-  chprintf(DEBUG_SERIAL, "\r\nStarting app_dtc...\r\n");
+  chprintf(DEBUG_SERIAL, "\r\nStarting app_diode...\r\n");
   oresat_start();
 
   return 0;
