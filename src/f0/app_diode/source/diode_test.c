@@ -278,7 +278,7 @@ THD_FUNCTION(dtc_watch, arg)
     chprintf(DEBUG_SERIAL,     "tsen:                  %04u \r\n", *dtc.ptsen);
 //*/
 
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(5000);
   }
 
   dbgprintf("Terminating dtc_watch thread...\r\n");
