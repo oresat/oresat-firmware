@@ -15,9 +15,9 @@ sample_t sample[SAMPLES];
 void dtc_callCtrlThreadFunctions(void)
 {
   
-	// TODO: call these functions based on status object
-	dtc_muxSelect();
-	dtc_dacSet();
+  // TODO: call these functions based on status object
+  dtc_muxSelect();
+  dtc_dacSet();
 }
 
 /*
@@ -26,8 +26,8 @@ void dtc_callCtrlThreadFunctions(void)
  */
 void dtc_init(void)
 {
-	// fill array with function pointers
-	// their indeces are used to call from the OD using CANopen
+  // fill array with function pointers
+  // their indeces are used to call from the OD using CANopen
   dtc.pfunc[1] = &dtc_dacStart;
   dtc.pfunc[2] = &dtc_dacStop;
   dtc.pfunc[3] = &dtc_gptStart;
@@ -37,13 +37,13 @@ void dtc_init(void)
   dtc.pfunc[7] = &dtc_muxEnable;
   dtc.pfunc[8] = &dtc_muxDisable;
   dtc.pfunc[9] = &dtc_clearErrors;
-	//        ^  lastFunctionIndex
+  //        ^  lastFunctionIndex
 
   int i = 1; // determine last index of functions 
   for(; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
   dtc.lastFunctionIndex = i;
 
-	// create pointers to OD objects
+  // create pointers to OD objects
   dtc.pctrl = &OD_RAM.x4000_dtc.ctrl;
   dtc.pmux_select = &OD_RAM.x4000_dtc.mux_select;
   dtc.pdac = &OD_RAM.x4000_dtc.dac;
@@ -57,7 +57,7 @@ void dtc_init(void)
   
   dtc.padcsample = &OD_RAM.x4001_adcsample.led_current;
 
-	// start drivers
+  // start drivers
   dtc_dacStart();
   dtc_gptStart();
 }
@@ -72,8 +72,8 @@ static const DACConfig dac1cfg1 = {
 };
 
 /*
- *	dtc_dacStart 
- *	wrapper that calls the ChibiOS version	
+ *  dtc_dacStart 
+ *  wrapper that calls the ChibiOS version  
  */
 void dtc_dacStart(void)
 {
@@ -95,16 +95,16 @@ void dtc_dacStop(void)
  */
 void dtc_dacSet(void)
 {
-	if(*dtc.pdac < 0xFFF)
-	{
-		osalSysLock();
-		dacPutChannelX(&DACD1, 0, *dtc.pdac);
-		osalSysUnlock();
-	}
-	else
-	{
-		//TODO: set bit in error object
-	}
+  if(*dtc.pdac < 0xFFF)
+  {
+    osalSysLock();
+    dacPutChannelX(&DACD1, 0, *dtc.pdac);
+    osalSysUnlock();
+  }
+  else
+  {
+    //TODO: set bit in error object
+  }
 }
 
 /*
@@ -142,7 +142,7 @@ static const ADCConversionGroup adcgrpcfg1 = {
   adc_error_callback,
   ADC_CFGR1_EXTEN_RISING | ADC_CFGR1_RES_12BIT,   /* CFGR1 */
   ADC_TR(0, 0),                                   /* TR */
-	/* SMPR set to long delay because of possible sanmple and hold issue*/
+  /* SMPR set to long delay because of possible sanmple and hold issue*/
   ADC_SMPR_SMP_239P5,                             /* SMPR */
   ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL5  |        /* CHSELR */
   ADC_CHSELR_CHSEL6 | ADC_CHSELR_CHSEL17          
@@ -291,7 +291,7 @@ THD_FUNCTION(dtc_watch, arg)
  * enables the diode mux (logic low enable)
  */
 void dtc_muxEnable(void)
-{	
+{ 
   palClearPad(GPIOB, DTC_MUX_EN); // logic low enable
   (*dtc.pstatus) |= (1 << CTRL_MUX_EN);
 }
@@ -340,19 +340,19 @@ THD_FUNCTION(ctrl_thread, arg)
     
     if(*dtc.pctrl > 0) 
     {
-			if(*dtc.pctrl <= dtc.lastFunctionIndex)
-			{
-				dtc.pfunc[*dtc.pctrl]();
-			}
-			else
-			{	
-				// TODO: set error bit in OD
-			}
-			
-			*dtc.pctrl = 0;
+      if(*dtc.pctrl <= dtc.lastFunctionIndex)
+      {
+        dtc.pfunc[*dtc.pctrl]();
+      }
+      else
+      { 
+        // TODO: set error bit in OD
+      }
+      
+      *dtc.pctrl = 0;
     }
     
-		dtc_callCtrlThreadFunctions();
+    dtc_callCtrlThreadFunctions();
 
     chThdSleepMilliseconds(200);
   }
