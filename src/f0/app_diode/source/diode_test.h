@@ -95,13 +95,13 @@ extern THD_WORKING_AREA(blink_wa, 0x400);
 extern THD_FUNCTION(blink, arg);
 extern THD_WORKING_AREA(adc_watch_wa, 0x400);
 extern THD_FUNCTION(adc_watch, arg);
-extern THD_WORKING_AREA(diode_select_wa, 0x400);
-extern THD_FUNCTION(diode_select, arg);
+extern THD_WORKING_AREA(ctrl_thread_wa, 0x400);
+extern THD_FUNCTION(ctrl_thread, arg);
 /**
  * function declaration 
 */
 void dtc_init(void);
-void dtc_doNothing(void);
+void dtc_callCtrlThreadFunctions(void);
 void dtc_dacStart(void);
 void dtc_dacStop(void);
 void dtc_dacSet(void);

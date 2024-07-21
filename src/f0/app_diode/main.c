@@ -49,13 +49,13 @@ static thread_descriptor_t adc_watch_worker_desc = {
   .arg = NULL
 };
 
-static worker_t diode_select_worker;
-static thread_descriptor_t diode_select_worker_desc = {
+static worker_t ctrl_thread_worker;
+static thread_descriptor_t ctrl_thread_worker_desc = {
   .name = "diode select thread",
-  .wbase = THD_WORKING_AREA_BASE(diode_select_wa),
-  .wend = THD_WORKING_AREA_END(diode_select_wa),
+  .wbase = THD_WORKING_AREA_BASE(ctrl_thread_wa),
+  .wend = THD_WORKING_AREA_END(ctrl_thread_wa),
   .prio = NORMALPRIO,
-  .funcp = diode_select,
+  .funcp = ctrl_thread,
   .arg = NULL
 };
 
@@ -68,7 +68,7 @@ static void app_init(void)
   dtc_init();  
   reg_worker(&blink_worker, &blink_worker_desc, true, true);
   reg_worker(&adc_watch_worker, &adc_watch_worker_desc, true, true);
-  reg_worker(&diode_select_worker, &diode_select_worker_desc, true, true);
+  reg_worker(&ctrl_thread_worker, &ctrl_thread_worker_desc, true, true);
   
   /* Start up serial for debug output */
   sdStart(&SD2, NULL);

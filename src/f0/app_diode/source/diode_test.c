@@ -8,15 +8,16 @@ DTC dtc = { 0 };
 sample_t sample[SAMPLES];
 #define BUFFER_DEPTH            sizeof(sample)/sizeof(sample_t)
 
-void dtc_doNothing(void)
+void dtc_callCtrlThreadFunctions(void)
 {
-  // blank stub placeholder
-  // TODO: fix this temp workaround
+  // gets called every time ctrl_thread is polled
+	dtc_muxSelect();
+	dtc_dacSet();
 }
 
 void dtc_init(void)
 {
-  dtc.pfunc[0] = &dtc_doNothing; // NOP TODO: do something better
+  dtc.pfunc[0] = &dtc_callCtrlThreadFunctions; 
   dtc.pfunc[1] = &dtc_dacStart;
   dtc.pfunc[2] = &dtc_dacStop;
   dtc.pfunc[3] = &dtc_dacSet;
@@ -252,8 +253,8 @@ void dtc_muxSelect(void)
 /**
  *  diode select
 */
-THD_WORKING_AREA(diode_select_wa, 0x400);
-THD_FUNCTION(diode_select, arg)
+THD_WORKING_AREA(ctrl_thread_wa, 0x400);
+THD_FUNCTION(ctrl_thread, arg)
 {
   (void)arg;
 
@@ -267,9 +268,8 @@ THD_FUNCTION(diode_select, arg)
       dtc.pfunc[*dtc.pctrl]();
       *dtc.pctrl = 0;
     }
-  
-    dtc_muxSelect();
-    dtc_dacSet();
+    
+		dtc_callCtrlThreadFunctions();
 
     chThdSleepMilliseconds(200);
   }
