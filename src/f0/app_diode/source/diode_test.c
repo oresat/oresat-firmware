@@ -27,7 +27,8 @@ void dtc_callCtrlThreadFunctions(void)
 void dtc_init(void)
 {
   // fill array with function pointers
-  // their indeces are used to call from the OD using CANopen
+  // indeces are used to call functions from the OD ctrl
+  // dtc.pfunc[MAX_FUNCTIONS] is initialized to NULL
   dtc.pfunc[1] = &dtc_dacStart;
   dtc.pfunc[2] = &dtc_dacStop;
   dtc.pfunc[3] = &dtc_gptStart;
@@ -39,7 +40,8 @@ void dtc_init(void)
   dtc.pfunc[9] = &dtc_clearErrors;
   //        ^  lastFunctionIndex
 
-  int i = 1; // determine last index of functions 
+  int i = 1; // first function in dtc.pfunc
+  // determine last index of functions 
   for(; *dtc.pfunc[i] && i < MAX_FUNCTIONS; ++i){}
   dtc.lastFunctionIndex = i;
 
@@ -48,12 +50,14 @@ void dtc_init(void)
   dtc.pmux_select = &OD_RAM.x4000_dtc.mux_select;
   dtc.pdac = &OD_RAM.x4000_dtc.dac;
   dtc.pstatus = &OD_RAM.x4000_dtc.status;
-  dtc.perror = &OD_RAM.x4000_dtc.error;
+  dtc.perror = &OD_RAM.x4000_dtc.error; 
 
   dtc.pled_current = &OD_RAM.x4001_adcsample.led_current;
   dtc.pled_swir_pd_current = &OD_RAM.x4001_adcsample.led_swir_pd_current;
   dtc.puv_pd_current = &OD_RAM.x4001_adcsample.uv_pd_current;
-  dtc.ptsen = &OD_RAM.x4001_adcsample.tsen;
+  // TODO: there is already an OD object planned for tsen
+  // this can be replaced when that is defined
+  //dtc.ptsen = &OD_RAM.x4001_adcsample.tsen;
   
   dtc.padcsample = &OD_RAM.x4001_adcsample.led_current;
 
@@ -118,7 +122,7 @@ static void adc_callback(ADCDriver *adcp) {
   OD_RAM.x4001_adcsample.led_current = psample[i].led_current;
   OD_RAM.x4001_adcsample.led_swir_pd_current = psample[i].led_swir_pd_current;
   OD_RAM.x4001_adcsample.uv_pd_current = psample[i].uv_pd_current;
-  OD_RAM.x4001_adcsample.tsen = psample[i].tsen;
+  //OD_RAM.x4001_adcsample.tsen = psample[i].tsen; // TODO: replace with reserved object
 }
 
 /*
@@ -275,7 +279,7 @@ THD_FUNCTION(dtc_watch, arg)
     chprintf(DEBUG_SERIAL,     "led_current:           %04u \r\n", *dtc.pled_current);
     chprintf(DEBUG_SERIAL,     "led_swir_pd_current:   %04u \r\n", *dtc.pled_swir_pd_current);
     chprintf(DEBUG_SERIAL,     "uv_pd_current:         %04u \r\n", *dtc.puv_pd_current);
-    chprintf(DEBUG_SERIAL,     "tsen:                  %04u \r\n", *dtc.ptsen);
+    //chprintf(DEBUG_SERIAL,     "tsen:                  %04u \r\n", *dtc.ptsen);
 //*/
 
     chThdSleepMilliseconds(5000);
@@ -307,7 +311,7 @@ void dtc_muxDisable(void)
 
 /*
  * dtc_muxSelect
- * select desired diode (0 -7)
+ * select desired diode (0 - 7)
  */
 void dtc_muxSelect(void)
 {
@@ -338,6 +342,8 @@ THD_FUNCTION(ctrl_thread, arg)
   while (!chThdShouldTerminateX()) 
   {
     
+    // TODO: make this thread interrupt driven instead of polling
+    // might need interrupts for changes in mux_select and dac as well
     if(*dtc.pctrl > 0) 
     {
       if(*dtc.pctrl <= dtc.lastFunctionIndex)
@@ -357,7 +363,7 @@ THD_FUNCTION(ctrl_thread, arg)
     chThdSleepMilliseconds(200);
   }
 
-  dbgprintf("Terminating diode select thread...\r\n");
+  dbgprintf("Terminating ctrl_thread...\r\n");
 
   chThdExit(MSG_OK);
 }

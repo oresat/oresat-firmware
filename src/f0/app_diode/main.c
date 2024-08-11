@@ -41,7 +41,7 @@ static thread_descriptor_t blink_worker_desc = {
 
 static worker_t dtc_watch_worker;
 static thread_descriptor_t dtc_watch_worker_desc = {
-  .name = "stc watcher thread",
+  .name = "dtc watcher thread",
   .wbase = THD_WORKING_AREA_BASE(dtc_watch_wa),
   .wend = THD_WORKING_AREA_END(dtc_watch_wa),
   .prio = NORMALPRIO,

@@ -53,7 +53,7 @@
 #define CTRL_C                  0xC
 #define CTRL_D                  0xD
 #define CTRL_E                  0xE
-#define CTRL_F                  0xFa
+#define CTRL_F                  0xF
 
 // bit masks
 #define CTRL_MUX_MASK           (0x7 << CTRL_MUX_A0)
