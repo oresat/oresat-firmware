@@ -192,7 +192,7 @@ THD_FUNCTION(pdo_sync, arg)
 
     /* Register the callback function to wake up thread when message received */
     CO_SYNC_initCallbackPre(co->SYNC, chThdGetSelfX(), process_cb);
-#ifdef OD_CNT_RPDO
+#if OD_CNT_RPDO > 0
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         CO_RPDO_initCallbackPre(&co->RPDO[i], chThdGetSelfX(), process_cb);
     }
@@ -203,18 +203,24 @@ THD_FUNCTION(pdo_sync, arg)
         uint32_t timeout = ((typeof(timeout))-1);
         bool_t syncWas;
 
+#if (CO_CONFIG_SYNC) & CO_CONFIG_SYNC_ENABLE
         /* Process SYNC */
         syncWas = CO_process_SYNC(co, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+#endif
+#if (CO_CONFIG_PDO) & CO_CONFIG_RPDO_ENABLE
         /* Read inputs */
         CO_process_RPDO(co, syncWas, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+#endif
+#if (CO_CONFIG_PDO) & CO_CONFIG_TPDO_ENABLE
         /* Write outputs */
         CO_process_TPDO(co, syncWas, TIME_I2US(chVTTimeElapsedSinceX(prev_time)), &timeout);
+#endif
 
         prev_time = chVTGetSystemTime();
         chEvtWaitAnyTimeout(CO_EVT_WAKEUP | CO_EVT_TERMINATE, TIME_US2I(timeout));
     }
     CO_SYNC_initCallbackPre(co->SYNC, NULL, NULL);
-#ifdef OD_CNT_RPDO
+#if OD_CNT_RPDO > 0
     for (int i = 0; i < OD_CNT_RPDO; i++) {
         CO_RPDO_initCallbackPre(&co->RPDO[i], NULL, NULL);
     }
@@ -345,7 +351,7 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
     CO_t *CO = NULL;
     CO_ReturnError_t err;
     /* TODO: Use proper OD interface */
-#ifdef OD_CNT_RPDO
+#if OD_CNT_RPDO > 0
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDUsedByRPDO;
@@ -359,7 +365,7 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
             RPDOCommParam[i].COB_IDUsedByRPDO += node_id + i / 4;
     }
 #endif
-#ifdef OD_CNT_TPDO
+#if OD_CNT_TPDO > 0
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDUsedByTPDO;
