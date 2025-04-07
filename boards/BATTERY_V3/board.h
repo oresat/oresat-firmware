@@ -35,8 +35,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_BATTERY_V2
-#define BOARD_NAME                  "Battery v2.x"
+#define BOARD_BATTERY_V3
+#define BOARD_NAME                  "Battery v3.x"
 
 /*
  * Board oscillators-related settings.

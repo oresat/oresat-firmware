@@ -13,7 +13,7 @@ CANOPENSRC  := $(PROJ_SRC)/CO_driver.c                  \
                $(CANOPEN_SRC)/301/CO_SDOserver.c        \
                $(CANOPEN_SRC)/301/CO_SYNC.c             \
                $(CANOPEN_SRC)/301/CO_PDO.c              \
-			   $(CANOPEN_SRC)/301/crc16-ccitt.c         \
+               $(CANOPEN_SRC)/301/crc16-ccitt.c         \
                $(CANOPEN_SRC)/CANopen.c
 
 # Optional sources
