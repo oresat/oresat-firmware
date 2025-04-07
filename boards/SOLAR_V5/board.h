@@ -27,7 +27,7 @@
 /*===========================================================================*/
 
 /*
- * Oresat Solar V4 STM32F091CC board.
+ * Oresat Solar V5 STM32F091CC board.
  * PART: STM32F091CC
  * PACKAGE: LQFP32
  */
@@ -35,8 +35,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_ORSAT_SOLAR_V4
-#define BOARD_NAME                  "Oresat Solar v4.x"
+#define BOARD_ORSAT_SOLAR_V5
+#define BOARD_NAME                  "Oresat Solar v5.x"
 
 /*
  * Board oscillators-related settings.
