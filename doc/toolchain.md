@@ -35,13 +35,4 @@ The packages needed for Debian are as follow:
 `$ sudo apt install autoconf automake gcc-arm-none-eabi gdb-multiarch
  git libcapstone4 libftdi1-2 libgpiod2 libhidapi-hidraw0 libtool
  libusb-1.0-0 libusb-1.0-0-dev make pkg-config python3 srecord
- stlink-tools tcl xxd`
-
-OpenOCD can be built as follow:
-
-- `$ git clone https://git.code.sf.net/p/openocd/code openocd`
-- `$ cd openocd`
-- `$ ./bootstrap`
-- `$ ./configure --prefix=/usr --disable-werror --enable-stlink`
-- `$ make`
-- `$ sudo make install`
+ stlink-tools tcl xxd openocd`

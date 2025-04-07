@@ -86,11 +86,6 @@ Tools required:
 To install oresat-configs:
 * `$ pip install oresat-configs`
 
-PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
-package managers is several years old. You MUST build it from source for it
-to work with our boards, as there have been over 1000 commits since the
-last official release and several of our boards were added since then.
-
 Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.
 
