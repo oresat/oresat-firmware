@@ -1,116 +1,154 @@
-/**
-*  @project Oresat-1 solar board firmware
-*
-*  @file sensor_mon.c
-*
-*  @authors and contributors
-**/
-
 #include "ch.h"
 #include "hal.h"
-#include "tmp101.h"             // driver for Texas Instruments' TMP101 temperature sensor
 #include "CANopen.h"
-#include "solar.h"
 #include "OD.h"
 
+#include <sys/param.h>
 
-#if 0
-#define DEBUG_SD                (BaseSequentialStream *) &SD2
+#ifdef DEBUG_PRINT
 #include "chprintf.h"
-#define dbgprintf(str, ...)       chprintf((BaseSequentialStream*) &SD2, str, ##__VA_ARGS__)
+#define DEBUG_SD (BaseSequentialStream *) &SD2
+#define dbgprintf(str, ...) chprintf(DEBUG_SD, str, ##__VA_ARGS__)
 #else
 #define dbgprintf(str, ...)
 #endif
 
+#define ARRAY_SIZE(n) (sizeof(n)/sizeof(n[0]))
 
-//FIXME I believe MAX() is defined in some common C library???
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MIN(a,b) (((a)<(b))?(a):(b))
+// The i2c driver returns two separate kinds of errors, a msg_t or a i2cflags_t
+// The only unique error from msg_t is MSG_TIMEOUT though so if we make a new
+// i2cflags_t value that represents that we can just have one error type.
+#define I2C_DRIVER_TIMEOUT 0x80
 
-#define DEBUG_SD                  (BaseSequentialStream *) &SD2
+i2cflags_t transmit(I2CDriver * i2c, i2caddr_t addr,
+    const uint8_t *txbuf, size_t txbytes,
+    uint8_t *rxbuf, size_t rxbytes) {
 
-#define TMP101_SADDR_SENSOR_01  (0x48)
-#define TMP101_SADDR_SENSOR_02  (0x4A)
+    i2cflags_t errs = I2C_NO_ERROR;
+    i2cAcquireBus(i2c);
+    switch(i2cMasterTransmitTimeout(i2c, addr, txbuf, txbytes, rxbuf, rxbytes,
+        TIME_MS2I(50))) {
+    case MSG_RESET:
+        errs = i2cGetErrors(i2c);
+        break;
+    case MSG_TIMEOUT:
+        errs = I2C_DRIVER_TIMEOUT;
+        // On TIMEOUT the i2c driver goes into LOCKED and needs to be restarted
+        i2cStart(i2c, i2c->config);
+        break;
+    case MSG_OK:
+        break;
+    }
+    i2cReleaseBus(i2c);
+    return errs;
+}
 
-extern const I2CConfig i2cconfig;
 
-static const TMP101Config config_for_temp_sensor_01 = {
-    &I2CD2,
-    &i2cconfig,
-    TMP101_SADDR_SENSOR_01
-};
+// I2C addresses
+#define CELL_1  (0x48)
+#define CELL_2  (0x4A)
 
-static const TMP101Config config_for_temp_sensor_02 = {
-    &I2CD2,
-    &i2cconfig,
-    TMP101_SADDR_SENSOR_02
-};
+// Register addresses
+static const uint8_t TEMPERATURE   = 0x00;
+static const uint8_t CONFIGURATION = 0x01;
 
-static TMP101Driver device_driver_for_temp_sensor_01;
-static TMP101Driver device_driver_for_temp_sensor_02;
+// Configure register bits
+#define SD     (1 << 0)
+#define TM     (1 << 1)
+#define POL    (1 << 2)
+#define FQ_1   (0 << 3)
+#define FQ_2   (1 << 3)
+#define FQ_4   (2 << 3)
+#define FQ_6   (3 << 3)
+#define RES_09 (0 << 5)
+#define RES_10 (1 << 5)
+#define RES_11 (2 << 5)
+#define RES_12 (3 << 5)
+#define OS     (1 << 7)
 
 
-/*===========================================================================*/
-/* public functions                                                          */
-/*===========================================================================*/
+msg_t OneShot(I2CDriver * i2c, i2caddr_t addr) {
+    uint8_t buf[2] = {CONFIGURATION, RES_09 | SD | OS};
+    return transmit(i2c, addr, buf, ARRAY_SIZE(buf), NULL, 0);
+}
+
+// The OD Records for cells 1 and 2 are the same type but our OD generator
+// doesn't yet know how to indicate that. This union is a quick hack to get the
+// types to work out.
+typedef union {
+    typeof(OD_RAM.x4001_cell_1) * cell;
+    typeof(OD_RAM.x4002_cell_2) * cell2;
+} CellRecord;
+
+i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, CellRecord record) {
+    // The temperature register is two bytes but we only have one byte assigned
+    // in the OD. Conveniently the high byte corresponds to signed degrees C
+    // which is also what the OD wants, so we just take the high byte and stuff
+    // it in the OD.
+    int8_t buf = 0;
+    i2cflags_t errs = transmit(i2c, addr, &TEMPERATURE, sizeof(TEMPERATURE),
+        (uint8_t*)&buf, sizeof(buf));
+
+    dbgprintf("Cell %X: %dC\r\n", addr, buf);
+
+    if(!errs) {
+        record.cell->temperature = buf;
+        record.cell->temperature_max = MAX(buf, record.cell->temperature_max);
+        record.cell->temperature_min = MIN(buf, record.cell->temperature_min);
+    }
+    return errs;
+}
+
 
 THD_WORKING_AREA(sensor_mon_wa, 0x200);
-THD_FUNCTION(sensor_mon, arg)
-{
-    (void)arg;
-    chThdSleepMilliseconds(10);
+THD_FUNCTION(sensor_mon, arg) {
+    I2CDriver *i2c = arg;
+    osalDbgCheck(i2c->state > I2C_STOP);
 
-    dbgprintf("Initializing TMP101 driver instances...\r\n");
-    tmp101ObjectInit(&device_driver_for_temp_sensor_01);
-    tmp101Start(&device_driver_for_temp_sensor_01, &config_for_temp_sensor_01);
+    dbgprintf("Starting TMP101\r\n");
 
-    tmp101ObjectInit(&device_driver_for_temp_sensor_02);
-    tmp101Start(&device_driver_for_temp_sensor_02, &config_for_temp_sensor_02);
+    CellRecord record1 = {.cell  = &OD_RAM.x4001_cell_1};
+    CellRecord record2 = {.cell2 = &OD_RAM.x4002_cell_2};
 
-    dbgprintf("Starting TMP101 loop,\r\n");
+    // FIXME: remove once oresat-configs is updated
+    record1.cell->temperature_max = INT8_MIN;
+    record1.cell->temperature_min = INT8_MAX;
 
-    int16_t temp_c = 0;
-    int32_t temp_mC = 0;
-    if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
-    	OD_RAM.x4001_cell_1.temperature = temp_c;
-    	OD_RAM.x4001_cell_1.temperature_max = temp_c;
-    	OD_RAM.x4001_cell_1.temperature_min = temp_c;
-    }
+    record2.cell->temperature_max = INT8_MIN;
+    record2.cell->temperature_min = INT8_MAX;
 
-    if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
-    	OD_RAM.x4002_cell_2.temperature = temp_c;
-    	OD_RAM.x4002_cell_2.temperature_max = temp_c;
-    	OD_RAM.x4002_cell_2.temperature_min = temp_c;
-    }
+    while (!chThdShouldTerminateX()) {
+        systime_t start = chVTGetSystemTime();
+        i2cflags_t errs = I2C_NO_ERROR;
 
-
-    while (!chThdShouldTerminateX())
-    {
-        if( tmp101ReadTemperature(&device_driver_for_temp_sensor_01, &temp_c, &temp_mC) == MSG_OK ) {
-        	OD_RAM.x4001_cell_1.temperature = temp_c;
-        	OD_RAM.x4001_cell_1.temperature_max = MAX(temp_c, OD_RAM.x4001_cell_1.temperature_max);
-        	OD_RAM.x4001_cell_1.temperature_min = MIN(temp_c, OD_RAM.x4001_cell_1.temperature_min);
-
-        	dbgprintf("temp_c 1 = %d C  (%d mC)\r\n", temp_c, temp_mC);
-        } else {
-        	dbgprintf("Failed to read I2C temperature\r\n");
-        	//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_1_COMM_ERROR);
+        if((errs = OneShot(i2c, CELL_1))) {
+            // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
+            //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_1_COMM_ERROR);
+            dbgprintf("Failed to read cell 1 temperature: %d\r\n", errs);
+        }
+        if((errs = OneShot(i2c, CELL_2))) {
+            // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
+            //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_1_COMM_ERROR);
+            dbgprintf("Failed to read cell 1 temperature: %d\r\n", errs);
         }
 
-        if( tmp101ReadTemperature(&device_driver_for_temp_sensor_02, &temp_c, &temp_mC) == MSG_OK ) {
-        	OD_RAM.x4002_cell_2.temperature = temp_c;
-			OD_RAM.x4002_cell_2.temperature_max = MAX(temp_c, OD_RAM.x4002_cell_2.temperature_max);
-			OD_RAM.x4002_cell_2.temperature_min = MIN(temp_c, OD_RAM.x4002_cell_2.temperature_min);
+        // 9 bit conversion takes a max of 75ms, see datasheet section 6.5
+        // There's no way to get an interrupt from the chip
+        chThdSleepUntil(start + TIME_MS2I(75));
 
-			dbgprintf("temp_c 2 = %d C  (%d mC)\r\n", temp_c, temp_mC);
-        } else {
-			dbgprintf("Failed to read I2C temperature\r\n");
-			//CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_2_COMM_ERROR);
+        if((errs = ReadTemperature(i2c, CELL_1, record1))) {
+            // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
+            //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_1_COMM_ERROR);
+            dbgprintf("Failed to read cell 1 temperature: %d\r\n", errs);
+        }
+        if((errs = ReadTemperature(i2c, CELL_2, record2))) {
+            // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
+            //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_2_COMM_ERROR);
+            dbgprintf("Failed to read cell 2 temperature: %d\r\n", errs);
         }
 
-        chThdSleepMilliseconds(4000);
+        chThdSleepUntil(start + TIME_MS2I(
+            OD_RAM.x1803_tpdo_4_communication_parameters.event_timer));
     }
-
-    palClearLine(LINE_LED);
     chThdExit(MSG_OK);
 }

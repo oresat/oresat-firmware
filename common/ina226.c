@@ -1,28 +1,137 @@
-/**
- * @file    ina226.c
- * @brief   INA226 Digital to Analog Converter.
- *
- * @addtogroup INA226
- * @ingrup ORESAT
- * @{
- */
+/* INA226 Digital to Analog Converter */
 
 #include "hal.h"
 #include "ina226.h"
 
-#define DEBUG_SD                  (BaseSequentialStream *) &SD2
+// INA226 Register Addresses
+#define INA226_AD_CONFIG                    0x00U
+#define INA226_AD_SHUNT                     0x01U
+#define INA226_AD_VBUS                      0x02U
+#define INA226_AD_POWER                     0x03U
+#define INA226_AD_CURRENT                   0x04U
+#define INA226_AD_CAL                       0x05U
+#define INA226_AD_ME                        0x06U
+#define INA226_AD_LIM                       0x07U
+#define INA226_AD_MFG_ID                    0xFEU
+#define INA226_AD_DIE_ID                    0xFFU
 
-/*===========================================================================*/
-/* Driver local definitions.                                                 */
-/*===========================================================================*/
 
-/*===========================================================================*/
-/* Driver exported variables.                                                */
-/*===========================================================================*/
+/**
+ * @name    INA226 Shunt Voltage register fields
+ * @{
+ */
+#define INA226_SHUNT_Pos                    (0U)
+#define INA226_SHUNT_Msk                    (0xFFFFU << INA226_SHUNT_Pos)
+#define INA226_SHUNT                        INA226_SHUNT_Msk
+/** @} */
 
-/*===========================================================================*/
-/* Driver local variables and types.                                         */
-/*===========================================================================*/
+/**
+ * @name    INA226 VBUS Voltage register fields
+ * @{
+ */
+#define INA226_VBUS_Pos                     (0U)
+#define INA226_VBUS_Msk                     (0x7FFFU << INA226_VBUS_Pos)
+#define INA226_VBUS                         INA226_VBUS_Msk
+/** @} */
+
+/**
+ * @name    INA226 Power register fields
+ * @{
+ */
+#define INA226_POWER_Pos                    (0U)
+#define INA226_POWER_Msk                    (0xFFFFU << INA226_POWER_Pos)
+#define INA226_POWER                        INA226_POWER_Msk
+/** @} */
+
+/**
+ * @name    INA226 Current register fields
+ * @{
+ */
+#define INA226_CURRENT_Pos                  (0U)
+#define INA226_CURRENT_Msk                  (0xFFFFU << INA226_CURRENT_Pos)
+#define INA226_CURRENT                      INA226_CURRENT_Msk
+/** @} */
+
+/**
+ * @name    INA226 Calibration register fields
+ * @{
+ */
+#define INA226_CAL_Pos                      (0U)
+#define INA226_CAL_Msk                      (0x7FFFU << INA226_CAL_Pos)
+#define INA226_CAL                          INA226_CAL_Msk
+/** @} */
+
+/**
+ * @name    INA226 Alert Mask/Enable register fields
+ * @{
+ */
+#define INA226_ME_LEN_Pos                   (0U)
+#define INA226_ME_LEN_Msk                   (0x1U << INA226_ME_LEN_Pos)
+#define INA226_ME_LEN                       INA226_ME_LEN_Msk
+#define INA226_ME_APOL_Pos                  (1U)
+#define INA226_ME_APOL_Msk                  (0x1U << INA226_ME_APOL_Pos)
+#define INA226_ME_APOL                      INA226_ME_APOL_Msk
+#define INA226_ME_OVF_Pos                   (2U)
+#define INA226_ME_OVF_Msk                   (0x1U << INA226_ME_OVF_Pos)
+#define INA226_ME_OVF                       INA226_ME_OVF_Msk
+#define INA226_ME_CVRF_Pos                  (3U)
+#define INA226_ME_CVRF_Msk                  (0x1U << INA226_ME_CVRF_Pos)
+#define INA226_ME_CVRF                      INA226_ME_CVRF_Msk
+#define INA226_ME_AFF_Pos                   (4U)
+#define INA226_ME_AFF_Msk                   (0x1U << INA226_ME_AFF_Pos)
+#define INA226_ME_AFF                       INA226_ME_AFF_Msk
+#define INA226_ME_CNVR_Pos                  (10U)
+#define INA226_ME_CNVR_Msk                  (0x1U << INA226_ME_CNVR_Pos)
+#define INA226_ME_CNVR                      INA226_ME_CNVR_Msk
+#define INA226_ME_POL_Pos                   (11U)
+#define INA226_ME_POL_Msk                   (0x1U << INA226_ME_POL_Pos)
+#define INA226_ME_POL                       INA226_ME_POL_Msk
+#define INA226_ME_BUL_Pos                   (12U)
+#define INA226_ME_BUL_Msk                   (0x1U << INA226_ME_BUL_Pos)
+#define INA226_ME_BUL                       INA226_ME_BUL_Msk
+#define INA226_ME_BOL_Pos                   (13U)
+#define INA226_ME_BOL_Msk                   (0x1U << INA226_ME_BOL_Pos)
+#define INA226_ME_BOL                       INA226_ME_BOL_Msk
+#define INA226_ME_SUL_Pos                   (14U)
+#define INA226_ME_SUL_Msk                   (0x1U << INA226_ME_SUL_Pos)
+#define INA226_ME_SUL                       INA226_ME_SUL_Msk
+#define INA226_ME_SOL_Pos                   (15U)
+#define INA226_ME_SOL_Msk                   (0x1U << INA226_ME_SOL_Pos)
+#define INA226_ME_SOL                       INA226_ME_SOL_Msk
+/** @} */
+
+/**
+ * @name    INA226 Alert Limit register fields
+ * @{
+ */
+#define INA226_LIM_Pos                      (0U)
+#define INA226_LIM_Msk                      (0xFFFFU << INA226_LIM_Pos)
+#define INA226_LIM                          INA226_LIM_Msk
+/** @} */
+
+/**
+ * @name    INA226 Manufacturer ID register fields
+ * @{
+ */
+#define INA226_MFG_ID_Pos                   (0U)
+#define INA226_MFG_ID_Msk                   (0xFFFFU << INA226_MFG_ID_Pos)
+#define INA226_MFG_ID                       INA226_MFG_ID_Msk
+/** @} */
+
+/**
+ * @name    INA226 Die ID register fields
+ * @{
+ */
+#define INA226_DIE_ID_RID_Pos               (0U)
+#define INA226_DIE_ID_RID_Msk               (0xFU << INA226_DIE_ID_RID_Pos)
+#define INA226_DIE_ID_RID                   INA226_DIE_ID_RID_Msk
+#define INA226_DIE_ID_DID_Pos               (4U)
+#define INA226_DIE_ID_DID_Msk               (0xFFFU << INA226_DIE_ID_DID_Pos)
+#define INA226_DIE_ID_DID                   INA226_DIE_ID_DID_Msk
+/** @} */
+
+
+
 typedef union {
     struct __attribute__((packed)) {
         uint8_t reg;
@@ -38,7 +147,6 @@ typedef union {
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
-#if (INA226_USE_I2C) || defined(__DOXYGEN__)
 /**
  * @brief   Reads registers value using I2C.
  * @pre     The I2C interface must be initialized and the driver started.
@@ -74,15 +182,7 @@ msg_t ina226I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
     return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
     		TIME_MS2I(50));
 }
-#endif /* INA226_USE_I2C */
 
-/*==========================================================================*/
-/* Interface implementation.                                                */
-/*==========================================================================*/
-
-static const struct INA226VMT vmt_device = {
-    (size_t)0,
-};
 
 /*===========================================================================*/
 /* Driver exported functions.                                                */
@@ -96,10 +196,7 @@ static const struct INA226VMT vmt_device = {
  * @init
  */
 void ina226ObjectInit(INA226Driver *devp) {
-    devp->vmt = &vmt_device;
-
     devp->config = NULL;
-
     devp->state = INA226_STOP;
 }
 
@@ -112,25 +209,19 @@ void ina226ObjectInit(INA226Driver *devp) {
  * @api
  */
 void ina226Start(INA226Driver *devp, const INA226Config *config) {
-    i2cbuf_t buf;
 
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == INA226_STOP) ||
             (devp->state == INA226_READY),
             "ina226Start(), invalid state");
+    osalDbgCheck(config->i2cp->state > I2C_STOP);
 
     devp->config = config;
 
     /* Configuring common registers.*/
-#if INA226_USE_I2C
-#if INA226_SHARED_I2C
     i2cAcquireBus(config->i2cp);
-#endif /* INA226_SHARED_I2C */
 
-    //chprintf(DEBUG_SD, "Starting INA226 i2c....\r\n");
-    i2cStart(config->i2cp, config->i2ccfg);
-    //chprintf(DEBUG_SD, "Done Starting INA226 i2c....\r\n");
-
+    i2cbuf_t buf;
     buf.reg = INA226_AD_CONFIG;
     buf.value = __REVSH(INA226_CONFIG_RST);
     if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
@@ -169,10 +260,7 @@ void ina226Start(INA226Driver *devp, const INA226Config *config) {
     	return;
     }
 
-#if INA226_SHARED_I2C
     i2cReleaseBus(config->i2cp);
-#endif /* INA226_SHARED_I2C */
-#endif /* INA226_USE_I2C */
 
     devp->state = INA226_READY;
 }
@@ -192,11 +280,7 @@ void ina226Stop(INA226Driver *devp) {
             "ina226Stop(), invalid state");
 
     if (devp->state == INA226_READY) {
-#if INA226_USE_I2C
-#if INA226_SHARED_I2C
         i2cAcquireBus(devp->config->i2cp);
-        i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* INA226_SHARED_I2C */
 
         /* Reset to input.*/
         buf.reg = INA226_AD_CONFIG;
@@ -205,11 +289,7 @@ void ina226Stop(INA226Driver *devp) {
 
         }
 
-        i2cStop(devp->config->i2cp);
-#if INA226_SHARED_I2C
         i2cReleaseBus(devp->config->i2cp);
-#endif /* INA226_SHARED_I2C */
-#endif /* INA226_USE_I2C */
     }
     devp->state = INA226_STOP;
 }
@@ -230,11 +310,7 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
     osalDbgAssert(devp->state == INA226_READY,
             "ina226SetAlert(), invalid state");
 
-#if INA226_USE_I2C
-#if INA226_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* INA226_SHARED_I2C */
 
     buf.reg = INA226_AD_LIM;
     buf.value = __REVSH(alert_lim);
@@ -243,10 +319,7 @@ void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
     buf.value = __REVSH(alert_me);
     ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
 
-#if INA226_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
-#endif /* INA226_SHARED_I2C */
-#endif /* INA226_USE_I2C */
 }
 
 /**
@@ -264,19 +337,12 @@ msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest) {
     osalDbgAssert(devp->state == INA226_READY,
             "ina226ReadRaw(), invalid state");
 
-#if INA226_USE_I2C
-#if INA226_SHARED_I2C
     i2cAcquireBus(devp->config->i2cp);
-    i2cStart(devp->config->i2cp, devp->config->i2ccfg);
-#endif /* INA226_SHARED_I2C */
 
     buf.reg = reg;
     const msg_t ret = ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
 
-#if INA226_SHARED_I2C
     i2cReleaseBus(devp->config->i2cp);
-#endif /* INA226_SHARED_I2C */
-#endif /* INA226_USE_I2C */
 
     if( ret == MSG_OK ) {
     	*dest = __REVSH(buf.value);

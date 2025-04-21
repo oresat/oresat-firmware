@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -Og -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -Og -ggdb -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
@@ -125,7 +125,6 @@ ALLINC += $(ODDIR)
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/ina226.mk
-include $(PROJ_SRC)/tmp101.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -142,9 +141,6 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v6m.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/lib/test.mk
-#include $(CHIBIOS)/test/rt/rt_test.mk
-#include $(CHIBIOS)/test/oslib/oslib_test.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
@@ -174,7 +170,7 @@ ASMXSRC = $(ALLXASMSRC)
 INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
 
 # Define C warning options here.
-CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
+CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes -Wsystem-headers
 
 # Define C++ warning options here.
 CPPWARN = -Wall -Wextra -Wundef
@@ -188,7 +184,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = 
+UDEFS = -D_XOPEN_SOURCE=0 -D_FORTIFY_SOURCE=0 -D__ARM_FP=0 -DDEBUG_PRINT
 
 # Define ASM defines here
 UADEFS =
