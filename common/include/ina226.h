@@ -52,9 +52,6 @@
 #define INA226_CONFIG_AVG_256               (0x5U << INA226_CONFIG_AVG_Pos)
 #define INA226_CONFIG_AVG_512               (0x6U << INA226_CONFIG_AVG_Pos)
 #define INA226_CONFIG_AVG_1024              (0x7U << INA226_CONFIG_AVG_Pos)
-#define INA226_CONFIG_RST_Pos               (15U)
-#define INA226_CONFIG_RST_Msk               (0x1U << INA226_CONFIG_RST_Pos)
-#define INA226_CONFIG_RST                   INA226_CONFIG_RST_Msk
 
 /**
  * @brief   Driver state machine possible states.
@@ -82,13 +79,13 @@ typedef struct {
      */
     uint16_t                    cfg;
     /**
-     * @brief INA226 calibration reg value
+     * @brief Shunt resistor value
      */
-    uint16_t                    cal;
+    uint16_t                    rshunt_mOhm;
     /**
-     * @brief Optional Current LSB value for use in calculations
+     * @brief Current LSB value for use in calculations
      */
-    uint16_t                    curr_lsb;
+    uint16_t                    curr_lsb_uA;
 } INA226Config;
 
 
@@ -96,23 +93,20 @@ typedef struct {
  * @brief INA226 Power Monitor class.
  */
 typedef struct INA226Driver {
-    /** @brief Virtual Methods Table.*/
-    const struct INA226VMT     *vmt;
-    /* Driver state.*/                                                      \
-    ina226_state_t              state;                                      \
-    /* Current configuration data.*/                                        \
+    /* Driver state.*/
+    ina226_state_t              state;
+    /* Current configuration data.*/
     const INA226Config          *config;
-
+    /* Time for a single power conversion in system ticks */
+    systime_t t_conversion;
 } INA226Driver;
 
 void ina226ObjectInit(INA226Driver *devp);
-void ina226Start(INA226Driver *devp, const INA226Config *config);
-void ina226Stop(INA226Driver *devp);
-void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim);
-msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest);
-msg_t ina226ReadShunt(INA226Driver *devp, int32_t *dest_voltage_uV);
-msg_t ina226ReadVBUS(INA226Driver *devp, uint32_t *dest_voltage_mV);
-msg_t ina226ReadCurrent(INA226Driver *devp, uint32_t *dest_current_uA);
-msg_t ina226ReadPower(INA226Driver *devp, uint32_t *dest_power_mW);
+msg_t ina226Start(INA226Driver *devp, const INA226Config *config);
+msg_t ina226Stop(INA226Driver *devp);
+msg_t ina226ReadShunt(INA226Driver *devp, int32_t *voltage_uV);
+msg_t ina226ReadVBUS(INA226Driver *devp, int32_t *voltage_mV);
+msg_t ina226ReadCurrent(INA226Driver *devp, int32_t *current_uA);
+msg_t ina226ReadPower(INA226Driver *devp, int32_t *power_mW);
 
 #endif /* _INA226_H_ */

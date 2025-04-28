@@ -16,6 +16,11 @@
 #define INA226_AD_DIE_ID                    0xFFU
 
 
+#define INA226_CONFIG_RST_Pos               (15U)
+#define INA226_CONFIG_RST_Msk               (0x1U << INA226_CONFIG_RST_Pos)
+#define INA226_CONFIG_RST                   INA226_CONFIG_RST_Msk
+
+
 /**
  * @name    INA226 Shunt Voltage register fields
  * @{
@@ -131,314 +136,179 @@
 /** @} */
 
 
+static msg_t read_register(INA226Driver *devp, uint8_t reg, uint16_t * val) {
+    I2CDriver *i2cp = devp->config->i2cp;
+    i2caddr_t sad = devp->config->saddr;
 
-typedef union {
-    struct __attribute__((packed)) {
-        uint8_t reg;
-        union {
-            uint8_t data[2];
-            uint16_t value;
-        };
-    };
-    uint8_t buf[3];
-} i2cbuf_t;
-
-/*===========================================================================*/
-/* Driver local functions.                                                   */
-/*===========================================================================*/
-
-/**
- * @brief   Reads registers value using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in]  i2cp      pointer to the I2C interface
- * @param[in]  sad       slave address without R bit
- * @param[in]  reg       first sub-register address
- * @param[out] rxbuf     pointer to an output buffer
- * @param[in]  n         number of consecutive register to read
- * @return               the operation status.
- * @notapi
- */
-msg_t ina226I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg,
-        uint8_t* rxbuf, size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, rxbuf, n,
-    		TIME_MS2I(50));
+    uint8_t buf[2] = {};
+    i2cAcquireBus(i2cp);
+    msg_t r = i2cMasterTransmitTimeout(i2cp, sad, &reg, 1, buf, sizeof(buf), TIME_MS2I(50));
+    i2cReleaseBus(i2cp);
+    *val = buf[1] | buf[0] << 8;
+    return r;
 }
 
-/**
- * @brief   Writes a value into a register using I2C.
- * @pre     The I2C interface must be initialized and the driver started.
- *
- * @param[in] i2cp       pointer to the I2C interface
- * @param[in] sad        slave address without R bit
- * @param[in] txbuf      buffer containing reg in first byte and high
- *                       and low data bytes
- * @param[in] n          size of txbuf
- * @return               the operation status.
- * @notapi
- */
-msg_t ina226I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf,
-        size_t n) {
-    return i2cMasterTransmitTimeout(i2cp, sad, txbuf, n, NULL, 0,
-    		TIME_MS2I(50));
+static msg_t write_register(INA226Driver *devp, uint8_t reg, uint16_t val) {
+    I2CDriver *i2cp = devp->config->i2cp;
+    i2caddr_t sad = devp->config->saddr;
+
+    uint8_t buf[3] = {reg, (val >> 8) & 0xFF, val & 0xFF};
+    i2cAcquireBus(i2cp);
+    msg_t r = i2cMasterTransmitTimeout(i2cp, sad, buf, sizeof(buf), NULL, 0, TIME_MS2I(50));
+    i2cReleaseBus(i2cp);
+    return r;
 }
 
-
-/*===========================================================================*/
-/* Driver exported functions.                                                */
-/*===========================================================================*/
-
-/**
- * @brief   Initializes an instance.
- *
- * @param[out] devp     pointer to the @p INA226Driver object
- *
- * @init
- */
 void ina226ObjectInit(INA226Driver *devp) {
     devp->config = NULL;
     devp->state = INA226_STOP;
 }
 
-/**
- * @brief   Configures and activates INA226 Complex Driver peripheral.
- *
- * @param[in] devp      pointer to the @p INA226Driver object
- * @param[in] config    pointer to the @p INA226Config object
- *
- * @api
- */
-void ina226Start(INA226Driver *devp, const INA226Config *config) {
-
+msg_t ina226Start(INA226Driver *devp, const INA226Config *config) {
     osalDbgCheck((devp != NULL) && (config != NULL));
     osalDbgAssert((devp->state == INA226_STOP) ||
             (devp->state == INA226_READY),
             "ina226Start(), invalid state");
     osalDbgCheck(config->i2cp->state > I2C_STOP);
 
+    devp->state = INA226_STOP;
     devp->config = config;
 
-    /* Configuring common registers.*/
-    i2cAcquireBus(config->i2cp);
+    msg_t ret = MSG_OK;
 
-    i2cbuf_t buf;
-    buf.reg = INA226_AD_CONFIG;
-    buf.value = __REVSH(INA226_CONFIG_RST);
-    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
-    	devp->state = INA226_UNINIT;
-    	return;
+    // Reset chip
+    ret = write_register(devp, INA226_AD_CONFIG, INA226_CONFIG_RST);
+    if(ret != MSG_OK) {
+        return ret;
     }
 
-    bool reset_success = false;
-    for(int loop_count = 0; loop_count < 10; loop_count++ ) {
-        ina226I2CReadRegister(config->i2cp, config->saddr, INA226_AD_CONFIG, buf.data, sizeof(buf.data));
-
-        if( (buf.data[0] & 0x80U) ) {
-        	/* While still resetting */
-        } else {
-        	reset_success = true;
-        	break;
+    int loop_count = 0;
+    for(; loop_count < 10; ++loop_count) {
+        uint16_t buf;
+        ret = read_register(devp, INA226_AD_CONFIG, &buf);
+        if(ret != MSG_OK) {
+            return ret;
         }
+        if(!(buf & INA226_CONFIG_RST)) {
+            break;
+        }
+
+    }
+    if(loop_count >= 10) {
+        return MSG_RESET;
     }
 
-    if( ! reset_success ) {
-    	devp->state = INA226_UNINIT;
-    	return;
+    // Table 7-3, in samples
+    uint16_t AVG[8] = {1, 4, 16, 64, 128, 256, 512, 1024};
+    // Tables 7-4 and 7-5, in uS
+    uint16_t VCT[8] = {140, 204, 332, 558, 1100, 2116, 4156, 8244};
+
+
+    uint16_t avg    = AVG[(config->cfg & INA226_CONFIG_AVG_Msk) >> INA226_CONFIG_AVG_Pos];
+    uint16_t vbusct = VCT[(config->cfg & INA226_CONFIG_VBUSCT_Msk) >> INA226_CONFIG_VBUSCT_Pos];
+    uint16_t vshct  = VCT[(config->cfg & INA226_CONFIG_VSHCT_Msk) >> INA226_CONFIG_VSHCT_Pos];
+
+    devp->t_conversion = TIME_US2I(avg * (vbusct + vshct));
+    // Configure common registers
+    ret = write_register(devp, INA226_AD_CONFIG, config->cfg);
+    if(ret != MSG_OK) {
+        return ret;
     }
 
-    buf.reg = INA226_AD_CONFIG;
-    buf.value = __REVSH(config->cfg);
-    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
-    	devp->state = INA226_UNINIT;
-    	return;
+    // Based on datasheet equation (1),
+    // CAL = 0.00512 / (CURR_LSB * Rshunt)
+    // Since CURR_LSB is in uA and Rshunt is in mOhm
+    // CAL = 0.00512 / (CURR_LSB * Rshunt * 10^-9)
+    uint16_t cal = 5120000 / (config->curr_lsb_uA * config->rshunt_mOhm);
+    ret = write_register(devp, INA226_AD_CAL, cal);
+    if(ret != MSG_OK) {
+        return ret;
     }
-
-    buf.reg = INA226_AD_CAL;
-    buf.value = __REVSH(config->cal);
-    if( ina226I2CWriteRegister(config->i2cp, config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
-    	devp->state = INA226_UNINIT;
-    	return;
-    }
-
-    i2cReleaseBus(config->i2cp);
 
     devp->state = INA226_READY;
+    return MSG_OK;
 }
 
-/**
- * @brief   Deactivates the INA226 Complex Driver peripheral.
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- *
- * @api
- */
-void ina226Stop(INA226Driver *devp) {
-    i2cbuf_t buf;
-
+msg_t ina226Stop(INA226Driver *devp) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert((devp->state == INA226_STOP) || (devp->state == INA226_READY),
             "ina226Stop(), invalid state");
 
+    msg_t ret = MSG_OK;
     if (devp->state == INA226_READY) {
-        i2cAcquireBus(devp->config->i2cp);
-
-        /* Reset to input.*/
-        buf.reg = INA226_AD_CONFIG;
-        buf.value = __REVSH(INA226_CONFIG_RST);
-        if( ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf)) != MSG_OK ) {
-
-        }
-
-        i2cReleaseBus(devp->config->i2cp);
+        ret = write_register(devp, INA226_AD_CONFIG, INA226_CONFIG_RST);
     }
     devp->state = INA226_STOP;
+    return ret;
 }
 
-/**
- * @brief   Sets INA226 Alert type and value
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @param[in] alert_me   the value to write to Mask/Enable register (0 to disable)
- * @param[in] alert_lim  the value to write to Alert Limit register
- *
- * @api
- */
-void ina226SetAlert(INA226Driver *devp, uint16_t alert_me, uint16_t alert_lim) {
-    i2cbuf_t buf;
-
+msg_t ina226ReadShunt(INA226Driver *devp, int32_t *voltage_uV) {
     osalDbgCheck(devp != NULL);
     osalDbgAssert(devp->state == INA226_READY,
-            "ina226SetAlert(), invalid state");
+            "ina226ReadShunt(), invalid state");
 
-    i2cAcquireBus(devp->config->i2cp);
+    uint16_t val = 0;
+    const msg_t ret = read_register(devp, INA226_AD_SHUNT, &val);
 
-    buf.reg = INA226_AD_LIM;
-    buf.value = __REVSH(alert_lim);
-    ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-    buf.reg = INA226_AD_ME;
-    buf.value = __REVSH(alert_me);
-    ina226I2CWriteRegister(devp->config->i2cp, devp->config->saddr, buf.buf, sizeof(buf));
-
-    i2cReleaseBus(devp->config->i2cp);
-}
-
-/**
- * @brief   Reads INA226 Register as raw value.
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t ina226ReadRaw(INA226Driver *devp, uint8_t reg, uint16_t *dest) {
-    i2cbuf_t buf;
-
-    osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == INA226_READY,
-            "ina226ReadRaw(), invalid state");
-
-    i2cAcquireBus(devp->config->i2cp);
-
-    buf.reg = reg;
-    const msg_t ret = ina226I2CReadRegister(devp->config->i2cp, devp->config->saddr, buf.reg, buf.data, sizeof(buf.data));
-
-    i2cReleaseBus(devp->config->i2cp);
-
+    // Datasheet 7.1.2: Shunt reg value is twos complement, LSB 2.5uV.
     if( ret == MSG_OK ) {
-    	*dest = __REVSH(buf.value);
-    }
-
-    return(ret);
-}
-
-/**
- * @brief   Reads INA226 Shunt voltage.
- *
- * @param[in] devp       Pointer to the @p INA226Driver object
- * @return               Shunt voltage in 1uV increments
- *
- * @api
- */
-msg_t ina226ReadShunt(INA226Driver *devp, int32_t *dest_voltage_uV) {
-    osalDbgCheck(devp != NULL);
-
-    //TODO validate the math on this. This function has not actually been tested
-    uint16_t reg_value = 0;
-    const msg_t ret = ina226ReadRaw(devp, INA226_AD_SHUNT, &reg_value);
-
-    if( ret == MSG_OK ) {
-    	*dest_voltage_uV = ((int32_t) ((int16_t) reg_value) * 25)/10;
-    }
-
-    return(ret);
-}
-
-/**
- * @brief   Reads INA226 VBUS voltage.
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @return               VBUS voltage in 1 mV increments
- *
- * @api
- */
-msg_t ina226ReadVBUS(INA226Driver *devp, uint32_t *dest_voltage_mV) {
-    osalDbgCheck(devp != NULL);
-
-    uint16_t reg_value = 0;
-    const msg_t ret = ina226ReadRaw(devp, INA226_AD_VBUS, &reg_value);
-    if( ret == MSG_OK ) {
-    	*dest_voltage_mV = (((uint32_t) reg_value) * 1250) / 1000;
+        *voltage_uV = ((int32_t) ((int16_t) val) * 25)/10;
     }
 
     return ret;
 }
 
-/**
- * @brief   Reads INA226 Current.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Current in units of micro amps
- *
- * @api
- */
-msg_t ina226ReadCurrent(INA226Driver *devp, uint32_t *dest_current_uA) {
+msg_t ina226ReadVBUS(INA226Driver *devp, int32_t *voltage_mV) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "ina226ReadCurrent(): invalid curr_lsb value");
+    osalDbgAssert(devp->state == INA226_READY,
+            "ina226ReadVBUS(), invalid state");
 
-    uint16_t reg_value = 0;
-    const msg_t ret = ina226ReadRaw(devp, INA226_AD_CURRENT, &reg_value);
+    uint16_t val = 0;
+    const msg_t ret = read_register(devp, INA226_AD_VBUS, &val);
 
+    // Datasheet 7.1.3: Bus voltage is always positive, LSB 1.25mV
     if( ret == MSG_OK ) {
-    	*dest_current_uA = (reg_value * devp->config->curr_lsb * 1000) / 2048;
+        // Double type cast to preserve sign, going straight from uint16_t ->
+        // int32_t doesn't set sign bits.
+        *voltage_mV = (((int32_t)(int16_t) val) * 1250) / 1000;
     }
 
-    return(ret);
+    return ret;
 }
 
-/**
- * @brief   Reads INA226 Power.
- * @note    Requires curr_lsb to be set in config
- *
- * @param[in] devp       pointer to the @p INA226Driver object
- * @return               Power in increments of mW
- *
- * @api
- */
-msg_t ina226ReadPower(INA226Driver *devp, uint32_t *dest_power_mW) {
+msg_t ina226ReadCurrent(INA226Driver *devp, int32_t *current_uA) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->config->curr_lsb,
-            "ina226ReadCurrent(): invalid curr_lsb value");
+    osalDbgAssert(devp->state == INA226_READY,
+            "ina226ReadCurrent(), invalid state");
+    osalDbgAssert(devp->config->curr_lsb_uA,
+            "ina226ReadCurrent(): invalid curr_lsb_uA value");
 
-    uint16_t reg_value = 0;
-	const msg_t ret = ina226ReadRaw(devp, INA226_AD_POWER, &reg_value);
+    uint16_t val = 0;
+    const msg_t ret = read_register(devp, INA226_AD_CURRENT, &val);
 
-	if( ret == MSG_OK ) {
-		*dest_power_mW = reg_value / 2;
-	}
+    if( ret == MSG_OK ) {
+        *current_uA = ((int16_t)val) * devp->config->curr_lsb_uA;
+    }
 
-	return ret;
+    return ret;
 }
 
-/** @} */
+msg_t ina226ReadPower(INA226Driver *devp, int32_t *power_mW) {
+    osalDbgCheck(devp != NULL);
+    osalDbgAssert(devp->state == INA226_READY,
+            "ina226ReadPower(), invalid state");
+    osalDbgAssert(devp->config->curr_lsb_uA,
+            "ina226ReadPower(): invalid curr_lsb_uA value");
+
+
+    uint16_t val = 0;
+    const msg_t ret = read_register(devp, INA226_AD_POWER, &val);
+
+    // Datasheet 7.1.4: LSB is 25 * (Current_LSB as watts). See also the
+    // paragraph above equation 4 for a worked example.
+    if(ret == MSG_OK) {
+        *power_mW = (((int16_t)val) * 25 * devp->config->curr_lsb_uA) / 1000;
+    }
+
+    return ret;
+}

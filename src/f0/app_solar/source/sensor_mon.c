@@ -77,6 +77,7 @@ msg_t OneShot(I2CDriver * i2c, i2caddr_t addr) {
 // types to work out.
 typedef union {
     typeof(OD_RAM.x4001_cell_1) * cell;
+    typeof(OD_RAM.x4001_cell_1) * cell1;
     typeof(OD_RAM.x4002_cell_2) * cell2;
 } CellRecord;
 
@@ -107,7 +108,7 @@ THD_FUNCTION(sensor_mon, arg) {
 
     dbgprintf("Starting TMP101\r\n");
 
-    CellRecord record1 = {.cell  = &OD_RAM.x4001_cell_1};
+    CellRecord record1 = {.cell1 = &OD_RAM.x4001_cell_1};
     CellRecord record2 = {.cell2 = &OD_RAM.x4002_cell_2};
 
     // FIXME: remove once oresat-configs is updated

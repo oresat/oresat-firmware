@@ -2,8 +2,7 @@
 #include "hal.h"
 
 THD_WORKING_AREA(blink_wa, 0x40);
-THD_FUNCTION(blink, arg)
-{
+THD_FUNCTION(blink, arg) {
     (void)arg;
 
     while (!chThdShouldTerminateX()) {

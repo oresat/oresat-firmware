@@ -5,7 +5,7 @@
 
 #include <sys/param.h>
 
-#if 0
+#ifdef DEBUG_PRINT
 #include "chprintf.h"
 #define DEBUG_SD (BaseSequentialStream *) &SD2
 #define dbgprintf(str, ...) chprintf(DEBUG_SD, str, ##__VA_ARGS__)
@@ -14,44 +14,26 @@
 #endif
 
 
-/* Defines for INA226 */
-#define CURR_LSB                20       /* 20uA/bit */
-#define RSENSE                  100      /* 0.1 ohm  */
-#define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
-
+/* DAC1 configuration */
 //Assumes 3.3V Vcc
+#define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
 #define DAC_MININUM_ADJUST_uV   805
 
+/* MPPT configuration */
 #define I_ADJ_FAILSAFE          1450000
 #define I_ADJ_INITIAL           1500000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
 #define HISTERESIS_mW           3
 
-
 //1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
-#define VREF_STEP_NEGATIVE_uV             1000
-#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * 4)
+#define VREF_STEP_NEGATIVE_uV             -1000
+#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4)
 
-
-#if VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
+#if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
 #endif
 
-/* Based on INA226 datasheet, page 15, Equation (2)
- * CURR_LSB = Max Current / 2^15
- * So, with CURR_LSB = 20 uA/bit, Max current = 655 mA
- *
- * Based on equation (1),
- * CAL = 0.00512 / (CURR_LSB * Rsense)
- * Since CURR_LSB is in uA and Rsense is in mOhm
- * CAL = 0.00512 / (CURR_LSB * Rsense * 10^-9)
- */
-#define NUM_INA226_AVG                                 16
-#define INA226_ADC_CONVERSION_uS        1100
-
-
-/* DAC1 configuration */
 static const DACConfig dac1cfg = {
     .init         = 1861U,                /* Initialize DAC to 1.5V (1500*4096)/3300 */
     .datamode     = DAC_DHRM_12BIT_RIGHT, /* 12 bit, right aligned */
@@ -64,13 +46,12 @@ typedef enum {
     MPPT_ALGORITHM_PAO = 0
 } mppt_algorithm_t;
 
-
 struct Sample {
-    uint32_t power_mW;
-    uint32_t voltage_mV;
-    uint32_t current_uA;
+    int32_t power_mW;
+    int32_t voltage_mV;
+    int32_t current_uA;
+    int32_t shunt_uV;
 };
-
 
 typedef struct {
     bool direction_up_flag;
@@ -78,9 +59,8 @@ typedef struct {
 
     uint32_t iadj_uV;
     struct Sample sample;
-    uint32_t max_voltage_mV;
+    int32_t max_voltage_mV;
 } MpptPaoState;
-
 
 /**
  * @brief control DAC output in microvolts.
@@ -104,6 +84,9 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
 bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sample) {
 
     bool ret = true;
+    if(ina226ReadShunt(ina226, &sample->shunt_uV) != MSG_OK) {
+        ret = false;
+    }
     if( ina226ReadPower(ina226, &sample->power_mW) != MSG_OK ) {
         ret = false;
     }
@@ -129,16 +112,17 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
 }
 
 // Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
-uint32_t get_iadj_step_size(MpptPaoState *state) {
+int32_t iadj_step_uV(MpptPaoState *state) {
     // FIXME: hit_step_size_threshold flag never gets unset
     if(!state->hit_step_size_threshold_flag && state->max_voltage_mV != 0) {
-        const uint32_t threshold_05_mV = state->max_voltage_mV / 20; // 0.95 threshold
-        const uint32_t threshold_95_mV = state->max_voltage_mV - threshold_05_mV;
+        const int32_t threshold_05_mV = state->max_voltage_mV / 20; // 0.95 threshold
+        const int32_t threshold_95_mV = state->max_voltage_mV - threshold_05_mV;
 
         if(state->sample.voltage_mV > threshold_95_mV) {
             //Linear scale of step size based on delta from maximum voltage
             const int32_t v = ((state->sample.voltage_mV - threshold_95_mV) * 100) / threshold_05_mV;
-            return (((5000 - VREF_STEP_NEGATIVE_uV) * v) / 100) + VREF_STEP_NEGATIVE_uV;
+            const int32_t step = (((5000 + VREF_STEP_NEGATIVE_uV) * v) / 100) - VREF_STEP_NEGATIVE_uV;
+            return (state->direction_up_flag ? 1 : -1) * step;
         } else {
             state->hit_step_size_threshold_flag = true;
         }
@@ -150,23 +134,21 @@ uint32_t get_iadj_step_size(MpptPaoState *state) {
     return VREF_STEP_NEGATIVE_uV;
 }
 
-bool itterate_mppt_perturb_and_observe(MpptPaoState *state) {
+bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
+    const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
+    const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
 
-    uint32_t step = get_iadj_step_size(state);
-    // FIXME: why can't get_step_size set the negative value?
-    uint64_t iadj = state->iadj_uV + state->direction_up_flag ? step : -step;
-    uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
-
-    if( state->iadj_uV == iadj_uV_perturbed ) { // i.e. either I_ADJ_MIN or I_ADJ_MAX
+    if(state->iadj_uV == iadj_uV_perturbed) {
         // It has saturated to an identical value, flip the search direction and process in the
         // next iteration
-        state->direction_up_flag = (! state->direction_up_flag);
+        state->direction_up_flag = !state->direction_up_flag;
         return true;
     }
 
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
-    //Compensate for the internal averaging done by the ina chip
-    chThdSleepMilliseconds((NUM_INA226_AVG * INA226_ADC_CONVERSION_uS) / 1000);
+    // Compensate for the internal averaging done by the ina226 chip
+    // FIXME: ina226 oneshot with interrupt/cvrf flag
+    chThdSleep(ina226dev.t_conversion);
     struct Sample perturbed = {};
     if(!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
@@ -202,16 +184,19 @@ THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
     I2CDriver * i2c = arg;
-    const INA226Config ina226config = {
-        i2c,
-        INA226_SADDR,
-        INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
-        INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
-        INA226_CONFIG_AVG_16,
-        (5120000/(RSENSE * CURR_LSB)),
-        CURR_LSB
-    };
 
+    // Based on INA226 datasheet, page 15, Equation (2)
+    // CURR_LSB = Max Current / 2^15
+    // So, with CURR_LSB = 20 uA/bit, Max current = 655 mA
+    const INA226Config ina226config = {
+        .i2cp  = i2c,
+        .saddr = INA226_SADDR,
+        .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
+                 INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
+                 INA226_CONFIG_AVG_16,
+        .rshunt_mOhm = 100, /* 0.1 ohm  */
+        .curr_lsb_uA = 20,  /* 20uA/bit */
+    };
 
     dbgprintf("\r\nRunning solar app...\r\n");
     /* Start up drivers */
@@ -249,8 +234,9 @@ THD_FUNCTION(solar, arg)
     // FIXME: reset energyTrack every n minutes?
     uint32_t energy_mJ = 0;
 
+    int loop = 0;
     while(!chThdShouldTerminateX()) {
-        itterate_mppt_perturb_and_observe(&state);
+        iterate_mppt_perturb_and_observe(&state);
 
         /*
         Energy Tracking:
@@ -281,6 +267,14 @@ THD_FUNCTION(solar, arg)
         OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, state.sample.power_mW);
 
         OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
+
+        // FIXME remove once canopen util is avaliable
+        if(!(loop % 50)) {
+            dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
+                state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
+            loop = 0;
+        }
+        loop += 1;
     }
 
     /* Stop drivers */
