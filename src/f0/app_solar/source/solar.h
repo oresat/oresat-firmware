@@ -20,4 +20,14 @@ typedef enum {
 	SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA,
 } solar_od_error_type_t;
 
+
+#if !HAL_USE_I2C
+#error "TMP101 requires HAL_USE_I2C"
+#endif
+
+#if !I2C_USE_MUTUAL_EXCLUSION
+#error "TMP101 requires I2C_USE_MUTUAL_EXCLUSION"
+#endif
+
+
 #endif
