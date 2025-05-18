@@ -10,3 +10,6 @@ build*/
 # Python
 __pycache__
 .direnv
+
+# clangd
+*/compile_commands.json

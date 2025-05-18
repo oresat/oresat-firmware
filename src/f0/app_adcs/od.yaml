@@ -1,0 +1,381 @@
+name: adcs
+nice_name: ADCS
+
+objects:
+  - index: 0x4000
+    name: gyroscope
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: pitch_rate
+        data_type: int16
+        description: x-axis rate
+        access_type: ro
+        unit: deg/s
+
+      - subindex: 0x2
+        name: yaw_rate
+        data_type: int16
+        description: y-axis rate
+        access_type: ro
+        unit: deg/s
+
+      - subindex: 0x3
+        name: roll_rate
+        data_type: int16
+        description: z-axis rate
+        access_type: ro
+        unit: deg/s
+
+      - subindex: 0x4
+        name: pitch_rate_raw
+        data_type: uint16
+        description: raw x-axis rate
+        access_type: ro
+
+      - subindex: 0x5
+        name: yaw_rate_raw
+        data_type: uint16
+        description: raw y-axis rate
+        access_type: ro
+
+      - subindex: 0x6
+        name: roll_rate_raw
+        data_type: uint16
+        description: raw z-axis rate
+        access_type: ro
+
+  - index: 0x4001
+    name: accelerometer
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int16
+        description: x acceleration
+        access_type: ro
+        unit: g
+        scale_factor: 0.001
+
+      - subindex: 0x2
+        name: y
+        data_type: int16
+        description: y acceleration
+        access_type: ro
+        unit: g
+        scale_factor: 0.001
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: z acceleration
+        unit: g
+        access_type: ro
+        scale_factor: 0.001
+
+      - subindex: 0x4
+        name: x_raw
+        data_type: uint16
+        description: raw x acceleration value
+        access_type: ro
+
+      - subindex: 0x5
+        name: y_raw
+        data_type: uint16
+        description: raw y acceleration value
+        access_type: ro
+
+      - subindex: 0x6
+        name: z_raw
+        data_type: uint16
+        description: raw z acceleration value
+        access_type: ro
+
+  - index: 0x4002
+    name: temperature
+    data_type: int8
+    description: imu sensor temperature
+    access_type: ro
+    unit: C
+
+  - index: 0x4003
+    name: pos_z_magnetometer_1
+    object_type: record
+    description: +z endcard magnetometer 1 data
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int16
+        description: +z mag 1 x-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x2
+        name: y
+        data_type: int16
+        description: +z mag 1 y-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: +z mag 1 z-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+  - index: 0x4004
+    name: pos_z_magnetometer_2
+    object_type: record
+    description: +z endcard magnetometer 2 data
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int16
+        description: +z mag 2 x-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x2
+        name: y
+        data_type: int16
+        description: +z mag 2 y-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: +z mag 2 z-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+  - index: 0x4005
+    name: min_z_magnetometer_1
+    object_type: record
+    description: -z endcard magnetometer 1 data
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int16
+        description: -z mag 1 x-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x2
+        name: y
+        data_type: int16
+        description: -z mag 1 y-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: -z mag 1 z-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+  - index: 0x4006
+    name: min_z_magnetometer_2
+    object_type: record
+    description: -z endcard magnetometer 2 data
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int16
+        description: -z mag 2 x-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x2
+        name: y
+        data_type: int16
+        description: -z mag 2 y-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: -z mag 2 z-axis magnetic field
+        access_type: ro
+        low_limit: -8192
+        high_limit: 8192
+        unit: gauss
+        scale_factor: 0.001
+
+  - index: 0x4007
+    name: magnetorquer
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: current_x
+        data_type: int32
+        description: current feedback in the x-axis
+        access_type: ro
+        unit: uA
+
+      - subindex: 0x2
+        name: current_y
+        data_type: int32
+        description: current feedback in the y-axis
+        access_type: ro
+        unit: uA
+
+      - subindex: 0x3
+        name: current_z
+        data_type: int32
+        description: current feedback in the y-axis
+        access_type: ro
+        unit: uA
+
+      - subindex: 0x4
+        name: current_x_setpoint
+        data_type: int32
+        description: Setpoint for current in thex x-axis
+        access_type: rw
+        unit: uA
+
+      - subindex: 0x5
+        name: current_y_setpoint
+        data_type: int32
+        description: Setpoint for current in the y-axis
+        access_type: rw
+        unit: uA
+
+      - subindex: 0x6
+        name: current_z_setpoint
+        data_type: int32
+        description: Setpoint for current in thex z-axis
+        access_type: rw
+        unit: uA
+
+      - subindex: 0x7
+        name: pwm_x
+        data_type: int16
+        description: X axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+        scale_factor: 0.01
+        unit: "%"
+
+      - subindex: 0x8
+        name: pwm_y
+        data_type: int16
+        description: X axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+        scale_factor: 0.01
+        unit: "%"
+
+      - subindex: 0x9
+        name: pwm_z
+        data_type: int16
+        description: X axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+        scale_factor: 0.01
+        unit: "%"
+
+tpdos:
+  - num: 1
+    fields:
+      - [gyroscope, pitch_rate]
+      - [gyroscope, yaw_rate]
+      - [gyroscope, roll_rate]
+    event_timer_ms: 1000
+
+  - num: 2
+    fields:
+      - [accelerometer, x]
+      - [accelerometer, y]
+      - [accelerometer, z]
+    event_timer_ms: 1000
+
+  - num: 3
+    fields:
+      - [temperature]
+    event_timer_ms: 1000
+
+  - num: 4
+    fields:
+      - [pos_z_magnetometer_1, x]
+      - [pos_z_magnetometer_1, y]
+      - [pos_z_magnetometer_1, z]
+    event_timer_ms: 1000
+
+  - num: 5
+    fields:
+      - [pos_z_magnetometer_2, x]
+      - [pos_z_magnetometer_2, y]
+      - [pos_z_magnetometer_2, z]
+    event_timer_ms: 1000
+
+  - num: 6
+    fields:
+      - [min_z_magnetometer_1, x]
+      - [min_z_magnetometer_1, y]
+      - [min_z_magnetometer_1, z]
+    event_timer_ms: 1000
+
+  - num: 7
+    fields:
+      - [min_z_magnetometer_2, x]
+      - [min_z_magnetometer_2, y]
+      - [min_z_magnetometer_2, z]
+    event_timer_ms: 1000
+
+  - num: 8
+    fields:
+      - [magnetorquer, current_x]
+      - [magnetorquer, pwm_x]
+    event_timer_ms: 1000
+
+  - num: 9
+    fields:
+      - [magnetorquer, current_y]
+      - [magnetorquer, pwm_y]
+    event_timer_ms: 1000
+
+  - num: 10
+    fields:
+      - [magnetorquer, current_z]
+      - [magnetorquer, pwm_z]
+    event_timer_ms: 1000

@@ -1,0 +1,116 @@
+name: firmware
+nice_name: Firmware
+
+std_objects:
+  - device_type
+  - error_register
+  - predefined_error_field
+  - cob_id_sync
+  - communication_cycle_period
+  - cob_id_emergency_message
+  - inhibit_time_emcy
+  - producer_heartbeat_time
+  - identity
+  - synchronous_counter_overflow_value
+  - sdo_server_parameter
+  - scet
+  - utc
+
+objects:
+  - index: 0x3000
+    name: satellite_id
+    data_type: uint8
+    description: the unique oresat satellite id
+    access_type: const
+
+  - index: 0x3001
+    name: flight_mode
+    data_type: bool
+    description: card is in flight mode
+    access_type: ro
+    default: true
+
+  - index: 0x3002
+    name: versions
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: hw_version
+        data_type: str
+        description: card hw version
+        access_type: const
+        default: "0.0"
+
+      - subindex: 0x2
+        name: configs_version
+        data_type: str
+        description: oresat configs version
+        access_type: const
+        default: "0.0.0"
+
+      # subindex 0x3 reserved
+
+      - subindex: 0x4
+        name: fw_version
+        data_type: str
+        description: app fw version
+        access_type: const
+        default: "0.0.0"
+
+  - index: 0x3003
+    name: system
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: reset
+        data_type: uint8
+        description: reset the app
+        value_descriptions:
+          no_stop: 0
+          soft_reset: 1
+          hard_reset: 2
+          factory_reset: 3
+          poweroff: 4
+        access_type: wo
+
+      # subindex 0x2 reserved for storage_percent
+      # subindex 0x3 reserved for ram_percent
+      # subindex 0x4 reserved for unix_time
+
+      - subindex: 0x5
+        name: uptime
+        data_type: uint32
+        description: uptime
+        access_type: ro
+        unit: s
+
+      # subindex 0x6 reserved for power_cycles
+
+      - subindex: 0x7
+        name: temperature
+        data_type: int8
+        description: processor temperature
+        access_type: ro
+        unit: C
+
+      - subindex: 0x8
+        name: vrefint
+        description: processor internal voltage reference
+        data_type: uint16
+        access_type: ro
+        scale_factor: 0.001
+        unit: V
+
+        # subindex 0x9 reserved for boot_select
+
+  # index 0x3004 reserved
+  # index 0x3005 reserved
+  # index 0x3006 reserved
+  # index 0x3007 reserved
+  # index 0x3008 reserved
+
+  - index: 0x3009
+    name: board_id
+    data_type: uint8
+    description: the unique board id for the board revision
+    access_type: const

@@ -107,16 +107,12 @@ DEPDIR   := $(APP_ROOT)/.dep
 BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 ODDIR    := $(APP_ROOT)/od
-ifeq ($(ORESAT),)
-  ORESAT = 0.5
-endif
+
 # generate OD.c/OD.h from oresat-configs
-FW_VERSION = $(shell git describe --always)
-$(shell oresat-gen-fw-files --oresat $(ORESAT) imu -d $(ODDIR) -fw $(FW_VERSION) -hw $(BOARD))
+$(shell oresat-configs canopennode od.yaml $(PROJ_SRC)/od.yaml -d $(ODDIR))
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
-
 
 # Enable bootloader
 ifeq ($(USE_BOOTLOADER),)
@@ -190,7 +186,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DCO_VERSION_MAJOR=4 -DFW_VERSION=\"$(shell git describe --always)\" -DBOARD=\"$(BOARD)\"
 
 # Define ASM defines here
 UADEFS =

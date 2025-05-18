@@ -1,5 +1,6 @@
 include $(PROJ_SRC)/CANopen.mk
 include $(PROJ_SRC)/util.mk
+include $(PROJ_SRC)/version.mk
 
 PROJINC       = $(PROJ_SRC)/include
 

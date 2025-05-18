@@ -1,0 +1,176 @@
+name: solar
+nice_name: Solar
+
+objects:
+  - index: 0x4000
+    name: output
+    description: solar module output
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: voltage
+        data_type: uint16
+        description: voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x2
+        name: current
+        data_type: int16
+        description: current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0x3
+        name: power
+        data_type: uint16
+        description: power
+        access_type: ro
+        unit: mW
+
+      - subindex: 0x4
+        name: voltage_avg
+        data_type: uint16
+        description: average voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x5
+        name: current_avg
+        data_type: int16
+        description: average current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0x6
+        name: power_avg
+        data_type: uint16
+        description: average power
+        access_type: ro
+        unit: mW
+
+      - subindex: 0x7
+        name: voltage_max
+        data_type: uint16
+        description: max voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x8
+        name: current_max
+        data_type: int16
+        description: max current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0x9
+        name: power_max
+        data_type: uint16
+        description: max power
+        access_type: ro
+        unit: mW
+
+      - subindex: 0xa
+        name: energy
+        data_type: uint16
+        description: storing energy
+        access_type: ro
+        unit: mJ
+
+  - index: 0x4001
+    name: cell_1
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: temperature
+        data_type: int8
+        description: cell 1 temperature
+        access_type: ro
+        unit: C
+
+      - subindex: 0x2
+        name: temperature_min
+        data_type: int8
+        description: min cell 1 temperature
+        access_type: ro
+        unit: C
+
+      - subindex: 0x3
+        name: temperature_max
+        data_type: int8
+        description: max cell 1 temperature
+        access_type: ro
+        unit: C
+
+  - index: 0x4002
+    name: cell_2
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: temperature
+        data_type: int8
+        description: cell 2 temperature
+        access_type: ro
+        unit: C
+
+      - subindex: 0x2
+        name: temperature_min
+        data_type: int8
+        description: min cell 2 temperature
+        access_type: ro
+        unit: C
+
+      - subindex: 0x3
+        name: temperature_max
+        data_type: int8
+        description: max cell 2 temperature
+        access_type: ro
+        unit: C
+
+  - index: 0x4003
+    name: mppt_alg
+    data_type: uint8
+    description: mppt (maximum power point tracking) algorithm
+    value_descriptions:
+      perturb_and_observe: 0
+    access_type: rw
+
+  - index: 0x4004
+    name: lt1618_iadj
+    data_type: uint16
+    description: i_adj pin voltage
+    access_type: ro
+    unit: mV
+
+tpdos:
+  - num: 1
+    fields:
+      - [output, voltage]
+      - [output, current]
+      - [output, power]
+      - [output, voltage_avg]
+    event_timer_ms: 10000
+
+  - num: 2
+    fields:
+      - [output, current_avg]
+      - [output, power_avg]
+      - [output, voltage_max]
+      - [output, current_max]
+    event_timer_ms: 10000
+
+  - num: 3
+    fields:
+      - [output, power_max]
+      - [output, energy]
+    event_timer_ms: 10000
+
+  - num: 4
+    fields:
+      - [cell_1, temperature]
+      - [cell_2, temperature]
+      - [cell_1, temperature_min]
+      - [cell_2, temperature_min]
+      - [cell_1, temperature_max]
+      - [cell_2, temperature_max]
+    event_timer_ms: 10000

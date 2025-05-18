@@ -1,0 +1,410 @@
+name: battery
+nice_name: Battery
+
+objects:
+  - index: 0x4000
+    name: pack_1
+    description: battery pack 1 telemetry
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: vbatt
+        data_type: uint16
+        description: pack voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x2
+        name: vcell_max
+        data_type: uint16
+        description: max voltage for a cell
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x3
+        name: vcell_min
+        data_type: uint16
+        description: min voltage for a cell
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x4
+        name: vcell
+        data_type: uint16
+        description: lowest cell voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x5
+        name: vcell_1
+        data_type: uint16
+        description: cell 1 voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x6
+        name: vcell_2
+        data_type: uint16
+        description: cell 2 voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x7
+        name: vcell_avg
+        data_type: uint16
+        description: average voltage of both cells
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x8
+        name: current
+        data_type: int16
+        description: pack current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0x9
+        name: current_avg
+        data_type: int16
+        description: pack average current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xa
+        name: current_max
+        data_type: int16
+        description: pack max current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xb
+        name: current_min
+        data_type: int16
+        description: pack min current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xc
+        name: full_capacity
+        data_type: uint16
+        description: capacity of battery pack
+        access_type: ro
+        unit: mAh
+
+      - subindex: 0xd
+        name: reported_capacity
+        data_type: uint16
+        description: reported capacity of battery pack
+        access_type: ro
+        unit: mAh
+
+      - subindex: 0xe
+        name: time_to_empty
+        data_type: uint16
+        description: estimate of time until battery pack is empty
+        access_type: ro
+        unit: s
+
+      - subindex: 0xf
+        name: time_to_full
+        data_type: uint16
+        description: estimate of time until battery pack is full
+        access_type: ro
+        unit: s
+
+      - subindex: 0x10
+        name: cycles
+        data_type: uint16
+        description: charge/discharge cycles
+        access_type: ro
+        high_limit: 10485
+
+      - subindex: 0x11
+        name: reported_state_of_charge
+        data_type: uint8
+        description: reported charge percent
+        access_type: ro
+        high_limit: 100
+        unit: "%"
+
+      - subindex: 0x12
+        name: temperature
+        data_type: int8
+        description: temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x13
+        name: temperature_avg
+        data_type: int8
+        description: average temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x14
+        name: temperature_max
+        data_type: int8
+        description: max temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x15
+        name: temperature_min
+        data_type: int8
+        description: min temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x16
+        name: status
+        data_type: uint8
+        bit_definitions:
+          HEATER_ON: 0
+          DISCHARGE_DISABLE: 1
+          CHARGE_DISABLE: 2
+          DISCHARGE_STATUS: 3
+          CHARGE_STATUS: 4
+        access_type: ro
+
+  - index: 0x4001
+    name: pack_2
+    description: battery pack 2 telemetry
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: vbatt
+        data_type: uint16
+        description: pack voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x2
+        name: vcell_max
+        data_type: uint16
+        description: max voltage for a cell
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x3
+        name: vcell_min
+        data_type: uint16
+        description: min voltage for a cell
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x4
+        name: vcell
+        data_type: uint16
+        description: lowest cell voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x5
+        name: vcell_1
+        data_type: uint16
+        description: cell 1 voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x6
+        name: vcell_2
+        data_type: uint16
+        description: cell 2 voltage
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x7
+        name: vcell_avg
+        data_type: uint16
+        description: average voltage of both cells
+        access_type: ro
+        unit: mV
+
+      - subindex: 0x8
+        name: current
+        data_type: int16
+        description: pack current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0x9
+        name: current_avg
+        data_type: int16
+        description: pack average current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xa
+        name: current_max
+        data_type: int16
+        description: pack max current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xb
+        name: current_min
+        data_type: int16
+        description: pack min current
+        access_type: ro
+        unit: mA
+
+      - subindex: 0xc
+        name: full_capacity
+        data_type: uint16
+        description: capacity of battery pack
+        access_type: ro
+        unit: mAh
+
+      - subindex: 0xd
+        name: reported_capacity
+        data_type: uint16
+        description: reported capacity of battery pack
+        access_type: ro
+        unit: mAh
+
+      - subindex: 0xe
+        name: time_to_empty
+        data_type: uint16
+        description: estimate of time until battery pack is empty
+        access_type: ro
+        unit: s
+
+      - subindex: 0xf
+        name: time_to_full
+        data_type: uint16
+        description: estimate of time until battery pack is full
+        access_type: ro
+        unit: s
+
+      - subindex: 0x10
+        name: cycles
+        data_type: uint16
+        description: charge/discharge cycles
+        access_type: ro
+        high_limit: 10485
+
+      - subindex: 0x11
+        name: reported_state_of_charge
+        data_type: uint8
+        description: reported charge percent
+        access_type: ro
+        high_limit: 100
+        unit: "%"
+
+      - subindex: 0x12
+        name: temperature
+        data_type: int8
+        description: temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x13
+        name: temperature_avg
+        data_type: int8
+        description: average temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x14
+        name: temperature_max
+        data_type: int8
+        description: max temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x15
+        name: temperature_min
+        data_type: int8
+        description: min temperature of battery pack
+        access_type: ro
+        unit: C
+
+      - subindex: 0x16
+        name: status
+        data_type: uint8
+        bit_definitions:
+          HEATER_ON: 0
+          DISCHARGE_DISABLE: 1
+          CHARGE_DISABLE: 2
+          DISCHARGE_STATUS: 3
+          CHARGE_STATUS: 4
+        access_type: ro
+
+tpdos:
+  - num: 1
+    fields:
+      - [pack_1, vbatt]
+      - [pack_1, vcell_max]
+      - [pack_1, vcell_min]
+      - [pack_1, vcell]
+    event_timer_ms: 10000
+
+  - num: 2
+    fields:
+      - [pack_1, vcell_1]
+      - [pack_1, vcell_2]
+      - [pack_1, vcell_avg]
+    event_timer_ms: 10000
+
+  - num: 3
+    fields:
+      - [pack_1, current]
+      - [pack_1, current_avg]
+      - [pack_1, current_max]
+      - [pack_1, current_min]
+    event_timer_ms: 10000
+
+  - num: 4
+    fields:
+      - [pack_1, temperature]
+      - [pack_1, temperature_avg]
+      - [pack_1, temperature_max]
+      - [pack_1, temperature_min]
+    event_timer_ms: 10000
+
+  - num: 5
+    fields:
+      - [pack_1, full_capacity]
+      - [pack_1, reported_capacity]
+      - [pack_1, reported_state_of_charge]
+      - [pack_1, status]
+    event_timer_ms: 10000
+
+  - num: 6
+    fields:
+      - [pack_2, vbatt]
+      - [pack_2, vcell_max]
+      - [pack_2, vcell_min]
+      - [pack_2, vcell]
+    event_timer_ms: 10000
+
+  - num: 7
+    fields:
+      - [pack_2, vcell_1]
+      - [pack_2, vcell_2]
+      - [pack_2, vcell_avg]
+    event_timer_ms: 10000
+
+  - num: 8
+    fields:
+      - [pack_2, current]
+      - [pack_2, current_avg]
+      - [pack_2, current_max]
+      - [pack_2, current_min]
+    event_timer_ms: 10000
+
+  - num: 9
+    fields:
+      - [pack_2, temperature]
+      - [pack_2, temperature_avg]
+      - [pack_2, temperature_max]
+      - [pack_2, temperature_min]
+    event_timer_ms: 10000
+
+  - num: 10
+    fields:
+      - [pack_2, full_capacity]
+      - [pack_2, reported_capacity]
+      - [pack_2, reported_state_of_charge]
+      - [pack_2, status]
+    event_timer_ms: 10000
