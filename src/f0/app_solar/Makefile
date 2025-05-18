@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -111,13 +111,11 @@ ifeq ($(USE_BOOTLOADER),)
   USE_BOOTLOADER = yes
 endif
 
-ifeq ($(ORESAT),)
-  ORESAT = 0.5
-endif
-
 # generate OD.c/OD.h from oresat-configs
-FW_VERSION = $(shell git describe --always)
-$(shell oresat-gen-fw-files --oresat $(ORESAT) solar -d $(ODDIR) -fw $(FW_VERSION) -hw $(BOARD))
+$(shell oresat-configs canopennode od.yaml $(PROJ_SRC)/od.yaml -d $(ODDIR))
+ifneq ($(.SHELLSTATUS),0)
+  $(error oresat-configs canopennode failed to generate an Object Dictionary)
+endif
 # add them
 ALLCSRC += $(ODDIR)/OD.c
 ALLINC += $(ODDIR)
@@ -184,7 +182,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -D_XOPEN_SOURCE=0 -D_FORTIFY_SOURCE=0 -D__ARM_FP=0 -DDEBUG_PRINT
+UDEFS = -D_XOPEN_SOURCE=0 -D_FORTIFY_SOURCE=0 -D__ARM_FP=0 -DDEBUG_PRINT -DFW_VERSION=\"$(shell git describe --always)\"
 
 # Define ASM defines here
 UADEFS =

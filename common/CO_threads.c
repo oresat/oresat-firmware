@@ -198,37 +198,32 @@ void CO_init(CO_t **pCO, CANDriver *CANptr, uint8_t node_id, uint16_t bitrate, c
 {
     CO_t *CO = NULL;
     CO_ReturnError_t err;
-    /* TODO: Use proper OD interface */
+    int i;
+#if (defined(OD_CNT_RPDO) && OD_CNT_RPDO > 0) || (defined(OD_CNT_TPDO) && OD_CNT_TPDO > 0)
+    uint32_t cob_id;
+    OD_entry_t *entry;
+    for (int e = 0; e < OD->size; e++) {
+        entry = &OD->list[e];
 #if defined(OD_CNT_RPDO) && OD_CNT_RPDO > 0
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t COB_IDUsedByRPDO;
-        uint8_t transmissionType;
-        uint16_t eventTimer;
-    } *RPDOCommParam = (void*)&OD_RAM.x1400_rpdo_1_communication_parameters;
-    for (int i = 0; i < OD_CNT_RPDO; i++) {
-        uint16_t cob_id = RPDOCommParam[i].COB_IDUsedByRPDO & 0x7FF;
-        uint16_t cob_id_default = 0x200U + (0x100U * (i % 4));
-        if (cob_id == cob_id_default)
-            RPDOCommParam[i].COB_IDUsedByRPDO += node_id + i / 4;
-    }
+        if ((entry->index >= 0x1400) && (entry->index < 0x1600)) {
+            i = entry->index - 0x1400;
+            OD_get_u32(entry, 1, &cob_id, true);
+            if ((cob_id & 0x7FF) == (0x200U + (0x100U * (i % 4) + (i / 4)))) {
+                OD_set_u32(entry, 1, cob_id + node_id, true);
+            }
+        }
 #endif
 #if defined(OD_CNT_TPDO) && OD_CNT_TPDO > 0
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t COB_IDUsedByTPDO;
-        uint8_t transmissionType;
-        uint16_t inhibitTime;
-        uint16_t eventTimer;
-        uint8_t SYNCStartValue;
-    } *TPDOCommParam = (void*)&OD_RAM.x1800_tpdo_1_communication_parameters;
-    for (int i = 0; i < OD_CNT_TPDO; i++) {
-        uint16_t cob_id = TPDOCommParam[i].COB_IDUsedByTPDO & 0x7FF;
-        uint16_t cob_id_default = 0x180U + (0x100U * (i % 4));
-        if (cob_id == cob_id_default)
-            TPDOCommParam[i].COB_IDUsedByTPDO += node_id + i / 4;
-    }
+        if ((entry->index >= 0x1800) && (entry->index < 0x1A00)) {
+            i = entry->index - 0x1800;
+            OD_get_u32(entry, 1, &cob_id, true);
+            if ((cob_id & 0x7FF) == (0x180U + (0x100U * (i % 4) + (i / 4)))) {
+                OD_set_u32(entry, 1, cob_id + node_id, true);
+            }
+        }
 #endif
+#endif
+    }
     CO = CO_new(NULL, NULL);
     *pCO = CO;
     chDbgAssert(CO != NULL, "CO_new failed");
