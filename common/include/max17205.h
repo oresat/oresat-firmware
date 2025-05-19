@@ -1067,20 +1067,19 @@ msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
 msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value);
 
 /* Reference datasheet table 1 */
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest);
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest_mA);
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_pct);
+msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV);
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA);
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mC);
+msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mOhm);
+msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S);
 
-
-msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint8_t * max, uint8_t * min);
-msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max, int16_t * min);
-msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max, int8_t * min);
+msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C);
+msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV);
+msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV);
+msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mV, int16_t * min_mV);
+msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C);
 
 msg_t max17205HardwareReset(MAX17205Driver *devp);
 

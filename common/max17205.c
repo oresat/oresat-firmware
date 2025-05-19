@@ -39,12 +39,13 @@ msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
     osalDbgAssert(devp->state == MAX17205_READY,
             "max17205ReadRaw(), invalid state");
 
+    I2CDriver * i2c = devp->config->i2cp;
     uint8_t mem = MEM_ADDR(reg);
     uint8_t buf[2] = {};
 
-    i2cAcquireBus(devp->config->i2cp);
-    const msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, I2C_ADDR(reg), &mem, sizeof(mem), buf, sizeof(buf), TIME_MS2I(50));
-    i2cReleaseBus(devp->config->i2cp);
+    i2cAcquireBus(i2c);
+    const msg_t r = i2cMasterTransmitTimeout(i2c, I2C_ADDR(reg), &mem, sizeof(mem), buf, sizeof(buf), TIME_MS2I(50));
+    i2cReleaseBus(i2c);
 
     if (r == MSG_OK) {
         *dest = buf[0] | buf[1] << 8;
@@ -67,11 +68,12 @@ msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
     osalDbgAssert(devp->state == MAX17205_READY,
             "max17205WriteRaw(), invalid state");
 
+    I2CDriver * i2c = devp->config->i2cp;
     uint8_t buf[3] = {MEM_ADDR(reg), value & 0xFF, (value >> 8) & 0xFF};
 
-    i2cAcquireBus(devp->config->i2cp);
-    const msg_t r = i2cMasterTransmitTimeout(devp->config->i2cp, I2C_ADDR(reg), buf, sizeof(buf), NULL, 0, TIME_MS2I(50));
-    i2cReleaseBus(devp->config->i2cp);
+    i2cAcquireBus(i2c);
+    const msg_t r = i2cMasterTransmitTimeout(i2c, I2C_ADDR(reg), buf, sizeof(buf), NULL, 0, TIME_MS2I(50));
+    i2cReleaseBus(i2c);
 
     return r;
 }
@@ -207,16 +209,18 @@ void max17205Stop(MAX17205Driver *devp) {
  *
  * @api
  */
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest_mAh) {
     uint16_t buf = 0;
     const msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = buf * 5000 / devp->rsense_uOhm;
+        // Reference datasheet table 1: Capacity LSB is 5.0μVh/RSENSE where Vh/R=A, unsigned.
+        *dest_mAh = buf * 5000U / devp->rsense_uOhm;
         dbgprintf("  max17205ReadCapacity(0x%X %s) = %u mAh (raw: 0x%X)\r\n",
-            reg, max17205RegToStr(reg), *dest, buf);
+            reg, max17205RegToStr(reg), *dest_mAh, buf);
     }
     return r;
 }
+
 
 /**
  * @brief   Reads an MAX17205 percentage value from a register in 1% increments.
@@ -226,13 +230,14 @@ msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *d
  *
  * @api
  */
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_pct) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = buf / 256U;
-        dbgprintf("  max17205ReadPercentageChecked(0x%X %s) = %u%% (raw: 0x%X)\r\n",
-            reg, max17205RegToStr(reg), *dest, buf);
+        // Reference datasheet table 1: Percentage LSB is 1/256%, unsigned.
+        *dest_pct = buf / 256U;
+        dbgprintf("  max17205ReadPercentage(0x%X %s) = %u%% (raw: 0x%X)\r\n",
+            reg, max17205RegToStr(reg), *dest_pct, buf);
     }
     return r;
 }
@@ -245,42 +250,39 @@ msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
  *
  * @api
  */
-msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        //Output is in millivolts. LSB unit is 0.078125mV
-        *dest = (((uint32_t) buf) * 78125U) / 1000000U;
-        dbgprintf("  max17205ReadVoltageChecked(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
+        // Reference datasheet Table 1: Voltage LSB is 0.078125mV, unsigend.
+        // Converting to mV using integer math would be buf * 78125 / 1_000_000, but that could
+        // overflow a uint32_t so remove the common 5^6 factor from both numbers first.
+        *dest_mV = buf * 5U / 64U;
+        dbgprintf("  max17205ReadVoltage(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest_mV);
     }
     return r;
 }
 
-/**
- * @brief   Reads an MAX17205 voltage value from a register in mV.
- *
- * @param[in] devp       pointer to the @p MAX17205Driver object
- * @param[in] reg        the register to read from
- *
- * @api
- */
-msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV) {
     uint16_t buf = 0;
-    msg_t r = max17205Read(devp, reg, &buf);
+    msg_t r = max17205Read(devp, MAX17205_AD_BATT, &buf);
     if (r == MSG_OK) {
-        //Output is in millivolts. LSB unit is 1.25mV
-        *dest = (((uint32_t) buf) * 125U) / 100U;
-        dbgprintf("  max17205ReadBattVoltage(0x%X %s) = %u mV\r\n", reg, max17205RegToStr(reg), *dest);
+        //Reference datasheet page 71: Voltage LSB is 1.25mV, unsigned.
+        *dest_mV = buf * 125U / 100U;
+        dbgprintf("  max17205ReadBatt(0x%X %s) = %u mV\r\n",
+            MAX17205_AD_BATT, max17205RegToStr(MAX17205_AD_BATT), *dest_mV);
     }
     return r;
 }
 
-msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint8_t * max, uint8_t * min) {
+msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINVOLT, &buf);
     if (r == MSG_OK) {
-        *max =  (buf >> 8) * 20;
-        *min = (buf & 0xFF) * 20;
+        // Reference datasheet page 71: register MaxMinVolt is two 8 bit unsigned values with
+        // 20mV/LSB, the upper byte being max and lower byte min.
+        *max_mV =  (buf >> 8) * 20;
+        *min_mV = (buf & 0xFF) * 20;
     }
     return r;
 }
@@ -293,26 +295,29 @@ msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint8_t * max, uint8_t * m
  *
  * @api
  */
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest) {
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = ((int32_t)(int16_t)buf * 15625) / devp->rsense_uOhm;
+        // Referencce datasheet table 1: Current LSB is 1.5625μV/RSENSE, signed.
+        *dest_mA = (int16_t)buf * 15625 / (devp->rsense_uOhm * 10);
         dbgprintf("  max17205ReadCurrent(0x%X %s) = %d mA (raw: 0x%X)\r\n",
-            reg, max17205RegToStr(reg), *dest, buf);
+            reg, max17205RegToStr(reg), *dest_mA, buf);
     }
     return r;
 }
 
 
-msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max, int16_t * min) {
+msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mA, int16_t * min_mA) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINCURR, &buf);
     if (r == MSG_OK) {
+        // Reference datasheet page 73: MaxMinCurrent is two packed signed 1 byte values with
+        // LSB of 0.40mV/RSENSE.
         int8_t max_raw = (buf >> 8);
         int8_t min_raw = buf & 0xFF;
-        *max = ((int16_t) max_raw) * 40000 / devp->rsense_uOhm;
-        *min = ((int16_t) min_raw) * 40000 / devp->rsense_uOhm;
+        *max_mA = max_raw * 400000 / devp->rsense_uOhm;
+        *min_mA = min_raw * 400000 / devp->rsense_uOhm;
     }
     return r;
 }
@@ -325,12 +330,14 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max, int16_t * m
  *
  * @api
  */
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest) {
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mC) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = (int16_t)buf * 1000U / 256U;
-        dbgprintf("  max17205ReadTemperatureChecked(0x%X %s) = %d mC (%u C) (raw: 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, (*dest / 1000), buf);
+        // Reference Datasheet table 1: Temperature LSB is 1/256C, signed.
+        *dest_mC = (int16_t)buf * 1000 / 256;
+        dbgprintf("  max17205ReadTemperature(0x%X %s) = %d mC (%u C) (raw: 0x%X)\r\n",
+            reg, max17205RegToStr(reg), *dest_mC, (*dest_mC / 1000), buf);
     }
     return r;
 }
@@ -343,22 +350,29 @@ msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest)
  *
  * @api
  */
-msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest) {
+msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = ((int16_t)buf / 10) - 273;
-        dbgprintf("  max17205ReadTemperatureChecked(0x%X %s) = %d C (raw: 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, buf);
+        // Reference datasheet page 77: "These registers display temperature in degrees
+        // Celsius starting at absolute zero, -273ºC or 0ºK with an LSb of 0.1ºC."
+        // FIXME: Does that mean signed Celsius or unsigned Kelvin? The converison below
+        // assumes signed(!?) Kelvin but this should be checked on a live chip.
+        *dest_C = (int16_t)buf / 10 - 273;
+        dbgprintf("  max17205ReadTemperature(0x%X %s) = %d C (raw: 0x%X)\r\n",
+            reg, max17205RegToStr(reg), *dest_C, buf);
     }
     return r;
 }
 
-msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max, int8_t * min) {
+msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINTEMP, &buf);
     if (r == MSG_OK) {
-        *max = ((int16_t)buf) >> 8;
-        *min = buf & 0xFF;
+        // Reference datahseet page 76: Two packed signed 1 byte Celceus values with 1C/LSB, with
+        // the upper byte max and lower byte min.
+        *max_C = buf >> 8;
+        *min_C = buf & 0xFF;
     }
     return r;
 }
@@ -372,11 +386,12 @@ msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max, int8_t *
  * @api
  */
 
-msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mOhm) {
     uint16_t buf;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = buf * 1000U / 4096U;
+        // Reference datasheet table 1: Resistance LSB is 1/4096Ω, Unsigned
+        *dest_mOhm = buf * 1000U / 4096U;
     }
 
     return r;
@@ -390,18 +405,21 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest)
  *
  * @api
  */
-msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        *dest = buf * 5625U / 1000;
-        dbgprintf("  max17205ReadTimeChecked(0x%X %s) = %u seconds (raw: 0x%X)\r\n", reg, max17205RegToStr(reg), *dest, buf);
+        // Reference datasheet table 1: Time LSB is 5.625s, unsigned.
+        *dest_S = buf * 5625U / 1000;
+        dbgprintf("  max17205ReadTime(0x%X %s) = %u seconds (raw: 0x%X)\r\n",
+            reg, max17205RegToStr(reg), *dest_S, buf);
     }
     return r;
 }
 
 /**
- * The MAX17205 allows for the NV ram to be written no more then 7 times on a single chip. Each time, an additional bit is set in a flash register which can be queried.
+ * The MAX17205 allows for the NV ram to be written no more then 7 times on a single chip.
+ * Each time, an additional bit is set in a flash register which can be queried.
  *
  * TODO document this
  */
