@@ -86,6 +86,10 @@ Tools required:
 To install oresat-configs:
 * `$ pip install oresat-configs`
 
+### A Note about WSL
+* If using WSL make sure your usb devices are being shared with WSL.
+* You may need to use a tool like [usbipd-win](https://github.com/dorssel/usbipd-win).
+
 Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.
 
