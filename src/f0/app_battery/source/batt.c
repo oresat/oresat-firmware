@@ -9,8 +9,8 @@
 
 #ifdef DEBUG_PRINT
 #include "chprintf.h"
-#define DEBUG_SD (BaseSequentialStream *) &SD2
-#define dbgprintf(str, ...) chprintf(DEBUG_SD, str, ##__VA_ARGS__)
+#define DEBUG_SD &SD2
+#define dbgprintf(str, ...) chprintf((BaseSequentialStream *)DEBUG_SD, str, ##__VA_ARGS__)
 #else
 #define dbgprintf(str, ...)
 #endif
@@ -389,7 +389,7 @@ msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
 
 #if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
     dbgprintf("One or more NV Ram elements don't match expected values...\r\n");
-    r = max17205WriteRegisters(bat_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
+    r = max17205WriteRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
     if (r != MSG_OK) {
         dbgprintf("Failed to write new nv reg values\n");
         return r;
@@ -409,7 +409,7 @@ msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
 
     dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
     uint8_t ch = 0;
-    sdRead(&DEBUG_SD, &ch, 1);
+    sdRead(DEBUG_SD, &ch, 1);
     dbgprintf("\r\n");
 
     if (ch == 'y') {
