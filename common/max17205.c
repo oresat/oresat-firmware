@@ -11,7 +11,7 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
+#define ARRAY_LEN(x) (sizeof(x)/sizeof(x[0]))
 
 /* See datasheet table 27 and figure 74. The chip has 0x1FF registers but the
  * protocol only allows one byte for register addressing (i.e. registers up to
@@ -34,10 +34,9 @@
  *
  * @api
  */
-msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+static msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MAX17205_READY,
-            "max17205ReadRaw(), invalid state");
+    osalDbgCheck(dest != NULL);
 
     I2CDriver * i2c = devp->config->i2cp;
     uint8_t mem = MEM_ADDR(reg);
@@ -63,10 +62,8 @@ msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
  *
  * @api
  */
-msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
+static msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
     osalDbgCheck(devp != NULL);
-    osalDbgAssert(devp->state == MAX17205_READY,
-            "max17205WriteRaw(), invalid state");
 
     I2CDriver * i2c = devp->config->i2cp;
     uint8_t buf[3] = {MEM_ADDR(reg), value & 0xFF, (value >> 8) & 0xFF};
@@ -90,7 +87,7 @@ void max17205ObjectInit(MAX17205Driver *devp) {
     devp->state = MAX17205_STOP;
 }
 
-msg_t max17205HardwareReset(MAX17205Driver * devp) {
+static msg_t max17205HardwareReset(MAX17205Driver * devp) {
     msg_t r = max17205Write(devp, MAX17205_AD_COMMAND, MAX17205_COMMAND_HARDWARE_RESET);
     if (r != MSG_OK) {
         return r;
@@ -171,6 +168,7 @@ bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
         }
         devp->rsense_uOhm = nr_sense_value;
     }
+    osalDbgAssert(devp->rsense_uOhm > 0, "max17205Start(), config->rsense_uOhm or register nRSENSE must be > 0");
 
     if (comm_error_count == 0) {
         devp->state = MAX17205_READY;
@@ -210,6 +208,8 @@ void max17205Stop(MAX17205Driver *devp) {
  * @api
  */
 msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest_mAh) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCapacity(), invalid state");
+
     uint16_t buf = 0;
     const msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -231,6 +231,7 @@ msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *d
  * @api
  */
 msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_pct) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadPercentage(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -238,6 +239,19 @@ msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
         *dest_pct = buf / 256U;
         dbgprintf("  max17205ReadPercentage(0x%X %s) = %u%% (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_pct, buf);
+    }
+    return r;
+}
+
+msg_t max17205ReadCycles(MAX17205Driver *devp, uint16_t *dest_count) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCycles(), invalid state");
+    uint16_t buf = 0;
+    msg_t r = max17205Read(devp, MAX17205_AD_CYCLES, &buf);
+    if (r == MSG_OK) {
+        // Reference datasheet page 33: LSB is 16%, unsigned.
+        *dest_count = buf * 16U / 100U;
+        dbgprintf("  max17205ReadCycles(0x%X %s) = %u%% (raw: 0x%X)\r\n",
+            MAX17205_AD_CYCLES, max17205RegToStr(MAX17205_AD_CYCLES), *dest_count, buf);
     }
     return r;
 }
@@ -251,6 +265,7 @@ msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
  * @api
  */
 msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadVoltage(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -264,6 +279,7 @@ msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV)
 }
 
 msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadBatt(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_BATT, &buf);
     if (r == MSG_OK) {
@@ -276,6 +292,7 @@ msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV) {
 }
 
 msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinVoltage(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINVOLT, &buf);
     if (r == MSG_OK) {
@@ -296,6 +313,7 @@ msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_
  * @api
  */
 msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCurrent(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -309,6 +327,7 @@ msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA) 
 
 
 msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mA, int16_t * min_mA) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinCurrent(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINCURR, &buf);
     if (r == MSG_OK) {
@@ -331,6 +350,7 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mA, int16_t 
  * @api
  */
 msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mC) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTemperature(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -351,6 +371,7 @@ msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_
  * @api
  */
 msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadAverageTemperature(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -366,6 +387,7 @@ msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t
 }
 
 msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinTemperature(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINTEMP, &buf);
     if (r == MSG_OK) {
@@ -387,6 +409,7 @@ msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t
  */
 
 msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mOhm) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadResistance(), invalid state");
     uint16_t buf;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -406,6 +429,7 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
  * @api
  */
 msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTime(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
@@ -424,6 +448,7 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
  * TODO document this
  */
 msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *reg_dest, uint8_t *number_of_writes_left) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadNVWriteCountMaskingRegister(), invalid state");
     //Determine the number of times NV memory has been written on this chip.
     //See page 85 of the data sheet
 
@@ -461,6 +486,7 @@ msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *re
  * See page 85 of the data sheet
  */
 msg_t max17205NonvolatileBlockProgram(MAX17205Driver *devp) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205NonvolatileBlockProgram(), invalid state");
     //  1. Write desired memory locations to new values.
     //should be done prior to calling this function
 
@@ -513,7 +539,41 @@ msg_t max17205NonvolatileBlockProgram(MAX17205Driver *devp) {
     return MSG_OK;
 }
 
+msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len, bool * valid) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ValidateRegisters(), invalid state");
+    bool matches = true;
+    dbgprintf("Current and expected NV settings:\r\n");
+    for (size_t i = 0; i < len; ++i) {
+        uint16_t buf = 0;
+        msg_t r = max17205Read(devp, list[i].reg, &buf);
+        if (r != MSG_OK) {
+            return r;
+        }
+        dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n",
+            max17205RegToStr(list[i].reg), list[i].reg,
+            buf, list[i].value
+        );
+        if (buf != list[i].value) {
+           matches = false;
+        }
+    }
+    *valid = matches;
+    return MSG_OK;
+}
+
+msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205WriteRegisters(), invalid state");
+    for (size_t i = 0; i < len; ++i) {
+        msg_t r = max17205Write(devp, list[i].reg, list[i].value);
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+    return MSG_OK;
+}
+
 msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTime(), invalid state");
     uint16_t masking_register = 0;
     uint8_t num_left = 0;
     msg_t r = max17205ReadNVWriteCountMaskingRegister(devp, &masking_register, &num_left);
@@ -528,7 +588,7 @@ msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
         MAX17205_AD_NRSENSE,
     };
 
-    for(size_t i = 0; i < ARRAYSIZE(volatile_reg_list); ++i) {
+    for(size_t i = 0; i < ARRAY_LEN(volatile_reg_list); ++i) {
         uint16_t buf = 0;
         r = max17205Read(devp, volatile_reg_list[i], &buf);
         if (r != MSG_OK) {
@@ -631,7 +691,7 @@ msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
         MAX17205_AD_NDEVICENAME4,
     };
 
-    for(size_t i = 0; i < ARRAYSIZE(reg_list); ++i) {
+    for(size_t i = 0; i < ARRAY_LEN(reg_list); ++i) {
         uint16_t buf = 0;
         r = max17205Read(devp, reg_list[i], &buf);
         if (r != MSG_OK) {

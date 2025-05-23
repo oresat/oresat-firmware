@@ -15,6 +15,8 @@
 #define dbgprintf(str, ...)
 #endif
 
+#define ARRAY_LEN(x) (sizeof(x)/sizeof(x[0]))
+
 #define NCELLS          2U          /* Number of cells */
 
 typedef enum {
@@ -58,7 +60,6 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
 
     {MAX17205_AD_NFULLCAPREP, 0x1450 },
     {MAX17205_AD_NFULLCAPNOM, 0x1450 },
-    {0,0}
 };
 
 
@@ -352,7 +353,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     dbgprintf("time_to_empty = %u (seconds), time_to_full = %u (seconds), available_state_of_charge = %u%%, present_state_of_charge = %u%%\r\n", dest->time_to_empty_seconds, dest->time_to_full_seconds, dest->available_state_of_charge, dest->present_state_of_charge);
 
     /* other info */
-    if( (r = max17205Read(driver, MAX17205_AD_CYCLES, &dest->cycles)) != MSG_OK ) {
+    if( (r = max17205ReadCycles(driver, &dest->cycles)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
 
@@ -364,7 +365,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 /**
  * Helper function to trigger write of volatile memory on MAX71205 chip.
  */
-bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
+msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
     dbgprintf("\r\n%s\r\n", pack_str);
 
     uint16_t masking_register = 0;
@@ -374,55 +375,40 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
             masking_register, num_writes_left);
     }
 
-    bool all_elements_match = true;
-    dbgprintf("Current and expected NV settings:\r\n");
-    for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
-        uint16_t reg_value = 0;
-        if (max17205Read(devp, batt_nv_programing_cfg[idx].reg, &reg_value) != MSG_OK) {
-            dbgprintf("Failed to read reg value\r\n");
-            continue;
-        }
-        dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n",
-            max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg,
-            reg_value, batt_nv_programing_cfg[idx].value
-        );
-        if (reg_value != batt_nv_programing_cfg[idx].value) {
-            all_elements_match = false;
-        }
+    bool all_elements_match = false;
+    msg_t r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
+    if (r != MSG_OK) {
+        return r;
     }
 
     if (all_elements_match) {
         dbgprintf("All NV Ram elements already match expected values...\r\n");
-        return false;
+        return MSG_OK;
     }
 
-#if ENABLE_NV_MEMORY_UPDATE_CODE
+#if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
     dbgprintf("One or more NV Ram elements don't match expected values...\r\n");
-    for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
-        if (max17205Write(devp, batt_nv_programing_cfg[idx].reg, batt_nv_programing_cfg[idx].value) != MSG_OK ) {
-            dbgprintf("Failed to write reg value\r\n");
-            return false;
-        }
-        dbgprintf("Successfully wrote reg value\r\n");
+    r = max17205WriteRegisters(bat_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
+    if (r != MSG_OK) {
+        dbgprintf("Failed to write new nv reg values\n");
+        return r;
     }
+    dbgprintf("Successfully wrote new nv reg values\r\n");
 
-    dbgprintf("Current and expected NV settings:\r\n");
-    for (int idx = 0; batt_nv_programing_cfg[idx].reg != 0; idx++) {
-        uint16_t reg_value = 0;
-        if (max17205ReadRaw(devp, batt_nv_programing_cfg[idx].reg, &reg_value) != MSG_OK ) {
-            dbgprintf("Failed to read reg value\r\n");
-            continue;
-        }
-        dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n",
-            max17205RegToStr(batt_nv_programing_cfg[idx].reg), batt_nv_programing_cfg[idx].reg,
-            reg_value, batt_nv_programing_cfg[idx].value
-        );
-
+    all_elements_match = false;
+    r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
+    if (r != MSG_OK) {
+        return r;
     }
+    if (!all_elements_match) {
+        dbgprintf("NV Ram elements failed to update after write.\r\n");
+        return MSG_OK;
+    }
+    dbgprintf("All NV Ram elements now match expected values.\r\n");
 
     dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
     uint8_t ch = 0;
-    sdRead(&SD2, &ch, 1);
+    sdRead(&DEBUG_SD, &ch, 1);
     dbgprintf("\r\n");
 
     if (ch == 'y') {
@@ -436,7 +422,7 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
         }
     }
 #endif
-    return true;
+    return MSG_OK;
 }
 
 /**
