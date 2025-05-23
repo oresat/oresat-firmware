@@ -1059,26 +1059,29 @@ struct MAX17205Driver {
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* Driver state machine */
 void max17205ObjectInit(MAX17205Driver *devp);
 bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
 
-/* Reference datasheet table 1 */
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest_mA);
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_pct);
+/* Reference datasheet table 1, generic register reads */
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *dest_mAh);
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint8_t *dest_pct);
 msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV);
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA);
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mC);
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mA);
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mC);
 msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mOhm);
 msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S);
 
+/* Register reads that require a specific conversion not covered by table 1 */
 msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C);
-msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV);
+msg_t max17205ReadBatt(MAX17205Driver *devp, uint32_t *dest_mV);
 msg_t max17205ReadCycles(MAX17205Driver *devp, uint16_t *dest_count);
 msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV);
-msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mV, int16_t * min_mV);
+msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t * min_mA);
 msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C);
 
+/* Misc */
 msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len, bool * valid);
 msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len);
 msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *reg_dest, uint8_t *number_of_writes_left);

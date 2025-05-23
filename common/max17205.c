@@ -31,6 +31,8 @@
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read
+ * @param[out] dest      pointer to location to write read value
+ * @return               MSG_OK on success or negative on I2C error
  *
  * @api
  */
@@ -59,6 +61,7 @@ static msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to write to
  * @param[in] value      the value to write
+ * @return               MSG_OK on success or negative on I2C error
  *
  * @api
  */
@@ -85,6 +88,7 @@ static msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
 void max17205ObjectInit(MAX17205Driver *devp) {
     devp->config = NULL;
     devp->state = MAX17205_STOP;
+    devp->rsense_uOhm = 0;
 }
 
 static msg_t max17205HardwareReset(MAX17205Driver * devp) {
@@ -132,6 +136,7 @@ static msg_t max17205HardwareReset(MAX17205Driver * devp) {
  *
  * @param[in] devp      pointer to the @p MAX17205Driver object
  * @param[in] config    pointer to the @p MAX17205Config object
+ * @return              true on success or false on I2C error
  *
  * @api
  */
@@ -204,16 +209,20 @@ void max17205Stop(MAX17205Driver *devp) {
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_mAh  location to write capacity result, in mAh
+ * @return               MSG_OK on success or negative on I2C error
  *
+ * @details  dest_mAh will be between 0 and up to 327,675,000 mAh but typically
+ *           closer to 32,767 depending on the value of rsense_uOhm.
  * @api
  */
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest_mAh) {
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *dest_mAh) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCapacity(), invalid state");
 
     uint16_t buf = 0;
     const msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        // Reference datasheet table 1: Capacity LSB is 5.0μVh/RSENSE where Vh/R=A, unsigned.
+        // Reference datasheet table 1: Capacity LSB is 5.0μVh/RSENSE where Vh/R=Ah, unsigned.
         *dest_mAh = buf * 5000U / devp->rsense_uOhm;
         dbgprintf("  max17205ReadCapacity(0x%X %s) = %u mAh (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_mAh, buf);
@@ -227,10 +236,14 @@ msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *d
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_pct  location to write percentage result, in 1% increments
+ * @return               MSG_OK on success or negative on I2C error
+ *
+ * @details  dest_pct will be between 0% and 255%.
  *
  * @api
  */
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_pct) {
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint8_t *dest_pct) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadPercentage(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
@@ -243,6 +256,8 @@ msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
     return r;
 }
 
+
+/* dest_count will be between 0 and 10485 cycles */
 msg_t max17205ReadCycles(MAX17205Driver *devp, uint16_t *dest_count) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCycles(), invalid state");
     uint16_t buf = 0;
@@ -261,6 +276,10 @@ msg_t max17205ReadCycles(MAX17205Driver *devp, uint16_t *dest_count) {
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_mV   location to write voltage result, in mV
+ * @return               MSG_OK on success or negative on I2C error
+ *
+ * @details  dest_mV will be between 0 and 5119mV.
  *
  * @api
  */
@@ -278,7 +297,11 @@ msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV)
     return r;
 }
 
-msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV) {
+/**
+ * dest_mV will be between 0 and 81,918mV but realistically can be
+ * at most 76.8V in a 15 cell configuration.
+ */
+msg_t max17205ReadBatt(MAX17205Driver *devp, uint32_t *dest_mV) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadBatt(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_BATT, &buf);
@@ -291,6 +314,10 @@ msg_t max17205ReadBatt(MAX17205Driver *devp, uint16_t *dest_mV) {
     return r;
 }
 
+/**
+ * max_mV can be between 0mV and 5100mV, starting at 0.
+ * min_mV can be between 0mV and 5100mV, starting at 5100.
+ */
 msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinVoltage(), invalid state");
     uint16_t buf = 0;
@@ -309,10 +336,14 @@ msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_pct  location to write voltage result, in mV
+ * @return               MSG_OK on success or negative on I2C error
  *
+ * @details  dest_mA can be between -51,200,000mA and 51,198,437mA but typically
+ *           between -5,120mA and 5,119mA depending on rsense_uOhm.
  * @api
  */
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA) {
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mA) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadCurrent(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
@@ -325,8 +356,14 @@ msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mA) 
     return r;
 }
 
-
-msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mA, int16_t * min_mA) {
+/**
+ * Both max_mA and min_mA can be between -102,400,000mA and 102,000,000mA but typically
+ * between -10,240mA and 10,200mA depending on rsense_uOhm.
+ * max_mA starts at the minimum value.
+ * min_mA starts at the maximum value.
+ *
+ */
+msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t * min_mA) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinCurrent(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, MAX17205_AD_MAXMINCURR, &buf);
@@ -346,10 +383,13 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int16_t * max_mA, int16_t 
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_mC   location to write temperature output in mC
+ * @return               MSG_OK on success or negative on I2C error
  *
+ * @details  dest_mC will be between -256,000mC and 255,996mC.
  * @api
  */
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_mC) {
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mC) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTemperature(), invalid state");
     uint16_t buf = 0;
     msg_t r = max17205Read(devp, reg, &buf);
@@ -367,7 +407,10 @@ msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_C    location to write temperature output in C
+ * @return               MSG_OK on success or negative on I2C error
  *
+ * @details  dest_C will be between ?? and ??.
  * @api
  */
 msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C) {
@@ -386,6 +429,9 @@ msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t
     return r;
 }
 
+/**
+ * max_C and min_C will be between -128C and 127C.
+ */
 msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadMaxMinTemperature(), invalid state");
     uint16_t buf = 0;
@@ -404,6 +450,10 @@ msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_mOhm location to write resistance in mOhms
+ * @return               MSG_OK on success or negative on I2C error
+ *
+ * @details  dest_mOhm will be between 0mOhm and 15,999mOhm.
  *
  * @api
  */
@@ -413,7 +463,7 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
     uint16_t buf;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        // Reference datasheet table 1: Resistance LSB is 1/4096Ω, Unsigned
+        // Reference datasheet table 1: Resistance LSB is 1/4096Ω, unsigned.
         *dest_mOhm = buf * 1000U / 4096U;
     }
 
@@ -425,6 +475,10 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
  *
  * @param[in] devp       pointer to the @p MAX17205Driver object
  * @param[in] reg        the register to read from
+ * @param[out] dest_S    location to write time in S
+ * @return               MSG_OK on success or negative on I2C error
+ *
+ * @details dest_s will be between 0S and 368,634S.
  *
  * @api
  */
@@ -434,7 +488,7 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference datasheet table 1: Time LSB is 5.625s, unsigned.
-        *dest_S = buf * 5625U / 1000;
+        *dest_S = buf * 5625U / 1000U;
         dbgprintf("  max17205ReadTime(0x%X %s) = %u seconds (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_S, buf);
     }
