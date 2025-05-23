@@ -64,7 +64,7 @@ thread_t *start_worker(worker_t *wp)
 
 msg_t stop_worker(worker_t *wp)
 {
-    msg_t ret;
+    msg_t ret = MSG_OK;
 
     osalDbgCheck(wp != NULL);
 
