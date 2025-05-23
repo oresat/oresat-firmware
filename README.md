@@ -89,6 +89,10 @@ To install oresat-configs:
 Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.
 
+#### A Note about WSL
+* If using WSL make sure your usb devices are being shared with WSL.
+* You may need to use a tool like [usbipd-win](https://github.com/dorssel/usbipd-win).
+
 #### Test your toolchain
 To test that your build system works correctly, it's recommended that you build one of the `app_blinky` applications and write it to a dev board successfully. Here are the links for the various versions of the app with further documentation:
 * [NUCLEO64_STM32F091RC](src/f0/app_blinky)
