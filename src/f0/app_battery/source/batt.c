@@ -5,7 +5,7 @@
 #include "OD.h"
 #include <sys/param.h>
 
-#define ENABLE_NV_MEMORY_UPDATE_CODE      0
+#define ENABLE_NV_MEMORY_UPDATE_CODE      1
 
 #ifdef DEBUG_PRINT
 #include "chprintf.h"
@@ -47,20 +47,31 @@ typedef enum {
   correct yield generally reasonable read back values from the MAX17 chip.
  */
 static const max17205_regval_t batt_nv_programing_cfg[] = {
-    //{MAX17205_AD_NFULLCAPNOM, 0x1794 },
-    {MAX17205_AD_NDESIGNCAP, 0x1450}, /*5200 (0.5 increments)*/
-    {MAX17205_AD_NPACKCFG, 0x3EA2 },
-    {MAX17205_AD_NNVCFG0, 0x00B0 },//0x0920
-    {MAX17205_AD_NNVCFG1, 0xC000 },//0x8006
-    {MAX17205_AD_NNVCFG2, 0xFF0A },
-    {MAX17205_AD_NICHGTERM, 0x0034 },
-    {MAX17205_AD_NVEMPTY, 0x965A },
-    {MAX17205_AD_NTCURVE, 0x0064 },
-    {MAX17205_AD_NTGAIN, 0xF49A },
-    {MAX17205_AD_NTOFF, 0x16A1 },
+    {MAX17205_AD_NDESIGNCAP, 0x1450 }, // 5200 (0.5 increments)
+    {MAX17205_AD_NPACKCFG,   0x3EA2 },
+    {MAX17205_AD_NNVCFG0,    0x09A0 }, // was 0x00B0 -- try Wizard=0x09A0 (old comment: 0x0920)
+    {MAX17205_AD_NNVCFG1,    0x8006 }, // was 0xC000 -- try Wizard=0x8006
+    {MAX17205_AD_NNVCFG2,    0xFF0A },
+    {MAX17205_AD_NICHGTERM,  0x0034 }, // was 0x0034 -- try Wizard=0x14D
+    {MAX17205_AD_NVEMPTY,    0x965A },
+    {MAX17205_AD_NTCURVE,    0x0064 },
+    {MAX17205_AD_NTGAIN,     0xF49A },
+    {MAX17205_AD_NTOFF,      0x16A1 },
 
     {MAX17205_AD_NFULLCAPREP, 0x1450 },
-    {MAX17205_AD_NFULLCAPNOM, 0x1450 },
+    {MAX17205_AD_NFULLCAPNOM, 0x1794 }, // was 0x1450 -- try Wizard=0x1794
+
+    // Missing from in flight fw, but present in Wizard output with m5 EZ battery model:
+    {MAX17205_AD_NQRTABLE00, 0x2280 },
+    {MAX17205_AD_NQRTABLE10, 0x1000 },
+    {MAX17205_AD_NQRTABLE20, 0x0681 },
+    {MAX17205_AD_NQRTABLE30, 0x0682 },
+    {MAX17205_AD_NIAVGEMPTY, 0xEBB0 },
+    {MAX17205_AD_NCONFIG,    0x0211 },
+    {MAX17205_AD_NMISCCFG,   0x3070 },
+    {MAX17205_AD_NCONVGCFG,  0x2241 },
+
+    {0,0}
 };
 
 
@@ -364,9 +375,10 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 }
 
 /**
- * Helper function to trigger write of volatile memory on MAX71205 chip.
+ * Helper function to trigger write of volatile memory on MAX71205 chip. 
+ * Returns true if NV was written, false otherwise.
  */
-msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
+bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
     dbgprintf("\r\n%s\r\n", pack_str);
 
     uint16_t masking_register = 0;
@@ -379,34 +391,35 @@ msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
     bool all_elements_match = false;
     msg_t r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
     if (r != MSG_OK) {
-        return r;
+        return false;
     }
 
     if (all_elements_match) {
-        dbgprintf("All NV Ram elements already match expected values...\r\n");
-        return MSG_OK;
+        dbgprintf("All NV RAM elements already match expected values...\r\n");
+        return false;
     }
+    dbgprintf("One or more NV RAM elements don't match expected values...\r\n");
 
 #if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
-    dbgprintf("One or more NV Ram elements don't match expected values...\r\n");
     r = max17205WriteRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
     if (r != MSG_OK) {
-        dbgprintf("Failed to write new nv reg values\n");
-        return r;
+        dbgprintf("Failed to write new NV RAM reg values\n");
+        return false;
     }
-    dbgprintf("Successfully wrote new nv reg values\r\n");
+    dbgprintf("Successfully wrote new NV RAM reg values\r\n");
 
     all_elements_match = false;
     r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
     if (r != MSG_OK) {
-        return r;
+        return false;
     }
     if (!all_elements_match) {
-        dbgprintf("NV Ram elements failed to update after write.\r\n");
-        return MSG_OK;
+        dbgprintf("NV RAM elements failed to update after write.\r\n");
+        return false;
     }
-    dbgprintf("All NV Ram elements now match expected values.\r\n");
+    dbgprintf("All NV RAM elements now match expected values.\r\n");
 
+    // Answer n to just use the changes in the volatile registers
     dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
     uint8_t ch = 0;
     sdRead(DEBUG_SD, &ch, 1);
@@ -421,9 +434,10 @@ msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
         } else {
             dbgprintf("Failed to write non volatile memory on MAX17205...\r\n");
         }
+        return true; // NV changes made
     }
 #endif
-    return MSG_OK;
+    return false;
 }
 
 /**
@@ -538,23 +552,26 @@ THD_FUNCTION(batt, arg)
     dbgprintf("max17205Start(pack2) = %u\r\n", pack_2_init_flag);
 
 #if 1
+    bool nv_written = false;
+
     if( pack_1_init_flag ) {
-        prompt_nv_memory_write(&max17205devPack1, "Pack 1");
+        nv_written |= prompt_nv_memory_write(&max17205devPack1, "Pack 1");
     } else {
         dbgprintf("Skipping NV prompt for pack 1 as it failed to initialize...\r\n");
     }
 
     if( pack_2_init_flag ) {
-        prompt_nv_memory_write(&max17205devPack2, "Pack 2");
+        nv_written |= prompt_nv_memory_write(&max17205devPack2, "Pack 2");
     } else {
         dbgprintf("Skipping NV prompt for pack 2 as it failed to initialize...\r\n");
     }
 
-#if ENABLE_NV_MEMORY_UPDATE_CODE
-    dbgprintf("Done with NV RAM update code, disable ENABLE_NV_MEMORY_UPDATE_CODE and re-write firmware.\r\n");
-    for (;;) {
-        dbgprintf(".");
-        chThdSleepMilliseconds(1000);
+    if (nv_written) {
+        dbgprintf("Done with NV RAM update code, disable ENABLE_NV_MEMORY_UPDATE_CODE and re-write firmware.\r\n");
+        for (;;) {
+            dbgprintf(".");
+            chThdSleepMilliseconds(1000);
+        }
     }
 #endif
 #endif

@@ -370,10 +370,10 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t 
     if (r == MSG_OK) {
         // Reference datasheet page 73: MaxMinCurrent is two packed signed 1 byte values with
         // LSB of 0.40mV/RSENSE.
-        int8_t max_raw = (buf >> 8);
-        int8_t min_raw = buf & 0xFF;
-        *max_mA = max_raw * 400000 / devp->rsense_uOhm;
-        *min_mA = min_raw * 400000 / devp->rsense_uOhm;
+        int32_t max_raw = ((buf >> 8) * 0xFFU) & 0xFFU;
+        int32_t min_raw = buf & 0xFFU;
+        *max_mA = (int16_t)(max_raw * 400000 / devp->rsense_uOhm);
+        *min_mA = (int16_t)(min_raw * 400000 / devp->rsense_uOhm);
     }
     return r;
 }
@@ -395,7 +395,7 @@ msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int32_t *dest_
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference Datasheet table 1: Temperature LSB is 1/256C, signed.
-        *dest_mC = (int16_t)buf * 1000 / 256;
+        *dest_mC = (int16_t)((int32_t)buf * 1000 / 256);
         dbgprintf("  max17205ReadTemperature(0x%X %s) = %d mC (%u C) (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_mC, (*dest_mC / 1000), buf);
     }
@@ -463,8 +463,8 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
     uint16_t buf;
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
-        // Reference datasheet table 1: Resistance LSB is 1/4096Ω, unsigned.
-        *dest_mOhm = buf * 1000U / 4096U;
+        // Reference datasheet table 1: Resistance LSB is 1/4096Ω, Unsigned
+        *dest_mOhm = (uint16_t)((uint32_t)buf * 1000U / 4096U);
     }
 
     return r;
@@ -488,7 +488,7 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference datasheet table 1: Time LSB is 5.625s, unsigned.
-        *dest_S = buf * 5625U / 1000U;
+        *dest_S = (uint32_t)buf * 5625U / 1000;
         dbgprintf("  max17205ReadTime(0x%X %s) = %u seconds (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_S, buf);
     }
