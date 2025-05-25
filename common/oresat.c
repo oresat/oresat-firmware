@@ -2,6 +2,7 @@
 #include "sensors.h"
 #include "CO_threads.h"
 #include "CANopen.h"
+#include "version.h"
 
 CO_t *CO;
 CANDriver *cand;
@@ -45,6 +46,8 @@ void oresat_init(oresat_config_t *config)
 
     /* Initialize CANopen Subsystem */
     CO_init(&CO, cand, config->node_id, config->bitrate, config->fifo1_filters, config->filter_count);
+
+    version_extension_init();
 
     return;
 }
