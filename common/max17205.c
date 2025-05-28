@@ -120,10 +120,17 @@ msg_t max17205FirmwareReset(MAX17205Driver * devp) {
  * @api
  */
 msg_t max17205HardwareReset(MAX17205Driver * devp) {
+    msg_t r;
+
+    r = max17205Write(devp, MAX17205_AD_STATUS, 0);
+    if (r != MSG_OK) {
+        dbgprintf("Unable to clear POR status bit\r\n");
+    }
 
     dbgprintf("Performing MAX17205 hardware reset\r\n");
-    msg_t r = max17205Write(devp, MAX17205_AD_COMMAND, MAX17205_COMMAND_HARDWARE_RESET);
+    r = max17205Write(devp, MAX17205_AD_COMMAND, MAX17205_COMMAND_HARDWARE_RESET);
     if (r != MSG_OK) {
+        dbgprintf("Failed to write hardware reset command\r\n");
         return r;
     }
 
@@ -135,16 +142,26 @@ msg_t max17205HardwareReset(MAX17205Driver * devp) {
     do {
         r = max17205Read(devp, MAX17205_AD_STATUS, &status);
         if (r != MSG_OK) {
+            dbgprintf("Failed to read status after hardware reset\r\n");
             return r;
         }
+        chThdSleepMilliseconds(1);
         check_count++;
-    } while (!(status & MAX17205_STATUS_POR) && check_count < 10); /* While still resetting */
+    } while (!(status & MAX17205_STATUS_POR) && check_count < 20); /* While still resetting */
 
-    if (!(status & MAX17205_STATUS_POR))
+    if (!(status & MAX17205_STATUS_POR)) {
+        dbgprintf("POR bit is not yet set. Timing out.\r\n");
         return MSG_RESET;
+    }
+
+    r = max17205Write(devp, MAX17205_AD_STATUS, 0);
+    if (r != MSG_OK) {
+        dbgprintf("Unable to clear POR status bit\r\n");
+    }
 
     r = max17205FirmwareReset(devp);
     if (r != MSG_OK) {
+        dbgprintf("Failed to perform firmware reset\r\n");
         return r;
     }
 
@@ -154,13 +171,17 @@ msg_t max17205HardwareReset(MAX17205Driver * devp) {
     do {
         r = max17205Read(devp, MAX17205_AD_STATUS, &status);
         if (r != MSG_OK) {
+            dbgprintf("Failed to read status after firmware reset\r\n");
             return r;
         }
+        chThdSleepMilliseconds(1);
         check_count++;
-    } while (!(status & MAX17205_STATUS_POR) && check_count < 10); /* While still resetting */
+    } while (!(status & MAX17205_STATUS_POR) && check_count < 20); /* While still resetting */
 
-    if (!(status & MAX17205_STATUS_POR))
+    if (!(status & MAX17205_STATUS_POR)) {
+        dbgprintf("POR bit is not yet set. Timing out.\r\n");
         return MSG_RESET;
+    }
 
     return MSG_OK;
 }
@@ -634,16 +655,21 @@ msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * 
     dbgprintf("Current and expected NV settings:\r\n");
     for (size_t i = 0; i < len; ++i) {
         uint16_t buf = 0;
+        if (!list[i].reg && !list[i].value) { // Sentinel value
+            break;
+        }
         msg_t r = max17205Read(devp, list[i].reg, &buf);
         if (r != MSG_OK) {
             return r;
         }
-        dbgprintf("   %-30s register 0x%X is 0x%X     expected  0x%X\r\n",
-            max17205RegToStr(list[i].reg), list[i].reg,
-            buf, list[i].value
-        );
         if (buf != list[i].value) {
+            dbgprintf("   %-30s register 0x%04X is 0x%04X     NOT the expected  0x%04X\r\n",
+                max17205RegToStr(list[i].reg), list[i].reg,
+                buf, list[i].value);
            matches = false;
+        } else {
+            dbgprintf("   %-30s register 0x%04X is 0x%04X     CORRECT\r\n",
+                max17205RegToStr(list[i].reg), list[i].reg, buf);
         }
     }
     *valid = matches;
@@ -653,6 +679,9 @@ msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * 
 msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205WriteRegisters(), invalid state");
     for (size_t i = 0; i < len; ++i) {
+        if (!list[i].reg && !list[i].value) { // Sentinel value
+            break;
+        }
         msg_t r = max17205Write(devp, list[i].reg, list[i].value);
         if (r != MSG_OK) {
             return r;
