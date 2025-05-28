@@ -46,9 +46,16 @@ typedef enum {
   These values were generated using the windows tool from Maxim and while they are probably not totally
   correct yield generally reasonable read back values from the MAX17 chip.
  */
+static const uint16_t PACKCFG = (_VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
+                                 MAX17205_PACKCFG_BALCFG_40 |
+                                 MAX17205_PACKCFG_BTEN |
+                                 MAX17205_PACKCFG_CHEN |
+                                 MAX17205_PACKCFG_TDEN |
+                                 MAX17205_PACKCFG_A1EN |
+                                 MAX17205_PACKCFG_A2EN);
+
 static const max17205_regval_t batt_nv_programing_cfg[] = {
-    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // 5200 (0.5 increments)
-    {MAX17205_AD_NPACKCFG,     0x3EA2 },
+    {MAX17205_AD_NPACKCFG,     PACKCFG },
     {MAX17205_AD_NNVCFG0,      0x09A0 }, // was 0x00B0 -- try Wizard=0x09A0 (old comment: 0x0920)
     {MAX17205_AD_NNVCFG1,      0x8006 }, // was 0xC000 -- try Wizard=0x8006
     {MAX17205_AD_NNVCFG2,      0xFF0A },
@@ -57,10 +64,15 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
     {MAX17205_AD_NTCURVE,      0x0064 },
     {MAX17205_AD_NTGAIN,       0xF49A },
     {MAX17205_AD_NTOFF,        0x16A1 },
-
+#if 1
+    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // 5200 (0.5 increments)
     {MAX17205_AD_NFULLCAPREP,  0x1450 },
-    {MAX17205_AD_NFULLCAPNOM,  0x1794 }, // was 0x1450 -- try Wizard=0x1794
-
+    {MAX17205_AD_NFULLCAPNOM,  0x1450 }, // was 0x1450 -- try Wizard=0x1794
+#else
+    {MAX17205_AD_NDESIGNCAP,   0x0A28 }, // 5200 (0.5 increments)
+    {MAX17205_AD_NFULLCAPREP,  0x0A28 },
+    {MAX17205_AD_NFULLCAPNOM,  0x0BCA }, // was 0x1450 -- try Wizard=0x1794
+#endif
     // Missing from in flight fw, but present in Wizard output with m5 EZ battery model:
     {MAX17205_AD_NQRTABLE00,   0x2280 },
     {MAX17205_AD_NQRTABLE10,   0x1000 },
@@ -77,14 +89,7 @@ static const max17205_regval_t batt_nv_programing_cfg[] = {
 
 
 static const max17205_regval_t batt_cfg[] = {
-    {MAX17205_AD_PACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
-                                          _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
-                                          MAX17205_PACKCFG_BALCFG_40 |
-                                          MAX17205_PACKCFG_BTEN |
-                                          MAX17205_PACKCFG_CHEN |
-                                          MAX17205_PACKCFG_TDEN |
-                                          MAX17205_PACKCFG_A1EN |
-                                          MAX17205_PACKCFG_A2EN )},
+    {MAX17205_AD_PACKCFG, PACKCFG},
     {MAX17205_AD_NRSENSE, MAX17205_RSENSE2REG(10000U)},
     {MAX17205_AD_CONFIG, MAX17205_CONFIG_TEN | MAX17205_CONFIG_ETHRM},
     {0,0}
@@ -398,9 +403,14 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
 
     if (all_elements_match) {
         dbgprintf("All NV RAM elements already match expected values...\r\n");
+#if ENABLE_NV_MEMORY_UPDATE_CODE
+        dbgprintf("Continuing...\r\n");
+#else
         return false;
+#endif
+    } else {
+        dbgprintf("One or more NV RAM elements don't match expected values...\r\n");
     }
-    dbgprintf("One or more NV RAM elements don't match expected values...\r\n");
 
 #if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
     r = max17205WriteRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
@@ -418,8 +428,9 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
     if (!all_elements_match) {
         dbgprintf("NV RAM elements failed to update after write.\r\n");
         return false;
+    } else {
+        dbgprintf("All NV RAM elements now match expected values.\r\n");
     }
-    dbgprintf("All NV RAM elements now match expected values.\r\n");
 
 #if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
     // Answer n to just use the changes in the volatile registers
