@@ -284,6 +284,20 @@ msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *d
     return r;
 }
 
+msg_t max17205WriteCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t dest_mAh) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205WriteCapacity(), invalid state");
+
+    uint16_t buf = 0;
+    // Reference datasheet table 1: Capacity LSB is 5.0μVh/RSENSE where Vh/R=Ah, unsigned.
+    buf = (uint16_t)((dest_mAh * devp->rsense_uOhm) / 5000U);
+    const msg_t r = max17205Write(devp, reg, buf);
+    if (r == MSG_OK) {
+        dbgprintf("  max17205WriteCapacity(0x%X %s) = %u mAh (raw: 0x%X)\r\n",
+            reg, max17205RegToStr(reg), dest_mAh, buf);
+    }
+    return r;
+}
+
 
 /**
  * @brief   Reads an MAX17205 percentage value from a register in 1% increments.
@@ -544,10 +558,27 @@ msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S) {
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference datasheet table 1: Time LSB is 5.625s, unsigned.
-        *dest_S = (uint32_t)buf * 5625U / 1000;
+        *dest_S = (uint32_t)buf * 5625U / 1000U;
         dbgprintf("  max17205ReadTime(0x%X %s) = %u seconds (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_S, buf);
     }
+    return r;
+}
+
+msg_t max17205ReadLearnState(MAX17205Driver *devp, uint8_t *dest) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadLearnState(), invalid state");
+    uint16_t buf = 0;
+    msg_t r = max17205Read(devp, MAX17205_AD_NLEARNCFG, &buf);
+    if (r == MSG_OK) {
+        *dest = _FLD2VAL(MAX17205_LEARNCFG_LS, buf);
+    }
+    return r;
+}
+
+msg_t max17205WriteLearnState(MAX17205Driver *devp, uint8_t state) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205WriteLearnState(), invalid state");
+    uint16_t buf = MAX17205_SETVAL(MAX17205_AD_NLEARNCFG, _VAL2FLD(MAX17205_LEARNCFG_LS, state));
+    msg_t r = max17205Write(devp, MAX17205_AD_NLEARNCFG, buf);
     return r;
 }
 
@@ -655,9 +686,6 @@ msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * 
     dbgprintf("Current and expected NV settings:\r\n");
     for (size_t i = 0; i < len; ++i) {
         uint16_t buf = 0;
-        if (!list[i].reg && !list[i].value) { // Sentinel value
-            break;
-        }
         msg_t r = max17205Read(devp, list[i].reg, &buf);
         if (r != MSG_OK) {
             return r;
@@ -679,9 +707,6 @@ msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * 
 msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205WriteRegisters(), invalid state");
     for (size_t i = 0; i < len; ++i) {
-        if (!list[i].reg && !list[i].value) { // Sentinel value
-            break;
-        }
         msg_t r = max17205Write(devp, list[i].reg, list[i].value);
         if (r != MSG_OK) {
             return r;
@@ -690,7 +715,7 @@ msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * lis
     return MSG_OK;
 }
 
-msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
+msg_t max17205PrintVolatileMemory(MAX17205Driver *devp) {
     osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTime(), invalid state");
     uint16_t masking_register = 0;
     uint8_t num_left = 0;
@@ -703,7 +728,23 @@ msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
     uint16_t volatile_reg_list[] = {
         MAX17205_AD_PACKCFG,
         MAX17205_AD_DESIGNCAP,
-        MAX17205_AD_NRSENSE,
+        MAX17205_AD_LEARNCFG,
+        MAX17205_AD_QRTABLE00,
+        MAX17205_AD_QRTABLE10,
+        MAX17205_AD_QRTABLE20,
+        MAX17205_AD_QRTABLE30,
+        MAX17205_AD_CYCLES,
+        MAX17205_AD_FULLCAPNOM,
+        MAX17205_AD_RCOMP0,
+        MAX17205_AD_TEMPCO,
+        MAX17205_AD_IAVGEMPTY,
+        MAX17205_AD_FULLCAPREP,
+        MAX17205_AD_MAXMINCURR,
+        MAX17205_AD_MAXMINVOLT,
+        MAX17205_AD_MAXMINTEMP,
+        MAX17205_AD_MIXSOC,
+        MAX17205_AD_VFSOC,
+        MAX17205_AD_VEMPTY
     };
 
     for(size_t i = 0; i < ARRAY_LEN(volatile_reg_list); ++i) {
@@ -712,7 +753,18 @@ msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
         if (r != MSG_OK) {
             return r;
         }
-        dbgprintf("   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(volatile_reg_list[i]), volatile_reg_list[i], buf);
+        dbgprintf("   %-30s register 0x%04X is 0x%04X\r\n", max17205RegToStr(volatile_reg_list[i]), volatile_reg_list[i], buf);
+    }
+    return MSG_OK;
+}
+
+msg_t max17205PrintNonvolatileMemory(MAX17205Driver *devp) {
+    osalDbgAssert(devp->state == MAX17205_READY, "max17205ReadTime(), invalid state");
+    uint16_t masking_register = 0;
+    uint8_t num_left = 0;
+    msg_t r = max17205ReadNVWriteCountMaskingRegister(devp, &masking_register, &num_left);
+    if (r != MSG_OK) {
+        return r;
     }
 
     // See table 19 on page 83 of the data sheet to see the list of non-volatile registers
@@ -815,11 +867,138 @@ msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp) {
         if (r != MSG_OK) {
             return r;
         }
-        dbgprintf("   %-30s register 0x%X is 0x%X\r\n", max17205RegToStr(reg_list[i]), reg_list[i], buf);
+        dbgprintf("   %-30s register 0x%04X is 0x%04X\r\n", max17205RegToStr(reg_list[i]), reg_list[i], buf);
     }
     return MSG_OK;
 }
 
+uint16_t history_data[203][16];
+uint8_t history_length;
+
+msg_t max17205ReadHistory(MAX17205Driver *devp)
+{
+    int i;
+    msg_t r;
+    uint16_t write_flags[26];
+    uint16_t valid_flags[26];
+    uint8_t page_good[203];
+
+    //Read all flag information from the IC
+    r = max17205Write(devp, MAX17205_AD_COMMAND, 0xE2FB);
+    if (r != MSG_OK) {
+        dbgprintf("Failed to send command to read the lower history write flags.\r\n");
+        return r;
+    }
+    chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+
+    for (i = 0; i < 15; i++) {
+        r = max17205Read(devp, 0x1E1 + i, &write_flags[i]); // first set starts at 0x1E1, not 0x1E0 as the remaining sets do
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+
+    r = max17205Write(devp, MAX17205_AD_COMMAND, 0xE2FC);
+    if (r != MSG_OK) {
+        dbgprintf("Failed to send command to read the upper history write flags.\r\n");
+        return r;
+    }
+    chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+    for (i = 0; i < 11; i++) {
+        r = max17205Read(devp, 0x1E0 + i, &write_flags[i + 15]);
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        r = max17205Read(devp, 0x1EB + i, &valid_flags[i]);
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+
+    r = max17205Write(devp, MAX17205_AD_COMMAND, 0xE2FD);
+    if (r != MSG_OK) {
+        dbgprintf("Failed to send command to read the lower history valid flags.\r\n");
+        return r;
+    }
+    chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+    for (i = 0; i < 16; i++) {
+        r = max17205Read(devp, 0x1E0 + i, &valid_flags[i + 5]);
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+
+    r = max17205Write(devp, MAX17205_AD_COMMAND, 0xE2FE);
+    if (r != MSG_OK) {
+        dbgprintf("Failed to send command to read the upper history valid flags.\r\n");
+        return r;
+    }
+    chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+    for (i = 0; i < 5; i++) {
+        r = max17205Read(devp, 0x1E0 + i, &valid_flags[i + 21]);
+        if (r != MSG_OK) {
+            return r;
+        }
+    }
+
+    int loop;
+    int word;
+    int position;
+    int flag1;
+    int flag2;
+    int flag3;
+    int flag4;
+
+    //Determine which history pages contain valid data
+    for (loop = 0; loop < 202; loop++)
+    {
+        word = loop / 8;
+        position = loop % 8;
+        flag1 = (write_flags[word] >> position) & 0x0001;
+        flag2 = (write_flags[word] >> (position + 8)) & 0x0001;
+        flag3 = (valid_flags[word] >> position) & 0x0001;
+        flag4 = (valid_flags[word] >> (position + 8)) & 0x0001;
+        if ((flag1 || flag2) && (flag3 || flag4)) {
+            page_good[loop] = true;
+        } else {
+            page_good[loop] = false;
+        }
+    }
+
+    //Read all the history data from the IC
+    history_length = 0;
+    for(loop = 0; loop < 202; loop++)
+    {
+        if (!page_good[loop]) {
+            continue;
+        }
+        r = max17205Write(devp, MAX17205_AD_COMMAND, 0xE226 + loop);
+        if (r != MSG_OK) {
+            dbgprintf("Failed to send command to read the history entry %d\r\n", loop);
+            return r;
+        }
+        chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+        for (i = 0; i < 16; i++) {
+            r = max17205Read(devp, 0x1E0 + i, &history_data[history_length][i]);
+            if (r != MSG_OK) {
+                return r;
+            }
+        }
+        history_length++;
+    }
+
+    // print out full history
+    dbgprintf("%d History Entries:\r\n", history_length);
+    for (loop = 0; loop < history_length; loop++) {
+        dbgprintf(" Entry %d:\r\n", loop);
+        for (i = 0; i < 16; i++) {
+            dbgprintf("   %-30s register 0x%04X is 0x%04X\r\n", max17205RegToStr(0x1A0 + i), 0x1A0 + i, history_data[loop][i]);
+        }
+    }
+    return MSG_OK;
+}
 
 const char* max17205RegToStr(const uint16_t reg) {
     switch (reg) {
@@ -831,12 +1010,8 @@ const char* max17205RegToStr(const uint16_t reg) {
             return "MAX17205_AD_AVGVCELL";
         case MAX17205_AD_VCELL:
             return "MAX17205_AD_VCELL";
-        case MAX17205_AD_FULLCAP:
-            return "MAX17205_AD_FULLCAP";
         case MAX17205_AD_AVCAP:
             return "MAX17205_AD_AVCAP";
-        case MAX17205_AD_FULLCAPREP:
-            return "MAX17205_AD_FULLCAPREP";
         case MAX17205_AD_MIXCAP:
             return "MAX17205_AD_MIXCAP";
         case MAX17205_AD_TTE:
@@ -845,22 +1020,56 @@ const char* max17205RegToStr(const uint16_t reg) {
             return "MAX17205_AD_TTF";
         case MAX17205_AD_AVSOC:
             return "MAX17205_AD_AVSOC";
-        case MAX17205_AD_VFSOC:
-            return "MAX17205_AD_VFSOC";
-        case MAX17205_AD_CYCLES:
-            return "MAX17205_AD_CYCLES";
         case MAX17205_AD_TEMP:
             return "MAX17205_AD_TEMP";
         case MAX17205_AD_CURRENT:
             return "MAX17205_AD_CURRENT";
         case MAX17205_AD_AVGCURRENT:
             return "MAX17205_AD_AVGCURRENT";
+        case MAX17205_AD_LEARNCFG:
+            return "MAX17205_AD_LEARNCFG";
+        case MAX17205_AD_QRTABLE00:
+            return "MAX17205_AD_QRTABLE00";
+        case MAX17205_AD_QRTABLE10:
+            return "MAX17205_AD_QRTABLE10";
+        case MAX17205_AD_QRTABLE20:
+            return "MAX17205_AD_QRTABLE20";
+        case MAX17205_AD_QRTABLE30:
+            return "MAX17205_AD_QRTABLE30";
+        case MAX17205_AD_CYCLES:
+            return "MAX17205_AD_CYCLES";
+        case MAX17205_AD_FULLCAPNOM:
+            return "MAX17205_AD_FULLCAPNOM";
+        case MAX17205_AD_RCOMP0:
+            return "MAX17205_AD_RCOMP0";
+        case MAX17205_AD_TEMPCO:
+            return "MAX17205_AD_TEMPCO";
+        case MAX17205_AD_IAVGEMPTY:
+            return "MAX17205_AD_IAVGEMPTY";
+        case MAX17205_AD_FULLCAPREP:
+            return "MAX17205_AD_FULLCAPREP";
+        case MAX17205_AD_MAXMINCURR:
+            return "MAX17205_AD_MAXMINCURR";
+        case MAX17205_AD_MAXMINVOLT:
+            return "MAX17205_AD_MAXMINVOLT";
+        case MAX17205_AD_MAXMINTEMP:
+            return "MAX17205_AD_MAXMINTEMP";
+        case MAX17205_AD_MIXSOC:
+            return "MAX17205_AD_MIXSOC";
+        case MAX17205_AD_VFSOC:
+            return "MAX17205_AD_VFSOC";
+        case MAX17205_AD_TIMERH:
+            return "MAX17205_AD_TIMERH";
         case MAX17205_AD_BATT:
             return "MAX17205_AD_BATT";
-        case MAX17205_AD_AVGTEMP1:
-            return "MAX17205_AD_AVGTEMP1";
         case MAX17205_AD_TEMP1:
             return "MAX17205_AD_TEMP1";
+        case MAX17205_AD_TEMP2:
+            return "MAX17205_AD_TEMP2";
+        case MAX17205_AD_INTTEMP:
+            return "MAX17205_AD_INTTEMP";
+        case MAX17205_AD_AVGTEMP1:
+            return "MAX17205_AD_AVGTEMP1";
         case MAX17205_AD_AVGTEMP2:
             return "MAX17205_AD_AVGTEMP2";
         case MAX17205_AD_AVGINTTEMP:
@@ -937,6 +1146,8 @@ const char* max17205RegToStr(const uint16_t reg) {
             return "MAX17205_AD_NFILTERCFG";
         case MAX17205_AD_NVEMPTY:
             return "MAX17205_AD_NVEMPTY";
+        case MAX17205_AD_VEMPTY:
+            return "MAX17205_AD_VEMPTY";
         case MAX17205_AD_NLEARNCFG:
             return "MAX17205_AD_NLEARNCFG";
         case MAX17205_AD_NQRTABLE00:
