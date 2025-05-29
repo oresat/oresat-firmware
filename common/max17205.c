@@ -91,12 +91,45 @@ void max17205ObjectInit(MAX17205Driver *devp) {
     devp->rsense_uOhm = 0;
 }
 
-static msg_t max17205HardwareReset(MAX17205Driver * devp) {
+/**
+ * @brief   Firmware reset the chip. Allows it to utilize any
+ *          changes written to the shadow RAM register.
+ *
+ * @param[in] devp      pointer to the @p MAX17205Driver object
+ *
+ * @api
+ */
+msg_t max17205FirmwareReset(MAX17205Driver * devp) {
+
+    msg_t msg;
+
+    dbgprintf("Performing MAX17205 firmware reset\r\n");
+    // Now firmware-reset the chip so it will use the values written to various registers
+    msg = max17205Write(devp, MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
+    chThdSleepMilliseconds(MAX17205_T_POR_MS);
+
+    return msg;
+}
+
+/**
+ * @brief   Hardware reset the chip. Reloads nonvolatile
+ *          registers into shadow RAM.
+ *
+ * @param[in] devp      pointer to the @p MAX17205Driver object
+ *
+ * @api
+ */
+msg_t max17205HardwareReset(MAX17205Driver * devp) {
+
+    dbgprintf("Performing MAX17205 hardware reset\r\n");
     msg_t r = max17205Write(devp, MAX17205_AD_COMMAND, MAX17205_COMMAND_HARDWARE_RESET);
     if (r != MSG_OK) {
         return r;
     }
 
+    chThdSleepMilliseconds(MAX17205_T_POR_MS);
+
+    // Not sure this polling loop is needed; datasheet only mentions waiting tPOR.
     uint32_t check_count = 0;
     uint16_t status = 0;
     do {
@@ -110,11 +143,12 @@ static msg_t max17205HardwareReset(MAX17205Driver * devp) {
     if (!(status & MAX17205_STATUS_POR))
         return MSG_RESET;
 
-    r = max17205Write(devp, MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
+    r = max17205FirmwareReset(devp);
     if (r != MSG_OK) {
         return r;
     }
 
+    // Not sure this polling loop is needed; datasheet only mentions waiting tPOR.
     check_count = 0;
     status = 0;
     do {
@@ -151,18 +185,18 @@ bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config) {
     devp->state = MAX17205_STOP;
     devp->config = config;
 
-    if (max17205Write(devp, MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD) != MSG_OK) {
-        comm_error_count++;
-    }
-
-    // FIXME: is resetting just config2 correct? We should also wait for POR
-
+    chThdSleepMilliseconds(MAX17205_T_POR_MS);
     for (const max17205_regval_t *pair = config->regcfg; pair->reg; pair++) {
         dbgprintf("Setting MAX17205 register 0x%X to 0x%X\r\n", pair->reg, pair->value);
 
         if (max17205Write(devp, pair->reg, pair->value) != MSG_OK) {
             comm_error_count++;
         }
+    }
+
+    // Now firmware-reset the chip so it will use the values written to various registers
+    if (max17205FirmwareReset(devp) != MSG_OK) {
+        comm_error_count++;
     }
 
     devp->rsense_uOhm = config->rsense_uOhm;
@@ -198,8 +232,7 @@ void max17205Stop(MAX17205Driver *devp) {
 
     // FIXME: Given how the chip works does "stop" even make sense?
     if (devp->state == MAX17205_READY) {
-        max17205Write(devp, MAX17205_AD_COMMAND, MAX17205_COMMAND_HARDWARE_RESET);
-        max17205Write(devp, MAX17205_AD_CONFIG2, MAX17205_CONFIG2_POR_CMD);
+        max17205HardwareReset(devp);
     }
     devp->state = MAX17205_STOP;
 }
@@ -223,7 +256,7 @@ msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *d
     const msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference datasheet table 1: Capacity LSB is 5.0μVh/RSENSE where Vh/R=Ah, unsigned.
-        *dest_mAh = buf * 5000U / devp->rsense_uOhm;
+        *dest_mAh = ((uint32_t)buf * 5000U) / devp->rsense_uOhm;
         dbgprintf("  max17205ReadCapacity(0x%X %s) = %u mAh (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_mAh, buf);
     }
@@ -349,7 +382,7 @@ msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mA) 
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Referencce datasheet table 1: Current LSB is 1.5625μV/RSENSE, signed.
-        *dest_mA = (int16_t)buf * 15625 / (devp->rsense_uOhm * 10);
+        *dest_mA = (int16_t)((((int32_t)((int16_t)buf)) * 15625) / (devp->rsense_uOhm * 10));
         dbgprintf("  max17205ReadCurrent(0x%X %s) = %d mA (raw: 0x%X)\r\n",
             reg, max17205RegToStr(reg), *dest_mA, buf);
     }
@@ -372,8 +405,8 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t 
         // LSB of 0.40mV/RSENSE.
         int32_t max_raw = ((buf >> 8) * 0xFFU) & 0xFFU;
         int32_t min_raw = buf & 0xFFU;
-        *max_mA = (int16_t)(max_raw * 400000 / devp->rsense_uOhm);
-        *min_mA = (int16_t)(min_raw * 400000 / devp->rsense_uOhm);
+        *max_mA = (int16_t)((max_raw * 400000) / devp->rsense_uOhm);
+        *min_mA = (int16_t)((min_raw * 400000) / devp->rsense_uOhm);
     }
     return r;
 }
@@ -464,7 +497,9 @@ msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_
     msg_t r = max17205Read(devp, reg, &buf);
     if (r == MSG_OK) {
         // Reference datasheet table 1: Resistance LSB is 1/4096Ω, Unsigned
-        *dest_mOhm = (uint16_t)((uint32_t)buf * 1000U / 4096U);
+        *dest_mOhm = (uint16_t)(((uint32_t)buf * 1000U) / 4096U);
+        dbgprintf("  max17205ReadResistance(0x%X %s) = %u mOhm (raw: 0x%X)\r\n",
+                  reg, max17205RegToStr(reg), *dest_mOhm, buf);
     }
 
     return r;
@@ -803,6 +838,8 @@ const char* max17205RegToStr(const uint16_t reg) {
             return "MAX17205_AD_AVGINTTEMP";
         case MAX17205_AD_REPCAP:
             return "MAX17205_AD_REPCAP";
+        case MAX17205_AD_VFREMCAP:
+            return "MAX17205_AD_VFREMCAP";
         case MAX17205_AD_PACKCFG:
             return "MAX17205_AD_PACKCFG";
         case MAX17205_AD_DESIGNCAP:

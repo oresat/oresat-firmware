@@ -5,6 +5,7 @@
 #define MAX17205_T_RECAL_MS      5
 //tBlock(max) is specified as 7360ms in the data sheet, page 16
 #define MAX17205_T_BLOCK_MS      8000
+#define MAX17205_T_POR_MS        10
 
 /**
  * @name    MAX17205 Register Addresses
@@ -1084,6 +1085,9 @@ msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t
 /* Misc */
 msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len, bool * valid);
 msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len);
+msg_t max17205FirmwareReset(MAX17205Driver * devp);
+msg_t max17205HardwareReset(MAX17205Driver *devp);
+
 msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *reg_dest, uint8_t *number_of_writes_left);
 msg_t max17205NonvolatileBlockProgram(MAX17205Driver *devp);
 msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp);

@@ -47,30 +47,31 @@ typedef enum {
   correct yield generally reasonable read back values from the MAX17 chip.
  */
 static const max17205_regval_t batt_nv_programing_cfg[] = {
-    {MAX17205_AD_NDESIGNCAP, 0x1450 }, // 5200 (0.5 increments)
-    {MAX17205_AD_NPACKCFG,   0x3EA2 },
-    {MAX17205_AD_NNVCFG0,    0x09A0 }, // was 0x00B0 -- try Wizard=0x09A0 (old comment: 0x0920)
-    {MAX17205_AD_NNVCFG1,    0x8006 }, // was 0xC000 -- try Wizard=0x8006
-    {MAX17205_AD_NNVCFG2,    0xFF0A },
-    {MAX17205_AD_NICHGTERM,  0x0034 }, // was 0x0034 -- try Wizard=0x14D
-    {MAX17205_AD_NVEMPTY,    0x965A },
-    {MAX17205_AD_NTCURVE,    0x0064 },
-    {MAX17205_AD_NTGAIN,     0xF49A },
-    {MAX17205_AD_NTOFF,      0x16A1 },
+    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // 5200 (0.5 increments)
+    {MAX17205_AD_NPACKCFG,     0x3EA2 },
+    {MAX17205_AD_NNVCFG0,      0x09A0 }, // was 0x00B0 -- try Wizard=0x09A0 (old comment: 0x0920)
+    {MAX17205_AD_NNVCFG1,      0x8006 }, // was 0xC000 -- try Wizard=0x8006
+    {MAX17205_AD_NNVCFG2,      0xFF0A },
+    {MAX17205_AD_NICHGTERM,    0x0034 }, // was 0x0034 -- try Wizard=0x14D
+    {MAX17205_AD_NVEMPTY,      0x965A }, // VE = 0x12C * 10mV = 3.0v; VR = 0x5A * 40mV = 3.6v
+    {MAX17205_AD_NTCURVE,      0x0064 },
+    {MAX17205_AD_NTGAIN,       0xF49A },
+    {MAX17205_AD_NTOFF,        0x16A1 },
 
-    {MAX17205_AD_NFULLCAPREP, 0x1450 },
-    {MAX17205_AD_NFULLCAPNOM, 0x1794 }, // was 0x1450 -- try Wizard=0x1794
+    {MAX17205_AD_NFULLCAPREP,  0x1450 },
+    {MAX17205_AD_NFULLCAPNOM,  0x1794 }, // was 0x1450 -- try Wizard=0x1794
 
     // Missing from in flight fw, but present in Wizard output with m5 EZ battery model:
-    {MAX17205_AD_NQRTABLE00, 0x2280 },
-    {MAX17205_AD_NQRTABLE10, 0x1000 },
-    {MAX17205_AD_NQRTABLE20, 0x0681 },
-    {MAX17205_AD_NQRTABLE30, 0x0682 },
-    {MAX17205_AD_NIAVGEMPTY, 0xEBB0 },
-    {MAX17205_AD_NCONFIG,    0x0211 },
-    {MAX17205_AD_NMISCCFG,   0x3070 },
-    {MAX17205_AD_NCONVGCFG,  0x2241 },
-
+    {MAX17205_AD_NQRTABLE00,   0x2280 },
+    {MAX17205_AD_NQRTABLE10,   0x1000 },
+    {MAX17205_AD_NQRTABLE20,   0x0681 },
+    {MAX17205_AD_NQRTABLE30,   0x0682 },
+    {MAX17205_AD_NIAVGEMPTY,   0xEBB0 },
+    {MAX17205_AD_NCONFIG,      0x0211 },
+    {MAX17205_AD_NMISCCFG,     0x3070 },
+    {MAX17205_AD_NCONVGCFG,    0x2241 },
+    {MAX17205_AD_NFULLSOCTHR,  0x5005 },
+    {MAX17205_AD_NRIPPLECFGCFG,0x0204 },
     {0,0}
 };
 
@@ -79,6 +80,7 @@ static const max17205_regval_t batt_cfg[] = {
     {MAX17205_AD_PACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
                                           _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
                                           MAX17205_PACKCFG_BALCFG_40 |
+                                          MAX17205_PACKCFG_BTEN |
                                           MAX17205_PACKCFG_CHEN |
                                           MAX17205_PACKCFG_TDEN |
                                           MAX17205_PACKCFG_A1EN |
@@ -334,7 +336,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     if( (r = max17205ReadCapacity(driver, MAX17205_AD_MIXCAP, &dest->mix_capacity_mAh)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
-    if( (r = max17205ReadCapacity(driver, MAX17205_AD_REPCAP, &dest->reported_capacity_mAh)) != MSG_OK ) {
+    if( (r = max17205ReadCapacity(driver, /*MAX17205_AD_REPCAP*/ MAX17205_AD_VFREMCAP, &dest->reported_capacity_mAh)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
 
@@ -375,7 +377,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 }
 
 /**
- * Helper function to trigger write of volatile memory on MAX71205 chip. 
+ * Helper function to trigger write of volatile memory on MAX71205 chip.
  * Returns true if NV was written, false otherwise.
  */
 bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
@@ -419,6 +421,7 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
     }
     dbgprintf("All NV RAM elements now match expected values.\r\n");
 
+#if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
     // Answer n to just use the changes in the volatile registers
     dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
     uint8_t ch = 0;
@@ -437,7 +440,10 @@ bool prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
         return true; // NV changes made
     }
 #endif
-    return false;
+
+    //Now make the chip use the changes written to the shadow registers.
+    max17205FirmwareReset(devp);
+    return false; // no NV changes made
 }
 
 /**
@@ -573,7 +579,6 @@ THD_FUNCTION(batt, arg)
             chThdSleepMilliseconds(1000);
         }
     }
-#endif
 #endif
 
     uint32_t loop = 0;
