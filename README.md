@@ -84,7 +84,7 @@ Tools required:
 * oresat-configs
 
 To install oresat-configs:
-* `$ pip install oresat-configs`
+* `$ pip install -U oresat-configs==0.8.0`
 
 Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.
