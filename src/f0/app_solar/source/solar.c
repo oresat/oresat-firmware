@@ -85,9 +85,11 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     bool ret = true;
     bool conversion_ready = false;
 
+    // Write to the config register to trigger a conversion
     if (ina226TriggerOneShotConversion(ina226) != MSG_OK) {
         ret = false;
     }
+    // Wait for the CVRF bit to be set
     while (!conversion_ready) {
        ina226CheckConversionStatus(ina226, &conversion_ready); 
     }
