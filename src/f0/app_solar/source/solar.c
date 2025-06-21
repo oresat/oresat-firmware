@@ -82,8 +82,15 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
  * Reads power flow characteristics from the INA226
  */
 bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sample) {
-
     bool ret = true;
+    bool conversion_ready = false;
+
+    if (ina226TriggerOneShotConversion(ina226) != MSG_OK) {
+        ret = false;
+    }
+    while (!conversion_ready) {
+       ina226CheckConversionStatus(ina226, &conversion_ready); 
+    }
     if(ina226ReadShunt(ina226, &sample->shunt_uV) != MSG_OK) {
         ret = false;
     }
@@ -148,7 +155,8 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
     // Compensate for the internal averaging done by the ina226 chip
     // FIXME: ina226 oneshot with interrupt/cvrf flag
-    chThdSleep(ina226dev.t_conversion);
+    /* chThdSleep(ina226dev.t_conversion); */
+
     struct Sample perturbed = {};
     if(!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
@@ -191,7 +199,7 @@ THD_FUNCTION(solar, arg)
     const INA226Config ina226config = {
         .i2cp  = i2c,
         .saddr = INA226_SADDR,
-        .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS | INA226_CONFIG_MODE_CONT |
+        .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS |
                  INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
                  INA226_CONFIG_AVG_16,
         .rshunt_mOhm = 100, /* 0.1 ohm  */
