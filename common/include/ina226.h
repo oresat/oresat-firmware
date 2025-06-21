@@ -108,5 +108,7 @@ msg_t ina226ReadShunt(INA226Driver *devp, int32_t *voltage_uV);
 msg_t ina226ReadVBUS(INA226Driver *devp, int32_t *voltage_mV);
 msg_t ina226ReadCurrent(INA226Driver *devp, int32_t *current_uA);
 msg_t ina226ReadPower(INA226Driver *devp, int32_t *power_mW);
+msg_t ina226TriggerOneShotConversion(INA226Driver *devp);
+msg_t ina226CheckConversionStatus(INA226Driver *devp, bool *conversion_ready);
 
 #endif /* _INA226_H_ */
