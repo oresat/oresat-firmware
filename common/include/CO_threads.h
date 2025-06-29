@@ -2,9 +2,6 @@
 #include "CANopen.h"
 #include "OD.h"
 
-#ifndef OD_CNT_SDO_CLI
-#define OD_CNT_SDO_CLI 0
-#endif
 #ifndef OD_CNT_SDO_SRV
 #define OD_CNT_SDO_SRV 0
 #endif

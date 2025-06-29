@@ -8,7 +8,7 @@ OreSat is an oregon based nanosatellite project that is managed by the Portland 
 
 Learn more about our organization [here](https://www.oresat.org/About-PSAS).
 
-### Geting involved
+### Getting involved
 
 The general guidelines for getting involved with OreSat can be found [here](https://www.oresat.org/get-involved).
 

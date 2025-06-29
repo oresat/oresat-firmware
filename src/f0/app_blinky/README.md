@@ -3,6 +3,7 @@
 
 To ensure you have your toolchain correctly installed and configured:
 * Plug in a NUCLEO-F091RC development board using a USB MiniB cable.
+* If using WSL make sure your usb devices are being shared with WSL. You may need to use a tool like [usbipd-win](https://github.com/dorssel/usbipd-win).
 * `cd` into the `app_blinky` directory
 * Run `make` and `make write`
 
