@@ -83,16 +83,18 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
  */
 bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sample) {
     bool ret = true;
-    bool conversion_ready = false;
 
-    // Write to the config register to trigger a conversion
     if (ina226TriggerOneShotConversion(ina226) != MSG_OK) {
         ret = false;
     }
-    // Wait for the CVRF bit to be set
+
+    chThdSleep(ina226dev.t_conversion);
+
+    bool conversion_ready = false;
     while (!conversion_ready) {
-       ina226CheckConversionStatus(ina226, &conversion_ready); 
+       ina226CheckConversionStatus(ina226, &conversion_ready);
     }
+
     if(ina226ReadShunt(ina226, &sample->shunt_uV) != MSG_OK) {
         ret = false;
     }
@@ -155,9 +157,6 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     }
 
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
-    // Compensate for the internal averaging done by the ina226 chip
-    // FIXME: ina226 oneshot with interrupt/cvrf flag
-    /* chThdSleep(ina226dev.t_conversion); */
 
     struct Sample perturbed = {};
     if(!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
@@ -230,6 +229,9 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
+        .max_voltage_mV = 0,
+        .direction_up_flag = true,
+        .hit_step_size_threshold_flag = false,
     };
 
     palSetLine(LINE_LT1618_EN);
