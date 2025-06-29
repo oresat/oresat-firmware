@@ -1,9 +1,9 @@
 DATE = $(shell date +%Y%m%d)
 APP_HEXFILE = $(BUILDDIR)/$(PROJECT).hex
 GDB_ELF = $(BUILDDIR)/$(PROJECT).elf
-OOCD_CFG = oocd.cfg
-GDB_OOCD_CFG = gdboocd.cmd
-GDB_STL_CFG = gdbstl.cmd
+OOCD_CFG = -s $(BOARDDIR) -s $(TOOLCHAIN) -f oocd-interface.cfg -f oocd-target.cfg
+GDB_OOCD_CFG = $(TOOLCHAIN)/gdboocd.cmd
+GDB_STL_CFG = $(TOOLCHAIN)/gdbstl.cmd
 SERIAL_RAW != echo -e "$(SERIAL)"
 ifneq ($(SERIAL),)
 	SERIAL_ARG = adapter serial $(SERIAL);
@@ -23,7 +23,7 @@ endif
 write: $(OUTFILES) POST_MAKE_ALL_RULE_HOOK write_ocd
 
 write_ocd:
-	openocd -s $(BOARDDIR) -f $(OOCD_CFG) -c "$(SERIAL_ARG) program $(APP_HEXFILE) verify reset exit"
+	openocd $(OOCD_CFG) -c "$(SERIAL_ARG) program $(APP_HEXFILE) verify reset exit"
 
 write_stl:
 	st-flash --serial=$(SERIAL_RAW) --reset --format ihex write $(APP_HEXFILE)
@@ -31,10 +31,10 @@ write_stl:
 gdb: $(GDB_ELF) gdb_ocd
 
 gdb_ocd:
-	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -cd $(BOARDDIR) -ex "target extended-remote | openocd -f oocd.cfg -c '$(SERIAL_ARG) gdb_port pipe'" -x $(GDB_OOCD_CFG)
+	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -ex "target extended-remote | openocd $(OOCD_CFG) -c '$(SERIAL_ARG) gdb_port pipe'" -x $(GDB_OOCD_CFG)
 
 gdb_stl:
-	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -cd $(TOOLCHAIN) -x ./$(GDB_STL_CFG)
+	gdb-multiarch -q $(shell pwd)/$(GDB_ELF) -x $(GDB_STL_CFG)
 
 serial:
 	picocom -b 115200 /dev/serial/by-id/usb-STMicroelectronics_STLINK-V3_$(SERIAL_RAW)-if02

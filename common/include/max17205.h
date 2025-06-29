@@ -1,60 +1,10 @@
-/**
- * @file    max17205.h
- * @brief   MAX17205 Power Monitor.
- *
- * @addtogroup MAX17205
- * @ingroup ORESAT
- * @{
- */
+/*  MAX17205 Power Monitor  */
 #ifndef _MAX17205_H_
 #define _MAX17205_H_
-
-/*===========================================================================*/
-/* Driver constants.                                                         */
-/*===========================================================================*/
-
-/**
- * @name    Version Identification
- * @{
- */
-/**
- * @brief   MAX17205 Driver version string.
- */
-#define MAX17205_VERSION                    "1.0.0"
-
-/**
- * @brief   MAX17205 Driver version major number.
- */
-#define MAX17205_MAJOR                      1
-
-/**
- * @brief   MAX17205 Driver version minor number.
- */
-#define MAX17205_MINOR                      0
-
-/**
- * @brief   MAX17205 Driver version patch number.
- */
-#define MAX17205_PATCH                      0
-/** @} */
-
-/**
- * @brief   MAX17205 Slave Addresses and Conversion
- */
-#define MAX17205_SA_MG                      0x6CU
-#define MAX17205_SA_SBS_NV                  0x16U
-#define MAX17205_SA(reg)                    ((reg & 0x100U ? MAX17205_SA_SBS_NV : MAX17205_SA_MG) >> 1)
-
 
 #define MAX17205_T_RECAL_MS      5
 //tBlock(max) is specified as 7360ms in the data sheet, page 16
 #define MAX17205_T_BLOCK_MS      8000
-
-
-/**
- * @brief   MAX17205 Register Address Conversion
- */
-#define MAX17205_AD(reg)                    (reg & 0xFFU)
 
 /**
  * @name    MAX17205 Register Addresses
@@ -1027,54 +977,14 @@
 #define MAX17205_NRFASTVSHDN_NRFAST         MAX17205_NRFASTVSHDN_NRFAST_Msk
 /** @} */
 
-/*===========================================================================*/
-/* Driver pre-compile time settings.                                         */
-/*===========================================================================*/
-
-/**
- * @name    Configuration options
- * @{
- */
-/**
- * @brief   MAX17205 I2C interface switch.
- * @details If set to @p TRUE the support for I2C is included.
- * @note    The default is @p TRUE.
- */
-#if !defined(MAX17205_USE_I2C) || defined(__DOXYGEN__)
-#define MAX17205_USE_I2C                    TRUE
+#if !HAL_USE_I2C
+#error "MAX17205 requires HAL_USE_I2C"
 #endif
 
-/**
- * @brief   MAX17205 shared I2C switch.
- * @details If set to @p TRUE the device acquires I2C bus ownership
- *          on each transaction.
- * @note    The default is @p FALSE. Requires I2C_USE_MUTUAL_EXCLUSION.
- */
-#if !defined(MAX17205_SHARED_I2C) || defined(__DOXYGEN__)
-#define MAX17205_SHARED_I2C                 FALSE
-#endif
-/** @} */
-
-/*===========================================================================*/
-/* Derived constants and error checks.                                       */
-/*===========================================================================*/
-
-#if MAX17205_USE_I2C && !HAL_USE_I2C
-#error "MAX17205_USE_I2C requires HAL_USE_I2C"
+#if !I2C_USE_MUTUAL_EXCLUSION
+#error "MAX17205 requires I2C_USE_MUTUAL_EXCLUSION"
 #endif
 
-#if MAX17205_SHARED_I2C && !I2C_USE_MUTUAL_EXCLUSION
-#error "MAX17205_SHARED_I2C requires I2C_USE_MUTUAL_EXCLUSION"
-#endif
-
-/*===========================================================================*/
-/* Driver data structures and types.                                         */
-/*===========================================================================*/
-
-/**
- * @name    MAX17205 data structures and types.
- * @{
- */
 /**
  * @brief Structure representing a MAX17205 driver.
  */
@@ -1101,59 +1011,32 @@ typedef struct {
  * @brief   MAX17205 configuration structure.
  */
 typedef struct {
-#if (MAX17205_USE_I2C) || defined(__DOXYGEN__)
     /**
      * @brief I2C driver associated with this MAX17205.
      */
     I2CDriver                   *i2cp;
     /**
-     * @brief I2C configuration associated with this MAX17205.
-     */
-    const I2CConfig             *i2ccfg;
-#endif /* MAX17205_USE_I2C */
-    /**
      * @brief Array of reg:value pairs used to configure the IC.
      */
     const max17205_regval_t     *regcfg;
+    /**
+     * @brief The value of the physical RSENSE resistor in microohms.
+     */
+    uint16_t rsense_uOhm;
 } MAX17205Config;
-
-/**
- * @brief   @p MAX17205 specific methods.
- */
-#define _max17205_methods_alone
-
-/**
- * @brief   @p MAX17205 specific methods with inherited ones.
- */
-#define _max17205_methods                                                   \
-    _base_object_methods
-
-/**
- * @extends BaseObjectVMT
- *
- * @brief   @p MAX17205 virtual methods table.
- */
-struct MAX17205VMT {
-    _max17205_methods
-};
-
-/**
- * @brief   @p MAX17205Driver specific data.
- */
-#define _max17205_data                                                      \
-    _base_object_data                                                       \
-    /* Driver state.*/                                                      \
-    max17205_state_t              state;                                    \
-    /* Current configuration data.*/                                        \
-    const MAX17205Config          *config;
 
 /**
  * @brief MAX17205 Power Monitor class.
  */
 struct MAX17205Driver {
-    /** @brief Virtual Methods Table.*/
-    const struct MAX17205VMT     *vmt;
-    _max17205_data
+    /* Current configuration data. */
+    const MAX17205Config          *config;
+
+    /* Driver state. */
+    max17205_state_t state;
+
+    /* Runtime value of RSENSE. If not set in config it's read from nRSense */
+    uint16_t rsense_uOhm;
 };
 
 /** @} */
@@ -1176,30 +1059,34 @@ struct MAX17205Driver {
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* Driver state machine */
 void max17205ObjectInit(MAX17205Driver *devp);
 bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
 
-msg_t max17205ReadRaw(MAX17205Driver *devp, uint16_t reg, uint16_t *output_dest);
-msg_t max17205WriteRaw(MAX17205Driver *devp, uint16_t reg, uint16_t value);
+/* Reference datasheet table 1, generic register reads */
+msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *dest_mAh);
+msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint8_t *dest_pct);
+msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV);
+msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mA);
+msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mC);
+msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mOhm);
+msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint32_t *dest_S);
 
-msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint16_t *dest);
-msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadBattVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest);
-msg_t max17205ReadTime(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
-msg_t max17205ReadResistance(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+/* Register reads that require a specific conversion not covered by table 1 */
+msg_t max17205ReadAverageTemperature(MAX17205Driver *devp, uint16_t reg, int16_t *dest_C);
+msg_t max17205ReadBatt(MAX17205Driver *devp, uint32_t *dest_mV);
+msg_t max17205ReadCycles(MAX17205Driver *devp, uint16_t *dest_count);
+msg_t max17205ReadMaxMinVoltage(MAX17205Driver *devp, uint16_t * max_mV, uint16_t * min_mV);
+msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t * min_mA);
+msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C);
 
-msg_t max17205HardwareReset(I2CDriver *i2cp);
-msg_t max17205I2CWriteRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t *txbuf, size_t n);
-msg_t max17205I2CReadRegister(I2CDriver *i2cp, i2caddr_t sad, uint8_t reg, uint8_t* rxbuf, size_t n);
-
-msg_t max17205ReadNVWriteCountMaskingRegister(const MAX17205Config *config, uint16_t *reg_dest, uint8_t *number_of_writes_left);
-msg_t max17205NonvolatileBlockProgram(const MAX17205Config *config);
-msg_t max17205PrintintNonvolatileMemory(const MAX17205Config *config);
+/* Misc */
+msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len, bool * valid);
+msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len);
+msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *reg_dest, uint8_t *number_of_writes_left);
+msg_t max17205NonvolatileBlockProgram(MAX17205Driver *devp);
+msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp);
 
 const char* max17205RegToStr(const uint16_t reg);
 

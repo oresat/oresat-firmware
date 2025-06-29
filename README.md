@@ -4,7 +4,7 @@ This is the central repository for OreSat firmware development.
 
 OreSat uses ChibiOS, a Real Time Operating System (RTOS), for Command, Communication, and Control (C<sup>3</sup>), as well as for its various subsystems. All subsystems communicate via the ECSS CANbus Extension Protocol which is itself based on the CANopen protocol stack and implements the CCSDS Spacecraft Onboard Interface Services recommendations. The C<sup>3</sup> system controller manages the overall satellite, as well as critical communications with ground stations. Subsystems handle specific aspects of satellite operation. The various subsystems are listed below.
 
-Further general documentation can be found [here](doc)
+Further general documentation can be found [here](doc).
 
 ## Getting Started
 ### Prerequisites
@@ -84,15 +84,14 @@ Tools required:
 * oresat-configs
 
 To install oresat-configs:
-* `$ pip install oresat-configs`
+* `$ pip install -U oresat-configs==0.8.0`
 
-PLEASE NOTE: If you use OpenOCD, the latest "official" release of OpenOCD in
-package managers is several years old. You MUST build it from source for it
-to work with our boards, as there have been over 1000 commits since the
-last official release and several of our boards were added since then.
-
-Please refer to [Platform Specific Installation Instructions](doc/toolchain.md)
+Please refer to [Platform-specific Installation Instructions](doc/toolchain.md)
 for details on how to do this on a per-system basis.
+
+#### A Note about WSL
+* If using WSL, make sure that your usb devices are being shared with WSL.
+* You may need to use a tool like [usbipd-win](https://github.com/dorssel/usbipd-win).
 
 #### Test your toolchain
 To test that your build system works correctly, it's recommended that you build one of the `app_blinky` applications and write it to a dev board successfully. Here are the links for the various versions of the app with further documentation:
