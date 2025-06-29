@@ -1,4 +1,5 @@
 #include "ch.h"
+#include "chmtx.h"
 #include "hal.h"
 
 #include "CANopen.h"
@@ -40,7 +41,6 @@ static thread_descriptor_t solar_desc = {
     .wend = THD_WORKING_AREA_END(solar_wa),
     .prio = NORMALPRIO,
     .funcp = solar,
-    .arg = &I2CD2,
 };
 
 static worker_t sensor_mon_worker;
@@ -50,7 +50,6 @@ static thread_descriptor_t sensor_mon_desc = {
     .wend = THD_WORKING_AREA_END(sensor_mon_wa),
     .prio = NORMALPRIO,
     .funcp = sensor_mon,
-    .arg = &I2CD2,
 };
 
 static oresat_config_t oresat_conf = {
@@ -62,10 +61,26 @@ static oresat_config_t oresat_conf = {
 int main(void) {
     oresat_init(&oresat_conf);
 
-    dbgprintf("Node ID: %X\r\n", oresat_conf.node_id);
+    // dbgprintf("Node ID: %X\r\n", oresat_conf.node_id);
 
     sdStart(&SD2, NULL);
     i2cStart(&I2CD2, &i2cconfig);
+
+    struct SharedTempSample share = {};
+    chMtxObjectInit(&share.guard);
+
+    struct SolarArgs solar_desc_args = {
+        .i2c = &I2CD2,
+        .sample = &share,
+    };
+
+    struct SolarArgs sensor_mon_desc_args = {
+        .i2c = &I2CD2,
+        .sample = &share,
+    };
+
+    sensor_mon_desc.arg = &sensor_mon_desc_args;
+    solar_desc.arg = &solar_desc_args;
 
     reg_worker(&blink_worker, &blink_desc, false, true);
     reg_worker(&solar_worker, &solar_desc, true, true);

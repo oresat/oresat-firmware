@@ -20,6 +20,15 @@ typedef enum {
 	SOLAR_OD_ERROR_TYPE_PAO_INVALID_DATA,
 } solar_od_error_type_t;
 
+struct SharedTempSample {
+    uint32_t value;
+    mutex_t guard;
+};
+
+struct SolarArgs {
+    I2CDriver *i2c;
+    struct SharedTempSample *sample;
+};
 
 #if !HAL_USE_I2C
 #error "TMP101 requires HAL_USE_I2C"
