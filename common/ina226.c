@@ -312,3 +312,25 @@ msg_t ina226ReadPower(INA226Driver *devp, int32_t *power_mW) {
 
     return ret;
 }
+
+msg_t ina226TriggerOneShotConversion(INA226Driver *devp) {
+    // Datasheet 6.3.1: In triggered mode, writing any of the triggered convert
+    // modes into the Configuration Register (00h) triggers a single-shot conversion
+    osalDbgCheck(devp != NULL);
+    uint16_t val = devp->config->cfg | INA226_CONFIG_MODE_SHUNT_VBUS;
+    const msg_t ret = write_register(devp, INA226_AD_CONFIG, val);
+    return ret;
+};
+
+msg_t ina226CheckConversionStatus(INA226Driver *devp, bool *conversion_ready) {
+    // Datasheet 7.1.7: The Conversion Ready Flag bit is set after all
+    // conversions, averaging, and multiplications are complete
+    osalDbgCheck(devp != NULL);
+    uint16_t val = 0;
+    msg_t ret = read_register(devp, INA226_AD_ME, &val);
+    bool ready = (val & INA226_ME_CVRF_Msk) >> INA226_ME_CVRF_Pos;
+    if (ret == MSG_OK) {
+        *conversion_ready = ready;
+    }
+    return ret;
+}
