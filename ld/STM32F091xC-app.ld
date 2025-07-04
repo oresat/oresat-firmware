@@ -3,8 +3,8 @@ MEMORY
 {
     flash0 (rx) : org = 0x08000000, len = 40k   /* Bootloader   */
     flash1 (rx) : org = 0x0800A000, len = 2k    /* Metadata     */
-    flash2 (rx) : org = 0x0800A800, len = 214k  /* Application  */
-    flash3 (rx) : org = 0x00000000, len = 0
+    flash2 (rx) : org = 0x0800A800, len = 210k  /* Application  */
+    flash3 (rx) : org = 0x0803F000, len = 4k    /* Battery Data */
     flash4 (rx) : org = 0x00000000, len = 0
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
