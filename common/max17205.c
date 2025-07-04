@@ -36,7 +36,7 @@
  *
  * @api
  */
-static msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
+msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
     osalDbgCheck(devp != NULL);
     osalDbgCheck(dest != NULL);
 
@@ -65,7 +65,7 @@ static msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest) {
  *
  * @api
  */
-static msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
+msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value) {
     osalDbgCheck(devp != NULL);
 
     I2CDriver * i2c = devp->config->i2cp;

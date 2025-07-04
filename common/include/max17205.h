@@ -1066,6 +1066,9 @@ void max17205ObjectInit(MAX17205Driver *devp);
 bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
 
+msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value);
+
 /* Reference datasheet table 1, generic register reads */
 msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *dest_mAh);
 msg_t max17205WriteCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t dest_mAh);
