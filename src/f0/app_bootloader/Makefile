@@ -107,6 +107,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/util.mk
+include $(PROJ_SRC)/flash_f0.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
