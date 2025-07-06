@@ -125,6 +125,7 @@ ALLINC += $(ODDIR)
 # Project specific files.
 include $(PROJ_SRC)/oresat.mk
 include $(PROJ_SRC)/max17205.mk
+include $(PROJ_SRC)/flash_f0.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
