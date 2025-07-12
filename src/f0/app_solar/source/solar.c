@@ -3,6 +3,7 @@
 #include "CANopen.h"
 #include "OD.h"
 
+#include <stdint.h>
 #include <sys/param.h>
 
 #ifdef DEBUG_PRINT
@@ -21,14 +22,14 @@
 
 /* MPPT configuration */
 #define I_ADJ_FAILSAFE          1450000
-#define I_ADJ_INITIAL           1500000
-#define I_ADJ_MAX               1500000
+#define I_ADJ_INITIAL           1600000
+#define I_ADJ_MAX               1600000
 #define I_ADJ_MIN               0
 #define HISTERESIS_mW           3
 
 //1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
-#define VREF_STEP_NEGATIVE_uV             -1000
-#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4)
+#define VREF_STEP_NEGATIVE_uV             -805
+#define VREF_STEP_POSITIVE_uV              4000
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
@@ -54,12 +55,13 @@ struct Sample {
 };
 
 typedef struct {
-    bool direction_up_flag;
-    bool hit_step_size_threshold_flag;
-
+    int32_t prev_pow;
+    int32_t prev_curr;
     uint32_t iadj_uV;
     struct Sample sample;
-    int32_t max_voltage_mV;
+    struct SharedTempSample* temp_sample;
+    int32_t init_voc_read;
+    int32_t init_temp_read;
 } MpptPaoState;
 
 /**
@@ -81,7 +83,7 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
 /**
  * Reads power flow characteristics from the INA226
  */
-bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sample) {
+bool read_avg_power_and_current(struct INA226Driver * ina226, struct Sample * sample) {
     bool ret = true;
 
     if (ina226TriggerOneShotConversion(ina226) != MSG_OK) {
@@ -122,46 +124,62 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-// Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
+int32_t read_temp(struct SharedTempSample *temp_sample) {
+    chMtxLock(&temp_sample->guard);
+    int32_t temp = temp_sample->value;
+    chMtxUnlock(&temp_sample->guard);
+    return temp;
+}
+
 int32_t iadj_step_uV(MpptPaoState *state) {
-    // FIXME: hit_step_size_threshold flag never gets unset
-    if(!state->hit_step_size_threshold_flag && state->max_voltage_mV != 0) {
-        const int32_t threshold_05_mV = state->max_voltage_mV / 20; // 0.95 threshold
-        const int32_t threshold_95_mV = state->max_voltage_mV - threshold_05_mV;
+    int32_t temp = read_temp(state->temp_sample);
+    int32_t voc = 2*(2750 + (-56 * (temp - 28) / 10));
+    int32_t v1 = voc * 80 / 100;
+    int32_t v2 = voc * 95 / 100;
+    int32_t d_pow = state->sample.power_mW - state->prev_pow;
+    int32_t d_curr = state->sample.current_uA - state->prev_curr;
 
-        if(state->sample.voltage_mV > threshold_95_mV) {
-            //Linear scale of step size based on delta from maximum voltage
-            const int32_t v = ((state->sample.voltage_mV - threshold_95_mV) * 100) / threshold_05_mV;
-            const int32_t step = (((5000 + VREF_STEP_NEGATIVE_uV) * v) / 100) - VREF_STEP_NEGATIVE_uV;
-            return (state->direction_up_flag ? 1 : -1) * step;
+    dbgprintf("temp: %d ; voc: %d ; v1: %d ; v2: %d ;\r\n", temp, voc, v1, v2);
+
+    if (state->sample.voltage_mV < v1) {
+        dbgprintf("in area a\r\n");
+        return 10000;
+    } else if (state->sample.voltage_mV > v2) {
+        dbgprintf("in area d\r\n");
+        return -5000;
+    } else if (d_curr > 0) {
+        // if increasing current
+        if (d_pow < 0) {
+            // lowered power, then were on the right side of the curve = bad!
+            return VREF_STEP_POSITIVE_uV;
         } else {
-            state->hit_step_size_threshold_flag = true;
+            // raised power, keep going.
+            return VREF_STEP_NEGATIVE_uV;
         }
+    } else if (d_curr < 0) {
+        // if reducing current
+        if (d_pow < 0) {
+            // lowered power, then were on the left side, go forward now.
+            return VREF_STEP_NEGATIVE_uV;
+        } else {
+            // raised power, go back again, still on right side.
+            return VREF_STEP_POSITIVE_uV;
+        }
+    } else {
+        return 0;
     }
-
-    if( state->direction_up_flag ) {
-        return VREF_STEP_POSITIVE_uV;
-    }
-    return VREF_STEP_NEGATIVE_uV;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
 
-    if(state->iadj_uV == iadj_uV_perturbed) {
-        // It has saturated to an identical value, flip the search direction and process in the
-        // next iteration
-        state->direction_up_flag = !state->direction_up_flag;
-        return true;
-    }
-
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
 
     struct Sample perturbed = {};
-    if(!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
+
+    if(!read_avg_power_and_current(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
-        state->direction_up_flag = true;
 
         state->iadj_uV = iadj_uV_perturbed;
         if( state->iadj_uV > I_ADJ_FAILSAFE ) {
@@ -173,26 +191,22 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
         return false;
     }
 
-    if(perturbed.power_mW < (state->sample.power_mW - HISTERESIS_mW)) {
-        //Always move the iadj value, even if the output power is equal. This will cause it to hunt
-        //back and forth between two points that have a detectable difference in their power output.
-        state->direction_up_flag = (! state->direction_up_flag);
-    }
+    // save previous state to compare it to perturbed state
+    state->prev_pow = state->sample.power_mW;
+    state->prev_curr = state->sample.current_uA;
 
     state->iadj_uV = iadj_uV_perturbed;
-
     state->sample = perturbed;
-    state->max_voltage_mV = MAX(state->max_voltage_mV, perturbed.voltage_mV);
 
     return true;
 }
-
 
 /* Main solar management thread */
 THD_WORKING_AREA(solar_wa, 0x400);
 THD_FUNCTION(solar, arg)
 {
-    I2CDriver * i2c = arg;
+    struct SolarArgs *args = arg;
+    I2CDriver *i2c = args->i2c;
 
     // Based on INA226 datasheet, page 15, Equation (2)
     // CURR_LSB = Max Current / 2^15
@@ -229,10 +243,14 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
-        .max_voltage_mV = 0,
-        .direction_up_flag = true,
-        .hit_step_size_threshold_flag = false,
+        .temp_sample = args->sample,
     };
+
+    read_avg_power_and_current(&ina226dev, &state.sample); 
+    read_temp(args->sample);
+
+    state.init_voc_read = state.sample.voltage_mV;
+    state.init_temp_read = state.init_temp_read;
 
     palSetLine(LINE_LT1618_EN);
 
@@ -246,7 +264,6 @@ THD_FUNCTION(solar, arg)
     // FIXME: reset energyTrack every n minutes?
     uint32_t energy_mJ = 0;
 
-    int loop = 0;
     while(!chThdShouldTerminateX()) {
         iterate_mppt_perturb_and_observe(&state);
 
@@ -274,19 +291,10 @@ THD_FUNCTION(solar, arg)
         OD_RAM.x4000_output.power = state.sample.power_mW;
         OD_RAM.x4000_output.power_avg = state.sample.power_mW;
 
-        OD_RAM.x4000_output.voltage_max = state.max_voltage_mV;
         OD_RAM.x4000_output.current_max = MAX(OD_RAM.x4000_output.current_max, state.sample.current_uA / 1000);
         OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, state.sample.power_mW);
 
         OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
-
-        // FIXME remove once canopen util is avaliable
-        if(!(loop % 50)) {
-            dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
-                state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-            loop = 0;
-        }
-        loop += 1;
     }
 
     /* Stop drivers */

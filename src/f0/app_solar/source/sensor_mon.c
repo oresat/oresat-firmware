@@ -2,6 +2,7 @@
 #include "hal.h"
 #include "CANopen.h"
 #include "OD.h"
+#include "solar.h"
 
 #include <sys/param.h>
 
@@ -19,6 +20,7 @@
 // The only unique error from msg_t is MSG_TIMEOUT though so if we make a new
 // i2cflags_t value that represents that we can just have one error type.
 #define I2C_DRIVER_TIMEOUT 0x80
+
 
 i2cflags_t transmit(I2CDriver * i2c, i2caddr_t addr,
     const uint8_t *txbuf, size_t txbytes,
@@ -81,7 +83,7 @@ typedef union {
     typeof(OD_RAM.x4002_cell_2) * cell2;
 } CellRecord;
 
-i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, CellRecord record) {
+i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, struct SharedTempSample* sample, CellRecord record) {
     // The temperature register is two bytes but we only have one byte assigned
     // in the OD. Conveniently the high byte corresponds to signed degrees C
     // which is also what the OD wants, so we just take the high byte and stuff
@@ -90,8 +92,13 @@ i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, CellRecord record) {
     i2cflags_t errs = transmit(i2c, addr, &TEMPERATURE, sizeof(TEMPERATURE),
         (uint8_t*)&buf, sizeof(buf));
 
-    dbgprintf("Cell %X: %dC\r\n", addr, buf);
+    // dbgprintf("Cell %X: %dC\r\n", addr, buf);
 
+        chMtxLock(&sample->guard);
+        sample->value = (int32_t) buf;
+        chMtxUnlock(&sample->guard);
+
+        sample->value = sample->value;
     if(!errs) {
         record.cell->temperature = buf;
         record.cell->temperature_max = MAX(buf, record.cell->temperature_max);
@@ -100,11 +107,13 @@ i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, CellRecord record) {
     return errs;
 }
 
-
 THD_WORKING_AREA(sensor_mon_wa, 0x200);
 THD_FUNCTION(sensor_mon, arg) {
-    I2CDriver *i2c = arg;
+    struct SolarArgs* args = arg;
+    I2CDriver *i2c = args->i2c;
     osalDbgCheck(i2c->state > I2C_STOP);
+
+    struct SharedTempSample* sample = args->sample;
 
     dbgprintf("Starting TMP101\r\n");
 
@@ -137,16 +146,17 @@ THD_FUNCTION(sensor_mon, arg) {
         // There's no way to get an interrupt from the chip
         chThdSleepUntil(start + TIME_MS2I(75));
 
-        if((errs = ReadTemperature(i2c, CELL_1, record1))) {
+        if((errs = ReadTemperature(i2c, CELL_1, sample, record1))) {
             // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
             //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_1_COMM_ERROR);
             dbgprintf("Failed to read cell 1 temperature: %d\r\n", errs);
         }
-        if((errs = ReadTemperature(i2c, CELL_2, record2))) {
+        if((errs = ReadTemperature(i2c, CELL_2, sample, record2))) {
             // FIXME: CO_errorReport(CO->em, CO_EM_GENERIC_ERROR,
             //  CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_TMP101_2_COMM_ERROR);
             dbgprintf("Failed to read cell 2 temperature: %d\r\n", errs);
         }
+
 
         chThdSleepUntil(start + TIME_MS2I(
             OD_RAM.x1803_tpdo_4_communication_parameters.event_timer));
