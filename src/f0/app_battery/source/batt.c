@@ -240,6 +240,7 @@ static void print_runtime_entry(runtime_battery_data_t *data)
     }
 }
 
+#if defined(VERBOSE_DEBUG)
 static void print_batt_hist(void)
 {
     runtime_battery_data_t *data = battery_history;
@@ -258,6 +259,7 @@ static void print_batt_hist(void)
         data++;
     }
 }
+#endif
 
 static void find_last_batt_hist(void)
 {
@@ -342,12 +344,21 @@ static bool store_current_batt_hist(void)
         if (r != MSG_OK) {
             new_data.packs[i].mixcap = 0;
         } else {
+            // clamp to design limit to handle case where full pack is in storage,
+            // self discharges, then is charged later -- MAX17205 will then make max cap
+            // higher than it should be
+            if (tmp > CELL_CAPACITY_MAH_RAW) {
+                tmp = CELL_CAPACITY_MAH_RAW;
+            }
             new_data.packs[i].mixcap = tmp;
         }
         r = max17205Read(&packs[i].drvr, MAX17205_AD_REPCAP, &tmp);
         if (r != MSG_OK) {
             new_data.packs[i].repcap = 0;
         } else {
+            if (tmp > CELL_CAPACITY_MAH_RAW) {
+                tmp = CELL_CAPACITY_MAH_RAW;
+            }
             new_data.packs[i].repcap = tmp;
         }
     }
