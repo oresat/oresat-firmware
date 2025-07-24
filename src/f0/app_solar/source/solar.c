@@ -28,7 +28,7 @@
 
 //1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
 #define VREF_STEP_NEGATIVE_uV             -1000
-#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4)
+#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -15)
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
@@ -54,12 +54,11 @@ struct Sample {
 };
 
 typedef struct {
-    bool direction_up_flag;
-    bool hit_step_size_threshold_flag;
-
+    int32_t d_pow_mW;
+    int32_t d_curr_uA;
+    int32_t d_volt_mV;
     uint32_t iadj_uV;
     struct Sample sample;
-    int32_t max_voltage_mV;
 } MpptPaoState;
 
 /**
@@ -122,46 +121,57 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-// Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
 int32_t iadj_step_uV(MpptPaoState *state) {
-    // FIXME: hit_step_size_threshold flag never gets unset
-    if(!state->hit_step_size_threshold_flag && state->max_voltage_mV != 0) {
-        const int32_t threshold_05_mV = state->max_voltage_mV / 20; // 0.95 threshold
-        const int32_t threshold_95_mV = state->max_voltage_mV - threshold_05_mV;
+    //time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_volt_mV,d_pow_mW
+    dbgprintf("%d,%d,%d,%d,%d,%d,%d,%d\r\n",
+              TIME_I2MS(chVTGetSystemTime()),
+              state->iadj_uV,
+              state->sample.current_uA,
+              state->sample.voltage_mV,
+              state->sample.power_mW,
+              state->d_curr_uA,
+              state->d_volt_mV,
+              state->d_pow_mW
+              );
 
-        if(state->sample.voltage_mV > threshold_95_mV) {
-            //Linear scale of step size based on delta from maximum voltage
-            const int32_t v = ((state->sample.voltage_mV - threshold_95_mV) * 100) / threshold_05_mV;
-            const int32_t step = (((5000 + VREF_STEP_NEGATIVE_uV) * v) / 100) - VREF_STEP_NEGATIVE_uV;
-            return (state->direction_up_flag ? 1 : -1) * step;
+    if (state->d_pow_mW > (HISTERESIS_mW * -1) && state->d_pow_mW < HISTERESIS_mW) {
+        // ignore small changes in power
+        return VREF_STEP_NEGATIVE_uV;
+    }
+
+    if (state->d_curr_uA > 0) {
+        // if increasing current...
+        if (state->d_pow_mW < 0) {
+            // ...lowered power, then we're on the right side of the IP curve, go backwards.
+            return VREF_STEP_POSITIVE_uV;
         } else {
-            state->hit_step_size_threshold_flag = true;
+            // ...raised power, then we're on the left side, keep going.
+            return VREF_STEP_NEGATIVE_uV;
         }
+    } else if (state->d_curr_uA < 0) {
+        // if reducing current...
+        if (state->d_pow_mW < 0) {
+            // ...lowered power, then we're on the left side, go forward now.
+            return VREF_STEP_NEGATIVE_uV;
+        } else {
+            // ...raised power, then we're on the right side still, go back again.
+            return VREF_STEP_POSITIVE_uV;
+        }
+    } else {
+        // nothing's changed, default to moving forward.
+        return VREF_STEP_NEGATIVE_uV;
     }
-
-    if( state->direction_up_flag ) {
-        return VREF_STEP_POSITIVE_uV;
-    }
-    return VREF_STEP_NEGATIVE_uV;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
 
-    if(state->iadj_uV == iadj_uV_perturbed) {
-        // It has saturated to an identical value, flip the search direction and process in the
-        // next iteration
-        state->direction_up_flag = !state->direction_up_flag;
-        return true;
-    }
-
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
 
     struct Sample perturbed = {};
     if(!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
-        state->direction_up_flag = true;
 
         state->iadj_uV = iadj_uV_perturbed;
         if( state->iadj_uV > I_ADJ_FAILSAFE ) {
@@ -173,16 +183,11 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
         return false;
     }
 
-    if(perturbed.power_mW < (state->sample.power_mW - HISTERESIS_mW)) {
-        //Always move the iadj value, even if the output power is equal. This will cause it to hunt
-        //back and forth between two points that have a detectable difference in their power output.
-        state->direction_up_flag = (! state->direction_up_flag);
-    }
-
+    state->d_pow_mW = perturbed.power_mW - state->sample.power_mW;
+    state->d_curr_uA = perturbed.current_uA - state->sample.current_uA;
+    state->d_volt_mV = perturbed.voltage_mV - state->sample.voltage_mV;
     state->iadj_uV = iadj_uV_perturbed;
-
     state->sample = perturbed;
-    state->max_voltage_mV = MAX(state->max_voltage_mV, perturbed.voltage_mV);
 
     return true;
 }
@@ -229,9 +234,6 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
-        .max_voltage_mV = 0,
-        .direction_up_flag = true,
-        .hit_step_size_threshold_flag = false,
     };
 
     palSetLine(LINE_LT1618_EN);
@@ -274,7 +276,6 @@ THD_FUNCTION(solar, arg)
         OD_RAM.x4000_output.power = state.sample.power_mW;
         OD_RAM.x4000_output.power_avg = state.sample.power_mW;
 
-        OD_RAM.x4000_output.voltage_max = state.max_voltage_mV;
         OD_RAM.x4000_output.current_max = MAX(OD_RAM.x4000_output.current_max, state.sample.current_uA / 1000);
         OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, state.sample.power_mW);
 
