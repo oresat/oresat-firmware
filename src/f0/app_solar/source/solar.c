@@ -13,7 +13,6 @@
 #define dbgprintf(str, ...)
 #endif
 
-
 /* DAC1 configuration */
 //Assumes 3.3V Vcc
 #define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
@@ -24,14 +23,14 @@
 #define I_ADJ_INITIAL           1500000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
-#define HISTERESIS_mW           3
-
-//1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
-#define VREF_STEP_NEGATIVE_uV             -1000
-#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -15)
+#define SAMPLE_HIST_LENGTH      4
+#define SLOPE_THRESHOLD         0.00380
+#define SLOPE_SCALING_FACTOR    10000
+#define MAX_STEP                10000
+#define VREF_STEP_NEGATIVE_uV   -1000
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
-#error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
+#error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUST_uV"
 #endif
 
 static const DACConfig dac1cfg = {
@@ -51,14 +50,16 @@ struct Sample {
     int32_t voltage_mV;
     int32_t current_uA;
     int32_t shunt_uV;
+    int32_t d_pow_mW;
+    int32_t d_curr_uA;
 };
 
 typedef struct {
-    int32_t d_pow_mW;
-    int32_t d_curr_uA;
-    int32_t d_volt_mV;
     uint32_t iadj_uV;
     struct Sample sample;
+    uint8_t loop_position;
+    struct Sample sample_history[SAMPLE_HIST_LENGTH];
+    bool_t init;
 } MpptPaoState;
 
 /**
@@ -121,46 +122,68 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-int32_t iadj_step_uV(MpptPaoState *state) {
-    //time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_volt_mV,d_pow_mW
+void print_state_as_csv(MpptPaoState *state) {
+    //time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW
     dbgprintf("%d,%d,%d,%d,%d,%d,%d,%d\r\n",
               TIME_I2MS(chVTGetSystemTime()),
               state->iadj_uV,
               state->sample.current_uA,
               state->sample.voltage_mV,
               state->sample.power_mW,
-              state->d_curr_uA,
-              state->d_volt_mV,
-              state->d_pow_mW
+              state->sample.d_curr_uA,
+              state->sample.d_pow_mW,
+              state->loop_position
+              );
+}
+
+float32_t get_avg_ip_slope(MpptPaoState *state) {
+    float32_t avg_ip_slope_mW_per_uA = 0;
+
+    bool_t divide_by_zero_safe = true;
+    for (int8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
+        if (state->sample_history[i].d_curr_uA == 0) {
+            divide_by_zero_safe = false;
+        }
+    }
+    if (state->sample.d_curr_uA == 0) {
+        divide_by_zero_safe = false;
+    }
+
+    if (divide_by_zero_safe) {
+       for (uint8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
+            avg_ip_slope_mW_per_uA += ((float32_t) state->sample_history[i].d_pow_mW / (float32_t) state->sample_history[i].d_curr_uA);
+        }
+        avg_ip_slope_mW_per_uA += ((float32_t) state->sample.d_pow_mW / (float32_t) state->sample.d_curr_uA);
+        avg_ip_slope_mW_per_uA /= SAMPLE_HIST_LENGTH + 1;
+
+        return avg_ip_slope_mW_per_uA;
+    }
+
+    return avg_ip_slope_mW_per_uA;
+}
+
+int32_t iadj_step_uV(MpptPaoState *state) {
+    float32_t avg_ip_slope_mW_per_uA = get_avg_ip_slope(state);
+    int32_t slope_dist_to_threshold = (int32_t) ((avg_ip_slope_mW_per_uA - SLOPE_THRESHOLD) * SLOPE_SCALING_FACTOR);
+    int32_t step = VREF_STEP_NEGATIVE_uV * slope_dist_to_threshold;
+
+    if (step == 0) {
+        return VREF_STEP_NEGATIVE_uV;
+    } else if (step > MAX_STEP) {
+        step = MAX_STEP;
+    } else if (step < (MAX_STEP * -1)) {
+        step = (MAX_STEP * -1);
+    }
+
+    int32_t scaled_slope = ((int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR));
+    dbgprintf("slope_dist_to_threshold: %d ; step: %d ; slope: (%d / %d)\r\n",
+              slope_dist_to_threshold,
+              step,
+              scaled_slope,
+              SLOPE_SCALING_FACTOR
               );
 
-    if (state->d_pow_mW > (HISTERESIS_mW * -1) && state->d_pow_mW < HISTERESIS_mW) {
-        // ignore small changes in power
-        return VREF_STEP_NEGATIVE_uV;
-    }
-
-    if (state->d_curr_uA > 0) {
-        // if increasing current...
-        if (state->d_pow_mW < 0) {
-            // ...lowered power, then we're on the right side of the IP curve, go backwards.
-            return VREF_STEP_POSITIVE_uV;
-        } else {
-            // ...raised power, then we're on the left side, keep going.
-            return VREF_STEP_NEGATIVE_uV;
-        }
-    } else if (state->d_curr_uA < 0) {
-        // if reducing current...
-        if (state->d_pow_mW < 0) {
-            // ...lowered power, then we're on the left side, go forward now.
-            return VREF_STEP_NEGATIVE_uV;
-        } else {
-            // ...raised power, then we're on the right side still, go back again.
-            return VREF_STEP_POSITIVE_uV;
-        }
-    } else {
-        // nothing's changed, default to moving forward.
-        return VREF_STEP_NEGATIVE_uV;
-    }
+    return step;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
@@ -183,11 +206,16 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
         return false;
     }
 
-    state->d_pow_mW = perturbed.power_mW - state->sample.power_mW;
-    state->d_curr_uA = perturbed.current_uA - state->sample.current_uA;
-    state->d_volt_mV = perturbed.voltage_mV - state->sample.voltage_mV;
+    perturbed.d_pow_mW = perturbed.power_mW - state->sample.power_mW;
+    perturbed.d_curr_uA = perturbed.current_uA - state->sample.current_uA;
+
+    uint8_t hist_index = state->loop_position % SAMPLE_HIST_LENGTH;
+
     state->iadj_uV = iadj_uV_perturbed;
+    state->sample_history[hist_index] = state->sample;
     state->sample = perturbed;
+    state->loop_position++;
+    state->init = true;
 
     return true;
 }
@@ -212,13 +240,13 @@ THD_FUNCTION(solar, arg)
         .curr_lsb_uA = 20,  /* 20uA/bit */
     };
 
-    dbgprintf("\r\nRunning solar app...\r\n");
+    // dbgprintf("\r\nRunning solar app...\r\n");
     /* Start up drivers */
     ina226ObjectInit(&ina226dev);
-    dbgprintf("Initializing DAC....\r\n");
+    // dbgprintf("Initializing DAC....\r\n");
     dacStart(&DACD1, &dac1cfg);
 
-    dbgprintf("Initializing INA226....\r\n");
+    // dbgprintf("Initializing INA226....\r\n");
     ina226Start(&ina226dev, &ina226config);
 
     if( ina226dev.state != INA226_READY ) {
@@ -234,13 +262,24 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
+        .sample_history[0].d_pow_mW = 10,
+        .sample_history[0].d_curr_uA = 100, 
+        .sample_history[1].d_pow_mW = 10,
+        .sample_history[1].d_curr_uA = 100,
+        .sample_history[2].d_pow_mW = 10,
+        .sample_history[2].d_curr_uA = 100,
+        .sample_history[3].d_pow_mW = 10,
+        .sample_history[3].d_curr_uA = 100,
+        .sample.d_pow_mW = 10,
+        .sample.d_curr_uA = 100,
+        .init = false
     };
 
     palSetLine(LINE_LT1618_EN);
 
     dac_put_microvolts(&DACD1, 0, state.iadj_uV);
 
-    dbgprintf("Done with init INA226, running main loop....\r\n");
+    // dbgprintf("Done with init INA226, running main loop....\r\n");
 
     systime_t t_start = chVTGetSystemTime();
     systime_t t_last = t_start;
@@ -249,6 +288,9 @@ THD_FUNCTION(solar, arg)
     uint32_t energy_mJ = 0;
 
     int loop = 0;
+
+    // dbgprintf("time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW\r\n");
+
     while(!chThdShouldTerminateX()) {
         iterate_mppt_perturb_and_observe(&state);
 
@@ -281,12 +323,12 @@ THD_FUNCTION(solar, arg)
 
         OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
 
-        // FIXME remove once canopen util is avaliable
-        if(!(loop % 50)) {
-            dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
-                state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-            loop = 0;
-        }
+        // // FIXME remove once canopen util is avaliable
+        // if(!(loop % 50)) {
+        //     dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
+        //         state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
+        //     loop = 0;
+        // }
         loop += 1;
     }
 

@@ -90,7 +90,7 @@ i2cflags_t ReadTemperature(I2CDriver * i2c, i2caddr_t addr, CellRecord record) {
     i2cflags_t errs = transmit(i2c, addr, &TEMPERATURE, sizeof(TEMPERATURE),
         (uint8_t*)&buf, sizeof(buf));
 
-    dbgprintf("Cell %X: %dC\r\n", addr, buf);
+    // dbgprintf("Cell %X: %dC\r\n", addr, buf);
 
     if(!errs) {
         record.cell->temperature = buf;
