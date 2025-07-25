@@ -30,11 +30,11 @@
 #define I_ADJ_MIN               0
 
 /* Slope Calculation Configuration */
-#define CRITICAL_SLOPE            0.004// mW/uA
+#define CRITICAL_SLOPE            0.00425// mW/uA
     //slope of the IP curve that indicates we should turn around when below it
     //seems to be around 0.004 or 0.005
 
-#define IADJ_SAMPLE_OFFSET_uV 10000
+#define IADJ_SAMPLE_OFFSET_uV 15000
     //distance to jump and take another sample for slope calculation
 
 #define SLOPE_CORRECTION_FACTOR 100.0
@@ -125,7 +125,7 @@ void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
      */
     dacsample_t val = ((uV/100) << 12) / (DAC_VDDA_uV/100);
     dacPutChannelX(dacp, chan, val);
-    chThdSleepMilliseconds(DAC_SETTLE_DELAY_mS); //TODO: make this shorter
+    //chThdSleepMilliseconds(DAC_SETTLE_DELAY_mS); //TODO: make this shorter
 }
 
 //Reads power flow characteristics from the INA226
@@ -179,7 +179,7 @@ float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted,
     delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW); //W
     delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA); //uA
 
-    if (!ABS(delta_current) < FLOAT_DIST_TO_ZERO) { //TODO: make these ABS more efficient at runtime
+    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) { //TODO: make these ABS more efficient at runtime
         slope = (delta_power / delta_current); //mW/uA
     }
     return slope;
@@ -187,21 +187,24 @@ float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted,
 
 
 float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
-    float32_t slope1, slope2;
+    float32_t slope1 = 0;
+    float32_t slope2 = 0;
+    float32_t slope3 = 0;
     int32_t this_iadj = old_iadj;
     struct Sample second;
     struct Sample third;
+    struct Sample fourth;
 
     //int32_t* adjust = &old_iadj;
     slope1 = find_slope(current, &second, &this_iadj);
     slope2 = find_slope(&second, &third, &this_iadj);
+    //slope3 = find_slope(&third, &fourth, &this_iadj);
 
-
-    float32_t slope = (slope1 + slope2) / 2.0;
+    float32_t slope = (slope1 + slope2 + slope3) / 2.0;
 //    float32_t slope = slope1;
 
     //   dbgprintf("detlap: %d, deltai %d, slope %d, out of %d", (int) (deltap), (int) (deltai), (int) (slope*10000), (int) (CRITICAL_SLOPE*10000));
-    dbgprintf("calculated slope as %d/10,000 out of %d \n", (int32_t) (slope * 10000), (int32_t) (CRITICAL_SLOPE * 10000));
+    dbgprintf("calculated slope as %d/10,000 out of %d \n\r", (int32_t) (slope * 10000), (int32_t) (CRITICAL_SLOPE * 10000));
     dac_put_microvolts(&DACD1, 0, old_iadj);
 //   dbgprintf("returned to old iadj\n");
     return slope;
@@ -254,7 +257,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     } else {
         toRet = VREF_STEP_NEGATIVE_uV;
     }
-    dbgprintf("returning: %d\n", toRet);
+    dbgprintf("returning: %d\n\r", toRet);
     return toRet > MAX_STEP ? MAX_STEP: toRet;
 }
 
