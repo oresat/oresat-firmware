@@ -872,9 +872,6 @@ msg_t max17205PrintNonvolatileMemory(MAX17205Driver *devp) {
     return MSG_OK;
 }
 
-uint16_t history_data[203][16];
-uint8_t history_length;
-
 msg_t max17205ReadHistory(MAX17205Driver *devp)
 {
     int i;
@@ -968,7 +965,10 @@ msg_t max17205ReadHistory(MAX17205Driver *devp)
     }
 
     //Read all the history data from the IC
-    history_length = 0;
+    uint16_t history_data;
+    uint8_t history_length = 0;
+
+    dbgprintf("History:\r\n");
     for(loop = 0; loop < 202; loop++)
     {
         if (!page_good[loop]) {
@@ -980,22 +980,15 @@ msg_t max17205ReadHistory(MAX17205Driver *devp)
             return r;
         }
         chThdSleepMilliseconds(MAX17205_T_RECAL_MS);
+        dbgprintf(" Entry %d:\r\n", history_length);
         for (i = 0; i < 16; i++) {
-            r = max17205Read(devp, 0x1E0 + i, &history_data[history_length][i]);
+            r = max17205Read(devp, 0x1E0 + i, &history_data);
             if (r != MSG_OK) {
                 return r;
             }
+            dbgprintf("   %-30s register 0x%04X is 0x%04X\r\n", max17205RegToStr(0x1A0 + i), 0x1A0 + i, history_data);
         }
         history_length++;
-    }
-
-    // print out full history
-    dbgprintf("%d History Entries:\r\n", history_length);
-    for (loop = 0; loop < history_length; loop++) {
-        dbgprintf(" Entry %d:\r\n", loop);
-        for (i = 0; i < 16; i++) {
-            dbgprintf("   %-30s register 0x%04X is 0x%04X\r\n", max17205RegToStr(0x1A0 + i), 0x1A0 + i, history_data[loop][i]);
-        }
     }
     return MSG_OK;
 }

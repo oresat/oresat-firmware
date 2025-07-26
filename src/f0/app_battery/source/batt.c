@@ -228,14 +228,15 @@ typedef struct __attribute__((packed)) runtime_battery_data {
 
 #define NUM_BATT_HIST_ENTRIES ((STM32F093_FLASH_PAGE_SIZE) / sizeof(runtime_battery_data_t))
 runtime_battery_data_t *battery_history = (runtime_battery_data_t *) __flash3_base__;
-static runtime_battery_data_t *last_used;
-static runtime_battery_data_t last_batt_hist_entry;
+static runtime_battery_data_t *last_valid_history_entry; // pointer to final entry with good CRC
+static runtime_battery_data_t *last_empty_history_entry; // pointer to first empty entry
+static uint16_t reset_cycle_count;
 
-static void print_runtime_entry(runtime_battery_data_t *data)
+static void print_runtime_entry(runtime_battery_data_t *data, unsigned int start, unsigned int count)
 {
     dbgprintf("rst_cycle=%d, minute=%d, unused=%d, estimated=%d, crc=0x%08X\r\n",
               data->rst_cycle, data->minute, data->unused, data->estimated, data->crc);
-    for (unsigned int j = 0; j < NPACKS; j++) {
+    for (unsigned int j = start; j < start + count; j++) {
         dbgprintf("   pack %u: mixcap:0x%04X, repcap:0x%04X\r\n", j + 1, data->packs[j].mixcap, data->packs[j].repcap);
     }
 }
@@ -251,7 +252,7 @@ static void print_batt_hist(void)
     for (unsigned int i = 0; i < NUM_BATT_HIST_ENTRIES; i++) {
         if (!flashIsErasedF091((flashaddr_t)data, sizeof(runtime_battery_data_t))) {
             dbgprintf("%u. ", i);
-            print_runtime_entry(data);
+            print_runtime_entry(data, 0, NPACKS);
         } else {
             dbgprintf("%u. Found erased entry. Done.\r\n", i);
             break;
@@ -264,72 +265,76 @@ static void print_batt_hist(void)
 static void find_last_batt_hist(void)
 {
     runtime_battery_data_t *data = battery_history;
-    last_used = NULL;
+    last_valid_history_entry = NULL;
+    last_empty_history_entry = NULL;
 
+    // Search forward through stored history for the most recent entry that has
+    // a correct CRC.
     for (unsigned int i = 0; i < NUM_BATT_HIST_ENTRIES; i++) {
         if (flashIsErasedF091((flashaddr_t)data, sizeof(runtime_battery_data_t))) {
+            last_empty_history_entry = data;
             break;
         }
         uint32_t check_crc = crc32((uint8_t *)data, sizeof(*data) - sizeof(data->crc), 0);
-        bool good = true;
 
         if (check_crc == data->crc) {
-            for (unsigned int j = 0; j < NPACKS; j++) {
-                if ((data->packs[j].mixcap > CELL_CAPACITY_MAH_RAW) ||
-                    (data->packs[j].repcap > CELL_CAPACITY_MAH_RAW)) {
-                    good = false;
-                    dbgprintf("Values out of range on entry %u pack %u\r\n", i, j + 1);
-                }
-            }
-            if (good) {
-                last_used = data;
-            }
+            last_valid_history_entry = data;
         } else {
             dbgprintf("CRC failure on entry %u\r\n", i);
         }
         data++;
     }
-    if (last_used != NULL) {
-        dbgprintf("Selected last used runtime entry:\r\n");
-        print_runtime_entry(last_used);
-        memcpy(&last_batt_hist_entry, last_used, sizeof(last_batt_hist_entry));
-        // We have started a new cycle, so advance this counter now (used below)
-        last_batt_hist_entry.rst_cycle++;
-    }
-}
 
-static bool add_next_batt_hist(runtime_battery_data_t *new_data)
-{
-    if (last_used == NULL) {
-        last_used = battery_history;
-    } else {
-        last_used++;
-    }
+    // we found a good entry, so save a copy in RAM
+    if (last_valid_history_entry != NULL) {
+        dbgprintf("Selected last valid runtime entry:\r\n");
+        print_runtime_entry(last_valid_history_entry, 0, NPACKS);
 
-    if (last_used < &battery_history[NUM_BATT_HIST_ENTRIES]) {
-        if (flashWriteF091((flashaddr_t)last_used, (uint8_t *)new_data, sizeof(runtime_battery_data_t)) == FLASH_RETURN_SUCCESS) {
-            return true;
-        } else {
-            dbgprintf("Error writing to flash\r\n");
-        }
+        reset_cycle_count = last_valid_history_entry->rst_cycle;
+
+        // We have started a new cycle, so advance this counter once
+        reset_cycle_count++;
     }
-    last_used = NULL;
-    return false;
 }
 
 static void load_latest_batt_hist(pack_t *pack)
 {
-    if (last_used == NULL) {
+    if (last_valid_history_entry == NULL) {
         dbgprintf("No latest battery history to load\r\n");
         return;
     }
 
     msg_t r;
+    uint16_t tmp;
 
     dbgprintf("Loading entry to pack %u:\r\n", pack->pack_number);
-    print_runtime_entry(last_used);
-    r = max17205Write(&pack->drvr, MAX17205_AD_MIXCAP, last_used->packs[pack->pack_number - 1].mixcap);
-    r = max17205Write(&pack->drvr, MAX17205_AD_REPCAP, last_used->packs[pack->pack_number - 1].repcap);
+    print_runtime_entry(last_valid_history_entry, pack->pack_number - 1, 1);
+    tmp = MIN(last_valid_history_entry->packs[pack->pack_number - 1].mixcap, CELL_CAPACITY_MAH_RAW);
+    r = max17205Write(&pack->drvr, MAX17205_AD_MIXCAP, tmp);
+    if (r != MSG_OK) {
+        dbgprintf("Error writing AD_MIXCAP\r\n");
+    }
+    tmp = MIN(last_valid_history_entry->packs[pack->pack_number - 1].repcap, CELL_CAPACITY_MAH_RAW);
+    r = max17205Write(&pack->drvr, MAX17205_AD_REPCAP, tmp);
+    if (r != MSG_OK) {
+        dbgprintf("Error writing AD_REPCAP\r\n");
+    }
+}
+
+static bool add_next_batt_hist(runtime_battery_data_t *new_data)
+{
+    if (last_empty_history_entry < &battery_history[NUM_BATT_HIST_ENTRIES]) {
+        if (flashWriteF091((flashaddr_t)last_empty_history_entry, (uint8_t *)new_data, sizeof(runtime_battery_data_t)) == FLASH_RETURN_SUCCESS) {
+            last_valid_history_entry = last_empty_history_entry++;
+            return true;
+        } else {
+            dbgprintf("Error writing to flash\r\n");
+        }
+    }
+    // history storage is full or error writing flash, so let caller recover
+    last_valid_history_entry = NULL;
+    last_empty_history_entry = battery_history;
+    return false;
 }
 
 static bool store_current_batt_hist(void)
@@ -347,35 +352,28 @@ static bool store_current_batt_hist(void)
             // clamp to design limit to handle case where full pack is in storage,
             // self discharges, then is charged later -- MAX17205 will then make max cap
             // higher than it should be
-            if (tmp > CELL_CAPACITY_MAH_RAW) {
-                tmp = CELL_CAPACITY_MAH_RAW;
-            }
-            new_data.packs[i].mixcap = tmp;
+            new_data.packs[i].mixcap = MIN(tmp, CELL_CAPACITY_MAH_RAW);
         }
         r = max17205Read(&packs[i].drvr, MAX17205_AD_REPCAP, &tmp);
         if (r != MSG_OK) {
             new_data.packs[i].repcap = 0;
         } else {
-            if (tmp > CELL_CAPACITY_MAH_RAW) {
-                tmp = CELL_CAPACITY_MAH_RAW;
-            }
-            new_data.packs[i].repcap = tmp;
+            new_data.packs[i].repcap = MIN(tmp, CELL_CAPACITY_MAH_RAW);
         }
     }
-    new_data.rst_cycle = last_batt_hist_entry.rst_cycle;
+    new_data.rst_cycle = reset_cycle_count;
     new_data.minute = TIME_I2S(chVTGetSystemTime()) / 60;
     new_data.unused = 0;
     new_data.estimated = false;
     new_data.crc = crc32((uint8_t *)&new_data, sizeof(new_data) - sizeof(new_data.crc), 0);
     dbgprintf("Storing new runtime battery entry:\r\n");
-    print_runtime_entry(&new_data);
+    print_runtime_entry(&new_data, 0, NPACKS);
     for (i = 0; i < MAX_HIST_STORE_RETRIES; i++) {
         if (add_next_batt_hist(&new_data)) {
-            memcpy(&last_batt_hist_entry, &new_data, sizeof(last_batt_hist_entry));
             dbgprintf("Done.\r\n");
             return true;
         } else {
-            dbgprintf("Erasing page.\r\n");
+            dbgprintf("Retry %d. Erasing page.\r\n", i + 1);
             flashEraseF091((flashaddr_t)battery_history, STM32F093_FLASH_PAGE_SIZE);
         }
     }
