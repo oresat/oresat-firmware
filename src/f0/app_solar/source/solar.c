@@ -1,4 +1,5 @@
 #include "solar.h"
+#include "CO_driver_target.h"
 #include "ina226.h"
 #include "CANopen.h"
 #include "OD.h"
@@ -23,10 +24,11 @@
 #define I_ADJ_INITIAL           1500000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
-#define SAMPLE_HIST_LENGTH      4
-#define SLOPE_THRESHOLD         0.00380
+#define SAMPLE_HIST_LENGTH      2
+#define SLOPE_THRESHOLD         0.00460
 #define SLOPE_SCALING_FACTOR    10000
-#define MAX_STEP                10000
+#define BASE_STEP               -500
+#define MAX_STEP                8000
 #define VREF_STEP_NEGATIVE_uV   -1000
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
@@ -59,7 +61,6 @@ typedef struct {
     struct Sample sample;
     uint8_t loop_position;
     struct Sample sample_history[SAMPLE_HIST_LENGTH];
-    bool_t init;
 } MpptPaoState;
 
 /**
@@ -122,9 +123,9 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-void print_state_as_csv(MpptPaoState *state) {
-    //time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW
-    dbgprintf("%d,%d,%d,%d,%d,%d,%d,%d\r\n",
+void print_state_as_csv(MpptPaoState *state, int32_t step, float32_t avg_ip_slope_mW_per_uA) {
+    // time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW,(slope / SLOPE_SCALING_FACTOR),step
+    dbgprintf("%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",
               TIME_I2MS(chVTGetSystemTime()),
               state->iadj_uV,
               state->sample.current_uA,
@@ -132,31 +133,29 @@ void print_state_as_csv(MpptPaoState *state) {
               state->sample.power_mW,
               state->sample.d_curr_uA,
               state->sample.d_pow_mW,
-              state->loop_position
+              (int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR),
+              step
               );
 }
 
 float32_t get_avg_ip_slope(MpptPaoState *state) {
     float32_t avg_ip_slope_mW_per_uA = 0;
+    uint8_t non_zero_samples = 0;
 
-    bool_t divide_by_zero_safe = true;
-    for (int8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
-        if (state->sample_history[i].d_curr_uA == 0) {
-            divide_by_zero_safe = false;
-        }
-    }
-    if (state->sample.d_curr_uA == 0) {
-        divide_by_zero_safe = false;
-    }
-
-    if (divide_by_zero_safe) {
-       for (uint8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
+    for (uint8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
+        if (state->sample_history[i].d_curr_uA != 0) {
             avg_ip_slope_mW_per_uA += ((float32_t) state->sample_history[i].d_pow_mW / (float32_t) state->sample_history[i].d_curr_uA);
+            non_zero_samples++;
         }
-        avg_ip_slope_mW_per_uA += ((float32_t) state->sample.d_pow_mW / (float32_t) state->sample.d_curr_uA);
-        avg_ip_slope_mW_per_uA /= SAMPLE_HIST_LENGTH + 1;
+    }
 
-        return avg_ip_slope_mW_per_uA;
+    if (state->sample.d_curr_uA != 0) {
+        avg_ip_slope_mW_per_uA += ((float32_t) state->sample.d_pow_mW / (float32_t) state->sample.d_curr_uA);
+        non_zero_samples++;
+    }
+
+    if (non_zero_samples > 0) {
+        avg_ip_slope_mW_per_uA /= non_zero_samples;
     }
 
     return avg_ip_slope_mW_per_uA;
@@ -164,22 +163,25 @@ float32_t get_avg_ip_slope(MpptPaoState *state) {
 
 int32_t iadj_step_uV(MpptPaoState *state) {
     float32_t avg_ip_slope_mW_per_uA = get_avg_ip_slope(state);
-    int32_t slope_dist_to_threshold = (int32_t) ((avg_ip_slope_mW_per_uA - SLOPE_THRESHOLD) * SLOPE_SCALING_FACTOR);
-    int32_t step = VREF_STEP_NEGATIVE_uV * slope_dist_to_threshold;
 
-    if (step == 0) {
+    if (avg_ip_slope_mW_per_uA == 0) {
         return VREF_STEP_NEGATIVE_uV;
-    } else if (step > MAX_STEP) {
-        step = MAX_STEP;
+    }
+
+    int32_t slope_dist_to_threshold = (int32_t) ((avg_ip_slope_mW_per_uA - SLOPE_THRESHOLD) * SLOPE_SCALING_FACTOR);
+    int32_t step = BASE_STEP * slope_dist_to_threshold;
+
+    if (step > MAX_STEP * 2) {
+        step = MAX_STEP * 2;
     } else if (step < (MAX_STEP * -1)) {
         step = (MAX_STEP * -1);
     }
 
-    int32_t scaled_slope = ((int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR));
-    dbgprintf("slope_dist_to_threshold: %d ; step: %d ; slope: (%d / %d)\r\n",
+    dbgprintf("pow_mW %d ; slope_diff: %d ; step: %d ; slope: (%d / %d)\r\n",
+              state->sample.power_mW,
               slope_dist_to_threshold,
               step,
-              scaled_slope,
+              ((int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR)),
               SLOPE_SCALING_FACTOR
               );
 
@@ -215,7 +217,6 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     state->sample_history[hist_index] = state->sample;
     state->sample = perturbed;
     state->loop_position++;
-    state->init = true;
 
     return true;
 }
@@ -234,7 +235,7 @@ THD_FUNCTION(solar, arg)
         .i2cp  = i2c,
         .saddr = INA226_SADDR,
         .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS |
-                 INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
+                 INA226_CONFIG_VSHCT_204US | INA226_CONFIG_VBUSCT_204US |
                  INA226_CONFIG_AVG_16,
         .rshunt_mOhm = 100, /* 0.1 ohm  */
         .curr_lsb_uA = 20,  /* 20uA/bit */
@@ -262,18 +263,15 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
-        .sample_history[0].d_pow_mW = 10,
-        .sample_history[0].d_curr_uA = 100, 
-        .sample_history[1].d_pow_mW = 10,
-        .sample_history[1].d_curr_uA = 100,
-        .sample_history[2].d_pow_mW = 10,
-        .sample_history[2].d_curr_uA = 100,
-        .sample_history[3].d_pow_mW = 10,
-        .sample_history[3].d_curr_uA = 100,
-        .sample.d_pow_mW = 10,
-        .sample.d_curr_uA = 100,
-        .init = false
+        .sample.d_pow_mW = 1,
+        .sample.d_curr_uA = 200,
     };
+
+    // initialize history with a starting slope of 0.005 to get things started
+    for (int8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
+        state.sample_history[i].d_pow_mW = 1;
+        state.sample_history[i].d_curr_uA = 200;
+    }
 
     palSetLine(LINE_LT1618_EN);
 
@@ -289,7 +287,7 @@ THD_FUNCTION(solar, arg)
 
     int loop = 0;
 
-    // dbgprintf("time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW\r\n");
+    dbgprintf("time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW,(slope over %d),step\r\n", SLOPE_SCALING_FACTOR);
 
     while(!chThdShouldTerminateX()) {
         iterate_mppt_perturb_and_observe(&state);
