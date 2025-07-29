@@ -34,10 +34,10 @@
     //slope of the IP curve that indicates we should turn around when below it
     //seems to be around 0.004 or 0.005
 
-#define IADJ_SAMPLE_OFFSET_uV 15000
+#define IADJ_SAMPLE_OFFSET_uV 25000
     //distance to jump and take another sample for slope calculation
 
-#define SLOPE_CORRECTION_FACTOR 100.0
+#define SLOPE_CORRECTION_FACTOR 500.0
     //how aggresively to panic when we are below the critical slope
 
 #define FLOAT_DIST_TO_ZERO 0.1
@@ -45,9 +45,11 @@
 
 //TODO: what is the minimum adjustable value of the dac exactly?
 //1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
-#define VREF_STEP_NEGATIVE_uV             -8000
-#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -2) //ratio of 2
-#define MAX_STEP 50000 //cap steps so they aren't too big when dynamic
+#define VREF_STEP_NEGATIVE_uV             -16000
+#define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4) //ratio of 2
+#define MAX_STEP 200000 //cap steps so they aren't too big when dynamic
+
+#define SLEEP_CYCLE 50
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
@@ -257,7 +259,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     } else {
         toRet = VREF_STEP_NEGATIVE_uV;
     }
-    dbgprintf("returning: %d\n\r", toRet);
+    //dbgprintf("returning: %d\n\r", toRet);
     return toRet > MAX_STEP ? MAX_STEP: toRet;
 }
 
@@ -374,6 +376,7 @@ THD_FUNCTION(solar, arg)
     int loop = 0;
     while(!chThdShouldTerminateX()) {
         iterate_mppt_perturb_and_observe(&state);
+        chThdSleepMilliseconds(SLEEP_CYCLE);
         /* generateCSV(&ina226dev, state); */
 
         /*
