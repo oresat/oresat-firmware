@@ -1,9 +1,9 @@
 #include "solar.h"
-#include "CO_driver_target.h"
 #include "ina226.h"
 #include "CANopen.h"
 #include "OD.h"
 
+#include <math.h>
 #include <sys/param.h>
 
 #ifdef DEBUG_PRINT
@@ -20,16 +20,18 @@
 #define DAC_MININUM_ADJUST_uV   805
 
 /* MPPT configuration */
-#define I_ADJ_FAILSAFE          1450000
-#define I_ADJ_INITIAL           1500000
-#define I_ADJ_MAX               1500000
-#define I_ADJ_MIN               0
-#define SAMPLE_HIST_LENGTH      2
-#define SLOPE_THRESHOLD         0.00460
-#define SLOPE_SCALING_FACTOR    10000
-#define BASE_STEP               -500
-#define MAX_STEP                8000
-#define VREF_STEP_NEGATIVE_uV   -1000
+#define I_ADJ_FAILSAFE              1450000
+#define I_ADJ_INITIAL               1500000
+#define I_ADJ_MAX                   1500000
+#define I_ADJ_MIN                   0
+#define SAMPLE_HIST_LENGTH          2
+#define SLOPE_THRESHOLD             0.00460
+#define SLOPE_SCALING_FACTOR        10000
+#define BASE_STEP                   -1500.0
+#define MAX_STEP                    8000
+#define VREF_STEP_NEGATIVE_uV       -1000
+#define CURR_NOISE_GUARD_UA         5
+#define STEP_RANGE_STRETCH_FACTOR   0.8
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUST_uV"
@@ -140,22 +142,22 @@ void print_state_as_csv(MpptPaoState *state, int32_t step, float32_t avg_ip_slop
 
 float32_t get_avg_ip_slope(MpptPaoState *state) {
     float32_t avg_ip_slope_mW_per_uA = 0;
-    uint8_t non_zero_samples = 0;
+    uint8_t valid_samples = 0;
 
     for (uint8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
-        if (state->sample_history[i].d_curr_uA != 0) {
+        if (state->sample_history[i].d_curr_uA > CURR_NOISE_GUARD_UA | state->sample_history[i].d_curr_uA < (CURR_NOISE_GUARD_UA * -1)) {
             avg_ip_slope_mW_per_uA += ((float32_t) state->sample_history[i].d_pow_mW / (float32_t) state->sample_history[i].d_curr_uA);
-            non_zero_samples++;
+            valid_samples++;
         }
     }
 
-    if (state->sample.d_curr_uA != 0) {
+    if (state->sample.d_curr_uA > CURR_NOISE_GUARD_UA | state->sample.d_curr_uA < (CURR_NOISE_GUARD_UA * -1)) {
         avg_ip_slope_mW_per_uA += ((float32_t) state->sample.d_pow_mW / (float32_t) state->sample.d_curr_uA);
-        non_zero_samples++;
+        valid_samples++;
     }
 
-    if (non_zero_samples > 0) {
-        avg_ip_slope_mW_per_uA /= non_zero_samples;
+    if (valid_samples > 0) {
+        avg_ip_slope_mW_per_uA /= valid_samples;
     }
 
     return avg_ip_slope_mW_per_uA;
@@ -168,8 +170,14 @@ int32_t iadj_step_uV(MpptPaoState *state) {
         return VREF_STEP_NEGATIVE_uV;
     }
 
-    int32_t slope_dist_to_threshold = (int32_t) ((avg_ip_slope_mW_per_uA - SLOPE_THRESHOLD) * SLOPE_SCALING_FACTOR);
-    int32_t step = BASE_STEP * slope_dist_to_threshold;
+    float32_t slope_dist_to_threshold = ((avg_ip_slope_mW_per_uA - SLOPE_THRESHOLD) * SLOPE_SCALING_FACTOR);
+    int32_t step = 0;
+
+    if (slope_dist_to_threshold > 0) {
+        step = (int32_t) (BASE_STEP * logf(STEP_RANGE_STRETCH_FACTOR * (slope_dist_to_threshold + 1)));
+    } else {
+        step = (int32_t) ((BASE_STEP * -2) * logf(STEP_RANGE_STRETCH_FACTOR * (1 - slope_dist_to_threshold)));
+    }
 
     if (step > MAX_STEP * 2) {
         step = MAX_STEP * 2;
@@ -211,10 +219,8 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     perturbed.d_pow_mW = perturbed.power_mW - state->sample.power_mW;
     perturbed.d_curr_uA = perturbed.current_uA - state->sample.current_uA;
 
-    uint8_t hist_index = state->loop_position % SAMPLE_HIST_LENGTH;
-
     state->iadj_uV = iadj_uV_perturbed;
-    state->sample_history[hist_index] = state->sample;
+    state->sample_history[state->loop_position % SAMPLE_HIST_LENGTH] = state->sample;
     state->sample = perturbed;
     state->loop_position++;
 
