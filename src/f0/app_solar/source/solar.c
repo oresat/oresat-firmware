@@ -25,13 +25,14 @@
 #define I_ADJ_MAX                   1500000
 #define I_ADJ_MIN                   0
 #define SAMPLE_HIST_LENGTH          2
-#define SLOPE_THRESHOLD             0.004
+#define SLOPE_THRESHOLD             0.00455
 #define SLOPE_SCALING_FACTOR        10000
-#define BASE_STEP                   -2800.0
-#define MAX_STEP                    10000
+#define BASE_STEP                   -2500.0
+#define MAX_STEP                    3000
 #define VREF_STEP_NEGATIVE_uV       -1000
-#define CURR_NOISE_GUARD_UA         5
+#define CURR_NOISE_GUARD_UA         1
 #define STEP_RANGE_STRETCH_FACTOR   0.75
+#define SLEEP_CYCLE                 1
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUST_uV"
@@ -63,6 +64,7 @@ typedef struct {
     struct Sample sample;
     uint8_t loop_position;
     struct Sample sample_history[SAMPLE_HIST_LENGTH];
+    int32_t time_last;
 } MpptPaoState;
 
 /**
@@ -125,6 +127,13 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
+int32_t get_time_since_last_iter(MpptPaoState *state) {
+    int32_t time_now = TIME_I2MS(chVTGetSystemTime());
+    int32_t time_elapsed = time_now - state->time_last;
+    state->time_last = time_now;
+    return time_elapsed;
+}
+
 void print_state_as_csv(MpptPaoState *state, int32_t step, float32_t avg_ip_slope_mW_per_uA) {
     // time_ms,iadj_uV,current_uA,voltage_mV,power_mW,d_curr_uA,d_pow_mW,(slope / SLOPE_SCALING_FACTOR),step
     dbgprintf("%d,%d,%d,%d,%d,%d,%d,%d,%d\r\n",
@@ -181,11 +190,12 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 
     if (step > MAX_STEP) {
         step = MAX_STEP;
-    } else if (step < (MAX_STEP * -1)) {
-        step = (MAX_STEP * -1);
+    } else if (step < (MAX_STEP * -4)) {
+        step = (MAX_STEP * -4);
     }
 
-    dbgprintf("step: %d ; slope: (%d / %d)\r\n",
+    dbgprintf("time elapsed: %d ; step: %d ; slope: (%d / %d)\r\n",
+              get_time_since_last_iter(state),
               step,
               ((int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR)),
               SLOPE_SCALING_FACTOR
@@ -239,8 +249,8 @@ THD_FUNCTION(solar, arg)
         .i2cp  = i2c,
         .saddr = INA226_SADDR,
         .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS |
-                 INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
-                 INA226_CONFIG_AVG_4,
+                 INA226_CONFIG_VSHCT_204US | INA226_CONFIG_VBUSCT_204US |
+                 INA226_CONFIG_AVG_1,
         .rshunt_mOhm = 100, /* 0.1 ohm  */
         .curr_lsb_uA = 20,  /* 20uA/bit */
     };
@@ -266,6 +276,7 @@ THD_FUNCTION(solar, arg)
     OD_RAM.x4003_mppt_alg = MPPT_ALGORITHM_PAO;
 
     MpptPaoState state = {
+        .time_last = TIME_I2MS(chVTGetSystemTime()),
         .iadj_uV = I_ADJ_INITIAL,
         .sample.d_pow_mW = 1,
         .sample.d_curr_uA = 200,
@@ -295,7 +306,7 @@ THD_FUNCTION(solar, arg)
 
     while(!chThdShouldTerminateX()) {
         iterate_mppt_perturb_and_observe(&state);
-
+        chThdSleepMilliseconds(SLEEP_CYCLE);
         /*
         Energy Tracking:
         - Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the

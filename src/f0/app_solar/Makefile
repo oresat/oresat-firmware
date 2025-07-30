@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -Og -ggdb -lm -falign-functions=16
+  USE_OPT = -Og -lm -falign-functions=16
 endif
 
 # C specific options here (added to USE_OPT).
