@@ -25,13 +25,13 @@
 #define I_ADJ_MAX                   1500000
 #define I_ADJ_MIN                   0
 #define SAMPLE_HIST_LENGTH          2
-#define SLOPE_THRESHOLD             0.00460
+#define SLOPE_THRESHOLD             0.004
 #define SLOPE_SCALING_FACTOR        10000
-#define BASE_STEP                   -1500.0
-#define MAX_STEP                    8000
+#define BASE_STEP                   -2800.0
+#define MAX_STEP                    10000
 #define VREF_STEP_NEGATIVE_uV       -1000
 #define CURR_NOISE_GUARD_UA         5
-#define STEP_RANGE_STRETCH_FACTOR   0.8
+#define STEP_RANGE_STRETCH_FACTOR   0.75
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUST_uV"
@@ -145,13 +145,13 @@ float32_t get_avg_ip_slope(MpptPaoState *state) {
     uint8_t valid_samples = 0;
 
     for (uint8_t i = 0; i < SAMPLE_HIST_LENGTH; i++) {
-        if (state->sample_history[i].d_curr_uA > CURR_NOISE_GUARD_UA | state->sample_history[i].d_curr_uA < (CURR_NOISE_GUARD_UA * -1)) {
+        if ((state->sample_history[i].d_curr_uA > CURR_NOISE_GUARD_UA) | (state->sample_history[i].d_curr_uA < (CURR_NOISE_GUARD_UA * -1))) {
             avg_ip_slope_mW_per_uA += ((float32_t) state->sample_history[i].d_pow_mW / (float32_t) state->sample_history[i].d_curr_uA);
             valid_samples++;
         }
     }
 
-    if (state->sample.d_curr_uA > CURR_NOISE_GUARD_UA | state->sample.d_curr_uA < (CURR_NOISE_GUARD_UA * -1)) {
+    if ((state->sample.d_curr_uA > CURR_NOISE_GUARD_UA) | (state->sample.d_curr_uA < (CURR_NOISE_GUARD_UA * -1))) {
         avg_ip_slope_mW_per_uA += ((float32_t) state->sample.d_pow_mW / (float32_t) state->sample.d_curr_uA);
         valid_samples++;
     }
@@ -176,18 +176,16 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     if (slope_dist_to_threshold > 0) {
         step = (int32_t) (BASE_STEP * logf(STEP_RANGE_STRETCH_FACTOR * (slope_dist_to_threshold + 1)));
     } else {
-        step = (int32_t) ((BASE_STEP * -2) * logf(STEP_RANGE_STRETCH_FACTOR * (1 - slope_dist_to_threshold)));
+        step = (int32_t) ((BASE_STEP * -1) * logf(STEP_RANGE_STRETCH_FACTOR * (1 - slope_dist_to_threshold)));
     }
 
-    if (step > MAX_STEP * 2) {
-        step = MAX_STEP * 2;
+    if (step > MAX_STEP) {
+        step = MAX_STEP;
     } else if (step < (MAX_STEP * -1)) {
         step = (MAX_STEP * -1);
     }
 
-    dbgprintf("pow_mW %d ; slope_diff: %d ; step: %d ; slope: (%d / %d)\r\n",
-              state->sample.power_mW,
-              slope_dist_to_threshold,
+    dbgprintf("step: %d ; slope: (%d / %d)\r\n",
               step,
               ((int32_t) (avg_ip_slope_mW_per_uA * SLOPE_SCALING_FACTOR)),
               SLOPE_SCALING_FACTOR
@@ -241,8 +239,8 @@ THD_FUNCTION(solar, arg)
         .i2cp  = i2c,
         .saddr = INA226_SADDR,
         .cfg   = INA226_CONFIG_MODE_SHUNT_VBUS |
-                 INA226_CONFIG_VSHCT_204US | INA226_CONFIG_VBUSCT_204US |
-                 INA226_CONFIG_AVG_16,
+                 INA226_CONFIG_VSHCT_1100US | INA226_CONFIG_VBUSCT_1100US |
+                 INA226_CONFIG_AVG_4,
         .rshunt_mOhm = 100, /* 0.1 ohm  */
         .curr_lsb_uA = 20,  /* 20uA/bit */
     };
