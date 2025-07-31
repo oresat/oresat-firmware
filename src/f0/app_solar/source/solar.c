@@ -16,7 +16,6 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define ABS(a) (((a) < 0) ? -(a) : (a))
 /* DAC1 configuration */
 //Assumes 3.3V Vcc
 #define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
@@ -91,8 +90,6 @@ typedef struct {
     int32_t last_time_mS;
 } MpptPaoState;
 
-int32_t time_helper(MpptPaoState *state);
-
 /**
  * @brief control DAC output in microvolts.
  *
@@ -164,8 +161,6 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     return ret;
 }
 
-
-
 //takes two samples, one is assumed to be where we are. the second will be
 //moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparameter
 //which allows this function to be called multiple times to get n samples at constant distances
@@ -181,28 +176,24 @@ float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted,
     delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW); //W
     delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA); //uA
 
-    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) { //TODO: make these ABS more efficient at runtime
+    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) {
         slope = (delta_power / delta_current); //mW/uA
     }
     return slope;
 }
 
-
 float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
     float32_t slope1 = 0;
     float32_t slope2 = 0;
-    float32_t slope3 = 0;
     int32_t this_iadj = old_iadj;
     struct Sample second;
     struct Sample third;
-    struct Sample fourth;
 
     //int32_t* adjust = &old_iadj;
     slope1 = find_slope(current, &second, &this_iadj);
     slope2 = find_slope(&second, &third, &this_iadj);
-    //slope3 = find_slope(&third, &fourth, &this_iadj);
 
-    float32_t slope = (slope1 + slope2 + slope3) / 2.0;
+    float32_t slope = (slope1 + slope2) / 2.0;
 //    float32_t slope = slope1;
 
     //   dbgprintf("detlap: %d, deltai %d, slope %d, out of %d", (int) (deltap), (int) (deltai), (int) (slope*10000), (int) (CRITICAL_SLOPE*10000));
@@ -264,9 +255,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
-    int32_t step = iadj_step_uV(state);
-//    dbgprintf("step size uV: %5d | ", step);
-    const int64_t iadj = state->iadj_uV + step; //iadj_step_uV(state);
+    const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
 
     //print_state(state);
