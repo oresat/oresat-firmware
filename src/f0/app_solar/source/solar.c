@@ -167,8 +167,8 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
 
 
 //takes two samples, one is assumed to be where we are. the second will be
-//moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparemter
-//which is allows this function to be called multiple times to get n samples at constant distances
+//moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparameter
+//which allows this function to be called multiple times to get n samples at constant distances
 float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
     *iadj = *iadj + IADJ_SAMPLE_OFFSET_uV;
     float32_t delta_power = 0;
