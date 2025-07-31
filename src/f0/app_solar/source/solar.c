@@ -87,6 +87,13 @@ typedef struct {
  * @param[in] uV        output volts in uV (microVolts).
  */
 
+int32_t time_helper(MpptPaoState *state) {
+    int32_t time_mS = TIME_I2MS(chVTGetSystemTime());
+    int32_t rtn = time_mS - state->last_time_mS;
+    state->last_time_mS = time_mS;
+    return rtn;
+}
+
 void print_state(MpptPaoState *state) {
     dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | threshold flag: %d | cycle time mS: %d\r\n",
       state->sample.shunt_uV,
@@ -95,13 +102,6 @@ void print_state(MpptPaoState *state) {
       state->sample.power_mW,
       state->iadj_uV,
       time_helper(state));
-}
-
-int32_t time_helper(MpptPaoState *state) {
-    int32_t time_mS = TIME_I2MS(chVTGetSystemTime());
-    int32_t rtn = time_mS - state->last_time_mS;
-    state->last_time_mS = time_mS;
-    return rtn;
 }
 
 void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
