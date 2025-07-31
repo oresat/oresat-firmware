@@ -54,13 +54,6 @@
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
 #endif
 
-enum NextDirection{
-    Up,
-    Down,
-    Toggle,
-    Unchanged
-};
-
 static const DACConfig dac1cfg = {
     .init         = 1861U,                /* Initialize DAC to 1.5V (1500*4096)/3300 */
     .datamode     = DAC_DHRM_12BIT_RIGHT, /* 12 bit, right aligned */
@@ -81,12 +74,8 @@ struct Sample {
 };
 
 typedef struct {
-    bool direction_up_flag;
-    bool voltage_threshold_flag;
-
     uint32_t iadj_uV;
     struct Sample sample;
-    int32_t max_voltage_mV;
     int32_t last_time_mS;
 } MpptPaoState;
 
@@ -99,14 +88,12 @@ typedef struct {
  */
 
 void print_state(MpptPaoState *state) {
-    dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | direction flag: %d | threshold flag: %d | cycle time mS: %d\r\n",
+    dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | threshold flag: %d | cycle time mS: %d\r\n",
       state->sample.shunt_uV,
       state->sample.voltage_mV,
       state->sample.current_uA,
       state->sample.power_mW,
       state->iadj_uV,
-      state->direction_up_flag,
-      state->voltage_threshold_flag,
       time_helper(state));
 }
 
@@ -214,44 +201,19 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
 
 // Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
 int32_t iadj_step_uV(MpptPaoState *state) {
-    enum NextDirection next_direction = Unchanged;
-
     float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
     float32_t slope_error = (slope - CRITICAL_SLOPE) * SLOPE_CORRECTION_FACTOR;
 
-    if (slope_error <= 0) {
-        //dbgprintf("LESS THAN");
-        next_direction = Up;
+    int32_t step = 0;
+    if (slope_error < 0) {
+        step = VREF_STEP_POSITIVE_uV * (slope_error * -1);
     } else if (slope_error > 0) {
-        //dbgprintf("GREATER THAN");
-        next_direction = Down;
-    }
-    slope_error = slope_error < 0 ? -slope_error : slope_error;
-
-   //dbgprintf("slope_error as %d/10,000\n", (int32_t) (slope_error * 10000));
-    switch (next_direction) {
-        case Up:
-            state->direction_up_flag = 1;
-            break;
-        case Down:
-            state->direction_up_flag = 0;
-            break;
-        case Toggle:
-            state->direction_up_flag = !state->direction_up_flag;
-            break;
-        case Unchanged:
-            break;
-    }
-
-    int32_t toRet = 0;
-
-    if (state->direction_up_flag) {
-        toRet = VREF_STEP_POSITIVE_uV * slope_error;
+        step = VREF_STEP_NEGATIVE_uV;
     } else {
-        toRet = VREF_STEP_NEGATIVE_uV;
+        return VREF_STEP_POSITIVE_uV;
     }
-    //dbgprintf("returning: %d\n\r", toRet);
-    return toRet > MAX_STEP ? MAX_STEP: toRet;
+
+    return step > MAX_STEP ? MAX_STEP: step;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
@@ -265,7 +227,6 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     struct Sample perturbed = {};
     if (!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
-        state->direction_up_flag = true;
 
         state->iadj_uV = iadj_uV_perturbed;
         if (state->iadj_uV > I_ADJ_FAILSAFE) {
@@ -280,7 +241,6 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     state->iadj_uV = iadj_uV_perturbed;
 
     state->sample = perturbed;
-    state->max_voltage_mV = MAX(state->max_voltage_mV, perturbed.voltage_mV);
 
     return true;
 }
@@ -342,9 +302,6 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
-        .max_voltage_mV = 0,
-        .direction_up_flag = true,
-        .voltage_threshold_flag = false,
     };
 
     palSetLine(LINE_LT1618_EN);
