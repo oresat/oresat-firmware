@@ -152,7 +152,7 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
 //moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparameter
 //which allows this function to be called multiple times to get n samples at constant distances
 float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
-    *iadj = *iadj + IADJ_SAMPLE_OFFSET_uV;
+    *iadj += IADJ_SAMPLE_OFFSET_uV;
     float32_t delta_power = 0;
     float32_t delta_current = 0;
     float32_t slope = 0;
@@ -160,8 +160,8 @@ float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted,
     dac_put_microvolts(&DACD1, 0, *iadj);
     read_avg_power_and_voltage(&ina226dev, sample_adjusted);
 
-    delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW); //W
-    delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA); //uA
+    delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW);
+    delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA);
 
     if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) {
         slope = (delta_power / delta_current); //mW/uA
@@ -181,12 +181,9 @@ float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
     slope2 = find_slope(&second, &third, &this_iadj);
 
     float32_t slope = (slope1 + slope2) / 2.0;
-//    float32_t slope = slope1;
 
-    //   dbgprintf("detlap: %d, deltai %d, slope %d, out of %d", (int) (deltap), (int) (deltai), (int) (slope*10000), (int) (CRITICAL_SLOPE*10000));
     dbgprintf("calculated slope as %d/10,000 out of %d \n\r", (int32_t) (slope * 10000), (int32_t) (CRITICAL_SLOPE * 10000));
     dac_put_microvolts(&DACD1, 0, old_iadj);
-//   dbgprintf("returned to old iadj\n");
     return slope;
 }
 
@@ -199,7 +196,6 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-// Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
 int32_t iadj_step_uV(MpptPaoState *state) {
     float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
     float32_t slope_error = (slope - CRITICAL_SLOPE) * SLOPE_CORRECTION_FACTOR;
@@ -213,14 +209,12 @@ int32_t iadj_step_uV(MpptPaoState *state) {
         return VREF_STEP_POSITIVE_uV;
     }
 
-    return step > MAX_STEP ? MAX_STEP: step;
+    return step > MAX_STEP ? MAX_STEP : step;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
-
-    //print_state(state);
 
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
 
