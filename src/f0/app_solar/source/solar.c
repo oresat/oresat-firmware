@@ -16,17 +16,33 @@
 #define dbgprintf(str, ...)
 #endif
 
+
 /* DAC1 configuration */
 //Assumes 3.3V Vcc
 #define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
 #define DAC_MININUM_ADJUST_uV   805
 #define DAC_SETTLE_DELAY_mS     1
 
+
+/* Corner Cutting configuration */
+    //Corner cutting is the feature that looks at the change of the intensity
+    // over time to be more aggresive when it rises or conservative when it's
+    // falling.
+    //This feature should improve tracking and help with crashes on the
+    // descent.
+
+#define CC_ENABLE true //enable corner cutting
+#define CC_ARRAY_LEN 4 //should be power of 2
+#define CC_SAMPLE_SPACING 2 //distance between samples to see more of the trend.
+#define CC_STEP_SCALE 50000.0 //how does a trend effect our step size
+
+
 /* MPPT configuration */
 #define I_ADJ_FAILSAFE          1450000
 #define I_ADJ_INITIAL           1500000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
+
 
 /* Slope Calculation Configuration */
 #define CRITICAL_SLOPE            0.00425// mW/uA
@@ -46,7 +62,7 @@
 //1000 is based on the width of the flat at the top of the curve and the minimum adjustable value of the DAC
 #define VREF_STEP_NEGATIVE_uV             -16000
 #define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4) //ratio of 2
-#define MAX_STEP 200000 //cap steps so they aren't too big when dynamic
+#define MAX_STEP 100000 //cap steps so they aren't too big when dynamic
 
 #define SLEEP_CYCLE 50
 
@@ -71,12 +87,15 @@ struct Sample {
     int32_t voltage_mV;
     int32_t current_uA;
     int32_t shunt_uV;
+    systime_t time;
 };
 
 typedef struct {
     uint32_t iadj_uV;
     struct Sample sample;
     int32_t last_time_mS;
+    struct Sample CC_samples[CC_ARRAY_LEN];
+    uint32_t loop_counter;
 } MpptPaoState;
 
 /**
@@ -144,6 +163,8 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     if (! ret) {
         //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, SOLAR_OD_ERROR_TYPE_INA226_COMM_ERROR);
     }
+    //time this sample was taken
+    sample->time = chVTGetSystemTime();
 
     return ret;
 }
@@ -151,7 +172,7 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
 //takes two samples, one is assumed to be where we are. the second will be
 //moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparameter
 //which allows this function to be called multiple times to get n samples at constant distances
-float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
+float32_t find_ip_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
     *iadj += IADJ_SAMPLE_OFFSET_uV;
     float32_t delta_power = 0;
     float32_t delta_current = 0;
@@ -177,8 +198,8 @@ float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
     struct Sample third;
 
     //int32_t* adjust = &old_iadj;
-    slope1 = find_slope(current, &second, &this_iadj);
-    slope2 = find_slope(&second, &third, &this_iadj);
+    slope1 = find_ip_slope(current, &second, &this_iadj);
+    slope2 = find_ip_slope(&second, &third, &this_iadj);
 
     float32_t slope = (slope1 + slope2) / 2.0;
 
@@ -196,17 +217,46 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
+//just calculates dP/dT from a sample and the current state sample
+float32_t find_pt_slope(struct Sample * newer, struct Sample * older) {
+    float32_t dpdt = -(((float32_t) newer->power_mW) - ((float32_t) older->power_mW))
+        / (float32_t) chVTTimeElapsedSinceX(older->time);
+    return dpdt;
+}
+
 int32_t iadj_step_uV(MpptPaoState *state) {
     float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
     float32_t slope_error = (slope - CRITICAL_SLOPE) * SLOPE_CORRECTION_FACTOR;
 
+    //find the trend from the oldest sample
+    struct Sample reference = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + 1) % CC_ARRAY_LEN];
+    //get current time to compare with sample
+    //in mW/cycles
+        //how much do we change our step based on our velocity
+    float32_t compound_slope = 0.0;
+ 
+    for (int idx = 0; idx < CC_ARRAY_LEN; idx++) {
+        struct Sample older = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx + 1) % CC_ARRAY_LEN];
+        struct Sample this = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx) % CC_ARRAY_LEN];
+        compound_slope += find_pt_slope(&this, &older);
+    }
+    compound_slope = compound_slope / (float32_t) CC_ARRAY_LEN;
+
+    float32_t CC_fstep = compound_slope * CC_STEP_SCALE;
+    int32_t CC_step = 0;
+    dbgprintf("delta power over time %d/1000 ", (int32_t) (1000*compound_slope));
+    //if (CC_ENABLE) {
+    CC_step = (int32_t) CC_fstep;
+    //}
+    dbgprintf("CC_step is %d CC_fstep is %d\r\n", CC_step, (int32_t) CC_fstep);
+
     int32_t step = 0;
     if (slope_error < 0) {
-        step = VREF_STEP_POSITIVE_uV * (slope_error * -1);
+        step = VREF_STEP_POSITIVE_uV * (slope_error * -1) + CC_step;
     } else if (slope_error > 0) {
-        step = VREF_STEP_NEGATIVE_uV;
+        step = VREF_STEP_NEGATIVE_uV + CC_step;
     } else {
-        return VREF_STEP_POSITIVE_uV;
+        step = VREF_STEP_POSITIVE_uV + CC_step;
     }
 
     return step > MAX_STEP ? MAX_STEP : step;
@@ -313,8 +363,14 @@ THD_FUNCTION(solar, arg)
     // FIXME: reset energyTrack every n minutes?
     uint32_t energy_mJ = 0;
 
-    int loop = 0;
+    state.loop_counter = 0;
     while(!chThdShouldTerminateX()) {
+
+        //populate the corner cutting array with every nth sample.
+        if (!(state.loop_counter % CC_SAMPLE_SPACING)) {
+            state.CC_samples[state.loop_counter % CC_ARRAY_LEN] = state.sample;
+        }
+
         iterate_mppt_perturb_and_observe(&state);
         chThdSleepMilliseconds(SLEEP_CYCLE);
         /* generateCSV(&ina226dev, state); */
@@ -350,15 +406,15 @@ THD_FUNCTION(solar, arg)
 //        OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
 
         //FIXME: remove once canopen util is avaliable
-        if (!(loop % 50)) {
+        if (!(state.loop_counter % 50)) {
  //           dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
  //               state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-            loop = 0;
+            state.loop_counter = 0;
             systime_t current_time = chVTGetSystemTime();
             dbgprintf("cycling at %d ms\n", (int) (chTimeI2MS(current_time - last_print)/50));
             last_print = current_time;
         }
-        loop += 1;
+        state.loop_counter += 1;
     }
 
     /* Stop drivers */
