@@ -62,31 +62,6 @@ static const DACConfig dac1cfg = {
 
 static INA226Driver ina226dev;
 
-typedef enum {
-    MPPT_ALGORITHM_PAO = 0
-} mppt_algorithm_t;
-
-struct Sample {
-    int32_t power_mW;
-    int32_t voltage_mV;
-    int32_t current_uA;
-    int32_t shunt_uV;
-};
-
-typedef struct {
-    uint32_t iadj_uV;
-    struct Sample sample;
-    int32_t last_time_mS;
-} MpptPaoState;
-
-/**
- * @brief control DAC output in microvolts.
- *
- * @param[in] dacp      DAC driver pointer.
- * @param[in] chan      DAC channel.
- * @param[in] uV        output volts in uV (microVolts).
- */
-
 void print_state(MpptPaoState *state) {
     dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | threshold flag: %d | cycle time mS: %d\r\n",
       state->sample.shunt_uV,
@@ -104,6 +79,13 @@ int32_t time_helper(MpptPaoState *state) {
     return rtn;
 }
 
+/**
+ * @brief control DAC output in microvolts.
+ *
+ * @param[in] dacp      DAC driver pointer.
+ * @param[in] chan      DAC channel.
+ * @param[in] uV        output volts in uV (microVolts).
+ */
 void dac_put_microvolts(DACDriver *dacp, dacchannel_t chan, uint32_t uV) {
     /* Per section 14.5.3 of the STM32F0x1 ref manual,
      * Vout(mV) = VDDA(mV) * (reg_val / 4096)
