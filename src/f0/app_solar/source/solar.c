@@ -211,7 +211,12 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
-    const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
+    uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
+
+    if (iadj_uV_perturbed == state->iadj_uV) {
+        // It has saturated to an identical value. Default to stepping forward.
+        iadj_uV_perturbed = state->iadj_uV + VREF_STEP_NEGATIVE_uV;
+    }
 
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
 
