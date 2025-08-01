@@ -16,7 +16,6 @@
 #define dbgprintf(str, ...)
 #endif
 
-#define ABS(a) (((a) < 0) ? -(a) : (a))
 /* DAC1 configuration */
 //Assumes 3.3V Vcc
 #define DAC_VDDA_uV             3333000  /* 3.333 V. Change to 3.0 v when powered from debug board */
@@ -55,13 +54,6 @@
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
 #endif
 
-enum NextDirection{
-    Up,
-    Down,
-    Toggle,
-    Unchanged
-};
-
 static const DACConfig dac1cfg = {
     .init         = 1861U,                /* Initialize DAC to 1.5V (1500*4096)/3300 */
     .datamode     = DAC_DHRM_12BIT_RIGHT, /* 12 bit, right aligned */
@@ -82,16 +74,10 @@ struct Sample {
 };
 
 typedef struct {
-    bool direction_up_flag;
-    bool voltage_threshold_flag;
-
     uint32_t iadj_uV;
     struct Sample sample;
-    int32_t max_voltage_mV;
     int32_t last_time_mS;
 } MpptPaoState;
-
-int32_t time_helper(MpptPaoState *state);
 
 /**
  * @brief control DAC output in microvolts.
@@ -102,14 +88,12 @@ int32_t time_helper(MpptPaoState *state);
  */
 
 void print_state(MpptPaoState *state) {
-    dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | direction flag: %d | threshold flag: %d | cycle time mS: %d\r\n",
+    dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | threshold flag: %d | cycle time mS: %d\r\n",
       state->sample.shunt_uV,
       state->sample.voltage_mV,
       state->sample.current_uA,
       state->sample.power_mW,
       state->iadj_uV,
-      state->direction_up_flag,
-      state->voltage_threshold_flag,
       time_helper(state));
 }
 
@@ -164,51 +148,39 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     return ret;
 }
 
-
-
-//takes two samples, one is assumed to be where we are. the second will be
-//moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparemter
-//which is allows this function to be called multiple times to get n samples at constant distances
 float32_t find_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
-    *iadj = *iadj + IADJ_SAMPLE_OFFSET_uV;
-    float32_t delta_power = 0;
-    float32_t delta_current = 0;
+    // Finds the IP slope by taking a test sample backwards from where we are in order to find our location on the curve.
+    *iadj += IADJ_SAMPLE_OFFSET_uV;
+    int32_t delta_power = 0;
+    int32_t delta_current = 0;
     float32_t slope = 0;
 
     dac_put_microvolts(&DACD1, 0, *iadj);
     read_avg_power_and_voltage(&ina226dev, sample_adjusted);
 
-    delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW); //W
-    delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA); //uA
+    delta_power = sample_init->power_mW - sample_adjusted->power_mW;
+    delta_current = sample_init->current_uA - sample_adjusted->current_uA;
 
-    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) { //TODO: make these ABS more efficient at runtime
-        slope = (delta_power / delta_current); //mW/uA
+    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) {
+        slope = ((float32_t) delta_power / (float32_t) delta_current); //mW/uA
     }
     return slope;
 }
 
-
 float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
     float32_t slope1 = 0;
     float32_t slope2 = 0;
-    float32_t slope3 = 0;
     int32_t this_iadj = old_iadj;
     struct Sample second;
     struct Sample third;
-    struct Sample fourth;
 
-    //int32_t* adjust = &old_iadj;
     slope1 = find_slope(current, &second, &this_iadj);
     slope2 = find_slope(&second, &third, &this_iadj);
-    //slope3 = find_slope(&third, &fourth, &this_iadj);
 
-    float32_t slope = (slope1 + slope2 + slope3) / 2.0;
-//    float32_t slope = slope1;
+    float32_t slope = (slope1 + slope2) / 2.0;
 
-    //   dbgprintf("detlap: %d, deltai %d, slope %d, out of %d", (int) (deltap), (int) (deltai), (int) (slope*10000), (int) (CRITICAL_SLOPE*10000));
     dbgprintf("calculated slope as %d/10,000 out of %d \n\r", (int32_t) (slope * 10000), (int32_t) (CRITICAL_SLOPE * 10000));
     dac_put_microvolts(&DACD1, 0, old_iadj);
-//   dbgprintf("returned to old iadj\n");
     return slope;
 }
 
@@ -221,62 +193,31 @@ uint32_t saturate_uint32_t(const int64_t v, const uint32_t min, const uint32_t m
     return v;
 }
 
-// Determines step size for iAdj based on current voltage. Allows for faster convergence on MPP
 int32_t iadj_step_uV(MpptPaoState *state) {
-    enum NextDirection next_direction = Unchanged;
-
     float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
     float32_t slope_error = (slope - CRITICAL_SLOPE) * SLOPE_CORRECTION_FACTOR;
 
-    if (slope_error <= 0) {
-        //dbgprintf("LESS THAN");
-        next_direction = Up;
+    int32_t step = 0;
+    if (slope_error < 0) {
+        step = VREF_STEP_POSITIVE_uV * (slope_error * -1);
     } else if (slope_error > 0) {
-        //dbgprintf("GREATER THAN");
-        next_direction = Down;
-    }
-    slope_error = slope_error < 0 ? -slope_error : slope_error;
-
-   //dbgprintf("slope_error as %d/10,000\n", (int32_t) (slope_error * 10000));
-    switch (next_direction) {
-        case Up:
-            state->direction_up_flag = 1;
-            break;
-        case Down:
-            state->direction_up_flag = 0;
-            break;
-        case Toggle:
-            state->direction_up_flag = !state->direction_up_flag;
-            break;
-        case Unchanged:
-            break;
-    }
-
-    int32_t toRet = 0;
-
-    if (state->direction_up_flag) {
-        toRet = VREF_STEP_POSITIVE_uV * slope_error;
+        step = VREF_STEP_NEGATIVE_uV;
     } else {
-        toRet = VREF_STEP_NEGATIVE_uV;
+        return VREF_STEP_POSITIVE_uV;
     }
-    //dbgprintf("returning: %d\n\r", toRet);
-    return toRet > MAX_STEP ? MAX_STEP: toRet;
+
+    return step > MAX_STEP ? MAX_STEP : step;
 }
 
 bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
-    int32_t step = iadj_step_uV(state);
-//    dbgprintf("step size uV: %5d | ", step);
-    const int64_t iadj = state->iadj_uV + step; //iadj_step_uV(state);
+    const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
-
-    //print_state(state);
 
     dac_put_microvolts(&DACD1, 0, iadj_uV_perturbed);
 
     struct Sample perturbed = {};
     if (!read_avg_power_and_voltage(&ina226dev, &perturbed)) {
         //I2C communications error, no data to make a decision on. Fail safe to moving left
-        state->direction_up_flag = true;
 
         state->iadj_uV = iadj_uV_perturbed;
         if (state->iadj_uV > I_ADJ_FAILSAFE) {
@@ -291,7 +232,6 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     state->iadj_uV = iadj_uV_perturbed;
 
     state->sample = perturbed;
-    state->max_voltage_mV = MAX(state->max_voltage_mV, perturbed.voltage_mV);
 
     return true;
 }
@@ -353,9 +293,6 @@ THD_FUNCTION(solar, arg)
 
     MpptPaoState state = {
         .iadj_uV = I_ADJ_INITIAL,
-        .max_voltage_mV = 0,
-        .direction_up_flag = true,
-        .voltage_threshold_flag = false,
     };
 
     palSetLine(LINE_LT1618_EN);
