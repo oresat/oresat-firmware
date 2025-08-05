@@ -31,10 +31,16 @@
     //This feature should improve tracking and help with crashes on the
     // descent.
 
-#define CC_ENABLE true //enable corner cutting
+#define CC_ENABLE true//enable corner cutting
 #define CC_ARRAY_LEN 4 //should be power of 2
 #define CC_SAMPLE_SPACING 2 //distance between samples to see more of the trend.
 #define CC_STEP_SCALE 50000.0 //how does a trend effect our step size
+#define CC_PMAX 0.0048
+#define CC_PRATE 0.25
+#define CC_NMIN  0.00425
+#define CC_NRATE 0.25
+
+
 
 
 /* MPPT configuration */
@@ -225,30 +231,52 @@ float32_t find_pt_slope(struct Sample * newer, struct Sample * older) {
 }
 
 int32_t iadj_step_uV(MpptPaoState *state) {
-    float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
-    float32_t slope_error = (slope - CRITICAL_SLOPE) * SLOPE_CORRECTION_FACTOR;
+
+    int32_t CC_step = 0;
+    float32_t CC_correction = 0.0;
+    #if CC_ENABLE
 
     //find the trend from the oldest sample
-    struct Sample reference = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + 1) % CC_ARRAY_LEN];
+    //struct Sample reference = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + 1) % CC_ARRAY_LEN];
     //get current time to compare with sample
     //in mW/cycles
         //how much do we change our step based on our velocity
     float32_t compound_slope = 0.0;
- 
+
     for (int idx = 0; idx < CC_ARRAY_LEN; idx++) {
         struct Sample older = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx + 1) % CC_ARRAY_LEN];
         struct Sample this = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx) % CC_ARRAY_LEN];
         compound_slope += find_pt_slope(&this, &older);
     }
-    compound_slope = compound_slope / (float32_t) CC_ARRAY_LEN;
+
+    compound_slope = compound_slope / ((float32_t) CC_ARRAY_LEN);
 
     float32_t CC_fstep = compound_slope * CC_STEP_SCALE;
-    int32_t CC_step = 0;
     dbgprintf("delta power over time %d/1000 ", (int32_t) (1000*compound_slope));
-    //if (CC_ENABLE) {
     CC_step = (int32_t) CC_fstep;
-    //}
+    CC_step = 0; //TODO: remove me
     dbgprintf("CC_step is %d CC_fstep is %d\r\n", CC_step, (int32_t) CC_fstep);
+
+    if (compound_slope < 0) {
+        CC_correction = compound_slope * CC_NRATE;
+    } else if (compound_slope > 0) {
+        CC_correction = compound_slope * CC_PRATE;
+    }
+
+    #endif
+
+    //CC_correction = 0;
+    float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
+
+    float32_t reference_slope = CRITICAL_SLOPE - CC_correction;
+    dbgprintf("reference_slope is %d/10,000 \r\n", (int32_t) (reference_slope*10000));
+    if (reference_slope > CC_PMAX) {
+        reference_slope = CC_PMAX;
+    } else if (reference_slope < CC_NMIN) {
+        reference_slope = CC_NMIN;
+    }
+
+    float32_t slope_error = (slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
 
     int32_t step = 0;
     if (slope_error < 0) {
@@ -366,10 +394,12 @@ THD_FUNCTION(solar, arg)
     state.loop_counter = 0;
     while(!chThdShouldTerminateX()) {
 
+        #if CC_ENABLE
         //populate the corner cutting array with every nth sample.
-        if (!(state.loop_counter % CC_SAMPLE_SPACING)) {
+        //if (!(state.loop_counter % CC_SAMPLE_SPACING)) {
             state.CC_samples[state.loop_counter % CC_ARRAY_LEN] = state.sample;
-        }
+        //}
+        #endif
 
         iterate_mppt_perturb_and_observe(&state);
         chThdSleepMilliseconds(SLEEP_CYCLE);
@@ -406,14 +436,14 @@ THD_FUNCTION(solar, arg)
 //        OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
 
         //FIXME: remove once canopen util is avaliable
-        if (!(state.loop_counter % 50)) {
- //           dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
- //               state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-            state.loop_counter = 0;
-            systime_t current_time = chVTGetSystemTime();
-            dbgprintf("cycling at %d ms\n", (int) (chTimeI2MS(current_time - last_print)/50));
-            last_print = current_time;
-        }
+        //if (!(state.loop_counter % 50)) {
+ //     //      dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
+ //     //          state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
+        //    state.loop_counter = 0;
+        //    systime_t current_time = chVTGetSystemTime();
+        //    dbgprintf("cycling at %d ms\n", (int) (chTimeI2MS(current_time - last_print)/50));
+        //    last_print = current_time;
+        //}
         state.loop_counter += 1;
     }
 
