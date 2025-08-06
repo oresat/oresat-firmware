@@ -31,14 +31,14 @@
     //This feature should improve tracking and help with crashes on the
     // descent.
 
-#define CC_ENABLE true//enable corner cutting
+#define CC_ENABLE false //enable corner cutting
 #define CC_ARRAY_LEN 4 //should be power of 2
-#define CC_SAMPLE_SPACING 2 //distance between samples to see more of the trend.
-#define CC_STEP_SCALE 50000.0 //how does a trend effect our step size
-#define CC_PMAX 0.0048
-#define CC_PRATE 0.25
-#define CC_NMIN  0.00425
-#define CC_NRATE 0.25
+#define CC_SAMPLE_SPACING 8 //distance between samples to see more of the trend.
+#define CC_STEP_SCALE 400.0 //how does a trend effect our step size
+#define CC_PMAX 0.0045
+#define CC_PRATE 0.1
+#define CC_NMIN  0.0041
+#define CC_NRATE 0.1
 
 
 
@@ -101,7 +101,7 @@ typedef struct {
     struct Sample sample;
     int32_t last_time_mS;
     struct Sample CC_samples[CC_ARRAY_LEN];
-    uint32_t loop_counter;
+    uint32_t index_loop_counter;
 } MpptPaoState;
 
 /**
@@ -233,50 +233,58 @@ float32_t find_pt_slope(struct Sample * newer, struct Sample * older) {
 int32_t iadj_step_uV(MpptPaoState *state) {
 
     int32_t CC_step = 0;
-    float32_t CC_correction = 0.0;
-    #if CC_ENABLE
+    float32_t CC_critical_adjust = 0.0;
 
+    #if CC_ENABLE
     //find the trend from the oldest sample
-    //struct Sample reference = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + 1) % CC_ARRAY_LEN];
     //get current time to compare with sample
     //in mW/cycles
-        //how much do we change our step based on our velocity
-    float32_t compound_slope = 0.0;
+    //how much do we change our step based on our velocity
+    float32_t pt_slope = 0.0;
 
     for (int idx = 0; idx < CC_ARRAY_LEN; idx++) {
-        struct Sample older = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx + 1) % CC_ARRAY_LEN];
-        struct Sample this = state->CC_samples[ (state->loop_counter%CC_ARRAY_LEN + idx) % CC_ARRAY_LEN];
-        compound_slope += find_pt_slope(&this, &older);
+        struct Sample older = state->CC_samples[ (state->index_loop_counter%CC_ARRAY_LEN + idx + 1) % CC_ARRAY_LEN];
+        struct Sample this = state->CC_samples[ (state->index_loop_counter%CC_ARRAY_LEN + idx) % CC_ARRAY_LEN];
+        pt_slope += find_pt_slope(&this, &older);
     }
 
-    compound_slope = compound_slope / ((float32_t) CC_ARRAY_LEN);
+    //average by array len
+    pt_slope = pt_slope / ((float32_t) CC_ARRAY_LEN);
 
-    float32_t CC_fstep = compound_slope * CC_STEP_SCALE;
-    dbgprintf("delta power over time %d/1000 ", (int32_t) (1000*compound_slope));
-    CC_step = (int32_t) CC_fstep;
-    CC_step = 0; //TODO: remove me
-    dbgprintf("CC_step is %d CC_fstep is %d\r\n", CC_step, (int32_t) CC_fstep);
+    //float32_t CC_fstep = pt_slope * CC_STEP_SCALE;
+    dbgprintf("pt_slope %d/1000 ", (int32_t) (1000*pt_slope));
+    //CC_step = (int32_t) CC_fstep;
+    CC_step = pt_slope * CC_STEP_SCALE;
+    dbgprintf("CC_step is %d \r\n", CC_step);
 
-    if (compound_slope < 0) {
-        CC_correction = compound_slope * CC_NRATE;
-    } else if (compound_slope > 0) {
-        CC_correction = compound_slope * CC_PRATE;
+    if (pt_slope < 0) {
+        CC_critical_adjust = pt_slope * CC_NRATE;
+    } else if (pt_slope > 0) {
+        CC_critical_adjust = pt_slope * CC_PRATE;
     }
-
     #endif
 
-    //CC_correction = 0;
-    float32_t slope = find_compound_slope(&state->sample, state->iadj_uV);
 
-    float32_t reference_slope = CRITICAL_SLOPE - CC_correction;
-    dbgprintf("reference_slope is %d/10,000 \r\n", (int32_t) (reference_slope*10000));
+    //CC_correction = 0;
+    float32_t ip_slope = find_compound_slope(&state->sample, state->iadj_uV);
+
+    float32_t reference_slope = CRITICAL_SLOPE - CC_critical_adjust;
+    dbgprintf("reference_slope is %d/10,000, PMAX is %d/10,000, NMIN is %d/10,00  \r\n", (int32_t) (reference_slope*10000), (int32_t) (CC_PMAX*10000), (int32_t) (CC_NMIN*10000));
+
+    //part of corner cutting
+    //shouldn't effect normal operation if left in without corner cutting...
+    // but I'm disabling it just in case.
+    #if CC_ENABLE
     if (reference_slope > CC_PMAX) {
         reference_slope = CC_PMAX;
     } else if (reference_slope < CC_NMIN) {
         reference_slope = CC_NMIN;
     }
+    dbgprintf("reference slope bounded to %d/10,000 \r\n", (int32_t) (reference_slope*10000));
+    #endif
 
-    float32_t slope_error = (slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
+
+    float32_t slope_error = (ip_slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
 
     int32_t step = 0;
     if (slope_error < 0) {
@@ -391,14 +399,16 @@ THD_FUNCTION(solar, arg)
     // FIXME: reset energyTrack every n minutes?
     uint32_t energy_mJ = 0;
 
-    state.loop_counter = 0;
+    state.index_loop_counter = 0;
+    int32_t spacing_loop_counter = 0;
     while(!chThdShouldTerminateX()) {
 
         #if CC_ENABLE
         //populate the corner cutting array with every nth sample.
-        //if (!(state.loop_counter % CC_SAMPLE_SPACING)) {
-            state.CC_samples[state.loop_counter % CC_ARRAY_LEN] = state.sample;
-        //}
+        if (!(spacing_loop_counter % CC_SAMPLE_SPACING)) {
+            state.CC_samples[state.index_loop_counter % CC_ARRAY_LEN] = state.sample;
+            state.index_loop_counter++;
+        }
         #endif
 
         iterate_mppt_perturb_and_observe(&state);
@@ -436,15 +446,15 @@ THD_FUNCTION(solar, arg)
 //        OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
 
         //FIXME: remove once canopen util is avaliable
-        //if (!(state.loop_counter % 50)) {
+        //if (!(state.index_loop_counter % 50)) {
  //     //      dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
  //     //          state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-        //    state.loop_counter = 0;
+        //    state.index_loop_counter = 0;
         //    systime_t current_time = chVTGetSystemTime();
         //    dbgprintf("cycling at %d ms\n", (int) (chTimeI2MS(current_time - last_print)/50));
         //    last_print = current_time;
         //}
-        state.loop_counter += 1;
+        spacing_loop_counter += 1;
     }
 
     /* Stop drivers */
