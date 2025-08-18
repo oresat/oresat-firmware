@@ -45,7 +45,7 @@
 
 /* MPPT configuration */
 #define I_ADJ_FAILSAFE          1450000
-#define I_ADJ_INITIAL           1500000
+#define I_ADJ_INITIAL           1450000
 #define I_ADJ_MAX               1500000
 #define I_ADJ_MIN               0
 
