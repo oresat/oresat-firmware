@@ -235,7 +235,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     int32_t CC_step = 0;
     float32_t CC_critical_adjust = 0.0;
 
-    #if CC_ENABLE
+#if CC_ENABLE
     //find the trend from the oldest sample
     //get current time to compare with sample
     //in mW/cycles
@@ -262,7 +262,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     } else if (pt_slope > 0) {
         CC_critical_adjust = pt_slope * CC_PRATE;
     }
-    #endif
+#endif
 
 
     //CC_correction = 0;
@@ -274,14 +274,14 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     //part of corner cutting
     //shouldn't effect normal operation if left in without corner cutting...
     // but I'm disabling it just in case.
-    #if CC_ENABLE
+#if CC_ENABLE
     if (reference_slope > CC_PMAX) {
         reference_slope = CC_PMAX;
     } else if (reference_slope < CC_NMIN) {
         reference_slope = CC_NMIN;
     }
     dbgprintf("reference slope bounded to %d/10,000 \r\n", (int32_t) (reference_slope*10000));
-    #endif
+#endif
 
 
     float32_t slope_error = (ip_slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
@@ -403,15 +403,16 @@ THD_FUNCTION(solar, arg)
     int32_t spacing_loop_counter = 0;
     while(!chThdShouldTerminateX()) {
 
-        #if CC_ENABLE
+#if CC_ENABLE
         //populate the corner cutting array with every nth sample.
         if (!(spacing_loop_counter % CC_SAMPLE_SPACING)) {
             state.CC_samples[state.index_loop_counter % CC_ARRAY_LEN] = state.sample;
             state.index_loop_counter++;
         }
-        #endif
+#endif
 
         iterate_mppt_perturb_and_observe(&state);
+        print_state(&state);
         chThdSleepMilliseconds(SLEEP_CYCLE);
         /* generateCSV(&ina226dev, state); */
 
