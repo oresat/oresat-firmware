@@ -608,8 +608,10 @@ msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *re
         return r;
     }
 
+#ifdef DEBUG_PRINT
     uint8_t mm = (buf & 0xFF) & ((buf >> 8) & 0xFF);
     dbgprintf("Memory Update Masking of register 0x%X is 0x%X\r\n", 0x1ED, mm);
+#endif
 
     uint8_t num_left = 7;
     for(uint8_t i = 0; i < 8; i++) {

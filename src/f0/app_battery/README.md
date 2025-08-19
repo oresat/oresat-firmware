@@ -16,10 +16,13 @@ by defining the C macro DEBUG_PRINT in the Makefile:
 
 `UDEFS = -DCO_VERSION_MAJOR=4 -DDEBUG_PRINT=1`
 
-Detailed logging of battery history can be enabled by uncommenting the following at the top
-of batt.c:
+When building for the battery board v2.1, it is recommended to disable the heaters
+to prevent brownout resets. They are enabled by default.
+`-DENABLE_HEATERS=0`
 
-`//#define VERBOSE_DEBUG 1`
+Detailed logging of battery history can be enabled by adding to the above line:
+
+`-DVERBOSE_DEBUG=1`
 
 Battery history includes both the MAX17205 life logging data (up to 203 snapshots of NV registers 1A0h to 1AFh; see datasheet),
 as well as our custom periodic logging of MAX17205_AD_MIXCAP and MAX17205_AD_REPCAP used for reset recovery.
@@ -27,9 +30,9 @@ as well as our custom periodic logging of MAX17205_AD_MIXCAP and MAX17205_AD_REP
 Two more options are used for a special build to be run in the lab:
 
 ```
-#define ENABLE_NV_MEMORY_UPDATE_CODE 1
+-DENABLE_NV_MEMORY_UPDATE_CODE=1
 ...
-#define ENABLE_LEARN_COMPLETE 1
+-DENABLE_LEARN_COMPLETE=1
 ```
 
 Use these on a new battery pack to get the MAX17205 fuel gauge chips through multiple full charge / discharge learning cycles.

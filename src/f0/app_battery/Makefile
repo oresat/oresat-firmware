@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -99,6 +99,7 @@ TOOLCHAIN = $(PROJ_ROOT)/toolchain
 # Imported source files and paths.
 CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
+LDDIR    := $(APP_ROOT)/ld
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 ODDIR    := $(APP_ROOT)/od
@@ -149,9 +150,9 @@ include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
 ifeq ($(USE_BOOTLOADER),yes)
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app.ld
+  LDSCRIPT= $(LDDIR)/STM32F091xC-app.ld
 else
-  LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-app-noboot.ld
+  LDSCRIPT= $(LDDIR)/STM32F091xC-app-noboot.ld
 endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
@@ -187,7 +188,27 @@ CPPWARN = -Wall -Wextra -Wundef
 # Start of user section
 #
 
-# List all user C define here, like -DDEBUG_PRINT=1
+# List all user C defines here used for specific build configurations.
+# Add:
+#   -DDEBUG_PRINT=1    			to enable debug logging over serial
+#                                       --> defaults to not defined
+#   -DVERBOSE_DEBUG=1  			to enable additional logging of all the
+#   					battery history
+#                                       --> defaults to 0
+#   -DENABLE_NV_MEMORY_UPDATE_CODE=1    enable 15 second prompt to write any
+#					detected changes required to max17205 NV
+#                                       --> defaults to 0
+#   -DENABLE_LEARN_COMPLETE=1		enable initial forcing of the
+#   					ModelGauge m5 algorithm to AD_MIXCAP and
+#					AD_REPCAP to the nominal full capacity
+#					which assumes you have fully charged
+#					both packs and completed all learning
+#					cycles (discharge/charge) 7 times
+#					as indicated by AD_LEARNCFG = 7
+#                                       --> defaults to 0
+#   -DENABLE_HEATERS=0                  disable heaters (recommended on v2.1 boards
+#                                       to prevent brownout resets)
+#                                       --> defaults to 1
 UDEFS = -DCO_VERSION_MAJOR=4
 
 # Define ASM defines here
