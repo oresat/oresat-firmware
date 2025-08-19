@@ -31,14 +31,35 @@
     //This feature should improve tracking and help with crashes on the
     // descent.
 
-#define CC_ENABLE false //enable corner cutting
-#define CC_ARRAY_LEN 4 //should be power of 2
-#define CC_SAMPLE_SPACING 8 //distance between samples to see more of the trend.
+#define CC_ENABLE true //enable corner cutting
 #define CC_STEP_SCALE 400.0 //how does a trend effect our step size
 #define CC_PMAX 0.0045
 #define CC_PRATE 0.1
 #define CC_NMIN  0.0041
 #define CC_NRATE 0.1
+
+
+/* Dynamic Laziness configuration */
+    //Dynamic laziness is trying to allow the processor to sleep for longer
+    // when the intensity isn't changing much.
+    //This should improve the total output power by reducing
+    // the ammount of power consumed by the microcontroller.
+
+#define DL_ENABLE true
+
+
+/* Intensity Estimation */
+    //Intenisty Estimation is required by both CC and DL.
+    //Uses a ring buffer of past samples to gauge how intensity has changed
+    // over time.
+    //Assumes that the power gathered on a sample was close to the maximum.
+
+    //The code required to maintain this datastructure is added when either
+    // CC or DL are enabled
+#define IE_ENABLE DL_ENABLE || CC_ENABLE
+
+#define IE_ARRAY_LEN 4 //should be power of 2
+#define IE_SAMPLE_SPACING 8 //distance between samples to see more of the trend.
 
 
 
@@ -100,7 +121,7 @@ typedef struct {
     uint32_t iadj_uV;
     struct Sample sample;
     int32_t last_time_mS;
-    struct Sample CC_samples[CC_ARRAY_LEN];
+    struct Sample CC_samples[IE_ARRAY_LEN];
     uint32_t index_loop_counter;
 } MpptPaoState;
 
@@ -235,25 +256,27 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     int32_t CC_step = 0;
     float32_t CC_critical_adjust = 0.0;
 
-#if CC_ENABLE
+#if IE_ENABLE
     //find the trend from the oldest sample
     //get current time to compare with sample
-    //in mW/cycles
+    //in mW/cycle
     //how much do we change our step based on our velocity
     float32_t pt_slope = 0.0;
 
-    for (int idx = 0; idx < CC_ARRAY_LEN; idx++) {
-        struct Sample older = state->CC_samples[ (state->index_loop_counter%CC_ARRAY_LEN + idx + 1) % CC_ARRAY_LEN];
-        struct Sample this = state->CC_samples[ (state->index_loop_counter%CC_ARRAY_LEN + idx) % CC_ARRAY_LEN];
+    for (int idx = 0; idx < IE_ARRAY_LEN; idx++) {
+        struct Sample older = state->CC_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx + 1) % IE_ARRAY_LEN];
+        struct Sample this = state->CC_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx) % IE_ARRAY_LEN];
         pt_slope += find_pt_slope(&this, &older);
     }
 
     //average by array len
-    pt_slope = pt_slope / ((float32_t) CC_ARRAY_LEN);
-
-    //float32_t CC_fstep = pt_slope * CC_STEP_SCALE;
+    pt_slope = pt_slope / ((float32_t) IE_ARRAY_LEN);
     dbgprintf("pt_slope %d/1000 ", (int32_t) (1000*pt_slope));
-    //CC_step = (int32_t) CC_fstep;
+
+#endif
+
+#if CC_ENABLE
+
     CC_step = pt_slope * CC_STEP_SCALE;
     dbgprintf("CC_step is %d \r\n", CC_step);
 
@@ -262,6 +285,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     } else if (pt_slope > 0) {
         CC_critical_adjust = pt_slope * CC_PRATE;
     }
+
 #endif
 
 
@@ -403,16 +427,16 @@ THD_FUNCTION(solar, arg)
     int32_t spacing_loop_counter = 0;
     while(!chThdShouldTerminateX()) {
 
-#if CC_ENABLE
-        //populate the corner cutting array with every nth sample.
-        if (!(spacing_loop_counter % CC_SAMPLE_SPACING)) {
-            state.CC_samples[state.index_loop_counter % CC_ARRAY_LEN] = state.sample;
+#if IE_ENABLE
+        //populate the intensity estimation array with every nth sample.
+        if (!(spacing_loop_counter % IE_SAMPLE_SPACING)) {
+            state.CC_samples[state.index_loop_counter % IE_ARRAY_LEN] = state.sample;
             state.index_loop_counter++;
         }
 #endif
 
         iterate_mppt_perturb_and_observe(&state);
-        print_state(&state);
+        //print_state(&state);
         chThdSleepMilliseconds(SLEEP_CYCLE);
         /* generateCSV(&ina226dev, state); */
 
