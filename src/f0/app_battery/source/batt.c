@@ -126,40 +126,52 @@ typedef enum {
   These values were generated using the windows tool from Maxim and while they are probably not totally
   correct yield generally reasonable read back values from the MAX17 chip.
  */
-static const uint16_t PACKCFG = (_VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
-                                 MAX17205_PACKCFG_BALCFG_40 |
-                                 MAX17205_PACKCFG_BTEN |
-                                 MAX17205_PACKCFG_CHEN |
-                                 MAX17205_PACKCFG_TDEN |
-                                 MAX17205_PACKCFG_A1EN |
-                                 MAX17205_PACKCFG_A2EN);
+static const uint16_t PACKCFG = (_VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) | // 2 cells
+                                 MAX17205_PACKCFG_BALCFG_40 | // 40 mV cell balance threshold
+                                 MAX17205_PACKCFG_BTEN | // enable Vbatt channel
+                                 MAX17205_PACKCFG_CHEN | // enable voltage measurements cell1, cell2, Vbatt
+                                 MAX17205_PACKCFG_TDEN | // enable die temperature measurement
+                                 MAX17205_PACKCFG_A1EN | // enable AIN1 channel temperature measurement
+                                 MAX17205_PACKCFG_A2EN); // enable AIN2 channel temperature measurement
 
 static const max17205_regval_t batt_nv_programing_cfg[] = {
     {MAX17205_AD_NPACKCFG,     PACKCFG },
-    {MAX17205_AD_NNVCFG0,      0x09A0 }, // was 0x00B0 -- try Wizard=0x09A0 (old comment: 0x0920)
-    {MAX17205_AD_NNVCFG1,      0x8006 }, // was 0xC000 -- try Wizard=0x8006
-    {MAX17205_AD_NNVCFG2,      0xFF0A }, // life logging every 10 cycles
-    {MAX17205_AD_NICHGTERM,    0x014D }, // was 0x0034 -- try Wizard=0x14D
-    {MAX17205_AD_NVEMPTY,      0x965A }, // VE = 0x12C * 10mV = 3.0v; VR = 0x5A * 40mV = 3.6v
-    {MAX17205_AD_NTCURVE,      0x0064 },
-    {MAX17205_AD_NTGAIN,       0xF49A },
-    {MAX17205_AD_NTOFF,        0x16A1 },
-    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // 5200 (0.5 increments)
-    {MAX17205_AD_NFULLCAPREP,  0x1450 },
-    {MAX17205_AD_NFULLCAPNOM,  0x1A22 }, // Wizard=0x1794; full learning cycle found 0x1A22 on average of 2 packs
+    {MAX17205_AD_NNVCFG0,      0x09A0 }, // Wizard: enCfg=1, enRCfg=1, enLCfg=1, enICT=1, enVE=1
+    {MAX17205_AD_NNVCFG1,      0x8006 }, // Wizard: enTGO=1, enCrv=1, enCTE=1
+    {MAX17205_AD_NNVCFG2,      0xFF0A }, // factory default; life logging every 10 cycles,
+                                         //  enIAvg=1, enFC=1, enVT=1, enMMC=1, enMMV=1, enMMT=1, enSOC=1, enT=1
+    {MAX17205_AD_NICHGTERM,    0x014D }, // Wizard: 52.0 mA
+    {MAX17205_AD_NVEMPTY,      0x965A }, // Wizard: VEmpty = 0x12C * 10mV = 3.0v; VRecovery = 0x5A * 40mV = 3.6v
+    {MAX17205_AD_NTCURVE,      0x0064 }, // Wizard / datasheet recommendation for Fenwal thermistor
+    {MAX17205_AD_NTGAIN,       0xF49A }, // ditto
+    {MAX17205_AD_NTOFF,        0x16A1 }, // ditto
+    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // Wizard: 2600 mAh (x2 conversion factor)
+    {MAX17205_AD_NFULLCAPREP,  0x1450 }, // ditto
+    {MAX17205_AD_NFULLCAPNOM,  0x1A22 }, // Wizard: 0x1794; full learning cycle found 0x1A22 on average
+                                         //  of 2 packs so use that instead
 
     // Missing from in flight fw, but present in Wizard output with m5 EZ battery model:
-    {MAX17205_AD_NQRTABLE00,   0x2280 },
-    {MAX17205_AD_NQRTABLE10,   0x1000 },
-    {MAX17205_AD_NQRTABLE20,   0x0681 },
+    {MAX17205_AD_NQRTABLE00,   0x2280 }, // nQRTable00-30 contain battery characteristic data
+    {MAX17205_AD_NQRTABLE10,   0x1000 }, // no further information provided in datasheet about
+    {MAX17205_AD_NQRTABLE20,   0x0681 }, // actual meaning of each value
     {MAX17205_AD_NQRTABLE30,   0x0682 },
-    {MAX17205_AD_NIAVGEMPTY,   0xEBB0 },
-    {MAX17205_AD_NCONFIG,      0x0211 },
-    {MAX17205_AD_NMISCCFG,     0x3070 },
-    {MAX17205_AD_NCONVGCFG,    0x2241 },
-    {MAX17205_AD_NFULLSOCTHR,  0x5005 },
-    {MAX17205_AD_NRIPPLECFGCFG,0x0204 },
-    {MAX17205_AD_NRCOMP0,      0x006F }
+    {MAX17205_AD_NIAVGEMPTY,   0xEBB0 }, // Calling this I (current) seems wrong -- 0xEBB0 is actually -5200
+                                         //  (2s complement) x 156.25uA = 0.8125A. Alternate value based on
+                                         //  nVCfg2.enIAvg = 0 is -1 x nFullCapNom; for that EBB0 is right,
+                                         //  but isn't actually right since nVCfg2.enIAvg = 1.
+    {MAX17205_AD_NCONFIG,      0x0211 }, // Temperature channel enable, temperature alert enable
+    {MAX17205_AD_NMISCCFG,     0x3870 }, // FUS (Full Update Slope) = 6% (rate of adj of FullCapRep near end
+                                         //  of charge cycle); MR (Servo Mixing Rate) = 18.75uV. However,
+                                         //  bit 11 must = 1 according to datasheet (Wizard said: 0x3070),
+                                         //  so set that bit
+    {MAX17205_AD_NCONVGCFG,    0x2241 }, // recommended factory default; RepLow = 4%; VoltLowOff = 40mV;
+                                         //  MinSlopeX = 0.25; RepL per Stage = 1%
+    {MAX17205_AD_NFULLSOCTHR,  0x5005 }, // recommended factory default for EZ Performance = 80% (units of 1/256%)
+    {MAX17205_AD_NRIPPLECFGCFG,0x0204 }, // recommended factory default; kDV = 64 (amount of capacity to
+                                         //  compensate proportional to ripple?); NR = filter mag for ripple
+                                         //  observation = 22.4 seconds
+    {MAX17205_AD_NRCOMP0,      0x006F }  // characteristic info for computing open-circuit voltage of cell under
+                                         //  loaded conditions; undefined encoding
 };
 
 static const max17205_regval_t batt_cfg[] = {
