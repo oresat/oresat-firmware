@@ -46,9 +46,9 @@
     // the ammount of power consumed by the microcontroller.
 
 #define DL_ENABLE true
+#define DL_SLEW_RATE 900 // uA/ms
 
-
-/* Intensity Estimation */
+/* Intensity (Change) Estimation */
     //Intenisty Estimation is required by both CC and DL.
     //Uses a ring buffer of past samples to gauge how intensity has changed
     // over time.
@@ -56,12 +56,9 @@
 
     //The code required to maintain this datastructure is added when either
     // CC or DL are enabled
-#define IE_ENABLE DL_ENABLE || CC_ENABLE
-
+#define IE_ENABLE DL_ENABLE || CC_ENABLE //only enabled if either DL or CC are
 #define IE_ARRAY_LEN 4 //should be power of 2
 #define IE_SAMPLE_SPACING 8 //distance between samples to see more of the trend.
-
-
 
 
 /* MPPT configuration */
@@ -121,8 +118,9 @@ typedef struct {
     uint32_t iadj_uV;
     struct Sample sample;
     int32_t last_time_mS;
-    struct Sample CC_samples[IE_ARRAY_LEN];
+    struct Sample IE_samples[IE_ARRAY_LEN];
     uint32_t index_loop_counter;
+    float32_t pt_slope;
 } MpptPaoState;
 
 /**
@@ -217,6 +215,7 @@ float32_t find_ip_slope(struct Sample *sample_init, struct Sample *sample_adjust
     return slope;
 }
 
+//finds an average of two slopes
 float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
     float32_t slope1 = 0;
     float32_t slope2 = 0;
@@ -261,29 +260,29 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     //get current time to compare with sample
     //in mW/cycle
     //how much do we change our step based on our velocity
-    float32_t pt_slope = 0.0;
+    state->pt_slope = 0.0;
 
     for (int idx = 0; idx < IE_ARRAY_LEN; idx++) {
-        struct Sample older = state->CC_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx + 1) % IE_ARRAY_LEN];
-        struct Sample this = state->CC_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx) % IE_ARRAY_LEN];
-        pt_slope += find_pt_slope(&this, &older);
+        struct Sample older = state->IE_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx + 1) % IE_ARRAY_LEN];
+        struct Sample this = state->IE_samples[ (state->index_loop_counter%IE_ARRAY_LEN + idx) % IE_ARRAY_LEN];
+        state->pt_slope += find_pt_slope(&this, &older);
     }
 
     //average by array len
-    pt_slope = pt_slope / ((float32_t) IE_ARRAY_LEN);
-    dbgprintf("pt_slope %d/1000 ", (int32_t) (1000*pt_slope));
+    state->pt_slope = state->pt_slope / ((float32_t) IE_ARRAY_LEN);
+    dbgprintf("pt_slope %d/1000 ", (int32_t) (1000*(state->pt_slope)));
 
 #endif
 
 #if CC_ENABLE
 
-    CC_step = pt_slope * CC_STEP_SCALE;
+    CC_step = state->pt_slope * CC_STEP_SCALE;
     dbgprintf("CC_step is %d \r\n", CC_step);
 
-    if (pt_slope < 0) {
-        CC_critical_adjust = pt_slope * CC_NRATE;
-    } else if (pt_slope > 0) {
-        CC_critical_adjust = pt_slope * CC_PRATE;
+    if (state->pt_slope < 0) {
+        CC_critical_adjust = state->pt_slope * CC_NRATE;
+    } else if (state->pt_slope > 0) {
+        CC_critical_adjust = state->pt_slope * CC_PRATE;
     }
 
 #endif
@@ -309,6 +308,10 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 
 
     float32_t slope_error = (ip_slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
+    float32_t DL_size_factor = 0;
+#if DL_ENABLE
+    DL_size_factor = state->pt_slope;
+#endif
 
     int32_t step = 0;
     if (slope_error < 0) {
@@ -430,11 +433,10 @@ THD_FUNCTION(solar, arg)
 #if IE_ENABLE
         //populate the intensity estimation array with every nth sample.
         if (!(spacing_loop_counter % IE_SAMPLE_SPACING)) {
-            state.CC_samples[state.index_loop_counter % IE_ARRAY_LEN] = state.sample;
+            state.IE_samples[state.index_loop_counter % IE_ARRAY_LEN] = state.sample;
             state.index_loop_counter++;
         }
 #endif
-
         iterate_mppt_perturb_and_observe(&state);
         //print_state(&state);
         chThdSleepMilliseconds(SLEEP_CYCLE);
