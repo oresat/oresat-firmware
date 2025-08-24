@@ -3,9 +3,84 @@
 #include "max17205.h"
 #include "CANopen.h"
 #include "OD.h"
+#include "chtime.h"
+#include "oresat_f0.h"
+#include "flash_f0.h"
+#include "crc.h"
 #include <sys/param.h>
+#include <string.h>
 
-#define ENABLE_NV_MEMORY_UPDATE_CODE      0
+// Dump complete battery history
+#if !defined(VERBOSE_DEBUG)
+#define VERBOSE_DEBUG 0
+#endif
+#if VERBOSE_DEBUG
+#pragma message("Verbose debug messages enabled")
+#else
+#pragma message("Verbose debug messages disabled")
+#endif
+
+// If batt_nv_programing_cfg registers do not match current, rewrite the RAM shadow then prompt to write to NV.
+#if !defined(ENABLE_NV_MEMORY_UPDATE_CODE)
+#define ENABLE_NV_MEMORY_UPDATE_CODE 0
+#endif
+#if ENABLE_NV_MEMORY_UPDATE_CODE
+#pragma message("NV memory update code enabled")
+#else
+#pragma message("NV memory update code disabled")
+#endif
+
+// If state of charge is known to be full, set LS bits D6-D0 of LearnCfg register to 0b111
+// and write MixCap and RepCap registers to 2600.
+#if !defined(ENABLE_LEARN_COMPLETE)
+#define ENABLE_LEARN_COMPLETE 0
+#endif
+#if ENABLE_LEARN_COMPLETE
+#pragma message("Enable learn complete enabled")
+#else
+#pragma message("Enable learn complete disabled")
+#endif
+
+// Recommend setting ENABLE_HEADERS to 0 for battery board v2.1. Otherwise, brownouts can occur, causing
+// the C3 to reboot the battery board.
+#if !defined(ENABLE_HEATERS)
+#define ENABLE_HEATERS 1
+#endif
+#if ENABLE_HEATERS
+#pragma message("Heaters enabled")
+#else
+#pragma message("Heaters disabled")
+#endif
+
+#define NV_WRITE_PROMPT_TIMEOUT_S 15
+
+// This was disabled per discussion in Slack on April 25, 2021.
+#define ENABLE_CHARGING_CONTROL 0
+
+// Simplify conditionals below -- DEBUG_PRINT is required for ENABLE_NV_MEMORY_UPDATE_CODE to do anything
+#if defined(DEBUG_PRINT) && ENABLE_NV_MEMORY_UPDATE_CODE
+#define ENABLE_NV_WRITE_PROMPT 1
+#else
+#define ENABLE_NV_WRITE_PROMPT 0
+#endif
+
+// Uncomment to only store within 3 seconds on 'y',
+// or erase hist store flash on 'e'
+#if defined(DEBUG_PRINT)
+#define HIST_STORE_PROMPT 1
+#endif
+
+// Voltage below which we should stop everything until charging starts
+#define SHUTDOWN_MV 2850
+
+// Full battery detection thresholds
+#define BATT_FULL_THRESHOLD_MV 8000
+#define EOC_THRESHOLD_MA 50
+#define CELL_CAPACITY_MAH 2600
+#define CELL_CAPACITY_MAH_RAW 0x1450
+
+#define MAX_HIST_STORE_RETRIES 4
+#define RUNTIME_BATT_STORE_INTERVAL_MS 300000U // 5 minutes
 
 #ifdef DEBUG_PRINT
 #include "chprintf.h"
@@ -18,7 +93,12 @@
 #define ARRAY_LEN(x) (sizeof(x)/sizeof(x[0]))
 #define CLAMP(val, low, high) MIN(MAX(val, low), high)
 
-#define NCELLS          2U          /* Number of cells */
+#define NCELLS          2U          /* Number of cells per pack */
+#define NPACKS          2U          /* Number of packs */
+
+// Some of the code and data below requires 2 packs of 2 cells. Any other configuration may require changes.
+STATIC_ASSERT(NCELLS == 2);
+STATIC_ASSERT(NPACKS == 2);
 
 typedef enum {
     BATTERY_OD_ERROR_INFO_CODE_NONE = 0,
@@ -46,56 +126,62 @@ typedef enum {
   These values were generated using the windows tool from Maxim and while they are probably not totally
   correct yield generally reasonable read back values from the MAX17 chip.
  */
+static const uint16_t PACKCFG = (_VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) | // 2 cells
+                                 MAX17205_PACKCFG_BALCFG_40 | // 40 mV cell balance threshold
+                                 MAX17205_PACKCFG_BTEN | // enable Vbatt channel
+                                 MAX17205_PACKCFG_CHEN | // enable voltage measurements cell1, cell2, Vbatt
+                                 MAX17205_PACKCFG_TDEN | // enable die temperature measurement
+                                 MAX17205_PACKCFG_A1EN | // enable AIN1 channel temperature measurement
+                                 MAX17205_PACKCFG_A2EN); // enable AIN2 channel temperature measurement
+
 static const max17205_regval_t batt_nv_programing_cfg[] = {
-    //{MAX17205_AD_NFULLCAPNOM, 0x1794 },
-    {MAX17205_AD_NDESIGNCAP, 0x1450}, /*5200 (0.5 increments)*/
-    {MAX17205_AD_NPACKCFG, 0x3EA2 },
-    {MAX17205_AD_NNVCFG0, 0x00B0 },//0x0920
-    {MAX17205_AD_NNVCFG1, 0xC000 },//0x8006
-    {MAX17205_AD_NNVCFG2, 0xFF0A },
-    {MAX17205_AD_NICHGTERM, 0x0034 },
-    {MAX17205_AD_NVEMPTY, 0x965A },
-    {MAX17205_AD_NTCURVE, 0x0064 },
-    {MAX17205_AD_NTGAIN, 0xF49A },
-    {MAX17205_AD_NTOFF, 0x16A1 },
+    {MAX17205_AD_NPACKCFG,     PACKCFG },
+    {MAX17205_AD_NNVCFG0,      0x09A0 }, // Wizard: enCfg=1, enRCfg=1, enLCfg=1, enICT=1, enVE=1
+    {MAX17205_AD_NNVCFG1,      0x8006 }, // Wizard: enTGO=1, enCrv=1, enCTE=1
+    {MAX17205_AD_NNVCFG2,      0xFF0A }, // factory default; life logging every 10 cycles,
+                                         //  enIAvg=1, enFC=1, enVT=1, enMMC=1, enMMV=1, enMMT=1, enSOC=1, enT=1
+    {MAX17205_AD_NICHGTERM,    0x014D }, // Wizard: 52.0 mA
+    {MAX17205_AD_NVEMPTY,      0x965A }, // Wizard: VEmpty = 0x12C * 10mV = 3.0v; VRecovery = 0x5A * 40mV = 3.6v
+    {MAX17205_AD_NTCURVE,      0x0064 }, // Wizard / datasheet recommendation for Fenwal thermistor
+    {MAX17205_AD_NTGAIN,       0xF49A }, // ditto
+    {MAX17205_AD_NTOFF,        0x16A1 }, // ditto
+    {MAX17205_AD_NDESIGNCAP,   0x1450 }, // Wizard: 2600 mAh (x2 conversion factor)
+    {MAX17205_AD_NFULLCAPREP,  0x1450 }, // ditto
+    {MAX17205_AD_NFULLCAPNOM,  0x1A22 }, // Wizard: 0x1794; full learning cycle found 0x1A22 on average
+                                         //  of 2 packs so use that instead
 
-    {MAX17205_AD_NFULLCAPREP, 0x1450 },
-    {MAX17205_AD_NFULLCAPNOM, 0x1450 },
+    // Missing from in flight fw, but present in Wizard output with m5 EZ battery model:
+    {MAX17205_AD_NQRTABLE00,   0x2280 }, // nQRTable00-30 contain battery characteristic data
+    {MAX17205_AD_NQRTABLE10,   0x1000 }, // no further information provided in datasheet about
+    {MAX17205_AD_NQRTABLE20,   0x0681 }, // actual meaning of each value
+    {MAX17205_AD_NQRTABLE30,   0x0682 },
+    {MAX17205_AD_NIAVGEMPTY,   0xEBB0 }, // Calling this I (current) seems wrong -- 0xEBB0 is actually -5200
+                                         //  (2s complement) x 156.25uA = 0.8125A. Alternate value based on
+                                         //  nVCfg2.enIAvg = 0 is -1 x nFullCapNom; for that EBB0 is right,
+                                         //  but isn't actually right since nVCfg2.enIAvg = 1.
+    {MAX17205_AD_NCONFIG,      0x0211 }, // Temperature channel enable, temperature alert enable
+    {MAX17205_AD_NMISCCFG,     0x3870 }, // FUS (Full Update Slope) = 6% (rate of adj of FullCapRep near end
+                                         //  of charge cycle); MR (Servo Mixing Rate) = 18.75uV. However,
+                                         //  bit 11 must = 1 according to datasheet (Wizard said: 0x3070),
+                                         //  so set that bit
+    {MAX17205_AD_NCONVGCFG,    0x2241 }, // recommended factory default; RepLow = 4%; VoltLowOff = 40mV;
+                                         //  MinSlopeX = 0.25; RepL per Stage = 1%
+    {MAX17205_AD_NFULLSOCTHR,  0x5005 }, // recommended factory default for EZ Performance = 80% (units of 1/256%)
+    {MAX17205_AD_NRIPPLECFGCFG,0x0204 }, // recommended factory default; kDV = 64 (amount of capacity to
+                                         //  compensate proportional to ripple?); NR = filter mag for ripple
+                                         //  observation = 22.4 seconds
+    {MAX17205_AD_NRCOMP0,      0x006F }  // characteristic info for computing open-circuit voltage of cell under
+                                         //  loaded conditions; undefined encoding
 };
-
 
 static const max17205_regval_t batt_cfg[] = {
-    {MAX17205_AD_PACKCFG, MAX17205_SETVAL(MAX17205_AD_PACKCFG,
-                                          _VAL2FLD(MAX17205_PACKCFG_NCELLS, NCELLS) |
-                                          MAX17205_PACKCFG_BALCFG_40 |
-                                          MAX17205_PACKCFG_CHEN |
-                                          MAX17205_PACKCFG_TDEN |
-                                          MAX17205_PACKCFG_A1EN |
-                                          MAX17205_PACKCFG_A2EN )},
+    {MAX17205_AD_PACKCFG, PACKCFG},
     {MAX17205_AD_NRSENSE, MAX17205_RSENSE2REG(10000U)},
-    {MAX17205_AD_CONFIG, MAX17205_CONFIG_TEN | MAX17205_CONFIG_ETHRM},
-    {0,0}
+    {MAX17205_AD_CONFIG, MAX17205_CONFIG_TEN | MAX17205_CONFIG_ETHRM}
 };
-
-
-static const MAX17205Config max17205configPack1 = {
-    .i2cp = &I2CD1,
-    .regcfg = batt_cfg,
-    .rsense_uOhm = 10000,
-};
-
-static const MAX17205Config max17205configPack2 = {
-    .i2cp = &I2CD2,
-    .regcfg = batt_cfg,
-    .rsense_uOhm = 10000,
-};
-
-static MAX17205Driver max17205devPack1;
-static MAX17205Driver max17205devPack2;
 
 typedef struct {
     bool is_data_valid;
-    uint8_t pack_number;
 
     uint32_t batt_mV;
     uint16_t v_cell_1_mV;
@@ -125,111 +211,375 @@ typedef struct {
     uint16_t cycles; // count
 
     int16_t temp_1_C;
+    int16_t temp_2_C;
+    int16_t int_temp_C;
     int16_t avg_temp_1_C;
+    int16_t avg_temp_2_C;
     int16_t avg_int_temp_C;
     int8_t temp_min_C;
     int8_t temp_max_C;
 } batt_pack_data_t;
 
-static batt_pack_data_t pack_1_data;
-static batt_pack_data_t pack_2_data;
+#if ENABLE_HEATERS
+static battery_heating_state_machine_state_t current_battery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
+#endif
 
-battery_heating_state_machine_state_t current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
+// All state for a pack is contained in this structure.
+typedef struct pack {
+    bool init;
+    bool updated;
+    MAX17205Driver drvr;
+    MAX17205Config conf;
+    batt_pack_data_t data;
+    ioline_t heater_on;
+    ioline_t line_dchg_dis;
+    ioline_t line_chg_dis;
+    ioline_t line_dchg_stat;
+    ioline_t line_chg_stat;
+    uint8_t pack_number;
+    char *name;
+} pack_t;
 
+// All packs defined here, including non-zero initial data.
+static pack_t packs[NPACKS] = {
+    {.conf.i2cp = &I2CD1,
+     .conf.regcfg = batt_cfg,
+     .conf.rsense_uOhm = 10000,
+     .heater_on = LINE_HEATER_ON_1,
+     .line_dchg_dis = LINE_DCHG_DIS_PK1,
+     .line_chg_dis = LINE_CHG_DIS_PK1,
+     .line_dchg_stat = LINE_DCHG_STAT_PK1,
+     .line_chg_stat = LINE_CHG_STAT_PK1,
+     .pack_number = 1,
+     .name = "Pack 1"},
+    {.conf.i2cp = &I2CD2,
+     .conf.regcfg = batt_cfg,
+     .conf.rsense_uOhm = 10000,
+     .heater_on = LINE_HEATER_ON_2,
+     .line_dchg_dis = LINE_DCHG_DIS_PK2,
+     .line_chg_dis = LINE_CHG_DIS_PK2,
+     .line_dchg_stat = LINE_DCHG_STAT_PK2,
+     .line_chg_stat = LINE_CHG_STAT_PK2,
+     .pack_number = 2,
+     .name = "Pack 2"}
+};
 
-/**
- * @brief Runs the battery state machine, responsible for turning on/off heaters, charging, discharging etc.
- *
- * @*pk1_data[in] Current data for pack 1
- * @*pk2_data[in] Current data for pack 2
- */
-void run_battery_heating_state_machine(batt_pack_data_t *pk1_data, batt_pack_data_t *pk2_data) {
-    if (!pk1_data->is_data_valid || !pk2_data->is_data_valid) {
-        //Fail safe
+// raw register values to store at runtime per pack;
+// restoring after a reset should result in accurate
+// fuel gauge estimates
+typedef struct __attribute__((packed)) runtime_pack_data {
+    uint16_t mixcap; // MAX17205_AD_MIXCAP
+    uint16_t repcap; // MAX17205_AD_REPCAP
+} runtime_pack_data_t;
+
+// entry to append to already-written flash at next update interval
+typedef struct __attribute__((packed)) runtime_battery_data {
+    runtime_pack_data_t packs[NPACKS];
+    uint16_t rst_cycle;         // number of reset cycles so far
+    uint16_t minute : 12;       // number of minutes so far during a cycle
+    uint16_t unused : 3;        // must be 0
+    uint16_t estimated : 1;     // set to 1 if previous value was invalid or none found in flash
+    uint16_t crc;               // crc calculated over all fields prior to this field
+} runtime_battery_data_t;
+
+#define NUM_BATT_HIST_ENTRIES ((STM32F093_FLASH_PAGE_SIZE) / sizeof(runtime_battery_data_t))
+
+// the flash3 section is defined in app_battery's linker script
+extern const void __flash3_size__;
+#define FLASH3_SIZE ((const uint32_t)(&__flash3_size__))
+runtime_battery_data_t *battery_history = (runtime_battery_data_t *) __flash3_base__;
+static runtime_battery_data_t *last_valid_history_entry; // pointer to final entry with good CRC
+static runtime_battery_data_t *last_empty_history_entry; // pointer to first empty entry
+
+static uint16_t reset_cycle_count;
+
+static void print_runtime_entry(runtime_battery_data_t *data, unsigned int start, unsigned int count)
+{
+#ifndef DEBUG_PRINT
+    (void)data;
+#endif
+    dbgprintf("rst_cycle=%d, minute=%d, unused=%d, estimated=%d, crc=0x%08X\r\n",
+              data->rst_cycle, data->minute, data->unused, data->estimated, data->crc);
+    for (unsigned int j = start; j < start + count; j++) {
+        dbgprintf("   pack %u: mixcap:0x%04X, repcap:0x%04X\r\n", j + 1, data->packs[j].mixcap, data->packs[j].repcap);
+    }
+}
+
+#if VERBOSE_DEBUG
+static void print_batt_hist(void)
+{
+    runtime_battery_data_t *data = battery_history;
+
+    dbgprintf("Runtime battery history:\r\nentry size=%lu, entry count=%u\r\n",
+              sizeof(runtime_battery_data_t), NUM_BATT_HIST_ENTRIES);
+
+    for (unsigned int i = 0; i < NUM_BATT_HIST_ENTRIES; i++) {
+        if (!flashIsErasedF091((flashaddr_t)data, sizeof(runtime_battery_data_t))) {
+            dbgprintf("%u. ", i);
+            print_runtime_entry(data, 0, NPACKS);
+        } else {
+            dbgprintf("%u. Found erased entry. Done.\r\n", i);
+            break;
+        }
+        data++;
+    }
+}
+#endif // VERBOSE_DEBUG
+
+static void find_last_batt_hist(void)
+{
+    runtime_battery_data_t *data = battery_history;
+    last_valid_history_entry = NULL;
+    last_empty_history_entry = NULL;
+
+    // Search forward through stored history for the most recent entry that has
+    // a correct CRC.
+    for (unsigned int i = 0; i < NUM_BATT_HIST_ENTRIES; i++) {
+        if (flashIsErasedF091((flashaddr_t)data, sizeof(runtime_battery_data_t))) {
+            last_empty_history_entry = data;
+            break;
+        }
+        uint32_t check_crc = crc32((uint8_t *)data, sizeof(*data) - sizeof(data->crc), 0);
+
+        if (check_crc == data->crc) {
+            last_valid_history_entry = data;
+        } else {
+            dbgprintf("CRC failure on entry %u\r\n", i);
+        }
+        data++;
+    }
+
+    // we found a good entry, so save a copy in RAM
+    if (last_valid_history_entry != NULL) {
+        dbgprintf("Selected last valid runtime entry:\r\n");
+        print_runtime_entry(last_valid_history_entry, 0, NPACKS);
+
+        reset_cycle_count = last_valid_history_entry->rst_cycle;
+
+        // We have started a new cycle, so advance this counter once
+        reset_cycle_count++;
+    }
+}
+
+static void load_latest_batt_hist(pack_t *pack)
+{
+    if (last_valid_history_entry == NULL) {
+        dbgprintf("No latest battery history to load\r\n");
+        return;
+    }
+
+    msg_t r;
+    uint16_t tmp;
+
+    dbgprintf("Loading entry to pack %u:\r\n", pack->pack_number);
+    print_runtime_entry(last_valid_history_entry, pack->pack_number - 1, 1);
+    tmp = MIN(last_valid_history_entry->packs[pack->pack_number - 1].mixcap, CELL_CAPACITY_MAH_RAW);
+    r = max17205Write(&pack->drvr, MAX17205_AD_MIXCAP, tmp);
+    if (r != MSG_OK) {
+        dbgprintf("Error writing AD_MIXCAP\r\n");
+    }
+    tmp = MIN(last_valid_history_entry->packs[pack->pack_number - 1].repcap, CELL_CAPACITY_MAH_RAW);
+    r = max17205Write(&pack->drvr, MAX17205_AD_REPCAP, tmp);
+    if (r != MSG_OK) {
+        dbgprintf("Error writing AD_REPCAP\r\n");
+    }
+}
+
+static bool add_next_batt_hist(runtime_battery_data_t *new_data)
+{
+    if (last_empty_history_entry < &battery_history[NUM_BATT_HIST_ENTRIES]) {
+        if (flashWriteF091((flashaddr_t)last_empty_history_entry, (uint8_t *)new_data, sizeof(runtime_battery_data_t)) == FLASH_RETURN_SUCCESS) {
+            last_valid_history_entry = last_empty_history_entry++;
+            return true;
+        } else {
+            dbgprintf("Error writing to flash\r\n");
+        }
+    }
+    // history storage is full or error writing flash, so let caller recover
+    last_valid_history_entry = NULL;
+    last_empty_history_entry = battery_history;
+    return false;
+}
+
+static bool store_current_batt_hist(void)
+{
+    runtime_battery_data_t new_data;
+    unsigned int i;
+    msg_t r;
+    uint16_t tmp;
+
+#if defined(HIST_STORE_PROMPT)
+    uint8_t ch = 0;
+
+    dbgprintf("********** Store batt_hist e(rase), y(es), n(o)? ");
+    sdReadTimeout(DEBUG_SD, &ch, 1, TIME_S2I(3)); // wait for input but timeout
+    dbgprintf("\r\n");
+    if (ch == 'e') {
+        dbgprintf("Erasing *************\r\n");
+        flashEraseF091((flashaddr_t)battery_history, STM32F093_FLASH_PAGE_SIZE);
+        return true;
+    } else if (ch != 'y') {
+        dbgprintf("Not storing ************\r\n");
+        return true;
+    }
+#endif // HIST_STORE_PROMPT
+    for (i = 0; i < NPACKS; i++) {
+        r = max17205Read(&packs[i].drvr, MAX17205_AD_MIXCAP, &tmp);
+        if (r != MSG_OK) {
+            new_data.packs[i].mixcap = 0;
+        } else {
+            // clamp to design limit to handle case where full pack is in storage,
+            // self discharges, then is charged later -- MAX17205 will then make max cap
+            // higher than it should be
+            new_data.packs[i].mixcap = MIN(tmp, CELL_CAPACITY_MAH_RAW);
+        }
+        r = max17205Read(&packs[i].drvr, MAX17205_AD_REPCAP, &tmp);
+        if (r != MSG_OK) {
+            new_data.packs[i].repcap = 0;
+        } else {
+            new_data.packs[i].repcap = MIN(tmp, CELL_CAPACITY_MAH_RAW);
+        }
+    }
+    new_data.rst_cycle = reset_cycle_count;
+    new_data.minute = TIME_I2S(chVTGetSystemTime()) / 60;
+    new_data.unused = 0;
+    new_data.estimated = false;
+    new_data.crc = crc32((uint8_t *)&new_data, sizeof(new_data) - sizeof(new_data.crc), 0);
+    dbgprintf("Storing new runtime battery entry:\r\n");
+    print_runtime_entry(&new_data, 0, NPACKS);
+    for (i = 0; i < MAX_HIST_STORE_RETRIES; i++) {
+        if (add_next_batt_hist(&new_data)) {
+            dbgprintf("Done.\r\n");
+            return true;
+        } else {
+            dbgprintf("Retry %d. Erasing page.\r\n", i + 1);
+            flashEraseF091((flashaddr_t)battery_history, STM32F093_FLASH_PAGE_SIZE);
+        }
+    }
+    dbgprintf("ERROR: Unable to store current battery history.\r\n");
+    return false;
+}
+
+static void heaters_on(bool on)
+{
+    if (on) {
+        palSetLine(LINE_MOARPWR);
+        palSetLine(LINE_HEATER_ON_1);
+        palSetLine(LINE_HEATER_ON_2);
+        dbgprintf("Heaters ON\n\n");
+    } else {
         palClearLine(LINE_HEATER_ON_1);
         palClearLine(LINE_HEATER_ON_2);
         palClearLine(LINE_MOARPWR);
-
-        //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING);
-        return;
-    }
-    const uint16_t total_state_of_charge = (pk1_data->present_state_of_charge + pk2_data->present_state_of_charge) / 2;
-
-    switch (current_batery_state_machine_state) {
-        case BATTERY_STATE_MACHINE_STATE_HEATING:
-            dbgprintf("Turning heaters ON\r\n");
-            palSetLine(LINE_MOARPWR);
-            palSetLine(LINE_HEATER_ON_1);
-            palSetLine(LINE_HEATER_ON_2);
-            //Once they’re greater than 5 °C or the combined pack capacity is < 25%
-
-            if( (pk1_data->avg_temp_1_C > 5 && pk2_data->avg_temp_1_C > 5) || (total_state_of_charge < 25) ) {
-                current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
-            }
-            break;
-        case BATTERY_STATE_MACHINE_STATE_NOT_HEATING:
-            dbgprintf("Turning heaters OFF\r\n");
-            palClearLine(LINE_HEATER_ON_1);
-            palClearLine(LINE_HEATER_ON_2);
-            palClearLine(LINE_MOARPWR);
-
-            if( (pk1_data->avg_temp_1_C < -5 || pk2_data->avg_temp_1_C < -5) && (pk1_data->present_state_of_charge > 25 || pk2_data->present_state_of_charge > 25) ) {
-                current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_HEATING;
-            }
-            break;
-        default:
-            current_batery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
-            break;
+        dbgprintf("Heaters OFF\n\n");
     }
 }
 
 /**
+ * @brief Runs the battery state machine, responsible for turning on/off heaters, charging, discharging etc.
+ */
+#if ENABLE_HEATERS
+static void run_battery_heating_state_machine(void) {
+    unsigned int i;
+
+    for (i = 0; i < NPACKS; i++) {
+        if (!packs[i].data.is_data_valid) {
+            dbgprintf("FAILSAFE: ");
+            heaters_on(false);
+            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_HEATING);
+            return;
+        }
+    }
+
+    switch (current_battery_state_machine_state) {
+        case BATTERY_STATE_MACHINE_STATE_HEATING:
+            heaters_on(true);
+
+            //Once they’re greater than 5 °C or the combined pack capacity is < 25%
+            bool warm_enough = true;
+            uint16_t total_state_of_charge = 0;
+            for (i = 0; i < NPACKS; i++) {
+                if( packs[i].data.avg_temp_1_C <= 5 ) {
+                    warm_enough = false;
+                }
+                total_state_of_charge += packs[i].data.present_state_of_charge;
+            }
+            total_state_of_charge /= NPACKS;
+            if( warm_enough || (total_state_of_charge < 25) ) {
+                current_battery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
+                dbgprintf("Turning heaters OFF\r\n");
+            }
+            break;
+        case BATTERY_STATE_MACHINE_STATE_NOT_HEATING:
+            heaters_on(false);
+
+            //Once they’re less than -5 °C and the combined pack capacity is > 25%
+            bool too_cold = false;
+            bool full_enough = false;
+            for (i = 0; i < NPACKS; i++) {
+                if( packs[i].data.avg_temp_1_C < -5 ) {
+                    too_cold = true;
+                }
+                if( packs[i].data.present_state_of_charge > 25 ) {
+                    full_enough = true;
+                }
+            }
+            if( too_cold && full_enough ) {
+                current_battery_state_machine_state = BATTERY_STATE_MACHINE_STATE_HEATING;
+                dbgprintf("Turning heaters ON\r\n");
+            }
+            break;
+        default:
+            current_battery_state_machine_state = BATTERY_STATE_MACHINE_STATE_NOT_HEATING;
+            dbgprintf("Unknown state: turning heaters OFF\r\n");
+            break;
+    }
+}
+#endif // ENABLE_HEATERS
+
+
+/**
  * @brief Query the MAX17 chip for a given pack and populate *pk_data with the current status/state represented in the MAX17
  *
- * @param[in] *pk_data Destination into which to store MAX17 pack data.
- * @param[in] line_dchg_dis ioline to control the discharge disable pin.
- * @param[in] line_chg_dis ioline to control of the charge disable pin.
+ * @param[in] *pack Destination into which to store MAX17205
+ *       pack data.
  */
-void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t line_dchg_dis, const ioline_t line_chg_dis) {
-    dbgprintf("LINE_DCHG_STAT_PK1 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK1));
-    dbgprintf("LINE_CHG_STAT_PK1 = %u\r\n", palReadLine(LINE_CHG_STAT_PK1));
-    dbgprintf("LINE_DCHG_STAT_PK2 = %u\r\n", palReadLine(LINE_DCHG_STAT_PK2));
-    dbgprintf("LINE_CHG_STAT_PK2 = %u\r\n", palReadLine(LINE_CHG_STAT_PK2));
+static void update_battery_charging_state(const pack_t *pack) {
+    dbgprintf("LINE_DCHG_STAT_PK%d = %u\r\n", pack->pack_number, palReadLine(pack->line_dchg_stat));
+    dbgprintf("LINE_CHG_STAT_PK%d  = %u\r\n", pack->pack_number, palReadLine(pack->line_chg_stat));
+
+#if !ENABLE_CHARGING_CONTROL
+    (void)pack;
+#else
+    const batt_pack_data_t * const pk_data = &pack->data;
 
     if (!pk_data->is_data_valid) {
         //fail safe mode
-        //palSetLine(line_dchg_dis);
-        //palSetLine(line_chg_dis);
-
+        palSetLine(pack->line_dchg_dis);
+        palSetLine(pack->line_chg_dis);
+        dbgprintf("ERROR: %s data is invalid; disabling charging and discharging\r\n", pack->name);
         //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_HARDWARE, BATTERY_OD_ERROR_INFO_CODE_PACK_FAIL_SAFE_CHARGING);
         return;
     }
-
     if( pk_data->v_cell_mV < 3000 || pk_data->present_state_of_charge < 20 ) {
         //Disable discharge on both packs
-        dbgprintf("Disabling discharge on pack %u\r\n", pk_data->pack_number);
-        //palSetLine(line_dchg_dis);
+        dbgprintf("Disabling discharge on pack %u\r\n", pack->pack_number);
+        palSetLine(pack->line_dchg_dis);
     } else {
-        dbgprintf("Enabling discharge on pack %u\r\n", pk_data->pack_number);
+        dbgprintf("Enabling discharge on pack %u\r\n", pack->pack_number);
         //Allow discharge on both packs
-        //palClearLine(line_dchg_dis);
+        palClearLine(pack->line_dchg_dis);
     }
 
 
     if( pk_data->v_cell_mV > 4100 ) {
-        dbgprintf("Disabling charging on pack %u\r\n", pk_data->pack_number);
-        //palSetLine(line_chg_dis);
+        dbgprintf("Disabling charging on pack %u\r\n", pack->pack_number);
+        palSetLine(pack->line_chg_dis);
     } else {
-        dbgprintf("Enabling charging on pack %u\r\n", pk_data->pack_number);
-        //palClearLine(line_chg_dis);
-        if( pk_data->present_state_of_charge > 90 ) {
-            const int16_t vcell_delta_mV = pk_data->v_cell_1_mV - pk_data->v_cell_2_mV;
-
-            if( vcell_delta_mV < -50 || vcell_delta_mV > 50 ) {
-                //TODO command cell  balancing - this appears to be done in hardware based on config registers???
-            }
-        }
+        dbgprintf("Enabling charging on pack %u\r\n", pack->pack_number);
+        palClearLine(pack->line_chg_dis);
     }
+#endif // ENABLE_CHARGING_CONTROL
 }
 
 /**
@@ -238,7 +588,7 @@ void update_battery_charging_state(batt_pack_data_t *pk_data, const ioline_t lin
  *
  * @return true on success, false otherwise
  */
-bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
+static bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     msg_t r = 0;
     memset(dest, 0, sizeof(*dest));
 
@@ -252,7 +602,16 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_TEMP1, &dest->temp_1_C)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
+    if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_TEMP2, &dest->temp_2_C)) != MSG_OK ) {
+        dest->is_data_valid = false;
+    }
+    if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_INTTEMP, &dest->int_temp_C)) != MSG_OK ) {
+        dest->is_data_valid = false;
+    }
     if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_AVGTEMP1, &dest->avg_temp_1_C)) != MSG_OK ) {
+        dest->is_data_valid = false;
+    }
+    if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_AVGTEMP2, &dest->avg_temp_2_C)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
     if( (r = max17205ReadAverageTemperature(driver, MAX17205_AD_AVGINTTEMP, &dest->avg_int_temp_C)) != MSG_OK ) {
@@ -261,13 +620,6 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     if( (r = max17205ReadMaxMinTemperature(driver, &dest->temp_max_C, &dest->temp_min_C)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
-
-    dbgprintf("avg_temp_1_C = %d C, ", dest->avg_temp_1_C);
-    dbgprintf("temp_1_C = %d C, ", dest->temp_1_C);
-    dbgprintf("avg_int_temp_C = %d C, ", dest->avg_int_temp_C);
-    dbgprintf("temp_min_C = %d C, ", dest->temp_min_C);
-    dbgprintf("temp_max_C = %d C", dest->temp_max_C);
-    dbgprintf("\r\n");
 
     /* Record pack and cell voltages to object dictionary */
     if( (r = max17205ReadVoltage(driver, MAX17205_AD_AVGCELL1, &dest->v_cell_1_mV)) != MSG_OK ) {
@@ -288,14 +640,9 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
         dest->v_cell_2_mV = dest->batt_mV - dest->v_cell_1_mV;
     }
 
-    dbgprintf("cell1_mV = %u, cell2_mV = %u, vcell_mV = %u, batt_mV = %u\r\n", dest->v_cell_1_mV, dest->v_cell_2_mV, dest->v_cell_mV, dest->batt_mV);
-
     if( (r = max17205ReadMaxMinVoltage(driver, &dest->v_cell_max_volt_mV, &dest->v_cell_min_volt_mV)) != MSG_OK ) {
         dest->is_data_valid = false;
-    } else {
-        dbgprintf("vcell_max_volt_mV = %u, vcell_min_volt_mV = %u\r\n", dest->v_cell_max_volt_mV, dest->v_cell_min_volt_mV);
     }
-
 
     if( (r = max17205ReadCurrent(driver, MAX17205_AD_CURRENT, &dest->current_mA)) != MSG_OK ) {
         dest->is_data_valid = false;
@@ -306,12 +653,7 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
 
     if( (r = max17205ReadMaxMinCurrent(driver, &dest->max_current_mA, &dest->min_current_mA)) != MSG_OK ) {
         dest->is_data_valid = false;
-    } else {
-        dbgprintf("max_mA = %d, min_mA = %d\r\n", dest->max_current_mA, dest->min_current_mA);
     }
-
-    dbgprintf("avg_current_mA = %d mA\r\n", dest->avg_current_mA);
-
 
     /* capacity */
     if( (r = max17205ReadCapacity(driver, MAX17205_AD_FULLCAPREP, &dest->full_capacity_mAh)) != MSG_OK ) {
@@ -326,11 +668,6 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
     if( (r = max17205ReadCapacity(driver, MAX17205_AD_REPCAP, &dest->reported_capacity_mAh)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
-
-
-
-    dbgprintf("full_capacity_mAh = %u, available_capacity_mAh = %u, mix_capacity = %u, reported_capacity_mAh = %u\r\n",
-            dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity_mAh, dest->reported_capacity_mAh);
 
     /* state of charge */
     if( (r = max17205ReadTime(driver, MAX17205_AD_TTE, &dest->time_to_empty_seconds)) != MSG_OK ) {
@@ -350,24 +687,92 @@ bool populate_pack_data(MAX17205Driver *driver, batt_pack_data_t *dest) {
         dest->is_data_valid = false;
     }
 
-
-    dbgprintf("time_to_empty = %u (seconds), time_to_full = %u (seconds), available_state_of_charge = %u%%, present_state_of_charge = %u%%\r\n", dest->time_to_empty_seconds, dest->time_to_full_seconds, dest->available_state_of_charge, dest->present_state_of_charge);
-
     /* other info */
     if( (r = max17205ReadCycles(driver, &dest->cycles)) != MSG_OK ) {
         dest->is_data_valid = false;
     }
 
+    dbgprintf("\r\n");
+
+    dbgprintf("Temperature (C): Th1: avg = %d, cur = %d, Th2: avg = %d, cur = %d, Int: avg = %d, cur = %d, max = %d, min = %d\r\n",
+              dest->avg_temp_1_C, dest->temp_1_C, dest->avg_temp_2_C, dest->temp_2_C, dest->avg_int_temp_C, dest->int_temp_C, dest->temp_min_C, dest->temp_max_C);
+
+    dbgprintf("Voltage (mV):    cell1 = %u, cell2 = %u, vcell = %u, max = %d, min %d, batt = %u\r\n",
+              dest->v_cell_1_mV, dest->v_cell_2_mV, dest->v_cell_mV, dest->v_cell_max_volt_mV, dest->v_cell_min_volt_mV, dest->batt_mV);
+
+    dbgprintf("Current (mA):    cur = %d, max = %d, min = %d, avg = %d\r\n",
+              dest->current_mA, dest->max_current_mA, dest->min_current_mA, dest->avg_current_mA);
+
+    dbgprintf("Capacity (mAh):  full = %u, available = %u, mix = %u, reported = %u\r\n",
+              dest->full_capacity_mAh, dest->available_capacity_mAh, dest->mix_capacity_mAh, dest->reported_capacity_mAh);
+
+    dbgprintf("Time (seconds):  to_empty =%u, to_full = %u\r\n",
+              dest->time_to_empty_seconds, dest->time_to_full_seconds);
+
+    dbgprintf("SOC (%%):         reported = %u%%\r\n",
+              dest->reported_state_of_charge);
+
     dbgprintf("cycles = %u\r\n", dest->cycles);
+
+    dbgprintf("\r\n");
 
     return dest->is_data_valid;
 }
 
 /**
  * Helper function to trigger write of volatile memory on MAX71205 chip.
+ * Returns true if NV RAM was written, false otherwise.
  */
-msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
-    dbgprintf("\r\n%s\r\n", pack_str);
+static bool nv_ram_write(MAX17205Driver *devp, const char *pack_str) {
+#ifndef DEBUG_PRINT
+    (void)pack_str;
+#endif
+    dbgprintf("\r\nEnsure NV RAM settings are correct for %s\r\n", pack_str);
+
+    bool all_elements_match = false;
+    msg_t r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
+    if (r != MSG_OK) {
+        return false;
+    }
+
+    if (all_elements_match) {
+        dbgprintf("All NV RAM elements already match expected values...\r\n");
+        return false;
+    } else {
+        dbgprintf("One or more NV RAM elements don't match expected values...\r\n");
+    }
+
+    r = max17205WriteRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
+    if (r != MSG_OK) {
+        dbgprintf("Failed to write new NV RAM reg values\n");
+        return false;
+    }
+    dbgprintf("Successfully wrote new NV RAM reg values\r\n");
+
+    all_elements_match = false;
+    r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
+    if (r != MSG_OK) {
+        return false;
+    }
+    if (!all_elements_match) {
+        dbgprintf("NV RAM elements failed to update after write.\r\n");
+        return false;
+    }
+
+    dbgprintf("All NV RAM elements now match expected values.\r\n");
+
+    //Now make the chip use the changes written to the shadow registers.
+    max17205FirmwareReset(devp);
+    return true;
+}
+
+/**
+ * Helper function to trigger write of volatile memory on MAX71205 chip.
+ * Returns true if NV was written, false otherwise.
+ */
+#if ENABLE_NV_WRITE_PROMPT
+static bool prompt_nv_write(MAX17205Driver *devp, const char *pack_str) {
+    dbgprintf("\r\nWrite NV RAM to NV%s\r\n", pack_str);
 
     uint16_t masking_register = 0;
     uint8_t num_writes_left = 0;
@@ -376,65 +781,116 @@ msg_t prompt_nv_memory_write(MAX17205Driver *devp, const char *pack_str) {
             masking_register, num_writes_left);
     }
 
-    bool all_elements_match = false;
-    msg_t r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
-    if (r != MSG_OK) {
-        return r;
-    }
+    if (num_writes_left > 0) {
+        // Answer n to just use the changes in the volatile registers
+        dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
+        uint8_t ch = 0;
+        sdReadTimeout(DEBUG_SD, &ch, 1, TIME_S2I(NV_WRITE_PROMPT_TIMEOUT_S)); // wait for input but timeout
+        dbgprintf("\r\n");
 
-    if (all_elements_match) {
-        dbgprintf("All NV Ram elements already match expected values...\r\n");
-        return MSG_OK;
-    }
+        if (ch == 'y') {
+            dbgprintf("Attempting to write non volatile memory on MAX17205...\r\n");
+            chThdSleepMilliseconds(50);
 
-#if ENABLE_NV_MEMORY_UPDATE_CODE && defined(DEBUG_PRINT)
-    dbgprintf("One or more NV Ram elements don't match expected values...\r\n");
-    r = max17205WriteRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg));
-    if (r != MSG_OK) {
-        dbgprintf("Failed to write new nv reg values\n");
-        return r;
-    }
-    dbgprintf("Successfully wrote new nv reg values\r\n");
-
-    all_elements_match = false;
-    r = max17205ValidateRegisters(devp, batt_nv_programing_cfg, ARRAY_LEN(batt_nv_programing_cfg), &all_elements_match);
-    if (r != MSG_OK) {
-        return r;
-    }
-    if (!all_elements_match) {
-        dbgprintf("NV Ram elements failed to update after write.\r\n");
-        return MSG_OK;
-    }
-    dbgprintf("All NV Ram elements now match expected values.\r\n");
-
-    dbgprintf("Write NV memory on MAX17205 for %s ? y/n? ", pack_str);
-    uint8_t ch = 0;
-    sdRead(DEBUG_SD, &ch, 1);
-    dbgprintf("\r\n");
-
-    if (ch == 'y') {
-        dbgprintf("Attempting to write non volatile memory on MAX17205...\r\n");
-        chThdSleepMilliseconds(50);
-
-        if (max17205NonvolatileBlockProgram(devp) == MSG_OK ) {
-            dbgprintf("Successfully wrote non volatile memory on MAX17205...\r\n");
+            if (max17205NonvolatileBlockProgram(devp) == MSG_OK ) {
+                dbgprintf("Successfully wrote non volatile memory on MAX17205...\r\n");
+            } else {
+                dbgprintf("Failed to write non volatile memory on MAX17205...\r\n");
+            }
+            return true; // NV changes made
         } else {
-            dbgprintf("Failed to write non volatile memory on MAX17205...\r\n");
+            dbgprintf("Update skipped.\r\n");
         }
+    } else {
+        dbgprintf("No more NV writes remain.\r\n");
     }
-#endif
-    return MSG_OK;
+
+    return false; // no NV changes made
 }
+#endif // ENABLE_NV_WRITE_PROMPT
+
+//If state of charge is known to be full, set LS bits D6-D0 of LearnCfg register to 0b111
+//and write MixCap and RepCap registers to 2600.
+#if ENABLE_LEARN_COMPLETE && defined(DEBUG_PRINT)
+static bool update_learning_complete(MAX17205Driver *devp, pack_t *pack) {
+    batt_pack_data_t *pack_data = &pack->data;
+    bool ret = false;
+
+    if ((pack_data->batt_mV > BATT_FULL_THRESHOLD_MV) &&
+        (pack_data->avg_current_mA < EOC_THRESHOLD_MA) &&
+        (pack_data->avg_current_mA >= 0) &&
+        (pack_data->full_capacity_mAh >= CELL_CAPACITY_MAH) ) {
+
+        dbgprintf("Pack %d seems full\r\n", pack->pack_number);
+        uint8_t state;
+        msg_t r = max17205ReadLearnState(devp, &state);
+        if (r != MSG_OK) {
+            dbgprintf("Error reading learn state\r\n");
+            return ret;
+        }
+        dbgprintf("Learning state = %u\r\n", state);
+        if (state == MAX17205_LEARN_COMPLETE) {
+            dbgprintf("Learning is already complete.\r\n");
+        } else {
+            r = max17205WriteLearnState(devp, MAX17205_LEARN_COMPLETE);
+            if (r != MSG_OK) {
+                dbgprintf("Error writing learn state\r\n");
+                return ret;
+            }
+            r = max17205ReadLearnState(devp, &state);
+            if (r != MSG_OK) {
+                dbgprintf("Error checking learn state\r\n");
+                return ret;
+            }
+            if (state != 7) {
+                dbgprintf("Error setting state = %u; is %u\r\n", MAX17205_LEARN_COMPLETE, state);
+                return ret;
+            }
+            dbgprintf("Learning state set = %u\r\n", state);
+            ret = true;
+        }
+        pack_data->mix_capacity_mAh = pack_data->reported_capacity_mAh = pack_data->full_capacity_mAh;
+        if ( (r = max17205WriteCapacity(devp, MAX17205_AD_MIXCAP, pack_data->mix_capacity_mAh)) != MSG_OK ) {
+            dbgprintf("Failed to write MIXCAP\r\n");
+        } else if ( (r = max17205WriteCapacity(devp, MAX17205_AD_REPCAP, pack_data->reported_capacity_mAh)) != MSG_OK ) {
+            dbgprintf("Failed to write REPCAP\r\n");
+        } else {
+            dbgprintf("Mixcap and repcap set to %u\r\n", pack_data->full_capacity_mAh);
+        }
+        return ret;
+    }
+    return false;
+}
+#endif // ENABLE_LEARN_COMPLETE
+
 
 /**
  * @brief Populates CANOpen data structure values with values from the current battery pack data.
  *
  * @param *pack_data[in] Source of data for populating/publishing pack data.
  */
-void populate_od_pack_data(batt_pack_data_t *pack_data) {
+static void populate_od_pack_data(pack_t *pack) {
+    batt_pack_data_t *pack_data = &pack->data;
     uint8_t state_bitmask = 0;
 
-    if (pack_data->pack_number == 1) {
+    if( palReadLine(pack->heater_on) ) {
+        state_bitmask |= (1 << STATUS_BIT_HEATER);
+    }
+    if( palReadLine(pack->line_dchg_dis) ) {
+        state_bitmask |= (1 << STATUS_BIT_DCHG_DIS);
+    }
+    if (palReadLine(pack->line_chg_dis) ) {
+        state_bitmask |= (1 << STATUS_BIT_CHG_DIS);
+    }
+    if( palReadLine(pack->line_dchg_stat) ) {
+        state_bitmask |= (1 << STATUS_BIT_DCHG_STAT);
+    }
+    if( palReadLine(pack->line_chg_stat) ) {
+        state_bitmask |= (1 << STATUS_BIT_CHG_STAT);
+    }
+
+    if (pack->pack_number == 1) {
+        OD_RAM.x4000_pack_1.status = state_bitmask;
         OD_RAM.x4000_pack_1.vbatt = MIN(pack_data->batt_mV, UINT16_MAX);
         OD_RAM.x4000_pack_1.vcell_max = pack_data->v_cell_max_volt_mV;
         OD_RAM.x4000_pack_1.vcell_min = pack_data->v_cell_min_volt_mV;
@@ -456,24 +912,8 @@ void populate_od_pack_data(batt_pack_data_t *pack_data) {
         OD_RAM.x4000_pack_1.temperature_avg = CLAMP(pack_data->avg_temp_1_C, INT8_MIN, INT8_MAX);
         OD_RAM.x4000_pack_1.temperature_min = pack_data->temp_min_C;
         OD_RAM.x4000_pack_1.temperature_max = pack_data->temp_max_C;
-
-        if (palReadLine(LINE_HEATER_ON_1)) {
-            state_bitmask |= (1 << STATUS_BIT_HEATER);
-        }
-        if (palReadLine(LINE_DCHG_DIS_PK1)) {
-            state_bitmask |= (1 << STATUS_BIT_DCHG_DIS);
-        }
-        if (palReadLine(LINE_CHG_DIS_PK1)) {
-            state_bitmask |= (1 << STATUS_BIT_CHG_DIS);
-        }
-        if (palReadLine(LINE_DCHG_STAT_PK1)) {
-            state_bitmask |= (1 << STATUS_BIT_DCHG_STAT);
-        }
-        if (palReadLine(LINE_CHG_STAT_PK1)) {
-            state_bitmask |= (1 << STATUS_BIT_CHG_STAT);
-        }
-        OD_RAM.x4000_pack_1.status = state_bitmask;
-    } else if (pack_data->pack_number == 2) {
+    } else if (pack->pack_number == 2) {
+        OD_RAM.x4001_pack_2.status = state_bitmask;
         OD_RAM.x4001_pack_2.vbatt = MIN(pack_data->batt_mV, UINT16_MAX);
         OD_RAM.x4001_pack_2.vcell_max = pack_data->v_cell_max_volt_mV;
         OD_RAM.x4001_pack_2.vcell_min = pack_data->v_cell_min_volt_mV;
@@ -495,71 +935,125 @@ void populate_od_pack_data(batt_pack_data_t *pack_data) {
         OD_RAM.x4001_pack_2.temperature_avg = CLAMP(pack_data->avg_temp_1_C, INT8_MIN, INT8_MAX);
         OD_RAM.x4001_pack_2.temperature_min = pack_data->temp_min_C;
         OD_RAM.x4001_pack_2.temperature_max = pack_data->temp_max_C;
-
-        if (palReadLine(LINE_HEATER_ON_2)) {
-            state_bitmask |= (1 << STATUS_BIT_HEATER);
-        }
-        if (palReadLine(LINE_DCHG_DIS_PK2)) {
-            state_bitmask |= (1 << STATUS_BIT_DCHG_DIS);
-        }
-        if (palReadLine(LINE_CHG_DIS_PK2)) {
-            state_bitmask |= (1 << STATUS_BIT_CHG_DIS);
-        }
-        if (palReadLine(LINE_DCHG_STAT_PK2)) {
-            state_bitmask |= (1 << STATUS_BIT_DCHG_STAT);
-        }
-        if (palReadLine(LINE_CHG_STAT_PK2)) {
-            state_bitmask |= (1 << STATUS_BIT_CHG_STAT);
-        }
-        OD_RAM.x4001_pack_2.status = state_bitmask;
+    } else {
+        dbgprintf("ERROR: pack number not expected: %d\r\n", pack->pack_number);
     }
 }
 
+static bool are_batteries_critically_low(void)
+{
+    unsigned int i;
+
+    for (i = 0; i < NPACKS; i++) {
+        if ((packs[i].data.v_cell_1_mV < SHUTDOWN_MV) || (packs[i].data.v_cell_2_mV < SHUTDOWN_MV)) {
+            dbgprintf("Batteries are critically low!\r\n");
+            return true;
+        }
+    }
+
+    dbgprintf("Batteries are not critically low\r\n");
+    return false;
+}
+
+static bool check_for_critically_low_batteries(void)
+{
+    msg_t r;
+    unsigned int i;
+
+    dbgprintf("Check for critically low batteries\r\n");
+    for (i = 0; i < NPACKS; i++) {
+        if ((r = max17205ReadVoltage(&packs[i].drvr, MAX17205_AD_AVGCELL1, &packs[i].data.v_cell_1_mV)) != MSG_OK) {
+            packs[i].data.v_cell_1_mV = 0;
+        }
+        if ((r = max17205ReadBatt(&packs[i].drvr, &packs[i].data.batt_mV)) != MSG_OK) {
+            packs[i].data.batt_mV = 0;
+        }
+        packs[i].data.v_cell_2_mV = packs[i].data.batt_mV - packs[i].data.v_cell_1_mV;
+    }
+    return are_batteries_critically_low();
+}
+
+static void manage_calibration(void)
+{
+#if defined(DEBUG_PRINT)
+    unsigned int i;
+#if ENABLE_NV_WRITE_PROMPT
+    bool nv_written = false;
+#endif
+
+    for (i = 0; i < NPACKS; i++) {
+        dbgprintf("%s:\r\n", packs[i].name);
+        max17205PrintVolatileMemory(&packs[i].drvr);
+
+#if ENABLE_LEARN_COMPLETE
+        // If ENABLE_LEARN_COMPLETE=1, ENABLE_NV_MEMORY_UPDATE_CODE=1 and DEBUG_PRINT are all enabled, we will only prompt to update
+        // NV when learning is complete. If ENABLE_LEARN_COMPLETE is not 1 but the others are, then we will only prompt to update
+        // NV if there is a change to NV RAM required (done prior to the main loop).
+        packs[i].updated = update_learning_complete(&packs[i].drvr, &packs[i]);
+#endif
+#if ENABLE_NV_WRITE_PROMPT
+        if (packs[i].init && packs[i].updated) {
+            nv_written |= prompt_nv_write(&packs[i].drvr, packs[i].name);
+            packs[i].updated = false;
+        }
+#endif
+    }
+
+#if ENABLE_NV_WRITE_PROMPT
+    if (nv_written) {
+        dbgprintf("Done with NV RAM update code, set ENABLE_NV_MEMORY_UPDATE_CODE=0 and re-write firmware.\r\n");
+        for (;;) {
+            dbgprintf(".");
+            chThdSleepMilliseconds(1000);
+        }
+    }
+#endif
+#endif
+}
 
 /* Battery monitoring thread */
 THD_WORKING_AREA(batt_wa, 0x400);
 THD_FUNCTION(batt, arg)
 {
     (void)arg;
+    unsigned int i;
 
-    max17205ObjectInit(&max17205devPack1);
-    max17205ObjectInit(&max17205devPack2);
-    const bool pack_1_init_flag = max17205Start(&max17205devPack1, &max17205configPack1);
-    dbgprintf("max17205Start(pack1) = %u\r\n", pack_1_init_flag);
-
-#if 0
-    max17205PrintintNonvolatileMemory(&max17205configPack1);
-    while(1) {
-        chThdSleepMilliseconds(1000);
-    }
+#if VERBOSE_DEBUG
+    print_batt_hist();
 #endif
+    find_last_batt_hist();
 
-    const bool pack_2_init_flag = max17205Start(&max17205devPack2, &max17205configPack2);
-    dbgprintf("max17205Start(pack2) = %u\r\n", pack_2_init_flag);
-
-#if 1
-    if( pack_1_init_flag ) {
-        prompt_nv_memory_write(&max17205devPack1, "Pack 1");
-    } else {
-        dbgprintf("Skipping NV prompt for pack 1 as it failed to initialize...\r\n");
+    for (i = 0; i < NPACKS; i++) {
+        max17205ObjectInit(&packs[i].drvr);
+        packs[i].init = max17205Start(&packs[i].drvr, &packs[i].conf);
+        dbgprintf("max17205Start(%s) = %u\r\n", packs[i].name, packs[i].init);
     }
 
-    if( pack_2_init_flag ) {
-        prompt_nv_memory_write(&max17205devPack2, "Pack 2");
-    } else {
-        dbgprintf("Skipping NV prompt for pack 2 as it failed to initialize...\r\n");
-    }
+    heaters_on(false);
 
-#if ENABLE_NV_MEMORY_UPDATE_CODE
-    dbgprintf("Done with NV RAM update code, disable ENABLE_NV_MEMORY_UPDATE_CODE and re-write firmware.\r\n");
-    for (;;) {
-        dbgprintf(".");
-        chThdSleepMilliseconds(1000);
-    }
+    check_for_critically_low_batteries();
+
+    for (i = 0; i < NPACKS; i++) {
+        packs[i].updated = nv_ram_write(&packs[i].drvr, packs[i].name);
+
+        max17205PrintVolatileMemory(&packs[i].drvr);
+        max17205PrintNonvolatileMemory(&packs[i].drvr);
+#if VERBOSE_DEBUG
+        max17205ReadHistory(&packs[i].drvr);
 #endif
-#endif
+    }
+
+    // Let MAX17205s startup and run for a bit. Overwriting the MIXCAP and REPCAP values
+    // too quickly leads to bad measurements otherwise.
+    chThdSleepMilliseconds(500);
+    for (i = 0; i < NPACKS; i++) {
+        load_latest_batt_hist(&packs[i]);
+    }
 
     uint32_t loop = 0;
+    uint32_t ms = 0;
+    uint32_t next_update_ms = RUNTIME_BATT_STORE_INTERVAL_MS;
+
     while (!chThdShouldTerminateX()) {
         loop++;
         chThdSleepMilliseconds(500);
@@ -568,33 +1062,48 @@ THD_FUNCTION(batt, arg)
             continue; // we want light to blink at 2Hz, but code to run at 1Hz
         }
 
-        dbgprintf("================================= %u ms\r\n", TIME_I2MS(chVTGetSystemTime()));
+        ms = TIME_I2MS(chVTGetSystemTime());
 
-        dbgprintf("Populating Pack 1 Data\r\n");
-        if (populate_pack_data(&max17205devPack1, &pack_1_data) ) {
-            pack_1_data.pack_number = 1;
-            populate_od_pack_data(&pack_1_data);
-        } else {
-           // CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+        if (ms >= next_update_ms) {
+            next_update_ms = ms + RUNTIME_BATT_STORE_INTERVAL_MS;
+            store_current_batt_hist();
         }
 
-        dbgprintf("\r\nPopulating Pack 2 Data\r\n");
-        if (populate_pack_data(&max17205devPack2, &pack_2_data) ) {
-            pack_2_data.pack_number = 2;
-            populate_od_pack_data(&pack_2_data);
-        } else {
-            //CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_2_COMM_ERROR);
+#if defined(DEBUG_PRINT)
+        dbgprintf("================================= loop %u, %u.%03u s\r\n", loop, ms / 1000, ms % 1000);
+#endif
+
+        for (i = 0; i < NPACKS; i++) {
+            dbgprintf("Populating %s Data\r\n", packs[i].name);
+
+            if (populate_pack_data(&packs[i].drvr, &packs[i].data) ) {
+                populate_od_pack_data(&packs[i]);
+            } else {
+                // TODO: do we need to keep this around? Adding the loop results in the wrong error code on pack 2.
+                // CO_errorReport(CO->em, CO_EM_GENERIC_ERROR, CO_EMC_COMMUNICATION, BATTERY_OD_ERROR_INFO_CODE_PACK_1_COMM_ERROR);
+            }
         }
 
-        run_battery_heating_state_machine(&pack_1_data, &pack_2_data);
-        update_battery_charging_state(&pack_1_data, LINE_DCHG_DIS_PK1, LINE_CHG_DIS_PK1);
-        update_battery_charging_state(&pack_2_data, LINE_DCHG_DIS_PK2, LINE_CHG_DIS_PK2);
+#if ENABLE_HEATERS
+        if (!are_batteries_critically_low()) {
+            run_battery_heating_state_machine();
+        }
+#endif
+
+        for (i = 0; i < NPACKS; i++) {
+            update_battery_charging_state(&packs[i]);
+        }
+
+        if ((loop % 240) == 1) {
+            manage_calibration();
+        }
     }
 
     dbgprintf("Terminating battery thread...\r\n");
 
-    max17205Stop(&max17205devPack1);
-    max17205Stop(&max17205devPack2);
+    for (i = 0; i < NPACKS; i++) {
+        max17205Stop(&packs[i].drvr);
+    }
 
     palClearLine(LINE_LED);
     chThdExit(MSG_OK);

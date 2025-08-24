@@ -34,7 +34,7 @@ extern "C" {
 
 //The F0 uses half-word writes
 typedef uint16_t flashdata_t;
-typedef bool bool_t;
+//typedef bool bool;
 
 /**
  * @brief Maximum program/erase parallelism
@@ -121,7 +121,7 @@ int flashEraseF091(flashaddr_t address, size_t size);
  * @return TRUE Memory is already erased.
  * @return FALSE Memory is not erased.
  */
-bool_t flashIsErasedF091(flashaddr_t address, size_t size);
+bool flashIsErasedF091(flashaddr_t address, size_t size);
 
 /**
  * @brief Check if the data in @p buffer are identical to the one in flash memory.
@@ -131,7 +131,7 @@ bool_t flashIsErasedF091(flashaddr_t address, size_t size);
  * @return TRUE if the flash memory and the buffer contain identical data.
  * @return FALSE if the flash memory and the buffer don't contain identical data.
  */
-bool_t flashCompare(flashaddr_t address, const char* buffer, size_t size);
+bool flashCompare(flashaddr_t address, const char* buffer, size_t size);
 
 /**
  * @brief Copy data from the flash memory to a @p buffer.

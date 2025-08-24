@@ -5,6 +5,7 @@
 #define MAX17205_T_RECAL_MS      5
 //tBlock(max) is specified as 7360ms in the data sheet, page 16
 #define MAX17205_T_BLOCK_MS      8000
+#define MAX17205_T_POR_MS        10
 
 /**
  * @name    MAX17205 Register Addresses
@@ -396,14 +397,15 @@
  * @name    MAX17205 (n)LearnCfg register (028h/19Fh) fields
  * @{
  */
-#define MAX17205_AD_LEARNCFG_PermMsk        (0xFF8BU)
-#define MAX17205_AD_LEARNCFG_PermSet        (0x2602U)
+#define MAX17205_AD_NLEARNCFG_PermMsk        (0xFF8BU)
+#define MAX17205_AD_NLEARNCFG_PermSet        (0x2602U)
 #define MAX17205_LEARNCFG_FILT_EMPTY_Pos    (2U)
 #define MAX17205_LEARNCFG_FILT_EMPTY_Msk    (0x1U << MAX17205_LEARNCFG_FILT_EMPTY_Pos)
 #define MAX17205_LEARNCFG_FILT_EMPTY        MAX17205_LEARNCFG_FILT_EMPTY_Msk
 #define MAX17205_LEARNCFG_LS_Pos            (4U)
 #define MAX17205_LEARNCFG_LS_Msk            (0x7U << MAX17205_LEARNCFG_LS_Pos)
 #define MAX17205_LEARNCFG_LS                MAX17205_LEARNCFG_LS_Msk
+#define MAX17205_LEARN_COMPLETE             7
 /** @} */
 
 /**
@@ -1064,8 +1066,12 @@ void max17205ObjectInit(MAX17205Driver *devp);
 bool max17205Start(MAX17205Driver *devp, const MAX17205Config *config);
 void max17205Stop(MAX17205Driver *devp);
 
+msg_t max17205Read(MAX17205Driver *devp, uint16_t reg, uint16_t *dest);
+msg_t max17205Write(MAX17205Driver *devp, uint16_t reg, uint16_t value);
+
 /* Reference datasheet table 1, generic register reads */
 msg_t max17205ReadCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t *dest_mAh);
+msg_t max17205WriteCapacity(MAX17205Driver *devp, const uint16_t reg, uint32_t dest_mAh);
 msg_t max17205ReadPercentage(MAX17205Driver *devp, uint16_t reg, uint8_t *dest_pct);
 msg_t max17205ReadVoltage(MAX17205Driver *devp, uint16_t reg, uint16_t *dest_mV);
 msg_t max17205ReadCurrent(MAX17205Driver *devp, uint16_t reg, int32_t *dest_mA);
@@ -1082,11 +1088,19 @@ msg_t max17205ReadMaxMinCurrent(MAX17205Driver *devp, int32_t * max_mA, int32_t 
 msg_t max17205ReadMaxMinTemperature(MAX17205Driver *devp, int8_t * max_C, int8_t * min_C);
 
 /* Misc */
+msg_t max17205ReadLearnState(MAX17205Driver *devp, uint8_t *dest);
+msg_t max17205WriteLearnState(MAX17205Driver *devp, uint8_t state);
+msg_t max17205ReadHistory(MAX17205Driver *devp);
+
 msg_t max17205ValidateRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len, bool * valid);
 msg_t max17205WriteRegisters(MAX17205Driver *devp, const max17205_regval_t * list, size_t len);
+msg_t max17205FirmwareReset(MAX17205Driver * devp);
+msg_t max17205HardwareReset(MAX17205Driver *devp);
+
 msg_t max17205ReadNVWriteCountMaskingRegister(MAX17205Driver *devp, uint16_t *reg_dest, uint8_t *number_of_writes_left);
 msg_t max17205NonvolatileBlockProgram(MAX17205Driver *devp);
-msg_t max17205PrintintNonvolatileMemory(MAX17205Driver *devp);
+msg_t max17205PrintVolatileMemory(MAX17205Driver *devp);
+msg_t max17205PrintNonvolatileMemory(MAX17205Driver *devp);
 
 const char* max17205RegToStr(const uint16_t reg);
 

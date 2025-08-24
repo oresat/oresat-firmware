@@ -10,7 +10,7 @@ endif
 
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
-  USE_COPT = 
+  USE_COPT =
 endif
 
 # C++ specific options here (added to USE_OPT).
@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -88,6 +88,7 @@ PROJECT   = app_bootloader
 # Target settings.
 MCU       = cortex-m0
 BOARD     = PROTOCARD_V4
+# BATTERY_BOARD = 1
 
 #Project sources.
 PROJ_ROOT = ../../..
@@ -99,6 +100,7 @@ TOOLCHAIN = $(PROJ_ROOT)/toolchain
 # Imported source files and paths.
 CHIBIOS  := $(PROJ_ROOT)/ext/ChibiOS
 CONFDIR  := $(APP_ROOT)/cfg
+LDDIR    := $(APP_ROOT)/ld
 BUILDDIR := $(APP_ROOT)/build
 DEPDIR   := $(APP_ROOT)/.dep
 
@@ -107,6 +109,7 @@ BOARDDIR  = $(PROJ_ROOT)/boards/$(BOARD)
 
 # Project specific files.
 include $(PROJ_SRC)/util.mk
+include $(PROJ_SRC)/flash_f0.mk
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -126,7 +129,11 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(PROJ_ROOT)/ld/STM32F091xC-bootloader.ld
+ifeq ($(BATTERY_BOARD),)
+  LDSCRIPT= $(LDDIR)/STM32F091xC-bootloader.ld
+else
+  LDSCRIPT= $(LDDIR)/STM32F091xC-battery-bootloader.ld
+endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -161,7 +168,7 @@ CPPWARN = -Wall -Wextra -Wundef
 # Start of user section
 #
 
-# List all user C define here, like -D_DEBUG=1
+# List all user C define here, like -DDEBUG_PRINT=1
 UDEFS =
 
 # Define ASM defines here
