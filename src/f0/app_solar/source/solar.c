@@ -88,7 +88,7 @@
 #define VREF_STEP_POSITIVE_uV             (VREF_STEP_NEGATIVE_uV * -4) //ratio of 2
 #define MAX_STEP 100000 //cap steps so they aren't too big when dynamic
 
-#define SLEEP_CYCLE 50
+#define ITERATION_PERIOD 50
 
 #if -VREF_STEP_NEGATIVE_uV < DAC_MININUM_ADJUST_uV
 #error "VREF_STEP_NEGATIVE_uV must be greater then DAC_MININUM_ADJUSG_uV"
@@ -121,7 +121,7 @@ typedef struct {
     struct Sample IE_samples[IE_ARRAY_LEN];
     uint32_t index_loop_counter;
     float32_t pt_slope;
-} MpptPaoState;
+} MpptState;
 
 /**
  * @brief control DAC output in microvolts.
@@ -131,14 +131,14 @@ typedef struct {
  * @param[in] uV        output volts in uV (microVolts).
  */
 
-int32_t time_helper(MpptPaoState *state) {
+int32_t time_helper(MpptState *state) {
     int32_t time_mS = TIME_I2MS(chVTGetSystemTime());
     int32_t rtn = time_mS - state->last_time_mS;
     state->last_time_mS = time_mS;
     return rtn;
 }
 
-void print_state(MpptPaoState *state) {
+void print_state(MpptState *state) {
     dbgprintf("shunt uV: %10d | bus mV: %10d | curr uA: %10d | power mW: %10d | iadj uV: %d | threshold flag: %d | cycle time mS: %d\r\n",
       state->sample.shunt_uV,
       state->sample.voltage_mV,
@@ -194,40 +194,27 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     return ret;
 }
 
-//takes two samples, one is assumed to be where we are. the second will be
-//moved to after writing iadj+IADJ_SAMPLE_OFFSET_uV. where iadj is an outparameter
-//which allows this function to be called multiple times to get n samples at constant distances
-float32_t find_ip_slope(struct Sample *sample_init, struct Sample *sample_adjusted, int32_t* iadj) {
-    *iadj += IADJ_SAMPLE_OFFSET_uV;
-    float32_t delta_power = 0;
-    float32_t delta_current = 0;
-    float32_t slope = 0;
-
-    dac_put_microvolts(&DACD1, 0, *iadj);
-    read_avg_power_and_voltage(&ina226dev, sample_adjusted);
-
-    delta_power = ((float32_t) sample_init->power_mW - (float32_t) sample_adjusted->power_mW);
-    delta_current = ((float32_t) sample_init->current_uA - (float32_t) sample_adjusted->current_uA);
-
-    if (!(delta_current > -FLOAT_DIST_TO_ZERO && delta_current < FLOAT_DIST_TO_ZERO)) {
-        slope = (delta_power / delta_current); //mW/uA
-    }
-    return slope;
-}
-
 //finds an average of two slopes
-float32_t find_compound_slope(struct Sample *current, int32_t old_iadj) {
-    float32_t slope1 = 0;
-    float32_t slope2 = 0;
+float32_t find_ip_slope(struct Sample *first, int32_t old_iadj) {
     int32_t this_iadj = old_iadj;
     struct Sample second;
     struct Sample third;
 
-    //int32_t* adjust = &old_iadj;
-    slope1 = find_ip_slope(current, &second, &this_iadj);
-    slope2 = find_ip_slope(&second, &third, &this_iadj);
+    this_iadj += IADJ_SAMPLE_OFFSET_uV;
+    dac_put_microvolts(&DACD1, 0, this_iadj);
+    read_avg_power_and_voltage(&ina226dev, &second);
 
-    float32_t slope = (slope1 + slope2) / 2.0;
+    this_iadj += IADJ_SAMPLE_OFFSET_uV;
+    dac_put_microvolts(&DACD1, 0, this_iadj);
+    read_avg_power_and_voltage(&ina226dev, &third);
+
+    float32_t delta_power1 = (float32_t) first->power_mW - (float32_t) second.power_mW;
+    float32_t delta_current1 = (float32_t) first->current_uA - (float32_t) second.current_uA;
+
+    float32_t delta_power2 = (float32_t) second.power_mW - (float32_t) third.power_mW;
+    float32_t delta_current2 = (float32_t) second.current_uA - (float32_t) third.current_uA;
+
+    float32_t slope = (delta_power1 * delta_current2 + delta_power2 * delta_current1) / (2.0 * delta_current1 * delta_current2);
 
     dbgprintf("calculated slope as %d/10,000 out of %d \n\r", (int32_t) (slope * 10000), (int32_t) (CRITICAL_SLOPE * 10000));
     dac_put_microvolts(&DACD1, 0, old_iadj);
@@ -250,10 +237,7 @@ float32_t find_pt_slope(struct Sample * newer, struct Sample * older) {
     return dpdt;
 }
 
-int32_t iadj_step_uV(MpptPaoState *state) {
-
-    int32_t CC_step = 0;
-    float32_t CC_critical_adjust = 0.0;
+int32_t iadj_step_uV(MpptState *state) {
 
 #if IE_ENABLE
     //find the trend from the oldest sample
@@ -274,6 +258,9 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 
 #endif
 
+    int32_t CC_step = 0;
+    float32_t CC_critical_adjust = 0.0;
+
 #if CC_ENABLE
 
     CC_step = state->pt_slope * CC_STEP_SCALE;
@@ -288,8 +275,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 #endif
 
 
-    //CC_correction = 0;
-    float32_t ip_slope = find_compound_slope(&state->sample, state->iadj_uV);
+    float32_t ip_slope = find_ip_slope(&state->sample, state->iadj_uV);
 
     float32_t reference_slope = CRITICAL_SLOPE - CC_critical_adjust;
     dbgprintf("reference_slope is %d/10,000, PMAX is %d/10,000, NMIN is %d/10,00  \r\n", (int32_t) (reference_slope*10000), (int32_t) (CC_PMAX*10000), (int32_t) (CC_NMIN*10000));
@@ -308,9 +294,10 @@ int32_t iadj_step_uV(MpptPaoState *state) {
 
 
     float32_t slope_error = (ip_slope - reference_slope) * SLOPE_CORRECTION_FACTOR;
-    float32_t DL_size_factor = 0;
+//TODO: implement dynamic laziness here
+//    float32_t DL_size_factor = 0;
 #if DL_ENABLE
-    DL_size_factor = state->pt_slope;
+//    DL_size_factor = state->pt_slope;
 #endif
 
     int32_t step = 0;
@@ -325,7 +312,7 @@ int32_t iadj_step_uV(MpptPaoState *state) {
     return step > MAX_STEP ? MAX_STEP : step;
 }
 
-bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
+bool iterate(MpptState *state) {
     const int64_t iadj = state->iadj_uV + iadj_step_uV(state);
     const uint32_t iadj_uV_perturbed = saturate_uint32_t(iadj, I_ADJ_MIN, I_ADJ_MAX);
 
@@ -352,7 +339,7 @@ bool iterate_mppt_perturb_and_observe(MpptPaoState *state) {
     return true;
 }
 
-bool generateCSV(INA226Driver *devp, MpptPaoState state) {
+bool generateCSV(INA226Driver *devp, MpptState state) {
     //Generate CSV output to terminal for plotting
     dbgprintf("iadj_uV,power_mW,voltage_mV,current_uA\r\n");
 
@@ -407,7 +394,7 @@ THD_FUNCTION(solar, arg)
     //Only PAO implemented for the time being
     OD_RAM.x4003_mppt_alg = MPPT_ALGORITHM_PAO;
 
-    MpptPaoState state = {
+    MpptState state = {
         .iadj_uV = I_ADJ_INITIAL,
     };
 
@@ -417,9 +404,6 @@ THD_FUNCTION(solar, arg)
 
     dbgprintf("Done with init INA226, running main loop....\r\n");
 
-    systime_t last_print = chVTGetSystemTime();
-
-
     systime_t t_start = chVTGetSystemTime();
     systime_t t_last = t_start;
     systime_t t_now = t_start;
@@ -428,6 +412,7 @@ THD_FUNCTION(solar, arg)
 
     state.index_loop_counter = 0;
     int32_t spacing_loop_counter = 0;
+    int32_t main_iterations = 0;
     while(!chThdShouldTerminateX()) {
 
 #if IE_ENABLE
@@ -437,11 +422,12 @@ THD_FUNCTION(solar, arg)
             state.index_loop_counter++;
         }
 #endif
-        iterate_mppt_perturb_and_observe(&state);
-        //print_state(&state);
-        chThdSleepMilliseconds(SLEEP_CYCLE);
-        /* generateCSV(&ina226dev, state); */
 
+        iterate(&state);
+        //print_state(&state);
+        chThdSleepUntil(t_start + chTimeMS2I(ITERATION_PERIOD) * ++main_iterations);
+
+        /* generateCSV(&ina226dev, state); */
         /*
         Energy Tracking:
         - Approximating energy by taking the tDiff = (t_n - t_n-1) * pSample, pSample being the
@@ -451,36 +437,27 @@ THD_FUNCTION(solar, arg)
         - Converting to joules when we store it in the OD so we don't overflow the uint16_t in a
           90 min interval
         */
-//        t_last = t_now;
-//        t_now = chVTGetSystemTime();
-//        energy_mJ += state.sample.power_mW * TIME_I2S(t_now - t_last);
-//
-//        // Dividing by 1k to convert to joules and truncate to 16 bits for the OD.
-//        // FIXME: truncation looks suspicious
-//        OD_RAM.x4000_output.energy = (uint16_t) energy_mJ / 1000;
-//
-//        OD_RAM.x4000_output.voltage = state.sample.voltage_mV;
-//        OD_RAM.x4000_output.voltage_avg = state.sample.voltage_mV;
-//        OD_RAM.x4000_output.current = state.sample.current_uA / 1000;
-//        OD_RAM.x4000_output.current_avg = state.sample.current_uA / 1000;
-//        OD_RAM.x4000_output.power = state.sample.power_mW;
-//        OD_RAM.x4000_output.power_avg = state.sample.power_mW;
-//
-//        OD_RAM.x4000_output.voltage_max = state.max_voltage_mV;
-//        OD_RAM.x4000_output.current_max = MAX(OD_RAM.x4000_output.current_max, state.sample.current_uA / 1000);
-//        OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, state.sample.power_mW);
-//
-//        OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
+        t_last = t_now;
+        t_now = chVTGetSystemTime();
+        energy_mJ += state.sample.power_mW * TIME_I2S(t_now - t_last);
 
-        //FIXME: remove once canopen util is avaliable
-        //if (!(state.index_loop_counter % 50)) {
- //     //      dbgprintf("shunt uV: %d\r\nbus   mV: %d\r\ncurr  uA: %d\r\npower mW: %d\r\n\r\n",
- //     //          state.sample.shunt_uV, state.sample.voltage_mV, state.sample.current_uA, state.sample.power_mW);
-        //    state.index_loop_counter = 0;
-        //    systime_t current_time = chVTGetSystemTime();
-        //    dbgprintf("cycling at %d ms\n", (int) (chTimeI2MS(current_time - last_print)/50));
-        //    last_print = current_time;
-        //}
+        // Dividing by 1k to convert to joules and truncate to 16 bits for the OD.
+        // FIXME: truncation looks suspicious
+        OD_RAM.x4000_output.energy = (uint16_t) energy_mJ / 1000;
+
+        OD_RAM.x4000_output.voltage = state.sample.voltage_mV;
+        OD_RAM.x4000_output.voltage_avg = state.sample.voltage_mV;
+        OD_RAM.x4000_output.current = state.sample.current_uA / 1000;
+        OD_RAM.x4000_output.current_avg = state.sample.current_uA / 1000;
+        OD_RAM.x4000_output.power = state.sample.power_mW;
+        OD_RAM.x4000_output.power_avg = state.sample.power_mW;
+
+        //OD_RAM.x4000_output.voltage_max = state.max_voltage_mV;
+        OD_RAM.x4000_output.current_max = MAX(OD_RAM.x4000_output.current_max, state.sample.current_uA / 1000);
+        OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, state.sample.power_mW);
+
+        OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
+
         spacing_loop_counter += 1;
     }
 
