@@ -13,6 +13,8 @@ extern uint8_t __flash1_base__[];
 extern uint8_t __flash1_end__[];
 extern uint8_t __flash2_base__[];
 extern uint8_t __flash2_end__[];
+extern uint8_t __flash3_base__[];
+extern uint8_t __flash3_end__[];
 extern uint8_t __ram0_base__[];
 extern uint8_t __ram0_end__[];
 extern uint8_t __ram1_base__[];
@@ -23,11 +25,13 @@ extern uint8_t __ram1_end__[];
 extern const void __flash0_size__;
 extern const void __flash1_size__;
 extern const void __flash2_size__;
+extern const void __flash3_size__;
 extern const void __ram0_size__;
 extern const void __ram1_size__;
 #define FLASH0_SIZE ((const uint32_t)(&__flash0_size__))
 #define FLASH1_SIZE ((const uint32_t)(&__flash1_size__))
 #define FLASH2_SIZE ((const uint32_t)(&__flash2_size__))
+#define FLASH3_SIZE ((const uint32_t)(&__flash3_size__))
 #define RAM0_SIZE ((const uint32_t)(&__ram0_size__))
 #define RAM1_SIZE ((const uint32_t)(&__ram1_size__))
 

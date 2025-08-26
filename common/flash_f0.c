@@ -44,7 +44,7 @@ flashpage_t flashPageAtF091(flashaddr_t address)
  * @return CH_SUCCESS  Unlock was successful.
  * @return CH_FAILED    Unlock failed.
  */
-static bool_t flashUnlock(void)
+static bool flashUnlock(void)
 {
     /* Check if unlock is really needed */
     if (!(FLASH->CR & FLASH_CR_LOCK))
@@ -113,7 +113,7 @@ int flashEraseF091(flashaddr_t address, size_t size)
     return FLASH_RETURN_SUCCESS;
 }
 
-bool_t flashIsErasedF091(flashaddr_t address, size_t size)
+bool flashIsErasedF091(flashaddr_t address, size_t size)
 {
     /* Check for default set bits in the flash memory
      * For efficiency, compare flashdata_t values as much as possible,
@@ -136,7 +136,7 @@ bool_t flashIsErasedF091(flashaddr_t address, size_t size)
     return TRUE;
 }
 
-bool_t flashCompare(flashaddr_t address, const char* buffer, size_t size)
+bool flashCompare(flashaddr_t address, const char* buffer, size_t size)
 {
     /* For efficiency, compare flashdata_t values as much as possible,
      * then, fallback to byte per byte comparison. */

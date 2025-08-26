@@ -174,6 +174,7 @@ bool read_avg_power_and_voltage(struct INA226Driver * ina226, struct Sample * sa
     }
 
     if (ina226ReadShunt(ina226, &sample->shunt_uV) != MSG_OK) {
+
         ret = false;
     }
     if (ina226ReadPower(ina226, &sample->power_mW) != MSG_OK ) {
@@ -396,6 +397,9 @@ THD_FUNCTION(solar, arg)
 
     MpptState state = {
         .iadj_uV = I_ADJ_INITIAL,
+        .max_voltage_mV = 0,
+        .direction_up_flag = true,
+        .hit_step_size_threshold_flag = false,
     };
 
     palSetLine(LINE_LT1618_EN);
