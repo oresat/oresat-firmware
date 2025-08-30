@@ -1,0 +1,43 @@
+manifest:
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+    - name: oresat
+      url-base: https://github.com/oresat
+    - name: pete
+      url-base: https://github.com/plskeggs
+    - name: canopennode
+      url-base: https://github.com/CANopenNode
+  defaults:
+    remote: pete
+    #remote: oresat
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: b6aed5c
+      import:
+        name-allowlist:
+          - cmsis
+          - hal_stm32
+    - name: CANopenNode
+      remote: canopennode
+      revision: 58012aa
+      path: common/lib/canopennode_v4/CANopenNode
+    - name: oresat-configs
+      remote: oresat
+      revision: v1.0.0
+    - name: oresat-app-adcs
+      revision: main
+      path: apps/adcs
+    -name: oresat-app-battery
+      revision: main
+      path: apps/battery
+    -name: oresat-app-solar
+      revision: main
+      path: apps/solar
+    -name: oresat-app-template
+      revision: main
+      path: apps/template
+
+  self:
+    path: common

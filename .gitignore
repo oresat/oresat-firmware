@@ -1,0 +1,20 @@
+# editors
+.vscode
+*.swp
+*.cache
+
+# mac
+.DS_Store
+
+# python
+.venv
+__pycache__/
+
+# builds
+build/
+
+# generated files
+gen/
+
+# modules
+CANopenNode

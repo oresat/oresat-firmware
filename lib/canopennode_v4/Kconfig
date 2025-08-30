@@ -1,0 +1,42 @@
+# CANopenNode v4 CANopen protocol stack configuration options
+
+config CANOPENNODE_V4
+	bool "CANopenNode support"
+	select CRC
+	depends on CAN && !CAN_FD_MODE
+	help
+	  This option enables the CANopenNode v4 library.
+
+if CANOPENNODE_V4
+
+config CANOPENNODE_SDO_BUFFER_SIZE
+	int "CANopen SDO buffer size"
+	default 889
+	range 7 889
+	help
+	  Size of the internal CANopen SDO buffer in bytes. Size must
+	  be at least equal to the size of the largest variable in the
+	  object dictionary. If data type is DOMAIN, data length is
+	  not limited to the SDO buffer size. If block transfer is
+	  implemented, value should be set to 889.
+
+config CANOPENNODE_TRACE_BUFFER_SIZE
+	int "CANopen trace buffer size"
+	default 100
+	help
+	  Size of the CANopen trace buffer in bytes.
+
+config CANOPENNODE_TX_WORKQUEUE_STACK_SIZE
+	int "Stack size for the CANopen transmit workqueue"
+	default 512
+	help
+	  Size of the stack used for the internal CANopen transmit
+	  workqueue.
+
+config CANOPENNODE_TX_WORKQUEUE_PRIORITY
+	int "Priority for CANopen transmit workqueue"
+	default 0
+	help
+	  Priority level of the internal CANopen transmit workqueue.
+
+endif # CANOPENNODE_V4
