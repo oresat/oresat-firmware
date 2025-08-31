@@ -29,15 +29,20 @@ manifest:
     - name: oresat-app-adcs
       revision: main
       path: apps/adcs
-    -name: oresat-app-battery
+      #import: submanifests
+    - name: oresat-app-battery
       revision: main
       path: apps/battery
-    -name: oresat-app-solar
+      #import: submanifests
+    - name: oresat-app-solar
       revision: main
       path: apps/solar
-    -name: oresat-app-template
+      #import: submanifests
+    - name: oresat-app-template
       revision: main
       path: apps/template
+      import: submanifests
 
   self:
     path: common
+    #import: submanifests
