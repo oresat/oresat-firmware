@@ -19,6 +19,7 @@ manifest:
         name-allowlist:
           - cmsis
           - hal_stm32
+          - hal_nxp
     - name: CANopenNode
       remote: canopennode
       revision: 58012aa
