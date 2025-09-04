@@ -11,7 +11,7 @@
 __pycache__/
 
 # builds
-build/
+build*/
 
 # generated files
 gen/

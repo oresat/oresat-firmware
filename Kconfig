@@ -1,1 +1,1 @@
-rsource "common/Kconfig"
+rsource "lib/Kconfig"

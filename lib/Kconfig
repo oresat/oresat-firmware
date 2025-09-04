@@ -1,0 +1,2 @@
+rsource "canopennode_v4/Kconfig"
+rsource "util/Kconfig"

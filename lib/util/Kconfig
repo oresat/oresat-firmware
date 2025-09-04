@@ -1,3 +1,1 @@
-menu "Modules"
-rsource "canopennode_v4/Kconfig"
-endmenu
+
