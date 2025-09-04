@@ -39,4 +39,8 @@ config CANOPENNODE_TX_WORKQUEUE_PRIORITY
 	help
 	  Priority level of the internal CANopen transmit workqueue.
 
+module = CANOPENNODE_V4
+module-str = CANOpenNode
+source "subsys/logging/Kconfig.template.log_config"
+
 endif # CANOPENNODE_V4

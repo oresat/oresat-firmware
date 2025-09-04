@@ -15,6 +15,11 @@
 #include <CANopen.h>
 #include <OD.h>
 #include <canopennode.h>
+#include <zephyr/logging/log.h>
+
+#define LOG_LEVEL CONFIG_CANOPENNODE_V4_LOG_LEVEL
+
+LOG_MODULE_REGISTER(canopennode);
 
 #define CO_SDO_SRV_STACK_SIZE 2048
 #define CO_MAIN_STACK_SIZE    2048
@@ -58,11 +63,11 @@ static void co_rt_thread(void *p1, void *p2, void *p3);
 int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_id)
 {
 	CO_ReturnError_t err;
-	uint32_t heapMemoryUsed;
+	uint32_t heapMemoryUsed = 0;
 	uint32_t errInfo = 0;
 
 	if (!device_is_ready(dev)) {
-		printf("CAN interface not ready");
+		LOG_ERR("CAN interface not ready");
 		return -1;
 	}
 
@@ -70,14 +75,14 @@ int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_i
 	CO_config_t *config_ptr = NULL;
 	CO = CO_new(config_ptr, &heapMemoryUsed);
 	if (CO == NULL) {
-		printf("Can't allocate memory\n");
+		LOG_ERR("Can't allocate memory");
 		return -1;
 	} else {
-		printf("Allocated %u bytes for CANopen objects\n", heapMemoryUsed);
+		LOG_DBG("Allocated %u bytes for CANopen objects", heapMemoryUsed);
 	}
 
 	/* CANopen communication reset - initialize CANopen objects */
-	printf("CANopenNode - Reset communication...\n");
+	LOG_DBG("CANopenNode - Reset communication...");
 
 	/* Wait rt_thread. */
 	CO->CANmodule->CANnormal = false;
@@ -89,7 +94,7 @@ int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_i
 	/* initialize CANopen */
 	err = CO_CANinit(CO, (void *)dev, bit_rate);
 	if (err != CO_ERROR_NO) {
-		printf("CAN initialization failed: %d\n", err);
+		LOG_ERR("CAN initialization failed: %d", err);
 		return -1;
 	}
 
@@ -106,9 +111,9 @@ int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_i
 			     node_id, &errInfo);
 	if (err != CO_ERROR_NO && err != CO_ERROR_NODE_ID_UNCONFIGURED_LSS) {
 		if (err == CO_ERROR_OD_PARAMETERS) {
-			printf("Object Dictionary entry 0x%X\n", errInfo);
+			LOG_DBG("Object Dictionary entry 0x%X", errInfo);
 		} else {
-			printf("CANopen initialization failed: %d\n", err);
+			LOG_ERR("CANopen initialization failed: %d", err);
 		}
 		return -1;
 	}
@@ -116,9 +121,9 @@ int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_i
 	err = CO_CANopenInitPDO(CO, CO->em, OD, node_id, &errInfo);
 	if (err != CO_ERROR_NO) {
 		if (err == CO_ERROR_OD_PARAMETERS) {
-			printf("Object Dictionary entry 0x%X\n", errInfo);
+			LOG_DBG("Object Dictionary entry 0x%X", errInfo);
 		} else {
-			printf("PDO initialization failed: %d\n", err);
+			LOG_ERR("PDO initialization failed: %d", err);
 		}
 		return -1;
 	}
@@ -128,7 +133,7 @@ int canopennode_init(const struct device *dev, uint16_t bit_rate, uint8_t node_i
 	/* Configure CAN transmit and receive interrupt */
 
 	if (CO->nodeIdUnconfigured) {
-		printf("CANopenNode - Node-id not initialized\n");
+		LOG_ERR("CANopenNode - Node-id not initialized");
 	}
 
 	/* start CAN */
@@ -175,7 +180,7 @@ void canopennode_stop(const struct device *dev)
 	}
 	CO_delete(CO);
 
-	printf("CANopenNode finished\n");
+	LOG_DBG("CANopenNode finished");
 }
 
 static void process_cb(void *tid)
@@ -213,7 +218,7 @@ static void co_main_thread(void *p1, void *p2, void *p3)
 	uint32_t elapsed_us = 1000U;
 
 	reset = CO_RESET_NOT;
-	printf("CANopenNode - Running...\n");
+	LOG_DBG("CANopenNode - Running...");
 
 	while (reset == CO_RESET_NOT) {
 		k_sleep(K_FOREVER);

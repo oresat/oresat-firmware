@@ -18,6 +18,10 @@
 #include <CO_driver_target.h>
 #include <canopennode.h>
 
+#define LOG_LEVEL CONFIG_CANOPENNODE_V4_LOG_LEVEL
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(canopen_driver);
+
 #define OD_CNT_RX_MSG (OD_CNT_NMT + OD_CNT_SYNC + OD_CNT_SDO_SRV)
 
 struct can_filter_user_data {
@@ -90,7 +94,7 @@ static void canopen_tx_callback(const struct device *dev, int error, void *arg)
 	ARG_UNUSED(dev);
 
 	if (!CANmodule) {
-		printf("failed to process CAN tx callback");
+		LOG_ERR("failed to process CAN tx callback");
 		return;
 	}
 
@@ -142,7 +146,7 @@ void CO_CANsetConfigurationMode(void *CANptr)
 {
 	int err = can_stop(CANptr);
 	if (err != 0 && err != -EALREADY) {
-		printf("failed to disable CAN interface (err %d)\n", err);
+		LOG_ERR("failed to disable CAN interface (err %d)", err);
 	}
 }
 
@@ -152,13 +156,13 @@ void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 
 	err = can_set_mode(CANmodule->CANptr, CAN_MODE_NORMAL);
 	if (err) {
-		printf("failed to configure CAN interface (err %d)\n", err);
+		LOG_ERR("failed to configure CAN interface (err %d)", err);
 		return;
 	}
 
 	err = can_start(CANmodule->CANptr);
 	if (err != 0 && err != -EALREADY) {
-		printf("failed to start CAN interface (err %d)\n", err);
+		LOG_ERR("failed to start CAN interface (err %d)", err);
 		return;
 	}
 
@@ -172,21 +176,21 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 	uint16_t i;
 	int err;
 
-	printf("rxSize = %d, txSize = %d\n", rxSize, txSize);
+	LOG_DBG("rxSize = %d, txSize = %d", rxSize, txSize);
 
 	if (!CANmodule || !rxArray || !txArray || !CANptr) {
-		printf("failed to initialize CAN module\n");
+		LOG_ERR("failed to initialize CAN module");
 		return CO_ERROR_ILLEGAL_ARGUMENT;
 	}
 
 	int max_filters = can_get_max_filters(CANptr, false);
 	if (max_filters != -ENOSYS) {
 		if (max_filters < 0) {
-			printf("unable to determine number of CAN RX filters");
+			LOG_ERR("unable to determine number of CAN RX filters");
 			return CO_ERROR_SYSCALL;
 		} else if (rxSize > max_filters) {
-			printf("insufficient number of concurrent CAN RX filters"
-			       " (needs %d, %d available)\n",
+			LOG_ERR("insufficient number of concurrent CAN RX filters"
+			       " (needs %d, %d available)",
 			       rxSize, max_filters);
 			return CO_ERROR_OUT_OF_MEMORY;
 		}
@@ -236,7 +240,7 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule, void *CANptr, CO_C
 
 	err = can_set_bitrate(CANptr, KHZ(CANbitRate));
 	if (err) {
-		printf("failed to configure CAN bitrate (err %d)\n", err);
+		LOG_ERR("failed to configure CAN bitrate (err %d)", err);
 		return CO_ERROR_ILLEGAL_ARGUMENT;
 	}
 
@@ -253,7 +257,7 @@ void CO_CANmodule_disable(CO_CANmodule_t *CANmodule)
 
 	int err = can_stop(CANmodule->CANptr);
 	if (err != 0 && err != -EALREADY) {
-		printf("failed to disable CAN interface (err %d)\n", err);
+		LOG_ERR("failed to disable CAN interface (err %d)", err);
 	}
 }
 
@@ -283,7 +287,7 @@ CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, u
 
 		buffer->ident = ident & 0x07FFU;
 		if (rtr) {
-			printf("request for RTR frames, but RTR frames are rejected");
+			LOG_ERR("request for RTR frames, but RTR frames are rejected");
 			CO_errorReport(CO->em, CO_EM_GENERIC_SOFTWARE_ERROR,
 				       CO_EMC_SOFTWARE_INTERNAL, 0);
 			return CO_ERROR_ILLEGAL_ARGUMENT;
@@ -301,7 +305,7 @@ CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, u
 					  (void *)&filters_user_data[index], &filters[index]);
 		}
 	} else {
-		printf("failed to initialize CAN rx buffer, illegal argument");
+		LOG_ERR("failed to initialize CAN rx buffer, illegal argument");
 		ret = CO_ERROR_ILLEGAL_ARGUMENT;
 	}
 
@@ -318,7 +322,7 @@ CO_CANtx_t *CO_CANtxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16
 	}
 
 	if (index >= CANmodule->txSize) {
-		printf("failed to initialize CAN rx buffer, illegal argument");
+		LOG_ERR("failed to initialize CAN rx buffer, illegal argument");
 		CO_errorReport(CO->em, CO_EM_GENERIC_SOFTWARE_ERROR, CO_EMC_SOFTWARE_INTERNAL, 0);
 		return NULL;
 	}
