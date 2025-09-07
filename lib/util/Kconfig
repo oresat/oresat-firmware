@@ -1,1 +1,13 @@
+config ORESAT_COMMON_LIB
+	bool "Oresat Common Lib"
+	help
+	  This option enables the Oresat common library which pulls in support for common sensors and CAN.
+
+if ORESAT_COMMON_LIB
+
+module = ORESAT_COMMON_LIB
+module-str = OresatCommonLib
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # ORESAT_COMMON_LIB
 

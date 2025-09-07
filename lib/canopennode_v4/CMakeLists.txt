@@ -1,3 +1,5 @@
+if(CONFIG_CANOPENNODE_V4)
+
 zephyr_library()
 
 zephyr_include_directories(
@@ -20,3 +22,5 @@ zephyr_library_sources(
   CO_driver.c
   canopennode.c
 )
+
+endif()
