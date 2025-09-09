@@ -4,6 +4,7 @@
 #include <canopennode.h>
 #include <OD.h>
 
+#if defined(BOARD_NUCLEO_F091RC)
 #define DIE_TEMP_ALIAS(i) DT_ALIAS(_CONCAT(die_temp, i))
 #define DIE_TEMPERATURE_SENSOR(i, _)                                                               \
 	IF_ENABLED(DT_NODE_EXISTS(DIE_TEMP_ALIAS(i)), (DEVICE_DT_GET(DIE_TEMP_ALIAS(i)),))
@@ -39,3 +40,26 @@ void board_sensors_fill_od(void)
 	OD_RAM.x3003_system.temperature = die_temp.val1;
 	CO_UNLOCK_OD(CO->CANmodule);
 }
+
+#else
+
+void board_sensors_init(void)
+{
+}
+
+void board_sensors_fill_od(void)
+{
+	static uint16_t vrevint = 4578;
+	static int8_t temp = 20;
+
+	CO_LOCK_OD(CO->CANmodule);
+	OD_RAM.x3003_system.vrefint = vrevint--;
+	OD_RAM.x3003_system.temperature = temp++;
+	if (temp > 60) {
+		temp = -60;
+	}
+	CO_UNLOCK_OD(CO->CANmodule);
+}
+
+#endif
+
