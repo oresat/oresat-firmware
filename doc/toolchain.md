@@ -7,26 +7,20 @@ toolchain on various system platforms (Linux, macOS, etc).
 
 The build-related tools are acquired through the following packages:
 
-`$ pacman -Sy base-devel arm-none-eabi-binutils arm-none-eabi-gcc
-arm-none-eabi-gdb arm-none-eabi-newlib stlink python`
+`$ sudo pacman -S base-devel arm-none-eabi-binutils arm-none-eabi-gcc
+arm-none-eabi-gdb arm-none-eabi-newlib stlink python openocd`
 
-Both `openocd` and `srecord` must be install thru the AUR
-(Arch User Repository). Either use a AUR helper like `paru` or `yay` or
+`srecord` must be installed through the AUR
+(Arch User Repository). Either use an AUR helper like `paru` or `yay` or
 built it manually.
 
 ### AUR Helper example using paru
 
-- `$ paru -S openocd-git srecord`
+- `$ paru -S srecord`
 
 ### AUR Helper example using yay
 
-- `$ yay -S openocd-git srecord`
-
-### AUR manual build
-
-- Clone AUR openocd-git repo: `$ git clone https://aur.archlinux.org/openocd-git`
-- `$ cd openocd-git`
-- Build and install Arch Linux package: `$ makepkg -si`
+- `$ yay -S srecord`
 
 ## Debian Linux (and derivatives)
 
