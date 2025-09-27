@@ -39,6 +39,12 @@ manifest:
       revision: main
       path: apps/solar
       #import: submanifests
+    - name: oresat-mcxn947-demo
+      revision: feature-demo-other-hardware
+      path: apps/oresat-mcxn947-demo
+    - name: oresat-mcxn947-protocard
+      revision: feature-i2c
+      path: apps/oresat-mcxn947-demo/boards
     - name: oresat-app-template
       revision: main
       path: apps/template
