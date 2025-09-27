@@ -62,8 +62,9 @@ pip install west
 ### Get the source code
 
 ```bash
-west init -m https://github.com/oresat/oresat-zephyr --mr master zephyr-workspace
-cd zephyr-workspace
+mkdir -p ~/src/oresat
+cd ~/src/oresat
+west init -m https://github.com/plskeggs/oresat-zephyr-common --mr main
 west update
 ```
 
@@ -71,6 +72,18 @@ west update
 
 ```bash
 west zephyr-export
+```
+
+### Export zephyr environment
+
+```bash
+cd ~/src/oresat/zephyr
+./zephyr-env.sh
+```
+NOTE: it is helpful to also add these to your ~/.bashrc:
+```
+export ZEPHYR_SDK_INSTALL_DIR=/opt/zephyr-sdk-0.16.8
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 ```
 
 ### Install the rest of Zephyr's Python dependencies
@@ -88,7 +101,7 @@ pip install --user oresat-configs~=1.0.0
 ### Test compile and flash
 
 ```bash
-cd zephyr/samples/basic/blinky
+cd apps/template
 west build -p always -b nucleo_f091rc .
 west flash --runner openocd
 ```
