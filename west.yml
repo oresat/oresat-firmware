@@ -24,9 +24,6 @@ manifest:
       remote: canopennode
       revision: 58012aa
       path: common/lib/canopennode_v4/CANopenNode
-    - name: oresat-configs
-      remote: oresat
-      revision: v1.0.0
     - name: oresat-app-adcs
       revision: main
       path: apps/adcs
@@ -40,11 +37,11 @@ manifest:
       path: apps/solar
       #import: submanifests
     - name: oresat-mcxn947-demo
-      revision: feature-demo-other-hardware
-      path: apps/oresat-mcxn947-demo
+      revision: main
+      path: apps/mcxn947-demo
     - name: oresat-mcxn947-protocard
-      revision: feature-i2c
-      path: apps/oresat-mcxn947-demo/boards
+      revision: main
+      path: apps/oresat-mcxn947-demo/boards/mcxn947_protocard
     - name: oresat-app-template
       revision: main
       path: apps/template
