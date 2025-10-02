@@ -1,9 +1,8 @@
-# oresat-zephyr
+# oresat-firmware
 
-OreSat Zephyr common code and main manifest repository. Initialize a new west workspace from this repository --
-it contains the top level west.yml file for all Oresat card applications.
+OreSat firmware for Zephyr common code and main manifest repository.
 
-**NOTE:** The remainder of this document requires a complete rewrite to match the new design.
+Initialize a new west workspace from this repository --it contains the top level west.yml file for all Oresat card applications.
 
 ## Setup
 
@@ -39,11 +38,11 @@ it contains the top level west.yml file for all Oresat card applications.
 - Everything else
 
     ```bash
-    cd /opt
-    wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_linux-x86_64.tar.xz
-    tar xvf zephyr-sdk-0.16.8_linux-x86_64.tar.xz
-    cd zephyr-sdk-0.16.8
-    ./setup.sh
+    sudo cd /opt
+    sudo wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_linux-x86_64.tar.xz
+    sudo tar xvf zephyr-sdk-0.16.8_linux-x86_64.tar.xz
+    sudo cd zephyr-sdk-0.16.8
+    sudo ./setup.sh
     ```
 
 ### Add udev rule:
@@ -59,11 +58,11 @@ sudo udevadm control --reload
 pip install west
 ```
 
-### Get the source code
+### Get the source code for common firmware repo, all apps, zephyr, and zephyr modules
 
 ```bash
-mkdir -p ~/src/oresat
-cd ~/src/oresat
+mkdir -p ~/src/oresat/firmware
+cd ~/src/oresat/firmware
 west init -m https://github.com/plskeggs/oresat-zephyr-common --mr main
 west update
 ```
@@ -77,8 +76,8 @@ west zephyr-export
 ### Export zephyr environment
 
 ```bash
-cd ~/src/oresat/zephyr
-./zephyr-env.sh
+cd ~/src/oresat/firmware/zephyr
+source ./zephyr-env.sh
 ```
 NOTE: it is helpful to also add these to your ~/.bashrc:
 ```
@@ -89,7 +88,7 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 ### Install the rest of Zephyr's Python dependencies
 
 ```bash
-pip install -r zephyr/scripts/requirements.txt
+pip install -r ~/src/oresat/firmware/zephyr/scripts/requirements.txt
 ```
 
 ### Install OreSat Configs
@@ -101,7 +100,7 @@ pip install --user oresat-configs~=1.0.0
 ### Test compile and flash
 
 ```bash
-cd apps/template
+cd ~/src/oresat/firmware/apps/template
 west build -p always -b nucleo_f091rc .
 west flash --runner openocd
 ```

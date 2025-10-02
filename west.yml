@@ -9,8 +9,7 @@ manifest:
     - name: canopennode
       url-base: https://github.com/CANopenNode
   defaults:
-    remote: pete
-    #remote: oresat
+    remote: oresat
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
@@ -43,9 +42,11 @@ manifest:
       path: apps/template
       import: submanifests
     - name: oresat-mcxn947-demo
+      remote: pete
       revision: main
       path: apps/mcxn947-demo
     - name: oresat-mcxn947-protocard
+      remote: pete
       revision: main
       path: apps/mcxn947-demo/boards/mcxn947_protocard
 
