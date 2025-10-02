@@ -16,6 +16,8 @@ manifest:
       remote: zephyrproject-rtos
       revision: v4.2.0
       import:
+        # below, only import Zephyr modules we need;
+        # extend this per app in submanifests: see oresat-template-app
         name-allowlist:
           - cmsis_6
           - hal_stm32
@@ -24,28 +26,28 @@ manifest:
       remote: canopennode
       revision: 58012aa
       path: common/lib/canopennode_v4/CANopenNode
-    - name: oresat-app-adcs
+    - name: oresat-adcs-app
       revision: main
       path: apps/adcs
       #import: submanifests
-    - name: oresat-app-battery
+    - name: oresat-battery-app
       revision: main
       path: apps/battery
       #import: submanifests
-    - name: oresat-app-solar
+    - name: oresat-solar-app
       revision: main
       path: apps/solar
       #import: submanifests
+    - name: oresat-template-app
+      revision: main
+      path: apps/template
+      import: submanifests
     - name: oresat-mcxn947-demo
       revision: main
       path: apps/mcxn947-demo
     - name: oresat-mcxn947-protocard
       revision: main
-      path: apps/oresat-mcxn947-demo/boards/mcxn947_protocard
-    - name: oresat-app-template
-      revision: main
-      path: apps/template
-      import: submanifests
+      path: apps/mcxn947-demo/boards/mcxn947_protocard
 
   self:
     path: common
