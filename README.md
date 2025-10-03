@@ -63,7 +63,7 @@ pip install west
 ```bash
 mkdir -p ~/src/oresat/firmware
 cd ~/src/oresat/firmware
-west init -m https://github.com/plskeggs/oresat-zephyr-common --mr main
+west init -m https://github.com/oresat/oresat-firmware --mr zephyr
 west update
 ```
 
