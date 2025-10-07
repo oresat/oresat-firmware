@@ -22,10 +22,13 @@ Initialize a new west workspace from this repository --it contains the top level
 
     ```bash
     sudo apt install --no-install-recommends git cmake ninja-build gperf \
-      ccache dfu-util device-tree-compiler wget \
-      python3-dev python3-pip python3-setuptools python3-tk python3-wheel \
-      xz-utils file make libsdl2-dev libmagic1 stlink-tools
+      ccache dfu-util device-tree-compiler wget python3-dev python3-venv python3-tk \
+      xz-utils file make libsdl2-dev libmagic1 \
+	   python3-pip python3-setuptools python3-wheel stlink-tools
     ```
+    For the curious, this is mostly the same list as in the official Zephyr getting started,
+    except that we do not require: `gcc gcc-multilib g++-multilib`
+	 but instead add: `python3-pip python3-setuptools python3-wheel stlink-tools`
 
 ### Install Zephyr SDK
 
@@ -52,11 +55,36 @@ sudo cp /opt/zephyr-sdk-0.16.8/sysroots/x86_64-pokysdk-linux/usr/share/openocd/c
 sudo udevadm control --reload
 ```
 
+### Create a new virtual environment:
+
+```bash
+python3 -m venv ~/zephyrproject/.venv
+```
+
+### Activate the virtual environment:
+
+```bash
+source ~/zephyrproject/.venv/bin/activate
+```
+
+Once activated your shell will be prefixed with (.venv). The virtual environment can be deactivated at any time by running deactivate.
+
+**Note**
+
+Remember to activate the virtual environment every time you start working.
+
 ### Install west
 
 ```bash
 pip install west
 ```
+
+Alternatively, your OS's package manager might have a west package. Debian Testing does:
+```bash
+sudo apt install west
+```
+
+**However** it is highly recommended to use the pip (or uv) version as it will be the most up-to-date.
 
 ### Get the source code for common firmware repo, all apps, zephyr, and zephyr modules
 
@@ -105,6 +133,14 @@ west build -p always -b nucleo_f091rc .
 west flash --runner openocd
 ```
 
+### Segger J-Link
+
+In order to flash and debug the NXP MCXN947, you will need a Segger J-Link debugger
+and install the required J-Link software.
+
+Visit [Segger J-Link Downloads], download the latest J-Link software for your OS,
+and follow their installation instructions.
+
 ## Tools
 
 - [clang-format]: Used to auto format the code. Can be installed with
@@ -124,3 +160,4 @@ tools are needed for development and testing.
 [clang-format]:https://clang.llvm.org/docs/ClangFormat.html
 [candump]:https://manpages.debian.org/testing/can-utils/candump.1.en.html
 [SavvyCAN]:https://github.com/collin80/SavvyCAN
+[Segger J-Link Downloads]:https://www.segger.com/downloads/jlink/
