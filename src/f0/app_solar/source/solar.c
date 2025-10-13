@@ -404,7 +404,6 @@ THD_FUNCTION(solar, arg)
         //print_state(&state);
         spacing_loop_counter += 1; //must happen after iterate
 
-        chThdSleepUntil(t_start + chTimeMS2I(ITERATION_PERIOD) * ++main_iterations);
 
         /*
         Energy Tracking:
@@ -416,7 +415,7 @@ THD_FUNCTION(solar, arg)
           90 min interval
         */
         t_last = t_now;
-        t_now = chVTGetSystemTime();
+        t_now = state.sample.time;
         energy_mJ += state.sample.power_mW * TIME_I2S(t_now - t_last);
 
         // Dividing by 1k to convert to joules and truncate to 16 bits for the OD.
@@ -435,6 +434,8 @@ THD_FUNCTION(solar, arg)
         OD_RAM.x4000_output.power_max = MAX(OD_RAM.x4000_output.power_max, (uint16_t) state.sample.power_mW);
 
         OD_RAM.x4004_lt1618_iadj = state.iadj_uV / 1000;
+
+        chThdSleepUntil(t_start + chTimeMS2I(ITERATION_PERIOD) * ++main_iterations);
 
     }
 
