@@ -4,7 +4,7 @@
 #include <CANopen.h>
 #include <OD.h>
 #ifdef STM32F091xC
-#include "stm32f091xc.h"
+#include "stm32f0xx_hal.h"
 #endif
 
 #define DEFAULT_NODE_ID 0x7C
@@ -14,7 +14,7 @@ static inline uint8_t oresat_get_node_id(void)
 	uint8_t node_id = DEFAULT_NODE_ID;
 #ifdef STM32F091xC
 	/* node id is set in the stm32f091rc's option bytes. */
-	node_id = (FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos;
+	node_id = HAL_FLASHEx_OBGetUserData(OB_DATA_ADDRESS_DATA0); // (FLASH->OBR & FLASH_OBR_DATA0_Msk) >> FLASH_OBR_DATA0_Pos;
 	if (node_id == 0 || node_id > DEFAULT_NODE_ID) {
 		node_id = DEFAULT_NODE_ID;
 	}
