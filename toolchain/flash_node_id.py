@@ -11,40 +11,22 @@ import subprocess
 import sys
 from argparse import ArgumentParser
 
-# FIXME: retrieve IDs from oresat-configs
-NODE_IDS = {
-    ("battery", 1): 0x04,
-    ("battery", 2): 0x08,
-    ("solar_module", 1): 0x0C,
-    ("solar_module", 2): 0x10,
-    ("solar_module", 3): 0x14,
-    ("solar_module", 4): 0x18,
-    ("solar_module", 5): 0x1C,
-    ("solar_module", 6): 0x20,
-    ("solar_module", 7): 0x24,
-    ("solar_module", 8): 0x28,
-    ("adcs", 1): 0x38,
-    ("reaction_wheel", 1): 0x3C,
-    ("reaction_wheel", 2): 0x40,
-    ("reaction_wheel", 3): 0x44,
-    ("reaction_wheel", 4): 0x48,
-    ("diode_test", 1): 0x54,
-}
+from oresat_configs import OreSatConfig
 
 CONFIG_PATH = {
     "battery": "BATTERY_V3",
-    "solar_module": "SOLAR_V5",
+    "solar": "SOLAR_V5",
     "adcs": "ORESAT_ADCS_V1_2",
-    "reaction_wheel": "ORESAT_RWB_V4",
+    "rw": "ORESAT_RWB_V4",
     "diode_test": "PROTOCARD_V4",
 }
 
 CARD_ALIASES = {}
 for name, aliases in {
     "battery": ["bat", "batt"],
-    "solar_module": ["solar", "sol"],
+    "solar": ["sol", "solar_module"],
     "adcs": ["imu"],
-    "reaction_wheel": ["rw"],
+    "rw": ["reaction_wheel"],
     "diode_test": ["diode", "dtc"],
 }.items():
     CARD_ALIASES[name] = name
@@ -58,14 +40,17 @@ parser = ArgumentParser(
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("--ids", action='store_true', help="prints the list of node ids")
 group.add_argument("card", nargs='?', help="see below for valid names")
-parser.add_argument("number", nargs='?', type=int, default=1, help="card number, default: %(default)s")
+parser.add_argument("number", nargs='?', type=int, help="card number")
 args = parser.parse_args()
 
+config = OreSatConfig()
 if args.ids:
     print(f"{'Card name':16}| Node ID")
-    for (name, num), nid in NODE_IDS.items():
-        card = f"{name} {num}"
-        print(f"{card:16}: 0x{nid:02X}")
+    for card, info in config.cards.items():
+        if info.processor == 'stm32':
+            if card[-1].isdigit():
+                card = card.replace('_', ' ')
+            print(f"{card:16}: 0x{info.node_id:02X}")
     sys.exit(1)
 
 try:
@@ -75,9 +60,13 @@ except KeyError:
     sys.exit(1)
 
 try:
-    node_id = NODE_IDS[(card, args.number)]
+    if args.number is None:
+        node_id = config.cards[card].node_id
+    else:
+        node_id = config.cards[f"{card}_{args.number}"].node_id
 except KeyError:
     print(f"failed to find card with name {args.card} and number {args.number}")
+    raise
     sys.exit(1)
 
 subprocess.run(["openocd", # "-d",
