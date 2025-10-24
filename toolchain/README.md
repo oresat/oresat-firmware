@@ -1,15 +1,19 @@
 # Toolchain
 
-OreSat uses either STLink or OpenOCD to program and debug boards. STLink is the preferred method, and `make` commands default to using it.
+OreSat uses either STLink or OpenOCD to program and debug boards. OpenOCD is the
+preferred method, and `make` commands default to using it.
 
 ## Programming
 
-In order to program a board, one must simply build the program in question and then issue a `make write` command as follows (using app_blinky as an example):
+In order to program a board, the firmware must be built and then programmed on
+to the device. `make` on it's own will just build the firmware but `make write`
+will both build and program in a single step. This is an example of using `make
+write` in `app_blinky`:
+
 ```
-user@hostname:oresat-firmware/src/f0/app_blinky
-➜ make
+$ make write
 Compiler Options
-arm-none-eabi-gcc -c -mcpu=cortex-m0 -mthumb -Og -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -flto -Wall -Wextra -Wundef -Wstrict-prototypes -Wa,-alms=./build/lst/ -DCORTEX_USE_FPU=FALSE -DPORT_IGNORE_GCC_VERSION_CHECK -MD -MP -MF ./.dep/build.d -I. -I./cfg -I../../../ChibiOS/os/license -I../../../ChibiOS/os/common/portability/GCC -I../../../ChibiOS/os/common/startup/ARMCMx/compilers/GCC -I../../../ChibiOS/os/common/startup/ARMCMx/devices/STM32F0xx -I../../../ChibiOS/os/common/ext/ARM/CMSIS/Core/Include -I../../../ChibiOS/os/common/ext/ST/STM32F0xx -I../../../ChibiOS/os/hal/include -I../../../ChibiOS/os/hal/ports/common/ARMCMx -I../../../ChibiOS/os/hal/ports/STM32/STM32F0xx -I../../../ChibiOS/os/hal/ports/STM32/LLD/ADCv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/CANv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/DACv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/DMAv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/EXTIv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/GPIOv2 -I../../../ChibiOS/os/hal/ports/STM32/LLD/I2Cv2 -I../../../ChibiOS/os/hal/ports/STM32/LLD/RTCv2 -I../../../ChibiOS/os/hal/ports/STM32/LLD/SPIv2 -I../../../ChibiOS/os/hal/ports/STM32/LLD/TIMv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/USARTv2 -I../../../ChibiOS/os/hal/ports/STM32/LLD/USBv1 -I../../../ChibiOS/os/hal/ports/STM32/LLD/xWDGv1 -I../../../boards/ST_NUCLEO64_F091RC -I../../../ChibiOS/os/hal/osal/rt-nil -I../../../ChibiOS/os/rt/include -I../../../ChibiOS/os/oslib/include -I../../../ChibiOS/os/common/ports/ARMCMx -I../../../ChibiOS/os/common/ports/ARMCMx/compilers/GCC -I../../../common/include main.c -o main.o
+arm-none-eabi-gcc -c -mcpu=cortex-m0 -mthumb -Og -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -flto -Wall -Wextra -Wundef -Wstrict-prototypes -Wa,-alms=./build/lst/ -DCORTEX_USE_FPU=FALSE -MD -MP -MF ./.dep/build.d -I. -I./cfg -I../../../ext/ChibiOS/os/license -I../../../ext/ChibiOS/os/common/portability/GCC -I../../../ext/ChibiOS/os/common/startup/ARMCMx/compilers/GCC -I../../../ext/ChibiOS/os/common/startup/ARMCMx/devices/STM32F0xx -I../../../ext/ChibiOS/os/common/ext/ARM/CMSIS/Core/Include -I../../../ext/ChibiOS/os/common/ext/ST/STM32F0xx -I../../../ext/ChibiOS/os/hal/include -I../../../ext/ChibiOS/os/hal/ports/common/ARMCMx -I../../../ext/ChibiOS/os/hal/ports/STM32/STM32F0xx -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/ADCv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/CANv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/DACv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/DMAv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/EXTIv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/GPIOv2 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/I2Cv2 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/RTCv2 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/SPIv2 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/TIMv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/USARTv2 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/USBv1 -I../../../ext/ChibiOS/os/hal/ports/STM32/LLD/xWDGv1 -I../../../boards/ST_NUCLEO64_F091RC -I../../../ext/ChibiOS/os/hal/osal/rt-nil -I../../../ext/ChibiOS/os/rt/include -I../../../ext/ChibiOS/os/oslib/include -I../../../ext/ChibiOS/os/common/ports/ARMCMx -I../../../ext/ChibiOS/os/common/ports/ARMCMx/compilers/GCC -I../../../common/include main.c -o main.o
 
 Compiling crt0_v6m.S
 Compiling vectors.S
@@ -62,54 +66,96 @@ Creating build/app_blinky.bin
 Creating build/app_blinky.dmp
 
    text	   data	    bss	    dec	    hex	filename
-   5192	      0	  32768	  37960	   9448	build/app_blinky.elf
+   5236	      0	  32768	  38004	   9474	build/app_blinky.elf
 Creating build/app_blinky.list
 
 Done
-user@hostname:oresat-firmware/src/f0/app_blinky
-➜ make write
-st-flash  --reset --format ihex write ./build/app_blinky.hex
-st-flash 1.6.1
-2020-07-30T13:08:14 INFO common.c: F09X: 32 KiB SRAM, 256 KiB flash in at least 2 KiB pages.
-2020-07-30T13:08:14 INFO common.c: Attempting to write 5192 (0x1448) bytes to stm32 address: 134217728 (0x8000000)
-2020-07-30T13:08:14 INFO common.c: Flash page at addr: 0x08000000 erased
-2020-07-30T13:08:14 INFO common.c: Flash page at addr: 0x08000800 erased
-2020-07-30T13:08:14 INFO common.c: Flash page at addr: 0x08001000 erased
-2020-07-30T13:08:14 INFO common.c: Finished erasing 3 pages of 2048 (0x800) bytes
-2020-07-30T13:08:14 INFO common.c: Starting Flash write for VL/F0/F3/F1_XL core id
-2020-07-30T13:08:14 INFO flash_loader.c: Successfully loaded flash loader in sram
-  3/3 pages written
-2020-07-30T13:08:14 INFO common.c: Starting verification of write complete
-2020-07-30T13:08:14 INFO common.c: Flash written and verified! jolly good!
+openocd -s ../../../boards/ST_NUCLEO64_F091RC -s ../../../toolchain -f oocd-interface.cfg -f oocd-target.cfg -c " program ./build/app_blinky.hex verify reset exit"
+Open On-Chip Debugger 0.11.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+dapdirect_swd
+Info : STLINK V2J25M14 (API v2) VID:PID 0483:374B
+Info : Target voltage: 3.255680
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : clock speed 950 kHz
+Info : stlink_dap_op_connect(connect)
+Info : SWD DPIDR 0x0bb11477
+Info : stm32f0x.cpu: hardware has 4 breakpoints, 2 watchpoints
+Info : starting gdb server for stm32f0x.cpu on 3333
+Info : Listening on port 3333 for gdb connections
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+target halted due to debug-request, current mode: Thread
+xPSR: 0xc1000000 pc: 0x08001dac msp: 0x200005e0
+Info : Unable to match requested speed 8000 kHz, using 4000 kHz
+Info : Unable to match requested speed 8000 kHz, using 4000 kHz
+** Programming Started **
+Info : device id = 0x10006445
+Info : flash size = 32kbytes
+** Programming Finished **
+** Verify Started **
+** Verified OK **
+** Resetting Target **
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+shutdown command invoked
 ```
+The message `** Verified OK **` shows that programming was ultimately
+successful.
 
 ## Debugging
 
-Debugging is performed through GDB. Using ST-Link, a GDB server must be started in one terminal, then the `make gdb` command may be issued from the source directory.
+Debugging is performed through GDB. The `make gdb` command may be issued from
+any application source directory and it will automatically start both openocd
+and gdb for you.
 
-Terminal 1:
-```
-user@hostname:~
-➜ st-util
-st-util
-2020-07-30T13:14:06 INFO common.c: F09X: 32 KiB SRAM, 256 KiB flash in at least 2 KiB pages.
-2020-07-30T13:14:06 INFO gdb-server.c: Listening at *:4242...
+Terminal:
 ```
 
-Terminal 2:
-```
-user@hostname:oresat-firmware/src/f0/app_blinky
-➜ make gdb
-gdb-multiarch -q /home/user/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf -cd ../../../toolchain -x ./gdbstl.cmd
-Reading symbols from /home/user/Projects/PSAS/oresat-firmware/src/f0/app_blinky/./build/app_blinky.elf...
-_port_thread_start () at ../../../ChibiOS/os/common/ports/ARMCMx/compilers/GCC/chcoreasm_v6m.S:110
-110	                bl      chThdExit
-Loading section .vectors, size 0xc0 lma 0x8000000
-Loading section .text, size 0x11fc lma 0x80000c0
-Loading section .rodata, size 0x18c lma 0x80012bc
-Start address 0x08000190, load size 5192
-Transfer rate: 13 KB/sec, 1730 bytes/write.
+make gdb
+gdb-multiarch -q ./build/app_blinky.elf -ex "target extended-remote | openocd -s ../../../boards/ST_NUCLEO64_F091RC -s ../../../toolchain -f oocd-interface.cfg -f oocd-target.cfg -c ' gdb_port pipe'" -x ../../../toolchain/gdboocd.cmd
+Reading symbols from ./build/app_blinky.elf...
+Remote debugging using | openocd -s ../../../boards/ST_NUCLEO64_F091RC -s ../../../toolchain -f oocd-interface.cfg -f oocd-target.cfg -c ' gdb_port pipe'
+Open On-Chip Debugger 0.11.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+dapdirect_swd
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : STLINK V2J33M25 (API v2) VID:PID 0483:374B
+Info : Target voltage: 3.257482
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Info : clock speed 950 kHz
+Info : stlink_dap_op_connect(connect)
+Info : SWD DPIDR 0x0bb11477
+Info : stm32f0x.cpu: hardware has 4 breakpoints, 2 watchpoints
+Info : starting gdb server for stm32f0x.cpu on pipe
+Info : accepting 'gdb' connection from pipe
+target halted due to debug-request, current mode: Thread
+xPSR: 0x41000000 pc: 0x080006c2 psp: 0x20000368
+Info : device id = 0x10006442
+Info : flash size = 256kbytes
+0x080006c2 in port_wait_for_interrupt () at ../../../ext/ChibiOS/os/common/ports/ARMCMx/chcore_v6m.h:458
+458	  __WFI();
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Unable to match requested speed 1000 kHz, using 950 kHz
+Info : Unable to match requested speed 1000 kHz, using 950 kHz
+Unable to match requested speed 1000 kHz, using 950 kHz
+target halted due to debug-request, current mode: Thread
+xPSR: 0xc1000000 pc: 0x08000190 msp: 0x20000100
+target halted due to debug-request, current mode: Thread
+xPSR: 0xc1000000 pc: 0x08000190 msp: 0x20000100
+Info : Unable to match requested speed 8000 kHz, using 4000 kHz
+Info : Unable to match requested speed 8000 kHz, using 4000 kHz
+Unable to match requested speed 8000 kHz, using 4000 kHz
+Unable to match requested speed 8000 kHz, using 4000 kHz
 (gdb)
 ```
 
-At this point, the program is loaded and ready to debug.
+At this point, the program is loaded and ready to debug. To quit gdb press
+ctrl+d.
