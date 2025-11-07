@@ -21,8 +21,8 @@
 
 LOG_MODULE_REGISTER(canopennode);
 
-#define CO_SDO_SRV_STACK_SIZE 2048
-#define CO_MAIN_STACK_SIZE    2048
+#define CO_SDO_SRV_STACK_SIZE 1024 // 2048
+#define CO_MAIN_STACK_SIZE    1024 // 2048
 #define CO_RT_STACK_SIZE      512
 #define CO_SDO_SRV_PRIORITY   5
 #define CO_MAIN_PRIORITY      5
