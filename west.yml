@@ -25,9 +25,13 @@ manifest:
       remote: canopennode
       revision: 58012aa
       path: common/lib/canopennode_v4/CANopenNode
-    - name: oresat-adcs-app
+    - name: oresat-mag-app
       revision: main
-      path: apps/adcs
+      path: apps/mag
+      #import: submanifests
+    - name: oresat-reaction-wheel-app
+      revision: main
+      path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
       revision: main
