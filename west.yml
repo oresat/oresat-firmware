@@ -10,6 +10,7 @@ manifest:
       url-base: https://github.com/CANopenNode
   defaults:
     remote: oresat
+  group-filter: [+optional]
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
@@ -21,10 +22,8 @@ manifest:
           - cmsis_6
           - hal_stm32
           - hal_nxp
-    - name: CANopenNode
-      remote: canopennode
-      revision: 58012aa
-      path: common/lib/canopennode_v4/CANopenNode
+          - canopennode
+          - mcuboot
     - name: oresat-mag-app
       revision: main
       path: apps/mag
