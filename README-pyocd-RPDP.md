@@ -20,10 +20,22 @@ Downloading packs (press Control-C to cancel):
 Downloading descriptors (001/001)
 ```
 
+2. Install pyocd pack(v19!) to support the mcxn947
+   1. download [Device Family Pack 19](https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MCXN947_DFP.19.0.0.pack)
+      put it somewhere nice
+
+   2. create `pyocd.yaml` in the directory you plan to run `west flash`, containing the line:
+   ```
+   path: /path/to/NXP.MCXN947_DFP.19.0.0.pack
+   ```
+    change path to where you placed it.
+    ensure you run `west flash`/`pyocd flash` from the directory that contains this file.
+
+
 3. Connect the probe and verify we can see it
 ```
 ~/src/oresat/firmware/apps/solar/build/zephyr$ pyocd list
-  #   Probe/Board                            Unique ID          Target  
+  #   Probe/Board                            Unique ID          Target
 ------------------------------------------------------------------------
   0   Raspberry Pi Debug Probe (CMSIS-DAP)   E663AC91D38F7439   n/a      <-- found probe
 ```
