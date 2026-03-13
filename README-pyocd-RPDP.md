@@ -21,8 +21,7 @@ Downloading descriptors (001/001)
 ```
 
 2. Install pyocd pack(v19!) to support the mcxn947
-   1. download [Device Family Pack 19](https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MCXN947_DFP.19.0.0.pack)
-      and put it somewhere nice
+   1. download [Device Family Pack 19](https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MCXN947_DFP.19.0.0.pack) and put it somewhere nice
 
    2. create `pyocd.yaml` in the directory you plan to run `west flash`, containing the following lines:
 
@@ -33,11 +32,11 @@ Downloading descriptors (001/001)
 
     **Make sure to change path to where you placed it.**
 
-  - Alternatively, invoking `west` with the following command achieves the same result:
+    Alternatively, invoking `west` with the following command achieves the same result:
 
-  ```bash
-  west flash -r pyocd --tool-opt=--pack=/path/to/NXP.MCXN947_DFP.19.0.0.pack
-  ```
+    ```bash
+    west flash -r pyocd --tool-opt=--pack=/path/to/NXP.MCXN947_DFP.19.0.0.pack
+    ```
 
 3. Connect the probe and verify we can see it
 ```
