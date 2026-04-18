@@ -11,15 +11,6 @@ Information about the probe is here: [Raspberry Pi Debug Probe].
 ```
 Version 0.38.0 is the latest as of 10/23/2025, though 0.37.0 works fine.
 
-2. Install pyocd pack to support the mcxn947
-```
-$ pyocd pack install mcxn947
-0000465 I No pack index present, downloading now... [pack_cmd]
-Downloading packs (press Control-C to cancel):
-    NXP.MCXN947_DFP.25.09.00
-Downloading descriptors (001/001)
-```
-
 2. Install pyocd pack(v19!) to support the mcxn947
    1. download [Device Family Pack 19](https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MCXN947_DFP.19.0.0.pack) and put it somewhere nice
 
@@ -32,11 +23,16 @@ Downloading descriptors (001/001)
 
     **Make sure to change path to where you placed it.**
 
-    Alternatively, invoking `west` with the following command achieves the same result:
+    Alternatively, invoking `west` with the following command achieves the same result, though is less friendly to type:
 
     ```bash
     west flash -r pyocd --tool-opt=--pack=/path/to/NXP.MCXN947_DFP.19.0.0.pack
     ```
+    **NOTE**:
+
+    > if you are intending to build an app for a custom board file, such as the `mcxn947_protocard`, place a copy of this `pyocd.yaml` file
+    > in the board's folder; `pyocd` always looks for a `pyocd.yaml` in the specified board file folder when building for a locally defined
+    >  board; this allows you to use the simpler `west flash -b <board> -r pyocd` command line
 
 3. Connect the probe and verify we can see it
 ```
