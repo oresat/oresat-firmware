@@ -2,7 +2,7 @@
 #define ORESAT_H
 
 #include <CANopen.h>
-#include <OD.h>
+#include <CO_OD.h>
 #ifdef STM32F091xC
 #include "stm32f0xx_hal.h"
 #endif
@@ -24,9 +24,10 @@ static inline uint8_t oresat_get_node_id(void)
 
 static inline void oresat_fix_pdo_cob_ids(uint8_t node_id)
 {
+#if 0
 	int i;
 	uint32_t cob_id;
-	OD_entry_t *entry;
+	CO_OD_entry_t *entry;
 	for (int e = 0; e < OD->size; e++) {
 		entry = &OD->list[e];
 #if OD_CNT_RPDO > 0
@@ -48,6 +49,7 @@ static inline void oresat_fix_pdo_cob_ids(uint8_t node_id)
 		}
 #endif
 	}
+#endif
 }
 
 #endif
