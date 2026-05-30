@@ -1,10 +1,11 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/sensor.h>
+
+#if defined(BOARD_NUCLEO_F091RC)
 #include <canopennode.h>
 #include <CO_OD.h>
 
-#if defined(BOARD_NUCLEO_F091RC)
 #define DIE_TEMP_ALIAS(i) DT_ALIAS(_CONCAT(die_temp, i))
 #define DIE_TEMPERATURE_SENSOR(i, _)                                                               \
 	IF_ENABLED(DT_NODE_EXISTS(DIE_TEMP_ALIAS(i)), (DEVICE_DT_GET(DIE_TEMP_ALIAS(i)),))
