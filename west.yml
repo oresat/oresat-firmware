@@ -4,8 +4,6 @@ manifest:
       url-base: https://github.com/zephyrproject-rtos
     - name: oresat
       url-base: https://github.com/oresat
-    - name: pete
-      url-base: https://github.com/plskeggs
     - name: canopennode
       url-base: https://github.com/CANopenNode
   defaults:
@@ -14,7 +12,7 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: v4.3.0
+      revision: v4.4.0
       import:
         # below, only import Zephyr modules we need;
         # extend this per app in submanifests: see oresat-template-app
@@ -44,14 +42,6 @@ manifest:
       revision: main
       path: apps/template
       import: submanifests
-    - name: oresat-mcxn947-demo
-      remote: pete
-      revision: main
-      path: apps/mcxn947-demo
-    - name: oresat-mcxn947-protocard
-      remote: pete
-      revision: main
-      path: apps/mcxn947-demo/boards/mcxn947_protocard
 
   self:
     path: common
