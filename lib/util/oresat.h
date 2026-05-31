@@ -24,32 +24,43 @@ static inline uint8_t oresat_get_node_id(void)
 
 static inline void oresat_fix_pdo_cob_ids(uint8_t node_id)
 {
-#if 0
 	int i;
+	int e;
 	uint32_t cob_id;
-	CO_OD_entry_t *entry;
-	for (int e = 0; e < OD->size; e++) {
-		entry = &OD->list[e];
-#if OD_CNT_RPDO > 0
+	const CO_OD_entry_t *entry;
+	CO_RPDO_t *rpdo;
+	CO_TPDO_t *tpdo;
+	void *data;
+
+	for (e = 0; e < CO_NO_RPDO; e++) {
+		rpdo = CO->RPDO[e];
+		entry = rpdo->SDO->OD;
 		if ((entry->index >= 0x1400) && (entry->index < 0x1600)) {
 			i = entry->index - 0x1400;
-			OD_get_u32(entry, 1, &cob_id, true);
+			data = CO_OD_getDataPointer(rpdo->SDO, 0, 1);
+			cob_id = CO_getUint32(data);
+			//OD_get_u32(entry, 1, &cob_id, true);
 			if ((cob_id & 0x7FF) == (0x200U + (0x100U * (i % 4) + (i / 4)))) {
-				OD_set_u32(entry, 1, cob_id + node_id, true);
+				CO_setUint32(data, cob_id + node_id);
+				//OD_set_u32(entry, 1, cob_id + node_id, true);
 			}
 		}
-#endif
-#if OD_CNT_TPDO > 0
+	}
+
+	for (e = 0; e < CO_NO_TPDO; e++) {
+		tpdo = CO->TPDO[e];
+		entry = tpdo->SDO->OD;
 		if ((entry->index >= 0x1800) && (entry->index < 0x1A00)) {
 			i = entry->index - 0x1800;
-			OD_get_u32(entry, 1, &cob_id, true);
+			data = CO_OD_getDataPointer(tpdo->SDO, 0, 1);
+			cob_id = CO_getUint32(data);
+			//OD_get_u32(entry, 1, &cob_id, true);
 			if ((cob_id & 0x7FF) == (0x180U + (0x100U * (i % 4) + (i / 4)))) {
-				OD_set_u32(entry, 1, cob_id + node_id, true);
+				CO_setUint32(data, cob_id + node_id);
+				//OD_set_u32(entry, 1, cob_id + node_id, true);
 			}
 		}
-#endif
 	}
-#endif
 }
 
 #endif
