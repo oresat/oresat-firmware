@@ -209,6 +209,7 @@ CPPWARN = -Wall -Wextra -Wundef
 #   -DENABLE_HEATERS=0                  disable heaters (recommended on v2.1 boards
 #                                       to prevent brownout resets)
 #                                       --> defaults to 1
+#   -DENABLE_PROMPT=1                   enable initeraction with terminal
 UDEFS = -DCO_VERSION_MAJOR=4
 
 # Define ASM defines here

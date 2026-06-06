@@ -58,9 +58,11 @@
 #define ENABLE_CHARGING_CONTROL 0
 
 // Simplify conditionals below -- DEBUG_PRINT is required for ENABLE_NV_MEMORY_UPDATE_CODE to do anything
-#if defined(DEBUG_PRINT) && ENABLE_NV_MEMORY_UPDATE_CODE
+#if defined(DEBUG_PRINT) && ENABLE_NV_MEMORY_UPDATE_CODE && ENABLE_PROMPT
+#pragma message("Prompt for nv write enabled")
 #define ENABLE_NV_WRITE_PROMPT 1
 #else
+#pragma message("Prompt for nv write disabled")
 #define ENABLE_NV_WRITE_PROMPT 0
 #endif
 

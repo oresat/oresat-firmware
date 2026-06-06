@@ -40,7 +40,48 @@ This is needed for them to learn the battery characteristics for proper operatio
 Without this step, the default, much less accurate voltage-based mode is used by the MAX17205. The latter is what was used on Oresat 0 and Oresat 0.5, 
 resulting in very untrustworthy battery telemetry.
 
+To give the user control over whether battery history data is updated:
+```
+-DENABLE_PROMPT=1
+```
+This will briefly ask the user to type y so the history entry is written. Otherwise, no writes will occur.
+Defaults to disabled.
+
 **Note: the MAX17205 has a very limited number of NV (non-volatile) memory write cycles: 7 total.**
+
+# Building, Flashing and Running
+Do this to rebuild all files regardless of presence of changes:
+```
+$ make clean
+```
+
+Do a build (will be incremental -- only of changed files, or those missing in the build because of a previous clean):
+```
+$ make
+```
+
+Full chip erase, if needed prior to write, and you are using openocd:
+```
+$  openocd  -s ../../../boards/BATTERY_V3 -s ../../../toolchain -f oocd-interface.cfg -f oocd-target.cfg -c "init" -c "reset halt" -c "stm32f1x mass_erase 0" -c "shutdown"
+```
+This will remove the bootloader and the battery history data.
+
+Write the firmware to the flash:
+```
+$ make write
+```
+
+*NOTE: IMPORTANT*:
+This REQUIRES you to also flash the bootloader app after a full chip erase, or when the app appears to be dead,
+which often indicates the bootloader is missing.
+
+Do that in the `src/f0/app_bootloader` folder.
+In that folder, issue:
+```
+$ make clean
+$ make
+$ make write
+```
 
 ## Shortcomings of original Oresat battery app
 - original code was not using all register values from the Maxim Wizard software with no explanation as to why
