@@ -1,0 +1,10 @@
+patches:
+  - path: zephyr/fix-stm32f09x-die-temp.patch
+    sha256sum: 7de9fdb2c10ca5aa758f6afa4d0c44955cbe68b4ba48540a8cbb5c78b4144b27
+    module: zephyr
+    author: Pete Skeggs
+    email: plskeggs@noeticdesign.com
+    date: 2026-06-05
+    upstreamable: false
+    comments: |
+      Fix a problem with using an unsigned type in slope calc
