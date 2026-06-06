@@ -58,7 +58,7 @@
 #define ENABLE_CHARGING_CONTROL 0
 
 // Simplify conditionals below -- DEBUG_PRINT is required for ENABLE_NV_MEMORY_UPDATE_CODE to do anything
-#if defined(DEBUG_PRINT) && ENABLE_NV_MEMORY_UPDATE_CODE && ENABLE_PROMPT
+#if defined(DEBUG_PRINT) && ENABLE_NV_MEMORY_UPDATE_CODE
 #pragma message("Prompt for nv write enabled")
 #define ENABLE_NV_WRITE_PROMPT 1
 #else
@@ -68,8 +68,11 @@
 
 // Uncomment to only store within 3 seconds on 'y',
 // or erase hist store flash on 'e'
-#if defined(DEBUG_PRINT)
+#if defined(DEBUG_PRINT) && defined(ENABLE_PROMPT)
+#pragma message("Prompt for history write enabled")
 #define HIST_STORE_PROMPT 1
+#else
+#pragma message("Prompt for history write disabled")
 #endif
 
 // Voltage below which we should stop everything until charging starts
@@ -300,7 +303,7 @@ static void print_runtime_entry(runtime_battery_data_t *data, unsigned int start
 #ifndef DEBUG_PRINT
     (void)data;
 #endif
-    dbgprintf("rst_cycle=%d, minute=%d, unused=%d, estimated=%d, crc=0x%08X\r\n",
+    dbgprintf("rst_cycle=%d, minute=%d, unused=%d, estimated=%d, crc=0x%04X\r\n",
               data->rst_cycle, data->minute, data->unused, data->estimated, data->crc);
     for (unsigned int j = start; j < start + count; j++) {
         dbgprintf("   pack %u: mixcap:0x%04X, repcap:0x%04X\r\n", j + 1, data->packs[j].mixcap, data->packs[j].repcap);
@@ -339,9 +342,10 @@ static void find_last_batt_hist(void)
     for (unsigned int i = 0; i < NUM_BATT_HIST_ENTRIES; i++) {
         if (flashIsErasedF091((flashaddr_t)data, sizeof(runtime_battery_data_t))) {
             last_empty_history_entry = data;
+            dbgprintf("End of battery history flash at entry %d\r\n", i);
             break;
         }
-        uint32_t check_crc = crc32((uint8_t *)data, sizeof(*data) - sizeof(data->crc), 0);
+        uint16_t check_crc = crc16_ccitt_new((uint8_t *)data, sizeof(*data) - sizeof(data->crc), 0);
 
         if (check_crc == data->crc) {
             last_valid_history_entry = data;
@@ -360,6 +364,8 @@ static void find_last_batt_hist(void)
 
         // We have started a new cycle, so advance this counter once
         reset_cycle_count++;
+    } else {
+        dbgprintf("No last valid runtime history found\r\n");
     }
 }
 
@@ -446,7 +452,7 @@ static bool store_current_batt_hist(void)
     new_data.minute = TIME_I2S(chVTGetSystemTime()) / 60;
     new_data.unused = 0;
     new_data.estimated = false;
-    new_data.crc = crc32((uint8_t *)&new_data, sizeof(new_data) - sizeof(new_data.crc), 0);
+    new_data.crc = crc16_ccitt_new((uint8_t *)&new_data, sizeof(new_data) - sizeof(new_data.crc), 0);
     dbgprintf("Storing new runtime battery entry:\r\n");
     print_runtime_entry(&new_data, 0, NPACKS);
     for (i = 0; i < MAX_HIST_STORE_RETRIES; i++) {
@@ -1020,6 +1026,9 @@ THD_FUNCTION(batt, arg)
     (void)arg;
     unsigned int i;
 
+    palToggleLine(LINE_LED);
+    chThdSleepMilliseconds(500); // blink once for 500ms to indicate life
+    palToggleLine(LINE_LED);
 #if VERBOSE_DEBUG
     print_batt_hist();
 #endif
