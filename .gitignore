@@ -18,3 +18,6 @@ gen/
 
 # modules
 CANopenNode
+
+# DFP files for pyocd
+*.pack
