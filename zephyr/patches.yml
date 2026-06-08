@@ -8,3 +8,13 @@ patches:
     upstreamable: false
     comments: |
       Fix a problem with using an unsigned type in slope calc
+  - path: modules/lib/canopennode/fix-pdo-cob-ids.patch
+    sha256sum: f9b5ecd6e572d233cd88fce0e7f2b7b73b7b3b212574a9094b8f15caa158cbe9
+    module: canopennode
+    author: Pete Skeggs
+    email: plskeggs@noeticdesign.com
+    date: 2026-06-08
+    upstreamable: false
+    comments: |
+      Fix PDO COB ids for use with Oresat.
+
