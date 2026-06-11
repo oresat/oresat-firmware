@@ -42,7 +42,6 @@ manifest:
       revision: main
       path: apps/template
       import: submanifests
-      path: apps/mcxn947-demo/boards/mcxn947_protocard
 
   self:
     path: common
