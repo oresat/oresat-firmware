@@ -8,6 +8,16 @@ patches:
     upstreamable: false
     comments: |
       Fix a problem with using an unsigned type in slope calc
+  - path: zephyr/fix-force-vrefo-off.patch
+    sha256sum: 17ced080c12990a8308e24189d8b1e8b49bc590da164309cec4e7e6d94bd227e
+    module: zephyr
+    author: Pete Skeggs
+    email: plskeggs@noeticdesign.com
+    date: 2026-06-11
+    upstreamable: false
+    comments: |
+      Force VrefO off because we do not need that signal to be output
+      and it interferes with P4_7
   - path: modules/lib/canopennode/fix-pdo-cob-ids.patch
     sha256sum: f9b5ecd6e572d233cd88fce0e7f2b7b73b7b3b212574a9094b8f15caa158cbe9
     module: canopennode
