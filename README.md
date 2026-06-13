@@ -4,9 +4,11 @@ This documents how to install and use the Oresat firmware for Zephyr.
 
 ## Setup
 
-**NOTE 1:** This mostly rework of the [Zephyr Getting Started Guide].
+> **NOTE 1:** This mostly rework of the [Zephyr Getting Started Guide].
 
-**NOTE 2:** Below we use `~/src/oresat/firmware` as the root folder for installing all the source code. Modify as you wish.
+> **NOTE 2:** Below we use `~/src/oresat/firmware` as the root folder for installing all the source code. Modify as you wish.
+
+> **NOTE 3:** A document explaining the [Oresat Zephyr Repository Organization](README-Oresat-Zephyr-Repo-Organization.md) is here.
 
 ### Select and Update OS
 
