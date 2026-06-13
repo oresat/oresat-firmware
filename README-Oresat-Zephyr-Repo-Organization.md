@@ -38,22 +38,18 @@ Users should be able to create a branch on a specific Oresat repo, work in that 
 
 Prior to adopting this plan officially for Oresat >= 1.0, the following public github repositories were in my personal github account and named slightly differently ([github.com/plskeggs](https://github.com/plskeggs)).
 
-Now, all but **oresat-mcxn947-demo** and **oresat-mcxn947-protoboard** are in the Oresat github account ([github.com/oresat](https://github.com/oresat)). These will eventually be merged into the **oresat-template-app**, with additional support for other boards, such as the ST Nucleo-F091RC dev kit.
-
 The **oresat-zephyr-common** repo below is now a branch ***zephyr*** of the old oresat-firmware repo. Eventually the old master branch will be renamed (essentially archived) and replaced by the zephyr branch.
 
 - [Oresat-adcs-app](https://github.com/oresat/oresat-adcs-app)  
-  Placeholder
 - [Oresat-battery-app](https://github.com/oresat/oresat-battery-app)  
-  Port from the previous Oresat zephyr structure.
+  Port from the previous Oresat zephyr structure, which was then
+  updated with a ported ChibiOS version.
+- [Oresat-mag-app](https://github.com/oresat/oresat-mag-app)
+  Ported from the ChibiOS version, called then the app-adcs.
 - [Oresat-solar-app](https://github.com/oresat/oresat-solar-app)  
-  Placeholder
 - [Oresat-template-app](https://github.com/oresat/oresat-template-app)  
-  Prototype application, with a working example of using logging.
-- [Oresat-mcxn947-demo](https://github.com/plskeggs/oresat-mcxn947-demo)  
-  A working example of using various hardware in the MCXN.
-- [Oresat-mcxn947-protoboard](https://github.com/plskeggs/oresat-mcxn947-protoboard)  
-  Board files for the breakout board.
+  Prototype application, with a working example of using logging, adc, dac, and I2C.
+  Available for two Oresat-designed cards, the mcxn947_breakout and the mcxn947_protocard, as well as the STM32F091RC Nucleo dev kit and the NXP FRDM-MCXN947 dev kit.
 - [Oresat-firmware](https://github.com/oresat/oresat-firmware) → *moved here in **zephyr** branch from oresat-zephyr-common*  
   This is the central repository containing west.yml.
 
@@ -62,20 +58,19 @@ The **oresat-zephyr-common** repo below is now a branch ***zephyr*** of the old 
 These repositories are broken down into the following major categories:
 
 1. Oresat card applications, each in its own repository
-   - a. ADCS
-   - b. Battery
+   - a. Battery
+   - b. Mag
    - c. Solar
    - d. Template
-   - e. MCXN (Breakout) Demo
    - f. **NOTE**: each card application can have a submanifest that enables additional Zephyr modules that are not in the common list inside the main Oresat west.yml
 2. Oresat firmware *(in a branch called **zephyr**)*  
    This repository hooks everything together, holds common utility functions and libraries, as well as board files and device drivers. In the original Oresat Zephyr layout this was called **oresat-zephyr, which is now obsolete.**
    - a. Oresat board file definitions (device trees and Kconfig settings) – or perhaps just in the card application folders, though that seems limiting in other ways
    - b. Oresat device drivers – perhaps in the card application folders, but by centralizing them they can be reused by more than one card
-   - c. Canopennode_v4 (unless we move back to v2, already part of Zephyr)  
-     Zephyr is currently stuck at canopennode_v2, whereas *oresat-configs* was already upgraded to support canopennode_v4 for ChibiOS, so rather than backtrack, an Oresat volunteer ported Zephyr's canopennode_v2 interface code (canopennode.c, CO_driver.c) to v4
+   - c. Canopennode_v4 (obsolete -- we have moved to v2, already part of Zephyr)  
    - d. The main **west.yml** used when initializing a west workspace
-   - e. satellite-specific sysbuild files which would combine MCUboot builds with an application build into a final flash image for that application's card; OTA images will also be built that do not include MCUboot but can instead be loaded by it
+   - e. Zephyr, module, and bootloader patches in **zephyr/patches.yml** to be applied locally from the cloned upstream repositories
+   - f. Satellite-specific sysbuild files which would combine MCUboot builds with an application build into a final flash image for that application's card; OTA images will also be built that do not include MCUboot but can instead be loaded by it
 3. Zephyr and all of its dependent repositories
    - a. Zephyr itself, including Zephyr's **west.yml**
    - b. Zephyr-approved and integrated third-party modules as selected in the main west.yml above, as well as in the specific application's submanifest
@@ -92,56 +87,10 @@ Below, the ⇐ characters indicate where **west** cloned each git repo listed ab
 ```
 ./
 ├── apps/
-│   ├── adcs/ ⇐ https://github.com/oresat/oresat-adcs-app
 │   ├── battery/ ⇐ https://github.com/oresat/oresat-battery-app
-│   │   ├── src/
-│   │   │   └── main.c
-│   │   ├── CMakeLists.txt
-│   │   ├── Kconfig
-│   │   ├── od.yaml
-│   │   ├── prj.conf
-│   │   ├── README.md
-│   │   └── sample.yaml
+│   ├── mag/ ⇐ https://github.com/oresat/oresat-mag-app
 │   ├── solar/ ⇐ https://github.com/oresat/oresat-solar-app
-│   ├── mcxn947-demo = https://github.com/plskeggs/oresat-mcxn947-demo
-│   │   └── boards
-│   │       └── mcxn947_protocard = https://github.com/plskeggs/oresat-mcxn947-protocard
-│   │           ├── board.c
-│   │           ├── board.cmake
-│   │           ├── board.yml
-│   │           ├── CMakeLists.txt
-│   │           ├── Kconfig
-│   │           ├── Kconfig.defconfig
-│   │           ├── Kconfig.mcxn947_protocard
-│   │           ├── mcxn947_protocard.dtsi
-│   │           ├── mcxn947_protocard.dtsi
-│   │           ├── mcxn947_protocard_mcxn947_cpu0_defconfig
-│   │           ├── mcxn947_protocard_mcxn947_cpu0.dts
-│   │           ├── mcxn947_protocard_mcxn947_cpu0.dtsi
-│   │           ├── mcxn947_protocard-pinctrl.dtsi
-│   │           ├── mcxn947_protocard.yaml
-│   │           └── README.md
-│   │   ├── CMakeLists.txt
-│   │   ├── Kconfig
-│   │   ├── prj.conf
-│   │   ├── README.md
-│   │   ├── sample.yaml
-│   │   └── src
-│   │       ├── adc.c
-│   │       ├── blink.c
-│   │       ├── dac.c
-│   │       ├── i2c_sensor.c
-│   │       └── main.c
 │   └── template/ ⇐ https://github.com/oresat/oresat-template-app
-│       ├── src/
-│       │   └── main.c
-│       ├── submanifests/
-│       │   └── example.yaml  = EXAMPLE TO PULL IN ANOTHER MODULE
-│       ├── CMakeLists.txt
-│       ├── Kconfig
-│       ├── LICENSE
-│       ├── prj.conf
-│       └── README.md
 ├── common/ ⇐ https://github.com/oresat/oresat-firmware (zephyr branch)
 │   ├── boards/
 │   ├── drivers/
@@ -165,7 +114,11 @@ Below, the ⇐ characters indicate where **west** cloned each git repo listed ab
 │   │   ├── CMakeLists.txt
 │   │   └── Kconfig
 │   ├── zephyr/
-│   │   └── module.yml
+│   │   ├── patches/
+│   │   │   ├── modules/
+│   │   │   └── Zephyr/
+│   │   ├── module.yml
+│   │   └── patches.yml
 │   ├── CMakeLists.txt
 │   ├── format_code.sh*
 │   ├── Kconfig
@@ -330,38 +283,61 @@ Our goal is to make this as painless as possible for students and new community 
        $ git add …
        $ git commit -m "commit message"
        ```
-     - iv. Do *west update* and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back:
-          ```
-          $ west update
-          === updating zephyr (zephyr):
-          HEAD is now at b6aed5c505e kernel: dynamic: use 4k stack size for x86
-          === updating oresat-template-app (apps/template):
-          --- oresat-template-app: fetching, need revision main
-          From https://github.com/oresat/oresat-template-app
-           * branch            main       -> FETCH_HEAD
-          HEAD is now at ac7502a ignore any path that starts with build
-          === updating CANopenNode (common/lib/canopennode_v4/CANopenNode):
-          HEAD is now at 58012aa Fix links
-          === updating oresat-configs (oresat-configs):
-          HEAD is now at 0a26511 fix pip install command error in readme
-          === updating oresat-adcs-app (apps/adcs):
-          --- oresat-adcs-app: fetching, need revision main
-          From https://github.com/oresat/oresat-adcs-app
-           * branch            main       -> FETCH_HEAD
-          HEAD is now at eb51038 Initial commit
-          === updating oresat-battery-app (apps/battery):
-          --- oresat-app-battery: fetching, need revision main
-          From https://github.com/oresat/oresat-battery-app
-           * branch            main       -> FETCH_HEAD
-          HEAD is now at e9c01d8 Initial commit
-          WARNING: left behind oresat-battery-app branch
-          "feature-optimize-control-loop"; to switch back to it (fast forward):
-          git -C . checkout feature-optimize-control-loop
-          === updating oresat-solar-app (apps/solar):
-          --- oresat-solar-app: fetching, need revision main
-          From https://github.com/oresat/oresat-solar-app
-           * branch            main       -> FETCH_HEAD
-          ```
+   - c. Do *west patch clean* -- this undoes any patches applied to the zephyr, modules, or bootloader trees by a previous *west update*; should be no errors
+       ```
+       $ west patch clean
+       $
+       ```
+   - d. Do *west update* and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
+        **watch for errors and if any, ask for help before proceeding!**
+        ```
+        $ west update
+        === updating zephyr (zephyr):
+        HEAD is now at b6aed5c505e kernel: dynamic: use 4k stack size for x86
+        === updating oresat-template-app (apps/template):
+        --- oresat-template-app: fetching, need revision main
+        From https://github.com/oresat/oresat-template-app
+         * branch            main       -> FETCH_HEAD
+        HEAD is now at ac7502a ignore any path that starts with build
+        === updating CANopenNode (common/lib/canopennode_v4/CANopenNode):
+        HEAD is now at 58012aa Fix links
+        === updating oresat-configs (oresat-configs):
+        HEAD is now at 0a26511 fix pip install command error in readme
+        === updating oresat-adcs-app (apps/adcs):
+        --- oresat-adcs-app: fetching, need revision main
+        From https://github.com/oresat/oresat-adcs-app
+         * branch            main       -> FETCH_HEAD
+        HEAD is now at eb51038 Initial commit
+        === updating oresat-battery-app (apps/battery):
+        --- oresat-app-battery: fetching, need revision main
+        From https://github.com/oresat/oresat-battery-app
+         * branch            main       -> FETCH_HEAD
+        HEAD is now at e9c01d8 Initial commit
+        WARNING: left behind oresat-battery-app branch
+        "feature-optimize-control-loop"; to switch back to it (fast forward):
+        git -C . checkout feature-optimize-control-loop
+        === updating oresat-solar-app (apps/solar):
+        --- oresat-solar-app: fetching, need revision main
+        From https://github.com/oresat/oresat-solar-app
+         * branch            main       -> FETCH_HEAD
+        ```
+
+   - e. Do *west patch apply* -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
+        warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
+        ```
+        $ west patch apply
+        /home/peters/src/oresat/firmware/common/zephyr/patches/zephyr/fix-stm32f09x-die-temp.patch:33: trailing whitespace.
+                LOG_DBG("vdda_mv:%d, sense_data:%d ave_slope_code:%d", vdda_mv, (int)sense_data, (int)ave_slope_code); 
+        /home/peters/src/oresat/firmware/common/zephyr/patches/zephyr/fix-stm32f09x-die-temp.patch:47: trailing whitespace.
+          calib_data_shift:0 
+        warning: 2 lines add whitespace errors.
+        /home/peters/src/oresat/firmware/common/zephyr/patches/modules/lib/canopennode/fix-pdo-cob-ids.patch:126: trailing whitespace.
+                //if(ID == TPDO->defaultCOB_ID) 
+        /home/peters/src/oresat/firmware/common/zephyr/patches/modules/lib/canopennode/fix-pdo-cob-ids.patch:157: new blank line at EOF.
+        +
+        warning: 2 lines add whitespace errors.
+        3 patches applied successfully \o/
+       ```
 
 ---
 
@@ -439,6 +415,8 @@ The common repository README.md will contain instructions for downloading and in
 
 ### On YouTube
 
+- The recording is here: https://www.youtube.com/watch?v=WVfkcd0MbIo
+- NOTE: this was done at the start of the 2025 Oresat Zephyr effort. Some things have changed since then, but have been edited in above.
 - I said "repo" instead of just "name of remote" by mistake during the west manifest walk through
 - Further explanation of Manifest-rev: it is intended to not conflict with any local branch name that user creates (see updated West section of Zephyr Repo Layout)
 - Note that there is a Zephyr Project Discord channel: https://discord.com/invite/Ck7jw53nU2
