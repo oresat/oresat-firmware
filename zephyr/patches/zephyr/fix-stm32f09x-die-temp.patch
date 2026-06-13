@@ -1,0 +1,78 @@
+From 78a348c93f9f68874e55909580681455f265afe8 Mon Sep 17 00:00:00 2001
+From: Pete Skeggs <plskeggs@noeticdesign.com>
+Date: Fri, 5 Jun 2026 23:51:23 -0700
+Subject: [PATCH] fix stm32f09x die temp
+
+Fix a problem with using an unsigned type in slope calc.
+
+This results sometimes in the die temp being reported as
+a constant value.
+
+Add LOG_DBG statements.
+---
+ drivers/sensor/st/stm32_temp/stm32_temp.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/sensor/st/stm32_temp/stm32_temp.c b/drivers/sensor/st/stm32_temp/stm32_temp.c
+index d306caafb9e..49b0a1a5a84 100644
+--- a/drivers/sensor/st/stm32_temp/stm32_temp.c
++++ b/drivers/sensor/st/stm32_temp/stm32_temp.c
+@@ -146,7 +146,7 @@ static float convert_adc_sample_to_temperature(const struct device *dev)
+ 	 */
+ 	/* Perform multiplication first for higher accuracy */
+ 	const int vsense = ((int)data->raw * vdda_mv) / 4095;
+-
++	LOG_DBG("vdda_mv:%d, raw:%d, v25:%d", vdda_mv, data->raw, cfg->v25));
+ 	if (cfg->is_ntc) {
+ 		temperature = (float)(cfg->v25 - vsense);
+ 	} else {
+@@ -185,6 +185,7 @@ static float convert_adc_sample_to_temperature(const struct device *dev)
+ 	} else {
+ 		dividend = (sense_data - (calib[0] >> cfg->calib_data_shift));
+ 	}
++	LOG_DBG("vdda_mv:%d, sense_data:%d ave_slope_code:%d", vdda_mv, (int)sense_data, (int)ave_slope_code); 
+ 
+ 	temperature = (dividend / avg_slope_code) + cfg->ts_cal1_temp;
+ #else /* HAS_DUAL_CALIBRATION */
+@@ -194,10 +195,20 @@ static float convert_adc_sample_to_temperature(const struct device *dev)
+ 	 *
+ 	 *                 (TS_CAL2_TEMP - TS_CAL1_TEMP)
+ 	 *  where Slope =  -----------------------------
+-	 *                      (TS_CAL2 - TS_CAL1)
++	 *  					(TS_CAL2 - TS_CAL1)
++	 *
++	 * convert_adc_sample_to_temperature: vdda_mv:3300,
++ sense_data:1763 slope:0 ts_cal1_temp:30, ts_cal2_temp:110
++ convert_adc_sample_to_temperature: calib1:1310, calib0:1738,
++ calib_data_shift:0 
++	 *
+ 	 */
+ 	const float slope = ((float)(cfg->ts_cal2_temp - cfg->ts_cal1_temp))
+-					/ ((calib[1] - calib[0]) >> cfg->calib_data_shift);
++					/ ((((int)calib[1]) - ((int)calib[0])) >> cfg->calib_data_shift);
++	//LOG_DBG("vdda_mv:%d, sense_data:%d slope:%d ts_cal1_temp:%d, ts_cal2_temp:%d",
++	//		vdda_mv, (int)sense_data, (int)slope, cfg->ts_cal1_temp, cfg->ts_cal2_temp);
++	//LOG_DBG("calib1:%d, calib0:%d, calib_data_shift:%d",
++	//		calib[1], calib[0], cfg->calib_data_shift);
+ 
+ 	temperature = (slope * (sense_data - (calib[0] >> cfg->calib_data_shift)))
+ 			+ cfg->ts_cal1_temp;
+@@ -234,6 +245,7 @@ static int stm32_temp_sample_fetch(const struct device *dev, enum sensor_channel
+ 	}
+ 
+ 	adc_disable_tempsensor_channel(data->adc_base);
++	LOG_DBG("Read die temperature ADC");
+ 
+ unlock:
+ 	pm_device_runtime_put(data->adc);
+@@ -270,6 +282,7 @@ static int stm32_temp_init(const struct device *dev)
+ 		LOG_ERR("Device %s is not ready", data->adc->name);
+ 		return -ENODEV;
+ 	}
++	LOG_DBG("Initializing stm32 die temperature");
+ 
+ 	*asp = (struct adc_sequence){
+ 		.channels = BIT(data->adc_cfg.channel_id),
+-- 
+2.43.0
+
