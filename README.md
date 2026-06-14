@@ -8,7 +8,7 @@ This documents how to install and use the Oresat firmware for Zephyr.
 
 > **NOTE 2:** Below we use `~/src/oresat/firmware` as the root folder for installing all the source code. Modify as you wish.
 
-> **NOTE 3:** A document explaining the [Oresat Zephyr Repository Organization](README-Oresat-Zephyr-Repo-Organization.md) is here.
+> **NOTE 3:** A document explaining the [Oresat Zephyr Repository Organization] is here.
 
 ### Select and Update OS
 
@@ -96,6 +96,23 @@ mkdir -p ~/src/oresat/firmware
 cd ~/src/oresat/firmware
 west init -m https://github.com/oresat/oresat-firmware --mr zephyr
 west update
+```
+
+#### Updating to a newer release of oresat-firmware zephyr branch:
+
+> **IMPORTANT: when a newer version of this is available, you must do these steps!**
+
+1. If you changed anything in the code (in an app, here in common, or in zephyr), follow the instructions in [Oresat Zephyr Repository Organization-Tasks]
+2. Do *west patch clean* -- this undoes any patches applied to the zephyr, modules, or bootloader trees by a previous *west update*; should be no errors
+3. Do *west update* and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
+	  **watch for errors and if any, ask for help before proceeding!**
+4. Do *west patch apply* -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
+	  warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
+
+```bash
+west patch clean
+west update
+west patch apply
 ```
 
 #### Export Zephyr CMake package:
@@ -192,3 +209,5 @@ tools are needed for development and testing.
 [Segger J-Link Downloads]:https://www.segger.com/downloads/jlink/
 [Raspberry Pi Debug Probe]:README-pyocd-RPDP.md
 [ST Toolchain Setup]:https://github.com/oresat/oresat-firmware/blob/master/doc/toolchain.md
+[Oresat Zephyr Repository Organization]:README-Oresat-Zephyr-Repo-Organization.md
+[Oresat Zephyr Repository Organization-Tasks]:README-Oresat-Zephyr-Repo-Organization.md#tasks
