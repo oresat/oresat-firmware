@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: feature-mag-card
+      revision: sentinel-release
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
@@ -31,11 +31,11 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: feature-heater-failsafe
+      revision: sentinel-release
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: feature-add-can-shell
+      revision: sentinel-release
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
