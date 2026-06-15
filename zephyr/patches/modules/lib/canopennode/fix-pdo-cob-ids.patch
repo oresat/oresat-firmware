@@ -1,160 +1,33 @@
-From f7a28d89afe205c80dadcb211cde7d2896c15fef Mon Sep 17 00:00:00 2001
+From 97fc3b55d1aa165f8d8c857b87b80a640c5b46b2 Mon Sep 17 00:00:00 2001
 From: Pete Skeggs <plskeggs@noeticdesign.com>
-Date: Mon, 15 Dec 2025 11:18:38 -0800
-Subject: [PATCH] Improve configuration problem logging
+Date: Sun, 14 Jun 2026 18:23:07 -0700
+Subject: [PATCH] Fix bug in patch
 
-Add pragma message output for each distinct
-reason for failing to compile based on
-canopennode configuration problems.
-
-Signed-off-by: Pete Skeggs <plskeggs@noeticdesign.com>
-
-Simplify TPDO ID calculation
-
-Add the nodeId for all valid COB_IDs, not just
-the ones in the first 4.
-
-Signed-off-by: Pete Skeggs <plskeggs@noeticdesign.com>
 ---
- CANopen.c      | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- stack/CO_PDO.c | 13 +++++++++-
- 2 files changed, 80 insertions(+), 1 deletion(-)
+ stack/CO_PDO.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/CANopen.c b/CANopen.c
-index 141748c..cfade70 100644
---- a/CANopen.c
-+++ b/CANopen.c
-@@ -61,6 +61,8 @@
-   #endif
- #endif
- 
-+#define XSTR(x) STR(x)
-+#define STR(x) #x
- 
- /* Verify features from CO_OD *************************************************/
-     /* generate error, if features are not correctly configured for this project */
-@@ -78,6 +80,72 @@
-             || CO_NO_LSS_CLIENT                           >  1     \
-             || (CO_NO_LSS_SERVER > 0 && CO_NO_LSS_CLIENT > 0)
-         #error Features from CO_OD.h file are not corectly configured for this project!
-+        #if CO_NO_NMT_MASTER > 1
-+            #error CO_NO_NMT_MASTER > 1
-+            #pragma message XSTR(CO_NO_NMT_MASTER)
-+        #endif
-+        #if CO_NO_SYNC > 1
-+            #error CO_NO_SYNC > 1
-+            #pragma message XSTR(CO_NO_SYNC)
-+        #endif
-+        #if CO_NO_EMERGENCY != 1
-+            #error CO_NO_EMERGENCY != 1
-+            #pragma message XSTR(CO_NO_EMERGENCY)
-+        #endif
-+        #if CO_NO_SDO_SERVER == 0
-+            #error CO_NO_SDO_SERVER == 0
-+            #pragma message XSTR(CO_NO_SDO_SERVER)
-+        #endif
-+        #if CO_NO_TIME > 1
-+            #error CO_NO_TIME > 1
-+            #pragma message XSTR(CO_NO_TIME)
-+        #endif
-+        #if CO_NO_SDO_CLIENT > 128
-+            #error CO_NO_SDO_CLIENT > 128
-+            #pragma message XSTR(CO_NO_SDO_CLIENT)
-+        #endif
-+        #if CO_NO_RPDO < 1
-+            #error CO_NO_RPDO < 1
-+            #pragma message XSTR(CO_NO_RPDO)
-+        #endif
-+        #if CO_NO_RPDO > 0x200
-+            #error CO_NO_RPDO >0x200
-+            #pragma message XSTR(CO_NO_RPDO)
-+        #endif
-+        #if CO_NO_TPDO < 1
-+            #error CO_NO_TPDO < 1
-+            #pragma message XSTR(CO_NO_TPDO)
-+        #endif
-+        #if CO_NO_TPDO > 0x200
-+            #error CO_NO_TPDO > 0x200
-+            #pragma message XSTR(CO_NO_TPDO)
-+        #endif
-+        #if ODL_consumerHeartbeatTime_arrayLength      == 0
-+            #error ODL_consumerHeartbeatTime_arrayLength == 0
-+            #pragma message XSTR(ODL_consumerHeartbeatTime_arrayLength)
-+            #ifndef ODL_consumerHeartbeatTime_arrayLength
-+                #pragma message "ODL_consumerHeartbeatTime_arrayLength is not defined"
-+            #endif
-+        #endif
-+        #if ODL_errorStatusBits_stringLength           < 10
-+            #error ODL_errorStatusBits_stringLength < 10
-+            #pragma message XSTR(ODL_errorStatusBits_stringLength)
-+            #ifndef ODL_errorStatusBits_stringLength
-+                #pragma message "ODL_errorStatusBits_stringLength is not defined"
-+            #endif
-+        #endif
-+        #if CO_NO_LSS_SERVER                           >  1
-+            #error CO_NO_LSS_SERVER > 1
-+            #pragma message XSTR(CO_NO_LSS_SERVER)
-+        #endif
-+        #if CO_NO_LSS_CLIENT                           >  1
-+            #error CO_NO_LSS_CLIENT > 1
-+            #pragma message XSTR(CO_NO_LSS_CLIENT)
-+        #endif
-+        #if (CO_NO_LSS_SERVER > 0 && CO_NO_LSS_CLIENT > 0)
-+            #error (CO_NO_LSS_SERVER > 0 && CO_NO_LSS_CLIENT > 0)
-+            #pragma message XSTR(CO_NO_LSS_SERVER), XSTR(CO_NO_LSS_CLIENT)
-+        #endif
-     #endif
- 
- 
 diff --git a/stack/CO_PDO.c b/stack/CO_PDO.c
-index 1696d39..d9d8f3c 100644
+index 1696d39..7c29e55 100644
 --- a/stack/CO_PDO.c
 +++ b/stack/CO_PDO.c
-@@ -23,6 +23,7 @@
-  * limitations under the License.
-  */
- 
-+#include <zephyr/sys/printk.h>
- 
- #include "CO_driver.h"
- #include "CO_SDO.h"
-@@ -149,12 +150,15 @@ static void CO_TPDOconfigCom(CO_TPDO_t* TPDO, uint32_t COB_IDUsedByTPDO, uint8_t
+@@ -149,7 +149,15 @@ static void CO_TPDOconfigCom(CO_TPDO_t* TPDO, uint32_t COB_IDUsedByTPDO, uint8_t
      /* is TPDO used? */
      if((COB_IDUsedByTPDO & 0xBFFFF800L) == 0 && TPDO->dataLength && ID){
          /* is used default COB-ID? */
 -        if(ID == TPDO->defaultCOB_ID) ID += TPDO->nodeId;
-+        //if(ID == TPDO->defaultCOB_ID) 
-+        ID += TPDO->nodeId;
++        if(ID == TPDO->defaultCOB_ID) {
++            ID += TPDO->nodeId;
++        } else {
++            int i = TPDO->SDO->entryNo;
++
++            if((ID & 0x7FF) == (0x180U + (0x100U * (i % 4) + (i / 4)))) {
++                ID += TPDO->nodeId;
++            }
++        }
          TPDO->valid = true;
-+        //printk("TPDO valid: 0x%08x, ID: 0x%08x, nodeId: 0x%04x, default COB_ID: 0x%08x\n", COB_IDUsedByTPDO, ID, TPDO->nodeId, TPDO->defaultCOB_ID);
      }
      else{
-         ID = 0;
-         TPDO->valid = false;
-+        //printk("ERR: TPDO invalid: 0x%08x\n", COB_IDUsedByTPDO);
-     }
- 
-     TPDO->CANtxBuff = CO_CANtxBufferInit(
-@@ -167,6 +171,7 @@ static void CO_TPDOconfigCom(CO_TPDO_t* TPDO, uint32_t COB_IDUsedByTPDO, uint8_t
- 
-     if(TPDO->CANtxBuff == 0){
-         TPDO->valid = false;
-+        //printk("TPDO no tx buf: 0x%08x\n", COB_IDUsedByTPDO);
-     }
- }
- 
-@@ -1025,5 +1030,11 @@ void CO_TPDO_process(
- 
-     /* update timers */
-     TPDO->inhibitTimer = (TPDO->inhibitTimer > timeDifference_us) ? (TPDO->inhibitTimer - timeDifference_us) : 0;
-+    uint32_t tmp = TPDO->eventTimer;
-     TPDO->eventTimer = (TPDO->eventTimer > timeDifference_us) ? (TPDO->eventTimer - timeDifference_us) : 0;
-+    //printk("timediff: %u, eventTimer: %u\n", timeDifference_us, TPDO->eventTimer);
-+    if (tmp && !TPDO->eventTimer) {
-+        //printk("ERROR: event timer set to 0!\n");
-+    }
- }
-+
 -- 
 2.43.0
 
