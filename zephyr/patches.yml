@@ -19,11 +19,11 @@ patches:
       Force VrefO off because we do not need that signal to be output
       and it interferes with P4_7
   - path: modules/lib/canopennode/fix-pdo-cob-ids.patch
-    sha256sum: f9b5ecd6e572d233cd88fce0e7f2b7b73b7b3b212574a9094b8f15caa158cbe9
+    sha256sum: ffad3a3f2bb7d0b8533d8ca1d1859a6b3ab0c83e0108a84a064804b2d21ae1f7
     module: canopennode
     author: Pete Skeggs
     email: plskeggs@noeticdesign.com
-    date: 2026-06-08
+    date: 2026-06-14
     upstreamable: false
     comments: |
       Fix PDO COB ids for use with Oresat.
