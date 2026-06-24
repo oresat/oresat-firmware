@@ -175,16 +175,16 @@ You will need to install the required J-Link software.
 Visit [Segger J-Link Downloads], download the latest J-Link software for your OS,
 and follow their installation instructions.
 
-### Raspberry Pi Debug Probe
+### OreSat Card Debug Board v3
 
-To use the Raspi debug probe with the NXP MCXN947, follow the instructions: [Raspberry Pi Debug Probe].
+To use with the NXP MCXN947, follow the instructions: [Raspberry Pi Debug Probe].
 
 ### Test compile and flash
 
 ```bash
 cd ~/src/oresat/firmware/apps/template
-west build -p always -b nucleo_f091rc .
-west flash --runner openocd
+west build -p always -b mcxn947_protocard/mcxn947/cpu0
+west flash --runner pyocd
 ```
 
 ## Tools

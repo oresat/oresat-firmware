@@ -50,7 +50,7 @@ The **oresat-zephyr-common** repo below is now a branch ***zephyr*** of the old 
 - [Oresat-template-app](https://github.com/oresat/oresat-template-app)  
   Prototype application, with a working example of using logging, adc, dac, and I2C.
   Available for two Oresat-designed cards, the mcxn947_breakout and the mcxn947_protocard, as well as the STM32F091RC Nucleo dev kit and the NXP FRDM-MCXN947 dev kit.
-- [Oresat-firmware](https://github.com/oresat/oresat-firmware) → *moved here in **zephyr** branch from oresat-zephyr-common*  
+- [Oresat-firmware](https://github.com/oresat/oresat-firmware/tree/zephyr) → *moved here in **zephyr** branch from oresat-zephyr-common*  
   This is the central repository containing west.yml.
 
 ## Repository Organization
@@ -91,7 +91,7 @@ Below, the ⇐ characters indicate where **west** cloned each git repo listed ab
 │   ├── mag/ ⇐ https://github.com/oresat/oresat-mag-app
 │   ├── solar/ ⇐ https://github.com/oresat/oresat-solar-app
 │   └── template/ ⇐ https://github.com/oresat/oresat-template-app
-├── common/ ⇐ https://github.com/oresat/oresat-firmware (zephyr branch)
+├── common/ ⇐ https://github.com/oresat/oresat-firmware/tree/zephyr (zephyr branch)
 │   ├── boards/
 │   ├── drivers/
 │   ├── lib/
@@ -206,7 +206,7 @@ Our goal is to make this as painless as possible for students and new community 
 
 1. Initial setup  
    Below is a summary.  
-   See the [oresat-firmware zephyr README](https://github.com/oresat/oresat-firmware) for all details.
+   See the [oresat-firmware zephyr README](https://github.com/oresat/oresat-firmware/blob/zephyr/README.md) for all details.
    - a. Install dependencies
    - b. Install Zephyr SDK (toolchain contains target device C compiler, linker, build tools)
    - c. Install west

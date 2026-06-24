@@ -1,8 +1,11 @@
-# Raspberry Pi Debug Probe Installation and Usage for the NXP MCXN947
+# OreSat Card Debug Board v3 Installation and Usage for the NXP MCXN947
 
-Information about the probe is here: [Raspberry Pi Debug Probe].
+Information about the built-in probe on this board is here: [Raspberry Pi Debug Probe].
 
 ## Installation and use
+
+***Note***
+We will switch to the better `probe-rs` interface from `pyocd` soon.
 
 1. Check pyocd version
 ```
