@@ -31,11 +31,11 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: sentinel-release
+      revision: main
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: sentinel-release
+      revision: main
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
