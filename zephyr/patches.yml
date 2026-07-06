@@ -1,23 +1,13 @@
 patches:
   - path: zephyr/fix-stm32f09x-die-temp.patch
-    sha256sum: 7de9fdb2c10ca5aa758f6afa4d0c44955cbe68b4ba48540a8cbb5c78b4144b27
+    sha256sum: e34c60777de5d71356c710ced8b75d37a753000d0251f396e6902cfd44cf2adc
     module: zephyr
     author: Pete Skeggs
     email: plskeggs@noeticdesign.com
-    date: 2026-06-05
+    date: 2026-07-06
     upstreamable: false
     comments: |
       Fix a problem with using an unsigned type in slope calc
-  - path: zephyr/fix-force-vrefo-off.patch
-    sha256sum: 17ced080c12990a8308e24189d8b1e8b49bc590da164309cec4e7e6d94bd227e
-    module: zephyr
-    author: Pete Skeggs
-    email: plskeggs@noeticdesign.com
-    date: 2026-06-11
-    upstreamable: false
-    comments: |
-      Force VrefO off because we do not need that signal to be output
-      and it interferes with P4_7
   - path: modules/lib/canopennode/fix-pdo-cob-ids.patch
     sha256sum: ffad3a3f2bb7d0b8533d8ca1d1859a6b3ab0c83e0108a84a064804b2d21ae1f7
     module: canopennode
