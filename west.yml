@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: sentinel-release
+      revision: feature-zephyr-4.4.0
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
@@ -31,15 +31,15 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: main
+      revision: feature-zephyr-4.4.0
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: main
+      revision: feature-zephyr-4.4.0
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
-      revision: main
+      revision: feature-zephyr-4.4.0
       path: apps/template
       import: submanifests
 
