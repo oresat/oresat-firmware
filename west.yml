@@ -12,7 +12,7 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: v4.4.0
+      revision: v4.4.1
       import:
         # below, only import Zephyr modules we need;
         # extend this per app in submanifests: see oresat-template-app
@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: feature-zephyr-4.4.0
+      revision: feature-zephyr-4.4.1
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
@@ -31,15 +31,15 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: feature-zephyr-4.4.0
+      revision: feature-zephyr-4.4.1
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: feature-zephyr-4.4.0
+      revision: feature-zephyr-4.4.1
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
-      revision: feature-zephyr-4.4.0
+      revision: feature-zephyr-4.4.1
       path: apps/template
       import: submanifests
 
