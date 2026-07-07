@@ -15,27 +15,17 @@ We will switch to the better `probe-rs` interface from `pyocd` soon.
 Version 0.38.0 is the latest as of 10/23/2025, though 0.37.0 works fine.
 
 2. Install pyocd pack(v19!) to support the mcxn947
-   1. download [Device Family Pack 19](https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MCXN947_DFP.19.0.0.pack) and put it somewhere nice
+    run pyocd setup script `cd oresat-firmware && bash scripts/setup_pyocd.sh`
 
-   2. create `pyocd.yaml` in the directory you plan to run `west flash`, containing the following lines:
-
-   ```yaml
-   pack:
-    - /path/to/NXP.MCXN947_DFP.19.0.0.pack
-   ```
-
-    **Make sure to change path to where you placed it.**
-
-    Alternatively, invoking `west` with the following command achieves the same result, though is less friendly to type:
-
+    to flash firmware, run the following command to flash with the pyocd runner
     ```bash
-    west flash -r pyocd --tool-opt=--pack=/path/to/NXP.MCXN947_DFP.19.0.0.pack
+    west flash -r pyocd
     ```
+
     **NOTE**:
 
-    > if you are intending to build an app for a custom board file, such as the `mcxn947_protocard`, place a copy of this `pyocd.yaml` file
-    > in the board's folder; `pyocd` always looks for a `pyocd.yaml` in the specified board file folder when building for a locally defined
-    >  board; this allows you to use the simpler `west flash -b <board> -r pyocd` command line
+    > if you are intending to build an app for a custom board file, such as the `mcxn947_protocard`, place a symbolic link to the generated `oresat-firmware/support/pyocd.yaml` file
+    > in the board's folder; `pyocd` always looks for a `pyocd.yaml` in the specified board file folder when building for a locally defined board.
 
 3. Connect the probe and verify we can see it
 ```
