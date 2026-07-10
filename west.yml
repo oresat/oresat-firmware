@@ -34,7 +34,7 @@ manifest:
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
-      revision: feature-zephyr-4.4.1
+      revision: low-power
       path: apps/template
 #      import: submanifests
 
