@@ -4,24 +4,19 @@ manifest:
       url-base: https://github.com/zephyrproject-rtos
     - name: oresat
       url-base: https://github.com/oresat
-    - name: canopennode
-      url-base: https://github.com/CANopenNode
   defaults:
     remote: oresat
   group-filter: [+optional]
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: v4.4.1
+      revision: main
       import:
         # below, only import Zephyr modules we need;
         # extend this per app in submanifests: see oresat-template-app
         name-allowlist:
           - cmsis_6
-          - hal_stm32
           - hal_nxp
-          - canopennode
-          - mcuboot
     - name: oresat-mag-app
       revision: feature-zephyr-4.4.1
       path: apps/mag
@@ -41,7 +36,7 @@ manifest:
     - name: oresat-template-app
       revision: feature-zephyr-4.4.1
       path: apps/template
-      import: submanifests
+#      import: submanifests
 
   self:
     path: common
