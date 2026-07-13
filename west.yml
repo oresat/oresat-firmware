@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: sentinel-release
+      revision: feature-improve-adc
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
