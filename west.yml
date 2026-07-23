@@ -10,7 +10,7 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: pull/111618/head
+      revision: pull/113878/head
       import:
         # below, only import Zephyr modules we need;
         # extend this per app in submanifests: see oresat-template-app
