@@ -28,3 +28,13 @@ patches:
     path: scripts-runners-probe-rs-use-check-call-ignore-sigint.patch
     sha256sum: 8f8297ac6d9ca6d8abd07c8ea492efb900f3cd2329282a96b90a2d4d31df305c
     upstreamable: true
+
+  - author: Andres
+    date: '2026-04-02'
+    email: hidden@github.com
+    merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/106778
+    merge-status: true
+    module: scripts/west_commands/runners
+    path: scripts-runners-rename-run-client-and-fix-GDB-SIGINT-handling.patch
+    sha256sum: 099a9612a01805ad22fed73f1d601f962da109b7a6a9114c5f3c4f51571b9917
+    upstreamable: true

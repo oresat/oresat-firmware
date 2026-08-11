@@ -1,0 +1,223 @@
+From 72d52a28075c2a2de0c2a564a086fcd755beb482 Mon Sep 17 00:00:00 2001
+From: Andres Hernandez <andres.a.h@outlook.com>
+Date: Thu, 9 Apr 2026 11:25:33 -0700
+Subject: [PATCH 1/4] scripts: runners: core: rename run_client() to
+ check_call_ignore_sigint()
+
+Renaming run_client() to check_call_ignore_sigint() makes its purpose
+clearer and consistent with the pattern already established in the
+blackmagicprobe runner.
+
+Then, update all callers with the new name.
+
+run_client() is kept as a deprecated function, wrapping
+check_call_ignore_sigint() for backwards compatibility.
+
+Signed-off-by: Andres Hernandez <andres.a.h@outlook.com>
+---
+ scripts/west_commands/runners/core.py     | 12 ++++++++----
+ scripts/west_commands/runners/jlink.py    |  2 +-
+ scripts/west_commands/runners/lldbac.py   |  2 +-
+ scripts/west_commands/runners/openocd.py  |  2 +-
+ scripts/west_commands/runners/spi_burn.py |  2 +-
+ 5 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/west_commands/runners/core.py b/scripts/west_commands/runners/core.py
+index ef90eee4b3f9..44273e5f82db 100644
+--- a/scripts/west_commands/runners/core.py
++++ b/scripts/west_commands/runners/core.py
+@@ -897,19 +897,23 @@ def run_server_and_client(self, server, client, **kwargs):
+         It's useful to e.g. open a GDB server and client.'''
+         server_proc = self.popen_ignore_int(server, **kwargs)
+         try:
+-            self.run_client(client, **kwargs)
++            self.check_call_ignore_sigint(client, **kwargs)
+         finally:
+             server_proc.terminate()
+             server_proc.wait()
+ 
+-    def run_client(self, client, **kwargs):
+-        '''Run a client that handles SIGINT.'''
++    def check_call_ignore_sigint(self, client, **kwargs):
++        '''Run a command that ignores SIGINT.'''
+         previous = signal.signal(signal.SIGINT, signal.SIG_IGN)
+         try:
+             self.check_call(client, **kwargs)
+         finally:
+             signal.signal(signal.SIGINT, previous)
+ 
++    def run_client(self, client, **kwargs):
++        self.logger.warning('run_client is deprecated; use check_call_ignore_sigint instead')
++        self.check_call_ignore_sigint(client, **kwargs)
++
+     def _log_cmd(self, cmd: list[str]):
+         escaped = ' '.join(shlex.quote(s) for s in cmd)
+         if not self.dry_run:
+@@ -1016,7 +1020,7 @@ def run_telnet_client(
+             # If a `nc` command is available, run it, as it will provide the
+             # best support for CONFIG_SHELL_VT100_COMMANDS etc.
+             client_cmd = ['nc', host, str(port)]
+-            # Note: netcat (nc) does not handle sigint, so cannot use run_client()
++            # Note: netcat (nc) does not handle sigint, so cannot use check_call_ignore_sigint()
+             self.check_call(client_cmd)
+             return
+         else:
+diff --git a/scripts/west_commands/runners/jlink.py b/scripts/west_commands/runners/jlink.py
+index e7ae7db69cbe..49e077dc0a5e 100644
+--- a/scripts/west_commands/runners/jlink.py
++++ b/scripts/west_commands/runners/jlink.py
+@@ -465,7 +465,7 @@ def do_run(self, command, **kwargs):
+                 self.print_gdbserver_message()
+                 self.run_server_and_client(server_cmd, client_cmd)
+             else:
+-                self.run_client(client_cmd)
++                self.check_call_ignore_sigint(client_cmd)
+ 
+     def get_default_flash_commands(self):
+         lines = self.pre_script_cmds or [] # Prepend custom script commands
+diff --git a/scripts/west_commands/runners/lldbac.py b/scripts/west_commands/runners/lldbac.py
+index 29bf8b08a1be..78d3b5d90927 100644
+--- a/scripts/west_commands/runners/lldbac.py
++++ b/scripts/west_commands/runners/lldbac.py
+@@ -213,7 +213,7 @@ def do_debug_integrated(self, **kwargs):
+         lldbac_cmd.append(self.cfg.elf_file)
+ 
+         # Run interactively
+-        self.run_client(lldbac_cmd)
++        self.check_call_ignore_sigint(lldbac_cmd)
+ 
+     def _build_core_properties_for_hardware(self):
+         '''Build core properties string for run-lldbac --core argument.
+diff --git a/scripts/west_commands/runners/openocd.py b/scripts/west_commands/runners/openocd.py
+index a759b0e2efb8..3114726a6258 100644
+--- a/scripts/west_commands/runners/openocd.py
++++ b/scripts/west_commands/runners/openocd.py
+@@ -460,7 +460,7 @@ def do_attach_debug_rtt(self, command, **kwargs):
+         if command in ('attach', 'debug'):
+             server_proc = self.popen_ignore_int(server_cmd, stderr=subprocess.DEVNULL)
+             try:
+-                self.run_client(gdb_cmd)
++                self.check_call_ignore_sigint(gdb_cmd)
+             finally:
+                 server_proc.terminate()
+                 server_proc.wait()
+diff --git a/scripts/west_commands/runners/spi_burn.py b/scripts/west_commands/runners/spi_burn.py
+index 4fc4cd776a79..fb29b4fd5b29 100644
+--- a/scripts/west_commands/runners/spi_burn.py
++++ b/scripts/west_commands/runners/spi_burn.py
+@@ -145,7 +145,7 @@ def _debug(self):
+             ] + gdb_ex
+ 
+             # Run gdb
+-            self.run_client(client_cmd)
++            self.check_call_ignore_sigint(client_cmd)
+ 
+         finally:
+             self.stop_iceman()
+
+From 73d49b169d16ca0c66c98c91cb0d69fd3e10b1d0 Mon Sep 17 00:00:00 2001
+From: Andres Hernandez <andres.a.h@outlook.com>
+Date: Thu, 9 Apr 2026 11:32:42 -0700
+Subject: [PATCH 2/4] scripts: runners: blackmagicprobe: drop local
+ check_call_ignore_sigint()
+
+The local check_call_ignore_sigint() method is an exact duplicate
+of the same-named method in ZephyrBinaryRunner. Remove the
+local definition and rely on the base implementation.
+
+Signed-off-by: Andres Hernandez <andres.a.h@outlook.com>
+---
+ scripts/west_commands/runners/blackmagicprobe.py | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/scripts/west_commands/runners/blackmagicprobe.py b/scripts/west_commands/runners/blackmagicprobe.py
+index 2699943acc0d..b80d28aa7bd2 100644
+--- a/scripts/west_commands/runners/blackmagicprobe.py
++++ b/scripts/west_commands/runners/blackmagicprobe.py
+@@ -7,7 +7,6 @@
+ 
+ import glob
+ import os
+-import signal
+ import sys
+ from pathlib import Path
+ 
+@@ -180,13 +179,6 @@ def bmp_flash(self, command, **kwargs):
+                     '-silent'])
+         self.check_call(command)
+ 
+-    def check_call_ignore_sigint(self, command):
+-        previous = signal.signal(signal.SIGINT, signal.SIG_IGN)
+-        try:
+-            self.check_call(command)
+-        finally:
+-            signal.signal(signal.SIGINT, previous)
+-
+     def bmp_attach(self, command, **kwargs):
+         if self.elf_file is None:
+             command = (self.gdb +
+
+From d938ae8343ea51e2f8a4140a7926d60ec691b186 Mon Sep 17 00:00:00 2001
+From: Andres Hernandez <andres.a.h@outlook.com>
+Date: Thu, 9 Apr 2026 11:34:45 -0700
+Subject: [PATCH 3/4] scripts: runners: native: ignore SIGINT while GDB is
+ running
+
+The native runner's do_debug() and do_debugserver() methods launch GDB
+via check_call() without ignoring SIGINT in the parent Python process.
+When the user presses Ctrl+C, the signal kills the west process, which
+tears down GDB before it can clean up. When GDB is in TUI mode via
+`layout src`, this leaves the terminal in a bad state with mouse
+tracking escape sequences active.
+
+Fix by using check_call_ignore_sigint() from the base class.
+
+Signed-off-by: Andres Hernandez <andres.a.h@outlook.com>
+---
+ scripts/west_commands/runners/native.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/west_commands/runners/native.py b/scripts/west_commands/runners/native.py
+index e1ea8fa1d4ea..8a282dc972c4 100644
+--- a/scripts/west_commands/runners/native.py
++++ b/scripts/west_commands/runners/native.py
+@@ -73,9 +73,9 @@ def do_debug(self, **kwargs):
+         #   build/CMakeCache.txt should have `CMAKE_GDB`.
+ 
+         cmd = (self.gdb_cmd + ['--quiet', self.cfg.exe_file])
+-        self.check_call(cmd)
++        self.check_call_ignore_sigint(cmd)
+ 
+     def do_debugserver(self, **kwargs):
+         cmd = (['gdbserver', f':{self.gdb_port}', self.cfg.exe_file])
+ 
+-        self.check_call(cmd)
++        self.check_call_ignore_sigint(cmd)
+
+From ad619d9c62faab5c4d7874bd6a9021befb778160 Mon Sep 17 00:00:00 2001
+From: Andres Hernandez <andres.a.h@outlook.com>
+Date: Thu, 9 Apr 2026 11:37:24 -0700
+Subject: [PATCH 4/4] scripts: runners: xtensa: ignore SIGINT while GDB is
+ running
+
+The xtensa runner launches xt-gdb via check_call() without ignoring
+SIGINT in the parent Python process. When the user presses Ctrl+C,
+the signal kills the West process before GDB can clean up.
+
+Fix by using check_call_ignore_sigint() from the base class.
+
+Signed-off-by: Andres Hernandez <andres.a.h@outlook.com>
+---
+ scripts/west_commands/runners/xtensa.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/west_commands/runners/xtensa.py b/scripts/west_commands/runners/xtensa.py
+index 3514946c9b6c..9177b4c28bd4 100644
+--- a/scripts/west_commands/runners/xtensa.py
++++ b/scripts/west_commands/runners/xtensa.py
+@@ -34,4 +34,4 @@ def do_create(cls, cfg, args):
+     def do_run(self, command, **kwargs):
+         gdb_cmd = [self.cfg.gdb, self.cfg.elf_file]
+         self.require(gdb_cmd[0])
+-        self.check_call(gdb_cmd)
++        self.check_call_ignore_sigint(gdb_cmd)
