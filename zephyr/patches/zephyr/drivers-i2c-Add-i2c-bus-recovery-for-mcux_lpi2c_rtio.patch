@@ -1,0 +1,164 @@
+From 5f76ee2d6cedfd6f4d8f102ba3f7c9503aac493d Mon Sep 17 00:00:00 2001
+From: Pete Skeggs <plskeggs@noeticdesign.com>
+Date: Wed, 12 Aug 2026 14:56:17 -0700
+Subject: [PATCH] drivers: i2c: Add i2c bus recovery for mcux_lpi2c_rtio
+
+This driver's implemention of I2C bus recovery was incomplete.
+
+This patch copies in the relevant code from the mcux_lpi2c driver.
+
+Signed-off-by: Pete Skeggs <plskeggs@noeticdesign.com>
+---
+ drivers/i2c/i2c_mcux_lpi2c_rtio.c | 97 +++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+
+diff --git a/drivers/i2c/i2c_mcux_lpi2c_rtio.c b/drivers/i2c/i2c_mcux_lpi2c_rtio.c
+index aa8274b95b5..7fa49f6b083 100644
+--- a/drivers/i2c/i2c_mcux_lpi2c_rtio.c
++++ b/drivers/i2c/i2c_mcux_lpi2c_rtio.c
+@@ -58,6 +58,7 @@ struct mcux_lpi2c_config {
+ struct mcux_lpi2c_data {
+ 	DEVICE_MMIO_NAMED_RAM(reg_base);
+ 	lpi2c_master_handle_t handle;
++	struct k_sem lock;
+ 	struct i2c_rtio *ctx;
+ 	lpi2c_master_transfer_t transfer;
+ #ifdef CONFIG_I2C_TARGET
+@@ -83,9 +84,11 @@ static int mcux_lpi2c_configure(const struct device *dev,
+ static int  mcux_lpi2c_do_configure(const struct device *dev, uint32_t dev_config_raw)
+ {
+ 	const struct mcux_lpi2c_config *config = dev->config;
++	struct mcux_lpi2c_data *data = dev->data;
+ 	LPI2C_Type *base = (LPI2C_Type *)DEVICE_MMIO_NAMED_GET(dev, reg_base);
+ 	uint32_t clock_freq;
+ 	uint32_t baudrate;
++    int ret;
+ 
+ 	if (!(I2C_MODE_CONTROLLER & dev_config_raw)) {
+ 		return -EINVAL;
+@@ -114,7 +117,13 @@ static int  mcux_lpi2c_do_configure(const struct device *dev, uint32_t dev_confi
+ 		return -EINVAL;
+ 	}
+ 
++	ret = k_sem_take(&data->lock, K_FOREVER);
++	if (ret) {
++		return ret;
++	}
++
+ 	LPI2C_MasterSetBaudRate(base, clock_freq, baudrate);
++	k_sem_give(&data->lock);
+ 
+ 	return 0;
+ }
+@@ -274,6 +283,89 @@ static int mcux_lpi2c_transfer(const struct device *dev, struct i2c_msg *msgs,
+ 	return i2c_rtio_transfer(ctx, msgs, num_msgs, addr);
+ }
+ 
++#if CONFIG_I2C_MCUX_LPI2C_BUS_RECOVERY
++static void mcux_lpi2c_bitbang_set_scl(void *io_context, int state)
++{
++	const struct mcux_lpi2c_config *config = io_context;
++
++	gpio_pin_set_dt(&config->scl, state);
++}
++
++static void mcux_lpi2c_bitbang_set_sda(void *io_context, int state)
++{
++	const struct mcux_lpi2c_config *config = io_context;
++
++	gpio_pin_set_dt(&config->sda, state);
++}
++
++static int mcux_lpi2c_bitbang_get_sda(void *io_context)
++{
++	const struct mcux_lpi2c_config *config = io_context;
++
++	return gpio_pin_get_dt(&config->sda) == 0 ? 0 : 1;
++}
++
++static int mcux_lpi2c_recover_bus(const struct device *dev)
++{
++	const struct mcux_lpi2c_config *config = dev->config;
++	struct mcux_lpi2c_data *data = dev->data;
++	struct i2c_bitbang bitbang_ctx;
++	struct i2c_bitbang_io bitbang_io = {
++		.set_scl = mcux_lpi2c_bitbang_set_scl,
++		.set_sda = mcux_lpi2c_bitbang_set_sda,
++		.get_sda = mcux_lpi2c_bitbang_get_sda,
++	};
++	uint32_t bitrate_cfg;
++	int error = 0;
++
++	if (!gpio_is_ready_dt(&config->scl)) {
++		LOG_ERR("SCL GPIO device not ready");
++		return -EIO;
++	}
++
++	if (!gpio_is_ready_dt(&config->sda)) {
++		LOG_ERR("SDA GPIO device not ready");
++		return -EIO;
++	}
++
++	k_sem_take(&data->lock, K_FOREVER);
++
++	error = gpio_pin_configure_dt(&config->scl, GPIO_OUTPUT_HIGH);
++	if (error != 0) {
++		LOG_ERR("failed to configure SCL GPIO (err %d)", error);
++		goto restore;
++	}
++
++	error = gpio_pin_configure_dt(&config->sda, GPIO_OUTPUT_HIGH);
++	if (error != 0) {
++		LOG_ERR("failed to configure SDA GPIO (err %d)", error);
++		goto restore;
++	}
++
++	i2c_bitbang_init(&bitbang_ctx, &bitbang_io, (void *)config);
++
++	bitrate_cfg = i2c_map_dt_bitrate(config->bitrate) | I2C_MODE_CONTROLLER;
++	error = i2c_bitbang_configure(&bitbang_ctx, bitrate_cfg);
++	if (error != 0) {
++		LOG_ERR("failed to configure I2C bitbang (err %d)", error);
++		goto restore;
++	}
++
++	error = i2c_bitbang_recover_bus(&bitbang_ctx);
++	if (error != 0) {
++		LOG_ERR("failed to recover bus (err %d)", error);
++		goto restore;
++	}
++
++restore:
++	(void)pinctrl_apply_state(config->pincfg, PINCTRL_STATE_DEFAULT);
++
++	k_sem_give(&data->lock);
++
++	return error;
++}
++#endif /* CONFIG_I2C_MCUX_LPI2C_BUS_RECOVERY */
++
+ #if DT_HAS_COMPAT_STATUS_OKAY(nxp_lp_flexcomm)
+ #define LPI2C_IRQHANDLE_ARG LPI2C_GetInstance(base)
+ #else
+@@ -301,6 +393,8 @@ static int mcux_lpi2c_init(const struct device *dev)
+ 
+ 	base = (LPI2C_Type *)DEVICE_MMIO_NAMED_GET(dev, reg_base);
+ 
++	k_sem_init(&data->lock, 1, 1);
++
+ 	if (!device_is_ready(config->clock_dev)) {
+ 		LOG_ERR("clock control device not ready");
+ 		return -ENODEV;
+@@ -341,6 +435,9 @@ static DEVICE_API(i2c, mcux_lpi2c_driver_api) = {
+ 	.configure = mcux_lpi2c_configure,
+ 	.transfer = mcux_lpi2c_transfer,
+ 	.iodev_submit = mcux_lpi2c_submit,
++#if CONFIG_I2C_MCUX_LPI2C_BUS_RECOVERY
++	.recover_bus = mcux_lpi2c_recover_bus,
++#endif /* CONFIG_I2C_MCUX_LPI2C_BUS_RECOVERY */
+ };
+ 
+ #if CONFIG_I2C_MCUX_LPI2C_BUS_RECOVERY
+-- 
+2.43.0
+

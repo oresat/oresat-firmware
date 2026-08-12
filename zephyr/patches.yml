@@ -38,3 +38,13 @@ patches:
     path: scripts-runners-rename-run-client-and-fix-GDB-SIGINT-handling.patch
     sha256sum: 099a9612a01805ad22fed73f1d601f962da109b7a6a9114c5f3c4f51571b9917
     upstreamable: true
+
+  - path: zephyr/drivers-i2c-Add-i2c-bus-recovery-for-mcux_lpi2c_rtio.patch
+    sha256sum: e50b3689012a0c49da74736be782ec20d6fa00d9b5c244d600f396eb133fa9ae
+    module: zephyr
+    author: Pete Skeggs
+    email: plskeggs@noeticdesign.com
+    date: 2026-08-12
+    upstreamable: false
+    comments: |
+      Add missing i2c bus recovery functionality.
