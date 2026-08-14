@@ -31,11 +31,11 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: main
+      revision: feature-beecon-prism-release
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: main
+      revision: feature-beecon-prism-release
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
