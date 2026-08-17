@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: main
+      revision: feature-beecon-prism-release
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
