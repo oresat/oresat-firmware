@@ -23,7 +23,7 @@ manifest:
           - canopennode
           - mcuboot
     - name: oresat-mag-app
-      revision: feature-improve-adc
+      revision: feature-beecon-prism-release-zephyr-4.2.0
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
