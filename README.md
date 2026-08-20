@@ -48,6 +48,8 @@ Make sure you have at least the minimum required versions of:
 3. Devicetree compiler: 1.4.6
   `dtc --version`
 
+**The versions could be higher for later versions of Zephyr than the 4.2.0 referenced here.**
+
 ### Get Oresat common code, Zephyr, and Python dependencies
 
 #### Create a new virtual environment:
@@ -103,14 +105,18 @@ west update
 > **IMPORTANT: when a newer version of this is available, you must do these steps!**
 
 1. If you changed anything in the code (in an app, here in common, or in zephyr), follow the instructions in [Oresat Zephyr Repository Organization-Tasks]
-2. Do *west patch clean* -- this undoes any patches applied to the zephyr, modules, or bootloader trees by a previous *west update*; should be no errors
-3. Do *west update* and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
+2. Do **west patch clean** -- this undoes any patches applied to the zephyr, modules, or bootloader trees by a previous *west update*; should be no errors
+3. Do **cd ~/src/oresat/firmware/common** -- change directory to the `common` folder; this is where the contents of `oresat-firmware` `zephyr` branch are
+4. Do **git pull** -- pull in the latest changes to the `oresat-firmware` `zephyr` branch
+5. Do **west update** and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
 	  **watch for errors and if any, ask for help before proceeding!**
-4. Do *west patch apply* -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
+6. Do **west patch apply** -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
 	  warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
 
 ```bash
 west patch clean
+cd ~/src/oresat/firmware/common
+git pull
 west update
 west patch apply
 ```
@@ -145,7 +151,7 @@ source ./zephyr-env.sh
 export ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk-0.17.2
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 ```
-Obviously use the SDK version number actually installed.
+Obviously use the SDK version number actually installed. It could be `0.17.2` for Zephyr 4.2.0, or `1.0.1` for Zephyr 4.4.1.
 
 #### Add udev rule:
 
