@@ -35,7 +35,7 @@ manifest:
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: feature-beecon-prism-release
+      revision: feature-osiris-release
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
