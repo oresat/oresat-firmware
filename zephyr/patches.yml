@@ -3,20 +3,7 @@ clean-command: git clean -d -f -x
 patches:
 - apply-command: git apply
   author: Pete Skeggs
-  comments: 'Fix a problem with using an unsigned type in slope calc
-
-    '
-  date: 2026-07-06
-  email: plskeggs@noeticdesign.com
-  module: zephyr
-  path: zephyr/fix-stm32f09x-die-temp.patch
-  sha256sum: e34c60777de5d71356c710ced8b75d37a753000d0251f396e6902cfd44cf2adc
-  upstreamable: false
-- apply-command: git apply
-  author: Pete Skeggs
-  comments: 'Fix PDO COB ids for use with Oresat.
-
-    '
+  comments: 'Fix PDO COB ids for use with Oresat.'
   date: 2026-06-14
   email: plskeggs@noeticdesign.com
   module: canopennode
@@ -24,15 +11,14 @@ patches:
   sha256sum: ffad3a3f2bb7d0b8533d8ca1d1859a6b3ab0c83e0108a84a064804b2d21ae1f7
   upstreamable: false
 - apply-command: git apply
-  author: William Jeffreys
-  date: '2026-05-11'
-  email: willj@pdx.edu
-  merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/108829
-  merge-status: true
-  module: zephyr/scripts/west_commands/runners
-  path: scripts-runners-probe-rs-use-check-call-ignore-sigint.patch
-  sha256sum: 8f8297ac6d9ca6d8abd07c8ea492efb900f3cd2329282a96b90a2d4d31df305c
-  upstreamable: true
+  author: Pete Skeggs
+  comments: 'Fix a problem with using an unsigned type in slope calc'
+  date: 2026-07-06
+  email: plskeggs@noeticdesign.com
+  module: zephyr
+  path: zephyr/fix-stm32f09x-die-temp.patch
+  sha256sum: e34c60777de5d71356c710ced8b75d37a753000d0251f396e6902cfd44cf2adc
+  upstreamable: false
 - apply-command: git apply
   author: Andres
   date: '2026-04-02'
@@ -43,6 +29,16 @@ patches:
   path: scripts-runners-rename-run-client-and-fix-GDB-SIGINT-handling.patch
   sha256sum: 099a9612a01805ad22fed73f1d601f962da109b7a6a9114c5f3c4f51571b9917
   upstreamable: true
+- apply-command: git apply
+  author: William Jeffreys
+  date: '2026-05-11'
+  email: willj@pdx.edu
+  merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/108829
+  merge-status: true
+  module: zephyr/scripts/west_commands/runners
+  path: scripts-runners-probe-rs-use-check-call-ignore-sigint.patch
+  sha256sum: 8f8297ac6d9ca6d8abd07c8ea492efb900f3cd2329282a96b90a2d4d31df305c
+  upstreamable: true
 - author: William Jeffreys
   date: '2026-08-10'
   email: hidden@github.com
@@ -52,7 +48,17 @@ patches:
   path: scripts-runners-probe-rs-Rename-attach-RTT-command-to-rtt.patch
   sha256sum: cd06f0c3756c8318d9189d07923e3c3d3ec5e0f15b3b23851399f9e6c032335f
   upstreamable: true
-- author: Benjamin Perseghetti
+- author: "Benjamin Cab\xE9"
+  date: '2026-08-12'
+  email: benjamin@zephyrproject.org
+  merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/116093
+  merge-status: true
+  module: zephyr
+  path: drivers-sensor-rm3100-set-read-bit-on-one-shot-measurement-read.patch
+  sha256sum: cbc8bec1a907c89ff41290ffe3861080cba145466c82eb6d2ecd0d522e58fe21
+  upstreamable: true
+- apply-command: git apply
+  author: Benjamin Perseghetti
   date: '2026-08-24'
   email: bperseghetti@rudislabs.com
   merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/117395
@@ -61,7 +67,8 @@ patches:
   path: drivers-sensor-rm3100-only-set-the-SPI-read-bit-on-SPI-transfers.patch
   sha256sum: 0d9c1badb1b2bcfc4d72dd396bac33d8a52a5ba5c66fb135440a4e1d55c01fd5
   upstreamable: true
-- author: Benjamin Perseghetti
+- apply-command: git apply
+  author: Benjamin Perseghetti
   date: '2026-08-24'
   email: bperseghetti@rudislabs.com
   merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/117395
@@ -70,7 +77,8 @@ patches:
   path: drivers-sensor-rm3100-encode-a-fixed-channel-spec-when-streaming.patch
   sha256sum: 4131fc4f09c251b20ce6ae26fe3f8790256f3f3de6d170e8abf09bf5699b4e73
   upstreamable: true
-- author: Benjamin Perseghetti
+- apply-command: git apply
+  author: Benjamin Perseghetti
   date: '2026-08-24'
   email: bperseghetti@rudislabs.com
   merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/117395
