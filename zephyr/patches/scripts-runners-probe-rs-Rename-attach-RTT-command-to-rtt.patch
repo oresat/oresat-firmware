@@ -1,0 +1,79 @@
+From 3b374dcf774cf3db0cefe194ba48624529ad2d84 Mon Sep 17 00:00:00 2001
+From: William Jeffreys <wjeffreys96@gmail.com>
+Date: Mon, 10 Aug 2026 13:18:41 -0700
+Subject: [PATCH 1/2] scripts: runners: probe-rs: Rename 'attach' RTT command
+ to 'rtt'
+
+RTT support was previously exposed via `west attach` (commit 3c7d9732),
+but attach is meant for debugging without reflashing, not RTT. This
+renames the relevant runner methods so `west rtt` is used instead,
+avoiding confusion. Note this breaks the previous (incorrect) `west
+attach` invocation for RTT.
+
+Signed-off-by: William Jeffreys <wjeffreys96@gmail.com>
+---
+ scripts/west_commands/runners/probe_rs.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/west_commands/runners/probe_rs.py b/scripts/west_commands/runners/probe_rs.py
+index 909f1e284542..1c460596b294 100644
+--- a/scripts/west_commands/runners/probe_rs.py
++++ b/scripts/west_commands/runners/probe_rs.py
+@@ -67,7 +67,7 @@ def name(cls):
+ 
+     @classmethod
+     def capabilities(cls):
+-        return RunnerCaps(commands={'flash', 'debug', 'debugserver', 'attach'},
++        return RunnerCaps(commands={'flash', 'debug', 'debugserver', 'rtt'},
+                           dev_id=True,
+                           erase=True,
+                           reset=True,
+@@ -124,8 +124,8 @@ def do_run(self, command, **kwargs):
+             self.do_flash(**kwargs)
+         elif command in ('debug', 'debugserver'):
+             self.do_debug_debugserver(command, **kwargs)
+-        elif command == 'attach':
+-            self.do_attach(**kwargs)
++        elif command == 'rtt':
++            self.do_rtt(**kwargs)
+ 
+     def do_flash(self, **kwargs):
+         download_args = []
+@@ -180,7 +180,7 @@ def do_debug_debugserver(self, command, **kwargs):
+         self.check_call_ignore_sigint([self.probe_rs, 'gdb']
+                         + self.args + debug_args)
+ 
+-    def do_attach(self, **kwargs):
++    def do_rtt(self, **kwargs):
+         '''Attach to RTT logging using probe-rs attach command.'''
+         attach_cmd = [self.probe_rs, 'attach'] + self.args + [self.elf_name]
+         self.logger.info('Starting RTT session')
+
+From 32d318a12b40ce8b1813eb0696b1dc5d5f5e331e Mon Sep 17 00:00:00 2001
+From: William Jeffreys <wjeffreys96@gmail.com>
+Date: Fri, 14 Aug 2026 12:35:03 -0700
+Subject: [PATCH 2/2] docs: west: build-flash-debug: Add 'rtt' to list of west
+ commands
+
+`west rtt` is a west extension command so it should be included here.
+This will hopefully avoid confusion like in 3c7d973, where
+`west attach` was used for rtt.
+
+Signed-off-by: William Jeffreys <wjeffreys96@gmail.com>
+---
+ doc/develop/west/build-flash-debug.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/develop/west/build-flash-debug.rst b/doc/develop/west/build-flash-debug.rst
+index 50bb82100e51..c8c4d4aeb9be 100644
+--- a/doc/develop/west/build-flash-debug.rst
++++ b/doc/develop/west/build-flash-debug.rst
+@@ -5,7 +5,7 @@ Building, Flashing and Debugging
+ 
+ Zephyr provides several :ref:`west extension commands <west-extensions>` for
+ building, flashing, and interacting with Zephyr programs running on a board:
+-``build``, ``flash``, ``debug``, ``debugserver`` and ``attach``.
++``build``, ``flash``, ``debug``, ``debugserver``, ``rtt``, and ``attach``.
+ 
+ For information on adding board support for the flashing and debugging
+ commands, see :ref:`flash-and-debug-support` in the board porting guide.

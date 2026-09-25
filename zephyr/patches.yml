@@ -38,3 +38,13 @@ patches:
     path: scripts-runners-rename-run-client-and-fix-GDB-SIGINT-handling.patch
     sha256sum: 099a9612a01805ad22fed73f1d601f962da109b7a6a9114c5f3c4f51571b9917
     upstreamable: true
+
+  - author: William Jeffreys
+    date: '2026-08-10'
+    email: hidden@github.com
+    merge-pr: https://github.com/zephyrproject-rtos/zephyr/pull/115841
+    merge-status: true
+    module: zephyr/scripts/west_commands/runners
+    path: scripts-runners-probe-rs-Rename-attach-RTT-command-to-rtt.patch
+    sha256sum: cd06f0c3756c8318d9189d07923e3c3d3ec5e0f15b3b23851399f9e6c032335f
+    upstreamable: true
