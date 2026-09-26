@@ -1,0 +1,85 @@
+From 5bf1880cff3c3b4b50c2c37644e619d604df0ce3 Mon Sep 17 00:00:00 2001
+From: Benjamin Perseghetti <bperseghetti@rudislabs.com>
+Date: Sun, 23 Aug 2026 23:56:29 -0400
+Subject: [PATCH] drivers: sensor: rm3100: only set the SPI read bit on SPI
+ transfers
+
+The bus read helpers unconditionally OR the SPI read-address flag into
+the register address. On I2C the register address must be sent raw:
+with the flag set every read addresses a nonexistent register and
+returns zeros, so the sensor appears dead on I2C buses.
+
+Gate the flag on the RTIO bus type so I2C transfers send the plain
+register address while SPI behavior is unchanged.
+
+Signed-off-by: Benjamin Perseghetti <bperseghetti@rudislabs.com>
+---
+ drivers/sensor/pni/rm3100/rm3100.c        |  6 +++++-
+ drivers/sensor/pni/rm3100/rm3100_bus.h    |  8 +++++++-
+ drivers/sensor/pni/rm3100/rm3100_stream.c | 10 ++++++++--
+ 3 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/sensor/pni/rm3100/rm3100.c b/drivers/sensor/pni/rm3100/rm3100.c
+index 2a27c9a85483..d94eed9b5436 100644
+--- a/drivers/sensor/pni/rm3100/rm3100.c
++++ b/drivers/sensor/pni/rm3100/rm3100.c
+@@ -90,7 +90,11 @@ static void rm3100_submit_one_shot(const struct device *dev, struct rtio_iodev_s
+ 		return;
+ 	}
+ 
+-	uint8_t val = RM3100_REG_MX | REG_READ_BIT;
++	uint8_t val = RM3100_REG_MX;
++
++	if (rtio_is_spi(data->rtio.type)) {
++		val |= REG_READ_BIT;
++	}
+ 
+ 	rtio_sqe_prep_tiny_write(write_sqe,
+ 				 data->rtio.iodev,
+diff --git a/drivers/sensor/pni/rm3100/rm3100_bus.h b/drivers/sensor/pni/rm3100/rm3100_bus.h
+index 8517f7995979..be47b037e6cd 100644
+--- a/drivers/sensor/pni/rm3100/rm3100_bus.h
++++ b/drivers/sensor/pni/rm3100/rm3100_bus.h
+@@ -31,7 +31,13 @@ static inline int rm3100_bus_read(const struct device *dev,
+ 		return -ENOMEM;
+ 	}
+ 
+-	reg = reg | REG_READ_BIT;
++	/* The read-address flag is an SPI-only convention. Set it only on
++	 * SPI transfers. On I2C the register address must be sent raw, or
++	 * reads hit a nonexistent register and return zeros.
++	 */
++	if (rtio_is_spi(data->rtio.type)) {
++		reg = reg | REG_READ_BIT;
++	}
+ 
+ 	rtio_sqe_prep_write(write_sqe, iodev, RTIO_PRIO_HIGH, &reg, 1, NULL);
+ 	write_sqe->flags |= RTIO_SQE_TRANSACTION;
+diff --git a/drivers/sensor/pni/rm3100/rm3100_stream.c b/drivers/sensor/pni/rm3100/rm3100_stream.c
+index a216389a02fd..d367bba2eddc 100644
+--- a/drivers/sensor/pni/rm3100/rm3100_stream.c
++++ b/drivers/sensor/pni/rm3100/rm3100_stream.c
+@@ -112,7 +112,10 @@ static void rm3100_stream_get_data(const struct device *dev)
+ 
+ 	uint8_t val;
+ 
+-	val = RM3100_REG_STATUS | REG_READ_BIT;
++	val = RM3100_REG_STATUS;
++	if (rtio_is_spi(data->rtio.type)) {
++		val |= REG_READ_BIT;
++	}
+ 
+ 	rtio_sqe_prep_tiny_write(status_wr_sqe,
+ 				 data->rtio.iodev,
+@@ -134,7 +137,10 @@ static void rm3100_stream_get_data(const struct device *dev)
+ 	}
+ 	status_rd_sqe->flags |= RTIO_SQE_CHAINED;
+ 
+-	val = RM3100_REG_MX | REG_READ_BIT;
++	val = RM3100_REG_MX;
++	if (rtio_is_spi(data->rtio.type)) {
++		val |= REG_READ_BIT;
++	}
+ 
+ 	rtio_sqe_prep_tiny_write(write_sqe,
+ 				 data->rtio.iodev,

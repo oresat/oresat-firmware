@@ -1,0 +1,33 @@
+From a6ed96ba6a2548eb5796ad8c7b410968ea1e9592 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Benjamin=20Cab=C3=A9?= <benjamin@zephyrproject.org>
+Date: Wed, 12 Aug 2026 09:36:49 +0000
+Subject: [PATCH] drivers: sensor: rm3100: set read bit on one-shot measurement
+ read
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The one-shot RTIO path sent the bare RM3100_REG_MX address, unlike the
+bus and streaming paths which OR in REG_READ_BIT. On SPI this clears the
+R/W bit, so the device treats the transfer as a write and never shifts
+out measurement data, yielding garbage readings.
+
+Signed-off-by: Benjamin Cabé <benjamin@zephyrproject.org>
+Assisted-by: Claude:fable-5
+---
+ drivers/sensor/pni/rm3100/rm3100.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/sensor/pni/rm3100/rm3100.c b/drivers/sensor/pni/rm3100/rm3100.c
+index 25d1e3d455c2..2a27c9a85483 100644
+--- a/drivers/sensor/pni/rm3100/rm3100.c
++++ b/drivers/sensor/pni/rm3100/rm3100.c
+@@ -90,7 +90,7 @@ static void rm3100_submit_one_shot(const struct device *dev, struct rtio_iodev_s
+ 		return;
+ 	}
+ 
+-	uint8_t val = RM3100_REG_MX;
++	uint8_t val = RM3100_REG_MX | REG_READ_BIT;
+ 
+ 	rtio_sqe_prep_tiny_write(write_sqe,
+ 				 data->rtio.iodev,

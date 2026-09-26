@@ -1,0 +1,86 @@
+From 647b72ede76c4ec25daf9b0c987c49e821bdefc0 Mon Sep 17 00:00:00 2001
+From: Benjamin Perseghetti <bperseghetti@rudislabs.com>
+Date: Sun, 23 Aug 2026 23:58:26 -0400
+Subject: [PATCH] drivers: sensor: rm3100: fix bus SQE pool corruption under
+ streaming load
+
+The RM3100 streaming read acquires five bus SQEs one at a time and, on a
+short pool, calls rtio_sqe_drop_all() to clean up. rtio_sqe_drop_all frees
+every SQE queued on the shared bus RTIO context, including SQEs still in
+flight from another read chain, returning an in-use SQE to the pool. A
+later allocation then hands out that SQE with a corrupted back-pointer and
+the completion path dereferences it, hard-faulting in the RTIO executor
+(observed on I2C RM3100 hardware as a bus fault in the sensor work queue
+after "Failed to acquire RTIO SQEs").
+
+Acquire the five SQEs of a chain as one array with rtio_sqe_acquire_array,
+which pushes nothing until all five are held and rolls its own back on
+shortage, so a partial acquire can no longer orphan or double-free an SQE.
+The incomplete NULL check that omitted the two status SQEs is retired with
+it. Double the bus context pool from 8 to 16 so a five-SQE chain does not
+run the pool short under streaming load.
+
+The one-shot read path still acquires its SQEs individually and returns
+early on shortage without preparing them. That is a lower-pressure path
+outside the streaming scope of this change and is left to a follow-up.
+
+Signed-off-by: Benjamin Perseghetti <bperseghetti@rudislabs.com>
+---
+ drivers/sensor/pni/rm3100/rm3100.c        |  2 +-
+ drivers/sensor/pni/rm3100/rm3100_stream.c | 23 +++++++++++++++--------
+ 2 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/sensor/pni/rm3100/rm3100.c b/drivers/sensor/pni/rm3100/rm3100.c
+index d94eed9b5436..5e08f0772ac2 100644
+--- a/drivers/sensor/pni/rm3100/rm3100.c
++++ b/drivers/sensor/pni/rm3100/rm3100.c
+@@ -227,7 +227,7 @@ static int rm3100_init(const struct device *dev)
+ 
+ #define RM3100_DEFINE(inst)									   \
+ 												   \
+-	RTIO_DEFINE(rm3100_rtio_ctx_##inst, 8, 8);						   \
++	RTIO_DEFINE(rm3100_rtio_ctx_##inst, 16, 16);						   \
+ 	COND_CODE_1(DT_INST_ON_BUS(inst, i2c),							   \
+ 		    (I2C_DT_IODEV_DEFINE(rm3100_bus_##inst, DT_DRV_INST(inst))),		   \
+ 		    ());									   \
+diff --git a/drivers/sensor/pni/rm3100/rm3100_stream.c b/drivers/sensor/pni/rm3100/rm3100_stream.c
+index 924701ac5f04..2fc43db57528 100644
+--- a/drivers/sensor/pni/rm3100/rm3100_stream.c
++++ b/drivers/sensor/pni/rm3100/rm3100_stream.c
+@@ -102,21 +102,28 @@ static void rm3100_stream_get_data(const struct device *dev)
+ 		return;
+ 	}
+ 
+-	struct rtio_sqe *status_wr_sqe = rtio_sqe_acquire(data->rtio.ctx);
+-	struct rtio_sqe *status_rd_sqe = rtio_sqe_acquire(data->rtio.ctx);
+-	struct rtio_sqe *write_sqe = rtio_sqe_acquire(data->rtio.ctx);
+-	struct rtio_sqe *read_sqe = rtio_sqe_acquire(data->rtio.ctx);
+-	struct rtio_sqe *complete_sqe = rtio_sqe_acquire(data->rtio.ctx);
+-
+-	if (!write_sqe || !read_sqe || !complete_sqe) {
++	/*
++	 * Acquire the chain's five SQEs atomically: the bus RTIO context is
++	 * shared across reads, so a per-SQE acquire that falls back to
++	 * rtio_sqe_drop_all could free an SQE still in flight from another
++	 * chain.
++	 */
++	struct rtio_sqe *sqes[5];
++
++	if (rtio_sqe_acquire_array(data->rtio.ctx, ARRAY_SIZE(sqes), sqes) != 0) {
+ 		LOG_ERR("Failed to acquire RTIO SQEs");
+-		rtio_sqe_drop_all(data->rtio.ctx);
+ 
+ 		data->stream.iodev_sqe = NULL;
+ 		rtio_iodev_sqe_err(iodev_sqe, -ENOMEM);
+ 		return;
+ 	}
+ 
++	struct rtio_sqe *status_wr_sqe = sqes[0];
++	struct rtio_sqe *status_rd_sqe = sqes[1];
++	struct rtio_sqe *write_sqe = sqes[2];
++	struct rtio_sqe *read_sqe = sqes[3];
++	struct rtio_sqe *complete_sqe = sqes[4];
++
+ 	uint8_t val;
+ 
+ 	val = RM3100_REG_STATUS;
