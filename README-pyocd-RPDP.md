@@ -5,7 +5,10 @@ Information about the built-in probe on this board is here: [Raspberry Pi Debug 
 ## Installation and use
 
 ***Note***
-We will switch to the better `probe-rs` interface from `pyocd` soon.
+We switched to the better `probe-rs` interface from `pyocd`. **The instructions below are considered obsolete.**
+
+However, the `probe-rs` version of `gdb-server` is primitive -- it does not stop at main() but runs immediately, for example. Further, it cannot decode Zephyr threads in gdb.
+Consequently, the pyocd `gdb-server` is better for debugging complex issues.
 
 1. Check pyocd version
 ```

@@ -1,6 +1,6 @@
 # Zephyr Firmware Plan for Oresat 1.0
 
-**DRAFT 2**
+**Updated 13-Nov-2026**
 
 - Introduction
 - Repositories
@@ -38,7 +38,9 @@ Users should be able to create a branch on a specific Oresat repo, work in that 
 
 Prior to adopting this plan officially for Oresat >= 1.0, the following public github repositories were in my personal github account and named slightly differently ([github.com/plskeggs](https://github.com/plskeggs)).
 
-The **oresat-zephyr-common** repo below is now a branch ***zephyr*** of the old oresat-firmware repo. Eventually the old master branch will be renamed (essentially archived) and replaced by the zephyr branch.
+The **oresat-zephyr-common** repo below is the default ***main*** branch of the oresat-firmware repo; up until November 13, 2026, this was called the ***zephyr*** branch.
+
+The old ChibiOS firmware is available in the ***oresat05-master*** branch.
 
 - [Oresat-adcs-app](https://github.com/oresat/oresat-adcs-app)  
 - [Oresat-battery-app](https://github.com/oresat/oresat-battery-app)  
@@ -50,8 +52,8 @@ The **oresat-zephyr-common** repo below is now a branch ***zephyr*** of the old 
 - [Oresat-template-app](https://github.com/oresat/oresat-template-app)  
   Prototype application, with a working example of using logging, adc, dac, and I2C.
   Available for two Oresat-designed cards, the mcxn947_breakout and the mcxn947_protocard, as well as the STM32F091RC Nucleo dev kit and the NXP FRDM-MCXN947 dev kit.
-- [Oresat-firmware](https://github.com/oresat/oresat-firmware/tree/zephyr) → *moved here in **zephyr** branch from oresat-zephyr-common*  
-  This is the central repository containing west.yml.
+- [Oresat-firmware](https://github.com/oresat/oresat-firmware/tree/main)
+  This is the central repository for this project; it contains west.yml.
 
 ## Repository Organization
 
@@ -63,7 +65,7 @@ These repositories are broken down into the following major categories:
    - c. Solar
    - d. Template
    - f. **NOTE**: each card application can have a submanifest that enables additional Zephyr modules that are not in the common list inside the main Oresat west.yml
-2. Oresat firmware *(in a branch called **zephyr**)*  
+2. Oresat firmware *(in a branch called **main**)*  
    This repository hooks everything together, holds common utility functions and libraries, as well as board files and device drivers. In the original Oresat Zephyr layout this was called **oresat-zephyr, which is now obsolete.**
    - a. Oresat board file definitions (device trees and Kconfig settings) – or perhaps just in the card application folders, though that seems limiting in other ways
    - b. Oresat device drivers – perhaps in the card application folders, but by centralizing them they can be reused by more than one card
@@ -91,19 +93,10 @@ Below, the ⇐ characters indicate where **west** cloned each git repo listed ab
 │   ├── mag/ ⇐ https://github.com/oresat/oresat-mag-app
 │   ├── solar/ ⇐ https://github.com/oresat/oresat-solar-app
 │   └── template/ ⇐ https://github.com/oresat/oresat-template-app
-├── common/ ⇐ https://github.com/oresat/oresat-firmware/tree/zephyr (zephyr branch)
+├── common/ ⇐ https://github.com/oresat/oresat-firmware/tree/main (main branch)
 │   ├── boards/
 │   ├── drivers/
 │   ├── lib/
-│   │   ├── canopennode_v4/
-│   │   │   ├── CANopenNode/ ⇐
-│   │   │   ├── canopennode.c
-│   │   │   ├── canopennode.h
-│   │   │   ├── CMakeLists.txt
-│   │   │   ├── CO_driver.c
-│   │   │   ├── CO_driver_custom.h
-│   │   │   ├── CO_driver_target.h
-│   │   │   └── Kconfig
 │   │   ├── util/
 │   │   │   ├── board_sensors.c
 │   │   │   ├── board_sensors.h
@@ -206,7 +199,7 @@ Our goal is to make this as painless as possible for students and new community 
 
 1. Initial setup  
    Below is a summary.  
-   See the [oresat-firmware zephyr README](https://github.com/oresat/oresat-firmware/blob/zephyr/README.md) for all details.
+   See the [oresat-firmware README](https://github.com/oresat/oresat-firmware/blob/main/README.md) for all details.
    - a. Install dependencies
    - b. Install Zephyr SDK (toolchain contains target device C compiler, linker, build tools)
    - c. Install west
@@ -322,7 +315,7 @@ Our goal is to make this as painless as possible for students and new community 
          * branch            main       -> FETCH_HEAD
         ```
 
-   - e. Do *west patch apply* -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
+   - e. Do *west patch apply* -- this applies any patches in the zepyr-firmware/main branch to the zephyr, modules, or bootloader trees by this *west update*;
         warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
         ```
         $ west patch apply

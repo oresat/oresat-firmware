@@ -2,6 +2,17 @@
 
 This documents how to install and use the Oresat firmware for Zephyr.
 
+---
+
+**ATTENTION:**
+
+**The `main` branch in the `oresat-firmware` repository is now the one used for Zephyr, and is now the default branch.
+Previous references to a `zephyr` branch are no longer correct, and have been changed below.**
+
+**The old `master` branch containing ChibiOS firmware for STM32-based cards is now called `oresat05-master`.**
+
+---
+
 ## Setup
 
 > **NOTE 1:** This mostly rework of the [Zephyr Getting Started Guide].
@@ -89,18 +100,18 @@ sudo apt install west
 >
 > **Here are the main deviations from the [Zephyr Getting Started Guide]:**
 >
-> 1. *We initialize `west` from the zephyr branch of our common firmware repository, not from Zephyr itself.*
-> 2. *The common firmware zephyr branch contains a `west.yml` file which intentionally selects a specific Zephyr official release.
+> 1. *We initialize `west` from the main branch of our common firmware repository, not from Zephyr itself.*
+> 2. *The common firmware main branch contains a `west.yml` file which intentionally selects a specific Zephyr official release.
 > The Zephyr `main` branch is too much in flux to base a real project like Oresat on.*
 
 ```bash
 mkdir -p ~/src/oresat/firmware
 cd ~/src/oresat/firmware
-west init -m https://github.com/oresat/oresat-firmware --mr zephyr
+west init -m https://github.com/oresat/oresat-firmware --mr main
 west update
 ```
 
-#### Updating to a newer release of oresat-firmware zephyr branch:
+#### Updating to a newer release of oresat-firmware main branch:
 
 > **IMPORTANT: when a newer version of this is available, you must do these steps!**
 
@@ -110,7 +121,7 @@ west update
 4. Do **git pull** -- pull in the latest changes to the `oresat-firmware` `zephyr` branch
 5. Do **west update** and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
 	  **watch for errors and if any, ask for help before proceeding!**
-6. Do **west patch apply** -- this applies any patches in the zepyr-firmware/zephyr branch to the zephyr, modules, or bootloader trees by this *west update*;
+6. Do **west patch apply** -- this applies any patches in the zepyr-firmware/main branch to the zephyr, modules, or bootloader trees by this *west update*;
 	  warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
 
 ```bash
