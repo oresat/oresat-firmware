@@ -3,15 +3,6 @@ clean-command: git clean -d -f -x
 patches:
 - apply-command: git apply
   author: Pete Skeggs
-  comments: 'Fix PDO COB ids for use with Oresat.'
-  date: 2026-06-14
-  email: plskeggs@noeticdesign.com
-  module: canopennode
-  path: modules/lib/canopennode/fix-pdo-cob-ids.patch
-  sha256sum: ffad3a3f2bb7d0b8533d8ca1d1859a6b3ab0c83e0108a84a064804b2d21ae1f7
-  upstreamable: false
-- apply-command: git apply
-  author: Pete Skeggs
   comments: 'Fix a problem with using an unsigned type in slope calc'
   date: 2026-07-06
   email: plskeggs@noeticdesign.com
