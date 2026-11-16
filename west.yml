@@ -4,8 +4,6 @@ manifest:
       url-base: https://github.com/zephyrproject-rtos
     - name: oresat
       url-base: https://github.com/oresat
-    - name: canopennode
-      url-base: https://github.com/CANopenNode
   defaults:
     remote: oresat
   group-filter: [+optional]
@@ -20,10 +18,10 @@ manifest:
           - cmsis_6
           - hal_stm32
           - hal_nxp
-          - canopennode
           - mcuboot
+          - segger
     - name: oresat-mag-app
-      revision: main
+      revision: feature-zephyr-4.5.0
       path: apps/mag
       #import: submanifests
     - name: oresat-reaction-wheel-app
@@ -31,17 +29,23 @@ manifest:
       path: apps/reaction-wheel
       #import: submanifests
     - name: oresat-battery-app
-      revision: main
+      revision: feature-zephyr-4.5.0
       path: apps/battery
       #import: submanifests
     - name: oresat-solar-app
-      revision: main
+      revision: feature-zephyr-4.5.0
       path: apps/solar
       #import: submanifests
     - name: oresat-template-app
-      revision: main
+      revision: feature-zephyr-4.5.0
       path: apps/template
-      import: submanifests
+      #import: submanifests
+    - name: CANopenNodeZephyr
+      remote: zephyrproject-rtos
+      revision: main
+      submodules:
+        - path: CANopenNode
+      path: custom/lib/canopennode
 
   self:
     path: common
