@@ -1,5 +1,7 @@
 # Oresat Zephyr Getting Started Guide
 
+# *** ZEPHYR 4.5.0 WORKING BRANCH ***
+
 This documents how to install and use the Oresat firmware for Zephyr.
 
 ---
@@ -38,7 +40,7 @@ Update your OS with its latest packages.
       xz file make sdl2 stlink
     ```
 
-- Debian Linux
+- Debian or Ubuntu Linux
 
     ```bash
     sudo apt install --no-install-recommends git cmake ninja-build gperf \
@@ -52,14 +54,14 @@ Update your OS with its latest packages.
 
 Make sure you have at least the minimum required versions of:
 
-1. CMake: 3.20.5
+1. CMake: 3.28.0
   `cmake --version`
-2. Python: 3.10
+2. Python: 3.12
   `python3 --version`
 3. Devicetree compiler: 1.4.6
   `dtc --version`
 
-**The versions could be higher for later versions of Zephyr than the 4.2.0 referenced here.**
+**The versions could be higher for later versions of Zephyr than the 4.5.0 referenced here.**
 
 ### Get Oresat common code, Zephyr, and Python dependencies
 
@@ -94,6 +96,7 @@ sudo apt install west
 
 **However** it is highly recommended to use the pip (or uv) version as it will be the most up-to-date.
 
+---
 #### Get the source code for common firmware repo, all apps, zephyr, and zephyr modules:
 
 > **NOTE:**
@@ -111,16 +114,17 @@ west init -m https://github.com/oresat/oresat-firmware --mr main
 west update
 ```
 
+---
 #### Updating to a newer release of oresat-firmware main branch:
 
-> **IMPORTANT: when a newer version of this is available, you must do these steps!**
+> **IMPORTANT: when a newer version of this repository is available, you must do these steps!**
 
 1. If you changed anything in the code (in an app, here in common, or in zephyr), follow the instructions in [Oresat Zephyr Repository Organization-Tasks]
 2. Do **west patch clean** -- this undoes any patches applied to the zephyr, modules, or bootloader trees by a previous *west update*; should be no errors
-3. Do **cd ~/src/oresat/firmware/common** -- change directory to the `common` folder; this is where the contents of `oresat-firmware` `zephyr` branch are
-4. Do **git pull** -- pull in the latest changes to the `oresat-firmware` `zephyr` branch
+3. Do **cd ~/src/oresat/firmware/common** -- change directory to the `common` folder; this is where the contents of `oresat-firmware` `main` branch are
+4. Do **git pull** -- pull in the latest changes to the `oresat-firmware` `main` branch
 5. Do **west update** and watch the log output – it will likely switch away from your branch, and tell you this, and give you directions how to switch back;
-	  **watch for errors and if any, ask for help before proceeding!**
+	  **watch for errors and if any, ask for help in Slack or via github issues before proceeding!**
 6. Do **west patch apply** -- this applies any patches in the zepyr-firmware/main branch to the zephyr, modules, or bootloader trees by this *west update*;
 	  warnings are ok; **watch for any errors and if any, ask for help before proceeding!**
 
@@ -131,12 +135,7 @@ git pull
 west update
 west patch apply
 ```
-
-#### Export Zephyr CMake package:
-
-```bash
-west zephyr-export
-```
+---
 
 #### Install Python dependencies:
 
@@ -144,11 +143,17 @@ west zephyr-export
 west packages pip --install
 ```
 
+#### Export Zephyr CMake package:
+
+```bash
+west zephyr-export
+```
+
 #### Install the Zephyr SDK:
 
 ```bash
 cd ~/src/oresat/firmware/zephyr
-west sdk install
+swest sdk install
 ```
 
 #### Export Zephyr environment:
@@ -159,12 +164,14 @@ source ./zephyr-env.sh
 ```
 **NOTE: it is helpful to also add these to your ~/.bashrc:**
 ```
-export ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk-0.17.2
+export ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk-1.0.1
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 ```
-Obviously use the SDK version number actually installed. It could be `0.17.2` for Zephyr 4.2.0, or `1.0.1` for Zephyr 4.4.1.
+For the value of `ZEPHYR_SDK_INSTALL_DIR`, use the SDK version number actually installed. It was `0.17.2` for Zephyr 4.2.0 and `1.0.1` for Zephyr 4.4.1 through 4.5.0.
 
-#### Add udev rule:
+#### Add udev rule for openocd
+
+This is needed when working with the STM32 version of the battery card. It is not needed for the MCXN947 cards with the Oresat Card Debug Board v3.
 
 ```bash
 sudo cp $ZEPHYR_SDK_INSTALL_DIR/sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib/60-openocd.rules /etc/udev/rules.d
@@ -174,15 +181,18 @@ sudo udevadm control --reload
 ### Install OreSat Configs
 
 ```bash
-pip install oresat-configs~=1.0.0
+pip install oresat-configs~=1.2.0
 ```
 
-### ST-Link
+### Install Software for Programmer/Debugger Adapters
 
-Oresat 0.0 and 0.5 used the STM32F091 processor. The Oresat Card Debug Board contains an ST-Link V3 daughter board which
-supports this, and also provides a UART interface. The old documentation provides [ST Toolchain Setup] directions.
+#### OreSat Card Debug Board v3 (required for Oresat1)
 
-### Segger J-Link
+To use with the NXP MCXN947, follow the instructions: [Raspberry Pi Debug Probe].
+
+This debug adapter works very well with probe-rs. Support for this is integrated into all of the Oresat card apps.
+
+#### Segger J-Link (optional)
 
 In order to flash and debug the NXP MCXN947, you will need a compatible debug adapter.
 The Segger J-Link debugger, though expensive, works well.
@@ -192,16 +202,17 @@ You will need to install the required J-Link software.
 Visit [Segger J-Link Downloads], download the latest J-Link software for your OS,
 and follow their installation instructions.
 
-### OreSat Card Debug Board v3
+#### ST-Link (optional)
 
-To use with the NXP MCXN947, follow the instructions: [Raspberry Pi Debug Probe].
+Oresat 0.0 and 0.5 used the STM32F091 processor. The Oresat Card Debug Board v2 contains an ST-Link V3 daughter board which
+supports this, and also provides a UART interface. The old documentation provides [ST Toolchain Setup] directions.
 
 ### Test compile and flash
 
 ```bash
 cd ~/src/oresat/firmware/apps/template
-west build -p always -b mcxn947_protocard/mcxn947/cpu0
-west flash --runner pyocd
+west build -p always
+west flash
 ```
 
 ## Tools
@@ -225,6 +236,6 @@ tools are needed for development and testing.
 [SavvyCAN]:https://github.com/collin80/SavvyCAN
 [Segger J-Link Downloads]:https://www.segger.com/downloads/jlink/
 [Raspberry Pi Debug Probe]:README-pyocd-RPDP.md
-[ST Toolchain Setup]:https://github.com/oresat/oresat-firmware/blob/master/doc/toolchain.md
+[ST Toolchain Setup]:https://github.com/oresat/oresat-firmware/blob/oresat05-master/doc/toolchain.md
 [Oresat Zephyr Repository Organization]:README-Oresat-Zephyr-Repo-Organization.md
 [Oresat Zephyr Repository Organization-Tasks]:README-Oresat-Zephyr-Repo-Organization.md#tasks
